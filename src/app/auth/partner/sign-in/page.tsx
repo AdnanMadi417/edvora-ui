@@ -1,12 +1,27 @@
 'use client';
 
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Image from 'next/image';
 import InputField from '../../../../components/fields/InputField';
 import Checkbox from '../../../../components/checkbox';
-import logoImg from '/public/img/brand/Primary-Logo-White.png';
-import loginImgBg from '/public/img/avatars/graduates-male-studnet.png';
+import logoImg from "/public/img/brand/Primary-Logo-White.png";
+import loginImgBg from "/public/img/layout/Shield.png";
 
 function SignInPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    console.log("Email:", email);
+    console.log("Password:", password);
+
+    router.push("/partner/default");
+
+  };
   return (
     <div className="signin-page">
       <div className="container">
@@ -39,7 +54,7 @@ function SignInPage() {
               <p>Enter your email and password to sign in!</p>
             </div>
 
-            <form className="form">
+            <form className="form" onSubmit={handleSubmit}>
               <InputField
                 variant="auth"
                 extra="w-full"
@@ -65,16 +80,16 @@ function SignInPage() {
                 <a href="#">Forgot Password?</a>
               </div>
 
-              <div className="divider">
-                <div className="line" />
-                <span>or</span>
-                <div className="line" />
-              </div>
+              {/*<div className="divider">*/}
+              {/*  <div className="line" />*/}
+              {/*  <span>or</span>*/}
+              {/*  <div className="line" />*/}
+              {/*</div>*/}
 
-              <div className="signup-link">
-                <span>Not registered yet? </span>
-                <a href="/auth/sign-up/default">Create an account</a>
-              </div>
+              {/*<div className="signup-link">*/}
+              {/*  <span>Not registered yet? </span>*/}
+              {/*  /!*<a href="/auth/sign-up/default">Create an account</a>*!/*/}
+              {/*</div>*/}
 
               <button type="submit">Sign In</button>
             </form>
@@ -143,9 +158,9 @@ function SignInPage() {
         .form-wrapper {
           max-width: 400px;
           width: 100%;
-          min-height: 450px;
+          min-height: 400px;
           background-color: var(--card-bg);
-          padding: 1rem;
+          padding: 2rem 1rem;
           border: var(--border-thin) solid var(--border-color-default);
           border-radius: var(--border-thick);
         }

@@ -1,12 +1,28 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import Image from "next/image";
 import InputField from "../../../../components/fields/InputField";
 import Checkbox from "../../../../components/checkbox";
 import logoImg from "/public/img/brand/Primary-Logo-White.png";
 import loginImgBg from "/public/img/layout/Shield.png";
 
+
 function SignInPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    console.log("Email:", email);
+    console.log("Password:", password);
+
+    router.push("/admin/default");
+
+  };
   return (
     <div className="signin-page">
       <div className="container">
@@ -38,7 +54,8 @@ function SignInPage() {
               <p>Enter your email and password to sign in!</p>
             </div>
 
-            <form className="form">
+            <form className="form" onSubmit={handleSubmit}>
+
               <InputField
                 variant="auth"
                 extra="w-full"
