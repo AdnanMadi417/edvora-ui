@@ -150,8 +150,8 @@ module.exports = {
     colors: {
       white: '#ffffff',
       lightPrimary: '#F4F7FE',
-      blueSecondary: '#4318FF',
-      brandLinear: '#868CFF',
+      blueSecondary: '#0348D1',
+      brandLinear: '#2563EB',
       gray: {
         50: '#F5F6FA',
         100: '#EEF0F6',
