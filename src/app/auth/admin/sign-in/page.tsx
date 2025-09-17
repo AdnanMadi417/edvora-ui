@@ -17,8 +17,12 @@ function SignInPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    localStorage.setItem("role", "admin"); // or "partner" depending on page
+
+
     console.log("Email:", email);
     console.log("Password:", password);
+
 
     router.push("/admin/default");
 

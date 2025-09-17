@@ -16,6 +16,7 @@ import tableDataCheck from 'variables/data-tables/tableDataCheck';
 import tableDataComplex from 'variables/data-tables/tableDataComplex';
 
 const Dashboard = () => {
+
   return (
       <div>
         {/* Card widget */}

@@ -9,7 +9,7 @@ interface Route {
 }
 
 const adminRoutes: Route[] = [
-    { name: "Dashboard", layout: "/admin", path: "/dashboard", icon: MdDashboard },
+    { name: "Dashboard", layout: "/admin", path: "/default", icon: MdDashboard },
     { name: "Users", layout: "/admin", path: "/users", icon: MdPeople },
     { name: "Reports", layout: "/admin", path: "/reports", icon: MdAssessment },
 ];
