@@ -29,8 +29,6 @@ function SignInPage() {
           />
         </div>
 
-
-
         {/* Sign In Section */}
         <div className="sign-in-section">
           <div className="form-wrapper">
