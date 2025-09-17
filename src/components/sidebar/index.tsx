@@ -1,9 +1,12 @@
+"use client";
+
 import { HiX } from 'react-icons/hi';
 import Links from './components/Links';
 import { MdLogout } from "react-icons/md";
 import logoImg from '/public/img/brand/Primary-Logo-Blue.png';
 import { IRoute } from 'types/navigation';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface SidebarProps {
   routes: IRoute[];
@@ -12,24 +15,43 @@ interface SidebarProps {
 }
 
 function SidebarHorizon({ routes, open, setOpen }: SidebarProps) {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    router.push("/auth/admin/sign-in");
+  };
+
   return (
     <div
-      className={`duration-175 linear fixed !z-50 flex min-h-full flex-col pb-10 transition-all xl:!z-0 ${
-        open ? 'translate-x-0' : '-translate-x-96 xl:translate-x-0'
-      }`}
       style={{
         backgroundColor: 'var(--primary-bg)',
         color: 'var(--primary-text-color)',
         width: '300px',
         borderRight: 'var(--border-thin) solid var(--border-color)',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        zIndex: 50,
+        minHeight: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        paddingBottom: '2.5rem',
+        transition: 'transform 0.175s linear',
+        transform: open ? 'translateX(0)' : '-24rem',
       }}
     >
+
       <button
-        className="absolute right-4 top-4 block cursor-pointer rounded-md p-2 hover:bg-opacity-10 xl:hidden"
         onClick={() => setOpen(false)}
         style={{
+          position: 'absolute',
+          top: '1rem',
+          right: '1rem',
           backgroundColor: 'transparent',
           border: 'none',
+          cursor: 'pointer',
+          borderRadius: 'var(--radius-md)',
+          padding: '0.5rem',
           transition: 'var(--transition-fast)',
         }}
         onMouseEnter={(e) => {
@@ -40,46 +62,28 @@ function SidebarHorizon({ routes, open, setOpen }: SidebarProps) {
         }}
         aria-label="Close sidebar"
       >
-        <HiX
-          style={{
-            color: 'var(--secondary-text-color)',
-            fontSize: 'var(--icon-size-b)',
-          }}
-        />
+        <HiX style={{ color: 'var(--secondary-text-color)', fontSize: 'var(--icon-size-b)' }} />
       </button>
 
-      <div
-        className="mx-6 mt-6 flex items-center justify-center"
-        style={{ padding: '1rem 0' }}
-      >
+      <div style={{ margin: '1rem 1.5rem', display: 'flex', justifyContent: 'center' }}>
         <Image
           src={logoImg}
           alt="Company Logo"
-          width={400}
-          height={100}
-          className="max-h-[80px] max-w-[160px] object-contain"
+          width={160}
+          height={80}
+          style={{ objectFit: 'contain' }}
           priority
         />
       </div>
 
-      <div
-        className="mx-6 mb-7 mt-8 h-px"
-        style={{ backgroundColor: 'var(--border-color)' }}
-      />
+      <div style={{ margin: '2rem 1.5rem 1.75rem', height: '1px', backgroundColor: 'var(--border-color)' }} />
 
-      <nav
-        className="mb-auto flex-1 overflow-y-auto pt-1"
-        style={{
-          width: '100%',
-          paddingBottom: '2rem',
-        }}
-        role="navigation"
-        aria-label="Main navigation"
-      >
+      <nav style={{ flexGrow: 1, overflowY: 'auto', width: '100%', paddingBottom: '2rem' }} role="navigation" aria-label="Main navigation">
         <Links routes={routes} />
       </nav>
 
       <div
+        onClick={handleLogout}
         style={{
           display: "flex",
           alignItems: "center",
@@ -90,6 +94,7 @@ function SidebarHorizon({ routes, open, setOpen }: SidebarProps) {
           marginLeft: "20px",
           cursor: "pointer",
           transition: "var(--transition-fast)",
+          padding: "0.5rem 1rem",
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.color = "var(--error-text)";
@@ -98,10 +103,9 @@ function SidebarHorizon({ routes, open, setOpen }: SidebarProps) {
           e.currentTarget.style.color = "var(--muted-text-color)";
         }}
       >
-        <MdLogout style={{ fontSize: "var(--icon-size)" }} />
+        <MdLogout style={{ fontSize: "var(--icon-size-b)" }} />
         <span>Logout</span>
       </div>
-
     </div>
   );
 }
