@@ -21,8 +21,8 @@ export default function Links({ routes }: { routes: Route[] }) {
       style={{
         display: "flex",
         flexDirection: "column",
-        gap: "0.25rem",
-        padding: "0.5rem"
+        gap: "0",
+        padding: "0",
       }}
     >
       {routes.map((route, index) => {
@@ -32,49 +32,65 @@ export default function Links({ routes }: { routes: Route[] }) {
         const Icon = route.icon;
 
         return (
-          <Link
+          <div
             key={index}
-            href={fullPath}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "0.75rem",
-              padding: "0.75rem ",
-              borderRadius: "var(--radius-md)",
-              fontSize: "var(--font-size-p2)",
-              fontWeight: isActive ? "var(--font-weight-medium)" : "var(--font-weight-medium)",
-              color: isActive
-                ? "var(--primary-text-color)"
-                : isHovered
-                  ? "var(--primary-text-color)"
-                  : "var(--secondary-text-color)",
-              backgroundColor: isActive
-                ? "var(--table-header-bg)"
-                : isHovered
-                  ? "var(--card-hover)"
-                  : "transparent",
-              transition: "var(--transition-fast)",
-              cursor: "pointer",
-              textDecoration: "none",
-            }}
-            onMouseEnter={() => setHoveredIndex(index)}
-            onMouseLeave={() => setHoveredIndex(null)}
+            style={{ position: "relative" }}
           >
-            <Icon
+            <Link
+              href={fullPath}
               style={{
-                fontSize: "var(--icon-size)",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.75rem",
+                padding: "0.75rem",
+                marginLeft:"0.75rem",
+                borderRadius: "var(--radius-md)",
+                fontSize: "var(--font-size-p1)",
+                fontWeight: "var(--font-weight-medium)",
                 color: isActive
                   ? "var(--primary-text-color)"
                   : isHovered
-                    ? "var(--secondary-text-color)"
+                    ? "var(--primary-text-color)"
                     : "var(--muted-text-color)",
-                transition: "var(--transition-fast)",
+                transition: "var(--transition-medium)",
+                cursor: "pointer",
+                textDecoration: "none",
               }}
-            />
-            <span>{route.name}</span>
-          </Link>
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+            >
+              <Icon
+                style={{
+                  fontSize: "var(--icon-size-b)",
+                  color: isActive
+                    ? "var(--accent-color)"
+                    : isHovered
+                      ? "var(--primary-text-color)"
+                      : "var(--muted-text-color)",
+                  transition: "var(--transition-medium)",
+                }}
+              />
+
+              <span>{route.name}</span>
+            </Link>
+
+            {isActive && (
+              <div
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  top: "4px",
+                  height: "calc(100% - 8px)",
+                  width: "4px",
+                  borderRadius: "var(--radius-md)",
+                  backgroundColor: "var(--accent-color)",
+                }}
+              />
+            )}
+          </div>
         );
       })}
     </div>
+
   );
 }

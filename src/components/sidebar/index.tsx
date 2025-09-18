@@ -1,110 +1,100 @@
-"use client";
+'use client';
 
 import { HiX } from 'react-icons/hi';
+import { MdLogout } from 'react-icons/md';
 import Links from './components/Links';
-import { MdLogout } from "react-icons/md";
 import logoImg from '/public/img/brand/Primary-Logo-Blue.png';
 import { IRoute } from 'types/navigation';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-interface SidebarProps {
-  routes: IRoute[];
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}
-
-function SidebarHorizon({ routes, open, setOpen }: SidebarProps) {
+function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
+  const { routes, open, setOpen } = props;
+  const [isHovered, setIsHovered] = useState(false);
   const router = useRouter();
 
   const handleLogout = () => {
-    router.push("/auth/admin/sign-in");
+    router.push('/auth/sign-in');
   };
 
   return (
     <div
+      className={`sm:none duration-175 linear fixed !z-50 flex min-h-full flex-col pb-10 md:!z-50 lg:!z-50 xl:!z-0 ${
+        open ? 'translate-x-0' : '-translate-x-96 xl:translate-x-0'
+      }`
+    }
       style={{
         backgroundColor: 'var(--primary-bg)',
-        color: 'var(--primary-text-color)',
-        width: '300px',
-        borderRight: 'var(--border-thin) solid var(--border-color)',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        zIndex: 50,
-        minHeight: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        paddingBottom: '2.5rem',
-        transition: 'transform 0.175s linear',
-        transform: open ? 'translateX(0)' : '-24rem',
+        boxShadow: '--shadow-sm',
       }}
     >
-
-      <button
+      <span
+        className="absolute right-4 top-4 block cursor-pointer xl:hidden"
         onClick={() => setOpen(false)}
-        style={{
-          position: 'absolute',
-          top: '1rem',
-          right: '1rem',
-          backgroundColor: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          borderRadius: 'var(--radius-md)',
-          padding: '0.5rem',
-          transition: 'var(--transition-fast)',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--card-hover)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
-        }}
-        aria-label="Close sidebar"
       >
-        <HiX style={{ color: 'var(--secondary-text-color)', fontSize: 'var(--icon-size-b)' }} />
-      </button>
+        <HiX />
+      </span>
 
-      <div style={{ margin: '1rem 1.5rem', display: 'flex', justifyContent: 'center' }}>
-        <Image
-          src={logoImg}
-          alt="Company Logo"
-          width={160}
-          height={80}
-          style={{ objectFit: 'contain' }}
-          priority
-        />
+      <div className="mx-[56px] mt-[40px] flex items-center">
+        <div className="mb-5 mt-1 h-2.5 font-poppins text-[26px] font-bold uppercase text-navy-700 dark:text-white">
+          <div
+            style={{
+              margin: '0.7rem',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Image
+              src={logoImg}
+              alt="Unibexs Logo"
+              width={160}
+              height={80}
+              style={{ objectFit: 'contain' }}
+              priority
+            />
+          </div>
+        </div>
       </div>
 
-      <div style={{ margin: '2rem 1.5rem 1.75rem', height: '1px', backgroundColor: 'var(--border-color)' }} />
+      <div className=""
+           style={{
+             marginBottom: '7px',
+             marginTop: '50px',
+             backgroundColor: 'var(--border-color-default)',
+             height: 'var(--border-thin)',
+           }}
+      />
 
-      <nav style={{ flexGrow: 1, overflowY: 'auto', width: '100%', paddingBottom: '2rem' }} role="navigation" aria-label="Main navigation">
+      <ul className="mb-auto pt-1">
         <Links routes={routes} />
-      </nav>
+      </ul>
 
-      <div
-        onClick={handleLogout}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.5rem",
-          fontSize: "var(--font-size-p1)",
-          color: "var(--muted-text-color)",
-          textAlign: "start",
-          marginLeft: "20px",
-          cursor: "pointer",
-          transition: "var(--transition-fast)",
-          padding: "0.5rem 1rem",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.color = "var(--error-text)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.color = "var(--muted-text-color)";
-        }}
-      >
-        <MdLogout style={{ fontSize: "var(--icon-size-b)" }} />
-        <span>Logout</span>
+      <div className="mt-auto px-8">
+
+        <button
+          onClick={handleLogout}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className="flex w-full items-center gap-2 rounded-xl px-4 py-2"
+          style={{
+            cursor: 'pointer',
+            color: isHovered
+              ? 'var(--failed-color-hover)'
+              : 'var(--failed-color)',
+            fontWeight: 'var(--font-weight-medium)',
+            fontSize: 'var(--font-size-p1)',
+            transition: 'var(--transition-medium)',
+            marginLeft: isHovered ? '10px' : '0',
+            padding: '0',
+            margin: '0',
+          }}
+        >
+          <MdLogout
+            className=""
+          />
+          Logout
+        </button>
       </div>
     </div>
   );
