@@ -112,9 +112,12 @@ module.exports = {
         '99p': '99%',
       },
       fontFamily: {
+        sans: ['var(--font-jakarta)', 'sans-serif'],
+        jakarta: ['var(--font-jakarta)', 'sans-serif'],
         poppins: ['Poppins', 'sans-serif'],
         dm: ['DM Sans', 'sans-serif'],
       },
+
       boxShadow: {
         '3xl': '14px 17px 40px 4px',
         inset: 'inset 0px 18px 22px',

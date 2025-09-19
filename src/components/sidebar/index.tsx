@@ -37,7 +37,7 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
       </span>
 
       <div className="mx-[56px] mt-[40px] flex items-center">
-        <div className="mb-5 mt-1 h-2.5 font-poppins text-[26px] font-bold uppercase text-navy-700 dark:text-white">
+        <div className="mb-5 mt-1 h-2.5 text-[26px] font-bold uppercase text-navy-700 dark:text-white">
           <div
             style={{
               margin: '0.7rem',
@@ -96,6 +96,7 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
           Logout
         </button>
       </div>
+
     </div>
   );
 }
