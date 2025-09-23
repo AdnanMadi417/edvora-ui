@@ -15,7 +15,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex h-full w-full bg-background-100 dark:bg-background-900">
       <Sidebar routes={accountManagerRoutes} open={open} setOpen={setOpen} variant="admin" />
       <div className="h-full w-full font-dm dark:bg-navy-900">
-        <main className="mx-2.5 flex-none transition-all md:pr-2 xl:ml-[323px]">
+        <main className="mx-2.5 flex-none transition-all md:pr-2 xl:ml-[300px]">
           <Navbar
             onOpenSidenav={() => setOpen(!open)}
             brandText={getActiveRoute(accountManagerRoutes, pathname)}

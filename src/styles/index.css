@@ -5,9 +5,9 @@
 @tailwind utilities;
 
 :root {
-  --primary-bg: #FFFFFF;
-  --secondary-bg: #EBF1FF;
-  --card-bg: #F8F9FB;
+  --primary-bg: #F8F9FB;
+  --secondary-bg: #EEF0F6;
+  --card-bg: #FFFFFF;
   --card-hover: #FFFFFF;
 
   --border-color: #D0D4E0;
