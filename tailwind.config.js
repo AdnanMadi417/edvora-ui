@@ -216,6 +216,7 @@ module.exports = {
         lightPrimary: '#F4F7FE',
         blueSecondary: '#0348D1',
         brandLinear: '#2563EB',
+
         gray: {
           50: '#F5F6FA',
           100: '#EEF0F6',
@@ -228,7 +229,6 @@ module.exports = {
           800: '#2D396B',
           900: '#1B2559',
         },
-
         navy: {
           50: '#d0dcfb',
           100: '#aac0fe',
