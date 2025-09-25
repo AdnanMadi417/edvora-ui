@@ -10,7 +10,6 @@ import {
   Calendar,
   Clock,
   User,
-  Building,
 } from "lucide-react";
 import avatar from "/public/img/avatars/avatar4.png";
 import emptyPng from "/public/img/dashboards/empty-data-icon.png";
@@ -39,7 +38,7 @@ const ModernApplicationsTable = () => {
       nextAction: "Submit transcripts",
       priority: "medium",
       updatedAt: "2024-01-14T14:20:00Z",
-    },
+    }
   ]);
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
@@ -51,7 +50,7 @@ const ModernApplicationsTable = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setLoading(false); // stop loading after 2 seconds or after fetching data
+      setLoading(false);
     }, 2000);
 
     return () => clearTimeout(timer);
@@ -83,7 +82,6 @@ const ModernApplicationsTable = () => {
       filtered = filtered.filter((app) => app.status === filterStatus);
     }
 
-    // Sort
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) {
@@ -197,7 +195,7 @@ const ModernApplicationsTable = () => {
                 placeholder="Search applications..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-md border border-default bg-white py-2.5 pl-10 pr-4  outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:w-64"
+                className=" w-full sm:w-64 rounded-md border bg-card py-2.5 pl-10 pr-4 outline-0 focus:border-accent focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
@@ -206,7 +204,7 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="focus:ring-1focus:ring-blue-500 cursor-pointer appearance-none rounded-md border border-default bg-white py-2.5 pl-10 pr-8  outline-0 focus:border-blue-500"
+                className="focus:ring-1 focus:ring-blue-500 cursor-pointer appearance-none rounded-md border border-default bg-card py-2.5 pl-10 pr-8  outline-0 focus:border-accent"
               >
                 <option value="all">All Status</option>
                 <option value="in-progress">In Progress</option>
@@ -221,185 +219,184 @@ const ModernApplicationsTable = () => {
 
       <div className="overflow-x-auto border border-default bg-card rounded-lg">
         <table className="w-full">
+
           <thead>
-            <tr className="border-b border-default bg-card">
-              <th
-                onClick={() => handleSort("studentName")}
-                className="group  cursor-pointer px-6 py-4 text-start font-bold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-text-muted" />
-                  Student
-                  <SortIndicator field="studentName" />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("applicationName")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  Application
-                  <SortIndicator field="applicationName" />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("partner")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4 text-text-muted" />
-                  Partner
-                  <SortIndicator field="partner" />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("stage")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  Stage
-                  <SortIndicator field="stage" />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("status")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  Status
-                  <SortIndicator field="status" />
-                </div>
-              </th>
-              <th className="px-6 py-4 text-start  font-semibold tracking-wider  text-text-primary">
-                Next Action
-              </th>
-              <th
-                onClick={() => handleSort("priority")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  Priority
-                  <SortIndicator field="priority" />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("updatedAt")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-text-muted" />
-                  Updated
-                  <SortIndicator field="updatedAt" />
-                </div>
-              </th>
-              <th className="px-6 py-4 text-right  font-semibold tracking-wider  text-text-primary">
-                Actions
-              </th>
-            </tr>
+          <tr className="border-b border-default bg-card">
+
+            <th
+              onClick={() => handleSort("studentName")}
+              className="group w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-text-muted" />
+                Student
+                <SortIndicator field="studentName" />
+              </div>
+            </th>
+
+            <th
+              onClick={() => handleSort("applicationName")}
+              className="group w-[200px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                Application
+                <SortIndicator field="applicationName" />
+              </div>
+            </th>
+
+            <th
+              onClick={() => handleSort("stage")}
+              className="group w-[150px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                Stage
+                <SortIndicator field="stage" />
+              </div>
+            </th>
+
+            <th
+              onClick={() => handleSort("status")}
+              className="group w-[150px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                Status
+                <SortIndicator field="status" />
+              </div>
+            </th>
+
+            <th className="min-w-[140px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+              Next Action
+            </th>
+
+            <th
+              onClick={() => handleSort("priority")}
+              className="group w-[150px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                Priority
+                <SortIndicator field="priority" />
+              </div>
+            </th>
+
+            <th
+              onClick={() => handleSort("updatedAt")}
+              className="group w-[180px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <Clock className="h-4 w-4 text-text-muted" />
+                Updated
+                <SortIndicator field="updatedAt" />
+              </div>
+            </th>
+
+            <th className="w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+              Actions
+            </th>
+          </tr>
           </thead>
 
           <tbody className="divide-border-default divide-y bg-primary">
-            {loading ? (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="px-6 py-4 text-center text-p1 text-text-muted"
-                >
-                  Loading applications...
+          {loading ? (
+            <tr>
+              <td
+                colSpan={9}
+                className="px-6 py-4 text-center text-p1 text-text-muted"
+              >
+                Loading applications...
+              </td>
+            </tr>
+          ) : paginatedApplications.length === 0 ? (
+            <tr>
+              <td
+                colSpan={9}
+                className="px-6 py-8 text-center text-text-muted"
+              >
+                <div className="flex flex-col items-center gap-4">
+                  <Image
+                    width={100}
+                    height={100}
+                    className="h-[100px] w-[100px] rounded-md"
+                    src={emptyPng}
+                    alt="No applications"
+                  />
+                  <span className="text-p1">No applications found.</span>
+                </div>
+              </td>
+            </tr>
+          ) : (
+            paginatedApplications.map((app) => (
+              <tr
+                key={app.id}
+                className="group transition-colors hover:bg-primary"
+              >
+                <td className="w-[250px] px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-text-muted">
+                      <Image
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-full"
+                        src={avatar}
+                        alt={app.studentName}
+                      />
+                    </div>
+                    <div className="truncate">
+                      <div className="truncate text-text-primary">
+                        {app.studentName}
+                      </div>
+                    </div>
+                  </div>
                 </td>
-              </tr>
-            ) : paginatedApplications.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="px-6 py-8 text-center text-text-muted"
-                >
-                  <div className="flex flex-col items-center gap-4">
-                    <Image
-                      width={100}
-                      height={100}
-                      className="h-[100px] w-[100px] rounded-md"
-                      src={emptyPng}
-                      alt="No applications"
-                    />
-                    <span className="text-p1">No applications found.</span>
+
+                <td className="w-[200px] px-6 py-4">
+                  <div className="text-text-primary">{app.applicationName}</div>
+                </td>
+
+                <td className="w-[150px] px-6 py-4">
+                  <div className="text-text-muted">{app.stage}</div>
+                </td>
+
+                <td className="min-w-[150px] px-6 py-4">
+                  <StatusBadge status={app.status} />
+                </td>
+
+                <td className="w-[200px] px-6 py-4">
+                  <div className="truncate text-text-muted">
+                    {app.nextAction}
+                  </div>
+                </td>
+
+                <td className="w-[150px] px-6 py-4">
+                  <PriorityBadge priority={app.priority} />
+                </td>
+
+                <td className="w-[180px] px-6 py-4">
+                  <div className="flex items-center gap-1 text-text-muted">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(app.updatedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "2-digit",
+                    })}
+                  </div>
+                </td>
+
+                <td className="w-[150px] px-6 py-4">
+                  <div className="flex items-center gap-2">
+                    <button className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-blue-50 hover:text-blue-600">
+                      <Eye className="h-4 w-4" />
+                    </button>
+                    <button className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-green-50 hover:text-green-600">
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-red-50 hover:text-red-600">
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 </td>
               </tr>
-            ) : (
-              paginatedApplications.map((app) => (
-                <tr
-                  key={app.id}
-                  className="group transition-colors hover:bg-primary"
-                >
-                  <td className="min-w-[200px] max-w-[300px] px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-text-muted">
-                        <Image
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 rounded-full"
-                          src={avatar}
-                          alt={app.studentName}
-                        />
-                      </div>
-
-                      <div className="truncate">
-                        <div className="truncate text-text-primary">
-                          {app.studentName}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className=" text-text-primary">
-                      {app.applicationName}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-text-muted ">{app.partner}</div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-text-muted">{app.stage}</div>
-                  </td>
-                  <td className="min-w-[150px] max-w-[150px] px-6 py-4">
-                    <StatusBadge status={app.status} />
-                  </td>
-                  <td className="px-6 py-4 ">
-                    <div className="max-w-48 truncate  text-text-muted">
-                      {app.nextAction}
-                    </div>
-                  </td>
-                  <td className="min-w-[150px] max-w-[150px]  px-6 py-4">
-                    <PriorityBadge priority={app.priority} />
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1 text-text-muted">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(app.updatedAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "2-digit",
-                      })}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <button className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-blue-50 hover:text-blue-600">
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-green-50 hover:text-green-600">
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-red-50 hover:text-red-600">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
+            ))
+          )}
           </tbody>
         </table>
       </div>
