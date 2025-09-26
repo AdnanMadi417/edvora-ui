@@ -5,8 +5,6 @@ import {
   Search,
   Filter,
   Eye,
-  Edit,
-  Trash2,
   Calendar,
   Clock,
   User,
@@ -21,7 +19,10 @@ const ModernApplicationsTable = () => {
     {
       id: 1,
       studentName: "Sarah Chen",
+      studentEmail: "sarah.chen@gmail.com",
+      applicationID: "APP-2024-005",
       applicationName: "Computer Science Masters",
+      university: "Science Masters",
       partner: "Stanford University",
       stage: "Interview",
       status: "in-progress",
@@ -32,7 +33,10 @@ const ModernApplicationsTable = () => {
     {
       id: 2,
       studentName: "Marcus Johnson",
+      studentEmail: "marcus.johnson@gmail.com",
+      applicationID: "APP-2024-004",
       applicationName: "MBA Program",
+      university: "Science Masters",
       partner: "Harvard Business School",
       stage: "Application Review",
       status: "pending",
@@ -220,6 +224,7 @@ const ModernApplicationsTable = () => {
 
       <div className="overflow-x-auto border border-default bg-card rounded-lg">
         <table className="w-full">
+
           <thead>
             <tr className="border-b border-default bg-card">
               <th
@@ -331,6 +336,7 @@ const ModernApplicationsTable = () => {
                   key={app.id}
                   className="group transition-colors hover:bg-primary"
                 >
+
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-text-muted">
@@ -344,34 +350,57 @@ const ModernApplicationsTable = () => {
                       </div>
 
                       <div className="truncate">
+
                         <div className="truncate text-text-primary">
                           {app.studentName}
                         </div>
+
+                        <div className="truncate text-text-muted text-caption">
+                          {app.studentEmail}
+                        </div>
+
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
+
+                  <td className="min-w-[250px] max-w-[300px] px-6 py-4">
+
+                    <div className="truncate text-text-muted text-caption">
+                      {app.applicationID}
+                    </div>
+
                     <div className=" text-text-primary">
                       {app.applicationName}
                     </div>
+
+                    <div className="truncate text-text-muted text-caption">
+                      {app.university}
+                    </div>
+
                   </td>
+
                   <td className="min-w-[200px] px-6 py-4">
                     <div className="text-text-muted ">{app.partner}</div>
                   </td>
+
                   <td className="px-6 py-4">
                     <div className="text-text-muted">{app.stage}</div>
                   </td>
+
                   <td className="min-w-[150px] max-w-[150px] px-6 py-4">
                     <StatusBadge status={app.status} />
                   </td>
+
                   <td className="px-6 py-4 ">
                     <div className="max-w-48 truncate  text-text-muted">
                       {app.nextAction}
                     </div>
                   </td>
+
                   <td className="min-w-[150px] max-w-[150px]  px-6 py-4">
                     <PriorityBadge priority={app.priority} />
                   </td>
+
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1 text-text-muted">
                       <Calendar className="h-3 w-3" />
@@ -383,19 +412,16 @@ const ModernApplicationsTable = () => {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <button className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-blue-50 hover:text-blue-600">
-                        <Eye className="h-4 w-4" />
-                      </button>
-                      <button className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-green-50 hover:text-green-600">
-                        <Edit className="h-4 w-4" />
-                      </button>
-                      <button className="rounded-md p-1.5 text-text-muted transition-colors hover:bg-red-50 hover:text-red-600">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
+                  <td className="min-w-[200px] px-6 py-4">
+                    <button
+                      aria-label="View Application"
+                      className="flex items-center gap-2 rounded-md p-1.5 text-text-muted transition-colors hover:bg-blue-50 hover:text-blue-600"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span className="text-caption">View Application</span>
+                    </button>
                   </td>
+
                 </tr>
               ))
             )}
