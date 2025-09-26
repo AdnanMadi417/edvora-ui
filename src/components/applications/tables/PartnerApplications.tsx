@@ -3,11 +3,13 @@ import {
   ChevronUp,
   ChevronDown,
   Search,
-  Filter,
+  Layers,
+  Flag,
   Eye,
   Calendar,
   Clock,
   User,
+  Building,
 } from "lucide-react";
 import avatar from "/public/img/avatars/avatar4.png";
 import emptyPng from "/public/img/dashboards/empty-data-icon.png";
@@ -22,7 +24,6 @@ const ModernApplicationsTable = () => {
       applicationID: "APP-2024-005",
       applicationName: "Computer Science Masters",
       university: "Science Masters",
-      partner: "Stanford University",
       stage: "Interview",
       status: "in-progress",
       nextAction: "Schedule final interview",
@@ -32,23 +33,24 @@ const ModernApplicationsTable = () => {
     {
       id: 2,
       studentName: "Marcus Johnson",
-      studentEmail: "sarah.chen@gmail.com",
+      studentEmail: "marcus.johnson@gmail.com",
       applicationID: "APP-2024-004",
       applicationName: "MBA Program",
       university: "Science Masters",
-      partner: "Harvard Business School",
       stage: "Application Review",
       status: "pending",
       nextAction: "Submit transcripts",
       priority: "medium",
       updatedAt: "2024-01-14T14:20:00Z",
-    }
+    },
   ]);
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+  const [filterPriority, setFilterPriority] = useState("all");
+
   const itemsPerPage = 10;
   const [loading, setLoading] = useState(true);
 
@@ -77,13 +79,16 @@ const ModernApplicationsTable = () => {
           app.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
           app.applicationName
             .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          app.partner.toLowerCase().includes(searchTerm.toLowerCase())
+            .includes(searchTerm.toLowerCase())
       );
     }
 
     if (filterStatus !== "all") {
       filtered = filtered.filter((app) => app.status === filterStatus);
+    }
+
+    if (filterPriority !== "all") {
+      filtered = filtered.filter((app) => app.priority === filterPriority);
     }
 
     if (sortConfig.key) {
@@ -99,7 +104,7 @@ const ModernApplicationsTable = () => {
     }
 
     return filtered;
-  }, [applications, searchTerm, filterStatus, sortConfig]);
+  }, [applications, searchTerm, filterStatus, filterPriority, sortConfig]);
 
   const totalPages = Math.ceil(
     filteredAndSortedApplications.length / itemsPerPage
@@ -178,37 +183,40 @@ const ModernApplicationsTable = () => {
   };
 
   return (
-    <div className="mt-6  overflow-hidden text-p2">
+    <div className="mt-6 overflow-hidden text-p2">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-default bg-card">
 
-      <div className="border border-default bg-card p-6 rounded-lg mb-5">
-        <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-          <div>
-            <h2 className="text-xl font-semibold text-text-primary">
-              Applications Dashboard
-            </h2>
-            <p className="mt-1  text-text-muted">
-              Manage and track student applications
-            </p>
+        <div className="relative p-6">
+
+          <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
+            <div>
+              <h3 className="text-xl font-semibold text-text-primary">
+                Applications Dashboard
+              </h3>
+              <p className="mt-1 text-sm text-text-muted">
+                Manage and track student applications
+              </p>
+            </div>
           </div>
 
-          <div className="flex w-full flex-col gap-3 sm:flex-row md:w-auto">
-            <div className="relative">
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
               <input
                 type="text"
                 placeholder="Search applications..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className=" w-full sm:w-64 rounded-md border bg-card py-2.5 pl-10 pr-4 outline-0 focus:border-accent focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-md border border-default bg-background py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
+            <div className="relative flex-1 sm:flex-none">
+              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="focus:ring-1 focus:ring-blue-500 cursor-pointer appearance-none rounded-md border border-default bg-card py-2.5 pl-10 pr-8  outline-0 focus:border-accent"
+                className="w-full cursor-pointer rounded-md border border-default bg-background py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
                 <option value="in-progress">In Progress</option>
@@ -217,19 +225,44 @@ const ModernApplicationsTable = () => {
                 <option value="rejected">Rejected</option>
               </select>
             </div>
+
+            <div className="relative flex-1 sm:flex-none">
+              <Flag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
+              <select
+                value={filterPriority}
+                onChange={(e) => setFilterPriority(e.target.value)}
+                className="w-full cursor-pointer rounded-md border border-default bg-background py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="all">All Priority</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setFilterStatus("all");
+                setFilterPriority("all");
+              }}
+              className="flex items-center justify-center gap-2 rounded-md border border-default bg-background px-4 py-2.5 text-sm text-text-muted transition hover:text-text-error hover:border-text-error sm:w-auto"
+            >
+              Clear
+            </button>
           </div>
+
         </div>
+
       </div>
 
-      <div className="overflow-x-auto border border-default bg-card rounded-lg">
+      <div className="overflow-x-auto rounded-lg border border-default bg-card">
         <table className="w-full">
-
           <thead>
           <tr className="border-b border-default bg-card">
-
             <th
               onClick={() => handleSort("studentName")}
-              className="group w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group  cursor-pointer px-6 py-4 text-start font-bold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-text-muted" />
@@ -237,54 +270,48 @@ const ModernApplicationsTable = () => {
                 <SortIndicator field="studentName" />
               </div>
             </th>
-
             <th
               onClick={() => handleSort("applicationName")}
-              className="group w-[200px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
                 Application
                 <SortIndicator field="applicationName" />
               </div>
             </th>
-
             <th
               onClick={() => handleSort("stage")}
-              className="group w-[150px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
                 Stage
                 <SortIndicator field="stage" />
               </div>
             </th>
-
             <th
               onClick={() => handleSort("status")}
-              className="group w-[150px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
                 Status
                 <SortIndicator field="status" />
               </div>
             </th>
-
-            <th className="min-w-[140px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[150px] px-6 py-4 text-start  font-semibold tracking-wider  text-text-primary">
               Next Action
             </th>
-
             <th
               onClick={() => handleSort("priority")}
-              className="group w-[150px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
                 Priority
                 <SortIndicator field="priority" />
               </div>
             </th>
-
             <th
               onClick={() => handleSort("updatedAt")}
-              className="group w-[180px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-text-muted" />
@@ -292,8 +319,7 @@ const ModernApplicationsTable = () => {
                 <SortIndicator field="updatedAt" />
               </div>
             </th>
-
-            <th className="w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="px-6 py-4 text-start font-semibold tracking-wider  text-text-primary">
               Actions
             </th>
           </tr>
@@ -333,7 +359,7 @@ const ModernApplicationsTable = () => {
                 key={app.id}
                 className="group transition-colors hover:bg-primary"
               >
-                <td className="w-[250px] px-6 py-4">
+                <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-text-muted">
                       <Image
@@ -346,23 +372,19 @@ const ModernApplicationsTable = () => {
                     </div>
 
                     <div className="truncate">
-
                       <div className="truncate text-text-primary">
                         {app.studentName}
                       </div>
 
-                      <div className="truncate text-text-muted text-caption">
+                      <div className="truncate text-caption text-text-muted">
                         {app.studentEmail}
                       </div>
-
                     </div>
-
                   </div>
                 </td>
 
                 <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-
-                  <div className="truncate text-text-muted text-caption">
+                  <div className="truncate text-caption text-text-muted">
                     {app.applicationID}
                   </div>
 
@@ -370,31 +392,30 @@ const ModernApplicationsTable = () => {
                     {app.applicationName}
                   </div>
 
-                  <div className="truncate text-text-muted text-caption">
+                  <div className="truncate text-caption text-text-muted">
                     {app.university}
                   </div>
-
                 </td>
 
-                <td className="w-[150px] px-6 py-4">
+                <td className="px-6 py-4">
                   <div className="text-text-muted">{app.stage}</div>
                 </td>
 
-                <td className="min-w-[150px] px-6 py-4">
+                <td className="min-w-[150px] max-w-[150px] px-6 py-4">
                   <StatusBadge status={app.status} />
                 </td>
 
-                <td className="w-[200px] px-6 py-4">
-                  <div className="truncate text-text-muted">
+                <td className="px-6 py-4 ">
+                  <div className="max-w-48 truncate  text-text-muted">
                     {app.nextAction}
                   </div>
                 </td>
 
-                <td className="w-[150px] px-6 py-4">
+                <td className="min-w-[150px] max-w-[150px]  px-6 py-4">
                   <PriorityBadge priority={app.priority} />
                 </td>
 
-                <td className="w-[180px] px-6 py-4">
+                <td className="px-6 py-4">
                   <div className="flex items-center gap-1 text-text-muted">
                     <Calendar className="h-3 w-3" />
                     {new Date(app.updatedAt).toLocaleDateString("en-US", {
