@@ -384,9 +384,6 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                  <div className="truncate text-caption text-text-muted">
-                    {app.applicationID}
-                  </div>
 
                   <div className=" text-text-primary">
                     {app.applicationName}

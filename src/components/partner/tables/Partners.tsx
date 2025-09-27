@@ -222,11 +222,17 @@ const ModernApplicationsTable = () => {
                 <td className="px-6 py-4 text-text-muted min-w-[120px] max-w-[120px]">{app.country}</td>
                 <td className="px-6 py-4 min-w-[120px] max-w-[120px]"><StatusBadge status={app.status} /></td>
                 <td className="px-6 py-4 text-text-muted min-w-[150px] max-w-[150px]">{new Date(app.registeredAt).toLocaleDateString()}</td>
-                <td className="px-6 py-4 text-end flex items-center gap-2 min-w-[150px] max-w-[150px]">
-                  <button className="p-1.5 text-text-muted hover:bg-blue-50 hover:text-blue-600"><Eye className="h-4 w-4" /></button>
-                  <button className="p-1.5 text-text-muted hover:bg-green-50 hover:text-green-600"><Edit className="h-4 w-4" /></button>
-                  <button className="p-1.5 text-text-muted hover:bg-red-50 hover:text-red-600"><Trash2 className="h-4 w-4" /></button>
+
+                <td className="min-w-[200px] px-6 py-4">
+                  <button
+                    aria-label="View Application"
+                    className="flex items-center gap-2 rounded-md p-1.5 text-text-muted transition-colors hover:bg-blue-50 hover:text-blue-600"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span className="text-caption">View Application</span>
+                  </button>
                 </td>
+
               </tr>
             ))
           )}
