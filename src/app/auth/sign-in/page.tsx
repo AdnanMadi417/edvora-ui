@@ -31,11 +31,11 @@ function SignInPage() {
     if (normalizedEmail === "admin@gmail.com") {
       localStorage.setItem("role", "admin");
       localStorage.setItem("userEmail", email);
-      router.push("/admin/default");
+      router.push("/account-manager/applications");
     } else if (normalizedEmail === "partner@gmail.com") {
       localStorage.setItem("role", "partner");
       localStorage.setItem("userEmail", email);
-      router.push("/partner/default");
+      router.push("/partner/applications");
     } else {
       setError("Invalid email or password. Access denied.");
       setLoading(false);
