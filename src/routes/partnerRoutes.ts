@@ -1,17 +1,9 @@
-import { FaHome, FaBox, FaUser } from "react-icons/fa";
-import { IconType } from "react-icons";
+import { MdDescription, MdPayments } from "react-icons/md";
+import { IRoute } from "types/navigation";
 
-interface Route {
-  name: string;
-  layout: string;
-  path: string;
-  icon: IconType;
-}
-
-const partnerRoutes: Route[] = [
-  { name: "Dashboard", layout: "/partner", path: "/dashboard", icon: FaHome },
-  { name: "Orders", layout: "/partner", path: "/orders", icon: FaBox },
-  { name: "Profile", layout: "/partner", path: "/profile", icon: FaUser },
+const partnerRoutes: IRoute[] = [
+  { name: "Applications", layout: "/partner", path: "/applications", icon: MdDescription },
+  { name: "Commission", layout: "/partner", path: "/commission", icon: MdPayments },
 ];
 
 export default partnerRoutes;

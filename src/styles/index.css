@@ -5,9 +5,9 @@
 @tailwind utilities;
 
 :root {
-  --primary-bg: #FFFFFF;
-  --secondary-bg: #EBF1FF;
-  --card-bg: #F8F9FB;
+  --primary-bg: #F8F9FB;
+  --secondary-bg: #EEF0F6;
+  --card-bg: #FFFFFF;
   --card-hover: #FFFFFF;
 
   --border-color: #D0D4E0;
@@ -69,6 +69,13 @@
   --chart-4: #D32F2F;
   --chart-5: #0288D1;
 
+  --border-color-default: #D0D4E0;
+  --border-color-accent: #0348D1;
+  --border-color-danger: #D32F2F;
+  --border-color-success: #2E7D32;
+  --border-color-warning: #F57C00;
+  --border-color-info: #0288D1;
+
   --font-size-h1: 3rem;
   --font-size-h2: 2.5rem;
   --font-size-h3: 2rem;
@@ -101,13 +108,6 @@
   --transition-fast: all 0.2s ease-in-out;
   --transition-medium: all 0.3s ease-in-out;
   --transition-slow: all 0.5s ease-in-out;
-
-  --border-color-default: #D0D4E0;
-  --border-color-accent: #0348D1;
-  --border-color-danger: #D32F2F;
-  --border-color-success: #2E7D32;
-  --border-color-warning: #F57C00;
-  --border-color-info: #0288D1;
 }
 
 @layer base {
