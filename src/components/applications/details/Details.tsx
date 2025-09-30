@@ -14,6 +14,8 @@ import {
   FaHome,
   FaBook,
   FaGraduationCap,
+  FaPhoneAlt,
+  FaUsers
 } from "react-icons/fa";
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
@@ -358,37 +360,63 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
           </div>
 
           <div>
-            <div className="rounded-lg border border-red-200 bg-gradient-to-br from-red-50 to-red-100 p-6 shadow-sm">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
               <div className="mb-4 flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-600 font-bold text-white">
-                  !
-                </div>
-                <h4 className="text-p2 font-bold text-red-800">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-100">
+                  <FaPhoneAlt className="text-xs text-red-600" />
+                </span>
+                <h4 className="text-p2 font-semibold tracking-wide text-red-700">
                   Emergency Contact
                 </h4>
               </div>
-              <dl className="space-y-3">
-                <div className="flex justify-between">
-                  <dt className="text-xs font-medium text-red-700">Name</dt>
-                  <dd className="text-sm font-medium text-red-900">
+
+              <dl className="space-y-4">
+
+                <div className="flex items-center justify-between">
+                  <dt className="flex items-center gap-2 text-sm text-text-secondary font-medium">
+                    <FaUser className="text-text-secondary" />
+                    Name
+                  </dt>
+                  <dd className="text-sm font-normal text-text-primary">
                     {application.studentInfo?.emergencyContact.name || "-"}
                   </dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-xs font-medium text-red-700">Relation</dt>
-                  <dd className="text-sm font-medium text-red-900">
+
+                <div className="flex items-center justify-between">
+                  <dt className="flex items-center gap-2 text-sm text-text-secondary font-medium">
+                    <FaUsers className="text-text-secondary" />
+                    Relation
+                  </dt>
+                  <dd className="text-sm font-normal text-text-primary">
                     {application.studentInfo?.emergencyContact.relation || "-"}
                   </dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-xs font-medium text-red-700">Phone</dt>
-                  <dd className="text-sm font-bold text-red-900">
+
+                <div className="flex items-center justify-between">
+                  <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                    <FaPhoneAlt className="text-text-secondary" />
+                    Phone
+                  </dt>
+                  <dd className="px-3 py-1 text-sm font-normal text-text-primary">
                     {application.studentInfo?.emergencyContact.phone || "-"}
                   </dd>
                 </div>
+
+                <div className="flex items-center justify-between ">
+                  <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                    <FaEnvelope className="text-text-secondary" />
+                    Email
+                  </dt>
+                  <dd className="text-sm font-normal text-text-primary break-words">
+                    {application.studentInfo?.emergencyContact.email || "-"}
+                  </dd>
+                </div>
               </dl>
+
+
             </div>
           </div>
+
         </div>
       </div>
     </section>
