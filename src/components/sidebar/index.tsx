@@ -24,7 +24,6 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
       role="navigation"
       aria-label="Main navigation"
     >
-      {/* Close button */}
       <button
         className="absolute right-4 top-4 rounded-md bg-primary p-1
           text-text-primary transition-colors duration-200 hover:bg-card-hover
@@ -48,7 +47,6 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
         />
       </header>
 
-      {/* User info */}
       <div className="border-default border-y-thin px-6 py-4">
         <div className="flex items-center gap-3">
           <div
@@ -58,22 +56,20 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
             U
           </div>
           <div className="min-w-0 flex-1">
-            <p className="mb-[2px] truncate text-p2 font-medium text-text-primary">
-              Account Manager
+            <p className="truncate text-p2 font-semibold text-text-primary">
+              Adnan
             </p>
             <p className="truncate text-caption text-text-muted">
-              Administrator
+              Account Manager
             </p>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
       <nav className="flex-1 py-4">
         <Links routes={routes} />
       </nav>
 
-      {/* Logout */}
       <footer>
         <button
           onClick={handleLogout}

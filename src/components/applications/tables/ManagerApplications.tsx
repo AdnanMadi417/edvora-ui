@@ -11,41 +11,15 @@ import {
   User,
   Building,
 } from "lucide-react";
-import avatar from "/public/img/avatars/avatar4.png";
+import avatar from "/public/img/avatars/user.png";
 import emptyPng from "/public/img/dashboards/empty-data-icon.png";
 import Image from "next/image";
+import Link from "next/link";
+import { applications as initialApplications } from "components/data/applications";
+
 
 const ModernApplicationsTable = () => {
-  const [applications] = useState([
-    {
-      id: 1,
-      studentName: "Sarah Chen",
-      studentEmail: "sarah.chen@gmail.com",
-      applicationID: "APP-2024-005",
-      applicationName: "Computer Science Masters",
-      university: "Science Masters",
-      partner: "Stanford University",
-      stage: "Interview",
-      status: "in-progress",
-      nextAction: "Schedule final interview",
-      priority: "high",
-      updatedAt: "2024-01-15T10:30:00Z",
-    },
-    {
-      id: 2,
-      studentName: "Marcus Johnson",
-      studentEmail: "marcus.johnson@gmail.com",
-      applicationID: "APP-2024-004",
-      applicationName: "MBA Program",
-      university: "Science Masters",
-      partner: "Harvard Business School",
-      stage: "Application Review",
-      status: "pending",
-      nextAction: "Submit transcripts",
-      priority: "medium",
-      updatedAt: "2024-01-14T14:20:00Z",
-    },
-  ]);
+  const [applications] = useState(initialApplications);
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
@@ -79,6 +53,9 @@ const ModernApplicationsTable = () => {
       filtered = filtered.filter(
         (app) =>
           app.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.studentEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.university.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.stage.toLowerCase().includes(searchTerm.toLowerCase()) ||
           app.applicationName
             .toLowerCase()
             .includes(searchTerm.toLowerCase()) ||
@@ -158,9 +135,9 @@ const ModernApplicationsTable = () => {
 
   const PriorityBadge = ({ priority }) => {
     const priorityConfig = {
-      high: "bg-red-100 text-red-700 border-red-200",
-      medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
-      low: "bg-secondary text-text-muted border-default",
+      high: "bg-red-100 text-red-700 border-red-200 px-3 py-1",
+      medium: "bg-yellow-100 text-yellow-700 border-yellow-200 px-3 py-1",
+      low: "bg-gray-100 text-gray-600 border-gray-200 px-3 py-1",
     };
 
     return (
@@ -188,9 +165,7 @@ const ModernApplicationsTable = () => {
   return (
     <div className="mt-6 overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-default bg-card">
-
         <div className="relative p-6">
-
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-text-primary">
@@ -207,10 +182,10 @@ const ModernApplicationsTable = () => {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
               <input
                 type="text"
-                placeholder="Search applications..."
+                placeholder="Search applications by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-md border border-default bg-background py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full rounded-full border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
@@ -219,7 +194,7 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full cursor-pointer rounded-md border border-default bg-background py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
                 <option value="in-progress">In Progress</option>
@@ -234,7 +209,7 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
-                className="w-full cursor-pointer rounded-md border border-default bg-background py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               >
                 <option value="all">All Priority</option>
                 <option value="high">High</option>
@@ -249,18 +224,18 @@ const ModernApplicationsTable = () => {
                 setFilterStatus("all");
                 setFilterPriority("all");
               }}
-              className="flex items-center justify-center gap-2 rounded-md border border-default bg-background px-4 py-2.5 text-sm text-text-muted transition hover:text-text-error hover:border-text-error sm:w-auto"
+              className="bg-background flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error sm:w-auto"
             >
               Clear
             </button>
           </div>
-
         </div>
-
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-default bg-card">
+      <div className="overflow-x-auto rounded-lg rounded-b-none border border-default border-b-0 bg-card">
+
         <table className="w-full">
+
           <thead>
             <tr className="border-b border-default bg-card">
               <th
@@ -358,7 +333,7 @@ const ModernApplicationsTable = () => {
                     <Image
                       width={100}
                       height={100}
-                      className="h-[100px] w-[100px] rounded-md"
+                      className="h-[100px] w-[100px] rounded-lg"
                       src={emptyPng}
                       alt="No applications"
                     />
@@ -397,7 +372,6 @@ const ModernApplicationsTable = () => {
                   </td>
 
                   <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-
                     <div className=" text-text-primary">
                       {app.applicationName}
                     </div>
@@ -407,7 +381,7 @@ const ModernApplicationsTable = () => {
                     </div>
                   </td>
 
-                  <td className="min-w-[200px] px-6 py-4">
+                  <td className="min-w-[200px] max-w-[250px] px-6 py-4">
                     <div className="text-text-muted ">{app.partner}</div>
                   </td>
 
@@ -420,12 +394,12 @@ const ModernApplicationsTable = () => {
                   </td>
 
                   <td className="px-6 py-4 ">
-                    <div className="max-w-48 truncate  text-text-muted">
+                    <div className="max-w-48 truncate text-text-muted">
                       {app.nextAction}
                     </div>
                   </td>
 
-                  <td className="min-w-[150px] max-w-[150px]  px-6 py-4">
+                  <td className="min-w-[150px] max-w-[150px] px-6 py-4">
                     <PriorityBadge priority={app.priority} />
                   </td>
 
@@ -441,61 +415,66 @@ const ModernApplicationsTable = () => {
                   </td>
 
                   <td className="min-w-[200px] px-6 py-4">
-                    <button
+                    <Link
+                      href={`/account-manager/applications/${app.id}`}
                       aria-label="View Application"
-                      className="flex items-center gap-2 rounded-md p-1.5 text-text-muted transition-colors hover:bg-blue-50 hover:text-blue-600"
+                      className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-2 text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-600"
                     >
                       <Eye className="h-4 w-4" />
                       <span className="text-caption">View Application</span>
-                    </button>
+                    </Link>
                   </td>
-
                 </tr>
               ))
             )}
           </tbody>
         </table>
+
       </div>
 
-      {totalPages > 1 && (
-        <div className="border-t border-default bg-primary px-6 py-4 ">
-          <div className="flex items-center justify-between">
-            <div className="text-text-muted">
-              Showing{" "}
-              <span className="">{(currentPage - 1) * itemsPerPage + 1}</span>{" "}
-              to{" "}
-              <span className="">
+      <div className="rounded-b-lg bg-card border border-default px-6 py-4 sticky bottom-0">
+        <div className="flex flex-col items-center justify-between gap-3 text-sm text-text-muted md:flex-row">
+          <div>
+            Showing{" "}
+            <span className="font-medium">
+                {(currentPage - 1) * itemsPerPage + 1}
+              </span>{" "}
+            to{" "}
+            <span className="font-normal">
                 {Math.min(
                   currentPage * itemsPerPage,
                   filteredAndSortedApplications.length
                 )}
               </span>{" "}
-              of{" "}
-              <span className="">{filteredAndSortedApplications.length}</span>{" "}
-              results
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="border-md texttext-text-muted border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-3 py-2  text-text-muted">
+            of{" "}
+            <span className="font-normal">
+                {filteredAndSortedApplications.length}
+              </span>{" "}
+            results
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="rounded-full border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="px-2 text-text-muted">
                 Page {currentPage} of {totalPages}
               </span>
-              <button
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="border-md texttext-text-muted border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
+            <button
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="rounded-full border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         </div>
-      )}
+      </div>
+
     </div>
   );
 };
