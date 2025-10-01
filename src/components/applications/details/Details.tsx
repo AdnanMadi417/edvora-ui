@@ -1,7 +1,7 @@
 import { applications } from "components/data/applications";
 import React from "react";
-import emptyPng from "/public/img/dashboards/empty-data-icon.png";
-import Image from "next/image";
+import EmptyData from "components/emptyData/EmptyData";
+
 import {
   FaTasks,
   FaCogs,
@@ -15,7 +15,7 @@ import {
   FaBook,
   FaGraduationCap,
   FaPhoneAlt,
-  FaUsers
+  FaUsers,
 } from "react-icons/fa";
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
@@ -52,20 +52,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
   }
 
   if (!application) {
-    return (
-      <div className="mt-5 rounded-lg border border-default bg-card p-10 text-red-500">
-        <div className="flex flex-col items-center gap-4">
-          <Image
-            width={100}
-            height={100}
-            className="h-[100px] w-[100px] rounded-lg"
-            src={emptyPng}
-            alt="No applications"
-          />
-          <span className="text-p1">Application not found. </span>
-        </div>
-      </div>
-    );
+    return <EmptyData />;
   }
 
   return (
@@ -371,9 +358,8 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
               </div>
 
               <dl className="space-y-4">
-
                 <div className="flex items-center justify-between">
-                  <dt className="flex items-center gap-2 text-sm text-text-secondary font-medium">
+                  <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
                     <FaUser className="text-text-secondary" />
                     Name
                   </dt>
@@ -383,7 +369,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <dt className="flex items-center gap-2 text-sm text-text-secondary font-medium">
+                  <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
                     <FaUsers className="text-text-secondary" />
                     Relation
                   </dt>
@@ -407,16 +393,13 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                     <FaEnvelope className="text-text-secondary" />
                     Email
                   </dt>
-                  <dd className="text-sm font-normal text-text-primary break-words">
+                  <dd className="break-words text-sm font-normal text-text-primary">
                     {application.studentInfo?.emergencyContact.email || "-"}
                   </dd>
                 </div>
               </dl>
-
-
             </div>
           </div>
-
         </div>
       </div>
     </section>

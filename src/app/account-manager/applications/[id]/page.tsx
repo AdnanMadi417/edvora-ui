@@ -1,4 +1,5 @@
 import Details from "components/applications/details/Details";
+import ApplicationDocuments from "components/applications/details/ApplicationDocuments";
 
 interface ApplicationPageProps {
   params: {
@@ -7,5 +8,10 @@ interface ApplicationPageProps {
 }
 
 export default function ApplicationPage({ params }: ApplicationPageProps) {
-  return <Details params={params} />;
+  return (
+    <>
+      <Details params={params} />
+      <ApplicationDocuments params={params} />
+    </>
+  );
 }

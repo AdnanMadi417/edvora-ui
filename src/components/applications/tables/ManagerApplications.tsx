@@ -12,11 +12,10 @@ import {
   Building,
 } from "lucide-react";
 import avatar from "/public/img/avatars/user.png";
-import emptyPng from "/public/img/dashboards/empty-data-icon.png";
 import Image from "next/image";
 import Link from "next/link";
 import { applications as initialApplications } from "components/data/applications";
-
+import EmptyData from "components/emptyData/EmptyTableData";
 
 const ModernApplicationsTable = () => {
   const [applications] = useState(initialApplications);
@@ -329,16 +328,7 @@ const ModernApplicationsTable = () => {
                   colSpan={9}
                   className="px-6 py-8 text-center text-text-muted"
                 >
-                  <div className="flex flex-col items-center gap-4">
-                    <Image
-                      width={100}
-                      height={100}
-                      className="h-[100px] w-[100px] rounded-lg"
-                      src={emptyPng}
-                      alt="No applications"
-                    />
-                    <span className="text-p1">No applications found.</span>
-                  </div>
+                  <EmptyData/>
                 </td>
               </tr>
             ) : (
