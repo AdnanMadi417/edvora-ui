@@ -94,7 +94,7 @@ export default function DocumentsSection({
             {documents.map((doc, index) => (
               <div
                 key={doc.id}
-                className="relative flex items-center justify-between rounded-md border border-default  p-5 backdrop-blur transition-all duration-300"
+                className="relative flex items-center justify-between rounded-lg border border-default  p-5 backdrop-blur transition-all duration-300"
                 style={{
                   animation: showDocs
                     ? `slideIn 0.3s ease-out ${index * 0.08}s both`
@@ -118,12 +118,11 @@ export default function DocumentsSection({
                       </span>
                     </div>
 
-                    {/* File name */}
-                    <p className="mb-2 truncate rounded bg-slate-50 px-2.5 py-1 font-mono text-[11px] text-slate-500">
+                    <p className="mb-2 truncate rounded-full bg-slate-100 px-2.5 py-1 font-mono text-caption text-text-secondary">
                       Emma_Thompson_{doc.name.replace(/\s+/g, "_")}.pdf
                     </p>
 
-                    {/* Meta info */}
+
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-yellow-500" />
