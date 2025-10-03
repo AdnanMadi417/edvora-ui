@@ -58,6 +58,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 shadow-sm sm:p-6">
+
         <div className="flex flex-col items-start gap-4 sm:flex-row">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
             <FaTasks className="text-lg text-blue-700" />
@@ -114,9 +115,9 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
       </div>
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-6 shadow-sm">
-        <h3 className="text-p3 mb-4 flex items-center gap-3 font-semibold text-text-primary">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
-            <MdAssignmentTurnedIn className="text-lg text-blue-700" />
+        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+            <MdAssignmentTurnedIn className="text-xl text-blue-700" />
           </span>
           Application Information
         </h3>

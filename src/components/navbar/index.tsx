@@ -1,6 +1,6 @@
 import React from "react";
 import Dropdown from "components/dropdown";
-import { FiAlignJustify, FiSearch } from "react-icons/fi";
+import { FiAlignJustify,  } from "react-icons/fi";
 import NavLink from "components/link/NavLink";
 import Image from "next/image";
 import avatar from "/public/img/avatars/avatar4.png";
@@ -15,7 +15,6 @@ const Navbar = (props: {
 
   return (
     <nav className="sticky top-4 z-40 flex flex-wrap items-center justify-between rounded-md bg-brand-50/10 p-2 backdrop-blur-xl">
-      {/* Left side */}
       <div className="ml-[6px] flex flex-col">
         <div className="flex items-center text-p2 sm:text-base">
           <a

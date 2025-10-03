@@ -284,7 +284,7 @@ const ModernApplicationsTable = () => {
                   <SortIndicator field="status" />
                 </div>
               </th>
-              <th className="min-w-[150px] px-6 py-4 text-start  font-semibold tracking-wider  text-text-primary">
+              <th className="min-w-[200px] px-6 py-4 text-start  font-semibold tracking-wider  text-text-primary">
                 Next Action
               </th>
               <th
@@ -300,9 +300,9 @@ const ModernApplicationsTable = () => {
                 onClick={() => handleSort("updatedAt")}
                 className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
               >
-                <div className="flex items-center gap-2">
+                <div className=" min-w-[150px] flex items-center gap-2">
                   <Clock className="h-4 w-4 text-text-muted" />
-                  Updated
+                  Last Updated
                   <SortIndicator field="updatedAt" />
                 </div>
               </th>

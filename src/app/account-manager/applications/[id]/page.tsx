@@ -1,5 +1,6 @@
 import Details from "components/applications/details/Details";
 import ApplicationDocuments from "components/applications/details/ApplicationDocuments";
+// import ApplicationAccountManagerTopBar from "components/applications/topBar/ApplicationAccountManagerTopBar";
 
 interface ApplicationPageProps {
   params: {
