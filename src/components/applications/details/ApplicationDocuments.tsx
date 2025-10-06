@@ -8,19 +8,24 @@ import {
   CheckCircle,
   XCircle,
   Eye,
-} from 'lucide-react';
+  Download,
+  RotateCcw,
+} from "lucide-react";
 import { applications } from "components/data/applications";
+import ViewPopup from "components/applications/popups/ViewDoc";
+import DownloadPopup from "components/applications/popups/DownloadDoc";
+import ResubmitPopup from "components/applications/popups/ResubmitDoc";
 
 interface ApplicationDocumentsProps {
   params?: { id: string };
 }
 
-export default function ApplicationDocuments({
-                                               params,
-                                             }: ApplicationDocumentsProps) {
+export default function ApplicationDocuments({ params }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(true);
-
   const documents = applications[0]?.docs || [];
+  const [showViewPopup, setShowViewPopup] = useState(false);
+  const [showDownloadPopup, setShowDownloadPopup] = useState(false);
+  const [showResubmitPopup, setShowResubmitPopup] = useState(false);
 
   const pendingCount = documents.filter((d) => d.status === "pending").length;
   const approvedCount = documents.filter((d) => d.status === "approved").length;
@@ -86,7 +91,6 @@ export default function ApplicationDocuments({
 
       <div
         className={`transition-all duration-300 ease-in-out ${
-          // INCREASED MAX-HEIGHT FOR SAFETY AND ADDED OVERFLOW-HIDDEN
           showDocs ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
         }`}
       >
@@ -95,7 +99,7 @@ export default function ApplicationDocuments({
             {documents.map((doc, index) => (
               <div
                 key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-default  p-5 backdrop-blur transition-all duration-300"
+                className="relative flex items-center justify-between rounded-lg border border-default p-5 backdrop-blur transition-all duration-300"
                 style={{
                   animation: showDocs
                     ? `slideIn 0.3s ease-out ${index * 0.08}s both`
@@ -109,12 +113,12 @@ export default function ApplicationDocuments({
                     </div>
                   </div>
 
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-0 flex-1 max-w-[350px]">
                     <div className="mb-2 flex items-center gap-2">
                       <h3 className="truncate text-sm font-semibold text-slate-800">
                         {doc.name}
                       </h3>
-                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium capitalize text-slate-600">
+                      <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium capitalize text-slate-600">
                         {doc.type}
                       </span>
                     </div>
@@ -122,7 +126,6 @@ export default function ApplicationDocuments({
                     <p className="mb-2 truncate rounded-full bg-slate-100 px-2.5 py-1 font-mono text-caption text-text-secondary">
                       Emma_Thompson_{doc.name.replace(/\s+/g, "_")}.pdf
                     </p>
-
 
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
                       <div className="flex items-center gap-1.5">
@@ -161,18 +164,39 @@ export default function ApplicationDocuments({
                   </div>
                 </div>
 
-                <div className="ml-4 flex-shrink-0">
-                  <button className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-p2 font-normal text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-700">
-                    <Eye className="h-4 w-4 transition-colors duration-300 ease-in-out" />
-                    <span>View</span>
+                <div className="ml-4 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setShowViewPopup(true)}
+                    className="group rounded-full border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    title="View Application"
+                  >
+                    <Eye className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                  </button>
+
+                  <button
+                    onClick={() => setShowDownloadPopup(true)}
+                    className="group rounded-full border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
+                    title="Download Application"
+                  >
+                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                  </button>
+
+                  <button
+                    onClick={() => setShowResubmitPopup(true)}
+                    className="group rounded-full border border-transparent bg-amber-50 p-2 text-amber-600 transition-all duration-200 hover:border-amber-200 hover:bg-amber-100 hover:text-amber-700 focus-visible:ring-2 focus-visible:ring-amber-400"
+                    title="Resubmit Application"
+                  >
+                    <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
                 </div>
-
-
               </div>
             ))}
           </div>
         </div>
+
+        <ViewPopup isOpen={showViewPopup} onClose={() => setShowViewPopup(false)} />
+        <DownloadPopup isOpen={showDownloadPopup} onClose={() => setShowDownloadPopup(false)} />
+        <ResubmitPopup isOpen={showResubmitPopup} onClose={() => setShowResubmitPopup(false)} />
       </div>
 
       <style jsx>{`

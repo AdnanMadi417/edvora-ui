@@ -165,6 +165,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                   </div>
                 )}
               </div>
+
             </div>
           </div>
         </div>
