@@ -479,6 +479,11 @@ module.exports = {
 
       },
 
+      overlay: {
+        DEFAULT: 'var(--overlay-bg)',
+        light: 'var(--overlay-light-bg)',
+      },
+
       borderColor: {
         default: 'var(--border-color-default)',
         accent: 'var(--border-color-accent)',
