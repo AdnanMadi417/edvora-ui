@@ -55,30 +55,28 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   const handleOpen = () => {
     setIsDropdownOpen(false);
-    router.push('/applications');
+    router.push('/account-manager/applications');
   };
 
   return (
-    <section className="bg-gradient-to-br from-slate-50 to-slate-100">
+    <section >
 
-      <div className="sticky top-0 z-50 backdrop-blur-lg bg-white/80 border-b border-slate-200 shadow-sm">
+      <div className="sticky top-0 z-50 backdrop-blur-lg border-b">
 
         <div className="max-w-7xl mx-auto">
-          <div className="flex h-16 items-center justify-between px-6">
+          <div className="flex h-16 items-center justify-between">
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 sm:gap-6">
               <button
                 onClick={handleOpen}
-                className="group flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:text-slate-900 hover:bg-slate-100 rounded-lg"
+                className="group flex items-center gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 transition-all hover:text-slate-900 hover:bg-slate-100 rounded-full"
               >
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span>Applications</span>
+                <span className="sm:inline">Back to Applications</span>
               </button>
 
-              <div className="h-8 w-px bg-slate-200" />
-
+              <div className="hidden sm:block h-8 border border-default/70" />
             </div>
-
 
             <div className="flex items-center gap-3">
 
@@ -92,13 +90,13 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-md border border-default bg-card shadow-sm animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="p-2">
                       <button
                         onClick={handleHold}
-                        className="group flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-amber-50 hover:text-amber-900"
+                        className="group flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-amber-50 hover:text-amber-900"
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
                           <Clock className="h-4 w-4" />
                         </div>
                         <div className="flex-1">
@@ -111,9 +109,9 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
                       <button
                         onClick={handleCancel}
-                        className="group flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-red-50 hover:text-red-900"
+                        className="group flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-red-50 hover:text-red-900"
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
                           <XCircle className="h-4 w-4" />
                         </div>
                         <div className="flex-1">
@@ -126,9 +124,9 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
                       <button
                         onClick={handleOpen}
-                        className="group flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-blue-50 hover:text-blue-900"
+                        className="group flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-blue-50 hover:text-blue-900"
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
                           <ExternalLink className="h-4 w-4" />
                         </div>
                         <div className="flex-1">
@@ -141,6 +139,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 )}
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -151,6 +150,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
         onConfirm={handleConfirmHold}
         applicationId={application?.applicationID}
       />
+
     </section>
   );
 }

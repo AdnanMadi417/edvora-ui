@@ -15,9 +15,9 @@ interface ApplicationDocumentsProps {
   params?: { id: string };
 }
 
-export default function DocumentsSection({
-  params,
-}: ApplicationDocumentsProps) {
+export default function ApplicationDocuments({
+                                               params,
+                                             }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(true);
 
   const documents = applications[0]?.docs || [];
@@ -86,7 +86,8 @@ export default function DocumentsSection({
 
       <div
         className={`transition-all duration-300 ease-in-out ${
-          showDocs ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+          // INCREASED MAX-HEIGHT FOR SAFETY AND ADDED OVERFLOW-HIDDEN
+          showDocs ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
         }`}
       >
         <div className="rounded-b-lg border border-t-0 border-default bg-card p-6">
@@ -175,16 +176,16 @@ export default function DocumentsSection({
       </div>
 
       <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
+          @keyframes slideIn {
+              from {
+                  opacity: 0;
+                  transform: translateY(-10px);
+              }
+              to {
+                  opacity: 1;
+                  transform: translateY(0);
+              }
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
       `}</style>
     </section>
   );

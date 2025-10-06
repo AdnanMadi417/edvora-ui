@@ -1,3 +1,18 @@
+
+export interface TimelineEvent {
+  // Description of the event (e.g., "Initial application submitted", "Stage 1 approved")
+  description: string;
+  // Who or what initiated the event (e.g., "Partner", "AccountManager", "University", "System")
+  by: string;
+  // The exact date and time the event occurred (e.g., "2025-09-26 02:35:56 PM")
+  timestamp: string;
+}
+
+export interface ApplicationHistory {
+  // The actual list of timeline events
+  events: TimelineEvent[];
+}
+
 export interface Document {
   id: string;
   name: string;
@@ -10,7 +25,6 @@ export interface Document {
   reviewedBy?: string;
   reviewedAt?: string;
 }
-
 
 export interface Application {
   id: string;
@@ -25,7 +39,6 @@ export interface Application {
   nextAction: string;
   priority: string;
   updatedAt: string;
-
   // New fields
   program?: string;
   intakeDate?: string;
@@ -55,8 +68,9 @@ export interface Application {
     years: string;
     gpa: string;
   };
-
   docs?: Document[];
+  // New history field
+  history?: ApplicationHistory; // Added the timeline here
 }
 
 export const applications: Application[] = [
@@ -84,7 +98,7 @@ export const applications: Application[] = [
       phone: "+60-12-3456789",
       currentAddress: "12 Jalan Ampang, Kuala Lumpur, Malaysia",
       emergencyContact: {
-        email:"sarah.chen@gmail.com",
+        email: "sarah.chen@gmail.com",
         name: "Chen Wei Ming",
         relation: "Father",
         phone: "+60-12-9876543",
@@ -124,7 +138,31 @@ export const applications: Application[] = [
         version: 1,
         size: "1.5 MB",
       },
-    ]
+    ],
+    history: {
+      events: [
+        {
+          description: "Initial Master of Computer Science application submitted",
+          by: "Partner",
+          timestamp: "2025-09-26 02:35:56 PM",
+        },
+        {
+          description: "Stage 1 (Internal Review) Approved",
+          by: "AccountManager",
+          timestamp: "2025-09-27 09:00:00 AM",
+        },
+        {
+          description: "Application sent to Universiti Malaya (UM)",
+          by: "AccountManager",
+          timestamp: "2025-09-27 10:30:00 PM",
+        },
+        {
+          description: "University confirmed receipt, awaiting faculty review",
+          by: "System",
+          timestamp: "2025-09-28 11:00:00 AM",
+        },
+      ],
+    },
   },
   {
     id: "72f2d8d9-1344-4c9c-8f2b-90dbf112c671",
@@ -150,7 +188,7 @@ export const applications: Application[] = [
       phone: "+60-16-8888888",
       currentAddress: "23 Jalan Sultan Azlan Shah, Penang, Malaysia",
       emergencyContact: {
-        email:"sarah.chen@gmail.com",
+        email: "sarah.chen@gmail.com",
         name: "Lee Siew Ling",
         relation: "Mother",
         phone: "+60-16-5555555",
@@ -190,7 +228,36 @@ export const applications: Application[] = [
         version: 1,
         size: "1.5 MB",
       },
-    ]
+    ],
+    history: {
+      events: [
+        {
+          description: "Initial application submitted",
+          by: "Partner",
+          timestamp: "2025-09-05 09:00:00 AM",
+        },
+        {
+          description: "Documents review completed, all approved",
+          by: "AccountManager",
+          timestamp: "2025-09-10 03:00:00 PM",
+        },
+        {
+          description: "Application sent to Universiti Sains Malaysia (USM)",
+          by: "AccountManager",
+          timestamp: "2025-09-12 11:00:00 AM",
+        },
+        {
+          description: "University issued Conditional Offer Letter",
+          by: "University",
+          timestamp: "2025-09-20 10:30:00 PM",
+        },
+        {
+          description: "Automatic transition to Stage 3 (Offer Accepted/Pending Payment)",
+          by: "System",
+          timestamp: "2025-09-20 10:31:00 PM",
+        },
+      ],
+    },
   },
   {
     id: "a1b2c3d4-e5f6-7890-ab12-cd34ef567890",
@@ -257,6 +324,30 @@ export const applications: Application[] = [
         size: "1.8 MB",
       },
     ],
+    history: {
+      events: [
+        {
+          description: "Initial application submitted",
+          by: "Partner",
+          timestamp: "2025-09-08 04:00:00 PM",
+        },
+        {
+          description: "Passport document approved",
+          by: "System Account Manager",
+          timestamp: "2025-09-11 11:20:00 AM",
+        },
+        {
+          description: "Missing Bachelor Transcript. Student action required.",
+          by: "AccountManager",
+          timestamp: "2025-09-13 10:00:00 AM",
+        },
+        {
+          description: "Application moved to 'Pending' (waiting on student)",
+          by: "System",
+          timestamp: "2025-09-22 09:30:00 AM",
+        },
+      ],
+    },
   },
   {
     id: "b2c3d4e5-f678-9012-ab34-cd56ef789012",
@@ -325,6 +416,30 @@ export const applications: Application[] = [
         reviewedAt: "2025-09-17 02:30pm",
       },
     ],
+    history: {
+      events: [
+        {
+          description: "Initial application submitted with all required documents",
+          by: "Partner",
+          timestamp: "2025-09-14 10:00:00 AM",
+        },
+        {
+          description: "All documents successfully reviewed and approved",
+          by: "AccountManager",
+          timestamp: "2025-09-17 02:30:00 PM",
+        },
+        {
+          description: "Application sent to Universiti Putra Malaysia (UPM)",
+          by: "AccountManager",
+          timestamp: "2025-09-18 09:00:00 AM",
+        },
+        {
+          description: "Interview scheduled for Oct 1st",
+          by: "University",
+          timestamp: "2025-09-25 03:45:00 PM",
+        },
+      ],
+    },
   },
   {
     id: "c3d4e5f6-7890-1234-ab56-cd78ef901234",
@@ -389,5 +504,29 @@ export const applications: Application[] = [
         size: "1.7 MB",
       },
     ],
+    history: {
+      events: [
+        {
+          description: "Initial application created",
+          by: "Partner",
+          timestamp: "2025-09-19 10:00:00 AM",
+        },
+        {
+          description: "Documents uploaded by student",
+          by: "Aisha Rahman",
+          timestamp: "2025-09-21 01:15:00 PM",
+        },
+        {
+          description: "Application moved to 'Pending' for document review",
+          by: "System",
+          timestamp: "2025-09-22 09:00:00 AM",
+        },
+        {
+          description: "Further documents requested (Financial Proof)",
+          by: "AccountManager",
+          timestamp: "2025-09-28 08:00:00 AM",
+        },
+      ],
+    },
   },
 ];

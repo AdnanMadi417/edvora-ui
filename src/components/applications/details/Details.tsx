@@ -1,6 +1,7 @@
-import { applications } from "components/data/applications";
-import React from "react";
-import EmptyData from "components/emptyData/EmptyData";
+import { applications } from 'components/data/applications';
+import React from 'react';
+import EmptyData from 'components/emptyData/EmptyData';
+import ApplicationAccountManagerTopBar from 'components/applications/topBar/ApplicationAccountManagerTopBar';
 
 import {
   FaTasks,
@@ -16,9 +17,15 @@ import {
   FaGraduationCap,
   FaPhoneAlt,
   FaUsers,
-} from "react-icons/fa";
+} from 'react-icons/fa';
 
-import { MdAssignmentTurnedIn } from "react-icons/md";
+import { MdAssignmentTurnedIn } from 'react-icons/md';
+
+interface ApplicationPageProps {
+  params: {
+    id: string;
+  };
+}
 
 interface ApplicationPageProps {
   params: {
@@ -31,18 +38,18 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   function daysSince(dateString: string) {
     const dateParts = dateString.match(
-      /(\d{4})-(\d{2})-(\d{2}) (\d{1,2}):(\d{2})(am|pm)/i
+      /(\d{4})-(\d{2})-(\d{2}) (\d{1,2}):(\d{2})(am|pm)/i,
     );
     if (!dateParts) return 0;
 
     let [_, year, month, day, hour, minute, meridiem] = dateParts;
     let h = parseInt(hour, 10);
-    if (meridiem.toLowerCase() === "pm" && h < 12) h += 12;
-    if (meridiem.toLowerCase() === "am" && h === 12) h = 0;
+    if (meridiem.toLowerCase() === 'pm' && h < 12) h += 12;
+    if (meridiem.toLowerCase() === 'am' && h === 12) h = 0;
 
     const isoString = `${year}-${month}-${day}T${h
       .toString()
-      .padStart(2, "0")}:${minute}:00`;
+      .padStart(2, '0')}:${minute}:00`;
     const updatedDate = new Date(isoString);
 
     const today = new Date();
@@ -57,7 +64,10 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   return (
     <section>
+
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 shadow-sm sm:p-6">
+
+        <ApplicationAccountManagerTopBar params={params} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
@@ -70,18 +80,22 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
             </h3>
 
             <div className="flex flex-wrap gap-2">
-              <span className="inline-flex whitespace-nowrap rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 sm:text-p2">
+              <span
+                className="inline-flex whitespace-nowrap rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 sm:text-p2">
                 Processing
               </span>
-              <span className="inline-flex whitespace-nowrap rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 sm:text-p2">
+              <span
+                className="inline-flex whitespace-nowrap rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 sm:text-p2">
                 {application.priority.charAt(0).toUpperCase() +
-                  application.priority.slice(1)}{" "}
+                  application.priority.slice(1)}{' '}
                 Priority
               </span>
-              <span className="inline-flex whitespace-nowrap rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 sm:text-p2">
+              <span
+                className="inline-flex whitespace-nowrap rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 sm:text-p2">
                 Stage {application.stage}
               </span>
-              <span className="inline-flex whitespace-nowrap rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700 sm:text-p2">
+              <span
+                className="inline-flex whitespace-nowrap rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700 sm:text-p2">
                 {daysSince(application.updatedAt)} Days
               </span>
             </div>
@@ -104,7 +118,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
           <span className="text-p2 sm:text-base">Processing in progress</span>
         </div>
 
-        <div className="space-y-1 border-t border-default pt-3">
+        <div className="space-y-1">
           <p className="text-xs text-text-muted sm:text-p2">
             Next: Check status for next steps
           </p>
@@ -112,9 +126,11 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
             Last updated: {application.updatedAt}
           </p>
         </div>
+
       </div>
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-6 shadow-sm">
+
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <MdAssignmentTurnedIn className="text-xl text-blue-700" />
@@ -207,7 +223,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 <dt className="text-sm font-medium text-text-primary">Full Name</dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaUser className="text-text-muted" />
-                  {application.studentInfo?.fullName || "Not provided"}
+                  {application.studentInfo?.fullName || 'Not provided'}
                 </dd>
               </div>
 
@@ -215,7 +231,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 <dt className="text-sm font-medium text-text-primary">Date of Birth</dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaBirthdayCake className="text-text-muted" />
-                  {application.studentInfo?.dateOfBirth || "DD/MM/YYYY"}
+                  {application.studentInfo?.dateOfBirth || 'DD/MM/YYYY'}
                 </dd>
               </div>
 
@@ -223,7 +239,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 <dt className="text-sm font-medium text-text-primary">Nationality</dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaFlag className="text-text-muted" />
-                  {application.studentInfo?.nationality || "Not specified"}
+                  {application.studentInfo?.nationality || 'Not specified'}
                 </dd>
               </div>
 
@@ -231,7 +247,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 <dt className="text-sm font-medium text-text-primary">Passport Number</dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaIdCard className="text-text-muted" />
-                  {application.studentInfo?.passportNumber || "N/A"}
+                  {application.studentInfo?.passportNumber || 'N/A'}
                 </dd>
               </div>
 
@@ -239,7 +255,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 <dt className="text-sm font-medium text-text-primary">Email Address</dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaEnvelope className="text-text-muted" />
-                  {application.studentEmail || "example@email.com"}
+                  {application.studentEmail || 'example@email.com'}
                 </dd>
               </div>
 
@@ -247,7 +263,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 <dt className="text-sm font-medium text-text-primary">Phone Number</dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaPhone className="text-text-muted" />
-                  {application.studentInfo?.phone || "+00 000-000-000"}
+                  {application.studentInfo?.phone || '+00 000-000-000'}
                 </dd>
               </div>
 
@@ -255,7 +271,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 <dt className="text-sm font-medium text-text-primary">Current Address</dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted break-words">
                   <FaHome className="text-text-muted" />
-                  {application.studentInfo?.currentAddress || "No address provided"}
+                  {application.studentInfo?.currentAddress || 'No address provided'}
                 </dd>
               </div>
             </dl>
@@ -271,19 +287,19 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">Test Name</dt>
                   <dd className="text-sm text-text-muted">
-                    {application.englishProficiency?.test || "Not taken"}
+                    {application.englishProficiency?.test || 'Not taken'}
                   </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">Score</dt>
                   <dd className="text-sm font-semibold text-text-muted">
-                    {application.englishProficiency?.score || "N/A"}
+                    {application.englishProficiency?.score || 'N/A'}
                   </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">Test Date</dt>
                   <dd className="text-sm text-text-muted">
-                    {application.englishProficiency?.testDate || "DD/MM/YYYY"}
+                    {application.englishProficiency?.testDate || 'DD/MM/YYYY'}
                   </dd>
                 </div>
               </dl>
@@ -298,25 +314,25 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">Degree</dt>
                   <dd className="text-sm text-text-muted">
-                    {application.previousEducation?.degree || "Not specified"}
+                    {application.previousEducation?.degree || 'Not specified'}
                   </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">Institution</dt>
                   <dd className="max-w-[60%] break-words text-right text-sm text-text-muted">
-                    {application.previousEducation?.institution || "Institution name"}
+                    {application.previousEducation?.institution || 'Institution name'}
                   </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">Years</dt>
                   <dd className="text-sm text-text-muted">
-                    {application.previousEducation?.years || "Not provided"}
+                    {application.previousEducation?.years || 'Not provided'}
                   </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">GPA</dt>
                   <dd className="text-sm font-bold text-text-muted">
-                    {application.previousEducation?.gpa || "N/A"}
+                    {application.previousEducation?.gpa || 'N/A'}
                   </dd>
                 </div>
               </dl>
@@ -338,7 +354,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                     <FaUser className="text-text-secondary" /> Name
                   </dt>
                   <dd className="text-sm font-normal text-text-primary">
-                    {application.studentInfo?.emergencyContact.name || "Not provided"}
+                    {application.studentInfo?.emergencyContact.name || 'Not provided'}
                   </dd>
                 </div>
 
@@ -347,7 +363,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                     <FaUsers className="text-text-secondary" /> Relation
                   </dt>
                   <dd className="text-sm font-normal text-text-primary">
-                    {application.studentInfo?.emergencyContact.relation || "N/A"}
+                    {application.studentInfo?.emergencyContact.relation || 'N/A'}
                   </dd>
                 </div>
 
@@ -356,7 +372,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                     <FaPhoneAlt className="text-text-secondary" /> Phone
                   </dt>
                   <dd className="text-sm font-normal text-text-primary">
-                    {application.studentInfo?.emergencyContact.phone || "+00 000-000-000"}
+                    {application.studentInfo?.emergencyContact.phone || '+00 000-000-000'}
                   </dd>
                 </div>
 
@@ -365,7 +381,7 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                     <FaEnvelope className="text-text-secondary" /> Email
                   </dt>
                   <dd className="break-words text-sm font-normal text-text-primary">
-                    {application.studentInfo?.emergencyContact.email || "example@email.com"}
+                    {application.studentInfo?.emergencyContact.email || 'example@email.com'}
                   </dd>
                 </div>
               </dl>
@@ -376,5 +392,5 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
       </div>
     </section>
-  );
+);
 }

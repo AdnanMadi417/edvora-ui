@@ -231,10 +231,8 @@ const ModernApplicationsTable = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg rounded-b-none border border-default border-b-0 bg-card">
-
+      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-default bg-card">
         <table className="w-full">
-
           <thead>
             <tr className="border-b border-default bg-card">
               <th
@@ -252,7 +250,7 @@ const ModernApplicationsTable = () => {
                 className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
               >
                 <div className="flex items-center gap-2">
-                  Application
+                  University / Program
                   <SortIndicator field="applicationName" />
                 </div>
               </th>
@@ -260,7 +258,7 @@ const ModernApplicationsTable = () => {
                 onClick={() => handleSort("partner")}
                 className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
               >
-                <div className="flex items-center gap-2">
+                <div className=" flex items-center gap-2">
                   <Building className="h-4 w-4 text-text-muted" />
                   Partner
                   <SortIndicator field="partner" />
@@ -300,7 +298,7 @@ const ModernApplicationsTable = () => {
                 onClick={() => handleSort("updatedAt")}
                 className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
               >
-                <div className=" min-w-[150px] flex items-center gap-2">
+                <div className=" flex min-w-[150px] items-center gap-2">
                   <Clock className="h-4 w-4 text-text-muted" />
                   Last Updated
                   <SortIndicator field="updatedAt" />
@@ -328,7 +326,7 @@ const ModernApplicationsTable = () => {
                   colSpan={9}
                   className="px-6 py-8 text-center text-text-muted"
                 >
-                  <EmptyData/>
+                  <EmptyData />
                 </td>
               </tr>
             ) : (
@@ -419,27 +417,26 @@ const ModernApplicationsTable = () => {
             )}
           </tbody>
         </table>
-
       </div>
 
-      <div className="rounded-b-lg bg-card border border-default px-6 py-4 sticky bottom-0">
+      <div className="sticky bottom-0 rounded-b-lg border border-default bg-card px-6 py-4">
         <div className="flex flex-col items-center justify-between gap-3 text-sm text-text-muted md:flex-row">
           <div>
             Showing{" "}
             <span className="font-medium">
-                {(currentPage - 1) * itemsPerPage + 1}
-              </span>{" "}
+              {(currentPage - 1) * itemsPerPage + 1}
+            </span>{" "}
             to{" "}
             <span className="font-normal">
-                {Math.min(
-                  currentPage * itemsPerPage,
-                  filteredAndSortedApplications.length
-                )}
-              </span>{" "}
+              {Math.min(
+                currentPage * itemsPerPage,
+                filteredAndSortedApplications.length
+              )}
+            </span>{" "}
             of{" "}
             <span className="font-normal">
-                {filteredAndSortedApplications.length}
-              </span>{" "}
+              {filteredAndSortedApplications.length}
+            </span>{" "}
             results
           </div>
 
@@ -452,8 +449,8 @@ const ModernApplicationsTable = () => {
               Previous
             </button>
             <span className="px-2 text-text-muted">
-                Page {currentPage} of {totalPages}
-              </span>
+              Page {currentPage} of {totalPages}
+            </span>
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
@@ -464,7 +461,6 @@ const ModernApplicationsTable = () => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };
