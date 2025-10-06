@@ -2,9 +2,16 @@
 
 import { applications } from "components/data/applications";
 import React, { useState, useRef, useEffect } from "react";
-import { useRouter } from 'next/navigation';
-import { ChevronLeft, MoreVertical, Clock, XCircle, ExternalLink } from 'lucide-react';
-import HoldPopup from 'components/applications/popups/Hold';
+import { useRouter } from "next/navigation";
+import {
+  ChevronLeft,
+  MoreVertical,
+  Clock,
+  XCircle,
+  ExternalLink,
+} from "lucide-react";
+import HoldPopup from "components/applications/popups/Hold";
+import UpdateStatus from "components/applications/popups/UpdateStatus";
 
 interface ApplicationPageProps {
   params: {
@@ -18,21 +25,25 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showHoldPopup, setShowHoldPopup] = useState(false);
+  const [showUpdatePopup, setShowUpdatePopup] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     }
 
     if (isDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDropdownOpen]);
 
@@ -43,55 +54,70 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   const handleConfirmHold = () => {
     setShowHoldPopup(false);
-    console.log('Application held', application?.applicationID);
+    console.log("Application held", application?.applicationID);
   };
 
   const handleCancel = () => {
     setIsDropdownOpen(false);
-    if (confirm('Are you sure you want to cancel this application?')) {
-      console.log('Application cancelled');
+    if (confirm("Are you sure you want to cancel this application?")) {
+      console.log("Application cancelled");
     }
   };
 
   const handleOpen = () => {
     setIsDropdownOpen(false);
-    router.push('/account-manager/applications');
+    router.push("/account-manager/applications");
+  };
+
+  const handleUpdateStatus = () => {
+    setShowUpdatePopup(true);
+  };
+
+  const handleConfirmUpdate = () => {
+    setShowUpdatePopup(false);
+    console.log("Status updated for", application?.applicationID);
   };
 
   return (
-    <section >
+    <section className="w-full">
 
-      <div className="sticky top-0 z-50 backdrop-blur-lg border-b">
-
-        <div className="max-w-7xl mx-auto">
-          <div className="flex h-16 items-center justify-between">
+      <div className="border-b border-default">
+        <div className="mx-auto max-w-7xl ">
+          <div className="flex flex-wrap items-center justify-between gap-3 py-3 sm:h-16 sm:gap-6">
 
             <div className="flex items-center gap-2 sm:gap-6">
               <button
                 onClick={handleOpen}
-                className="group flex items-center gap-2 px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 transition-all hover:text-slate-900 hover:bg-slate-100 rounded-full"
+                className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="sm:inline">Back to Applications</span>
+                <span className="hidden sm:inline">Back to Applications</span>
               </button>
 
-              <div className="hidden sm:block h-8 border border-default/70" />
+              <div className="hidden h-8 border-l border-slate-200 sm:block" />
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={handleUpdateStatus}
+                className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+              >
+                <span>Update Status</span>
+              </button>
 
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-primary rounded-full border border-default transition-all"
+                  className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
                   <span>Actions</span>
                   <MoreVertical className="h-4 w-4" />
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-md border border-default bg-card shadow-sm animate-in fade-in slide-in-from-top-2 duration-200">
+                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white ring-1 ring-black/5">
                     <div className="p-2">
+
                       <button
                         onClick={handleHold}
                         className="group flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-amber-50 hover:text-amber-900"
@@ -101,7 +127,9 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                         </div>
                         <div className="flex-1">
                           <div className="font-medium">Hold</div>
-                          <div className="text-xs text-slate-500">Pause this application</div>
+                          <div className="text-xs text-slate-500">
+                            Pause this application
+                          </div>
                         </div>
                       </button>
 
@@ -116,7 +144,9 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                         </div>
                         <div className="flex-1">
                           <div className="font-medium">Cancel</div>
-                          <div className="text-xs text-slate-500">Reject application</div>
+                          <div className="text-xs text-slate-500">
+                            Reject application
+                          </div>
                         </div>
                       </button>
 
@@ -131,7 +161,9 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                         </div>
                         <div className="flex-1">
                           <div className="font-medium">Open Applications</div>
-                          <div className="text-xs text-slate-500">View all applications</div>
+                          <div className="text-xs text-slate-500">
+                            View all applications
+                          </div>
                         </div>
                       </button>
                     </div>
@@ -151,6 +183,13 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
         applicationId={application?.applicationID}
       />
 
+      <UpdateStatus
+        isOpen={showUpdatePopup}
+        onClose={() => setShowUpdatePopup(false)}
+        onConfirm={handleConfirmUpdate}
+        applicationId={application?.applicationID}
+      />
     </section>
+
   );
 }

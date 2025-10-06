@@ -2,14 +2,13 @@
 export interface TimelineEvent {
   // Description of the event (e.g., "Initial application submitted", "Stage 1 approved")
   description: string;
-  // Who or what initiated the event (e.g., "Partner", "AccountManager", "University", "System")
+  // Who or what initiated the event (e.g., "Partner", "Account Manager", "University", "System")
   by: string;
   // The exact date and time the event occurred (e.g., "2025-09-26 02:35:56 PM")
   timestamp: string;
 }
 
 export interface ApplicationHistory {
-  // The actual list of timeline events
   events: TimelineEvent[];
 }
 
@@ -39,7 +38,7 @@ export interface Application {
   nextAction: string;
   priority: string;
   updatedAt: string;
-  // New fields
+
   program?: string;
   intakeDate?: string;
   tuitionFee?: number;
@@ -148,12 +147,12 @@ export const applications: Application[] = [
         },
         {
           description: "Stage 1 (Internal Review) Approved",
-          by: "AccountManager",
+          by: "Account Manager",
           timestamp: "2025-09-27 09:00:00 AM",
         },
         {
           description: "Application sent to Universiti Malaya (UM)",
-          by: "AccountManager",
+          by: "Account Manager",
           timestamp: "2025-09-27 10:30:00 PM",
         },
         {
@@ -238,12 +237,12 @@ export const applications: Application[] = [
         },
         {
           description: "Documents review completed, all approved",
-          by: "AccountManager",
+          by: "Account Manager",
           timestamp: "2025-09-10 03:00:00 PM",
         },
         {
           description: "Application sent to Universiti Sains Malaysia (USM)",
-          by: "AccountManager",
+          by: "Account Manager",
           timestamp: "2025-09-12 11:00:00 AM",
         },
         {
@@ -338,7 +337,7 @@ export const applications: Application[] = [
         },
         {
           description: "Missing Bachelor Transcript. Student action required.",
-          by: "AccountManager",
+          by: "Account Manager",
           timestamp: "2025-09-13 10:00:00 AM",
         },
         {
@@ -425,12 +424,12 @@ export const applications: Application[] = [
         },
         {
           description: "All documents successfully reviewed and approved",
-          by: "AccountManager",
+          by: "Account Manager",
           timestamp: "2025-09-17 02:30:00 PM",
         },
         {
           description: "Application sent to Universiti Putra Malaysia (UPM)",
-          by: "AccountManager",
+          by: "Account Manager",
           timestamp: "2025-09-18 09:00:00 AM",
         },
         {
@@ -523,7 +522,7 @@ export const applications: Application[] = [
         },
         {
           description: "Further documents requested (Financial Proof)",
-          by: "AccountManager",
+          by: "Account Manager",
           timestamp: "2025-09-28 08:00:00 AM",
         },
       ],
