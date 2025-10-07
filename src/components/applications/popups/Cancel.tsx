@@ -143,7 +143,7 @@ export default function CancelPopup({
                 onClick={handleClose}
                 className="rounded-full border border-default bg-card px-5 py-2.5 text-p2 font-medium text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
               >
-                Go Back
+                Cancel
               </button>
               <button
                 onClick={handleConfirm}
