@@ -1,21 +1,54 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, XOctagon } from "lucide-react";
+import { XCircle, AlertCircle, RotateCcw } from "lucide-react";
 
+interface InputFieldProps {
+  label: string;
+  placeholder: string;
+  id: string;
+  type: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  variant?: string;
+  extra?: string;
+}
 
-interface CancelPopupProps {
+const InputField = ({
+                      label,
+                      placeholder,
+                      id,
+                      type,
+                      value,
+                      onChange,
+                    }: InputFieldProps) => (
+  <div className="space-y-2">
+    <label htmlFor={id} className="block text-p2 font-medium text-text-primary">
+      {label}
+    </label>
+    <input
+      id={id}
+      type={type}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="w-full rounded-md border border-default px-4 py-3 text-p2 transition-all duration-200 placeholder:text-text-muted outline-none focus:none"
+    />
+  </div>
+);
+
+interface HoldPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (reason: string) => void;
   applicationId?: string;
 }
 
-export default function CancelPopup({
-                                      isOpen,
-                                      onClose,
-                                      onConfirm,
-                                    }: CancelPopupProps) {
+export default function HoldPopup({
+                                    isOpen,
+                                    onClose,
+                                    onConfirm,
+                                  }: HoldPopupProps) {
   const [reason, setReason] = useState("");
   const [isVisible, setIsVisible] = useState(false);
 
@@ -29,6 +62,11 @@ export default function CancelPopup({
   }, [isOpen]);
 
   if (!isVisible) return null;
+
+  const handleConfirm = () => {
+    onConfirm(reason);
+    setReason("");
+  };
 
   const handleClose = () => {
     setReason("");
@@ -52,18 +90,15 @@ export default function CancelPopup({
           <div className="relative border-b border-default px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-red-200 bg-gradient-to-br from-red-50 to-rose-50">
-                  <XOctagon
-                    className="h-6 w-6 text-red-600"
-                    strokeWidth={2.5}
-                  />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
+                  <RotateCcw className="h-6 w-6 text-amber-600" strokeWidth={2.5} />
                 </div>
                 <div>
                   <h5 className="text-h4 font-bold text-gray-900">
-                    Cancel Application
+                    Request Resubmission Docs
                   </h5>
                   <p className="mt-0.5 text-caption text-text-muted">
-                    Permanently cancel this application
+                    Ask the applicant to resubmit or correct specific documents.
                   </p>
                 </div>
               </div>
@@ -78,7 +113,47 @@ export default function CancelPopup({
             </div>
           </div>
 
+          <div className="space-y-5 px-6 py-4">
+            <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
+              <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
+              <p className="text-p2 leading-relaxed text-text-primary">
+                This action will request the applicant to re-upload or fix documents.
+                Please include clear instructions or reasons to ensure proper resubmission.
+              </p>
+            </div>
+
+            <InputField
+              variant="auth"
+              extra="w-full"
+              label="Reason or instructions for resubmission (required):"
+              placeholder="e.g., Please re-upload your ID with higher resolution or include the signature page..."
+              id="reason"
+              type="text"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            />
+          </div>
+
+          <div className="border-t border-default px-6 py-5">
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleClose}
+                className="rounded-full border border-default bg-card px-5 py-2.5 text-p2 font-medium text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirm}
+                disabled={!reason.trim()}
+                className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-p2 font-medium text-white shadow-lg shadow-amber-500/25 transition-all duration-200 hover:from-amber-600 hover:to-orange-600 hover:shadow-xl hover:shadow-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+              >
+                Confirm Request
+              </button>
+            </div>
+          </div>
         </div>
+
+
       </div>
     </div>
   );

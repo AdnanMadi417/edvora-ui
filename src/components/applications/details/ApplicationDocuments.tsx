@@ -13,19 +13,20 @@ import {
 } from "lucide-react";
 import { applications } from "components/data/applications";
 import ViewPopup from "components/applications/popups/ViewDoc";
-import DownloadPopup from "components/applications/popups/DownloadDoc";
 import ResubmitPopup from "components/applications/popups/ResubmitDoc";
 
 interface ApplicationDocumentsProps {
   params?: { id: string };
 }
 
-export default function ApplicationDocuments({ params }: ApplicationDocumentsProps) {
+export default function ApplicationDocuments({
+  params,
+}: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(true);
   const documents = applications[0]?.docs || [];
   const [showViewPopup, setShowViewPopup] = useState(false);
-  const [showDownloadPopup, setShowDownloadPopup] = useState(false);
   const [showResubmitPopup, setShowResubmitPopup] = useState(false);
+  const [selectedDoc, setSelectedDoc] = useState(null);
 
   const pendingCount = documents.filter((d) => d.status === "pending").length;
   const approvedCount = documents.filter((d) => d.status === "approved").length;
@@ -91,7 +92,9 @@ export default function ApplicationDocuments({ params }: ApplicationDocumentsPro
 
       <div
         className={`transition-all duration-300 ease-in-out ${
-          showDocs ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+          showDocs
+            ? "max-h-[2000px] opacity-100"
+            : "max-h-0 overflow-hidden opacity-0"
         }`}
       >
         <div className="rounded-b-lg border border-t-0 border-default bg-card p-6">
@@ -113,7 +116,7 @@ export default function ApplicationDocuments({ params }: ApplicationDocumentsPro
                     </div>
                   </div>
 
-                  <div className="min-w-0 flex-1 max-w-[350px]">
+                  <div className="min-w-0 max-w-[350px] flex-1">
                     <div className="mb-2 flex items-center gap-2">
                       <h3 className="truncate text-sm font-semibold text-slate-800">
                         {doc.name}
@@ -166,17 +169,29 @@ export default function ApplicationDocuments({ params }: ApplicationDocumentsPro
 
                 <div className="ml-4 flex flex-wrap gap-2">
                   <button
-                    onClick={() => setShowViewPopup(true)}
+                    onClick={() => {
+                      setSelectedDoc(doc);
+                      setShowViewPopup(true);
+                    }}
                     className="group rounded-full border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="View Application"
+                    title="View Document"
+                    aria-label="View Document"
                   >
                     <Eye className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
 
                   <button
-                    onClick={() => setShowDownloadPopup(true)}
+                    onClick={() => {
+                      const fileUrl =
+                        doc.fileUrl || `/docs/${doc.name.replace(/\s+/g, "_")}.pdf`;
+                      const link = document.createElement("a");
+                      link.href = fileUrl;
+                      link.download = fileUrl.split("/").pop() || "document.pdf";
+                      link.click();
+                    }}
                     className="group rounded-full border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
-                    title="Download Application"
+                    title="Download Document"
+                    aria-label="Download Document"
                   >
                     <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
@@ -184,32 +199,43 @@ export default function ApplicationDocuments({ params }: ApplicationDocumentsPro
                   <button
                     onClick={() => setShowResubmitPopup(true)}
                     className="group rounded-full border border-transparent bg-amber-50 p-2 text-amber-600 transition-all duration-200 hover:border-amber-200 hover:bg-amber-100 hover:text-amber-700 focus-visible:ring-2 focus-visible:ring-amber-400"
-                    title="Resubmit Application"
+                    title="Resubmit Document"
+                    aria-label="Resubmit Document"
                   >
                     <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
                 </div>
+
+
               </div>
             ))}
           </div>
         </div>
 
-        <ViewPopup isOpen={showViewPopup} onClose={() => setShowViewPopup(false)} />
-        <DownloadPopup isOpen={showDownloadPopup} onClose={() => setShowDownloadPopup(false)} />
-        <ResubmitPopup isOpen={showResubmitPopup} onClose={() => setShowResubmitPopup(false)} />
+        <ViewPopup
+          isOpen={showViewPopup}
+          onClose={() => setShowViewPopup(false)}
+          doc={selectedDoc}
+        />
+
+
+        <ResubmitPopup
+          isOpen={showResubmitPopup}
+          onClose={() => setShowResubmitPopup(false)}
+        />
       </div>
 
       <style jsx>{`
-          @keyframes slideIn {
-              from {
-                  opacity: 0;
-                  transform: translateY(-10px);
-              }
-              to {
-                  opacity: 1;
-                  transform: translateY(0);
-              }
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
           }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
       `}</style>
     </section>
   );
