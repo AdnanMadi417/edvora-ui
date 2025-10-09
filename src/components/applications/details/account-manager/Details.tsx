@@ -1,7 +1,7 @@
-import { applications } from 'components/data/applications';
+import { applications } from '../../../data/applications';
 import React from 'react';
-import EmptyData from 'components/emptyData/EmptyData';
-import ApplicationAccountManagerTopBar from 'components/applications/topBar/ApplicationAccountManagerTopBar';
+import EmptyData from '../../../emptyData/EmptyData';
+import ApplicationAccountManagerTopBar from '../../topBar/ApplicationAccountManagerTopBar';
 
 import {
   FaTasks,

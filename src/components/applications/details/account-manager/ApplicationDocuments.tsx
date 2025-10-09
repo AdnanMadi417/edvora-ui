@@ -11,9 +11,9 @@ import {
   Download,
   RotateCcw,
 } from "lucide-react";
-import { applications } from "components/data/applications";
-import ViewPopup from "components/applications/popups/ViewDoc";
-import ResubmitPopup from "components/applications/popups/ResubmitDoc";
+import { applications } from "../../../data/applications";
+import ViewPopup from "../../popups/ViewDoc";
+import ResubmitPopup from "../../popups/ResubmitDoc";
 
 interface ApplicationDocumentsProps {
   params?: { id: string };

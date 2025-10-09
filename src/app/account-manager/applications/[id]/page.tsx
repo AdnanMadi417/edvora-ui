@@ -1,5 +1,5 @@
-import Details from "components/applications/details/Details";
-import ApplicationDocuments from "components/applications/details/ApplicationDocuments";
+import Details from "../../../../components/applications/details/account-manager/Details";
+import ApplicationDocuments from "../../../../components/applications/details/account-manager/ApplicationDocuments";
 import TimeLine from "components/applications/timeLine/TimeLine";
 
 interface ApplicationPageProps {

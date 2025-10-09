@@ -249,7 +249,7 @@ const ModernApplicationsTable = () => {
                 onClick={() => handleSort("applicationName")}
                 className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
               >
-                <div className="flex items-center gap-2">
+                <div className="min-w-[200px] flex items-center gap-2">
                   University / Program
                   <SortIndicator field="applicationName" />
                 </div>
