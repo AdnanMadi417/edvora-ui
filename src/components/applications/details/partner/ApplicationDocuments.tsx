@@ -20,7 +20,7 @@ interface ApplicationDocumentsProps {
 export default function ApplicationDocuments({
   params,
 }: ApplicationDocumentsProps) {
-  const [showDocs, setShowDocs] = useState(true);
+  const [showDocs, setShowDocs] = useState(false);
   const documents = applications[0]?.docs || [];
   const [showViewPopup, setShowViewPopup] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState(null);

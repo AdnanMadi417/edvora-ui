@@ -17,7 +17,7 @@ interface ApplicationTimeLineProps {
 export default function TimeLine({
                                    params,
                                  }: ApplicationTimeLineProps) {
-  const [showTimeline, setShowTimeline] = useState(true);
+  const [showTimeline, setShowTimeline] = useState(false);
 
   const timelineEvents = applications[0]?.history?.events || [];
 
