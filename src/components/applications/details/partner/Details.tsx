@@ -80,29 +80,25 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
             </h3>
 
             <div className="flex flex-wrap gap-2">
-              <span
-                className="inline-flex whitespace-nowrap rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 sm:text-p2">
+              <span className="inline-flex whitespace-nowrap rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
                 Processing
               </span>
-              <span
-                className="inline-flex whitespace-nowrap rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 sm:text-p2">
+              <span className="inline-flex whitespace-nowrap rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 sm:text-sm">
                 {application.priority.charAt(0).toUpperCase() +
-                  application.priority.slice(1)}{' '}
+                  application.priority.slice(1)}{" "}
                 Priority
               </span>
-              <span
-                className="inline-flex whitespace-nowrap rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 sm:text-p2">
+              <span className="inline-flex whitespace-nowrap rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 sm:text-sm">
                 Stage {application.stage}
               </span>
-              <span
-                className="inline-flex whitespace-nowrap rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700 sm:text-p2">
+              <span className="inline-flex whitespace-nowrap rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
                 {daysSince(application.updatedAt)} Days
               </span>
             </div>
           </div>
 
           <div className="w-full self-start sm:w-auto sm:text-end">
-            <span className="block truncate text-p2 text-text-secondary">
+            <span className="block truncate text-sm text-text-muted">
               {application.studentInfo?.fullName}
             </span>
             <span className="block truncate text-xs text-text-muted">

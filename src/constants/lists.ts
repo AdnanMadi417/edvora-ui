@@ -1,3 +1,5 @@
+
+// Document Types
 export const DOCUMENT_TYPES = [
   { key: "passport_copy", label: "Passport Copy", labelKey: "documents.passport_copy" },
   { key: "academic_transcripts", label: "Academic Transcripts", labelKey: "documents.academic_transcripts" },
@@ -11,6 +13,7 @@ export const DOCUMENT_TYPES = [
   { key: "other", label: "Other", labelKey: "documents.other" },
 ];
 
+// User Roles
 export const USER_ROLES = [
   { key: "admin", label: "Admin", labelKey: "roles.admin" },
   { key: "account_manager", label: "Account Manager", labelKey: "roles.account_manager" },
@@ -19,15 +22,25 @@ export const USER_ROLES = [
   { key: "applicant", label: "Applicant", labelKey: "roles.applicant" },
 ];
 
+// Gender Options
 export const GENDER_OPTIONS = [
   { key: "male", label: "Male", labelKey: "gender.male" },
   { key: "female", label: "Female", labelKey: "gender.female" },
 ];
 
-
+// Application Stages
+export const STAGE_OPTIONS = [
+  { key: "all", label: "All Stages", labelKey: "stage.all" },
+  { key: "application_review", label: "Application Review", labelKey: "stage.application_review" },
+  { key: "offer_letter", label: "Offer Letter", labelKey: "stage.offer_letter" },
+  { key: "visa_processing", label: "Visa Processing", labelKey: "stage.visa_processing" },
+  { key: "student_arrival", label: "Student Arrival", labelKey: "stage.student_arrival" },
+  { key: "commission_payment", label: "Commission Payment", labelKey: "stage.commission_payment" },
+];
 
 export default {
   DOCUMENT_TYPES,
   USER_ROLES,
   GENDER_OPTIONS,
+  STAGE_OPTIONS,
 };
