@@ -10,6 +10,7 @@ const publicRoutes = [
   '/account-manager/applications',
   '/partner/applications/550e8400-e29b-41d4-a716-446655440000',
   '/partner/applications',
+  '/account-manager/notifications',
 ]
 
 export function middleware(req: NextRequest) {

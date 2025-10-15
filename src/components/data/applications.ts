@@ -529,3 +529,28 @@ export const applications: Application[] = [
     },
   },
 ];
+
+
+export const notifications = [
+  {
+    title: "New Student Application",
+    message: "Student Ahmad has submitted an application for University of Malaya.",
+    from: "System",
+    type: "new",
+    timestamp: "2 hours ago",
+  },
+  {
+    title: "Action Required",
+    message: "Please review Student Siti’s uploaded documents.",
+    from: "Admin",
+    type: "pending",
+    timestamp: "5 hours ago",
+  },
+  {
+    title: "Application Approved",
+    message: "Student Amir’s application has been approved by the university.",
+    from: "University Admin",
+    type: "approved",
+    timestamp: "1 day ago",
+  },
+];
