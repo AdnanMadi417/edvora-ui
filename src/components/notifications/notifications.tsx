@@ -144,7 +144,7 @@ export default function Notifications({ params }: PartnerNotificationProps) {
 
                   <button
                     onClick={() => markAsRead(index)}
-                    className="ml-4 flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 transition hover:bg-green-200"
+                    className="ml-4 flex items-center gap-1.5 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 transition hover:bg-green-200 outline-0"
                   >
                     <Check className="h-3.5 w-3.5" /> Mark as Read
                   </button>
