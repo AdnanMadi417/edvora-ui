@@ -1,10 +1,9 @@
-
 export interface TimelineEvent {
-  // Description of the event (e.g., "Initial application submitted", "Stage 1 approved")
+
   description: string;
-  // Who or what initiated the event (e.g., "Partner", "Account Manager", "University", "System")
+
   by: string;
-  // The exact date and time the event occurred (e.g., "2025-09-26 02:35:56 PM")
+
   timestamp: string;
 }
 
@@ -71,6 +70,18 @@ export interface Application {
   // New history field
   history?: ApplicationHistory; // Added the timeline here
 }
+
+export interface Partner {
+  id: number;
+  partner: string;
+  type: string;
+  emailContact: string;
+  phoneContact: string;
+  country: string;
+  status: string;
+  registeredAt: string;
+}
+
 
 export const applications: Application[] = [
   {
@@ -530,7 +541,6 @@ export const applications: Application[] = [
   },
 ];
 
-
 export const notifications = [
   {
     title: "New Student Application",
@@ -554,3 +564,114 @@ export const notifications = [
     timestamp: "1 day ago",
   },
 ];
+
+export interface Message {
+  id: number;
+  sender: "partner" | "manager";
+  senderName: string;
+  text: string;
+  time: string;
+  read: boolean;
+  file?: {
+    name: string;
+    size: string;
+  };
+}
+
+export interface Chat {
+  id: string;
+  name: string;
+  fileName: string;
+  type: "pdf" | "excel" | "design" | "other";
+  status: "pending" | "approved" | "rejected";
+  uploadedAt: string;
+  version: number;
+  size: string;
+  reviewedBy?: string;
+  reviewedAt?: string;
+}
+
+export const partners: Partner[] = [
+  {
+    id: 1,
+    partner: "Stanford University",
+    type: "University",
+    emailContact: "sarah.chen@stanford.edu",
+    phoneContact: "+608886609882",
+    country: "USA",
+    status: "registered",
+    registeredAt: "2024-01-15T10:30:00Z",
+  },
+  {
+    id: 2,
+    partner: "Harvard Business School",
+    type: "University",
+    emailContact: "marcus.johnson@hbs.edu",
+    phoneContact: "+60888660923",
+    country: "USA",
+    status: "pending",
+    registeredAt: "2024-01-14T14:20:00Z",
+  },
+  {
+    id: 3,
+    partner: "Local NGO",
+    type: "Organization",
+    emailContact: "info@localngo.org",
+    phoneContact: "+608886609800",
+    country: "Malaysia",
+    status: "registered",
+    registeredAt: "2024-02-01T09:00:00Z",
+  },
+]
+
+
+export const conversations: Message[] = [
+  {
+    id: 1,
+    sender: "partner",
+    senderName: "John Chen",
+    text: "Hi! I have 3 new students interested in MBA programs. Can you help me with the university options?",
+    time: "09:30 AM",
+    read: true,
+  },
+  {
+    id: 2,
+    sender: "manager",
+    senderName: "Sarah Lee",
+    text: "Hello John! Of course, I can help. What are their preferred destinations?",
+    time: "09:35 AM",
+    read: true,
+  },
+  {
+    id: 3,
+    sender: "partner",
+    senderName: "John Chen",
+    text: "2 students prefer UK and 1 prefers Australia. I'm attaching their documents.",
+    time: "09:40 AM",
+    file: { name: "student_documents.pdf", size: "2.4 MB" },
+    read: true,
+  },
+  {
+    id: 4,
+    sender: "manager",
+    senderName: "Sarah Lee",
+    text: "Perfect! I've received the documents. For UK, I recommend University of Manchester and Birmingham. For Australia, Monash University has great MBA programs. Commission structure is 10% for all three universities.",
+    time: "10:15 AM",
+    read: false,
+  },
+];
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -10,6 +10,11 @@ import {
   Clock,
   User,
   Building,
+  AlertTriangle,
+  GraduationCap,
+  CalendarCheck,
+  BadgeCheck,
+  Settings
 } from "lucide-react";
 import avatar from "/public/img/avatars/user.png";
 import Image from "next/image";
@@ -136,7 +141,7 @@ const ModernApplicationsTable = () => {
     const priorityConfig = {
       high: "bg-red-100 text-red-700 border-red-200 px-3 py-1",
       medium: "bg-yellow-100 text-yellow-700 border-yellow-200 px-3 py-1",
-      low: "bg-gray-100 text-gray-600 border-gray-200 px-3 py-1",
+      low: "bg-gray-100 text-text-muted border-gray-200 px-3 py-1",
     };
 
     return (
@@ -184,7 +189,7 @@ const ModernApplicationsTable = () => {
                 placeholder="Search applications by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full rounded-full text-text-muted border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
@@ -223,7 +228,7 @@ const ModernApplicationsTable = () => {
                 setFilterStatus("all");
                 setFilterPriority("all");
               }}
-              className="bg-background flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error sm:w-auto"
+              className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error sm:w-auto"
             >
               Clear
             </button>
@@ -233,82 +238,102 @@ const ModernApplicationsTable = () => {
 
       <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-default bg-card">
         <table className="w-full">
+
           <thead>
-            <tr className="border-b border-default bg-card">
-              <th
-                onClick={() => handleSort("studentName")}
-                className="group  cursor-pointer px-6 py-4 text-start font-bold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-text-muted" />
-                  Student
-                  <SortIndicator field="studentName" />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("applicationName")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="min-w-[200px] flex items-center gap-2">
-                  University / Program
-                  <SortIndicator field="applicationName" />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("partner")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className=" flex items-center gap-2">
-                  <Building className="h-4 w-4 text-text-muted" />
-                  Partner
-                  <SortIndicator field="partner" />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("stage")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  Stage
-                  <SortIndicator field="stage" />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("status")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  Status
-                  <SortIndicator field="status" />
-                </div>
-              </th>
-              <th className="min-w-[200px] px-6 py-4 text-start  font-semibold tracking-wider  text-text-primary">
+          <tr className="border-b border-default bg-card">
+            <th
+              onClick={() => handleSort("studentName")}
+              className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Student
+                <SortIndicator field="studentName" />
+              </div>
+            </th>
+
+            <th
+              onClick={() => handleSort("applicationName")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="min-w-[250px] flex items-center gap-2">
+                <GraduationCap className="h-4 w-4" />
+                University / Program
+                <SortIndicator field="applicationName" />
+              </div>
+            </th>
+
+            <th
+              onClick={() => handleSort("partner")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <Building className="h-4 w-4" />
+                Partner
+                <SortIndicator field="partner" />
+              </div>
+            </th>
+
+            <th
+              onClick={() => handleSort("stage")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <Flag className="h-4 w-4" />
+                Stage
+                <SortIndicator field="stage" />
+              </div>
+            </th>
+
+            <th
+              onClick={() => handleSort("status")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <BadgeCheck className="h-4 w-4" />
+                Status
+                <SortIndicator field="status" />
+              </div>
+            </th>
+
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+              <div className="flex items-center gap-2">
+                <CalendarCheck className="h-4 w-4" />
                 Next Action
-              </th>
-              <th
-                onClick={() => handleSort("priority")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  Priority
-                  <SortIndicator field="priority" />
-                </div>
-              </th>
-              <th
-                onClick={() => handleSort("updatedAt")}
-                className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className=" flex min-w-[150px] items-center gap-2">
-                  <Clock className="h-4 w-4 text-text-muted" />
-                  Last Updated
-                  <SortIndicator field="updatedAt" />
-                </div>
-              </th>
-              <th className="px-6 py-4 text-start font-semibold tracking-wider  text-text-primary">
+              </div>
+            </th>
+
+            <th
+              onClick={() => handleSort("priority")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
+                Priority
+                <SortIndicator field="priority" />
+              </div>
+            </th>
+
+            <th
+              onClick={() => handleSort("updatedAt")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex min-w-[150px] items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Last Updated
+                <SortIndicator field="updatedAt" />
+              </div>
+            </th>
+
+            <th className="px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
                 Actions
-              </th>
-            </tr>
+              </div>
+            </th>
+          </tr>
           </thead>
+
 
           <tbody className="divide-border-default divide-y bg-primary">
             {loading ? (

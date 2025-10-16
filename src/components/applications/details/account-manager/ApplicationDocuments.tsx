@@ -59,22 +59,13 @@ export default function ApplicationDocuments({
               <FolderOpen className="text-xl text-blue-700" />
             </span>
             Documents
-          </h3>
 
-          <div className="ml-14 flex flex-wrap gap-1">
             <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
               {documents.length} Total
             </span>
-            <span className="rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700">
-              {pendingCount} Pending
-            </span>
-            <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
-              {approvedCount} Approved
-            </span>
-            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700">
-              {rejectedCount} Rejected
-            </span>
-          </div>
+
+          </h3>
+
         </div>
 
         <button

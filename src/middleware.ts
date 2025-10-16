@@ -6,10 +6,13 @@ const publicRoutes = [
   '/auth/sign-in',
   '/unauthorized',
   '/account-manager/partners',
+  '/account-manager/commission',
   '/account-manager/applications/550e8400-e29b-41d4-a716-446655440000',
   '/account-manager/applications',
   '/partner/applications/550e8400-e29b-41d4-a716-446655440000',
   '/partner/applications',
+  '/partner/notifications',
+  '/partner/commission',
   '/account-manager/notifications',
 ]
 

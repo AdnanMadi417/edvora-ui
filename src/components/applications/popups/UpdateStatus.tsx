@@ -268,7 +268,7 @@ export default function UpdateStatusPopup({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4 transition-all duration-300"
+      className="fixed inset-0 flex items-center justify-center bg-overlay p-4 transition-all duration-300 z-[80]"
       onClick={handleClose}
     >
       <div
