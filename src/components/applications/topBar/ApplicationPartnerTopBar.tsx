@@ -56,16 +56,6 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
               </button>
               <div className="hidden h-8 border-l border-default sm:block" />
             </div>
-
-            <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                className="flex items-center gap-2 rounded-full border border-default bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-              >
-                <MessageCircle className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                Comments
-              </button>
-
-            </div>
           </div>
         </div>
       </div>

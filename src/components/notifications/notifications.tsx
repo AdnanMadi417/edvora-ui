@@ -49,7 +49,7 @@ export default function Notifications({ params }: PartnerNotificationProps) {
         }`}
         onClick={() => setShowNotifications(!showNotifications)}
       >
-        <div className="flex flex-col gap">
+        <div className="flex flex-col gap-2">
           <h3 className="text-p3 flex items-center gap-3 font-semibold text-text-primary">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <Bell className="text-xl text-blue-700" />

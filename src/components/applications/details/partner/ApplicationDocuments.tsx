@@ -25,10 +25,6 @@ export default function ApplicationDocuments({
   const [showViewPopup, setShowViewPopup] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState(null);
 
-  const pendingCount = documents.filter((d) => d.status === "pending").length;
-  const approvedCount = documents.filter((d) => d.status === "approved").length;
-  const rejectedCount = documents.filter((d) => d.status === "rejected").length;
-
   const getFileStatus = (status: string) => {
     switch (status) {
       case "pending":

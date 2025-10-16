@@ -72,7 +72,7 @@ export interface Application {
 }
 
 export interface Partner {
-  id: number;
+  id: string;
   partner: string;
   type: string;
   emailContact: string;
@@ -593,36 +593,37 @@ export interface Chat {
 
 export const partners: Partner[] = [
   {
-    id: 1,
-    partner: "Stanford University",
-    type: "University",
-    emailContact: "sarah.chen@stanford.edu",
-    phoneContact: "+608886609882",
-    country: "USA",
+    id: "7b6f3c52-1a4e-4d2c-9b59-7c92a83b9e21",
+    partner: "Yayasan Harapan Malaysia",
+    type: "NGO",
+    emailContact: "info@yayasanharapan.org.my",
+    phoneContact: "+60322778899",
+    country: "Malaysia",
     status: "registered",
     registeredAt: "2024-01-15T10:30:00Z",
   },
   {
-    id: 2,
-    partner: "Harvard Business School",
-    type: "University",
-    emailContact: "marcus.johnson@hbs.edu",
-    phoneContact: "+60888660923",
-    country: "USA",
+    id: "f1c2a8d9-4c6b-45de-95df-8a6fbbde4a32",
+    partner: "GreenTech Malaysia",
+    type: "Company",
+    emailContact: "contact@greentechmalaysia.com",
+    phoneContact: "+60389218800",
+    country: "Malaysia",
     status: "pending",
     registeredAt: "2024-01-14T14:20:00Z",
   },
   {
-    id: 3,
-    partner: "Local NGO",
+    id: "b4f923de-7a5e-43b3-b913-1d6546d13c91",
+    partner: "MyChild Foundation",
     type: "Organization",
-    emailContact: "info@localngo.org",
-    phoneContact: "+608886609800",
+    emailContact: "hello@mychildfoundation.org.my",
+    phoneContact: "+60321883322",
     country: "Malaysia",
     status: "registered",
     registeredAt: "2024-02-01T09:00:00Z",
   },
-]
+];
+
 
 
 export const conversations: Message[] = [
