@@ -6,7 +6,6 @@ import { ChevronUp,
   Tag,
   Phone,
   CheckCircle,
-  Globe,
   CalendarDays,
   Settings,
 
@@ -15,6 +14,7 @@ import Image from "next/image";
 import partner from "/public/img/dashboards/partner-icon.png";
 import { partners as initialPartners } from "components/data/applications";
 import EmptyData from '../../emptyData/EmptyTableData';
+import Link from 'next/link';
 
 const ModernPartnersTable = () => {
   const [partners] = useState(initialPartners);
@@ -43,7 +43,7 @@ const ModernPartnersTable = () => {
   const filteredAndSortedPartners = useMemo(() => {
     let filtered = partners.filter((app) => {
       return (
-        app.partner.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        app.businessName.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (filterStatus === "all" || app.status === filterStatus) &&
         (filterCountry === "all" || app.country === filterCountry) &&
         (filterType === "all" || app.type === filterType)
@@ -277,7 +277,7 @@ const ModernPartnersTable = () => {
                       />
                     </div>
 
-                    {app.partner}
+                    {app.businessName}
                   </td>
                   <td className="min-w-[150px] max-w-[150px] px-6 py-4 text-text-muted">
                     {app.type}
@@ -300,15 +300,18 @@ const ModernPartnersTable = () => {
                     {new Date(app.registeredAt).toLocaleDateString()}
                   </td>
 
-                  <td className="min-w-[180px] px-6 py-4">
-                    <button
+                  <td className="min-w-[170px] px-6 py-4">
+                    <Link
+                      href={`/account-manager/partners/${app.id}`}
                       aria-label="View Partner"
                       className="flex items-center gap-2 rounded-full p-1.5 text-text-muted outline-0 transition-colors hover:bg-blue-50 hover:text-blue-600"
                     >
                       <Eye className="h-4 w-4" />
                       <span className="text-caption">View Partner</span>
-                    </button>
+                    </Link>
                   </td>
+
+
                 </tr>
               ))
             )}

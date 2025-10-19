@@ -6,6 +6,7 @@ const publicRoutes = [
   '/auth/sign-in',
   '/unauthorized',
   '/account-manager/partners',
+  '/account-manager/partners/7b6f3c52-1a4e-4d2c-9b59-7c92a83b9e21',
   '/account-manager/commission',
   '/account-manager/applications/550e8400-e29b-41d4-a716-446655440000',
   '/account-manager/applications',

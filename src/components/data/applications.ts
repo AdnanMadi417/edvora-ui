@@ -73,15 +73,17 @@ export interface Application {
 
 export interface Partner {
   id: string;
-  partner: string;
-  type: string;
-  emailContact: string;
+  businessName: string;
+  registrationNumber: string;
+  contactPerson: string;
+  businessAddress: string;
   phoneContact: string;
+  emailContact: string;
   country: string;
+  type: string;
   status: string;
   registeredAt: string;
 }
-
 
 export const applications: Application[] = [
   {
@@ -591,41 +593,6 @@ export interface Chat {
   reviewedAt?: string;
 }
 
-export const partners: Partner[] = [
-  {
-    id: "7b6f3c52-1a4e-4d2c-9b59-7c92a83b9e21",
-    partner: "Yayasan Harapan Malaysia",
-    type: "NGO",
-    emailContact: "info@yayasanharapan.org.my",
-    phoneContact: "+60322778899",
-    country: "Malaysia",
-    status: "registered",
-    registeredAt: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: "f1c2a8d9-4c6b-45de-95df-8a6fbbde4a32",
-    partner: "GreenTech Malaysia",
-    type: "Company",
-    emailContact: "contact@greentechmalaysia.com",
-    phoneContact: "+60389218800",
-    country: "Malaysia",
-    status: "pending",
-    registeredAt: "2024-01-14T14:20:00Z",
-  },
-  {
-    id: "b4f923de-7a5e-43b3-b913-1d6546d13c91",
-    partner: "MyChild Foundation",
-    type: "Organization",
-    emailContact: "hello@mychildfoundation.org.my",
-    phoneContact: "+60321883322",
-    country: "Malaysia",
-    status: "registered",
-    registeredAt: "2024-02-01T09:00:00Z",
-  },
-];
-
-
-
 export const conversations: Message[] = [
   {
     id: 1,
@@ -662,6 +629,60 @@ export const conversations: Message[] = [
   },
 ];
 
+export const partners: Partner[] = [
+  {
+    id: "7b6f3c52-1a4e-4d2c-9b59-7c92a83b9e21",
+    businessName: "Yayasan Harapan Malaysia",
+    registrationNumber: "SDG0874328",
+    contactPerson: "Dato' Ahmad Faiz",
+    businessAddress: "12 Jalan Tun Razak, Kuala Lumpur, 50400 Malaysia",
+    phoneContact: "+60322778899",
+    emailContact: "info@yayasanharapan.org.my",
+    country: "Malaysia",
+    type: "NGO",
+    status: "registered",
+    registeredAt: "2024-01-15T10:30:00Z",
+  },
+  {
+    id: "f1c2a8d9-4c6b-45de-95df-8a6fbbde4a32",
+    businessName: "GreenTech Malaysia",
+    registrationNumber: "MY-567890",
+    contactPerson: "Nurul Huda",
+    businessAddress: "88 Jalan Teknologi, Cyberjaya, Selangor, 63000 Malaysia",
+    phoneContact: "+60389218800",
+    emailContact: "contact@greentechmalaysia.com",
+    country: "Malaysia",
+    type: "Company",
+    status: "pending",
+    registeredAt: "2024-01-14T14:20:00Z",
+  },
+  {
+    id: "b4f923de-7a5e-43b3-b913-1d6546d13c91",
+    businessName: "MyChild Foundation",
+    registrationNumber: "MY-334455",
+    contactPerson: "Siti Aminah",
+    businessAddress: "45 Jalan Damai, Bukit Bintang, Kuala Lumpur, 50200 Malaysia",
+    phoneContact: "+60321883322",
+    emailContact: "hello@mychildfoundation.org.my",
+    country: "Malaysia",
+    type: "Organization",
+    status: "registered",
+    registeredAt: "2024-02-01T09:00:00Z",
+  },
+  {
+    id: "e3d7f2b8-9a12-4d5a-aef1-2b91c3e7f812",
+    businessName: "Your Uni Education Services",
+    registrationNumber: "N/A",
+    contactPerson: "University Representative",
+    businessAddress: "123 University Avenue, Education City, EC 12345",
+    phoneContact: "+1-555-0100",
+    emailContact: "contact@youruni.com",
+    country: "Malaysia",
+    type: "University",
+    status: "approved",
+    registeredAt: "2023-01-15T18:00:00Z",
+  },
+];
 
 
 
