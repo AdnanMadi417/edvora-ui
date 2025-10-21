@@ -32,7 +32,10 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsDropdownOpen(false);
       }
     }
@@ -58,7 +61,11 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   const handleConfirmHold = (reason: string) => {
     setShowHoldPopup(false);
-    console.log("Application placed on hold:", application?.applicationID, reason);
+    console.log(
+      "Application placed on hold:",
+      application?.applicationID,
+      reason
+    );
   };
 
   const handleCancel = () => {
@@ -82,11 +89,9 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   return (
     <section className="w-full">
-
       <div className="border-b border-default bg-white/70 backdrop-blur-md">
         <div className="mx-auto max-w-7xl">
           <div className="flex flex-wrap items-center justify-between gap-3 py-3 sm:h-16 sm:gap-6">
-
             <div className="flex items-center gap-2 sm:gap-6">
               <button
                 onClick={handleBack}
@@ -118,7 +123,6 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                 {isDropdownOpen && (
                   <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-default bg-white ring-1 ring-black/5">
                     <div className="p-2">
-
                       <button
                         onClick={handleHold}
                         className="group flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-amber-50 hover:text-amber-900"
@@ -128,7 +132,9 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                         </div>
                         <div className="flex-1">
                           <div className="font-medium">Hold</div>
-                          <div className="text-xs text-slate-500">Pause this application</div>
+                          <div className="text-xs text-slate-500">
+                            Pause this application
+                          </div>
                         </div>
                       </button>
 
@@ -143,7 +149,9 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                         </div>
                         <div className="flex-1">
                           <div className="font-medium">Cancel</div>
-                          <div className="text-xs text-slate-500">Reject this application</div>
+                          <div className="text-xs text-slate-500">
+                            Reject this application
+                          </div>
                         </div>
                       </button>
 
@@ -158,14 +166,15 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
                         </div>
                         <div className="flex-1">
                           <div className="font-medium">Open Applications</div>
-                          <div className="text-xs text-slate-500">View all applications</div>
+                          <div className="text-xs text-slate-500">
+                            View all applications
+                          </div>
                         </div>
                       </button>
                     </div>
                   </div>
                 )}
               </div>
-
             </div>
           </div>
         </div>
