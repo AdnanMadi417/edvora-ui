@@ -69,6 +69,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 shadow-sm sm:p-6">
+
         <ApplicationAccountManagerTopBar params={params} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
