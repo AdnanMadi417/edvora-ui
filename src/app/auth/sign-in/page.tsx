@@ -25,6 +25,22 @@ export default function SignInPage() {
       const loginRes = await api.post("/auth/login", { email, password });
       console.log("Login response:", loginRes);
 
+      // Handle bearer token from login response if provided
+      const accessToken: string | undefined = loginRes?.data?.access_token;
+      const tokenType: string | undefined = loginRes?.data?.token_type;
+      if (accessToken) {
+        const bearerPrefix = tokenType && tokenType.toLowerCase() === "bearer" ? "Bearer " : "";
+        const authorizationHeader = `${bearerPrefix}${accessToken}`;
+
+        // Persist for subsequent requests and middleware
+        if (typeof window !== "undefined") {
+          localStorage.setItem("token", authorizationHeader);
+          // Store raw JWT (without Bearer) for middleware verification
+          document.cookie = `token=${accessToken}; Path=/; SameSite=Lax`;
+        }
+        api.defaults.headers.common["Authorization"] = authorizationHeader;
+      }
+
       const res = await api.get("/auth/me");
       const user = res.data;
       console.log("Current user:", user);
