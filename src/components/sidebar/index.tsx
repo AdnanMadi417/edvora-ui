@@ -17,13 +17,23 @@ interface User {
   role: string;
 }
 
-function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
+function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
   const router = useRouter();
 
   const [user, setUser] = useState<User | null>(null);
   const [userError, setUserError] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const ROLE_LABELS: Record<string, string> = {
+    admin: "Admin",
+    account_manager: "Account Manager",
+    partner: "Partner",
+  };
+
+  function getRoleLabel(role: string): string {
+    return ROLE_LABELS[role] || role;
+  }
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -102,7 +112,7 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
 
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-40 backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-overlay bg-opacity-40 backdrop-blur-sm"
           onClick={handleOverlayClick}
           aria-hidden="true"
         />
@@ -110,9 +120,9 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
 
 
       <div
-        className={`border-default fixed z-50 flex min-h-full w-[280px] flex-col 
-          border-r-thin bg-card pb-6 shadow-none 
-          transition-transform duration-300 xl:z-0 xl:translate-x-0 
+        className={`fixed z-50 flex h-screen w-[280px] flex-col 
+          border-r border-gray-200 bg-white shadow-md
+          transition-transform duration-300 ease-in-out xl:z-0 xl:translate-x-0 
           ${open ? "translate-x-0" : "-translate-x-full"}`}
         role="navigation"
         aria-label="Main navigation"
@@ -128,12 +138,12 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
           <HiX className="text-icon-b" />
         </button>
 
-        <header className="flex items-center justify-center px-6 py-8">
+        <header className="flex items-center justify-center px-6 py-6 mt-3 mb-3">
           <Image
             src={logoImg}
             alt="Your Business Logo"
-            width={160}
-            height={80}
+            width={140}
+            height={70}
             className="object-contain"
             priority
           />
@@ -169,7 +179,7 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
                       {user.name}
                     </p>
                     <p className="truncate text-caption text-text-muted">
-                      {user.role}
+                      {getRoleLabel(user.role)}
                     </p>
                   </>
                 ) : (
@@ -183,30 +193,36 @@ function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
           )}
         </div>
 
-
         <nav className="flex-1 overflow-y-auto py-4">
           <Links routes={routes} />
         </nav>
 
-
-        <footer>
+        <footer className="border-t border-default p-4">
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="mx-auto flex w-[90%] items-center gap-3 rounded-md
-              px-4 py-3 text-left text-p1 font-medium text-failed
-              transition-fast hover:bg-alert-danger hover:text-failed-hover
+            className="flex w-full items-center gap-3 rounded-full
+              border border-transparent px-4 py-3 text-left
+              font-medium text-red-600 transition-all duration-200
+              hover:bg-red-50 hover:border-red-100
+              focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
               disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Sign out of your account"
             type="button"
           >
-            <MdLogout className={`text-icon-b ${isLoggingOut ? "animate-spin" : ""}`} />
-            <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+            <MdLogout
+              className={`h-5 w-5 ${isLoggingOut ? "animate-spin" : ""}`}
+            />
+            <span className="text-sm">
+              {isLoggingOut ? "Logging out..." : "Logout"}
+            </span>
           </button>
         </footer>
+
       </div>
+
     </>
   );
 }
 
-export default SidebarHorizon;
+export default SidebarUnibexs;
