@@ -7,83 +7,205 @@ import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import { IRoute } from "types/navigation";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useEffect, useState, useCallback } from "react";
+import api from "lib/useApi";
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
 
 function SidebarHorizon(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
   const router = useRouter();
 
-  const handleLogout = () => {
-    router.push("/auth/sign-in");
+  const [user, setUser] = useState<User | null>(null);
+  const [userError, setUserError] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await api.get("/auth/me");
+        setUser(res.data);
+        setUserError(false);
+      } catch (err) {
+        console.error("Failed to fetch user", err);
+        setUserError(true);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && open) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [open, setOpen]);
+
+  const handleOverlayClick = useCallback(() => {
+    setOpen(false);
+  }, [setOpen]);
+
+  const deleteAllCookies = () => {
+    const cookies = document.cookie.split(";");
+
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i];
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+
+      const domain = window.location.hostname;
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${domain}`;
+
+      const parts = domain.split(".");
+      if (parts.length > 2) {
+        const parentDomain = parts.slice(-2).join(".");
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${parentDomain}`;
+      }
+    }
   };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+
+    try {
+
+      await api.post("/auth/logout").catch(() => {
+
+      });
+    } catch (err) {
+      console.error("Logout API error:", err);
+    }
+
+    localStorage.clear();
+
+    sessionStorage.clear();
+
+    deleteAllCookies();
+
+    setTimeout(() => {
+      router.push("/auth/sign-in");
+    }, 100);
+  };
+
   return (
-    <div
-      className={`border-default fixed z-50 flex min-h-full w-[280px] flex-col 
-        border-r-thin bg-card pb-6 shadow-none 
-        transition-medium xl:z-0 xl:translate-x-0 
-        ${open ? "translate-x-0" : "-translate-x-full"}`}
-      role="navigation"
-      aria-label="Main navigation"
-    >
-      <button
-        className="absolute right-4 top-4 rounded-md bg-primary p-1
-          text-text-primary transition-colors duration-200 hover:bg-card-hover
-          hover:text-text-muted xl:hidden"
-        onClick={() => setOpen(false)}
-        aria-label="Close navigation menu"
-        type="button"
-      >
-        <HiX className="text-icon-b" />
-      </button>
+    <>
 
-      {/* Logo */}
-      <header className="flex items-center justify-center px-6 py-8">
-        <Image
-          src={logoImg}
-          alt="Your Business Logo"
-          width={160}
-          height={80}
-          className="object-contain"
-          priority
+      {open && (
+        <div
+          className="fixed inset-0 z-40 bg-black bg-opacity-40 backdrop-blur-sm"
+          onClick={handleOverlayClick}
+          aria-hidden="true"
         />
-      </header>
+      )}
 
-      <div className="border-default border-y-thin px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div
-            className="flex h-10 w-10 items-center justify-center
-            rounded-full bg-accent-light text-h5 font-medium text-accent"
-          >
-            U
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-p2 font-semibold text-text-primary">
-              Adnan
-            </p>
-            <p className="truncate text-caption text-text-muted">
-              Account Manager
-            </p>
-          </div>
-        </div>
-      </div>
 
-      <nav className="flex-1 py-4">
-        <Links routes={routes} />
-      </nav>
-
-      <footer>
+      <div
+        className={`border-default fixed z-50 flex min-h-full w-[280px] flex-col 
+          border-r-thin bg-card pb-6 shadow-none 
+          transition-transform duration-300 xl:z-0 xl:translate-x-0 
+          ${open ? "translate-x-0" : "-translate-x-full"}`}
+        role="navigation"
+        aria-label="Main navigation"
+      >
         <button
-          onClick={handleLogout}
-          className="mx-auto flex w-[90%] items-center gap-3 rounded-lg
-            px-4 py-3 text-left text-p1 font-medium text-failed
-            transition-fast hover:bg-alert-danger hover:text-failed-hover"
-          aria-label="Sign out of your account"
+          className="absolute right-4 top-4 rounded-md bg-primary p-1
+            text-text-primary transition-colors duration-200 hover:bg-card-hover
+            hover:text-text-muted xl:hidden"
+          onClick={handleOverlayClick}
+          aria-label="Close navigation menu"
           type="button"
         >
-          <MdLogout className="text-icon-b" />
-          <span>Logout</span>
+          <HiX className="text-icon-b" />
         </button>
-      </footer>
-    </div>
+
+        <header className="flex items-center justify-center px-6 py-8">
+          <Image
+            src={logoImg}
+            alt="Your Business Logo"
+            width={160}
+            height={80}
+            className="object-contain"
+            priority
+          />
+        </header>
+
+        <div className="border-default border-y-thin px-6 py-4">
+          {userError ? (
+            <div className="text-center">
+              <p className="text-p2 text-failed">Failed to load user</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="mt-2 text-caption text-accent hover:underline"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center
+                rounded-full bg-accent-light text-h5 font-medium text-accent"
+              >
+                {user ? (
+                  user.name[0].toUpperCase()
+                ) : (
+                  <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                {user ? (
+                  <>
+                    <p className="truncate text-p2 font-semibold text-text-primary">
+                      {user.name}
+                    </p>
+                    <p className="truncate text-caption text-text-muted">
+                      {user.role}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="mb-2 h-4 w-32 animate-pulse rounded bg-gray-300" />
+                    <div className="h-3 w-20 animate-pulse rounded bg-gray-300" />
+                  </>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+
+        <nav className="flex-1 overflow-y-auto py-4">
+          <Links routes={routes} />
+        </nav>
+
+
+        <footer>
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="mx-auto flex w-[90%] items-center gap-3 rounded-md
+              px-4 py-3 text-left text-p1 font-medium text-failed
+              transition-fast hover:bg-alert-danger hover:text-failed-hover
+              disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label="Sign out of your account"
+            type="button"
+          >
+            <MdLogout className={`text-icon-b ${isLoggingOut ? "animate-spin" : ""}`} />
+            <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
+          </button>
+        </footer>
+      </div>
+    </>
   );
 }
 
