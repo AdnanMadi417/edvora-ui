@@ -9,41 +9,20 @@ import {
   Calendar,
   Clock,
   User,
-  Building,
+  AlertTriangle,
+  GraduationCap,
+  CalendarCheck,
+  BadgeCheck,
+  Settings
 } from "lucide-react";
-import avatar from "/public/img/avatars/avatar4.png";
-import emptyPng from "/public/img/dashboards/empty-data-icon.png";
+import avatar from "/public/img/avatars/user.png";
 import Image from "next/image";
+import Link from "next/link";
+import { applications as initialApplications } from "components/data/applications";
+import EmptyData from "components/emptyData/EmptyTableData";
 
 const ModernApplicationsTable = () => {
-  const [applications] = useState([
-    {
-      id: 1,
-      studentName: "Sarah Chen",
-      studentEmail: "sarah.chen@gmail.com",
-      applicationID: "APP-2024-005",
-      applicationName: "Computer Science Masters",
-      university: "Science Masters",
-      stage: "Interview",
-      status: "in-progress",
-      nextAction: "Schedule final interview",
-      priority: "high",
-      updatedAt: "2024-01-15T10:30:00Z",
-    },
-    {
-      id: 2,
-      studentName: "Marcus Johnson",
-      studentEmail: "marcus.johnson@gmail.com",
-      applicationID: "APP-2024-004",
-      applicationName: "MBA Program",
-      university: "Science Masters",
-      stage: "Application Review",
-      status: "pending",
-      nextAction: "Submit transcripts",
-      priority: "medium",
-      updatedAt: "2024-01-14T14:20:00Z",
-    },
-  ]);
+  const [applications] = useState(initialApplications);
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
@@ -77,6 +56,9 @@ const ModernApplicationsTable = () => {
       filtered = filtered.filter(
         (app) =>
           app.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.studentEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.university.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.stage.toLowerCase().includes(searchTerm.toLowerCase()) ||
           app.applicationName
             .toLowerCase()
             .includes(searchTerm.toLowerCase())
@@ -155,9 +137,9 @@ const ModernApplicationsTable = () => {
 
   const PriorityBadge = ({ priority }) => {
     const priorityConfig = {
-      high: "bg-red-100 text-red-700 border-red-200",
-      medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
-      low: "bg-secondary text-text-muted border-default",
+      high: "bg-red-100 text-red-700 border-red-200 px-3 py-1",
+      medium: "bg-yellow-100 text-yellow-700 border-yellow-200 px-3 py-1",
+      low: "bg-gray-100 text-text-muted border-gray-200 px-3 py-1",
     };
 
     return (
@@ -185,9 +167,7 @@ const ModernApplicationsTable = () => {
   return (
     <div className="mt-6 overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-default bg-card">
-
         <div className="relative p-6">
-
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-text-primary">
@@ -204,10 +184,10 @@ const ModernApplicationsTable = () => {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
               <input
                 type="text"
-                placeholder="Search applications..."
+                placeholder="Search applications by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-md border border-default bg-background py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full rounded-full text-text-muted border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
@@ -216,7 +196,7 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full cursor-pointer rounded-md border border-default bg-background py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
                 <option value="in-progress">In Progress</option>
@@ -231,7 +211,7 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
-                className="w-full cursor-pointer rounded-md border border-default bg-background py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               >
                 <option value="all">All Priority</option>
                 <option value="high">High</option>
@@ -246,84 +226,101 @@ const ModernApplicationsTable = () => {
                 setFilterStatus("all");
                 setFilterPriority("all");
               }}
-              className="flex items-center justify-center gap-2 rounded-md border border-default bg-background px-4 py-2.5 text-sm text-text-muted transition hover:text-text-error hover:border-text-error sm:w-auto"
+              className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error sm:w-auto"
             >
               Clear
             </button>
           </div>
-
         </div>
-
       </div>
 
-      <div className="overflow-x-auto rounded-lg border border-default bg-card">
+      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-default bg-card">
         <table className="w-full">
+
           <thead>
           <tr className="border-b border-default bg-card">
             <th
               onClick={() => handleSort("studentName")}
-              className="group  cursor-pointer px-6 py-4 text-start font-bold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-text-muted" />
+                <User className="h-4 w-4" />
                 Student
                 <SortIndicator field="studentName" />
               </div>
             </th>
+
             <th
               onClick={() => handleSort("applicationName")}
-              className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
-              <div className="flex items-center gap-2">
-                Application
+              <div className="min-w-[250px] flex items-center gap-2">
+                <GraduationCap className="h-4 w-4" />
+                University / Program
                 <SortIndicator field="applicationName" />
               </div>
             </th>
+
             <th
               onClick={() => handleSort("stage")}
-              className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
+                <Flag className="h-4 w-4" />
                 Stage
                 <SortIndicator field="stage" />
               </div>
             </th>
+
             <th
               onClick={() => handleSort("status")}
-              className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
+                <BadgeCheck className="h-4 w-4" />
                 Status
                 <SortIndicator field="status" />
               </div>
             </th>
-            <th className="min-w-[150px] px-6 py-4 text-start  font-semibold tracking-wider  text-text-primary">
-              Next Action
+
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+              <div className="flex items-center gap-2">
+                <CalendarCheck className="h-4 w-4" />
+                Next Action
+              </div>
             </th>
+
             <th
               onClick={() => handleSort("priority")}
-              className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4" />
                 Priority
                 <SortIndicator field="priority" />
               </div>
             </th>
+
             <th
               onClick={() => handleSort("updatedAt")}
-              className="group cursor-pointer px-6 py-4 text-start  font-semibold  tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-text-muted" />
-                Updated
+              <div className="flex min-w-[150px] items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Last Updated
                 <SortIndicator field="updatedAt" />
               </div>
             </th>
-            <th className="px-6 py-4 text-start font-semibold tracking-wider  text-text-primary">
-              Actions
+
+            <th className="px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Actions
+              </div>
             </th>
           </tr>
           </thead>
+
 
           <tbody className="divide-border-default divide-y bg-primary">
           {loading ? (
@@ -341,16 +338,7 @@ const ModernApplicationsTable = () => {
                 colSpan={9}
                 className="px-6 py-8 text-center text-text-muted"
               >
-                <div className="flex flex-col items-center gap-4">
-                  <Image
-                    width={100}
-                    height={100}
-                    className="h-[100px] w-[100px] rounded-md"
-                    src={emptyPng}
-                    alt="No applications"
-                  />
-                  <span className="text-p1">No applications found.</span>
-                </div>
+                <EmptyData />
               </td>
             </tr>
           ) : (
@@ -384,7 +372,6 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-
                   <div className=" text-text-primary">
                     {app.applicationName}
                   </div>
@@ -403,12 +390,12 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="px-6 py-4 ">
-                  <div className="max-w-48 truncate  text-text-muted">
+                  <div className="max-w-48 truncate text-text-muted">
                     {app.nextAction}
                   </div>
                 </td>
 
-                <td className="min-w-[150px] max-w-[150px]  px-6 py-4">
+                <td className="min-w-[150px] max-w-[150px] px-6 py-4">
                   <PriorityBadge priority={app.priority} />
                 </td>
 
@@ -424,13 +411,14 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="min-w-[200px] px-6 py-4">
-                  <button
+                  <Link
+                    href={`/partner/applications/${app.id}`}
                     aria-label="View Application"
-                    className="flex items-center gap-2 rounded-md p-1.5 text-text-muted transition-colors hover:bg-blue-50 hover:text-blue-600"
+                    className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-2 text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-600"
                   >
                     <Eye className="h-4 w-4" />
                     <span className="text-caption">View Application</span>
-                  </button>
+                  </Link>
                 </td>
               </tr>
             ))
@@ -439,45 +427,48 @@ const ModernApplicationsTable = () => {
         </table>
       </div>
 
-      {totalPages > 1 && (
-        <div className="border-t border-default bg-primary px-6 py-4 ">
-          <div className="flex items-center justify-between">
-            <div className="text-text-muted">
-              Showing{" "}
-              <span className="">{(currentPage - 1) * itemsPerPage + 1}</span>{" "}
-              to{" "}
-              <span className="">
-                {Math.min(
-                  currentPage * itemsPerPage,
-                  filteredAndSortedApplications.length
-                )}
-              </span>{" "}
-              of{" "}
-              <span className="">{filteredAndSortedApplications.length}</span>{" "}
-              results
-            </div>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setCurrentPage(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="border-md texttext-text-muted border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span className="px-3 py-2  text-text-muted">
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="border-md texttext-text-muted border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
+      <div className="sticky bottom-0 rounded-b-lg border border-default bg-card px-6 py-4">
+        <div className="flex flex-col items-center justify-between gap-3 text-sm text-text-muted md:flex-row">
+          <div>
+            Showing{" "}
+            <span className="font-medium">
+              {(currentPage - 1) * itemsPerPage + 1}
+            </span>{" "}
+            to{" "}
+            <span className="font-normal">
+              {Math.min(
+                currentPage * itemsPerPage,
+                filteredAndSortedApplications.length
+              )}
+            </span>{" "}
+            of{" "}
+            <span className="font-normal">
+              {filteredAndSortedApplications.length}
+            </span>{" "}
+            results
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="rounded-full border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="px-2 text-text-muted">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="rounded-full border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -218,7 +218,7 @@ module.exports = {
         brandLinear: '#2563EB',
 
         gray: {
-          50: '#F5F6FA',
+          50: 'rgba(245,246,250,0.9)',
           100: '#EEF0F6',
           200: '#DADEEC',
           300: '#C9D0E3',
@@ -477,6 +477,11 @@ module.exports = {
           900: '#11047A',
         },
 
+      },
+
+      overlay: {
+        DEFAULT: 'var(--overlay-bg)',
+        light: 'var(--overlay-light-bg)',
       },
 
       borderColor: {
