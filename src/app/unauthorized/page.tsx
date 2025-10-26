@@ -6,12 +6,12 @@ import { ShieldX } from "lucide-react";
 
 export default function UnauthorizedPage() {
   const router = useRouter();
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(2);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push("/auth/sign-in");
-    },3000);
+    },2000);
 
     const countdownInterval = setInterval(() => {
       setCountdown((prev) => prev - 1);

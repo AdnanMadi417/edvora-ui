@@ -1,8 +1,8 @@
-
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 import AuthLayout from "components/auth/AuthLayout";
 import SignInForm from "components/auth/SignInForm";
 import api from "lib/useApi";
@@ -20,40 +20,29 @@ export default function SignInPage() {
     }
 
     try {
-      console.log("Attempting login with:", { email });
-
       const loginRes = await api.post("/auth/login", { email, password });
-      console.log("Login response:", loginRes);
+      const token = loginRes.data.access_token;
 
-      const res = await api.get("/auth/me");
-      const user = res.data;
-      console.log("Current user:", user);
+      Cookies.set("token", token, { expires: 1, path: "/" });
 
-      if (user.role === "account_manager") {
-        router.push("/account-manager/applications");
-      } else if (user.role === "partner") {
-        router.push("/partner/applications");
-      } else {
-        console.warn("Unknown user role:", user.role);
-        setError("Unauthorized role");
-      }
+      const userRes = await api.get("/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const role = userRes.data.role?.toLowerCase();
+
+      if (role === "partner") router.replace("/partner/applications");
+      else if (role === "account_manager" || role === "admin") router.replace("/account-manager/applications");
+      else setError("Unauthorized role");
     } catch (err: any) {
-      console.error("Login failed:", err);
-
-      const msg = err.response?.data?.detail || err.message || "Login failed. Please try again.";
-      setError(msg);
+      setError(err.response?.data?.detail || "Login failed. Please try again.");
     }
   };
 
   return (
     <AuthLayout>
       <SignInForm onSubmit={handleSignIn} />
-
-      {error && (
-        <div className="mt-4 rounded-md border border-danger bg-alert-danger px-4 py-2 text-center text-sm text-text-error">
-          {error}
-        </div>
-      )}
+      {error && <div className="text-red-500 mt-2 text-center">{error}</div>}
     </AuthLayout>
   );
 }
