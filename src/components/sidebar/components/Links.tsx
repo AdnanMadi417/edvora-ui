@@ -27,7 +27,7 @@ export default function Links({ routes }: { routes: Route[] }) {
     >
       {routes.map((route, index) => {
         const fullPath = route.layout + route.path;
-        const isActive = pathname === fullPath;
+        const isActive = pathname === fullPath || pathname.startsWith(fullPath + "/");
         const isHovered = hoveredIndex === index;
         const Icon = route.icon;
 
