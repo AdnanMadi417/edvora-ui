@@ -336,110 +336,110 @@ const ModernApplicationsTable = () => {
 
 
           <tbody className="divide-border-default divide-y bg-primary">
-            {loading ? (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="px-6 py-4 text-center text-p1 text-text-muted"
-                >
-                  Loading applications...
-                </td>
-              </tr>
-            ) : paginatedApplications.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="px-6 py-8 text-center text-text-muted"
-                >
-                  <EmptyData />
-                </td>
-              </tr>
-            ) : (
-              paginatedApplications.map((app) => (
-                <tr
-                  key={app.id}
-                  className="group transition-colors hover:bg-primary"
-                >
-                  <td className="min-w-[200px] max-w-[300px] px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-text-muted">
-                        <Image
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 rounded-full"
-                          src={avatar}
-                          alt={app.studentName}
-                        />
+          {loading ? (
+            <tr>
+              <td
+                colSpan={9}
+                className="px-6 py-4 text-center text-p1 text-text-muted"
+              >
+                Loading applications...
+              </td>
+            </tr>
+          ) : paginatedApplications.length === 0 ? (
+            <tr>
+              <td
+                colSpan={9}
+                className="px-6 py-8 text-center text-text-muted"
+              >
+                <EmptyData />
+              </td>
+            </tr>
+          ) : (
+            paginatedApplications.map((app) => (
+              <tr
+                key={app.id}
+                className="group transition-colors hover:bg-primary"
+              >
+                <td className="min-w-[200px] max-w-[300px] px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-text-muted">
+                      <Image
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-full"
+                        src={avatar}
+                        alt={app.studentName}
+                      />
+                    </div>
+
+                    <div className="truncate">
+                      <div className="truncate text-text-primary">
+                        {app.studentName}
                       </div>
 
-                      <div className="truncate">
-                        <div className="truncate text-text-primary">
-                          {app.studentName}
-                        </div>
-
-                        <div className="truncate text-caption text-text-muted">
-                          {app.studentEmail}
-                        </div>
+                      <div className="truncate text-caption text-text-muted">
+                        {app.studentEmail}
                       </div>
                     </div>
-                  </td>
+                  </div>
+                </td>
 
-                  <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                    <div className=" text-text-primary">
-                      {app.applicationName}
-                    </div>
+                <td className="min-w-[250px] max-w-[300px] px-6 py-4">
+                  <div className=" text-text-primary">
+                    {app.applicationName}
+                  </div>
 
-                    <div className="truncate text-caption text-text-muted">
-                      {app.university}
-                    </div>
-                  </td>
+                  <div className="truncate text-caption text-text-muted">
+                    {app.university}
+                  </div>
+                </td>
 
-                  <td className="min-w-[200px] max-w-[250px] px-6 py-4">
-                    <div className="text-text-muted ">{app.partner}</div>
-                  </td>
+                <td className="min-w-[200px] max-w-[250px] px-6 py-4">
+                  <div className="text-text-muted ">{app.partner}</div>
+                </td>
 
-                  <td className="px-6 py-4">
-                    <div className="text-text-muted">{app.stage}</div>
-                  </td>
+                <td className="px-6 py-4">
+                  <div className="text-text-muted">{app.stage}</div>
+                </td>
 
-                  <td className="min-w-[150px] max-w-[150px] px-6 py-4">
-                    <StatusBadge status={app.status} />
-                  </td>
+                <td className="min-w-[150px] max-w-[150px] px-6 py-4">
+                  <StatusBadge status={app.status} />
+                </td>
 
-                  <td className="px-6 py-4 ">
-                    <div className="max-w-48 truncate text-text-muted">
-                      {app.nextAction}
-                    </div>
-                  </td>
+                <td className="px-6 py-4 ">
+                  <div className="max-w-48 truncate text-text-muted">
+                    {app.nextAction}
+                  </div>
+                </td>
 
-                  <td className="min-w-[150px] max-w-[150px] px-6 py-4">
-                    <PriorityBadge priority={app.priority} />
-                  </td>
+                <td className="min-w-[150px] max-w-[150px] px-6 py-4">
+                  <PriorityBadge priority={app.priority} />
+                </td>
 
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1 text-text-muted">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(app.updatedAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "2-digit",
-                      })}
-                    </div>
-                  </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-1 text-text-muted">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(app.updatedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "2-digit",
+                    })}
+                  </div>
+                </td>
 
-                  <td className="min-w-[200px] px-6 py-4">
-                    <Link
-                      href={`/account-manager/applications/${app.id}`}
-                      aria-label="View Application"
-                      className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-2 text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-600"
-                    >
-                      <Eye className="h-4 w-4" />
-                      <span className="text-caption">View Application</span>
-                    </Link>
-                  </td>
-                </tr>
-              ))
-            )}
+                <td className="min-w-[200px] px-6 py-4">
+                  <Link
+                    href={`/account-manager/applications/${app.id}`}
+                    aria-label="View Application"
+                    className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-2 text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-600"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span className="text-caption">View Application</span>
+                  </Link>
+                </td>
+              </tr>
+            ))
+          )}
           </tbody>
         </table>
       </div>

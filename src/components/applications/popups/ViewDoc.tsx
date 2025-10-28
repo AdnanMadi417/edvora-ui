@@ -27,7 +27,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4"
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
       onClick={handleClose}
     >
       <div

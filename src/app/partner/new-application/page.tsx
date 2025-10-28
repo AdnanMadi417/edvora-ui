@@ -1,12 +1,12 @@
+
 'use client';
 
+import ApplicationForm from "../../../components/partner/applications/form/StudentApplication"
 
-const NewApplication = () => {
+export default function StudentApplicationForm() {
   return (
-    <div className="">
-      Welcome to the following applications.
-    </div>
+    <section className="min-[100vh]">
+      <ApplicationForm/>
+    </section>
   );
-};
-
-export default NewApplication;
+}

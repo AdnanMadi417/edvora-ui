@@ -38,7 +38,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         <label
           htmlFor={id}
           className={clsx(
-            "text-p2 text-text-primary dark:text-white",
+            "mb-1 block text-sm font-medium text-text-primary",
             variant === "auth" ? "ml-1.5 font-medium" : "ml-3 font-bold"
           )}
         >
@@ -56,7 +56,7 @@ const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
           aria-invalid={state === "error"}
           aria-describedby={message ? messageId : undefined}
           className={clsx(
-            "mt-2 flex h-12 w-full items-center justify-center rounded-md border bg-transparent p-3 text-p2 outline-none transition-colors",
+            "mt-2 flex h-12 w-full items-center justify-center rounded-md border bg-transparent p-3 text-p2 outline-none px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500  transition-colors",
             {
               "!border-none !bg-gray-100 dark:!bg-white/5 dark:placeholder:text-white/20":
               disabled,
