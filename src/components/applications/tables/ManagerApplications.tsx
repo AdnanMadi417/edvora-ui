@@ -427,14 +427,14 @@ const ModernApplicationsTable = () => {
                   </div>
                 </td>
 
-                <td className="min-w-[200px] px-6 py-4">
+                <td className="min-w-[150px] px-6 py-4">
                   <Link
                     href={`/account-manager/applications/${app.id}`}
                     aria-label="View Application"
-                    className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-2 text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-600"
+                    className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-full border border-default p-2 text-sm text-text-muted transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
                   >
                     <Eye className="h-4 w-4" />
-                    <span className="text-caption">View Application</span>
+                    <span className="text-caption">View </span>
                   </Link>
                 </td>
               </tr>

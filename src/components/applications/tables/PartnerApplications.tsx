@@ -187,7 +187,7 @@ const ModernApplicationsTable = () => {
                 placeholder="Search applications by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full text-text-muted border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full rounded-full text-text-muted border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -196,7 +196,7 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
                 <option value="in-progress">In Progress</option>
@@ -211,7 +211,7 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all">All Priority</option>
                 <option value="high">High</option>
@@ -230,6 +230,13 @@ const ModernApplicationsTable = () => {
             >
               Clear
             </button>
+
+            <Link
+              className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+              href="/partner/applications/new-application">
+              New Application</Link>
+
+
           </div>
         </div>
       </div>
@@ -410,16 +417,18 @@ const ModernApplicationsTable = () => {
                   </div>
                 </td>
 
-                <td className="min-w-[200px] px-6 py-4">
+                <td className="min-w-[150px] px-6 py-4">
                   <Link
                     href={`/partner/applications/${app.id}`}
                     aria-label="View Application"
-                    className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-2 text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-600"
+                    className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-full border border-default p-2 text-sm text-text-muted transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
                   >
                     <Eye className="h-4 w-4" />
-                    <span className="text-caption">View Application</span>
+                    <span className="text-caption">View</span>
                   </Link>
                 </td>
+
+
               </tr>
             ))
           )}
