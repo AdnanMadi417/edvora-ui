@@ -1,7 +1,7 @@
 node_modules
 .next
 .env
-# .env.local
+.env.local # comment out when you run in local machine
 .DS_Store
 .git
 .gitignore
