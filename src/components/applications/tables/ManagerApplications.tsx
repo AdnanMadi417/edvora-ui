@@ -19,11 +19,12 @@ import {
 import avatar from "/public/img/avatars/user.png";
 import Image from "next/image";
 import Link from "next/link";
-import { applications as initialApplications } from "components/data/applications";
 import EmptyData from "components/emptyData/EmptyTableData";
+import Cookies from "js-cookie";
+import api from "lib/useApi";
 
 const ModernApplicationsTable = () => {
-  const [applications] = useState(initialApplications);
+  const [applications, setApplications] = useState([]);
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,11 +36,47 @@ const ModernApplicationsTable = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+    const fetchApplications = async () => {
+      try {
+        setLoading(true);
+        const token = Cookies.get("token");
+        const managerId = localStorage.getItem("managerId");
 
-    return () => clearTimeout(timer);
+        if (!token || !managerId) {
+          console.error("Missing token or managerId");
+          setLoading(false);
+          return;
+        }
+
+        const res = await api.get(`/account-managers/${managerId}/applications`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("✅ Account Manager Applications:", res.data);
+
+        setApplications(
+          (res.data || []).map((app) => ({
+            id: app.id,
+            studentName: app.student_name,
+            studentEmail: app.student_email,
+            university: app.university_name,
+            applicationName: app.program_name,
+            partner: app.partner_name,
+            stage: app.stage,
+            status: app.status,
+            nextAction: app.next_action,
+            priority: app.priority,
+            updatedAt: app.updated_at,
+          }))
+        );
+      } catch (err) {
+        console.error("❌ Error fetching account manager applications:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplications();
   }, []);
 
   const handleSort = (key) => {
@@ -189,7 +226,7 @@ const ModernApplicationsTable = () => {
                 placeholder="Search applications by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full text-text-muted border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full rounded-full text-text-muted border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -198,7 +235,7 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
                 <option value="in-progress">In Progress</option>
@@ -213,7 +250,7 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all">All Priority</option>
                 <option value="high">High</option>

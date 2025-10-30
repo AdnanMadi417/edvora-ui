@@ -7,7 +7,7 @@ import {
   Upload,
   FileText,
 } from "lucide-react";
-import NewApplicationSuccess from "components/partner/applications/popups/NewApplicationSuccess"
+import NewApplicationSuccess from "../../popups/NewApplicationSuccess"
 
 const stages = [
   { id: 1, name: "Personal Details", icon: User },

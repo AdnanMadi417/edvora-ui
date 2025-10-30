@@ -74,13 +74,13 @@ export default function RecentApplications() {
 
         <div className="flex items-center gap-3">
 
-          <button
-            onClick={handleBack}
-            className="group flex items-center gap-2 rounded-full bg-slate-50 px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
-          >
-            <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            <span className="hidden sm:inline">Back to Applications</span>
-          </button>
+          {/*<button*/}
+          {/*  onClick={handleBack}*/}
+          {/*  className="group flex items-center gap-2 rounded-full bg-slate-50 px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"*/}
+          {/*>*/}
+          {/*  <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />*/}
+          {/*  <span className="hidden sm:inline">Back to Applications</span>*/}
+          {/*</button>*/}
 
           <button
             className="flex items-center justify-center rounded-full bg-blue-100 p-2.5 text-blue-600 transition-all duration-200 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
