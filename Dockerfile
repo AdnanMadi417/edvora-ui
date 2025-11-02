@@ -3,8 +3,8 @@ FROM node:lts-alpine AS base
 # Stage 1: Install dependencies
 FROM base AS deps
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
-RUN corepack enable pnpm && pnpm install --force
+COPY package.json package-lock.json* ./
+RUN npm ci --legacy-peer-deps
 
 # Stage 2: Build the application
 FROM base AS builder
