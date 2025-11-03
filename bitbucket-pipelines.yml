@@ -26,6 +26,7 @@ pipelines:
       #       - test-reports/**
       - step:
           name: Build and Push Docker Image
+          size: 2x  # 4GB RAM instead of default 1GB (or use 4x, 8x for more)
           services:
             - docker
           caches:
