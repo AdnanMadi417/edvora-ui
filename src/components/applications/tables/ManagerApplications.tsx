@@ -138,12 +138,34 @@ const ModernApplicationsTable = () => {
 
   const StatusBadge = ({ status }) => {
     const statusConfig = {
-      "in-progress": { bg: "bg-blue-50 border-blue-200", text: "text-blue-700" },
-      pending: { bg: "bg-amber-50 border-amber-200", text: "text-amber-700" },
-      accepted: { bg: "bg-emerald-50 border-emerald-200", text: "text-emerald-700" },
-      rejected: { bg: "bg-red-50 border-red-200", text: "text-red-700" },
-      "under review": { bg: "bg-purple-50 border-purple-200", text: "text-purple-700" },
+      "in-progress": {
+        bg: "bg-blue-100 border-blue-300",
+        text: "text-blue-800",
+        dot: "bg-blue-600",
+      },
+      pending: {
+        bg: "bg-gray-100 border-gray-300",
+        text: "text-gray-800",
+        dot: "bg-gray-500",
+      },
+      accepted: {
+        bg: "bg-green-100 border-green-300",
+        text: "text-green-800",
+        dot: "bg-green-600",
+      },
+      rejected: {
+        bg: "bg-red-100 border-red-300",
+        text: "text-red-800",
+        dot: "bg-red-600",
+      },
+      under_review: {
+        bg: "bg-yellow-100 border-yellow-300",
+        text: "text-yellow-800",
+        dot: "bg-yellow-600",
+      },
     };
+
+    const normalizedStatus = status?.toLowerCase().replace(/\s+/g, "_");
 
     const config = statusConfig[status.toLowerCase()] || { bg: "bg-gray-50 border-gray-200", text: "text-gray-700" };
     return (
@@ -212,11 +234,12 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:text-blue-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
                 <option value="in-progress">In Progress</option>
                 <option value="pending">Pending</option>
+                <option value="Under Review">Under Review</option>
                 <option value="accepted">Accepted</option>
                 <option value="rejected">Rejected</option>
               </select>
