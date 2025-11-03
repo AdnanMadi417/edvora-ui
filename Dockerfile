@@ -2,17 +2,17 @@ FROM node:lts-alpine AS base
 
 # Stage 1: Install dependencies
 FROM base AS deps
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 COPY package.json pnpm-lock.yaml ./
 RUN corepack enable pnpm && \
-    pnpm install --frozen-lockfile --no-optional --ignore-scripts
+    pnpm install --frozen-lockfile --no-optional --prod=false
 
 # Stage 2: Build the application
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-COPY .env.local .env.local
 
 # Set environment variable to skip type checking during build
 ENV NEXT_TELEMETRY_DISABLED=1
