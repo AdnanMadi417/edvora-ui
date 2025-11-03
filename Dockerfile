@@ -4,9 +4,14 @@ FROM node:lts-alpine AS base
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
+
+# Set specific pnpm version (change to match your local version)
+ENV PNPM_VERSION=8.15.5
+
 COPY package.json pnpm-lock.yaml ./
 RUN corepack enable pnpm && \
-    pnpm install --frozen-lockfile --no-optional --prod=false
+    corepack prepare pnpm@${PNPM_VERSION} --activate && \
+    pnpm install --frozen-lockfile --no-optional
 
 # Stage 2: Build the application
 FROM base AS builder
