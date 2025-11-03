@@ -25,52 +25,53 @@ import api from "lib/useApi";
 
 const ModernApplicationsTable = () => {
   const [applications, setApplications] = useState([]);
-
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [filterPriority, setFilterPriority] = useState("all");
+  // const [filterPriority, setFilterPriority] = useState("all");
+  const [loading, setLoading] = useState(true);
 
   const itemsPerPage = 10;
-  const [loading, setLoading] = useState(true);
+
+  // Reset page when filters/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus /*, filterPriority */]);
 
   useEffect(() => {
     const fetchApplications = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const token = Cookies.get("token");
         const managerId = localStorage.getItem("managerId");
 
-        if (!token || !managerId) {
-          console.error("Missing token or managerId");
-          setLoading(false);
-          return;
-        }
+        if (!token || !managerId) return;
 
         const res = await api.get(`/account-managers/${managerId}/applications`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        console.log("✅ Account Manager Applications:", res.data);
+        const appsArray = Array.isArray(res.data.items) ? res.data.items : [];
 
-        setApplications(
-          (res.data || []).map((app) => ({
-            id: app.id,
-            studentName: app.student_name,
-            studentEmail: app.student_email,
-            university: app.university_name,
-            applicationName: app.program_name,
-            partner: app.partner_name,
-            stage: app.stage,
-            status: app.status,
-            nextAction: app.next_action,
-            priority: app.priority,
-            updatedAt: app.updated_at,
-          }))
-        );
+        const mappedApps = appsArray.map((app) => ({
+          id: app.id,
+          studentName: app.student_name,
+          studentEmail: app.student_email,
+          university: app.university_name,
+          applicationName: app.program_name,
+          partner: app.partner_name,
+          stage: app.stage,
+          status: app.status || "Pending",
+          // priority: app.priority || "low", // fallback if not present
+          updatedAt: app.updated_at,
+          nextAction: app.next_action || "-",
+        }));
+
+
+        setApplications(mappedApps);
       } catch (err) {
-        console.error("❌ Error fetching account manager applications:", err);
+        console.error("❌ Error fetching applications:", err);
       } finally {
         setLoading(false);
       }
@@ -80,121 +81,96 @@ const ModernApplicationsTable = () => {
   }, []);
 
   const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+    }));
   };
 
+// Normalize for sorting
   const filteredAndSortedApplications = useMemo(() => {
-    let filtered = applications;
+    let filtered = [...applications];
 
     if (searchTerm) {
+      const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (app) =>
-          app.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.studentEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.university.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.stage.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.applicationName
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          app.partner.toLowerCase().includes(searchTerm.toLowerCase())
+          app.studentName.toLowerCase().includes(term) ||
+          app.studentEmail.toLowerCase().includes(term) ||
+          app.university.toLowerCase().includes(term) ||
+          app.applicationName.toLowerCase().includes(term) ||
+          app.partner.toLowerCase().includes(term) ||
+          app.stage.toLowerCase().includes(term)
       );
     }
 
-    if (filterStatus !== "all") {
-      filtered = filtered.filter((app) => app.status === filterStatus);
-    }
+    if (filterStatus !== "all")
+      filtered = filtered.filter(
+        (app) => app.status.toLowerCase() === filterStatus.toLowerCase()
+      );
 
-    if (filterPriority !== "all") {
-      filtered = filtered.filter((app) => app.priority === filterPriority);
-    }
+    // if (filterPriority !== "all")
+    //   filtered = filtered.filter(
+    //     (app) => app.priority.toLowerCase() === filterPriority.toLowerCase()
+    //   );
 
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === "asc" ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === "asc" ? 1 : -1;
-        }
+        const aVal = a[sortConfig.key]?.toString().toLowerCase() ?? "";
+        const bVal = b[sortConfig.key]?.toString().toLowerCase() ?? "";
+        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
       });
     }
 
     return filtered;
-  }, [applications, searchTerm, filterStatus, filterPriority, sortConfig]);
+  }, [applications, searchTerm, filterStatus /*, filterPriority */ , sortConfig]);
 
-  const totalPages = Math.ceil(
-    filteredAndSortedApplications.length / itemsPerPage
-  );
+  const totalPages = Math.ceil(filteredAndSortedApplications.length / itemsPerPage);
   const paginatedApplications = filteredAndSortedApplications.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
+  const goPrev = () => setCurrentPage((p) => Math.max(p - 1, 1));
+  const goNext = () => setCurrentPage((p) => Math.min(p + 1, totalPages));
+
   const StatusBadge = ({ status }) => {
     const statusConfig = {
-      "in-progress": {
-        bg: "bg-blue-50 border-blue-200",
-        text: "text-blue-700",
-        dot: "bg-blue-500",
-        width: "100px",
-      },
-      pending: {
-        bg: "bg-amber-50 border-amber-200",
-        text: "text-amber-700",
-        dot: "bg-amber-500",
-        width: "100px",
-      },
-      accepted: {
-        bg: "bg-emerald-50 border-emerald-200",
-        text: "text-emerald-700",
-        dot: "bg-emerald-500",
-        width: "100px",
-      },
-      rejected: {
-        bg: "bg-red-50 border-red-200",
-        text: "text-red-700",
-        dot: "bg-red-500",
-        width: "100px",
-      },
+      "in-progress": { bg: "bg-blue-50 border-blue-200", text: "text-blue-700" },
+      pending: { bg: "bg-amber-50 border-amber-200", text: "text-amber-700" },
+      accepted: { bg: "bg-emerald-50 border-emerald-200", text: "text-emerald-700" },
+      rejected: { bg: "bg-red-50 border-red-200", text: "text-red-700" },
+      "under review": { bg: "bg-purple-50 border-purple-200", text: "text-purple-700" },
     };
 
-    const config = statusConfig[status] || statusConfig["pending"];
-
+    const config = statusConfig[status.toLowerCase()] || { bg: "bg-gray-50 border-gray-200", text: "text-gray-700" };
     return (
-      <div
-        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-p2 ${config.bg} ${config.text}`}
-      >
-        {status.charAt(0).toUpperCase() + status.slice(1).replace("-", " ")}
+      <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-p2 ${config.bg} ${config.text}`}>
+        {status}
       </div>
     );
   };
 
-  const PriorityBadge = ({ priority }) => {
-    const priorityConfig = {
-      high: "bg-red-100 text-red-700 border-red-200 px-3 py-1",
-      medium: "bg-yellow-100 text-yellow-700 border-yellow-200 px-3 py-1",
-      low: "bg-gray-100 text-text-muted border-gray-200 px-3 py-1",
-    };
+// Priority badge component
+//   const PriorityBadge = ({ priority }) => {
+//     const priorityConfig = {
+//       high: "bg-red-100 text-red-700 border-red-200 px-3 py-1",
+//       medium: "bg-yellow-100 text-yellow-700 border-yellow-200 px-3 py-1",
+//       low: "bg-gray-100 text-text-muted border-gray-200 px-3 py-1",
+//     };
+//     return (
+//       <span className={`inline-flex rounded-full border px-2 py-1 text-p2 ${priorityConfig[priority]}`}>
+//       {priority.charAt(0).toUpperCase() + priority.slice(1)}
+//     </span>
+//     );
+//   };
 
-    return (
-      <span
-        className={`inline-flex rounded-full border px-2 py-1 text-p2 ${priorityConfig[priority]}`}
-      >
-        {priority.charAt(0).toUpperCase() + priority.slice(1)}
-      </span>
-    );
-  };
-
+// Sort indicator component
   const SortIndicator = ({ field }) => {
     if (sortConfig.key !== field) {
-      return (
-        <ChevronUp className="h-4 w-4 text-text-muted opacity-0 transition-opacity group-hover:opacity-100" />
-      );
+      return <ChevronUp className="h-4 w-4 text-text-muted opacity-0 transition-opacity group-hover:opacity-100" />;
     }
     return sortConfig.direction === "asc" ? (
       <ChevronUp className="h-4 w-4 text-accent" />
@@ -202,6 +178,7 @@ const ModernApplicationsTable = () => {
       <ChevronDown className="h-4 w-4 text-accent" />
     );
   };
+
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
@@ -245,25 +222,25 @@ const ModernApplicationsTable = () => {
               </select>
             </div>
 
-            <div className="relative flex-1 sm:flex-none">
-              <Flag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
-              <select
-                value={filterPriority}
-                onChange={(e) => setFilterPriority(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
-              >
-                <option value="all">All Priority</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
-              </select>
-            </div>
+            {/*<div className="relative flex-1 sm:flex-none">*/}
+            {/*  <Flag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />*/}
+            {/*  <select*/}
+            {/*    value={filterPriority}*/}
+            {/*    onChange={(e) => setFilterPriority(e.target.value)}*/}
+            {/*    className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"*/}
+            {/*  >*/}
+            {/*    <option value="all">All Priority</option>*/}
+            {/*    <option value="high">High</option>*/}
+            {/*    <option value="medium">Medium</option>*/}
+            {/*    <option value="low">Low</option>*/}
+            {/*  </select>*/}
+            {/*</div>*/}
 
             <button
               onClick={() => {
                 setSearchTerm("");
                 setFilterStatus("all");
-                setFilterPriority("all");
+                // setFilterPriority("all");
               }}
               className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error sm:w-auto"
             >
@@ -340,16 +317,16 @@ const ModernApplicationsTable = () => {
               </div>
             </th>
 
-            <th
-              onClick={() => handleSort("priority")}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-            >
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                Priority
-                <SortIndicator field="priority" />
-              </div>
-            </th>
+            {/*<th*/}
+            {/*  onClick={() => handleSort("priority")}*/}
+            {/*  className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"*/}
+            {/*>*/}
+            {/*  <div className="flex items-center gap-2">*/}
+            {/*    <AlertTriangle className="h-4 w-4" />*/}
+            {/*    Priority*/}
+            {/*    <SortIndicator field="priority" />*/}
+            {/*  </div>*/}
+            {/*</th>*/}
 
             <th
               onClick={() => handleSort("updatedAt")}
@@ -371,23 +348,16 @@ const ModernApplicationsTable = () => {
           </tr>
           </thead>
 
-
           <tbody className="divide-border-default divide-y bg-primary">
           {loading ? (
             <tr>
-              <td
-                colSpan={9}
-                className="px-6 py-4 text-center text-p1 text-text-muted"
-              >
+              <td colSpan={9} className="px-6 py-4 text-center text-p1 text-text-muted">
                 Loading applications...
               </td>
             </tr>
           ) : paginatedApplications.length === 0 ? (
             <tr>
-              <td
-                colSpan={9}
-                className="px-6 py-8 text-center text-text-muted"
-              >
+              <td colSpan={9} className="px-6 py-8 text-center text-text-muted">
                 <EmptyData />
               </td>
             </tr>
@@ -395,11 +365,11 @@ const ModernApplicationsTable = () => {
             paginatedApplications.map((app) => (
               <tr
                 key={app.id}
-                className="group transition-colors hover:bg-primary"
-              >
+                className="group transition-colors hover:bg-primary">
+
                 <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-text-muted">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border border-default">
                       <Image
                         width={40}
                         height={40}
@@ -439,7 +409,7 @@ const ModernApplicationsTable = () => {
                   <div className="text-text-muted">{app.stage}</div>
                 </td>
 
-                <td className="min-w-[150px] max-w-[150px] px-6 py-4">
+                <td className="min-w-[200px] max-w-[150px] px-6 py-4">
                   <StatusBadge status={app.status} />
                 </td>
 
@@ -449,9 +419,9 @@ const ModernApplicationsTable = () => {
                   </div>
                 </td>
 
-                <td className="min-w-[150px] max-w-[150px] px-6 py-4">
-                  <PriorityBadge priority={app.priority} />
-                </td>
+                {/*<td className="min-w-[150px] max-w-[150px] px-6 py-4">*/}
+                {/*  <PriorityBadge priority={app.priority} />*/}
+                {/*</td>*/}
 
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 text-text-muted">
@@ -474,10 +444,14 @@ const ModernApplicationsTable = () => {
                     <span className="text-caption">View </span>
                   </Link>
                 </td>
+
+
               </tr>
             ))
           )}
           </tbody>
+
+
         </table>
       </div>
 
