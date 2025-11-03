@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, FileText } from "lucide-react";
 import Image from "next/image";
-import filePng from "/public/img/dashboards/file-icon-png.png";
+import filePng from "/public/img/dashboards/file-icon.png";
 
 interface ViewPopupProps {
   isOpen: boolean;
