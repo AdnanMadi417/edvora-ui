@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useMemo, useEffect } from "react";
 import {
   ChevronUp,
@@ -9,43 +11,65 @@ import {
   Calendar,
   Clock,
   User,
+  BadgeCheck,
+  Settings,
+  CalendarCheck,
   AlertTriangle,
   GraduationCap,
-  CalendarCheck,
-  BadgeCheck,
-  Settings
 } from "lucide-react";
 import avatar from "/public/img/avatars/user.png";
 import Image from "next/image";
 import Link from "next/link";
-import { applications as initialApplications } from "components/data/applications";
 import EmptyData from "components/emptyData/EmptyTableData";
+import api from "lib/useApi";
+import Cookies from "js-cookie";
 
-const ModernApplicationsTable = () => {
-  const [applications] = useState(initialApplications);
-
+const PartnerApplications = () => {
+  const [applications, setApplications] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPriority, setFilterPriority] = useState("all");
-
-  const itemsPerPage = 10;
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+  const itemsPerPage = 10;
 
-    return () => clearTimeout(timer);
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const token = Cookies.get("token");
+        const partnerId = localStorage.getItem("partnerId");
+
+        if (!token || !partnerId) {
+          console.error("Missing token or partnerId", { token, partnerId });
+          return;
+        }
+
+        const res = await api.get(`/partners/${partnerId}/applications`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const appsWithPriority = res.data.items.map((app: any) => ({
+          ...app,
+          priority: app.priority || "low",
+        }));
+
+        setApplications(appsWithPriority);
+      } catch (err: any) {
+        console.error("Error fetching partner applications:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplications();
   }, []);
 
-  const handleSort = (key) => {
+  const handleSort = (key: string) => {
     let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
+    if (sortConfig.key === key && sortConfig.direction === "asc")
       direction = "desc";
-    }
     setSortConfig({ key, direction });
   };
 
@@ -55,32 +79,34 @@ const ModernApplicationsTable = () => {
     if (searchTerm) {
       filtered = filtered.filter(
         (app) =>
-          app.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.studentEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.university.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.stage.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.applicationName
+          app.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.student_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.program_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          app.university_name
             .toLowerCase()
-            .includes(searchTerm.toLowerCase())
+            .includes(searchTerm.toLowerCase()) ||
+          app.stage.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (filterStatus !== "all") {
-      filtered = filtered.filter((app) => app.status === filterStatus);
+      filtered = filtered.filter(
+        (app) => app.status.toLowerCase() === filterStatus.toLowerCase()
+      );
     }
 
     if (filterPriority !== "all") {
-      filtered = filtered.filter((app) => app.priority === filterPriority);
+      filtered = filtered.filter(
+        (app) => app.priority.toLowerCase() === filterPriority.toLowerCase()
+      );
     }
 
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === "asc" ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === "asc" ? 1 : -1;
-        }
+        const valA = a[sortConfig.key]?.toString().toLowerCase?.() || "";
+        const valB = b[sortConfig.key]?.toString().toLowerCase?.() || "";
+        if (valA < valB) return sortConfig.direction === "asc" ? -1 : 1;
+        if (valA > valB) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
       });
     }
@@ -99,54 +125,63 @@ const ModernApplicationsTable = () => {
   const StatusBadge = ({ status }) => {
     const statusConfig = {
       "in-progress": {
-        bg: "bg-blue-50 border-blue-200",
-        text: "text-blue-700",
-        dot: "bg-blue-500",
-        width: "100px",
+        bg: "bg-blue-100 border-blue-300",
+        text: "text-blue-800",
+        dot: "bg-blue-600",
       },
       pending: {
-        bg: "bg-amber-50 border-amber-200",
-        text: "text-amber-700",
-        dot: "bg-amber-500",
-        width: "100px",
+        bg: "bg-gray-100 border-gray-300",
+        text: "text-gray-800",
+        dot: "bg-gray-500",
       },
       accepted: {
-        bg: "bg-emerald-50 border-emerald-200",
-        text: "text-emerald-700",
-        dot: "bg-emerald-500",
-        width: "100px",
+        bg: "bg-green-100 border-green-300",
+        text: "text-green-800",
+        dot: "bg-green-600",
       },
       rejected: {
-        bg: "bg-red-50 border-red-200",
-        text: "text-red-700",
-        dot: "bg-red-500",
-        width: "100px",
+        bg: "bg-red-100 border-red-300",
+        text: "text-red-800",
+        dot: "bg-red-600",
+      },
+      under_review: {
+        bg: "bg-yellow-100 border-yellow-300",
+        text: "text-yellow-800",
+        dot: "bg-yellow-600",
       },
     };
 
-    const config = statusConfig[status] || statusConfig["pending"];
+    const normalizedStatus = status?.toLowerCase().replace(/\s+/g, "_");
+
+    const config = statusConfig[normalizedStatus] || {
+      bg: "bg-gray-100 border-gray-200",
+      text: "text-gray-700",
+      dot: "bg-gray-400",
+      width: "100px",
+    };
 
     return (
-      <div
-        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-p2 ${config.bg} ${config.text}`}
+      <span
+        className={`inline-flex rounded-full border px-2 py-1 text-p2 ${config.bg} ${config.text}`}
       >
-        {status.charAt(0).toUpperCase() + status.slice(1).replace("-", " ")}
-      </div>
+        {status?.charAt(0).toUpperCase() + status?.slice(1)}
+      </span>
     );
   };
 
   const PriorityBadge = ({ priority }) => {
     const priorityConfig = {
-      high: "bg-red-100 text-red-700 border-red-200 px-3 py-1",
-      medium: "bg-yellow-100 text-yellow-700 border-yellow-200 px-3 py-1",
-      low: "bg-gray-100 text-text-muted border-gray-200 px-3 py-1",
+      high: "bg-red-100 text-red-700 border-red-200",
+      medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
+      low: "bg-gray-100 text-text-muted border-gray-200",
     };
-
     return (
       <span
-        className={`inline-flex rounded-full border px-2 py-1 text-p2 ${priorityConfig[priority]}`}
+        className={`inline-flex rounded-full border px-2 py-1 text-p2 ${
+          priorityConfig[priority] || priorityConfig.low
+        }`}
       >
-        {priority.charAt(0).toUpperCase() + priority.slice(1)}
+        {priority?.charAt(0).toUpperCase() + priority?.slice(1)}
       </span>
     );
   };
@@ -187,7 +222,7 @@ const ModernApplicationsTable = () => {
                 placeholder="Search applications by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full text-text-muted border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full rounded-full border border-default px-4 py-2.5 pl-10 pr-4 text-sm text-text-muted outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -196,11 +231,12 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
                 <option value="in-progress">In Progress</option>
                 <option value="pending">Pending</option>
+                <option value="Under Review">Under Review</option>
                 <option value="accepted">Accepted</option>
                 <option value="rejected">Rejected</option>
               </select>
@@ -211,7 +247,7 @@ const ModernApplicationsTable = () => {
               <select
                 value={filterPriority}
                 onChange={(e) => setFilterPriority(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all">All Priority</option>
                 <option value="high">High</option>
@@ -226,209 +262,212 @@ const ModernApplicationsTable = () => {
                 setFilterStatus("all");
                 setFilterPriority("all");
               }}
-              className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error sm:w-auto"
+              className="bg-background flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted outline-0 transition hover:border-text-error hover:text-text-error sm:w-auto"
             >
               Clear
             </button>
+
+            <Link
+              className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+              href="/partner/applications/new-application"
+            >
+              New Application
+            </Link>
           </div>
         </div>
       </div>
 
       <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-default bg-card">
         <table className="w-full">
-
           <thead>
-          <tr className="border-b border-default bg-card">
-            <th
-              onClick={() => handleSort("studentName")}
-              className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-            >
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Student
-                <SortIndicator field="studentName" />
-              </div>
-            </th>
+            <tr className="border-b border-default bg-card">
+              <th
+                onClick={() => handleSort("studentName")}
+                className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              >
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Student
+                  <SortIndicator field="studentName" />
+                </div>
+              </th>
 
-            <th
-              onClick={() => handleSort("applicationName")}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-            >
-              <div className="min-w-[250px] flex items-center gap-2">
-                <GraduationCap className="h-4 w-4" />
-                University / Program
-                <SortIndicator field="applicationName" />
-              </div>
-            </th>
+              <th
+                onClick={() => handleSort("applicationName")}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              >
+                <div className="flex min-w-[200px] items-center gap-2">
+                  <GraduationCap className="h-4 w-4" />
+                  University / Program
+                  <SortIndicator field="applicationName" />
+                </div>
+              </th>
 
-            <th
-              onClick={() => handleSort("stage")}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-            >
-              <div className="flex items-center gap-2">
-                <Flag className="h-4 w-4" />
-                Stage
-                <SortIndicator field="stage" />
-              </div>
-            </th>
+              <th
+                onClick={() => handleSort("stage")}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              >
+                <div className="flex items-center gap-2">
+                  <Flag className="h-4 w-4" />
+                  Stage
+                  <SortIndicator field="stage" />
+                </div>
+              </th>
 
-            <th
-              onClick={() => handleSort("status")}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-            >
-              <div className="flex items-center gap-2">
-                <BadgeCheck className="h-4 w-4" />
-                Status
-                <SortIndicator field="status" />
-              </div>
-            </th>
+              <th
+                onClick={() => handleSort("status")}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              >
+                <div className="flex items-center gap-2">
+                  <BadgeCheck className="h-4 w-4" />
+                  Status
+                  <SortIndicator field="status" />
+                </div>
+              </th>
 
-            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
-              <div className="flex items-center gap-2">
-                <CalendarCheck className="h-4 w-4" />
-                Next Action
-              </div>
-            </th>
+              <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+                <div className="flex items-center gap-2">
+                  <CalendarCheck className="h-4 w-4" />
+                  Next Action
+                </div>
+              </th>
 
-            <th
-              onClick={() => handleSort("priority")}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-            >
-              <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4" />
-                Priority
-                <SortIndicator field="priority" />
-              </div>
-            </th>
+              <th
+                onClick={() => handleSort("priority")}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              >
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  Priority
+                  <SortIndicator field="priority" />
+                </div>
+              </th>
 
-            <th
-              onClick={() => handleSort("updatedAt")}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-            >
-              <div className="flex min-w-[150px] items-center gap-2">
-                <Clock className="h-4 w-4" />
-                Last Updated
-                <SortIndicator field="updatedAt" />
-              </div>
-            </th>
+              <th
+                onClick={() => handleSort("updatedAt")}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              >
+                <div className="flex min-w-[150px] items-center gap-2">
+                  <Clock className="h-4 w-4" />
+                  Last Updated
+                  <SortIndicator field="updatedAt" />
+                </div>
+              </th>
 
-            <th className="px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
-              <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Actions
-              </div>
-            </th>
-          </tr>
+              <th className="px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+                <div className="flex items-center gap-2">
+                  <Settings className="h-4 w-4" />
+                  Actions
+                </div>
+              </th>
+            </tr>
           </thead>
 
-
           <tbody className="divide-border-default divide-y bg-primary">
-          {loading ? (
-            <tr>
-              <td
-                colSpan={9}
-                className="px-6 py-4 text-center text-p1 text-text-muted"
-              >
-                Loading applications...
-              </td>
-            </tr>
-          ) : paginatedApplications.length === 0 ? (
-            <tr>
-              <td
-                colSpan={9}
-                className="px-6 py-8 text-center text-text-muted"
-              >
-                <EmptyData />
-              </td>
-            </tr>
-          ) : (
-            paginatedApplications.map((app) => (
-              <tr
-                key={app.id}
-                className="group transition-colors hover:bg-primary"
-              >
-                <td className="min-w-[200px] max-w-[300px] px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-accent text-text-muted">
-                      <Image
-                        width={40}
-                        height={40}
-                        className="h-10 w-10 rounded-full"
-                        src={avatar}
-                        alt={app.studentName}
-                      />
-                    </div>
-
-                    <div className="truncate">
-                      <div className="truncate text-text-primary">
-                        {app.studentName}
-                      </div>
-
-                      <div className="truncate text-caption text-text-muted">
-                        {app.studentEmail}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-
-                <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                  <div className=" text-text-primary">
-                    {app.applicationName}
-                  </div>
-
-                  <div className="truncate text-caption text-text-muted">
-                    {app.university}
-                  </div>
-                </td>
-
-                <td className="px-6 py-4">
-                  <div className="text-text-muted">{app.stage}</div>
-                </td>
-
-                <td className="min-w-[150px] max-w-[150px] px-6 py-4">
-                  <StatusBadge status={app.status} />
-                </td>
-
-                <td className="px-6 py-4 ">
-                  <div className="max-w-48 truncate text-text-muted">
-                    {app.nextAction}
-                  </div>
-                </td>
-
-                <td className="min-w-[150px] max-w-[150px] px-6 py-4">
-                  <PriorityBadge priority={app.priority} />
-                </td>
-
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-1 text-text-muted">
-                    <Calendar className="h-3 w-3" />
-                    {new Date(app.updatedAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "2-digit",
-                    })}
-                  </div>
-                </td>
-
-                <td className="min-w-[200px] px-6 py-4">
-                  <Link
-                    href={`/partner/applications/${app.id}`}
-                    aria-label="View Application"
-                    className="flex items-center gap-2 rounded-full bg-blue-50 px-3 py-2 text-blue-500 transition-colors duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-600"
-                  >
-                    <Eye className="h-4 w-4" />
-                    <span className="text-caption">View Application</span>
-                  </Link>
+            {loading ? (
+              <tr>
+                <td
+                  colSpan={9}
+                  className="px-6 py-4 text-center text-p1 text-text-muted"
+                >
+                  Loading applications...
                 </td>
               </tr>
-            ))
-          )}
+            ) : paginatedApplications.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={9}
+                  className="px-6 py-8 text-center text-text-muted"
+                >
+                  <EmptyData />
+                </td>
+              </tr>
+            ) : (
+              paginatedApplications.map((app) => (
+                <tr
+                  key={app.id}
+                  className="group transition-colors hover:bg-primary"
+                >
+                  <td className="min-w-[200px] max-w-[300px] px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border border-default">
+                        <Image
+                          width={40}
+                          height={40}
+                          className="h-10 w-10 rounded-full"
+                          src={avatar}
+                          alt={app.student_name}
+                        />
+                      </div>
+
+                      <div className="truncate">
+                        <div className="truncate text-text-primary">
+                          {app.student_name}
+                        </div>
+
+                        <div className="truncate text-caption text-text-muted">
+                          {app.student_email}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="min-w-[250px] max-w-[300px] px-6 py-4">
+                    <div className=" text-text-primary">{app.program_name}</div>
+
+                    <div className="truncate text-caption text-text-muted">
+                      {app.university_name}
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="text-text-muted">{app.stage}</div>
+                  </td>
+
+                  <td className="min-w-[200px] max-w-[150px] px-6 py-4">
+                    <StatusBadge status={app.status} />
+                  </td>
+
+                  <td className="px-6 py-4 ">
+                    <div className="max-w-48 truncate text-text-muted">
+                      {app.next_action}
+                    </div>
+                  </td>
+
+                  <td className="min-w-[150px] max-w-[150px] px-6 py-4">
+                    <PriorityBadge priority={app.priority} />
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-1 text-text-muted">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(app.updated_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "2-digit",
+                      })}
+                    </div>
+                  </td>
+
+                  <td className="min-w-[120px] px-6 py-4">
+                    <Link
+                      href={`/partner/applications/${app.id}`}
+                      aria-label="View Application"
+                      className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-default p-2 text-sm text-text-muted outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span className="text-caption">View</span>
+                    </Link>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
       <div className="sticky bottom-0 rounded-b-lg border border-default bg-card px-6 py-4">
-        <div className="flex flex-col items-center justify-between gap-3 text-sm text-text-muted md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-2 text-sm text-text-muted md:flex-row">
           <div>
             Showing{" "}
             <span className="font-medium">
@@ -473,4 +512,4 @@ const ModernApplicationsTable = () => {
   );
 };
 
-export default ModernApplicationsTable;
+export default PartnerApplications;

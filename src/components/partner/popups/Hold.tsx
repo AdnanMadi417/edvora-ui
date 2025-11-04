@@ -76,7 +76,7 @@ export default function HoldPartnerPopup({
 
   return (
     <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 transition-all duration-300"
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 transition-all duration-300 backdrop-blur-sm"
       onClick={handleClose}
     >
       <div
