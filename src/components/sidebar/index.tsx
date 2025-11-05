@@ -193,7 +193,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           )}
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-4">
+        <nav className="flex-1 py-4">
           <Links routes={routes} />
         </nav>
 
