@@ -5,13 +5,18 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH,
   assetPrefix: process.env.NEXT_PUBLIC_BASE_PATH,
   typescript: {
-    // Skip type checking during build
     ignoreBuildErrors: true,
   },
   eslint: {
-    // Skip ESLint during build
     ignoreDuringBuilds: true,
   },
+  // Reduce memory usage
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
+  // Disable source maps in production to save memory
+  productionBrowserSourceMaps: false,
   images: {
     domains: [
       'images.unsplash.com',
