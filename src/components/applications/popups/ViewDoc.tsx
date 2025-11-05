@@ -23,7 +23,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
 
   const handleClose = () => onClose();
 
-  const fileUrl = doc.fileUrl || `/docs/${doc.name.replace(/\s+/g, "_")}.pdf`;
+  const fileUrl = doc.file_url || `/docs/${doc.name?.replace(/\s+/g, "_")}.pdf`;
 
   return (
     <div

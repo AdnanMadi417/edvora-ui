@@ -87,7 +87,6 @@ const ModernApplicationsTable = () => {
     }));
   };
 
-// Normalize for sorting
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = [...applications];
 
@@ -458,6 +457,7 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="min-w-[150px] px-6 py-4">
+
                   <Link
                     href={`/account-manager/applications/${app.id}`}
                     aria-label="View Application"

@@ -1,6 +1,4 @@
-import { applications } from "../../../data/applications";
 import React from "react";
-import EmptyData from "../../../emptyData/EmptyData";
 import ApplicationAccountManagerTopBar from "../../topBar/ApplicationAccountManagerTopBar";
 
 import {
@@ -21,56 +19,42 @@ import {
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
 
-interface ApplicationPageProps {
-  params: {
-    id: string;
-  };
+interface ApplicationDetailsProps {
+  application: any;
 }
 
-interface ApplicationPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default async function ApplicationPage({ params }: ApplicationPageProps) {
-
-  const { id } = await params;
-
-  const application = applications.find((app) => app.id === id);
-
+export default function ApplicationDetails({ application }: ApplicationDetailsProps) {
 
   function daysSince(dateString: string) {
-    const dateParts = dateString.match(
-      /(\d{4})-(\d{2})-(\d{2}) (\d{1,2}):(\d{2})(am|pm)/i
-    );
-    if (!dateParts) return 0;
+    if (!dateString) return 0;
 
-    let [_, year, month, day, hour, minute, meridiem] = dateParts;
-    let h = parseInt(hour, 10);
-    if (meridiem.toLowerCase() === "pm" && h < 12) h += 12;
-    if (meridiem.toLowerCase() === "am" && h === 12) h = 0;
-
-    const isoString = `${year}-${month}-${day}T${h
-      .toString()
-      .padStart(2, "0")}:${minute}:00`;
-    const updatedDate = new Date(isoString);
-
+    const updatedDate = new Date(dateString);
     const today = new Date();
     const diffTime = today.getTime() - updatedDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
   }
 
-  if (!application) {
-    return <EmptyData />;
+  function formatDate(dateString: string | null) {
+    if (!dateString) return "Not provided";
+    return new Date(dateString).toLocaleDateString();
   }
+
+  const student = application.student || {};
+  const program = application.program || {};
+  const university = program.university || {};
+  const partner = application.partner || {};
+  const stage = application.stage || {};
+  const emergencyContact = student.emergency_contacts?.[0] || {};
+  const englishProficiency = student.english_proficiencies?.[0] || {};
+  const previousEducation = student.previous_educations?.[0] || {};
+  const currentStatus = stage.statuses?.[0] || {};
 
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 shadow-sm sm:p-6">
 
-        <ApplicationAccountManagerTopBar params={params} />
+        <ApplicationAccountManagerTopBar params={{ id: application.id }} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
@@ -80,32 +64,31 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
           <div className="min-w-0 flex-1 space-y-3">
             <h3 className="break-words text-base font-semibold text-gray-800">
               Review commission details and approve payment
+
             </h3>
 
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex whitespace-nowrap rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
-                Processing
+                {currentStatus.name || "Processing"}
               </span>
               <span className="inline-flex whitespace-nowrap rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 sm:text-sm">
-                {application.priority.charAt(0).toUpperCase() +
-                  application.priority.slice(1)}{" "}
-                Priority
+                Normal Priority
               </span>
               <span className="inline-flex whitespace-nowrap rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 sm:text-sm">
-                Stage {application.stage}
+                {stage.name || "Not provided"}
               </span>
               <span className="inline-flex whitespace-nowrap rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
-                {daysSince(application.updatedAt)} Days
+                {daysSince(application.updated_at)} Days
               </span>
             </div>
           </div>
 
           <div className="w-full self-start sm:w-auto sm:text-end">
             <span className="block truncate text-sm text-text-muted">
-              {application.studentInfo?.fullName}
+              {student.name || "Not provided"}
             </span>
             <span className="block truncate text-xs text-text-muted">
-              {application.applicationID}
+              {application.id}
             </span>
           </div>
 
@@ -123,7 +106,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
             Next: Check status for next steps
           </p>
           <p className="text-xs text-text-secondary">
-            Last updated: {application.updatedAt}
+            Last updated: {formatDate(application.updated_at)}
           </p>
         </div>
       </div>
@@ -142,7 +125,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
               Program
             </span>
             <span className="text-p2 text-text-muted">
-              {application.program}
+              {program.name || "Not provided"}
             </span>
           </div>
 
@@ -151,7 +134,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
               University
             </span>
             <span className="text-p2 text-text-muted">
-              {application.university}
+              {university.name || "Not provided"}
             </span>
           </div>
 
@@ -160,7 +143,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
               Partner
             </span>
             <span className="text-p2 text-text-muted">
-              {application.partner}
+              {partner.name || "Not provided"}
             </span>
           </div>
 
@@ -168,7 +151,9 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
             <span className="block text-p1 font-medium text-text-primary">
               Stage
             </span>
-            <span className="text-p2 text-text-muted">{application.stage}</span>
+            <span className="text-p2 text-text-muted">
+              {stage.name || "Not provided"}
+            </span>
           </div>
 
           <div>
@@ -176,7 +161,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
               Status
             </span>
             <span className="text-p2 text-text-muted">
-              {application.status}
+              {currentStatus.name || "Not provided"}
             </span>
           </div>
 
@@ -185,7 +170,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
               Intake Date
             </span>
             <span className="text-p2 text-text-muted">
-              {application.intakeDate}
+              {formatDate(program.intake_date)}
             </span>
           </div>
 
@@ -193,8 +178,8 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
             <span className="block text-p1 font-medium text-text-primary">
               Tuition Fee
             </span>
-            <span className="text-p1 text-text-success ">
-              $ {application.tuitionFee}
+            <span className="text-p1 text-text-success">
+              $ {program.tuition_fee?.toLocaleString() || "Not provided"}
             </span>
           </div>
         </div>
@@ -221,7 +206,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaUser className="text-text-muted" />
-                  {application.studentInfo?.fullName || "Not provided"}
+                  {student.name || "Not provided"}
                 </dd>
               </div>
 
@@ -231,7 +216,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaBirthdayCake className="text-text-muted" />
-                  {application.studentInfo?.dateOfBirth || "DD/MM/YYYY"}
+                  {formatDate(student.birthday)}
                 </dd>
               </div>
 
@@ -241,7 +226,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaFlag className="text-text-muted" />
-                  {application.studentInfo?.nationality || "Not specified"}
+                  {student.nationality || "Not provided"}
                 </dd>
               </div>
 
@@ -251,7 +236,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaIdCard className="text-text-muted" />
-                  {application.studentInfo?.passportNumber || "N/A"}
+                  {student.passport_number || "Not provided"}
                 </dd>
               </div>
 
@@ -261,7 +246,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaEnvelope className="text-text-muted" />
-                  {application.studentEmail || "example@email.com"}
+                  {student.email || "Not provided"}
                 </dd>
               </div>
 
@@ -271,7 +256,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaPhone className="text-text-muted" />
-                  {application.studentInfo?.phone || "+00 000-000-000"}
+                  {student.phone || "Not provided"}
                 </dd>
               </div>
 
@@ -281,8 +266,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 break-words text-sm text-text-muted">
                   <FaHome className="text-text-muted" />
-                  {application.studentInfo?.currentAddress ||
-                    "No address provided"}
+                  {student.current_address || "Not provided"}
                 </dd>
               </div>
             </dl>
@@ -290,7 +274,6 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
 
           <div>
             <div className="mb-6">
-
               <h4 className="mb-3 flex items-center gap-2 text-h6 font-semibold text-text-primary">
                 <FaBook /> English Proficiency
               </h4>
@@ -301,7 +284,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                     Test Name
                   </dt>
                   <dd className="text-sm text-text-muted">
-                    {application.englishProficiency?.test || "Not taken"}
+                    {englishProficiency.test_name || "Not provided"}
                   </dd>
                 </div>
                 <div className="flex justify-between">
@@ -309,7 +292,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                     Score
                   </dt>
                   <dd className="text-sm font-semibold text-text-muted">
-                    {application.englishProficiency?.score || "N/A"}
+                    {englishProficiency.score || "Not provided"}
                   </dd>
                 </div>
                 <div className="flex justify-between">
@@ -317,17 +300,15 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                     Test Date
                   </dt>
                   <dd className="text-sm text-text-muted">
-                    {application.englishProficiency?.testDate || "DD/MM/YYYY"}
+                    {formatDate(englishProficiency.test_date)}
                   </dd>
                 </div>
               </dl>
             </div>
 
             <div>
-
               <h4 className="mb-3 flex items-center gap-2 text-h6 font-semibold text-text-primary">
                 <FaGraduationCap /> Previous Education
-
               </h4>
 
               <dl className="space-y-3">
@@ -336,7 +317,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                     Degree
                   </dt>
                   <dd className="text-sm text-text-muted">
-                    {application.previousEducation?.degree || "Not specified"}
+                    {previousEducation.qualification || "Not provided"}
                   </dd>
                 </div>
                 <div className="flex justify-between">
@@ -344,8 +325,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                     Institution
                   </dt>
                   <dd className="max-w-[60%] break-words text-right text-sm text-text-muted">
-                    {application.previousEducation?.institution ||
-                      "Institution name"}
+                    {previousEducation.institution_name || "Not provided"}
                   </dd>
                 </div>
                 <div className="flex justify-between">
@@ -353,13 +333,15 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                     Years
                   </dt>
                   <dd className="text-sm text-text-muted">
-                    {application.previousEducation?.years || "Not provided"}
+                    {previousEducation.start_date && previousEducation.end_date
+                      ? `${formatDate(previousEducation.start_date)} - ${formatDate(previousEducation.end_date)}`
+                      : "Not provided"}
                   </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">GPA</dt>
                   <dd className="text-sm font-bold text-text-muted">
-                    {application.previousEducation?.gpa || "N/A"}
+                    {previousEducation.gpa || "Not provided"}
                   </dd>
                 </div>
               </dl>
@@ -381,8 +363,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                     <FaUser className="text-text-secondary" /> Name
                   </dt>
                   <dd className="text-sm font-normal text-text-primary">
-                    {application.studentInfo?.emergencyContact.name ||
-                      "Not provided"}
+                    {emergencyContact.name || "Not provided"}
                   </dd>
                 </div>
 
@@ -391,8 +372,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                     <FaUsers className="text-text-secondary" /> Relation
                   </dt>
                   <dd className="text-sm font-normal text-text-primary">
-                    {application.studentInfo?.emergencyContact.relation ||
-                      "N/A"}
+                    {emergencyContact.relation || "Not provided"}
                   </dd>
                 </div>
 
@@ -401,8 +381,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                     <FaPhoneAlt className="text-text-secondary" /> Phone
                   </dt>
                   <dd className="text-sm font-normal text-text-primary">
-                    {application.studentInfo?.emergencyContact.phone ||
-                      "+00 000-000-000"}
+                    {emergencyContact.phone || "Not provided"}
                   </dd>
                 </div>
 
@@ -411,8 +390,7 @@ export default async function ApplicationPage({ params }: ApplicationPageProps) 
                     <FaEnvelope className="text-text-secondary" /> Email
                   </dt>
                   <dd className="break-words text-sm font-normal text-text-primary">
-                    {application.studentInfo?.emergencyContact.email ||
-                      "example@email.com"}
+                    {emergencyContact.email || "Not provided"}
                   </dd>
                 </div>
               </dl>
