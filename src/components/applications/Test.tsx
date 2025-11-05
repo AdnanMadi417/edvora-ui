@@ -20,7 +20,6 @@ export default function PartnerApplications() {
           headers: { Authorization: `Bearer ${token}` },
         })
 
-        console.log('Partner Applications:', res.data)
       } catch (err: any) {
         console.error('Error fetching partner applications:', err)
       }

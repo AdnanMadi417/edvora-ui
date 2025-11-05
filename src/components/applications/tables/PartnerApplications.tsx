@@ -452,6 +452,7 @@ const PartnerApplications = () => {
                   <td className="min-w-[120px] px-6 py-4">
                     <Link
                       href={`/partner/applications/${app.id}`}
+
                       aria-label="View Application"
                       className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-default p-2 text-sm text-text-muted outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
                     >
