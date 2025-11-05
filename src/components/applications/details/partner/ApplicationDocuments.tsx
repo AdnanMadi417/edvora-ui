@@ -22,7 +22,6 @@ export default function ApplicationDocuments({
                                              }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
   const [showViewPopup, setShowViewPopup] = useState(false);
-  const [showResubmitPopup, setShowResubmitPopup] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
 
   const documents = application?.documents || [];

@@ -7,12 +7,11 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  RotateCw,
   Eye,
   Download,
   RotateCcw,
 } from "lucide-react";
-import ViewPopup from "../../popups/ViewDoc";
+import ViewPopup from "components/applications/popups/ViewDoc";
 import ResubmitPopup from "../../popups/ResubmitDoc";
 import EmptyData from "components/emptyData/EmptyData"
 
