@@ -8,7 +8,7 @@ interface LoadingProps {
 
 const Loading: React.FC<LoadingProps> = ({
                                            size = 50,
-                                           color = "#3498db",
+                                           color = "#2563eb",
                                            text = "Loading...",
                                          }) => {
   return (

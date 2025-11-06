@@ -23,8 +23,9 @@ interface ApplicationDetailsProps {
   application: any;
 }
 
-export default function ApplicationDetails({ application }: ApplicationDetailsProps) {
-
+export default function ApplicationDetails({
+                                             application,
+                                           }: ApplicationDetailsProps) {
   function daysSince(dateString: string) {
     if (!dateString) return 0;
 
@@ -52,8 +53,7 @@ export default function ApplicationDetails({ application }: ApplicationDetailsPr
 
   return (
     <section>
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 shadow-sm sm:p-6">
-
+      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 pt-0 shadow-sm sm:p-6">
         <ApplicationPartnerTopBar params={{ id: application.id }} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
@@ -62,15 +62,12 @@ export default function ApplicationDetails({ application }: ApplicationDetailsPr
           </span>
 
           <div className="min-w-0 flex-1 space-y-3">
-            <h3 className="break-words text-base font-semibold text-gray-800">
-              Review commission details and approve payment
 
+            <h3 className="break-words text-base font-semibold text-gray-800">
+              Review {application.program?.name}
             </h3>
 
             <div className="flex flex-wrap gap-2">
-              <span className="inline-flex whitespace-nowrap rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
-                {currentStatus.name || "Processing"}
-              </span>
               <span className="inline-flex whitespace-nowrap rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 sm:text-sm">
                 Normal Priority
               </span>
@@ -91,19 +88,29 @@ export default function ApplicationDetails({ application }: ApplicationDetailsPr
               {application.id}
             </span>
           </div>
-
         </div>
 
         <div className="flex items-center gap-3 py-2">
           <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center">
             <FaCogs className="text-xl text-blue-600" />
           </div>
-          <span className="text-p2 sm:text-base">Processing in progress</span>
+          <span className="text-p2 sm:text-base">
+
+            <span className="text-p1 font-medium text-text-primary">
+              Current Status:{" "}
+            </span>
+
+            {application.stage?.statuses?.[0]?.name ||
+              application.stage?.name ||
+              "Not provided"}
+          </span>
         </div>
 
         <div className="space-y-1">
           <p className="text-xs text-text-muted sm:text-p2">
-            Next: Check status for next steps
+            Next Action:{" "}
+            {application.stage?.statuses?.[0]?.next_actions?.[0]?.name ||
+              "Not provided"}
           </p>
           <p className="text-xs text-text-secondary">
             Last updated: {formatDate(application.updated_at)}
@@ -135,6 +142,15 @@ export default function ApplicationDetails({ application }: ApplicationDetailsPr
             </span>
             <span className="text-p2 text-text-muted">
               {university.name || "Not provided"}
+            </span>
+          </div>
+
+          <div>
+            <span className="block text-p1 font-medium text-text-primary">
+              Country of University
+            </span>
+            <span className="text-p2 text-text-muted">
+              {university.country || "Not provided"}
             </span>
           </div>
 
@@ -207,6 +223,16 @@ export default function ApplicationDetails({ application }: ApplicationDetailsPr
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaUser className="text-text-muted" />
                   {student.name || "Not provided"}
+                </dd>
+              </div>
+
+              <div>
+                <dt className="text-sm font-medium text-text-primary">
+                  Student Gender
+                </dt>
+                <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
+                  <FaUser  className="text-text-muted" />
+                  {formatDate(student.gender)}
                 </dd>
               </div>
 
@@ -334,7 +360,9 @@ export default function ApplicationDetails({ application }: ApplicationDetailsPr
                   </dt>
                   <dd className="text-sm text-text-muted">
                     {previousEducation.start_date && previousEducation.end_date
-                      ? `${formatDate(previousEducation.start_date)} - ${formatDate(previousEducation.end_date)}`
+                      ? `${formatDate(
+                        previousEducation.start_date
+                      )} - ${formatDate(previousEducation.end_date)}`
                       : "Not provided"}
                   </dd>
                 </div>

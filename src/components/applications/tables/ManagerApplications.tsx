@@ -166,11 +166,19 @@ const ModernApplicationsTable = () => {
 
     const normalizedStatus = status?.toLowerCase().replace(/\s+/g, "_");
 
-    const config = statusConfig[status.toLowerCase()] || { bg: "bg-gray-50 border-gray-200", text: "text-gray-700" };
+    const config = statusConfig[normalizedStatus] || {
+      bg: "bg-gray-100 border-gray-200",
+      text: "text-gray-700",
+      dot: "bg-gray-400",
+      width: "100px",
+    };
+
     return (
-      <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-p2 ${config.bg} ${config.text}`}>
-        {status}
-      </div>
+      <span
+        className={`inline-flex rounded-full border px-2 py-1 text-p2 ${config.bg} ${config.text}`}
+      >
+        {status?.charAt(0).toUpperCase() + status?.slice(1)}
+      </span>
     );
   };
 
