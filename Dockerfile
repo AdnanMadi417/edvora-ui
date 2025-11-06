@@ -7,9 +7,14 @@ WORKDIR /app
 
 # Set specific pnpm version (change to match your local version)
 ENV PNPM_VERSION=8.15.5
+ENV NODE_OPTIONS="--max-old-space-size=4096"
 
 COPY package.json pnpm-lock.yaml ./
-RUN corepack enable pnpm && \
+RUN echo "=== System Info ===" && \
+    free -m && \
+    df -h && \
+    echo "=== Starting pnpm install ===" && \
+    corepack enable pnpm && \
     corepack prepare pnpm@${PNPM_VERSION} --activate && \
     pnpm install --frozen-lockfile --no-optional
 
