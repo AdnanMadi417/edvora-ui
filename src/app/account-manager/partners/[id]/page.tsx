@@ -1,5 +1,6 @@
-import TopBar from "components/partner/cards/TopBar"
-import RecentApplications from "components/partner/Applications/RecentApplications"
+import RecentApplications from "components/partner/applications/RecentApplications"
+import PartnerDetails from "components/partner/cards/PartnerDetails"
+import PartnerStudentsList from "components/partner/applications/PartnerStudentsList"
 
 
 interface PartnerPageProps {
@@ -12,9 +13,11 @@ export default function PartnerPage({ params }: PartnerPageProps) {
   return (
     <section className="min-[100vh]">
 
-      <TopBar params={params} />
+      <PartnerDetails params={params} />
 
       <RecentApplications/>
+
+      <PartnerStudentsList/>
 
     </section>
   );
