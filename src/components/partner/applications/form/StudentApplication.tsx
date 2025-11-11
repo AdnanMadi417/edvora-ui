@@ -156,7 +156,6 @@ export default function StudentApplication() {
   const handleSubmit = () => {
     if (validateStage(5)) {
       setShowPopup(true);
-      console.log("Form Data:", formData);
 
       const timer = setTimeout(() => {
         setShowPopup(false);

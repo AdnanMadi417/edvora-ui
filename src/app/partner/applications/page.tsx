@@ -1,11 +1,11 @@
 'use client';
 
-import PartnerApplications from '../../../components/applications/tables/PartnerApplications'
+import Applications from '../../../components/applications/tables/PartnerApplications'
 
 const ProfileOverview = () => {
   return (
     <div className="">
-      <PartnerApplications/>
+      <Applications/>
     </div>
   );
 };
