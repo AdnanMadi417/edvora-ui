@@ -1,0 +1,57 @@
+image: atlassian/default-image:4
+
+pipelines:
+  branches:
+    release/staging:
+      - step:
+          name: Build and Push Docker Image
+          size: 8x  # 4GB RAM instead of default 1GB (or use 4x, 8x for more)
+          max-time: 30
+          services:
+            - docker
+          caches:
+            - docker
+
+          script:
+            - apt-get update && apt-get install -y wget
+            - wget https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
+            - tar xf doctl-1.104.0-linux-amd64.tar.gz
+            - mv doctl /usr/local/bin
+
+            # Authenticate with Digital Ocean Container Registry
+            - doctl auth init --access-token $DIGITALOCEAN_ACCESS_TOKEN
+            - doctl registry login
+
+            # Set image variables
+            - export IMAGE_NAME="registry.digitalocean.com/unibexs-internal/unibexs-frontend"
+            - export IMAGE_TAG="staging-${BITBUCKET_COMMIT:0:7}"
+            - export IMAGE_FULL="${IMAGE_NAME}:${IMAGE_TAG}"
+
+            # backend env
+            - echo "APP_NAME=Unibexs UI" > .env.local
+            - echo "NODE_ENV=$NODE_ENV" >> .env.local
+            - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env.local
+            # Build and push the Docker image
+            - docker build
+              --progress=plain
+              --shm-size=2gb
+              --build-arg BUILDKIT_INLINE_CACHE=1
+              --cache-from ${IMAGE_NAME}:staging-latest
+              -t ${IMAGE_FULL}
+              -t ${IMAGE_NAME}:staging-latest
+              -f Dockerfile
+              .
+
+            # Push to Digital Ocean Container Registry
+            - docker push ${IMAGE_FULL}
+            - docker push ${IMAGE_NAME}:staging-latest
+
+            # Output image info
+            - echo "Image pushed successfully:"
+            - echo "  ${IMAGE_FULL}"
+            - echo "  ${IMAGE_NAME}:staging-latest"
+
+definitions:
+  services:
+    docker:
+      memory: 3072  # Reduced to 3GB for Docker daemon
