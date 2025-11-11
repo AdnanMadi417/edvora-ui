@@ -10,38 +10,66 @@ import {
   Eye,
   Download,
 } from "lucide-react";
-import { applications } from "../../../data/applications";
 import ViewPopup from "../../popups/ViewDoc";
+import EmptyData from "components/emptyData/EmptyData"
 
 interface ApplicationDocumentsProps {
-  params?: { id: string };
+  application: any;
 }
 
 export default function ApplicationDocuments({
-  params,
-}: ApplicationDocumentsProps) {
+                                               application,
+                                             }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
-  const documents = applications[0]?.docs || [];
   const [showViewPopup, setShowViewPopup] = useState(false);
-  const [selectedDoc, setSelectedDoc] = useState(null);
+  const [selectedDoc, setSelectedDoc] = useState<any>(null);
+
+  const documents = application?.documents || [];
 
   const getFileStatus = (status: string) => {
     switch (status) {
-      case "pending":
+      case "1":
         return <Clock className="h-5 w-5 text-yellow-500" />;
-      case "approved":
+      case "2":
         return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case "rejected":
+      case "3":
         return <XCircle className="h-5 w-5 text-red-600" />;
       default:
-        return null;
+        return <Clock className="h-5 w-5 text-yellow-500" />;
     }
   };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "1":
+        return "Pending";
+      case "2":
+        return "Approved";
+      case "3":
+        return "Rejected";
+      default:
+        return "Pending";
+    }
+  };
+
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return "Not provided";
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const getFileName = (fileUrl: string | null) => {
+    if (!fileUrl) return "document.pdf";
+    return fileUrl.split("/").pop() || "document.pdf";
+  };
+
+  if (documents.length === 0) {
+    return <EmptyData/>;
+  }
 
   return (
     <section className="mb-6 mt-6 rounded-lg bg-card transition-all duration-300">
       <div
-        className={`group flex items-center justify-between border border-default p-6 transition-all duration-300 ${
+        className={`group flex cursor-pointer items-center justify-between border border-default p-6 transition-all duration-300 ${
           showDocs ? "rounded-t-lg" : "rounded-lg"
         }`}
         onClick={() => setShowDocs(!showDocs)}
@@ -52,11 +80,9 @@ export default function ApplicationDocuments({
               <FolderOpen className="text-xl text-blue-700" />
             </span>
             Documents
-
             <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
               {documents.length} Total
             </span>
-
           </h3>
         </div>
 
@@ -82,7 +108,7 @@ export default function ApplicationDocuments({
       >
         <div className="rounded-b-lg border border-t-0 border-default bg-card p-6">
           <div className="space-y-4">
-            {documents.map((doc, index) => (
+            {documents.map((doc: any, index: number) => (
               <div
                 key={doc.id}
                 className="relative flex items-center justify-between rounded-lg border border-default p-5 backdrop-blur transition-all duration-300"
@@ -102,15 +128,15 @@ export default function ApplicationDocuments({
                   <div className="min-w-0 max-w-[350px] flex-1">
                     <div className="mb-2 flex items-center gap-2">
                       <h3 className="truncate text-sm font-semibold text-slate-800">
-                        {doc.name}
+                        Document {index + 1}
                       </h3>
-                      <span className="inline-flex items-center px-2 py-0.5 text-[11px] font-medium capitalize text-slate-600">
-                        {doc.type}
+                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium capitalize text-slate-600">
+                        {getStatusText(doc.status)}
                       </span>
                     </div>
 
                     <p className="mb-2 truncate rounded-full bg-slate-100 px-2.5 py-1 font-mono text-caption text-text-secondary">
-                      Emma_Thompson_{doc.name.replace(/\s+/g, "_")}.pdf
+                      {getFileName(doc.file_url)}
                     </p>
 
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
@@ -132,27 +158,30 @@ export default function ApplicationDocuments({
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                           />
                         </svg>
-                        <span className="font-medium">2.3 MB</span>
+                        <span className="font-medium">PDF</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{doc.uploadedAt}</span>
+                        <span>{formatDate(doc.created_at)}</span>
                       </div>
                     </div>
 
-                    <div className="mt-2.5 text-xs text-slate-500">
-                      Reviewed by{" "}
-                      <span className="font-medium text-slate-700">
-                        System Account Manager
-                      </span>{" "}
-                      on 9/8/2025
-                    </div>
+                    {doc.approve_notes && (
+                      <div className="mt-2.5 text-xs text-slate-500">
+                        Notes:{" "}
+                        <span className="font-medium text-slate-700">
+                          {doc.approve_notes}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
+
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       setSelectedDoc(doc);
                       setShowViewPopup(true);
                     }}
@@ -164,17 +193,16 @@ export default function ApplicationDocuments({
                   </button>
 
                   <button
-                    onClick={() => {
-                      const fileUrl =
-                        doc.fileUrl || `/docs/${doc.name.replace(/\s+/g, "_")}.pdf`;
-                      const link = document.createElement("a");
-                      link.href = fileUrl;
-                      link.download = fileUrl.split("/").pop() || "document.pdf";
-                      link.click();
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (doc.file_url) {
+                        window.open(doc.file_url, "_blank");
+                      }
                     }}
                     className="group rounded-full border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
                     title="Download Document"
                     aria-label="Download Document"
+                    disabled={!doc.file_url}
                   >
                     <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
@@ -193,20 +221,19 @@ export default function ApplicationDocuments({
           doc={selectedDoc}
         />
 
-
       </div>
 
       <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
+          @keyframes slideIn {
+              from {
+                  opacity: 0;
+                  transform: translateY(-10px);
+              }
+              to {
+                  opacity: 1;
+                  transform: translateY(0);
+              }
           }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
       `}</style>
     </section>
   );
