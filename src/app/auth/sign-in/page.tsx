@@ -36,8 +36,6 @@ export default function SignInPage() {
       localStorage.setItem("userRole", role);
       localStorage.setItem("userId", user.id);
 
-      console.log("User data:", user);
-
 
       if (role === "partner") {
         localStorage.setItem("partnerId", user.partner_id ? user.partner_id : user.id);

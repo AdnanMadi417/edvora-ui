@@ -11,11 +11,11 @@ export default function UnauthorizedPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push("/auth/sign-in");
-    },2000);
+    },1000);
 
     const countdownInterval = setInterval(() => {
       setCountdown((prev) => prev - 1);
-    }, 1000);
+    }, 500);
 
 
     return () => {
