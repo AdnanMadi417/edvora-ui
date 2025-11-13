@@ -1,6 +1,5 @@
 "use client";
 
-import { applications } from "components/data/applications";
 import React, { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -14,15 +13,16 @@ import HoldPopup from "components/applications/popups/Hold";
 import UpdateStatus from "components/applications/popups/UpdateStatus";
 import CancelPopup from "components/applications/popups/Cancel";
 
-interface ApplicationPageProps {
-  params: {
-    id: string;
-  };
+interface Props {
+  application: any;
 }
 
-export default function ApplicationPage({ params }: ApplicationPageProps) {
-  const application = applications.find((app) => app.id === params.id);
+export default function ApplicationAccountManagerTopBar({ application }: Props) {
+
   const router = useRouter();
+
+  // console.log(" account manager application details ID", application.id  );
+  // console.log(" account manager application details bar  ", application  );
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showHoldPopup, setShowHoldPopup] = useState(false);
@@ -61,11 +61,6 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   const handleConfirmHold = (reason: string) => {
     setShowHoldPopup(false);
-    console.log(
-      "Application placed on hold:",
-      application?.applicationID,
-      reason
-    );
   };
 
   const handleCancel = () => {
@@ -75,7 +70,6 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   const handleConfirmCancel = (reason: string) => {
     setShowCancelPopup(false);
-    console.log("Application cancelled:", application?.applicationID, reason);
   };
 
   const handleUpdateStatus = () => {
@@ -84,7 +78,6 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
 
   const handleConfirmUpdate = () => {
     setShowUpdatePopup(false);
-    console.log("Status updated for:", application?.applicationID);
   };
 
   return (
@@ -184,22 +177,26 @@ export default function ApplicationPage({ params }: ApplicationPageProps) {
         isOpen={showHoldPopup}
         onClose={() => setShowHoldPopup(false)}
         onConfirm={handleConfirmHold}
-        applicationId={application?.applicationID}
+        applicationId={application?.id}
       />
 
       <CancelPopup
         isOpen={showCancelPopup}
         onClose={() => setShowCancelPopup(false)}
         onConfirm={handleConfirmCancel}
-        applicationId={application?.applicationID}
+        applicationId={application?.id}
       />
 
-      <UpdateStatus
-        isOpen={showUpdatePopup}
-        onClose={() => setShowUpdatePopup(false)}
-        onConfirm={handleConfirmUpdate}
-        applicationId={application?.applicationID}
-      />
+      {application && showUpdatePopup && (
+        <UpdateStatus
+          isOpen={showUpdatePopup}
+          onClose={() => setShowUpdatePopup(false)}
+          onConfirm={handleConfirmUpdate}
+          application={application}
+        />
+      )}
+
+
     </section>
   );
 }
