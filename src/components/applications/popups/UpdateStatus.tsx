@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, Clock, Plus, Trash2, AlertCircle } from "lucide-react";
-import { DOCUMENT_TYPES } from "constants/lists";
+import { XCircle, Clock, Plus, Trash2, AlertCircle, Pause, CheckCircle } from "lucide-react";
 import api from "lib/useApi";
 
 interface User {
@@ -34,9 +33,10 @@ interface StatusOption {
 interface DocumentRequestListProps {
   documents: DocumentRequest[];
   setDocuments: React.Dispatch<React.SetStateAction<DocumentRequest[]>>;
+  documentTypes: { id: string; label: string }[];
 }
 
-const DocumentRequestList = ({ documents, setDocuments }: DocumentRequestListProps) => {
+const DocumentRequestList = ({ documents, setDocuments, documentTypes }: DocumentRequestListProps) => {
   const addDocument = () => {
     setDocuments([...documents, { id: Date.now().toString(), type: "", reason: "" }]);
   };
@@ -54,7 +54,7 @@ const DocumentRequestList = ({ documents, setDocuments }: DocumentRequestListPro
   return (
     <div className="space-y-4">
       {documents.map((doc, index) => (
-        <div key={doc.id} className="relative space-y-3 rounded-md border border-amber-200 bg-card p-4">
+        <div key={doc.id} className="relative space-y-3 rounded-md border bg-blue-200 border-blue-200 bg-card p-4">
           {documents.length > 1 && (
             <button
               onClick={() => removeDocument(doc.id)}
@@ -64,19 +64,18 @@ const DocumentRequestList = ({ documents, setDocuments }: DocumentRequestListPro
               <Trash2 className="h-4 w-4" />
             </button>
           )}
-
           <div>
-            <label className="mb-2 block text-p2 font-medium text-text-muted">
+            <label className="mb-2 block text-p2 font-medium text-gray-900">
               Document Type {index + 1}
             </label>
             <select
               value={doc.type}
               onChange={(e) => updateDocument(doc.id, "type", e.target.value)}
-              className="w-full rounded-md border border-default bg-card px-4 py-2.5 text-p2 outline-none transition-all duration-200 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+              className="w-full rounded-md border border-default bg-card px-4 py-2.5 text-p2 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             >
               <option value="">Select document type...</option>
-              {DOCUMENT_TYPES.map((d) => (
-                <option key={d.key} value={d.label}>
+              {documentTypes.map((d) => (
+                <option key={d.id} value={d.id}>
                   {d.label}
                 </option>
               ))}
@@ -84,15 +83,13 @@ const DocumentRequestList = ({ documents, setDocuments }: DocumentRequestListPro
           </div>
 
           <div>
-            <label className="mb-2 block text-p2 font-medium text-text-muted">
-              Reason for Request
-            </label>
+            <label className="mb-2 block text-p2 font-medium text-gray-900">Reason for Request</label>
             <textarea
               value={doc.reason}
               onChange={(e) => updateDocument(doc.id, "reason", e.target.value)}
               placeholder="Why is this document needed?"
               rows={3}
-              className="w-full rounded-md border border-default px-4 py-2.5 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+              className="w-full rounded-md border border-default px-4 py-2.5 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
             />
           </div>
         </div>
@@ -100,7 +97,7 @@ const DocumentRequestList = ({ documents, setDocuments }: DocumentRequestListPro
 
       <button
         onClick={addDocument}
-        className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-amber-300 bg-amber-50/50 px-4 py-3 text-p2 font-medium text-amber-700 transition-all duration-200 hover:border-amber-400 hover:bg-amber-100"
+        className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-blue-300 bg-blue-50/50 px-4 py-3 text-p2 font-medium text-blue-700 transition-all duration-200 hover:border-blue-400 hover:bg-blue-100"
       >
         <Plus className="h-4 w-4" />
         Add Another Document
@@ -109,53 +106,6 @@ const DocumentRequestList = ({ documents, setDocuments }: DocumentRequestListPro
   );
 };
 
-interface InputFieldProps {
-  label: string;
-  placeholder: string;
-  id: string;
-  type?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  required?: boolean;
-  isTextarea?: boolean;
-}
-
-const InputField = ({
-                      label,
-                      placeholder,
-                      id,
-                      type = "text",
-                      value,
-                      onChange,
-                      required = false,
-                      isTextarea = false,
-                    }: InputFieldProps) => (
-  <div className="space-y-2">
-    <label htmlFor={id} className="block text-p2 font-medium text-text-muted">
-      {label} {required && <span className="ml-1 text-red-500">*</span>}
-    </label>
-    {isTextarea ? (
-      <textarea
-        id={id}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        rows={4}
-        className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-      />
-    ) : (
-      <input
-        id={id}
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-      />
-    )}
-  </div>
-);
-
 interface UpdateStatusPopupProps {
   isOpen: boolean;
   onClose: () => void;
@@ -163,40 +113,25 @@ interface UpdateStatusPopupProps {
   application?: any;
 }
 
-export default function UpdateStatusPopup({
-                                            isOpen,
-                                            onClose,
-                                            onConfirm,
-                                            application,
-                                          }: UpdateStatusPopupProps) {
+export default function UpdateStatusPopup({ isOpen, onClose, onConfirm, application }: UpdateStatusPopupProps) {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [reason, setReason] = useState("");
   const [notes, setNotes] = useState("");
   const [documents, setDocuments] = useState<DocumentRequest[]>([{ id: "1", type: "", reason: "" }]);
   const [statusOptions, setStatusOptions] = useState<StatusOption[]>([]);
-  const [user, setUser] = useState<User | null>(null);
+  const [documentTypes, setDocumentTypes] = useState<{ id: string; label: string }[]>([]);
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string>("");
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const fetchUser = async () => {
-      try {
-        const response = await api.get("/auth/me");
-        setUser({
-          id: response.data.id,
-          name: response.data.name,
-          email: response.data.email,
-          role: response.data.role?.name || response.data.role,
-        });
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
-      }
-    };
-
-    fetchUser();
-  }, [isOpen]);
+  const getStatusStyle = (name: string) => {
+    const lower = name.toLowerCase();
+    if (lower.includes("approve")) return { icon: CheckCircle, color: "text-green-600", bgColor: "bg-green-50", borderColor: "border-green-200" };
+    if (lower.includes("reject") || lower.includes("denied")) return { icon: XCircle, color: "text-red-600", bgColor: "bg-red-50", borderColor: "border-red-200" };
+    if (lower.includes("review")) return { icon: Clock, color: "text-yellow-600", bgColor: "bg-yellow-50", borderColor: "border-yellow-200" };
+    if (lower.includes("pending") || lower.includes("waiting")) return { icon: Pause, color: "text-gray-600", bgColor: "bg-gray-50", borderColor: "border-gray-200" };
+    if (lower.includes("correction")) return { icon: AlertCircle, color: "text-orange-600", bgColor: "bg-orange-50", borderColor: "border-orange-200" };
+    return { icon: Clock, color: "text-blue-600", bgColor: "bg-blue-50", borderColor: "border-blue-200" };
+  };
 
   useEffect(() => {
     if (!isOpen || !application?.id) return;
@@ -206,24 +141,25 @@ export default function UpdateStatusPopup({
         const response = await api.get(`/applications/${application.id}`);
         const appData = response.data;
 
-        const options: StatusOption[] = (appData.stage_statuses || []).map((s: any) => ({
-          id: s.id,
-          label: s.name,
-          description: s.description ?? "",
-          nextAction: s.next_action ?? "",
-          icon: Clock,
-          color: "text-blue-600",
-          bgColor: "bg-blue-50",
-          borderColor: "border-blue-200",
-          requiresReason: !!s.is_requires_reason,
-          requiresDocumentSelection: !!s.is_requires_document_selection,
-        }));
+        setDocumentTypes(appData.document_types || []);
+
+        const options: StatusOption[] = (appData.stage_statuses || []).map((s: any) => {
+          const matchingAction = (appData.available_actions || []).find(a => a.status === s.name);
+          return {
+            id: s.id,
+            label: s.name,
+            description: s.description ?? "",
+            nextAction: matchingAction?.next_action ?? "",
+            ...getStatusStyle(s.name),
+            requiresReason: !!s.is_requires_reason,
+            requiresDocumentSelection: !!s.is_requires_document_selection,
+          };
+        });
 
         setStatusOptions(options);
-      } catch (error: any) {
-        console.error("Error fetching application details:", error);
+      } catch (err) {
+        console.error(err);
         setStatusOptions([]);
-        setError("Failed to load status options. Please try again.");
       }
     };
 
@@ -234,89 +170,32 @@ export default function UpdateStatusPopup({
   const requiresReason = selectedOption?.requiresReason || false;
   const requiresDocuments = selectedOption?.requiresDocumentSelection || false;
 
-  const validateForm = (): boolean => {
-    if (!selectedStatus) {
-      setError("Please select a status");
-      return false;
-    }
-
-    if (requiresReason && !reason.trim()) {
-      setError("Reason is required for this status");
-      return false;
-    }
-
-    if (requiresDocuments) {
-      const hasEmptyDocuments = documents.some(doc => !doc.type);
-      if (hasEmptyDocuments) {
-        setError("Please select a document type for all documents");
-        return false;
-      }
-    }
-
+  const validateForm = () => {
+    if (!selectedStatus) return setError("Please select a status"), false;
+    if (requiresReason && !reason.trim()) return setError("Reason is required for this status"), false;
+    if (requiresDocuments && documents.some(doc => !doc.type)) return setError("Please select a document type for all documents"), false;
     setError("");
     return true;
   };
 
   const handleConfirm = async () => {
     if (!validateForm() || !application?.id) return;
-
     setIsSubmitting(true);
-    setError("");
 
     try {
-
-      let required_document_type_ids: string[] = [];
-      if (requiresDocuments) {
-        required_document_type_ids = documents.map((doc) => {
-          const match = DOCUMENT_TYPES.find((d) => d.label === doc.type);
-          if (!match) throw new Error(`Document type "${doc.type}" is invalid`);
-          return match.key;
-        });
-      }
-
       const payload = {
         status_id: selectedStatus,
         reason_text: reason.trim(),
         notes: notes.trim(),
-        required_document_type_ids,
+        required_document_type_ids: requiresDocuments ? documents.map(doc => doc.type) : [],
       };
 
-      console.log("Sending payload:", payload);
-      const response = await api.post(`/applications/${application.id}/status`, payload);
-      console.log("Response:", response.data);
+      await api.post(`/applications/${application.id}/status`, payload);
 
       onConfirm(selectedStatus, reason, notes);
       handleClose();
-    } catch (error: any) {
-      let errorMessage = "Failed to update status.";
-      if (error.response) {
-        switch (error.response.status) {
-          case 401:
-            errorMessage = "Unauthorized. Please log in again.";
-            break;
-          case 403:
-            errorMessage = "Permission denied. You don't have access to update this application.";
-            break;
-          case 404:
-            errorMessage = "Application not found. It may have been deleted.";
-            break;
-          case 422:
-            const details = error.response.data?.detail || [];
-            const fieldErrors = details.map((d: any) => `• ${d.loc.join(" -> ")}: ${d.msg}`).join("\n");
-            errorMessage = `Validation failed:\n${fieldErrors}`;
-            break;
-          case 500:
-            errorMessage = "Server error. Please try again later.";
-            break;
-          default:
-            errorMessage = error.response.data?.message || `Error (${error.response.status})`;
-        }
-      } else if (error.request) {
-        errorMessage = "Network error. Cannot reach the server. Please check your connection.";
-      } else {
-        errorMessage = `Error: ${error.message}`;
-      }
-      setError(errorMessage);
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to update status.");
     } finally {
       setIsSubmitting(false);
     }
@@ -334,22 +213,16 @@ export default function UpdateStatusPopup({
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-overlay p-4 z-[80] backdrop-blur-sm"
-      onClick={handleClose}
-    >
-      <div
-        className="w-full max-w-2xl transform rounded-md bg-card shadow-xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-
-        <div className="flex justify-between items-center border-b border-default px-6 py-5">
-          <h5 className="text-xl font-bold">Update Application Status</h5>
-          <button onClick={handleClose} className="text-gray-500 hover:text-gray-900" aria-label="Close">
-            <XCircle className="h-5 w-5" />
-          </button>
+    <div className="fixed inset-0 flex items-center justify-center bg-overlay p-4 z-[80] backdrop-blur-sm" onClick={handleClose}>
+      <div className="w-full max-w-2xl transform rounded-md bg-card shadow-xl" onClick={e => e.stopPropagation()}>
+        <div className="relative border-b border-default px-6 pb-4 pt-6">
+          <div className="flex items-start justify-between">
+            <h5 className="text-h4 font-bold text-gray-900">Update Application Status</h5>
+            <button onClick={handleClose} className="group flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+              <XCircle className="h-5 w-5" strokeWidth={2} />
+            </button>
+          </div>
         </div>
-
 
         <div className="max-h-[60vh] overflow-y-auto space-y-6 px-6 py-6">
           {error && (
@@ -363,7 +236,7 @@ export default function UpdateStatusPopup({
           )}
 
           <div className="space-y-3">
-            <label className="block font-semibold text-gray-900">
+            <label className="mb-3 block text-p2 font-semibold text-gray-900">
               Select New Status <span className="text-red-500">*</span>
             </label>
             {statusOptions.length === 0 ? (
@@ -377,15 +250,14 @@ export default function UpdateStatusPopup({
                     key={option.id}
                     onClick={() => setSelectedStatus(option.id)}
                     className={`cursor-pointer rounded-md border p-4 transition-all ${
-                      isSelected
-                        ? `${option.borderColor} ${option.bgColor} shadow`
-                        : "border-default bg-card hover:border-gray-300 hover:shadow"
+                      isSelected ? `${option.borderColor} ${option.bgColor} shadow` : "border-default bg-card hover:border-gray-300 hover:shadow"
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <Icon className={`h-5 w-5 ${isSelected ? option.color : "text-gray-400"}`} />
                       <div>
                         <p className="font-semibold text-gray-900">{option.label}</p>
+                        {option.nextAction && <p className="text-xs text-gray-600 mt-1"><span className="font-medium text-gray-700">Next :</span> {option.nextAction}</p>}
                         {option.description && <p className="text-xs text-gray-500 mt-0.5">{option.description}</p>}
                       </div>
                     </div>
@@ -395,43 +267,36 @@ export default function UpdateStatusPopup({
             )}
           </div>
 
-          {requiresDocuments && <DocumentRequestList documents={documents} setDocuments={setDocuments} />}
+          {requiresDocuments && <DocumentRequestList documents={documents} setDocuments={setDocuments} documentTypes={documentTypes} />}
 
           {requiresReason && (
-            <InputField
-              label="Reason"
-              placeholder="Please provide a detailed reason..."
-              id="reason"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              required
-              isTextarea
-            />
+            <div className="space-y-2">
+              <label className="block text-p2 font-medium text-text-muted">Reason <span className="ml-1 text-red-500">*</span></label>
+              <textarea
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Please provide a detailed reason..."
+                rows={4}
+                className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+              />
+            </div>
           )}
 
-          <InputField
-            label="Additional Notes (Optional)"
-            placeholder="Add any additional notes..."
-            id="notes"
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            isTextarea
-          />
+          <div className="space-y-2">
+            <label className="block text-p2 font-medium text-text-muted">Additional Notes (Optional)</label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Add any additional notes..."
+              rows={4}
+              className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+            />
+          </div>
         </div>
 
-        <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
-          <button
-            onClick={handleClose}
-            disabled={isSubmitting}
-            className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleConfirm}
-            disabled={!selectedStatus || isSubmitting || (requiresReason && !reason.trim())}
-            className="rounded-full bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
+        <div className="border-t border-default px-6 py-5 flex justify-end gap-3">
+          <button onClick={handleClose} disabled={isSubmitting} className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">Cancel</button>
+          <button onClick={handleConfirm} disabled={!selectedStatus || isSubmitting || (requiresReason && !reason.trim())} className="rounded-full bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed">
             {isSubmitting ? "Updating..." : "Update Status"}
           </button>
         </div>

@@ -135,32 +135,37 @@ const ModernApplicationsTable = () => {
   const goPrev = () => setCurrentPage((p) => Math.max(p - 1, 1));
   const goNext = () => setCurrentPage((p) => Math.min(p + 1, totalPages));
 
-  const StatusBadge = ({ status }) => {
+  const StatusBadge = ({ status }: { status: string }) => {
     const statusConfig = {
       "in-progress": {
-        bg: "bg-blue-100 border-blue-300",
-        text: "text-blue-800",
+        bg: "bg-blue-50 border-blue-200",
+        text: "text-blue-700",
         dot: "bg-blue-600",
+        label: "In Progress",
       },
       pending: {
-        bg: "bg-gray-100 border-gray-300",
-        text: "text-gray-800",
+        bg: "bg-gray-50 border-gray-200",
+        text: "text-gray-700",
         dot: "bg-gray-500",
+        label: "Pending",
       },
       accepted: {
-        bg: "bg-green-100 border-green-300",
-        text: "text-green-800",
+        bg: "bg-green-50 border-green-200",
+        text: "text-green-700",
         dot: "bg-green-600",
+        label: "Accepted",
       },
       rejected: {
-        bg: "bg-red-100 border-red-300",
-        text: "text-red-800",
+        bg: "bg-red-50 border-red-200",
+        text: "text-red-700",
         dot: "bg-red-600",
+        label: "Rejected",
       },
       under_review: {
-        bg: "bg-yellow-100 border-yellow-300",
-        text: "text-yellow-800",
+        bg: "bg-yellow-50 border-yellow-200",
+        text: "text-yellow-700",
         dot: "bg-yellow-600",
+        label: "Under Review by Account Manager",
       },
     };
 
@@ -170,15 +175,17 @@ const ModernApplicationsTable = () => {
       bg: "bg-gray-100 border-gray-200",
       text: "text-gray-700",
       dot: "bg-gray-400",
-      width: "100px",
+      label: status || "Unknown",
     };
 
     return (
       <span
-        className={`inline-flex rounded-full border px-2 py-1 text-p2 ${config.bg} ${config.text}`}
+        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-normal ${config.bg} ${config.text}`}
+        title={config.label}
       >
-        {status?.charAt(0).toUpperCase() + status?.slice(1)}
-      </span>
+        <span className={`w-2 h-2 rounded-full ${config.dot}`}></span>
+        <span className="truncate ">{config.label}</span>
+    </span>
     );
   };
 
@@ -439,12 +446,12 @@ const ModernApplicationsTable = () => {
                   <div className="text-text-muted">{app.stage}</div>
                 </td>
 
-                <td className="min-w-[200px] max-w-[150px] px-6 py-4">
+                <td className="px-6 py-4 min-w-[150px]">
                   <StatusBadge status={app.status} />
                 </td>
 
                 <td className="px-6 py-4 ">
-                  <div className="max-w-48 truncate text-text-muted">
+                  <div className="max-w-48 break-words text-text-muted">
                     {app.nextAction}
                   </div>
                 </td>
