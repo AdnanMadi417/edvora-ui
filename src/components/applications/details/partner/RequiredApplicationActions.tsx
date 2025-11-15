@@ -36,22 +36,17 @@ export default function RequiredApplicationActions({
     fetchApplication();
   }, [id]);
 
-  const fileToBase64 = (file: File): Promise<string> =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (err) => reject(err);
-    });
-
   const handleConfirmUpload = async (file: File | null, documentTypeId: string) => {
     if (!file) return;
 
     try {
+      // TODO: upload to external storage later
+      const dummyUrl = "https://example.com/dummy-file.pdf"; // temporary fake URL
+
       const payload = [
         {
           document_type_id: documentTypeId,
-          file_url: await fileToBase64(file),
+          file_url: dummyUrl, // send ONLY STRING
         },
       ];
 
