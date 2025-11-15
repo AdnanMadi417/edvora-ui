@@ -24,6 +24,7 @@ WORKDIR /app
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV SKIP_TYPE_CHECK=true
+ENV PNPM_VERSION=8.15.5
 
 # Copy EVERYTHING from deps stage including optional SWC binaries
 COPY --from=deps /app/node_modules ./node_modules
