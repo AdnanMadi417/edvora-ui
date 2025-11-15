@@ -11,11 +11,10 @@ import NewApplicationSuccess from "../../popups/NewApplicationSuccess"
 
 const stages = [
   { id: 1, name: "Personal Details", icon: User },
-  { id: 2, name: "English Proficiency", icon: Languages },
-  { id: 3, name: "Previous Education", icon: GraduationCap },
-  { id: 4, name: "University & Program", icon: GraduationCap },
-  { id: 5, name: "Emergency Contact", icon: Phone },
-  { id: 6, name: "Documents Upload", icon: Upload },
+  { id: 2, name: "Previous Education", icon: GraduationCap },
+  { id: 3, name: "University & Program", icon: GraduationCap },
+  { id: 4, name: "Emergency Contact", icon: Phone },
+  { id: 5, name: "Documents Upload", icon: Upload },
 ];
 
 export default function StudentApplication() {
@@ -32,19 +31,10 @@ export default function StudentApplication() {
     passportNumber: "",
     email: "",
     phone: "",
-    address: "",
-    city: "",
-    country: "",
-    postalCode: "",
-
-    // English Proficiency
-    englishTest: "",
-    testScore: "",
-    testDate: "",
-    listeningScore: "",
-    readingScore: "",
-    writingScore: "",
-    speakingScore: "",
+    fullAddress : "",
+    parentName: "",
+    parentPhone: "",
+    parentEmail: "",
 
     // Previous Education
     highestQualification: "",
@@ -94,13 +84,6 @@ export default function StudentApplication() {
           newErrors.nationality = "Nationality is required";
         break;
       case 2:
-        if (!formData.englishTest)
-          newErrors.englishTest = "Please select a test";
-        if (!formData.testScore)
-          newErrors.testScore = "Overall score is required";
-        if (!formData.testDate) newErrors.testDate = "Test date is required";
-        break;
-      case 3:
         if (!formData.highestQualification)
           newErrors.highestQualification = "Qualification is required";
         if (!formData.institutionName)
@@ -109,8 +92,12 @@ export default function StudentApplication() {
           newErrors.fieldOfStudy = "Field of study is required";
         if (!formData.graduationYear)
           newErrors.graduationYear = "Graduation year is required";
+        if (!formData.englishTest)
+          newErrors.englishTest = "Please select a test";
+        if (!formData.testScore)
+          newErrors.testScore = "Overall score is required";
         break;
-      case 4:
+      case 3:
         if (!formData.universityName)
           newErrors.universityName = "University name is required";
         if (!formData.programName)
@@ -120,7 +107,7 @@ export default function StudentApplication() {
         if (!formData.intakeYear)
           newErrors.intakeYear = "Intake year is required";
         break;
-      case 5:
+      case 4:
         if (!formData.emergencyName)
           newErrors.emergencyName = "Contact name is required";
         if (!formData.emergencyRelationship)
@@ -128,7 +115,7 @@ export default function StudentApplication() {
         if (!formData.emergencyPhone)
           newErrors.emergencyPhone = "Contact phone is required";
         break;
-      case 6:
+      case 5:
         if (formData.uploadedDocs.length === 0)
           newErrors.uploadedDocs = "Please upload at least one document";
         break;
@@ -348,94 +335,47 @@ export default function StudentApplication() {
                 />
               </div>
 
-              <h5 className="text-md mb-3 mt-6 font-semibold text-gray-900">
-                Address Details
-              </h5>
-
               <div className="grid grid-cols-1 gap-x-3 gap-y-0 md:grid-cols-2">
                 <div className="md:col-span-2">
                   <InputField
                     label="Street Address"
-                    field="address"
+                    field="fullAddress"
                     placeholder="123 Main Street"
                   />
                 </div>
+
+              </div>
+
+              <h5 className="mb-2 mt-2 text-base font-semibold text-text-primary">
+                Parent / Guardian Information
+              </h5>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <InputField
-                  label="City"
-                  field="city"
-                  placeholder="Kuala Lumpur"
+                  label="Parent's Name"
+                  field="parentName"
+                  placeholder="Parent or Guardian Name"
+                  required={false}
                 />
                 <InputField
-                  label="Country"
-                  field="country"
-                  placeholder="Malaysia"
+                  label="Parent's Phone"
+                  field="parentPhone"
+                  type="tel"
+                  placeholder="+60123456789"
+                  required={false}
                 />
                 <InputField
-                  label="Postal Code"
-                  field="postalCode"
-                  placeholder="50000"
+                  label="Parent's Email"
+                  field="parentEmail"
+                  type="email"
+                  placeholder="parent@example.com"
+                  required={false}
                 />
               </div>
+
             </div>
           )}
 
           {stage === 2 && (
-            <div>
-              <h4 className="mb-4 text-lg font-semibold text-gray-900">
-                English Proficiency Test Results
-              </h4>
-              <div className="grid grid-cols-1 gap-x-3 gap-y-0 md:grid-cols-2">
-                <SelectField
-                  label="Test Type"
-                  field="englishTest"
-                  options={[
-                    "IELTS",
-                    "TOEFL",
-                    "PTE",
-                    "Duolingo",
-                    "Cambridge English",
-                  ]}
-                />
-                <InputField
-                  label="Overall Score"
-                  field="testScore"
-                  placeholder="7.5"
-                />
-                <InputField label="Test Date" field="testDate" type="date" />
-                <div></div>
-
-                <h5 className="text-md col-span-full mt-2 font-semibold text-gray-900">
-                  Band Scores (Optional)
-                </h5>
-                <InputField
-                  label="Listening Score"
-                  field="listeningScore"
-                  required={false}
-                  placeholder="8.0"
-                />
-                <InputField
-                  label="Reading Score"
-                  field="readingScore"
-                  required={false}
-                  placeholder="7.5"
-                />
-                <InputField
-                  label="Writing Score"
-                  field="writingScore"
-                  required={false}
-                  placeholder="7.0"
-                />
-                <InputField
-                  label="Speaking Score"
-                  field="speakingScore"
-                  required={false}
-                  placeholder="7.5"
-                />
-              </div>
-            </div>
-          )}
-
-          {stage === 3 && (
             <div>
               <h4 className="mb-4 text-lg font-semibold text-gray-900">
                 Educational Background
@@ -474,10 +414,36 @@ export default function StudentApplication() {
                   placeholder="3.8 / 4.0"
                 />
               </div>
+
+              <div>
+
+                <h5 className="text-md col-span-full mt-2 font-semibold text-gray-900">
+                  English Proficiency Test Results
+                </h5>
+
+                <div className="grid grid-cols-1 gap-x-3 gap-y-0 md:grid-cols-2">
+                  <SelectField
+                    label="Test Type"
+                    field="englishTest"
+                    options={[
+                      "IELTS",
+                      "TOEFL",
+                      "PTE",
+                      "Duolingo",
+                      "Cambridge English",
+                    ]}
+                  />
+                  <InputField
+                    label="Overall Score"
+                    field="testScore"
+                    placeholder="7.5"
+                  />
+                </div>
+              </div>
             </div>
           )}
 
-          {stage === 4 && (
+          {stage === 3 && (
             <div>
               <h4 className="mb-4 text-lg font-semibold text-gray-900">
                 University & Program Selection
@@ -530,7 +496,7 @@ export default function StudentApplication() {
           )}
 
 
-          {stage === 5 && (
+          {stage === 4 && (
             <div>
               <h4 className="mb-4 text-lg font-semibold text-gray-900">
                 Emergency Contact Information
@@ -571,7 +537,7 @@ export default function StudentApplication() {
             </div>
           )}
 
-          {stage === 6 && (
+          {stage === 5 && (
             <div>
               <h4 className="mb-4 text-lg font-semibold text-gray-900">
                 Upload Required Documents

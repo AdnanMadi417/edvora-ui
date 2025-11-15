@@ -7,7 +7,6 @@ import Cookies from "js-cookie";
 import EmptyData from "components/emptyData/EmptyData";
 import ApplicationDetails from "../../../../components/applications/details/account-manager/ApplicationDetails";
 import ApplicationDocuments from "../../../../components/applications/details/account-manager/ApplicationDocuments";
-import ApplicationCommission from "../../../../components/applications/details/account-manager/ApplicationCommission";
 import Loading from "components/loading/Loading";
 
 
@@ -46,7 +45,6 @@ export default function ApplicationPage() {
     <>
       <ApplicationDetails application={application} />
       <ApplicationDocuments application={application} />
-      {/*<ApplicationCommission application={application} />*/}
     </>
   );
 }

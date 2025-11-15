@@ -26,6 +26,9 @@ interface ApplicationDetailsProps {
 export default function ApplicationDetails({
   application,
 }: ApplicationDetailsProps) {
+
+  // console.log("📝 Application Data from Backend:", application);
+
   function daysSince(dateString: string) {
     if (!dateString) return 0;
 
@@ -54,7 +57,8 @@ export default function ApplicationDetails({
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 pt-0 shadow-sm sm:p-6">
-        <ApplicationAccountManagerTopBar params={{ id: application.id }} />
+
+        <ApplicationAccountManagerTopBar application={application} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">

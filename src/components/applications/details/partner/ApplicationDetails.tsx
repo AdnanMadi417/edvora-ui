@@ -1,5 +1,6 @@
 import React from "react";
 import ApplicationPartnerTopBar from "../../topBar/ApplicationPartnerTopBar";
+import RequiredApplicationActions from "../../../applications/details/partner/RequiredApplicationActions";
 
 import {
   FaTasks,
@@ -116,6 +117,10 @@ export default function ApplicationDetails({
             Last updated: {formatDate(application.updated_at)}
           </p>
         </div>
+      </div>
+
+      <div>
+        <RequiredApplicationActions params={{ id: application.id }} />
       </div>
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-6 shadow-sm">
