@@ -141,7 +141,13 @@ export default function UpdateStatusPopup({ isOpen, onClose, onConfirm, applicat
         const response = await api.get(`/applications/${application.id}`);
         const appData = response.data;
 
-        setDocumentTypes(appData.document_types || []);
+        setDocumentTypes(
+          (appData.document_types || []).map((d: any) => ({
+            id: d.id,
+            label: d.description || d.type, // use description for display
+          }))
+        );
+
 
         const options: StatusOption[] = (appData.stage_statuses || []).map((s: any) => {
           const matchingAction = (appData.available_actions || []).find(a => a.status === s.name);
