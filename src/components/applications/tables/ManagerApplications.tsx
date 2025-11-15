@@ -402,11 +402,11 @@ const ModernApplicationsTable = () => {
             paginatedApplications.map((app) => (
               <tr
                 key={app.id}
-                className="group transition-colors hover:bg-primary">
-
+                className="group transition-colors hover:bg-primary/10"
+              >
                 <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border border-default">
+                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-default">
                       <Image
                         width={40}
                         height={40}
@@ -416,11 +416,8 @@ const ModernApplicationsTable = () => {
                       />
                     </div>
 
-                    <div className="truncate">
-                      <div className="truncate text-text-primary">
-                        {app.studentName}
-                      </div>
-
+                    <div className="w-full overflow-hidden">
+                      <div className="truncate text-text-primary">{app.studentName}</div>
                       <div className="truncate text-caption text-text-muted">
                         {app.studentEmail}
                       </div>
@@ -429,17 +426,14 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                  <div className=" text-text-primary">
-                    {app.applicationName}
-                  </div>
-
+                  <div className="text-text-primary">{app.applicationName}</div>
                   <div className="truncate text-caption text-text-muted">
                     {app.university}
                   </div>
                 </td>
 
                 <td className="min-w-[200px] max-w-[250px] px-6 py-4">
-                  <div className="text-text-muted ">{app.partner}</div>
+                  <div className="text-text-muted">{app.partner}</div>
                 </td>
 
                 <td className="px-6 py-4">
@@ -450,15 +444,9 @@ const ModernApplicationsTable = () => {
                   <StatusBadge status={app.status} />
                 </td>
 
-                <td className="px-6 py-4 ">
-                  <div className="max-w-48 break-words text-text-muted">
-                    {app.nextAction}
-                  </div>
+                <td className="px-6 py-4 max-w-48">
+                  <div className="break-words text-text-muted">{app.nextAction}</div>
                 </td>
-
-                {/*<td className="min-w-[150px] max-w-[150px] px-6 py-4">*/}
-                {/*  <PriorityBadge priority={app.priority} />*/}
-                {/*</td>*/}
 
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 text-text-muted">
@@ -472,19 +460,17 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="min-w-[150px] px-6 py-4">
-
                   <Link
                     href={`/account-manager/applications/${app.id}`}
                     aria-label="View Application"
-                    className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-full border border-default p-2 text-sm text-text-muted transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+                    className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
                   >
                     <Eye className="h-4 w-4" />
-                    <span className="text-caption">View </span>
+                    <span>View</span>
                   </Link>
                 </td>
-
-
               </tr>
+
             ))
           )}
           </tbody>

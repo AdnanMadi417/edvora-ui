@@ -303,7 +303,7 @@ const PartnerApplications = () => {
                 onClick={() => handleSort("applicationName")}
                 className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
               >
-                <div className="flex min-w-[200px] items-center gap-2">
+                <div className="flex min-w-[250px] items-center gap-2">
                   <GraduationCap className="h-4 w-4" />
                   University / Program
                   <SortIndicator field="applicationName" />
@@ -393,11 +393,11 @@ const PartnerApplications = () => {
               paginatedApplications.map((app) => (
                 <tr
                   key={app.id}
-                  className="group transition-colors hover:bg-primary"
+                  className="group transition-colors hover:bg-primary/10"
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border border-default">
+                      <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-default">
                         <Image
                           width={40}
                           height={40}
@@ -407,11 +407,8 @@ const PartnerApplications = () => {
                         />
                       </div>
 
-                      <div className="truncate">
-                        <div className="truncate text-text-primary">
-                          {app.student_name}
-                        </div>
-
+                      <div className="w-full overflow-hidden">
+                        <div className="truncate text-text-primary">{app.student_name}</div>
                         <div className="truncate text-caption text-text-muted">
                           {app.student_email}
                         </div>
@@ -420,8 +417,7 @@ const PartnerApplications = () => {
                   </td>
 
                   <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                    <div className=" text-text-primary">{app.program_name}</div>
-
+                    <div className="text-text-primary">{app.program_name}</div>
                     <div className="truncate text-caption text-text-muted">
                       {app.university_name}
                     </div>
@@ -431,15 +427,12 @@ const PartnerApplications = () => {
                     <div className="text-text-muted">{app.stage}</div>
                   </td>
 
-
                   <td className="px-6 py-4 min-w-[150px]">
                     <StatusBadge status={app.status} />
                   </td>
 
-
-
-                  <td className="px-6 py-4 ">
-                    <div className="max-w-48 break-words text-text-muted">
+                  <td className="px-6 py-4">
+                    <div className="max-w-[200px] break-words text-text-muted">
                       {app.next_action}
                     </div>
                   </td>
@@ -462,15 +455,15 @@ const PartnerApplications = () => {
                   <td className="min-w-[120px] px-6 py-4">
                     <Link
                       href={`/partner/applications/${app.id}`}
-
                       aria-label="View Application"
-                      className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-default p-2 text-sm text-text-muted outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+                      className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-600 hover:text-blue-600"
                     >
                       <Eye className="h-4 w-4" />
                       <span className="text-caption">View</span>
                     </Link>
                   </td>
                 </tr>
+
               ))
             )}
           </tbody>
