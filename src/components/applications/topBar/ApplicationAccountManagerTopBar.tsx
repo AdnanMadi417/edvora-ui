@@ -21,9 +21,6 @@ export default function ApplicationAccountManagerTopBar({ application }: Props) 
 
   const router = useRouter();
 
-  // console.log(" account manager application details ID", application.id  );
-  // console.log(" account manager application details bar  ", application  );
-
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showHoldPopup, setShowHoldPopup] = useState(false);
   const [showCancelPopup, setShowCancelPopup] = useState(false);
@@ -195,7 +192,6 @@ export default function ApplicationAccountManagerTopBar({ application }: Props) 
           application={application}
         />
       )}
-
 
     </section>
   );

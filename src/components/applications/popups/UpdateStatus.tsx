@@ -3,17 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, Clock, Plus, Trash2, AlertCircle, Pause, CheckCircle } from "lucide-react";
 import api from "lib/useApi";
+import { useToast } from "components/context/ToastContext";
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
 
 interface DocumentRequest {
   id: string;
-  type: string;
+  type: string[];
   reason: string;
 }
 
@@ -38,7 +33,7 @@ interface DocumentRequestListProps {
 
 const DocumentRequestList = ({ documents, setDocuments, documentTypes }: DocumentRequestListProps) => {
   const addDocument = () => {
-    setDocuments([...documents, { id: Date.now().toString(), type: "", reason: "" }]);
+    setDocuments([...documents, { id: Date.now().toString(), type: [], reason: "" }]);
   };
 
   const removeDocument = (id: string) => {
@@ -47,57 +42,81 @@ const DocumentRequestList = ({ documents, setDocuments, documentTypes }: Documen
     }
   };
 
-  const updateDocument = (id: string, field: keyof DocumentRequest, value: string) => {
+  const updateDocument = (id: string, field: keyof DocumentRequest, value: any) => {
     setDocuments(documents.map((doc) => (doc.id === id ? { ...doc, [field]: value } : doc)));
+  };
+
+  const toggleType = (docId: string, typeId: string) => {
+    const doc = documents.find(d => d.id === docId);
+    if (!doc) return;
+
+    const newTypes = doc.type.includes(typeId)
+      ? doc.type.filter(t => t !== typeId)
+      : [...doc.type, typeId];
+
+    updateDocument(docId, "type", newTypes);
   };
 
   return (
     <div className="space-y-4">
       {documents.map((doc, index) => (
-        <div key={doc.id} className="relative space-y-3 rounded-md border bg-blue-200 border-blue-200 bg-card p-4">
+        <div key={doc.id} className="relative space-y-3 rounded-md border bg-card p-4">
           {documents.length > 1 && (
             <button
               onClick={() => removeDocument(doc.id)}
-              className="absolute right-2 top-2 rounded-md p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600"
+              className="absolute right-2 top-2 rounded-md p-1.5 text-red-400 hover:bg-red-50 hover:text-red-600"
               aria-label="Remove document"
             >
               <Trash2 className="h-4 w-4" />
             </button>
           )}
+
           <div>
             <label className="mb-2 block text-p2 font-medium text-gray-900">
               Document Type {index + 1}
             </label>
-            <select
-              value={doc.type}
-              onChange={(e) => updateDocument(doc.id, "type", e.target.value)}
-              className="w-full rounded-md border border-default bg-card px-4 py-2.5 text-p2 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-            >
-              <option value="">Select document type...</option>
-              {documentTypes.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.label}
-                </option>
-              ))}
-            </select>
-          </div>
 
-          <div>
-            <label className="mb-2 block text-p2 font-medium text-gray-900">Reason for Request</label>
-            <textarea
-              value={doc.reason}
-              onChange={(e) => updateDocument(doc.id, "reason", e.target.value)}
-              placeholder="Why is this document needed?"
-              rows={3}
-              className="w-full rounded-md border border-default px-4 py-2.5 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-            />
+            <div className="flex flex-wrap gap-2 mb-2">
+              {doc.type.map((t) => {
+                const label = documentTypes.find(d => d.id === t)?.label || t;
+                return (
+                  <span
+                    key={t}
+                    className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-sm flex items-center gap-1"
+                  >
+                    {label}
+                    <button
+                      type="button"
+                      onClick={() => toggleType(doc.id, t)}
+                      className="text-blue-500 hover:text-blue-700"
+                    >
+                      ×
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto border border-gray-200 rounded-md p-2">
+              {documentTypes.map((d) => (
+                <label key={d.id} className="flex items-center gap-2 text-p2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={doc.type.includes(d.id)}
+                    onChange={() => toggleType(doc.id, d.id)}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  {d.label}
+                </label>
+              ))}
+            </div>
           </div>
         </div>
       ))}
 
       <button
         onClick={addDocument}
-        className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-blue-300 bg-blue-50/50 px-4 py-3 text-p2 font-medium text-blue-700 transition-all duration-200 hover:border-blue-400 hover:bg-blue-100"
+        className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-blue-300 bg-blue-50/50 px-4 py-3 text-p2 font-medium text-blue-700 hover:border-blue-400 hover:bg-blue-100"
       >
         <Plus className="h-4 w-4" />
         Add Another Document
@@ -117,11 +136,13 @@ export default function UpdateStatusPopup({ isOpen, onClose, onConfirm, applicat
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [reason, setReason] = useState("");
   const [notes, setNotes] = useState("");
-  const [documents, setDocuments] = useState<DocumentRequest[]>([{ id: "1", type: "", reason: "" }]);
+  const [documents, setDocuments] = useState<DocumentRequest[]>([{ id: "1", type: [], reason: "" }]);
   const [statusOptions, setStatusOptions] = useState<StatusOption[]>([]);
   const [documentTypes, setDocumentTypes] = useState<{ id: string; label: string }[]>([]);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { showToast } = useToast();
+
 
   const getStatusStyle = (name: string) => {
     const lower = name.toLowerCase();
@@ -144,7 +165,7 @@ export default function UpdateStatusPopup({ isOpen, onClose, onConfirm, applicat
         setDocumentTypes(
           (appData.document_types || []).map((d: any) => ({
             id: d.id,
-            label: d.description || d.type, // use description for display
+            label: d.description || d.type,
           }))
         );
 
@@ -189,19 +210,30 @@ export default function UpdateStatusPopup({ isOpen, onClose, onConfirm, applicat
     setIsSubmitting(true);
 
     try {
+      const selectedDocumentTypeIds: string[] = requiresDocuments
+        ? documents.flatMap((doc) => doc.type).filter(Boolean)
+        : [];
+
       const payload = {
         status_id: selectedStatus,
         reason_text: reason.trim(),
         notes: notes.trim(),
-        required_document_type_ids: requiresDocuments ? documents.map(doc => doc.type) : [],
+        required_document_type_ids: selectedDocumentTypeIds,
       };
 
       await api.post(`/applications/${application.id}/status`, payload);
 
+      showToast("Status updated successfully.", "success");
+
+      setTimeout(() => window.location.reload(), 2000);
+
       onConfirm(selectedStatus, reason, notes);
+
       handleClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to update status.");
+      const msg = err.response?.data?.message || "Failed to update status.";
+      showToast(msg, "error");
+      setError(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -211,7 +243,7 @@ export default function UpdateStatusPopup({ isOpen, onClose, onConfirm, applicat
     setSelectedStatus("");
     setReason("");
     setNotes("");
-    setDocuments([{ id: "1", type: "", reason: "" }]);
+    setDocuments([{ id: "1", type: [], reason: "" }]);
     setError("");
     onClose();
   };
@@ -287,17 +319,6 @@ export default function UpdateStatusPopup({ isOpen, onClose, onConfirm, applicat
               />
             </div>
           )}
-
-          <div className="space-y-2">
-            <label className="block text-p2 font-medium text-text-muted">Additional Notes (Optional)</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add any additional notes..."
-              rows={4}
-              className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-            />
-          </div>
         </div>
 
         <div className="border-t border-default px-6 py-5 flex justify-end gap-3">

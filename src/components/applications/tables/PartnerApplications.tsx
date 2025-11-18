@@ -452,16 +452,17 @@ const PartnerApplications = () => {
                     </div>
                   </td>
 
-                  <td className="min-w-[120px] px-6 py-4">
+                  <td className="min-w-[150px] px-6 py-4">
                     <Link
                       href={`/partner/applications/${app.id}`}
                       aria-label="View Application"
-                      className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-600 hover:text-blue-600"
+                      className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
                     >
                       <Eye className="h-4 w-4" />
-                      <span className="text-caption">View</span>
+                      <span>View</span>
                     </Link>
                   </td>
+
                 </tr>
 
               ))
