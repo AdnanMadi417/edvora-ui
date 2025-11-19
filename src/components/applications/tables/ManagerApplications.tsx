@@ -29,15 +29,13 @@ const ModernApplicationsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  // const [filterPriority, setFilterPriority] = useState("all");
   const [loading, setLoading] = useState(true);
 
   const itemsPerPage = 10;
 
-  // Reset page when filters/search change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterStatus /*, filterPriority */]);
+  }, [searchTerm, filterStatus ]);
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -62,8 +60,7 @@ const ModernApplicationsTable = () => {
           applicationName: app.program_name,
           partner: app.partner_name,
           stage: app.stage,
-          status: app.status || "Pending",
-          // priority: app.priority || "low", // fallback if not present
+          status: app.status,
           updatedAt: app.updated_at,
           nextAction: app.next_action || "-",
         }));
@@ -71,7 +68,7 @@ const ModernApplicationsTable = () => {
 
         setApplications(mappedApps);
       } catch (err) {
-        console.error("❌ Error fetching applications:", err);
+        console.error("Error fetching applications:", err);
       } finally {
         setLoading(false);
       }
@@ -108,11 +105,6 @@ const ModernApplicationsTable = () => {
         (app) => app.status.toLowerCase() === filterStatus.toLowerCase()
       );
 
-    // if (filterPriority !== "all")
-    //   filtered = filtered.filter(
-    //     (app) => app.priority.toLowerCase() === filterPriority.toLowerCase()
-    //   );
-
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         const aVal = a[sortConfig.key]?.toString().toLowerCase() ?? "";
@@ -124,7 +116,7 @@ const ModernApplicationsTable = () => {
     }
 
     return filtered;
-  }, [applications, searchTerm, filterStatus /*, filterPriority */ , sortConfig]);
+  }, [applications, searchTerm, filterStatus , sortConfig]);
 
   const totalPages = Math.ceil(filteredAndSortedApplications.length / itemsPerPage);
   const paginatedApplications = filteredAndSortedApplications.slice(
@@ -135,68 +127,62 @@ const ModernApplicationsTable = () => {
   const goPrev = () => setCurrentPage((p) => Math.max(p - 1, 1));
   const goNext = () => setCurrentPage((p) => Math.min(p + 1, totalPages));
 
-  const StatusBadge = ({ status }) => {
-    const statusConfig = {
-      "in-progress": {
-        bg: "bg-blue-100 border-blue-300",
-        text: "text-blue-800",
+  const StatusBadge = ({ status }: { status: string }) => {
+    const statusConfig: Record<string, any> = {
+      new_application: {
+        bg: "bg-blue-50 border-blue-200",
+        text: "text-blue-700",
         dot: "bg-blue-600",
+        label: "New Application",
       },
-      pending: {
-        bg: "bg-gray-100 border-gray-300",
-        text: "text-gray-800",
-        dot: "bg-gray-500",
+      under_review_by_account_manager: {
+        bg: "bg-yellow-50 border-yellow-200",
+        text: "text-yellow-700",
+        dot: "bg-yellow-600",
+        label: "Under Review by Account Manager",
       },
-      accepted: {
-        bg: "bg-green-100 border-green-300",
-        text: "text-green-800",
+      correction_requested_by_account_manager: {
+        bg: "bg-orange-50 border-orange-200",
+        text: "text-orange-700",
+        dot: "bg-orange-600",
+        label: "Correction Requested by Account Manager",
+      },
+      approved_from_stage_1: {
+        bg: "bg-green-50 border-green-200",
+        text: "text-green-700",
         dot: "bg-green-600",
+        label: "Approved",
       },
       rejected: {
-        bg: "bg-red-100 border-red-300",
-        text: "text-red-800",
+        bg: "bg-red-50 border-red-200",
+        text: "text-red-700",
         dot: "bg-red-600",
-      },
-      under_review: {
-        bg: "bg-yellow-100 border-yellow-300",
-        text: "text-yellow-800",
-        dot: "bg-yellow-600",
+        label: "Rejected",
       },
     };
 
     const normalizedStatus = status?.toLowerCase().replace(/\s+/g, "_");
 
-    const config = statusConfig[normalizedStatus] || {
-      bg: "bg-gray-100 border-gray-200",
-      text: "text-gray-700",
-      dot: "bg-gray-400",
-      width: "100px",
-    };
+    const config =
+      statusConfig[normalizedStatus] || {
+        bg: "bg-gray-100 border-gray-200",
+        text: "text-gray-700",
+        dot: "bg-gray-400",
+        label: status || "Unknown",
+      };
 
     return (
       <span
-        className={`inline-flex rounded-full border px-2 py-1 text-p2 ${config.bg} ${config.text}`}
+        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-normal ${config.bg} ${config.text}`}
+        title={config.label}
       >
-        {status?.charAt(0).toUpperCase() + status?.slice(1)}
-      </span>
+      <span className={`w-2 h-2 rounded-full ${config.dot}`}></span>
+      <span className="truncate">{config.label}</span>
+    </span>
     );
   };
 
-// Priority badge component
-//   const PriorityBadge = ({ priority }) => {
-//     const priorityConfig = {
-//       high: "bg-red-100 text-red-700 border-red-200 px-3 py-1",
-//       medium: "bg-yellow-100 text-yellow-700 border-yellow-200 px-3 py-1",
-//       low: "bg-gray-100 text-text-muted border-gray-200 px-3 py-1",
-//     };
-//     return (
-//       <span className={`inline-flex rounded-full border px-2 py-1 text-p2 ${priorityConfig[priority]}`}>
-//       {priority.charAt(0).toUpperCase() + priority.slice(1)}
-//     </span>
-//     );
-//   };
 
-// Sort indicator component
   const SortIndicator = ({ field }) => {
     if (sortConfig.key !== field) {
       return <ChevronUp className="h-4 w-4 text-text-muted opacity-0 transition-opacity group-hover:opacity-100" />;
@@ -244,33 +230,20 @@ const ModernApplicationsTable = () => {
                 className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:text-blue-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
-                <option value="in-progress">In Progress</option>
-                <option value="pending">Pending</option>
-                <option value="Under Review">Under Review</option>
-                <option value="accepted">Accepted</option>
-                <option value="rejected">Rejected</option>
+                <option value="New Application">New Application</option>
+                <option value="Under Review by Account Manager">Under Review</option>
+                <option value="Correction Requested by Account Manager">Correction Requested</option>
+                <option value="Approved (from Stage 1)">Approved</option>
+                <option value="Rejected">Rejected</option>
+
+
               </select>
             </div>
-
-            {/*<div className="relative flex-1 sm:flex-none">*/}
-            {/*  <Flag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />*/}
-            {/*  <select*/}
-            {/*    value={filterPriority}*/}
-            {/*    onChange={(e) => setFilterPriority(e.target.value)}*/}
-            {/*    className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"*/}
-            {/*  >*/}
-            {/*    <option value="all">All Priority</option>*/}
-            {/*    <option value="high">High</option>*/}
-            {/*    <option value="medium">Medium</option>*/}
-            {/*    <option value="low">Low</option>*/}
-            {/*  </select>*/}
-            {/*</div>*/}
 
             <button
               onClick={() => {
                 setSearchTerm("");
                 setFilterStatus("all");
-                // setFilterPriority("all");
               }}
               className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error sm:w-auto"
             >
@@ -347,17 +320,6 @@ const ModernApplicationsTable = () => {
               </div>
             </th>
 
-            {/*<th*/}
-            {/*  onClick={() => handleSort("priority")}*/}
-            {/*  className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"*/}
-            {/*>*/}
-            {/*  <div className="flex items-center gap-2">*/}
-            {/*    <AlertTriangle className="h-4 w-4" />*/}
-            {/*    Priority*/}
-            {/*    <SortIndicator field="priority" />*/}
-            {/*  </div>*/}
-            {/*</th>*/}
-
             <th
               onClick={() => handleSort("updatedAt")}
               className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
@@ -395,11 +357,11 @@ const ModernApplicationsTable = () => {
             paginatedApplications.map((app) => (
               <tr
                 key={app.id}
-                className="group transition-colors hover:bg-primary">
-
+                className="group transition-colors hover:bg-primary/10"
+              >
                 <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white border border-default">
+                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-default">
                       <Image
                         width={40}
                         height={40}
@@ -409,11 +371,8 @@ const ModernApplicationsTable = () => {
                       />
                     </div>
 
-                    <div className="truncate">
-                      <div className="truncate text-text-primary">
-                        {app.studentName}
-                      </div>
-
+                    <div className="w-full overflow-hidden">
+                      <div className="truncate text-text-primary">{app.studentName}</div>
                       <div className="truncate text-caption text-text-muted">
                         {app.studentEmail}
                       </div>
@@ -422,36 +381,27 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                  <div className=" text-text-primary">
-                    {app.applicationName}
-                  </div>
-
+                  <div className="text-text-primary">{app.applicationName}</div>
                   <div className="truncate text-caption text-text-muted">
                     {app.university}
                   </div>
                 </td>
 
                 <td className="min-w-[200px] max-w-[250px] px-6 py-4">
-                  <div className="text-text-muted ">{app.partner}</div>
+                  <div className="text-text-muted">{app.partner}</div>
                 </td>
 
                 <td className="px-6 py-4">
                   <div className="text-text-muted">{app.stage}</div>
                 </td>
 
-                <td className="min-w-[200px] max-w-[150px] px-6 py-4">
+                <td className="px-6 py-4 min-w-[150px]">
                   <StatusBadge status={app.status} />
                 </td>
 
-                <td className="px-6 py-4 ">
-                  <div className="max-w-48 truncate text-text-muted">
-                    {app.nextAction}
-                  </div>
+                <td className="px-6 py-4 max-w-48">
+                  <div className="break-words text-text-muted">{app.nextAction}</div>
                 </td>
-
-                {/*<td className="min-w-[150px] max-w-[150px] px-6 py-4">*/}
-                {/*  <PriorityBadge priority={app.priority} />*/}
-                {/*</td>*/}
 
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 text-text-muted">
@@ -465,19 +415,17 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="min-w-[150px] px-6 py-4">
-
                   <Link
                     href={`/account-manager/applications/${app.id}`}
                     aria-label="View Application"
-                    className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-full border border-default p-2 text-sm text-text-muted transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+                    className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
                   >
                     <Eye className="h-4 w-4" />
-                    <span className="text-caption">View </span>
+                    <span>View</span>
                   </Link>
                 </td>
-
-
               </tr>
+
             ))
           )}
           </tbody>

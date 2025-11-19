@@ -7,7 +7,7 @@ import { LogOut, Settings } from "lucide-react";
 import NavLink from "components/link/NavLink";
 import Image from "next/image";
 import Link from "next/link";
-import avatar from "/public/img/avatars/avatar4.png";
+import avatar from "/public/img/avatars/user.png";
 import api from "../../lib/useApi";
 import { useRouter } from "next/navigation";
 

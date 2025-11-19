@@ -34,7 +34,6 @@ export default function StudentApplication() {
     parentName: "",
     parentPhone: "",
     parentEmail: "",
-    hearAboutUs: "",
 
     // Previous Education
     highestQualification: "",
@@ -79,8 +78,7 @@ export default function StudentApplication() {
           newErrors.nationality = "Nationality is required";
         if (!formData.passportNumber)
           newErrors.passportNumber = "Passport number is required";
-        if (!formData.hearAboutUs)
-          newErrors.hearAboutUs = "This field is required";
+
         break;
       case 2:
         if (!formData.highestQualification)
@@ -149,7 +147,6 @@ export default function StudentApplication() {
           parentName: "",
           parentPhone: "",
           parentEmail: "",
-          hearAboutUs: "",
           highestQualification: "",
           institutionName: "",
           fieldOfStudy: "",
@@ -393,19 +390,6 @@ export default function StudentApplication() {
                   type="email"
                   placeholder="parent@example.com"
                   required={false}
-                />
-                <SelectField
-                  label="How did you hear about us"
-                  field="hearAboutUs"
-                  options={[
-                    "Social Media",
-                    "Friend/Family",
-                    "University Website",
-                    "Education Fair",
-                    "Agent/Consultant",
-                    "Online Advertisement",
-                    "Other",
-                  ]}
                 />
               </div>
             </div>
