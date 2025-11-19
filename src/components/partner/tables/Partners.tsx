@@ -114,6 +114,7 @@ const ModernPartnersTable = () => {
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
+
       <div className="relative mb-8 overflow-hidden rounded-lg border border-default bg-card">
         <div className="relative p-6">
 
@@ -128,18 +129,18 @@ const ModernPartnersTable = () => {
 
           </div>
 
-          <div className="mb-0 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-            <input
-              type="text"
-              placeholder="Search partners by name or business..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-full border border-default bg-card px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 sm:w-64"
-            />
+          <div className="flex flex-wrap gap-3">
 
-            <div className="flex flex-wrap gap-3">
+              <input
+                type="text"
+                placeholder="Search partners by name or business..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full rounded-full border border-default bg-card px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-0 focus:ring-blue-500 sm:w-64"
+              />
+
               <select
-                className="rounded-full border border-default px-3 py-2"
+                className="rounded-full border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
@@ -148,17 +149,19 @@ const ModernPartnersTable = () => {
                 <option value="pending">Pending</option>
                 <option value="rejected">Rejected</option>
               </select>
+
+              {/*<select*/}
+              {/*  className="rounded-full border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"*/}
+              {/*  value={filterCountry}*/}
+              {/*  onChange={(e) => setFilterCountry(e.target.value)}*/}
+              {/*>*/}
+              {/*  <option value="all">All Countries</option>*/}
+              {/*  <option value="USA">USA</option>*/}
+              {/*  <option value="Malaysia">Malaysia</option>*/}
+              {/*</select>*/}
+
               <select
-                className="rounded-full border border-default px-3 py-2"
-                value={filterCountry}
-                onChange={(e) => setFilterCountry(e.target.value)}
-              >
-                <option value="all">All Countries</option>
-                <option value="USA">USA</option>
-                <option value="Malaysia">Malaysia</option>
-              </select>
-              <select
-                className="rounded-full border border-default px-3 py-2"
+                className="rounded-full border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
               >
@@ -178,8 +181,9 @@ const ModernPartnersTable = () => {
               >
                 Clear
               </button>
+
             </div>
-          </div>
+
         </div>
       </div>
 
@@ -188,7 +192,7 @@ const ModernPartnersTable = () => {
 
           <thead>
           <tr className="border-b border-default bg-card">
-            <th className="min-w-[200px] max-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
               <div className="flex items-center gap-2">
                 <Building className="h-4 w-4" />
                 Partner
@@ -196,7 +200,7 @@ const ModernPartnersTable = () => {
               </div>
             </th>
 
-            <th className="min-w-[200px] max-w-[250px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
               <div className="flex items-center gap-2">
                 <Tag className="h-4 w-4" />
                 Partner Type
@@ -204,34 +208,34 @@ const ModernPartnersTable = () => {
               </div>
             </th>
 
-            <th className="min-w-[200px] max-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4" />
                 Contact
               </div>
             </th>
 
-            <th className="min-w-[120px] max-w-[120px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
               <div className="flex items-center gap-2">
                 Country
               </div>
             </th>
 
-            <th className="min-w-[120px] max-w-[120px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[120px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4" />
                 Status
               </div>
             </th>
 
-            <th className="min-w-[200px] max-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
               <div className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4" />
-                Date Registered
+                Registered Date
               </div>
             </th>
 
-            <th className="min-w-[150px] max-w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 Actions
@@ -266,7 +270,8 @@ const ModernPartnersTable = () => {
                   key={app.id}
                   className="group transition-colors hover:bg-primary"
                 >
-                  <td className="flex min-w-[250px] max-w-[250px] items-center gap-2 px-6 py-4 text-text-primary">
+
+                  <td className="min-w-[250px] px-6 py-4 flex  items-center gap-2 text-text-primary">
                     <div className="">
                       <Image
                         width="40"
@@ -279,10 +284,12 @@ const ModernPartnersTable = () => {
 
                     {app.businessName}
                   </td>
-                  <td className="min-w-[150px] max-w-[150px] px-6 py-4 text-text-muted">
+
+                  <td className="min-w-[200px] px-6 py-4 text-text-muted">
                     {app.type}
                   </td>
-                  <td className="min-w-[200px] max-w-[250px] px-6 py-4 text-text-muted">
+
+                  <td className="min-w-[200px] px-6 py-4 text-text-muted">
                     <span className="block font-semibold">
                       {app.emailContact}
                     </span>
@@ -290,24 +297,27 @@ const ModernPartnersTable = () => {
                       {app.phoneContact}
                     </span>
                   </td>
-                  <td className="min-w-[120px] max-w-[120px] px-6 py-4 text-text-muted">
+
+                  <td className="min-w-[150px] px-6 py-4 text-text-muted">
                     {app.country}
                   </td>
-                  <td className="min-w-[120px] max-w-[120px] px-6 py-4">
+
+                  <td className="min-w-[100px] px-6 py-4">
                     <StatusBadge status={app.status} />
                   </td>
-                  <td className="min-w-[150px] max-w-[150px] px-6 py-4 text-text-muted">
+
+                  <td className="min-w-[150px] px-6 py-4 text-text-muted">
                     {new Date(app.registeredAt).toLocaleDateString()}
                   </td>
 
-                  <td className="min-w-[170px] px-6 py-4">
+                  <td className="min-w-[150px] px-6 py-4">
                     <Link
                       href={`/account-manager/partners/${app.id}`}
                       aria-label="View Partner"
-                      className="flex items-center gap-2 rounded-full p-1.5 text-text-muted outline-0 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                      className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-full border border-default p-2 text-sm text-text-muted transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
                     >
                       <Eye className="h-4 w-4" />
-                      <span className="text-caption">View Partner</span>
+                      <span className="text-caption">View </span>
                     </Link>
                   </td>
 

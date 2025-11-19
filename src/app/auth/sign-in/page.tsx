@@ -20,6 +20,7 @@ export default function SignInPage() {
     }
 
     try {
+
       const loginRes = await api.post("/auth/login", { email, password });
       const token = loginRes.data.access_token;
 
@@ -29,12 +30,30 @@ export default function SignInPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      const role = userRes.data.role?.toLowerCase();
+      const user = userRes.data;
+      const role = user.role?.toLowerCase();
 
-      if (role === "partner") router.replace("/partner/applications");
-      else if (role === "account_manager" || role === "admin") router.replace("/account-manager/applications");
-      else setError("Unauthorized role");
+      localStorage.setItem("userRole", role);
+      localStorage.setItem("userId", user.id);
+
+
+      if (role === "partner") {
+        localStorage.setItem("partnerId", user.partner_id ? user.partner_id : user.id);
+        setTimeout(() => {
+          router.replace("/partner/applications");
+        }, 100);
+
+      } else if (role === "account_manager" || role === "admin") {
+        localStorage.setItem("managerId", user.manager_id || user.id);
+        setTimeout(() => {
+          router.replace("/account-manager/applications");
+        }, 100);
+
+      } else {
+        setError("Unauthorized role");
+      }
     } catch (err: any) {
+      console.error(" Login Error:", err);
       setError(err.response?.data?.detail || "Login failed. Please try again.");
     }
   };
