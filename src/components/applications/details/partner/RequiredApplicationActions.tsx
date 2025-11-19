@@ -40,8 +40,7 @@ export default function RequiredApplicationActions({
     if (!file) return;
 
     try {
-      // TODO: upload to external storage later
-      const dummyUrl = "https://example.com/dummy-file.pdf"; // temporary fake URL
+      const dummyUrl = "https://example.com/dummy-file.pdf";
 
       const payload = [
         {
@@ -54,12 +53,8 @@ export default function RequiredApplicationActions({
         `/applications/${id}/requested-documents/bulk`,
         payload
       );
-
-      console.log("Upload response:", res.data);
-      alert("Upload successful!");
     } catch (err: any) {
       console.error("Upload failed:", err.response?.data || err.message);
-      alert("Upload failed. Check console for details.");
     }
   };
 
