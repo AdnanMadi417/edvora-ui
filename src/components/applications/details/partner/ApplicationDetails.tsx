@@ -1,6 +1,5 @@
 import React from "react";
 import ApplicationPartnerTopBar from "../../topBar/ApplicationPartnerTopBar";
-import RequiredApplicationActions from "../../../applications/details/partner/RequiredApplicationActions";
 
 import {
   FaTasks,
@@ -55,7 +54,8 @@ export default function ApplicationDetails({
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 pt-0 shadow-sm sm:p-6">
-        <ApplicationPartnerTopBar params={{ id: application.id }} />
+
+        <ApplicationPartnerTopBar application={{ id: application.id }} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
@@ -117,10 +117,6 @@ export default function ApplicationDetails({
             Last updated: {formatDate(application.updated_at)}
           </p>
         </div>
-      </div>
-
-      <div>
-        <RequiredApplicationActions params={{ id: application.id }} />
       </div>
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-6 shadow-sm">

@@ -10,7 +10,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import HoldPopup from "components/applications/popups/Hold";
-import UpdateStatus from "components/applications/popups/UpdateStatus";
+import UpdateStatus from "../popups/accountmanager/UpdateStatus";
 import CancelPopup from "components/applications/popups/Cancel";
 
 interface Props {
@@ -20,9 +20,6 @@ interface Props {
 export default function ApplicationAccountManagerTopBar({ application }: Props) {
 
   const router = useRouter();
-
-  // console.log(" account manager application details ID", application.id  );
-  // console.log(" account manager application details bar  ", application  );
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showHoldPopup, setShowHoldPopup] = useState(false);
@@ -195,7 +192,6 @@ export default function ApplicationAccountManagerTopBar({ application }: Props) 
           application={application}
         />
       )}
-
 
     </section>
   );

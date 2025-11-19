@@ -30,7 +30,6 @@ const PartnerApplications = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [filterPriority, setFilterPriority] = useState("all");
   const [loading, setLoading] = useState(true);
 
   const itemsPerPage = 10;
@@ -52,7 +51,6 @@ const PartnerApplications = () => {
 
         const appsWithPriority = res.data.items.map((app: any) => ({
           ...app,
-          priority: app.priority || "low",
         }));
 
         setApplications(appsWithPriority);
@@ -95,12 +93,6 @@ const PartnerApplications = () => {
       );
     }
 
-    if (filterPriority !== "all") {
-      filtered = filtered.filter(
-        (app) => app.priority.toLowerCase() === filterPriority.toLowerCase()
-      );
-    }
-
     if (sortConfig.key) {
       filtered.sort((a, b) => {
         const valA = a[sortConfig.key]?.toString().toLowerCase?.() || "";
@@ -112,7 +104,7 @@ const PartnerApplications = () => {
     }
 
     return filtered;
-  }, [applications, searchTerm, filterStatus, filterPriority, sortConfig]);
+  }, [applications, searchTerm, filterStatus, sortConfig]);
 
   const totalPages = Math.ceil(
     filteredAndSortedApplications.length / itemsPerPage
@@ -123,24 +115,30 @@ const PartnerApplications = () => {
   );
 
   const StatusBadge = ({ status }: { status: string }) => {
-    const statusConfig = {
-      "in-progress": {
+    const statusConfig: Record<string, any> = {
+      new_application: {
         bg: "bg-blue-50 border-blue-200",
         text: "text-blue-700",
         dot: "bg-blue-600",
-        label: "In Progress",
+        label: "New Application",
       },
-      pending: {
-        bg: "bg-gray-50 border-gray-200",
-        text: "text-gray-700",
-        dot: "bg-gray-500",
-        label: "Pending",
+      under_review_by_account_manager: {
+        bg: "bg-yellow-50 border-yellow-200",
+        text: "text-yellow-700",
+        dot: "bg-yellow-600",
+        label: "Under Review by Account Manager",
       },
-      accepted: {
+      correction_requested_by_account_manager: {
+        bg: "bg-orange-50 border-orange-200",
+        text: "text-orange-700",
+        dot: "bg-orange-600",
+        label: "Correction Requested by Account Manager",
+      },
+      approved_from_stage_1: {
         bg: "bg-green-50 border-green-200",
         text: "text-green-700",
         dot: "bg-green-600",
-        label: "Accepted",
+        label: "Approved",
       },
       rejected: {
         bg: "bg-red-50 border-red-200",
@@ -148,48 +146,26 @@ const PartnerApplications = () => {
         dot: "bg-red-600",
         label: "Rejected",
       },
-      under_review: {
-        bg: "bg-yellow-50 border-yellow-200",
-        text: "text-yellow-700",
-        dot: "bg-yellow-600",
-        label: "Under Review by Account Manager",
-      },
     };
 
     const normalizedStatus = status?.toLowerCase().replace(/\s+/g, "_");
 
-    const config = statusConfig[normalizedStatus] || {
-      bg: "bg-gray-100 border-gray-200",
-      text: "text-gray-700",
-      dot: "bg-gray-400",
-      label: status || "Unknown",
-    };
+    const config =
+      statusConfig[normalizedStatus] || {
+        bg: "bg-gray-100 border-gray-200",
+        text: "text-gray-700",
+        dot: "bg-gray-400",
+        label: status || "Unknown",
+      };
 
     return (
       <span
         className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-normal ${config.bg} ${config.text}`}
         title={config.label}
       >
-        <span className={`w-2 h-2 rounded-full ${config.dot}`}></span>
-        <span className="truncate ">{config.label}</span>
+      <span className={`w-2 h-2 rounded-full ${config.dot}`}></span>
+      <span className="truncate">{config.label}</span>
     </span>
-    );
-  };
-
-  const PriorityBadge = ({ priority }) => {
-    const priorityConfig = {
-      high: "bg-red-100 text-red-700 border-red-200",
-      medium: "bg-yellow-100 text-yellow-700 border-yellow-200",
-      low: "bg-gray-100 text-text-muted border-gray-200",
-    };
-    return (
-      <span
-        className={`inline-flex rounded-full border px-2 py-1 text-p2 ${
-          priorityConfig[priority] || priorityConfig.low
-        }`}
-      >
-        {priority?.charAt(0).toUpperCase() + priority?.slice(1)}
-      </span>
     );
   };
 
@@ -241,25 +217,12 @@ const PartnerApplications = () => {
                 className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all">All Status</option>
-                <option value="in-progress">In Progress</option>
-                <option value="pending">Pending</option>
-                <option value="Under Review">Under Review</option>
-                <option value="accepted">Accepted</option>
-                <option value="rejected">Rejected</option>
-              </select>
-            </div>
+                <option value="New Application">New Application</option>
+                <option value="Under Review by Account Manager">Under Review</option>
+                <option value="Correction Requested by Account Manager">Correction Requested</option>
+                <option value="Approved (from Stage 1)">Approved</option>
+                <option value="Rejected">Rejected</option>
 
-            <div className="relative flex-1 sm:flex-none">
-              <Flag className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
-              <select
-                value={filterPriority}
-                onChange={(e) => setFilterPriority(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
-              >
-                <option value="all">All Priority</option>
-                <option value="high">High</option>
-                <option value="medium">Medium</option>
-                <option value="low">Low</option>
               </select>
             </div>
 
@@ -267,7 +230,6 @@ const PartnerApplications = () => {
               onClick={() => {
                 setSearchTerm("");
                 setFilterStatus("all");
-                setFilterPriority("all");
               }}
               className="bg-background flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted outline-0 transition hover:border-text-error hover:text-text-error sm:w-auto"
             >
@@ -336,17 +298,6 @@ const PartnerApplications = () => {
                 <div className="flex items-center gap-2">
                   <CalendarCheck className="h-4 w-4" />
                   Next Action
-                </div>
-              </th>
-
-              <th
-                onClick={() => handleSort("priority")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4" />
-                  Priority
-                  <SortIndicator field="priority" />
                 </div>
               </th>
 
@@ -437,10 +388,6 @@ const PartnerApplications = () => {
                     </div>
                   </td>
 
-                  <td className="min-w-[150px] max-w-[150px] px-6 py-4">
-                    <PriorityBadge priority={app.priority} />
-                  </td>
-
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1 text-text-muted">
                       <Calendar className="h-3 w-3" />
@@ -452,16 +399,17 @@ const PartnerApplications = () => {
                     </div>
                   </td>
 
-                  <td className="min-w-[120px] px-6 py-4">
+                  <td className="min-w-[150px] px-6 py-4">
                     <Link
                       href={`/partner/applications/${app.id}`}
                       aria-label="View Application"
-                      className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-600 hover:text-blue-600"
+                      className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
                     >
                       <Eye className="h-4 w-4" />
-                      <span className="text-caption">View</span>
+                      <span>View</span>
                     </Link>
                   </td>
+
                 </tr>
 
               ))
