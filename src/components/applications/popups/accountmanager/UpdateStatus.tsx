@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, Clock, Plus, Trash2, AlertCircle, Pause, CheckCircle } from "lucide-react";
-import api from "lib/useApi";
-import { useToast } from "components/context/ToastContext";
+import api from "../../../../lib/useApi";
+import { useToast } from "../../../context/ToastContext";
 
 
 interface DocumentRequest {
@@ -295,8 +295,8 @@ export default function UpdateStatusPopup({ isOpen, onClose, onConfirm, applicat
                       <Icon className={`h-5 w-5 ${isSelected ? option.color : "text-gray-400"}`} />
                       <div>
                         <p className="font-semibold text-gray-900">{option.label}</p>
-                        {option.nextAction && <p className="text-xs text-gray-600 mt-1"><span className="font-medium text-gray-700">Next :</span> {option.nextAction}</p>}
-                        {option.description && <p className="text-xs text-gray-500 mt-0.5">{option.description}</p>}
+                        {option.nextAction && <p className="text-xs text-text-muted mt-1"><span className="font-medium">Next :</span> {option.nextAction}</p>}
+                        {option.description && <p className="text-xs text-text-muted mt-0.5">{option.description}</p>}
                       </div>
                     </div>
                   </div>

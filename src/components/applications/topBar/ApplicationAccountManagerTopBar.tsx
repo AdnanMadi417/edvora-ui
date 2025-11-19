@@ -10,7 +10,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import HoldPopup from "components/applications/popups/Hold";
-import UpdateStatus from "components/applications/popups/UpdateStatus";
+import UpdateStatus from "../popups/accountmanager/UpdateStatus";
 import CancelPopup from "components/applications/popups/Cancel";
 
 interface Props {
