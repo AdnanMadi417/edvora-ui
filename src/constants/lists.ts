@@ -38,6 +38,48 @@ export const STAGE_OPTIONS = [
   { key: "commission_payment", label: "Commission Payment", labelKey: "stage.commission_payment" },
 ];
 
+// QUALIFICATION OPTIONS
+export const QUALIFICATION_OPTIONS = [
+  { label: "SPM / O-Level", value: "SPM / O-Level" },
+  { label: "STPM / A-Level", value: "STPM / A-Level" },
+  { label: "Diploma", value: "Diploma" },
+  { label: "Bachelor's Degree", value: "Bachelor's Degree" },
+  { label: "Master's Degree", value: "Master's Degree" },
+  { label: "PhD", value: "PhD" },
+];
+
+export const ENGLISH_TEST_OPTIONS = [
+  { label: "None / Not Taken", value: "none" },
+  { label: "IELTS", value: "IELTS" },
+  { label: "TOEFL", value: "TOEFL" },
+  { label: "PTE", value: "PTE" },
+  { label: "Duolingo", value: "Duolingo" },
+  { label: "Cambridge English", value: "Cambridge English" },
+  { label: "TOEIC", value: "TOEIC" },
+  { label: "OET", value: "OET" },
+  { label: "CEFR", value: "CEFR" },
+  { label: "EmSAT English", value: "EmSAT" },
+  { label: "Qiyas English", value: "Qiyas" },
+];
+
+// Malaysian Universities
+export const MALAYSIAN_UNIVERSITIES = [
+  { label: "University of Malaya", value: "University of Malaya" },
+  { label: "Universiti Kebangsaan Malaysia", value: "Universiti Kebangsaan Malaysia" },
+  { label: "Universiti Putra Malaysia", value: "Universiti Putra Malaysia" },
+  { label: "Universiti Teknologi Malaysia", value: "Universiti Teknologi Malaysia" },
+  { label: "Universiti Sains Malaysia", value: "Universiti Sains Malaysia" },
+];
+
+// Master Programs
+export const MASTER_PROGRAMS = [
+  { label: "Master of Computer Science", value: "Master of Computer Science" },
+  { label: "Master of Software Engineering", value: "Master of Software Engineering" },
+  { label: "Master of Data Science", value: "Master of Data Science" },
+  { label: "Master of Artificial Intelligence", value: "Master of Artificial Intelligence" },
+  { label: "Master of Information Systems", value: "Master of Information Systems" },
+];
+
 export default {
   DOCUMENT_TYPES,
   USER_ROLES,
