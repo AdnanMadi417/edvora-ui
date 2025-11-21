@@ -155,7 +155,7 @@ export default function ApplicationDetails({
 
         <div className="space-y-1">
           <p className="text-xs text-text-muted sm:text-p2">
-            Last updated: {formatDate(application.updated_at)}
+            Application created: {formatDate(application.updated_at)}
           </p>
         </div>
       </div>
