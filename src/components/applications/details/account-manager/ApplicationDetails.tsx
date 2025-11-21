@@ -117,7 +117,7 @@ export default function ApplicationDetails({
               "Not provided"}
           </p>
           <p className="text-xs text-text-secondary">
-            Last updated: {formatDate(application.updated_at)}
+            Application created: {formatDate(application.updated_at)}
           </p>
         </div>
       </div>
