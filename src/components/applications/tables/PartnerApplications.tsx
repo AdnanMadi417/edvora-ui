@@ -249,171 +249,171 @@ const PartnerApplications = () => {
       <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-default bg-card">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-default bg-card">
-              <th
-                onClick={() => handleSort("studentName")}
-                className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Student
-                  <SortIndicator field="studentName" />
-                </div>
-              </th>
+          <tr className="border-b border-default bg-card">
+            <th
+              onClick={() => handleSort("studentName")}
+              className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Student
+                <SortIndicator field="studentName" />
+              </div>
+            </th>
 
-              <th
-                onClick={() => handleSort("applicationName")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex min-w-[250px] items-center gap-2">
-                  <GraduationCap className="h-4 w-4" />
-                  University / Program
-                  <SortIndicator field="applicationName" />
-                </div>
-              </th>
+            <th
+              onClick={() => handleSort("applicationName")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex min-w-[250px] items-center gap-2">
+                <GraduationCap className="h-4 w-4" />
+                University / Program
+                <SortIndicator field="applicationName" />
+              </div>
+            </th>
 
-              <th
-                onClick={() => handleSort("stage")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <Flag className="h-4 w-4" />
-                  Stage
-                  <SortIndicator field="stage" />
-                </div>
-              </th>
+            <th
+              onClick={() => handleSort("stage")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <Flag className="h-4 w-4" />
+                Stage
+                <SortIndicator field="stage" />
+              </div>
+            </th>
 
-              <th
-                onClick={() => handleSort("status")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <BadgeCheck className="h-4 w-4" />
-                  Status
-                  <SortIndicator field="status" />
-                </div>
-              </th>
+            <th
+              onClick={() => handleSort("status")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <BadgeCheck className="h-4 w-4" />
+                Status
+                <SortIndicator field="status" />
+              </div>
+            </th>
 
-              <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
-                <div className="flex items-center gap-2">
-                  <CalendarCheck className="h-4 w-4" />
-                  Next Action
-                </div>
-              </th>
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+              <div className="flex items-center gap-2">
+                <CalendarCheck className="h-4 w-4" />
+                Next Action
+              </div>
+            </th>
 
-              <th
-                onClick={() => handleSort("updatedAt")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex min-w-[150px] items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  Last Updated
-                  <SortIndicator field="updatedAt" />
-                </div>
-              </th>
+            <th
+              onClick={() => handleSort("updatedAt")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex min-w-[150px] items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Last Updated
+                <SortIndicator field="updatedAt" />
+              </div>
+            </th>
 
-              <th className="px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
-                <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  Actions
-                </div>
-              </th>
-            </tr>
+            <th className="px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Actions
+              </div>
+            </th>
+          </tr>
           </thead>
 
           <tbody className="divide-border-default divide-y bg-primary">
-            {loading ? (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="px-6 py-4 text-center text-p1 text-text-muted"
-                >
-                  Loading applications...
-                </td>
-              </tr>
-            ) : paginatedApplications.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="px-6 py-8 text-center text-text-muted"
-                >
-                  <EmptyData />
-                </td>
-              </tr>
-            ) : (
-              paginatedApplications.map((app) => (
-                <tr
-                  key={app.id}
-                  className="group transition-colors hover:bg-primary/10"
-                >
-                  <td className="min-w-[200px] max-w-[300px] px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-default">
-                        <Image
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 rounded-full"
-                          src={avatar}
-                          alt={app.student_name}
-                        />
+          {loading ? (
+            <tr>
+              <td
+                colSpan={9}
+                className="px-6 py-4 text-center text-p1 text-text-muted"
+              >
+                Loading applications...
+              </td>
+            </tr>
+          ) : paginatedApplications.length === 0 ? (
+            <tr>
+              <td
+                colSpan={9}
+                className="px-6 py-8 text-center text-text-muted"
+              >
+                <EmptyData />
+              </td>
+            </tr>
+          ) : (
+            paginatedApplications.map((app) => (
+              <tr
+                key={app.id}
+                className="group transition-colors hover:bg-primary/10"
+              >
+                <td className="min-w-[200px] max-w-[300px] px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-default">
+                      <Image
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-full"
+                        src={avatar}
+                        alt={app.student_name}
+                      />
+                    </div>
+
+                    <div className="w-full overflow-hidden">
+                      <div className="truncate text-text-primary">{app.student_name}</div>
+                      <div className="truncate text-caption text-text-muted">
+                        {app.student_email}
                       </div>
-
-                      <div className="w-full overflow-hidden">
-                        <div className="truncate text-text-primary">{app.student_name}</div>
-                        <div className="truncate text-caption text-text-muted">
-                          {app.student_email}
-                        </div>
-                      </div>
                     </div>
-                  </td>
+                  </div>
+                </td>
 
-                  <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                    <div className="text-text-primary">{app.program_name}</div>
-                    <div className="truncate text-caption text-text-muted">
-                      {app.university_name}
-                    </div>
-                  </td>
+                <td className="min-w-[250px] max-w-[300px] px-6 py-4">
+                  <div className="text-text-primary">{app.program_name}</div>
+                  <div className="truncate text-caption text-text-muted">
+                    {app.university_name}
+                  </div>
+                </td>
 
-                  <td className="px-6 py-4">
-                    <div className="text-text-muted">{app.stage}</div>
-                  </td>
+                <td className="px-6 py-4">
+                  <div className="text-text-muted">{app.stage}</div>
+                </td>
 
-                  <td className="px-6 py-4 min-w-[150px]">
-                    <StatusBadge status={app.status} />
-                  </td>
+                <td className="px-6 py-4 min-w-[150px]">
+                  <StatusBadge status={app.status} />
+                </td>
 
-                  <td className="px-6 py-4">
-                    <div className="max-w-[200px] break-words text-text-muted">
-                      {app.next_action}
-                    </div>
-                  </td>
+                <td className="px-6 py-4">
+                  <div className="max-w-[200px] break-words text-text-muted">
+                    {app.next_action}
+                  </div>
+                </td>
 
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1 text-text-muted">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(app.updated_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "2-digit",
-                      })}
-                    </div>
-                  </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-1 text-text-muted">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(app.updated_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "2-digit",
+                    })}
+                  </div>
+                </td>
 
-                  <td className="min-w-[150px] px-6 py-4">
-                    <Link
-                      href={`/partner/applications/${app.id}`}
-                      aria-label="View Application"
-                      className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
-                    >
-                      <Eye className="h-4 w-4" />
-                      <span>View</span>
-                    </Link>
-                  </td>
+                <td className="min-w-[150px] px-6 py-4">
+                  <Link
+                    href={`/partner/applications/${app.id}`}
+                    aria-label="View Application"
+                    className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>View</span>
+                  </Link>
+                </td>
 
-                </tr>
+              </tr>
 
-              ))
-            )}
+            ))
+          )}
           </tbody>
         </table>
       </div>

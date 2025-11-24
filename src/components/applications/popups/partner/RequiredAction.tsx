@@ -222,7 +222,10 @@ export default function RequiredAction({
                     </div>
                   </div>
                 ) : (
-                  <NoDocumentsRequired/>
+                  <NoDocumentsRequired
+                    title="No documents required"
+                    subtitle="This application does not require any document uploads."
+                  />
                 )}
               </>
             ) : (
