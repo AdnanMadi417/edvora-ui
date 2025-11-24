@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { User, GraduationCap, Phone, Upload, FileText, Check } from "lucide-react";
 import NewApplicationSuccess from "../../popups/NewApplicationSuccess";
 import {
@@ -8,11 +8,16 @@ import {
   MASTER_PROGRAMS,
   QUALIFICATION_OPTIONS,
 } from "constants/lists";
-
+import { useToast } from "components/context/ToastContext";
+import api from "lib/useApi";
+import Cookies from "js-cookie";
 
 const getNestedValue = (obj, path) => {
   if (!path) return undefined;
-  return path.split(/[\.\[\]]/).filter(Boolean).reduce((acc, key) => (acc ? acc[key] : undefined), obj);
+  return path
+    .split(/[\.\[\]]/)
+    .filter(Boolean)
+    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
 const setNestedValue = (obj, path, value) => {
@@ -32,7 +37,6 @@ const setNestedValue = (obj, path, value) => {
       if (cur[k] === undefined || cur[k] === null) {
         cur[k] = nextIsIndex ? [] : {};
       } else {
-
         cur[k] = Array.isArray(cur[k]) ? [...cur[k]] : { ...cur[k] };
       }
       cur = cur[k];
@@ -143,6 +147,8 @@ export default function StudentApplication() {
   const [stage, setStage] = useState(1);
   const [completedStages, setCompletedStages] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
 
   const [formData, setFormData] = useState({
     program_id: "",
@@ -197,7 +203,6 @@ export default function StudentApplication() {
 
   const updateFormData = (fieldPath, value) => {
     setFormData((prev) => setNestedValue(prev, fieldPath, value));
-
     setErrors((prev) => setNestedValue(prev || {}, fieldPath, ""));
   };
 
@@ -232,14 +237,11 @@ export default function StudentApplication() {
       case 3: {
         if (!formData.university_id) newErrors["university_id"] = "University is required";
         if (!formData.program_id) newErrors["program_id"] = "Program is required";
-        if (!getNestedValue(formData, "student.previous_educations[0].start_date") && !getNestedValue(formData, "student.previous_educations[0].end_date")) {
-
-        }
+        // you had an empty check here originally — leaving it intentionally blank (no extra validation)
         break;
       }
 
       case 4: {
-
         const ec = getNestedValue(formData, "student.emergency_contacts[0]") || {};
         if (ec.name && !ec.phone) newErrors["student.emergency_contacts[0].phone"] = "Phone is required for emergency contact";
         break;
@@ -264,7 +266,7 @@ export default function StudentApplication() {
       if (!completedStages.includes(stage)) setCompletedStages((prev) => [...prev, stage]);
       setStage((s) => s + 1);
     } else {
-
+      // keep as-is (no UI feedback here because errors are set)
     }
   };
 
@@ -272,8 +274,6 @@ export default function StudentApplication() {
   const canAccessStage = (id) => id === 1 || completedStages.includes(id - 1);
 
   const mapGenderToBoolean = (g) => {
-
-
     if (typeof g === "boolean") return g;
     if (!g) return null;
     const val = String(g).toLowerCase();
@@ -282,40 +282,70 @@ export default function StudentApplication() {
     return null;
   };
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const token = Cookies.get("token");
+        const partnerId = localStorage.getItem("partnerId");
 
-    const ok = validateStage(5) && validateStage(1) && validateStage(2) && validateStage(3);
-    if (!ok) {
+        // Just log partnerId and token presence; removed broken `payload` usage.
+        console.log("PartnerId:", partnerId);
+        console.log("Token present:", !!token);
 
-      return;
-    }
+        // If you intended to fetch partner applications, uncomment and adjust:
+        // if (token && partnerId) {
+        //   const res = await api.get(`/partners/${partnerId}/applications`, {
+        //     headers: { Authorization: `Bearer ${token}` },
+        //   });
+        //   // do something with res
+        // }
+
+        if (!token || !partnerId) {
+          console.error("Missing token or partnerId", { token, partnerId });
+          // don't return early — we just log, component can still be used to create application
+        }
+      } catch (err) {
+        console.error("Error fetching partner applications:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApplications();
+  }, []);
+
+  const handleSubmit = async () => {
+    // Validate all stages (keeps your original set of required stages)
+    const ok =
+      validateStage(1) &&
+      validateStage(2) &&
+      validateStage(3) &&
+      validateStage(5);
+
+    if (!ok) return;
 
     const payload = {
-      program_id: formData.program_id,
-      university_id: formData.university_id,
-      student_id: formData.student_id || "",
-
       student: {
-        name: getNestedValue(formData, "student.name") || "",
-        birthday: getNestedValue(formData, "student.birthday") || "",
-        nationality: getNestedValue(formData, "student.nationality") || "",
-        passport_number: getNestedValue(formData, "student.passport_number") || "",
-        email: getNestedValue(formData, "student.email") || "",
-        phone: getNestedValue(formData, "student.phone") || "",
-        current_address: getNestedValue(formData, "student.current_address") || "",
-        gender: mapGenderToBoolean(getNestedValue(formData, "student.gender")),
-        emergency_contacts: (getNestedValue(formData, "student.emergency_contacts") || []).map((c) => ({
+        name: formData.student?.name || "",
+        birthday: formData.student?.birthday || "",
+        nationality: formData.student?.nationality || "",
+        passport_number: formData.student?.passport_number || "",
+        email: formData.student?.email || "",
+        phone: formData.student?.phone || "",
+        current_address: formData.student?.current_address || "",
+        gender: mapGenderToBoolean(formData.student?.gender),
+        emergency_contacts: (formData.student?.emergency_contacts || []).map((c) => ({
           name: c.name || "",
           relation: c.relation || "",
           phone: c.phone || "",
           email: c.email || "",
         })),
-        english_proficiencies: (getNestedValue(formData, "student.english_proficiencies") || []).map((e) => ({
+        english_proficiencies: (formData.student?.english_proficiencies || []).map((e) => ({
           test_type: e.test_type || "",
           score: e.score || "",
           test_date: e.test_date || "",
         })),
-        previous_educations: (getNestedValue(formData, "student.previous_educations") || []).map((p) => ({
+        previous_educations: (formData.student?.previous_educations || []).map((p) => ({
           institution_name: p.institution_name || "",
           qualification: p.qualification || "",
           start_date: p.start_date || "",
@@ -323,7 +353,6 @@ export default function StudentApplication() {
           grade: p.grade || "",
           field_of_study: p.field_of_study || "",
         })),
-
       },
 
       documents: (formData.documents || []).map((d) => ({
@@ -334,13 +363,26 @@ export default function StudentApplication() {
       is_draft: !!formData.is_draft,
     };
 
+    console.log("Submitting payload:", JSON.stringify(payload, null, 2));
 
-    console.log(JSON.stringify(payload, null, 2));
+    try {
+      const token = Cookies.get("token");
 
-    setShowPopup(true);
-    setTimeout(() => {
-      setShowPopup(false);
-    }, 3000);
+      // POST to your application's endpoint. Change path if your backend expects different route.
+      const res = await api.post("/applications", payload, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      showToast("Application submitted successfully.", "success");
+      setShowPopup(true);
+
+      // optional: reload to reflect changes after showing popup
+      setTimeout(() => window.location.reload(), 2000);
+    } catch (err) {
+      const msg = err?.response?.data?.message || "Failed to submit application.";
+      showToast(msg, "error");
+      console.error("Error submitting application:", err);
+    }
   };
 
   const handleFileUpload = (e) => {
@@ -417,7 +459,6 @@ export default function StudentApplication() {
         </div>
 
         <div className="mb-6 min-h-[400px] rounded-md border bg-gray-50 p-6">
-
           {stage === 1 && (
             <div className="mb-8">
               <div className="mb-6">
@@ -482,7 +523,6 @@ export default function StudentApplication() {
               </div>
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-
                 <SelectField label="University" field="university_id" options={MALAYSIAN_UNIVERSITIES} formData={formData} errors={errors} updateFormData={updateFormData} />
                 <SelectField label="Program" field="program_id" options={MASTER_PROGRAMS} formData={formData} errors={errors} updateFormData={updateFormData} />
                 <InputField label="Intake Year" field="student.previous_educations[0].start_date" type="number" placeholder="2025" formData={formData} errors={errors} updateFormData={updateFormData} />
@@ -522,7 +562,7 @@ export default function StudentApplication() {
                 <p className="text-sm text-gray-800">Please upload all necessary documents to complete your application.</p>
               </div>
 
-              <div className="p-4 m-y-2">
+              <div className="p-4 my-2">
                 <h4 className="mb-3 text-sm font-semibold text-gray-800">Required Documents</h4>
                 <ul className="space-y-0">
                   {REQUIRED_DOCUMENTS.map((doc, index) => (
