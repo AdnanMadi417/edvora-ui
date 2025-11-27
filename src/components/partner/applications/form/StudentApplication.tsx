@@ -289,8 +289,8 @@ export default function StudentApplication() {
     });
 
     try {
-      // 2️⃣ Get presigned URLs from backend
-      const presigned = await getPresignedUploads(files, "documents");
+      // 2️⃣ Get presigned URLs from backend (uses "applications-files" folder by default)
+      const presigned = await getPresignedUploads(files, "applications-files");
 
       // 3️⃣ Upload files to Spaces
       const results = await uploadFilesToSpaces(files, presigned, (i, pct) => {

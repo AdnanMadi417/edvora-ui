@@ -12,7 +12,7 @@ export interface PresignedUpload {
 
 export async function getPresignedUploads(
   files: File[],
-  folder = "documents"
+  folder = "applications-files"
 ): Promise<PresignedUpload[]> {
   if (!files || !files.length) return [];
 
