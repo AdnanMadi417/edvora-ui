@@ -18,6 +18,7 @@ import {
 } from "react-icons/fa";
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
+import { Clock } from 'lucide-react';
 
 interface ApplicationDetailsProps {
   application: any;
@@ -89,35 +90,39 @@ export default function ApplicationDetails({
               {student.name || "Not provided"}
             </span>
             <span className="block truncate text-xs text-text-muted">
-              {application.id}
+              {/*{application.id}*/}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 py-2">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center">
-            <FaCogs className="text-xl text-blue-600" />
+        <div className="block rounded-md border border-gray-200 p-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-50">
+              <FaCogs className="text-2xl text-blue-600" />
+            </div>
+
+            <div className="flex flex-col">
+              <span className="text-sm sm:text-base">
+                <span className="font-semibold text-text-primary">
+                  Current Status:{" "}
+                </span>
+                {application.stage?.statuses?.[0]?.name ||
+                  application.stage?.name ||
+                  "Not provided"}
+              </span>
+
+              <span className="mt-1 text-xs text-text-muted sm:text-sm">
+                <span className="font-medium">Next Action: </span>
+                {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ??
+                  "Not provided"}
+              </span>
+            </div>
           </div>
-          <span className="text-p2 sm:text-base">
-
-            <span className="text-p1 font-medium text-text-primary">
-              Current Status:{" "}
-            </span>
-
-            {application.stage?.statuses?.[0]?.name ||
-              application.stage?.name ||
-              "Not provided"}
-          </span>
         </div>
 
         <div className="space-y-1">
           <p className="text-xs text-text-muted sm:text-p2">
-            Next Action:{" "}
-            {application.stage?.statuses?.[0]?.next_actions?.[0]?.name ||
-              "Not provided"}
-          </p>
-          <p className="text-xs text-text-secondary">
-            Application created: {formatDate(application.updated_at)}
+            Application created: {application?.updated_at ? formatDate(application.updated_at) : "N/A"}
           </p>
         </div>
       </div>

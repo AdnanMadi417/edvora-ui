@@ -354,7 +354,7 @@ export default function UpdateStatusPopup({
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-caption text-gray-600">
                   <AlertCircle className="h-4 w-4 text-amber-600" />
                   <span className="font-medium">Status:</span>
                   <span className="font-normal">
@@ -413,35 +413,50 @@ export default function UpdateStatusPopup({
                 const currentStatusId = application?.stage?.statuses?.[0]?.id;
                 const prevStatusId = application?.stage?.statuses?.[1]?.id; // assuming index 0 is current, 1 is previous
 
-                const isDisabled = option.id === currentStatusId || option.id === prevStatusId;
+                const isDisabled =
+                  option.id === currentStatusId || option.id === prevStatusId;
 
                 return (
                   <div
                     key={option.id}
-                    onClick={() => !isDisabled && setSelectedStatus(option.id)}
-                    className={`cursor-pointer rounded-md border p-4 transition-all ${
+                    title={isDisabled ? "You cannot select this option." : ""}
+                    onClick={() =>
+                      !isDisabled && setSelectedStatus(option.id)
+                    }
+                    className={`rounded-md border p-4 transition-all 
+    ${
                       isDisabled
-                        ? "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                        ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60"
                         : isSelected
-                          ? `${option.borderColor} ${option.bgColor} shadow`
-                          : "border-default bg-card hover:border-gray-300 hover:shadow"
-                    }`}
+                          ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
+                          : "cursor-pointer border-default bg-card hover:border-gray-300 hover:shadow"
+                    }
+  `}
                   >
                     <div className="flex items-center gap-3">
                       <Icon
                         className={`h-5 w-5 ${
-                          isSelected ? option.color : isDisabled ? "text-gray-400" : "text-gray-400"
+                          isSelected
+                            ? option.color
+                            : isDisabled
+                              ? "text-gray-400"
+                              : "text-gray-400"
                         }`}
                       />
                       <div>
-                        <p className="font-semibold text-gray-900">{option.label}</p>
+                        <p className="font-semibold text-gray-900">
+                          {option.label}
+                        </p>
                         {option.nextAction && (
                           <p className="mt-1 text-xs text-text-muted">
-                            <span className="font-medium">Next :</span> {option.nextAction}
+                            <span className="font-medium">Next :</span>{" "}
+                            {option.nextAction}
                           </p>
                         )}
                         {option.description && (
-                          <p className="mt-0.5 text-xs text-text-muted">{option.description}</p>
+                          <p className="mt-0.5 text-xs text-text-muted">
+                            {option.description}
+                          </p>
                         )}
                       </div>
                     </div>
