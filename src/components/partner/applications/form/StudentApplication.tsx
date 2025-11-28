@@ -5,12 +5,10 @@ import {
   Phone,
   Upload,
   FileText,
-  Check,
+  Trash,
+  File,
 } from "lucide-react";
-import {
-  ENGLISH_TEST_OPTIONS,
-  QUALIFICATION_OPTIONS,
-} from "constants/lists";
+import { ENGLISH_TEST_OPTIONS, QUALIFICATION_OPTIONS } from "constants/lists";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
@@ -22,14 +20,60 @@ import {
 } from "services/uploadService";
 import { useMe } from "hooks/useMe";
 
+interface Student {
+  name: string;
+  birthday: string;
+  nationality: string;
+  passport_number: string;
+  email: string;
+  phone: string;
+  current_address: string;
+  gender: string | null;
+  emergency_contacts: {
+    name: string;
+    relation: string;
+    phone: string;
+    email: string;
+  }[];
+  english_proficiencies: {
+    test_type: string;
+    score: string;
+    test_date: string;
+  }[];
+  previous_educations: {
+    institution_name: string;
+    qualification: string;
+    start_date: string;
+    end_date: string;
+    grade: string;
+  }[];
+}
+
 interface DocumentItem {
   document_type_id: string;
   file_url: string;
+  file_key?: string;
   name?: string;
   size?: string;
   raw?: File;
   uploading?: boolean;
   progress?: number;
+}
+
+type DocumentType = {
+  id: string;
+  type: string;
+  description: string;
+};
+
+interface FormDataType {
+  program_id: string;
+  university_id: string;
+  intake_date: string;
+  student_id: string;
+  student: Student;
+  documents: DocumentItem[];
+  is_draft: boolean;
 }
 
 const getNestedValue = (obj, path) => {
@@ -72,31 +116,34 @@ const stages = [
   { id: 5, name: "Documents Upload", icon: Upload },
 ];
 
-const REQUIRED_DOCUMENTS = [
-  "High School Certificate",
-  "Bachelor Certificate with Transcripts (For Master & PhD)",
-  "Master Certificate with Transcripts (For PhD)",
-  "Photo with White Background",
-  "Passport Copy",
-  "IELTS or TOEFL Certificate (if available)",
-];
-
 export default function StudentApplication() {
   const [stage, setStage] = useState(1);
   const [completedStages, setCompletedStages] = useState([]);
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
-  const { universities, loading: universitiesLoading, error: universitiesError } = useUniversities();
+  const {
+    universities,
+    loading: universitiesLoading,
+    error: universitiesError,
+  } = useUniversities();
   const { user, loading: userLoading, error: userError } = useMe();
+  const [documentTypes, setDocumentTypes] = useState<
+    { id: string; type: string; description: string }[]
+  >([]);
 
-  const getCurrentYear = () => new Date().getFullYear();
+  const getCurrentDate = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataType>({
     program_id: "",
     university_id: "",
-    intake_date: getCurrentYear().toString(),
+    intake_date: getCurrentDate().toString(),
     student_id: "",
-
     student: {
       name: "",
       birthday: "",
@@ -106,39 +153,22 @@ export default function StudentApplication() {
       phone: "",
       current_address: "",
       gender: null,
-
-      emergency_contacts: [
-        {
-          name: "",
-          relation: "",
-          phone: "",
-          email: "",
-        },
-      ],
-
-      english_proficiencies: [
-        {
-          test_type: "",
-          score: "",
-          test_date: "",
-        },
-      ],
-
+      emergency_contacts: [{ name: "", relation: "", phone: "", email: "" }],
+      english_proficiencies: [{ test_type: "", score: "", test_date: "" }],
       previous_educations: [
         {
           institution_name: "",
           qualification: "",
-          start_date:"",
+          start_date: "",
           end_date: "",
           grade: "",
         },
       ],
     },
-
     documents: [],
-
     is_draft: false,
   });
+
   const [errors, setErrors] = useState({});
 
   const updateFormData = (fieldPath, value) => {
@@ -234,7 +264,6 @@ export default function StudentApplication() {
       addCompletedStage(stage);
       setStage((s) => Math.min(s + 1, stages.length));
     } else {
-
     }
   };
 
@@ -252,8 +281,6 @@ export default function StudentApplication() {
         const token = Cookies.get("token");
         const partnerId = localStorage.getItem("partnerId");
 
-        console.log("PartnerId:", partnerId);
-        console.log("Token present:", !!token);
       } catch (err) {
         console.error("Error during initial fetch:", err);
       } finally {
@@ -268,14 +295,34 @@ export default function StudentApplication() {
     updateFormData("program_id", "");
   }, [formData.university_id]);
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    const fetchDocumentTypes = async () => {
+      try {
+        const token = Cookies.get("token");
+        const res = await api.get("/document-types", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+
+        setDocumentTypes(res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch document types", err);
+      }
+    };
+
+    fetchDocumentTypes();
+  }, []);
+
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    document_type_id: string
+  ) => {
     const files: File[] = Array.from(e.target.files || []);
     if (!files.length) return;
 
-    // 1️⃣ Add placeholders for UI
-    const placeholders = files.map((file) => ({
-      document_type_id: "",
+    const placeholders: DocumentItem[] = files.map((file) => ({
+      document_type_id,
       file_url: "",
+      file_key: "",
       name: file.name,
       size: (file.size / 1024).toFixed(2) + " KB",
       raw: file,
@@ -284,130 +331,197 @@ export default function StudentApplication() {
     }));
 
     setFormData((prev) => {
-      const existing = getNestedValue(prev, "documents") || [];
-      return setNestedValue(prev, "documents", [...existing, ...placeholders]);
+      const docs = prev.documents.filter(
+        (d) => d.document_type_id !== document_type_id
+      );
+      return { ...prev, documents: [...docs, ...placeholders] };
     });
 
     try {
-      // 2️⃣ Get presigned URLs from backend (uses "applications-files" folder by default)
-      const presigned = await getPresignedUploads(files, "applications-files");
+      const presigned = await getPresignedUploads(files, "documents");
 
-      // 3️⃣ Upload files to Spaces
-      const results = await uploadFilesToSpaces(files, presigned, (i, pct) => {
-        setFormData((prev) => {
-          const docs = [...(getNestedValue(prev, "documents") || [])];
-          docs[i] = { ...docs[i], progress: pct };
-          return setNestedValue(prev, "documents", docs);
-        });
-      });
+      const results = await uploadFilesToSpaces(
+        files,
+        presigned,
+        (fileIndex, pct) => {
+          setFormData((prev) => {
+            const docs = [...prev.documents];
 
-      // 4️⃣ Update UI after upload
+            const idx = docs.findIndex((d) => d.raw === files[fileIndex]);
+            if (idx !== -1) {
+              docs[idx] = { ...docs[idx], progress: pct };
+            }
+            return { ...prev, documents: docs };
+          });
+
+        }
+      );
+
       setFormData((prev) => {
-        const docs = getNestedValue(prev, "documents") || [];
-        const updated = docs.map((d) => {
-          const match = results.find((r) => r.file_key.includes(d.name));
-          return match
-            ? { ...d, uploading: false, progress: 100, file_url: match.public_url }
-            : d;
+        const docs = [...prev.documents];
+        files.forEach((file, i) => {
+          const idx = docs.findIndex((d) => d.raw === file);
+          if (idx !== -1) {
+            docs[idx] = {
+              ...docs[idx],
+              uploading: false,
+              progress: 100,
+              file_url: results[i]?.public_url || "",
+              file_key: results[i]?.file_key || "",
+            };
+          }
         });
-        return setNestedValue(prev, "documents", updated);
+        return { ...prev, documents: docs };
       });
 
       showToast("Files uploaded successfully", "success");
     } catch (err: any) {
-      console.error("File upload failed:", err);
+      console.error("Error uploading files:", err);
       showToast(err?.message || "Upload failed", "error");
 
-      // Optionally mark failed files as not uploading
-      setFormData((prev) => {
-        const docs = getNestedValue(prev, "documents") || [];
-        const updated = docs.map((d) => ({ ...d, uploading: false }));
-        return setNestedValue(prev, "documents", updated);
-      });
+      setFormData((prev) => ({
+        ...prev,
+        documents: prev.documents.map((d) =>
+          d.uploading ? { ...d, uploading: false } : d
+        ),
+      }));
     }
   };
 
-  const removeDocument = (index) => {
-    const current = formData.documents || [];
-    const updated = current.filter((_, i) => i !== index);
-    setFormData((prev) => setNestedValue(prev, "documents", updated));
+  const removeDocument = async (document_type_id: string) => {
+    const doc = formData.documents.find(
+      (d) => d.document_type_id === document_type_id
+    );
+    if (!doc) return;
+
+    if (doc.file_key) {
+      try {
+        const token = Cookies.get("token");
+        await api.delete("/storage/file", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          data: { file_key: doc.file_key },
+        });
+        showToast("File deleted from storage successfully", "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to delete file from storage", "error");
+        return;
+      }
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      documents: prev.documents.filter(
+        (d) => d.document_type_id !== document_type_id
+      ),
+    }));
   };
 
   const handleSubmit = async () => {
-    const ok =
+    const allValid =
       validateStage(1) &&
       validateStage(2) &&
       validateStage(3) &&
       validateStage(4) &&
       validateStage(5);
 
-    if (!ok) return;
+    if (!allValid) return;
 
-    if (!user?.partner_id) {
-      showToast("Partner information not available.", "error");
+    const uploadingFiles = formData.documents?.filter((d) => d.uploading);
+    if (uploadingFiles?.length > 0) {
+      showToast("Please wait for all files to finish uploading.", "error");
       return;
     }
 
-    const payload = {
-      program_id: formData.program_id || "",
-      university_id: formData.university_id || "",
-      intake_date: formData.intake_date || getCurrentYear().toString(),
-      student_id: "",
+    const missingDocs = documentTypes.filter((docType) => {
+      return !formData.documents.some(
+        (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
+      );
+    });
 
+    if (missingDocs.length > 0) {
+
+      showToast(
+        `Please upload all required documents: ${missingDocs
+          .map((d) => d.type)
+          .join(", ")}`,
+        "error"
+      );
+      return;
+    }
+
+    if (missingDocs.length > 0) {
+      showToast(
+        `Please upload all required documents: ${missingDocs
+          .map((d) => d.type)
+          .join(", ")}`,
+        "error"
+      );
+      return;
+    }
+
+    const payload: any = {
+      program_id: formData.program_id,
+      university_id: formData.university_id,
+      intake_date: formData.intake_date,
       student: {
-        name: formData.student?.name || "",
-        birthday: formData.student?.birthday || "",
-        nationality: formData.student?.nationality || "",
-        passport_number: formData.student?.passport_number || "",
-        email: formData.student?.email || "",
-        phone: formData.student?.phone || "",
-        current_address: formData.student?.current_address || "",
-        gender: formData.student?.gender,
+        ...formData.student,
 
-        emergency_contacts: (formData.student?.emergency_contacts || []).map((c) => ({
+        english_proficiencies: formData.student.english_proficiencies.map(
+          (e) => ({
+            test_type: e.test_type || "N/A",
+            score: e.score || "",
+            test_date: e.test_date
+              ? new Date(e.test_date).toISOString().split("T")[0]
+              : getCurrentDate(),
+          })
+        ),
+
+        previous_educations: formData.student.previous_educations.map((p) => ({
+          institution_name: p.institution_name || "N/A",
+          qualification: p.qualification || "N/A",
+          start_date: p.start_date
+            ? new Date(p.start_date).toISOString().split("T")[0]
+            : getCurrentDate(),
+          end_date: p.end_date
+            ? new Date(p.end_date).toISOString().split("T")[0]
+            : getCurrentDate(),
+          grade: p.grade || "N/A",
+        })),
+
+        emergency_contacts: formData.student.emergency_contacts.map((c) => ({
           name: c.name || "",
           relation: c.relation || "",
           phone: c.phone || "",
           email: c.email || "",
         })),
-
-        english_proficiencies: (formData.student?.english_proficiencies || []).map((e) => ({
-          test_type: e.test_type || "",
-          score: e.score || "",
-          test_date: e.test_date || "",
-        })),
-
-        previous_educations: (formData.student?.previous_educations || []).map((p) => ({
-          institution_name: p.institution_name || "",
-          qualification: p.qualification || "",
-          start_date: p.start_date || "",
-          end_date: p.end_date || "",
-          grade: p.grade || "",
-        })),
       },
-
-      documents: (formData.documents || []).map((d) => ({
-        document_type_id: d.document_type_id || "",
-        file_url: d.file_url || "",
+      documents: formData.documents.map((d) => ({
+        document_type_id: d.document_type_id,
+        file_url: d.file_url,
+        file_key: d.file_key,
       })),
-
       is_draft: !!formData.is_draft,
     };
 
-    console.log(payload);
+    if (!formData.student_id) delete payload.student_id;
 
     try {
       const token = Cookies.get("token");
-      const res = await api.post(`/partners/${user.partner_id}/applications`, payload, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-
-      console.log(res.data);
+      const res = await api.post(
+        `/partners/${user.partner_id}/applications`,
+        payload,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
       showToast("Application submitted successfully.", "success");
-    } catch (err) {
-      const msg = err?.response?.data?.message || "Failed to submit application.";
-      showToast(msg, "error");
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch (err: any) {
       console.error("Error submitting application:", err);
+      const msg =
+        err?.response?.data?.message || "Failed to submit application.";
+      showToast(msg, "error");
     }
   };
 
@@ -422,7 +536,7 @@ export default function StudentApplication() {
   }
 
   return (
-    <section className="mx-auto mt-5 max-w-5xl">
+    <section className="mx-auto mt-5">
       <div className="rounded-lg border border-gray-200 bg-card p-6">
         <div className="mb-6 flex items-start gap-x-3 border-b-2 border-gray-100 pb-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
@@ -465,10 +579,10 @@ export default function StudentApplication() {
                       isCompleted
                         ? "bg-blue-500 text-white"
                         : isActive
-                          ? "scale-110 bg-blue-100 text-gray-900"
-                          : canAccess
-                            ? "bg-gray-100 text-text-muted hover:bg-gray-200"
-                            : "bg-gray-100 text-gray-900"
+                        ? "scale-110 bg-blue-100 text-gray-900"
+                        : canAccess
+                        ? "bg-gray-100 text-text-muted hover:bg-gray-200"
+                        : "bg-gray-100 text-gray-900"
                     }`}
                   >
                     <Icon size={20} />
@@ -625,7 +739,7 @@ export default function StudentApplication() {
                   label="Started Date"
                   field="student.previous_educations[0].start_date"
                   type="number"
-                  placeholder="2025"
+                  placeholder="2022"
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
@@ -634,7 +748,7 @@ export default function StudentApplication() {
                   label="Graduation Year"
                   field="student.previous_educations[0].end_date"
                   type="number"
-                  placeholder="2023"
+                  placeholder="2025"
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
@@ -714,17 +828,17 @@ export default function StudentApplication() {
                 <SelectField
                   label="Program"
                   field="program_id"
-                  options={
-                    (universities.find(u => u.id === formData.university_id)?.programs || []).map(p => ({
-                      value: p.id,
-                      label: p.name,
-                    }))
-                  }
+                  options={(
+                    universities.find((u) => u.id === formData.university_id)
+                      ?.programs || []
+                  ).map((p) => ({
+                    value: p.id,
+                    label: p.name,
+                  }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
-
               </div>
             </div>
           )}
@@ -813,88 +927,47 @@ export default function StudentApplication() {
                 </p>
               </div>
 
-              <div className="my-2 p-4">
-                <h4 className="mb-3 text-sm font-semibold text-gray-800">
-                  Required Documents
-                </h4>
-                <ul className="space-y-0">
-                  {REQUIRED_DOCUMENTS.map((doc, index) => (
-                    <li
-                      key={index}
-                      className="flex items-start gap-2 rounded-md p-0 "
-                    >
-                      <Check className="mt-1 h-4 w-4 flex-shrink-0 text-blue-700" />
-                      <span className="text-p2 text-text-muted">{doc}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <div className="space-y-6">
+                {documentTypes.map((docType) => (
+                  <div
+                    key={docType.id}
+                    className="relative flex items-center justify-between rounded-md border border-default bg-white p-5 backdrop-blur transition-all duration-300 hover:shadow-sm"
+                  >
+                    <p className="mb-2 flex items-center justify-between font-medium text-blue-800 sm:mb-0">
+                      <File className="mr-2 h-4 w-4 text-blue-900" />
 
-              <div className="mb-4">
-                <label className="block">
-                  <div className="cursor-pointer rounded-md border-2 border-dashed p-8 text-center hover:border-blue-500">
-                    <Upload
-                      size={40}
-                      className="mx-auto mb-2 text-text-muted"
-                    />
-                    <p className="text-sm">Click to upload or drag and drop</p>
-                    <p className="text-xs text-text-muted">
-                      PDF, PNG, JPG (MAX 10MB)
+                      <span>
+                        {docType.type.charAt(0).toUpperCase() +
+                          docType.type.slice(1)}
+                      </span>
                     </p>
+
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => removeDocument(docType.id)}
+                        className="flex items-center gap-2 rounded-full border border-red-300 p-2 text-sm text-red-700 transition hover:border-red-600 hover:text-red-600"
+                      >
+                        <Trash className="h-4 w-4" />
+                        <span>Remove</span>
+                      </button>
+
+                      <label className="flex cursor-pointer items-center gap-2 rounded-full border border-gray-300 p-2 text-sm text-gray-700 transition hover:border-blue-600 hover:text-blue-600">
+                        <Upload className="h-4 w-4" />
+                        <span>Upload</span>
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={(e) => handleFileUpload(e, docType.id)}
+                        />
+                      </label>
+                    </div>
                   </div>
-
-                  <input
-                    type="file"
-                    multiple
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
-
-                {errors.documents && (
-                  <p className="mt-2 text-xs text-red-600">
-                    {errors.documents}
-                  </p>
-                )}
+                ))}
               </div>
 
-              {formData.documents.length > 0 && (
-                <div>
-                  <h5 className="mb-2 font-semibold text-text-primary">
-                    Uploaded Documents:
-                  </h5>
-
-                  <div className="space-y-2">
-                    {formData.documents.map((doc, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between rounded-md border bg-card p-3"
-                      >
-                        <div className="flex items-center gap-3">
-                          <FileText size={20} className="text-blue-500" />
-                          <div>
-                            <p className="text-sm font-medium">
-                              {doc.name || doc.file_url}
-                            </p>
-                            <p className="text-xs text-text-muted">
-                              {doc.uploading
-                                ? `Uploading... ${Math.round(doc.progress || 0)}%`
-                                : doc.size}
-                            </p>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() => removeDocument(idx)}
-                          className="text-sm text-red-600"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {errors.documents && (
+                <p className="mt-2 text-xs text-red-600">{errors.documents}</p>
               )}
             </div>
           )}
