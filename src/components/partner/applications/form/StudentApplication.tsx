@@ -19,6 +19,7 @@ import {
   uploadFilesToSpaces,
 } from "services/uploadService";
 import { useMe } from "hooks/useMe";
+import Loading from "components/loading/Loading";
 
 interface Student {
   name: string;
@@ -529,7 +530,7 @@ export default function StudentApplication() {
     return (
       <section className="mx-auto mt-5 max-w-5xl">
         <div className="rounded-lg border border-gray-200 bg-card p-6">
-          <p>Loading...</p>
+          <Loading text="Fetching application data..." />
         </div>
       </section>
     );
