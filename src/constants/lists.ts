@@ -22,12 +22,6 @@ export const USER_ROLES = [
   { key: "applicant", label: "Applicant", labelKey: "roles.applicant" },
 ];
 
-// Gender Options
-export const GENDER_OPTIONS = [
-  { key: "male", label: "Male", labelKey: "gender.male" },
-  { key: "female", label: "Female", labelKey: "gender.female" },
-];
-
 // Application Stages
 export const STAGE_OPTIONS = [
   { key: "all", label: "All Stages", labelKey: "stage.all" },
@@ -62,27 +56,8 @@ export const ENGLISH_TEST_OPTIONS = [
   { label: "Qiyas English", value: "Qiyas" },
 ];
 
-// Malaysian Universities
-export const MALAYSIAN_UNIVERSITIES = [
-  { label: "University of Malaya", value: "University of Malaya" },
-  { label: "Universiti Kebangsaan Malaysia", value: "Universiti Kebangsaan Malaysia" },
-  { label: "Universiti Putra Malaysia", value: "Universiti Putra Malaysia" },
-  { label: "Universiti Teknologi Malaysia", value: "Universiti Teknologi Malaysia" },
-  { label: "Universiti Sains Malaysia", value: "Universiti Sains Malaysia" },
-];
-
-// Master Programs
-export const MASTER_PROGRAMS = [
-  { label: "Master of Computer Science", value: "Master of Computer Science" },
-  { label: "Master of Software Engineering", value: "Master of Software Engineering" },
-  { label: "Master of Data Science", value: "Master of Data Science" },
-  { label: "Master of Artificial Intelligence", value: "Master of Artificial Intelligence" },
-  { label: "Master of Information Systems", value: "Master of Information Systems" },
-];
-
 export default {
   DOCUMENT_TYPES,
   USER_ROLES,
-  GENDER_OPTIONS,
   STAGE_OPTIONS,
 };

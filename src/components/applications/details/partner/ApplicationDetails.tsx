@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import ApplicationPartnerTopBar from "../../topBar/ApplicationPartnerTopBar";
 import RequiredAction from "components/applications/popups/partner/RequiredAction";
 import api from "../../../../lib/useApi";
@@ -68,7 +68,6 @@ export default function ApplicationDetails({
     fetchDetails();
   }, [application.id]);
 
-
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 pt-0 shadow-sm sm:p-6">
@@ -102,14 +101,13 @@ export default function ApplicationDetails({
               {student.name || "Not provided"}
             </span>
             <span className="block truncate text-xs text-text-muted">
-              {application.id}
+              {/*{application.id}*/}
             </span>
           </div>
         </div>
 
         <div className="block rounded-md border border-gray-200 p-4">
-
-          <div className="flex items-center gap-4 mb-4">
+          <div className="mb-4 flex items-center gap-4">
             <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-50">
               <FaCogs className="text-2xl text-blue-600" />
             </div>
@@ -125,10 +123,8 @@ export default function ApplicationDetails({
               </span>
 
               <span className="mt-1 text-xs text-text-muted sm:text-sm">
-                <span className="font-medium text-text-primary">
-                  Next Action:{" "}
-                </span>
-                {application.stage?.statuses?.[0]?.next_actions?.[0]?.name ||
+                <span className="font-medium">Next Action: </span>
+                {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ??
                   "Not provided"}
               </span>
             </div>
@@ -139,7 +135,7 @@ export default function ApplicationDetails({
               {appDetails.document_types?.length > 0 ? (
                 <button
                   onClick={openRequiredActionPopup}
-                  className="flex items-center text-center justify-center w-full gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
                 >
                   <Clock className="h-4 w-4 text-orange-500" />
                   Upload Required Documents
@@ -149,13 +145,11 @@ export default function ApplicationDetails({
               )}
             </>
           )}
-
-
         </div>
 
         <div className="space-y-1">
           <p className="text-xs text-text-muted sm:text-p2">
-            Last updated: {formatDate(application.updated_at)}
+            Application created: {application?.updated_at ? formatDate(application.updated_at) : "N/A"}
           </p>
         </div>
       </div>
