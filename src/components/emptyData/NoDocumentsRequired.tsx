@@ -2,7 +2,12 @@ import React from "react";
 import emptyPng from "/public/img/dashboards/empty-data-icon.png";
 import Image from "next/image";
 
-export default function EmptyData() {
+interface EmptyDataProps {
+  title?: string;
+  subtitle?: string;
+}
+
+export default function EmptyData({ title = "No data", subtitle = "No additional information available." }: EmptyDataProps) {
   return (
     <section>
       <div className="mt-5 rounded-md border border-default bg-card p-10 text-center">
@@ -17,14 +22,9 @@ export default function EmptyData() {
             />
           </div>
 
-          <p className="text-p2 font-medium text-text-primary">
-            No documents required
-          </p>
+          <p className="text-p2 font-medium text-text-primary">{title}</p>
 
-          <p className="text-caption font-normal text-text-muted">
-            This application does not require any document uploads.
-          </p>
-
+          <p className="text-caption font-normal text-text-muted">{subtitle}</p>
         </div>
       </div>
     </section>

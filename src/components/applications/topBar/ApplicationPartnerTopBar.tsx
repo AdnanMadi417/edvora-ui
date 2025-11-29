@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Clock, ChevronLeft } from "lucide-react";
-import RequiredAction from "components/applications/popups/partner/RequiredAction";
+import {ChevronLeft } from "lucide-react";
 
 interface Props {
   application: { id: string | number };
@@ -11,11 +9,8 @@ interface Props {
 
 export default function ApplicationAccountManagerTopBar({ application }: Props) {
   const router = useRouter();
-  const [showRequiredActionPopup, setShowRequiredActionPopup] = useState(false);
 
   const handleBack = () => router.push("/partner/applications");
-  const openRequiredActionPopup = () => setShowRequiredActionPopup(true);
-  const closeRequiredActionPopup = () => setShowRequiredActionPopup(false);
 
   return (
     <section className="w-full">
@@ -32,27 +27,10 @@ export default function ApplicationAccountManagerTopBar({ application }: Props) 
               </button>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={openRequiredActionPopup}
-                className="flex items-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
-              >
-                <Clock className="h-4 w-4 text-orange-500 transition-transform group-hover:rotate-12" />
-                Required Action
-              </button>
-            </div>
+            <div className="flex items-center gap-2 sm:gap-3"></div>
           </div>
         </div>
       </div>
-
-      {application && showRequiredActionPopup && (
-        <RequiredAction
-          isOpen={showRequiredActionPopup}
-          onClose={closeRequiredActionPopup}
-          applicationId={application.id}
-          onConfirm={(id) => console.log("Confirmed required action for application:", id)}
-        />
-      )}
     </section>
   );
 }
