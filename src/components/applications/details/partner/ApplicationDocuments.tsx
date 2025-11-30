@@ -11,18 +11,24 @@ import {
   Download,
 } from "lucide-react";
 import ViewPopup from "../../popups/ViewDoc";
-import EmptyData from "components/emptyData/EmptyData"
+import EmptyData from "components/emptyData/EmptyData";
+import { useDocumentType } from "hooks/useDocumentType";
 
 interface ApplicationDocumentsProps {
   application: any;
 }
 
 export default function ApplicationDocuments({
-                                               application,
-                                             }: ApplicationDocumentsProps) {
+  application,
+}: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
   const [showViewPopup, setShowViewPopup] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
+  const {
+    documentTypes,
+    loading: loadingDocTypes,
+    error: docTypeError,
+  } = useDocumentType();
 
   const documents = application?.documents || [];
 
@@ -63,7 +69,7 @@ export default function ApplicationDocuments({
   };
 
   if (documents.length === 0) {
-    return <EmptyData/>;
+    return <EmptyData />;
   }
 
   return (
@@ -128,22 +134,26 @@ export default function ApplicationDocuments({
                   <div className="min-w-0 max-w-[350px] flex-1">
                     <div className="mb-2 flex items-center gap-2">
                       <h3 className="truncate text-sm font-semibold text-slate-800">
-                        Document {index + 1}
+                        {documentTypes.length > 0
+                          ? documentTypes.find(
+                              (dt) => dt.id === doc.document_type_id
+                            )?.type || `Document ${index + 1}`
+                          : `Document ${index + 1}`}
                       </h3>
                       <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium capitalize text-slate-600">
                         {getStatusText(doc.status)}
                       </span>
                     </div>
 
-                    <p className="mb-2 truncate rounded-full bg-slate-100 px-2.5 py-1 font-mono text-caption text-text-secondary">
-                      {getFileName(doc.file_url)}
-                    </p>
+                    {documentTypes.length > 0 && (
+                      <p className="mb-2 truncate rounded-full bg-slate-100 px-2.5 py-1 font-mono text-caption text-text-secondary">
+                        {documentTypes.find(
+                          (dt) => dt.id === doc.document_type_id
+                        )?.description || ""}
+                      </p>
+                    )}
 
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-yellow-500" />
-                        <span className="font-medium">v1</span>
-                      </div>
                       <div className="flex items-center gap-1.5">
                         <svg
                           className="h-3.5 w-3.5 text-slate-400"
@@ -178,7 +188,6 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
-
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -206,10 +215,7 @@ export default function ApplicationDocuments({
                   >
                     <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
-
                 </div>
-
-
               </div>
             ))}
           </div>
@@ -220,20 +226,19 @@ export default function ApplicationDocuments({
           onClose={() => setShowViewPopup(false)}
           doc={selectedDoc}
         />
-
       </div>
 
       <style jsx>{`
-          @keyframes slideIn {
-              from {
-                  opacity: 0;
-                  transform: translateY(-10px);
-              }
-              to {
-                  opacity: 1;
-                  transform: translateY(0);
-              }
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
           }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
       `}</style>
     </section>
   );
