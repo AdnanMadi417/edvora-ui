@@ -1,11 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Pause, XCircle, AlertCircle } from "lucide-react";
+import { Pause, XCircle } from "lucide-react";
 import api from "../../../../lib/useApi";
 import { FaFileAlt } from "react-icons/fa";
 import { useToast } from "components/context/ToastContext";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
+import {
+  getPresignedUploads,
+  uploadFilesToSpaces,
+} from "services/uploadService";
 
 interface RequiredActionProps {
   isOpen: boolean;
@@ -22,7 +26,6 @@ export default function RequiredAction({
 }: RequiredActionProps) {
   const [appDetails, setAppDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
   const { showToast } = useToast();
   const [selectedFiles, setSelectedFiles] = useState<{
     [docId: string]: File | null;
@@ -50,61 +53,34 @@ export default function RequiredAction({
     setSelectedFiles((prev) => ({ ...prev, [docId]: file }));
   };
 
-  const handleUpload = async (docId: string) => {
-    const file = selectedFiles[docId] || null;
-    if (!file) return;
-
-    try {
-      // Here we can use your handleConfirmUpload logic
-      const dummyUrl = "https://example.com/dummy-file.pdf"; // replace with actual uploaded file URL
-      const payload = [
-        {
-          document_type_id: docId,
-          file_url: dummyUrl, // only string
-        },
-      ];
-
-      const res = await api.post(
-        `/applications/${applicationId}/requested-documents/bulk`,
-        payload
-      );
-      console.log("Upload successful:", res.data);
-      // Optional: reset file after upload
-      setSelectedFiles((prev) => ({ ...prev, [docId]: null }));
-    } catch (err: any) {
-      console.error("Upload failed:", err.response?.data || err.message);
-    }
-  };
-
   const handleConfirm = async () => {
-    const uploadPromises = Object.entries(selectedFiles).map(
-      ([docId, file]) => {
-        if (!file) return null;
-        const payload = [
-          {
-            document_type_id: docId,
-            file_url: "https://example.com/dummy-file.pdf",
-          },
-        ];
-        return api.post(
+    try {
+      for (const [docId, file] of Object.entries(selectedFiles)) {
+        if (!file) continue;
+
+        const presigned = await getPresignedUploads([file], "documents");
+        const results = await uploadFilesToSpaces([file], presigned);
+        const uploadedFile = results[0];
+
+        await api.post(
           `/applications/${applicationId}/requested-documents/bulk`,
-          payload
+          [
+            {
+              document_type_id: docId,
+              file_url: uploadedFile.public_url,
+              file_key: uploadedFile.file_key,
+            },
+          ]
         );
       }
-    );
 
-    try {
-      await Promise.all(uploadPromises);
-
-      showToast("Status updated successfully.", "success");
-      setTimeout(() => window.location.reload(), 2000);
-
-      console.log("All uploads complete");
+      showToast("All documents uploaded successfully.", "success");
       onConfirm?.(applicationId, Object.keys(selectedFiles));
-    } catch (err) {
-      const msg = err.response?.data?.message || "Failed to update status.";
+      setTimeout(() => window.location.reload(), 2000);
+    } catch (err: any) {
+      console.error("Some uploads failed:", err);
+      const msg = err.response?.data?.message || "Failed to upload documents.";
       showToast(msg, "error");
-      console.error("Some uploads failed", err);
     } finally {
       onClose();
     }
