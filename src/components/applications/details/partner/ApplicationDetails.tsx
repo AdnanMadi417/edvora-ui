@@ -59,6 +59,10 @@ export default function ApplicationDetails({
   const closeRequiredActionPopup = () => setShowRequiredActionPopup(false);
 
   const [appDetails, setAppDetails] = useState(null);
+  const formatGender = (value: boolean) => {
+    return value ? "Male" : "Female";
+  };
+
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -222,7 +226,7 @@ export default function ApplicationDetails({
               Intake Date
             </span>
             <span className="text-p2 text-text-muted">
-              {formatDate(program.intake_date)}
+              {formatDate(application.intake_date)}
             </span>
           </div>
 
@@ -268,7 +272,7 @@ export default function ApplicationDetails({
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaUser className="text-text-muted" />
-                  {formatDate(student.gender)}
+                  {formatGender(student.gender)}
                 </dd>
               </div>
 
@@ -346,7 +350,7 @@ export default function ApplicationDetails({
                     Test Name
                   </dt>
                   <dd className="text-sm text-text-muted">
-                    {englishProficiency.test_name || "Not provided"}
+                    {englishProficiency.test_type || "Not provided"}
                   </dd>
                 </div>
                 <div className="flex justify-between">
@@ -403,9 +407,9 @@ export default function ApplicationDetails({
                   </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">GPA</dt>
+                  <dt className="text-sm font-medium text-text-primary">Academic Grade</dt>
                   <dd className="text-sm font-bold text-text-muted">
-                    {previousEducation.gpa || "Not provided"}
+                    {previousEducation.grade || "Not provided"}
                   </dd>
                 </div>
               </dl>
