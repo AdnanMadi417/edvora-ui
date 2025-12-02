@@ -339,22 +339,22 @@ export default function StudentApplication() {
     });
 
     try {
+
       const presigned = await getPresignedUploads(files, "documents");
 
       const results = await uploadFilesToSpaces(
         files,
         presigned,
         (fileIndex, pct) => {
+          // Update progress in state
           setFormData((prev) => {
             const docs = [...prev.documents];
-
             const idx = docs.findIndex((d) => d.raw === files[fileIndex]);
             if (idx !== -1) {
               docs[idx] = { ...docs[idx], progress: pct };
             }
             return { ...prev, documents: docs };
           });
-
         }
       );
 
@@ -367,8 +367,8 @@ export default function StudentApplication() {
               ...docs[idx],
               uploading: false,
               progress: 100,
-              file_url: results[i]?.public_url || "",
-              file_key: results[i]?.file_key || "",
+              file_url: results[i].public_url,
+              file_key: results[i].file_key,
             };
           }
         });
@@ -502,6 +502,7 @@ export default function StudentApplication() {
         file_url: d.file_url,
         file_key: d.file_key,
       })),
+
       is_draft: !!formData.is_draft,
     };
 
@@ -944,18 +945,21 @@ export default function StudentApplication() {
                     </p>
 
                     <div className="flex items-center gap-3">
+
                       <button
                         type="button"
                         onClick={() => removeDocument(docType.id)}
-                        className="flex items-center gap-2 rounded-full border border-red-300 p-2 text-sm text-red-700 transition hover:border-red-600 hover:text-red-600"
+                        className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-text-error text-text-error px-4 py-2.5 text-sm transition hover:border-text-error hover:text-text-error sm:w-auto"
                       >
                         <Trash className="h-4 w-4" />
-                        <span>Remove</span>
+                        <span className="hidden sm:inline">Remove</span>
                       </button>
 
-                      <label className="flex cursor-pointer items-center gap-2 rounded-full border border-gray-300 p-2 text-sm text-gray-700 transition hover:border-blue-600 hover:text-blue-600">
+                      <label
+                        className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-blue-600 hover:text-blue-600 sm:w-auto"
+                      >
                         <Upload className="h-4 w-4" />
-                        <span>Upload</span>
+                        <span className="hidden sm:inline">Upload</span>
                         <input
                           type="file"
                           className="hidden"
@@ -963,6 +967,8 @@ export default function StudentApplication() {
                         />
                       </label>
                     </div>
+
+
                   </div>
                 ))}
               </div>

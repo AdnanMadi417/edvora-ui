@@ -1,31 +1,63 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   FolderOpen,
   ChevronDown,
   Clock,
   CheckCircle,
   XCircle,
-  Eye,
   Download,
   RotateCcw,
 } from "lucide-react";
 import ViewPopup from "components/applications/popups/ViewDoc";
-import ResubmitPopup from "../../popups/ResubmitDoc";
-import EmptyData from "components/emptyData/EmptyData"
+import HoldPopup from "../../popups/accountmanager/ResubmitDoc";
+import EmptyData from "components/emptyData/EmptyData";
+import { getDocumentDownloadUrl } from "services/documentService";
+import api from "lib/useApi"
 
 interface ApplicationDocumentsProps {
   application: any;
 }
 
 export default function ApplicationDocuments({
-                                               application,
-                                             }: ApplicationDocumentsProps) {
+  application,
+}: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
   const [showViewPopup, setShowViewPopup] = useState(false);
-  const [showResubmitPopup, setShowResubmitPopup] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
+  const [showResubmitPopup, setShowResubmitPopup] = useState(false);
+  const [correctionStatusId, setCorrectionStatusId] = useState<string | null>(null);
+
+
+  useEffect(() => {
+    const fetchApplicationDetails = async () => {
+      try {
+        const response = await api.get(`/applications/${application.id}`);
+        const appData = response.data;
+
+        const correctionStatus = appData.stage_statuses?.find(
+          (s) => s.name === "Correction Requested by Account Manager"
+        );
+
+        setCorrectionStatusId(correctionStatus?.id || null);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (application?.id) fetchApplicationDetails();
+  }, [application?.id]);
+
+  const handleDownload = async (fileKey: string) => {
+    try {
+      const downloadUrl = await getDocumentDownloadUrl(fileKey);
+      window.open(downloadUrl, "_blank");
+    } catch (err: any) {
+      console.error("Download failed:", err);
+      alert(err?.message || "Failed to download document");
+    }
+  };
 
   const documents = application?.documents || [];
 
@@ -42,19 +74,6 @@ export default function ApplicationDocuments({
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "1":
-        return "Pending";
-      case "2":
-        return "Approved";
-      case "3":
-        return "Rejected";
-      default:
-        return "Pending";
-    }
-  };
-
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Not provided";
     return new Date(dateString).toLocaleDateString();
@@ -66,7 +85,7 @@ export default function ApplicationDocuments({
   };
 
   if (documents.length === 0) {
-    return <EmptyData/>;
+    return <EmptyData />;
   }
 
   return (
@@ -82,7 +101,7 @@ export default function ApplicationDocuments({
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <FolderOpen className="text-xl text-blue-700" />
             </span>
-            Documents
+            Documents {documents.document_type}
             <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
               {documents.length} Total
             </span>
@@ -131,22 +150,12 @@ export default function ApplicationDocuments({
                   <div className="min-w-0 max-w-[350px] flex-1">
                     <div className="mb-2 flex items-center gap-2">
                       <h3 className="truncate text-sm font-semibold text-slate-800">
-                        Document {index + 1}
+                        {doc.document_type.charAt(0).toUpperCase() +
+                          doc.document_type.slice(1)}
                       </h3>
-                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium capitalize text-slate-600">
-                        {getStatusText(doc.status)}
-                      </span>
                     </div>
 
-                    <p className="mb-2 truncate rounded-full bg-slate-100 px-2.5 py-1 font-mono text-caption text-text-secondary">
-                      {getFileName(doc.file_url)}
-                    </p>
-
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-yellow-500" />
-                        <span className="font-medium">v1</span>
-                      </div>
                       <div className="flex items-center gap-1.5">
                         <svg
                           className="h-3.5 w-3.5 text-slate-400"
@@ -181,31 +190,16 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
-
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedDoc(doc);
-                      setShowViewPopup(true);
-                    }}
-                    className="group rounded-full border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="View Document"
-                    aria-label="View Document"
-                  >
-                    <Eye className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (doc.file_url) {
-                        window.open(doc.file_url, "_blank");
-                      }
+                      if (!doc.file_key) return;
+                      handleDownload(doc.file_key);
                     }}
                     className="group rounded-full border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
                     title="Download Document"
                     aria-label="Download Document"
-                    disabled={!doc.file_url}
+                    disabled={!doc.file_key}
                   >
                     <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
@@ -224,9 +218,6 @@ export default function ApplicationDocuments({
                   </button>
 
                 </div>
-
-
-
               </div>
             ))}
           </div>
@@ -238,23 +229,28 @@ export default function ApplicationDocuments({
           doc={selectedDoc}
         />
 
-        <ResubmitPopup
-          isOpen={showResubmitPopup}
-          onClose={() => setShowResubmitPopup(false)}
-        />
+        {showResubmitPopup && selectedDoc && (
+          <HoldPopup
+            isOpen={showResubmitPopup}
+            onClose={() => setShowResubmitPopup(false)}
+            applicationId={application.id}
+            docId={selectedDoc.document_type_id}
+            statusId={correctionStatusId}
+          />
+        )}
       </div>
 
       <style jsx>{`
-          @keyframes slideIn {
-              from {
-                  opacity: 0;
-                  transform: translateY(-10px);
-              }
-              to {
-                  opacity: 1;
-                  transform: translateY(0);
-              }
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
           }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
       `}</style>
     </section>
   );

@@ -97,7 +97,7 @@ const DocumentRequestList = ({
 
           <div>
             <label className="mb-2 block text-p2 font-medium text-gray-900">
-              Document Type {index + 1}
+              Document Type
             </label>
 
             <div className="mb-2 flex flex-wrap gap-2">
@@ -409,9 +409,8 @@ export default function UpdateStatusPopup({
                 const Icon = option.icon;
                 const isSelected = selectedStatus === option.id;
 
-                // Disable current status and previous status
                 const currentStatusId = application?.stage?.statuses?.[0]?.id;
-                const prevStatusId = application?.stage?.statuses?.[1]?.id; // assuming index 0 is current, 1 is previous
+                const prevStatusId = application?.stage?.statuses?.[1]?.id;
 
                 const isDisabled =
                   option.id === currentStatusId || option.id === prevStatusId;
