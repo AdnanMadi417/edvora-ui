@@ -43,7 +43,6 @@ export default function UploadDoc({
     setSelectedFile(null);
   };
 
-
   const handleClose = () => {
     setSelectedFile(null);
     onClose();

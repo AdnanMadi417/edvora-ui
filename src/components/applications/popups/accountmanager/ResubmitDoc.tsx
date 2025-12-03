@@ -176,11 +176,6 @@ export default function HoldPopup({
               </p>
             </div>
 
-            <p className="mt-1 text-sm text-gray-500">
-              Current Status:{" "}
-              <span className="font-medium">{currentStatus}</span>
-            </p>
-
             <InputField
               label="Reason or instructions"
               field="reason"
