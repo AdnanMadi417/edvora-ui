@@ -18,7 +18,6 @@ export async function getPresignedUploads(
   if (!files || !files.length) return [];
 
   const token = Cookies.get("token");
-  console.log("Token for presigned upload:", token);
 
   if (!token) {
     throw new Error("No token found. Please log in again.");
@@ -33,8 +32,6 @@ export async function getPresignedUploads(
     })),
   };
 
-  console.log("Request body for presigned upload:", body);
-
   try {
     const { data } = await api.post("/storage/presigned-upload-urls", body, {
       headers: {
@@ -45,7 +42,7 @@ export async function getPresignedUploads(
 
     if (data.uploads) {
       data.uploads.forEach((p: PresignedUpload, i: number) => {
-        console.log(`Upload ${i}:`, p.upload_url, p.fields);
+
       });
     }
 
@@ -81,10 +78,6 @@ export async function uploadFilesToSpaces(
 
       formData.append("file", file);
 
-      console.log(`Uploading file: ${file.name}`);
-      console.log("Upload URL:", presigned.upload_url);
-      console.log("FormData entries:", Array.from(formData.entries()));
-
       try {
         const response = await fetch(presigned.upload_url, {
           method: "POST",
@@ -98,7 +91,6 @@ export async function uploadFilesToSpaces(
           throw new Error(`Upload failed with status ${response.status}`);
         }
 
-        console.log(`File uploaded successfully: ${file.name}`);
         results.push({
           public_url: presigned.public_url,
           file_key: presigned.file_key,

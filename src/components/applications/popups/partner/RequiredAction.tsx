@@ -50,8 +50,13 @@ export default function RequiredAction({
   }, [applicationId, isOpen]);
 
   const handleFileChange = (docId: string, file: File | null) => {
+    if (!file) return;
+
     setSelectedFiles((prev) => ({ ...prev, [docId]: file }));
+
+    showToast(`File uploaded successfully.`, "success");
   };
+
 
   const handleConfirm = async () => {
     try {
@@ -59,6 +64,7 @@ export default function RequiredAction({
         if (!file) continue;
 
         const presigned = await getPresignedUploads([file], "documents");
+
         const results = await uploadFilesToSpaces([file], presigned);
         const uploadedFile = results[0];
 
@@ -74,8 +80,10 @@ export default function RequiredAction({
         );
       }
 
-      showToast("All documents uploaded successfully.", "success");
+      showToast("All documents processed successfully.", "success");
+
       onConfirm?.(applicationId, Object.keys(selectedFiles));
+
       setTimeout(() => window.location.reload(), 2000);
     } catch (err: any) {
       console.error("Some uploads failed:", err);
