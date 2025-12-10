@@ -231,7 +231,6 @@ export default function UpdateStatusPopup({
       try {
         const response = await api.get(`/applications/${application.id}`);
         const appData = response.data;
-        console.log(appData);
 
         setDocumentTypes(
           (appData.document_types || []).map((d: any) => ({
