@@ -14,7 +14,6 @@ import {
   BadgeCheck,
   Settings,
   CalendarCheck,
-  AlertTriangle,
   GraduationCap,
 } from "lucide-react";
 import avatar from "/public/img/avatars/user.png";
@@ -29,7 +28,8 @@ const PartnerApplications = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterStatus, setFilterStatus] = useState('all_status');
+  const [filterStages, setFilterStages] = useState('all_stages');
   const [loading, setLoading] = useState(true);
 
   const itemsPerPage = 10;
@@ -72,39 +72,47 @@ const PartnerApplications = () => {
   };
 
   const filteredAndSortedApplications = useMemo(() => {
-    let filtered = applications;
+    let filtered = [...applications];
 
     if (searchTerm) {
-      filtered = filtered.filter(
-        (app) =>
-          app.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.student_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.program_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          app.university_name
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          app.stage.toLowerCase().includes(searchTerm.toLowerCase())
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter((app) =>
+        app.studentName.toLowerCase().includes(term) ||
+        app.studentEmail.toLowerCase().includes(term) ||
+        app.university.toLowerCase().includes(term) ||
+        app.applicationName.toLowerCase().includes(term) ||
+        app.partner.toLowerCase().includes(term) ||
+        app.stage.toLowerCase().includes(term),
       );
     }
 
-    if (filterStatus !== "all") {
+    if (filterStatus !== 'all_status') {
       filtered = filtered.filter(
-        (app) => app.status.toLowerCase() === filterStatus.toLowerCase()
+        (app) =>
+          app.status?.toLowerCase().replace(/\s+/g, '_') === filterStatus,
+      );
+    }
+
+    if (filterStages !== 'all_stages') {
+      filtered = filtered.filter(
+        (app) =>
+          app.stage?.toLowerCase().replace(/\s+/g, '_') === filterStages,
       );
     }
 
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        const valA = a[sortConfig.key]?.toString().toLowerCase?.() || "";
-        const valB = b[sortConfig.key]?.toString().toLowerCase?.() || "";
-        if (valA < valB) return sortConfig.direction === "asc" ? -1 : 1;
-        if (valA > valB) return sortConfig.direction === "asc" ? 1 : -1;
+        const aVal = a[sortConfig.key]?.toString().toLowerCase() ?? '';
+        const bVal = b[sortConfig.key]?.toString().toLowerCase() ?? '';
+
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
       });
     }
 
     return filtered;
-  }, [applications, searchTerm, filterStatus, sortConfig]);
+  }, [applications, searchTerm, filterStatus, filterStages, sortConfig]);
 
   const totalPages = Math.ceil(
     filteredAndSortedApplications.length / itemsPerPage
@@ -205,8 +213,21 @@ const PartnerApplications = () => {
                 placeholder="Search applications by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full border border-default px-4 py-2.5 pl-10 pr-4 text-sm text-text-muted outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-full border border-default px-4 py-2.5 pl-10 pr-4 text-sm text-text-muted outline-0 placeholder:text-text-muted focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
+            </div>
+
+            <div className="relative flex-1 sm:flex-none">
+              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
+              <select
+                value={filterStages}
+                onChange={(e) => setFilterStages(e.target.value)}
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:text-blue-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+              >
+                <option value="all_stages">All Stages</option>
+                <option value="application_review">Application Review</option>
+                <option value="offer_letter">Offer Letter</option>
+              </select>
             </div>
 
             <div className="relative flex-1 sm:flex-none">
@@ -214,22 +235,22 @@ const PartnerApplications = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:text-blue-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
-                <option value="all">All Status</option>
-                <option value="New Application">New Application</option>
-                <option value="Under Review by Account Manager">Under Review</option>
-                <option value="Correction Requested by Account Manager">Correction Requested</option>
-                <option value="Approved (from Stage 1)">Approved</option>
-                <option value="Rejected">Rejected</option>
-
+                <option value="all_status">All Status</option>
+                <option value="new_application">New Application</option>
+                <option value="under_review_by_account_manager">Under Review</option>
+                <option value="correction_requested_by_account_manager">Correction Requested</option>
+                <option value="approved_from_stage_1">Approved</option>
+                <option value="rejected">Rejected</option>
               </select>
             </div>
 
             <button
               onClick={() => {
                 setSearchTerm("");
-                setFilterStatus("all");
+                setFilterStatus('all_status');
+                setFilterStages('all_stages');
               }}
               className="bg-background flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted outline-0 transition hover:border-text-error hover:text-text-error sm:w-auto"
             >
@@ -249,171 +270,171 @@ const PartnerApplications = () => {
       <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-default bg-card">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-default bg-card">
-              <th
-                onClick={() => handleSort("studentName")}
-                className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Student
-                  <SortIndicator field="studentName" />
-                </div>
-              </th>
+          <tr className="border-b border-default bg-card">
+            <th
+              onClick={() => handleSort("studentName")}
+              className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Student
+                <SortIndicator field="studentName" />
+              </div>
+            </th>
 
-              <th
-                onClick={() => handleSort("applicationName")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex min-w-[250px] items-center gap-2">
-                  <GraduationCap className="h-4 w-4" />
-                  University / Program
-                  <SortIndicator field="applicationName" />
-                </div>
-              </th>
+            <th
+              onClick={() => handleSort("applicationName")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex min-w-[250px] items-center gap-2">
+                <GraduationCap className="h-4 w-4" />
+                University / Program
+                <SortIndicator field="applicationName" />
+              </div>
+            </th>
 
-              <th
-                onClick={() => handleSort("stage")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <Flag className="h-4 w-4" />
-                  Stage
-                  <SortIndicator field="stage" />
-                </div>
-              </th>
+            <th
+              onClick={() => handleSort("stage")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <Flag className="h-4 w-4" />
+                Stage
+                <SortIndicator field="stage" />
+              </div>
+            </th>
 
-              <th
-                onClick={() => handleSort("status")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex items-center gap-2">
-                  <BadgeCheck className="h-4 w-4" />
-                  Status
-                  <SortIndicator field="status" />
-                </div>
-              </th>
+            <th
+              onClick={() => handleSort("status")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex items-center gap-2">
+                <BadgeCheck className="h-4 w-4" />
+                Status
+                <SortIndicator field="status" />
+              </div>
+            </th>
 
-              <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
-                <div className="flex items-center gap-2">
-                  <CalendarCheck className="h-4 w-4" />
-                  Next Action
-                </div>
-              </th>
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+              <div className="flex items-center gap-2">
+                <CalendarCheck className="h-4 w-4" />
+                Next Action
+              </div>
+            </th>
 
-              <th
-                onClick={() => handleSort("updatedAt")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
-              >
-                <div className="flex min-w-[150px] items-center gap-2">
-                  <Clock className="h-4 w-4" />
-                  Last Updated
-                  <SortIndicator field="updatedAt" />
-                </div>
-              </th>
+            <th
+              onClick={() => handleSort("updatedAt")}
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+            >
+              <div className="flex min-w-[150px] items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Last Updated
+                <SortIndicator field="updatedAt" />
+              </div>
+            </th>
 
-              <th className="px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
-                <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
-                  Actions
-                </div>
-              </th>
-            </tr>
+            <th className="px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Actions
+              </div>
+            </th>
+          </tr>
           </thead>
 
           <tbody className="divide-border-default divide-y bg-primary">
-            {loading ? (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="px-6 py-4 text-center text-p1 text-text-muted"
-                >
-                  Loading applications...
-                </td>
-              </tr>
-            ) : paginatedApplications.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={9}
-                  className="px-6 py-8 text-center text-text-muted"
-                >
-                  <EmptyData />
-                </td>
-              </tr>
-            ) : (
-              paginatedApplications.map((app) => (
-                <tr
-                  key={app.id}
-                  className="group transition-colors hover:bg-primary/10"
-                >
-                  <td className="min-w-[200px] max-w-[300px] px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-default">
-                        <Image
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 rounded-full"
-                          src={avatar}
-                          alt={app.student_name}
-                        />
+          {loading ? (
+            <tr>
+              <td
+                colSpan={9}
+                className="px-6 py-4 text-center text-p1 text-text-muted"
+              >
+                Loading applications...
+              </td>
+            </tr>
+          ) : paginatedApplications.length === 0 ? (
+            <tr>
+              <td
+                colSpan={9}
+                className="px-6 py-8 text-center text-text-muted"
+              >
+                <EmptyData />
+              </td>
+            </tr>
+          ) : (
+            paginatedApplications.map((app) => (
+              <tr
+                key={app.id}
+                className="group transition-colors hover:bg-primary/10"
+              >
+                <td className="min-w-[200px] max-w-[300px] px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-default">
+                      <Image
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-full"
+                        src={avatar}
+                        alt={app.student_name}
+                      />
+                    </div>
+
+                    <div className="w-full overflow-hidden">
+                      <div className="truncate text-text-primary">{app.student_name}</div>
+                      <div className="truncate text-caption text-text-muted">
+                        {app.student_email}
                       </div>
-
-                      <div className="w-full overflow-hidden">
-                        <div className="truncate text-text-primary">{app.student_name}</div>
-                        <div className="truncate text-caption text-text-muted">
-                          {app.student_email}
-                        </div>
-                      </div>
                     </div>
-                  </td>
+                  </div>
+                </td>
 
-                  <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                    <div className="text-text-primary">{app.program_name}</div>
-                    <div className="truncate text-caption text-text-muted">
-                      {app.university_name}
-                    </div>
-                  </td>
+                <td className="min-w-[250px] max-w-[300px] px-6 py-4">
+                  <div className="text-text-primary">{app.program_name}</div>
+                  <div className="truncate text-caption text-text-muted">
+                    {app.university_name}
+                  </div>
+                </td>
 
-                  <td className="px-6 py-4">
-                    <div className="text-text-muted">{app.stage}</div>
-                  </td>
+                <td className="px-6 py-4">
+                  <div className="text-text-muted">{app.stage}</div>
+                </td>
 
-                  <td className="px-6 py-4 min-w-[150px]">
-                    <StatusBadge status={app.status} />
-                  </td>
+                <td className="px-6 py-4 min-w-[150px]">
+                  <StatusBadge status={app.status} />
+                </td>
 
-                  <td className="px-6 py-4">
-                    <div className="max-w-[200px] break-words text-text-muted">
-                      {app.next_action}
-                    </div>
-                  </td>
+                <td className="px-6 py-4">
+                  <div className="max-w-[200px] break-words text-text-muted">
+                    {app.next_action}
+                  </div>
+                </td>
 
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-1 text-text-muted">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(app.updated_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "2-digit",
-                      })}
-                    </div>
-                  </td>
+                <td className="px-6 py-4">
+                  <div className="flex items-center gap-1 text-text-muted">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(app.updated_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "2-digit",
+                    })}
+                  </div>
+                </td>
 
-                  <td className="min-w-[150px] px-6 py-4">
-                    <Link
-                      href={`/partner/applications/${app.id}`}
-                      aria-label="View Application"
-                      className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
-                    >
-                      <Eye className="h-4 w-4" />
-                      <span>View</span>
-                    </Link>
-                  </td>
+                <td className="min-w-[150px] px-6 py-4">
+                  <Link
+                    href={`/partner/applications/${app.id}`}
+                    aria-label="View Application"
+                    className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span>View</span>
+                  </Link>
+                </td>
 
-                </tr>
+              </tr>
 
-              ))
-            )}
+            ))
+          )}
           </tbody>
         </table>
       </div>

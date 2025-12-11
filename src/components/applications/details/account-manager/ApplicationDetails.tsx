@@ -15,6 +15,8 @@ import {
   FaGraduationCap,
   FaPhoneAlt,
   FaUsers,
+  FaClock,
+  FaStream,
 } from "react-icons/fa";
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
@@ -26,8 +28,6 @@ interface ApplicationDetailsProps {
 export default function ApplicationDetails({
   application,
 }: ApplicationDetailsProps) {
-
-  // console.log("📝 Application Data from Backend:", application);
 
   function daysSince(dateString: string) {
     if (!dateString) return 0;
@@ -53,11 +53,13 @@ export default function ApplicationDetails({
   const englishProficiency = student.english_proficiencies?.[0] || {};
   const previousEducation = student.previous_educations?.[0] || {};
   const currentStatus = stage.statuses?.[0] || {};
+  const formatGender = (value: boolean) => {
+    return value ? "Male" : "Female";
+  };
 
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 pt-0 shadow-sm sm:p-6">
-
         <ApplicationAccountManagerTopBar application={application} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
@@ -66,19 +68,18 @@ export default function ApplicationDetails({
           </span>
 
           <div className="min-w-0 flex-1 space-y-3">
-
             <h3 className="break-words text-base font-semibold text-gray-800">
               Review {application.program?.name}
             </h3>
 
             <div className="flex flex-wrap gap-2">
-              <span className="inline-flex whitespace-nowrap rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 sm:text-sm">
-                Normal Priority
+              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
+                <FaStream  className="text-[10px] text-amber-700" />
+                Stage: {stage.name || "Not provided"}
               </span>
-              <span className="inline-flex whitespace-nowrap rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 sm:text-sm">
-                {stage.name || "Not provided"}
-              </span>
-              <span className="inline-flex whitespace-nowrap rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
+
+              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
+                <FaClock  className="text-[10px] text-purple-700" />
                 {daysSince(application.updated_at)} Days
               </span>
             </div>
@@ -89,35 +90,42 @@ export default function ApplicationDetails({
               {student.name || "Not provided"}
             </span>
             <span className="block truncate text-xs text-text-muted">
-              {application.id}
+              {/*{application.id}*/}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 py-2">
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center">
-            <FaCogs className="text-xl text-blue-600" />
+        <div className="block rounded-md border border-gray-200 p-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-50">
+              <FaCogs className="text-2xl text-blue-600" />
+            </div>
+
+            <div className="flex flex-col">
+              <span className="text-sm sm:text-base">
+                <span className="font-semibold text-text-primary">
+                  Current Status:{" "}
+                </span>
+                {application.stage?.statuses?.[0]?.name ||
+                  application.stage?.name ||
+                  "Not provided"}
+              </span>
+
+              <span className="mt-1 text-xs text-text-muted sm:text-sm">
+                <span className="font-medium">Next Action: </span>
+                {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ??
+                  "Not provided"}
+              </span>
+            </div>
           </div>
-          <span className="text-p2 sm:text-base">
-
-            <span className="text-p1 font-medium text-text-primary">
-              Current Status:{" "}
-            </span>
-
-            {application.stage?.statuses?.[0]?.name ||
-              application.stage?.name ||
-              "Not provided"}
-          </span>
         </div>
 
         <div className="space-y-1">
           <p className="text-xs text-text-muted sm:text-p2">
-            Next Action:{" "}
-            {application.stage?.statuses?.[0]?.next_actions?.[0]?.name ||
-              "Not provided"}
-          </p>
-          <p className="text-xs text-text-secondary">
-            Last updated: {formatDate(application.updated_at)}
+            Application created:{" "}
+            {application?.updated_at
+              ? formatDate(application.updated_at)
+              : "N/A"}
           </p>
         </div>
       </div>
@@ -190,7 +198,7 @@ export default function ApplicationDetails({
               Intake Date
             </span>
             <span className="text-p2 text-text-muted">
-              {formatDate(program.intake_date)}
+              {formatDate(application.intake_date)}
             </span>
           </div>
 
@@ -232,11 +240,11 @@ export default function ApplicationDetails({
 
               <div>
                 <dt className="text-sm font-medium text-text-primary">
-                  Student Gender
+                  Gender
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
-                  <FaUser  className="text-text-muted" />
-                  {formatDate(student.gender)}
+                  <FaUser className="text-text-muted" />
+                  {formatGender(student.gender)}
                 </dd>
               </div>
 
@@ -314,7 +322,7 @@ export default function ApplicationDetails({
                     Test Name
                   </dt>
                   <dd className="text-sm text-text-muted">
-                    {englishProficiency.test_name || "Not provided"}
+                    {englishProficiency.test_type || "Not provided"}
                   </dd>
                 </div>
                 <div className="flex justify-between">
@@ -360,7 +368,7 @@ export default function ApplicationDetails({
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">
-                    Years
+                    Study Period
                   </dt>
                   <dd className="text-sm text-text-muted">
                     {previousEducation.start_date && previousEducation.end_date
@@ -371,9 +379,11 @@ export default function ApplicationDetails({
                   </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">GPA</dt>
+                  <dt className="text-sm font-medium text-text-primary">
+                    GPA / Grade
+                  </dt>
                   <dd className="text-sm font-bold text-text-muted">
-                    {previousEducation.gpa || "Not provided"}
+                    {previousEducation.grade || "Not provided"}
                   </dd>
                 </div>
               </dl>

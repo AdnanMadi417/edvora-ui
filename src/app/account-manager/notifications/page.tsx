@@ -1,6 +1,6 @@
 'use client';
 
-import Notification from "components/notifications/notifications";
+import Notification from "../../../components/notifications/accountManager/Notifications";
 
 interface Notification {
   params: {

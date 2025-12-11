@@ -1,17 +1,11 @@
 'use client';
 
-import Notification from "components/notifications/notifications";
+import Notification from "../../../components/notifications/partner/Notifications";
 
-interface Notification {
-  params: {
-    id: string;
-  };
-}
-
-const Dashboard = ({ params }: Notification) => {
+const Dashboard = () => {
   return (
     <div>
-      <Notification params={params} />
+      <Notification/>
     </div>
   );
 };

@@ -7,24 +7,35 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Eye,
   Download,
 } from "lucide-react";
 import ViewPopup from "../../popups/ViewDoc";
-import EmptyData from "components/emptyData/EmptyData"
+import EmptyData from "components/emptyData/EmptyData";
+
+import { getDocumentDownloadUrl } from "services/documentService";
 
 interface ApplicationDocumentsProps {
   application: any;
 }
 
 export default function ApplicationDocuments({
-                                               application,
-                                             }: ApplicationDocumentsProps) {
+  application,
+}: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
   const [showViewPopup, setShowViewPopup] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
 
   const documents = application?.documents || [];
+
+  const handleDownload = async (fileKey: string) => {
+    try {
+      const downloadUrl = await getDocumentDownloadUrl(fileKey);
+      window.open(downloadUrl, "_blank"); // opens PDF or file in browser
+    } catch (err: any) {
+      console.error("Download failed:", err);
+      alert(err?.message || "Failed to download document");
+    }
+  };
 
   const getFileStatus = (status: string) => {
     switch (status) {
@@ -39,31 +50,13 @@ export default function ApplicationDocuments({
     }
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "1":
-        return "Pending";
-      case "2":
-        return "Approved";
-      case "3":
-        return "Rejected";
-      default:
-        return "Pending";
-    }
-  };
-
   const formatDate = (dateString: string | null) => {
     if (!dateString) return "Not provided";
     return new Date(dateString).toLocaleDateString();
   };
 
-  const getFileName = (fileUrl: string | null) => {
-    if (!fileUrl) return "document.pdf";
-    return fileUrl.split("/").pop() || "document.pdf";
-  };
-
   if (documents.length === 0) {
-    return <EmptyData/>;
+    return <EmptyData />;
   }
 
   return (
@@ -128,22 +121,11 @@ export default function ApplicationDocuments({
                   <div className="min-w-0 max-w-[350px] flex-1">
                     <div className="mb-2 flex items-center gap-2">
                       <h3 className="truncate text-sm font-semibold text-slate-800">
-                        Document {index + 1}
+                        {doc.document_type.charAt(0).toUpperCase() + doc.document_type.slice(1)}
                       </h3>
-                      <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium capitalize text-slate-600">
-                        {getStatusText(doc.status)}
-                      </span>
                     </div>
 
-                    <p className="mb-2 truncate rounded-full bg-slate-100 px-2.5 py-1 font-mono text-caption text-text-secondary">
-                      {getFileName(doc.file_url)}
-                    </p>
-
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-yellow-500" />
-                        <span className="font-medium">v1</span>
-                      </div>
                       <div className="flex items-center gap-1.5">
                         <svg
                           className="h-3.5 w-3.5 text-slate-400"
@@ -182,34 +164,17 @@ export default function ApplicationDocuments({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedDoc(doc);
-                      setShowViewPopup(true);
+                      if (!doc.file_key) return;
+                      handleDownload(doc.file_key);
                     }}
-                    className="group rounded-full border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="View Document"
-                    aria-label="View Document"
-                  >
-                    <Eye className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (doc.file_url) {
-                        window.open(doc.file_url, "_blank");
-                      }
-                    }}
-                    className="group rounded-full border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
+                    className="group rounded-full cursor-pointer border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
                     title="Download Document"
                     aria-label="Download Document"
-                    disabled={!doc.file_url}
+                    disabled={!doc.file_key}
                   >
                     <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
-
                 </div>
-
-
               </div>
             ))}
           </div>
@@ -220,20 +185,19 @@ export default function ApplicationDocuments({
           onClose={() => setShowViewPopup(false)}
           doc={selectedDoc}
         />
-
       </div>
 
       <style jsx>{`
-          @keyframes slideIn {
-              from {
-                  opacity: 0;
-                  transform: translateY(-10px);
-              }
-              to {
-                  opacity: 1;
-                  transform: translateY(0);
-              }
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
           }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
       `}</style>
     </section>
   );
