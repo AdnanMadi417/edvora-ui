@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ApplicationPartnerTopBar from "../../topBar/ApplicationPartnerTopBar";
 import RequiredAction from "components/applications/popups/partner/RequiredAction";
+import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
 import api from "../../../../lib/useApi";
 
 import {
@@ -17,6 +18,8 @@ import {
   FaGraduationCap,
   FaPhoneAlt,
   FaUsers,
+  FaStream,
+  FaClock,
 } from "react-icons/fa";
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
@@ -54,15 +57,18 @@ export default function ApplicationDetails({
   const previousEducation = student.previous_educations?.[0] || {};
   const currentStatus = stage.statuses?.[0] || {};
   const [showRequiredActionPopup, setShowRequiredActionPopup] = useState(false);
-
   const openRequiredActionPopup = () => setShowRequiredActionPopup(true);
   const closeRequiredActionPopup = () => setShowRequiredActionPopup(false);
+
+  const [showProgramDecisionPopup, setShowProgramDecisionPopup] =
+    useState(false);
+  const openProgramDecisionPopup = () => setShowProgramDecisionPopup(true);
+  const closeProgramDecisionPopup = () => setShowProgramDecisionPopup(false);
 
   const [appDetails, setAppDetails] = useState(null);
   const formatGender = (value: boolean) => {
     return value ? "Male" : "Female";
   };
-
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -88,13 +94,13 @@ export default function ApplicationDetails({
             </h3>
 
             <div className="flex flex-wrap gap-2">
-              <span className="inline-flex whitespace-nowrap rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 sm:text-sm">
-                Normal Priority
+              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
+                <FaStream className="text-[10px] text-amber-700" />
+                Stage: {stage.name || "Not provided"}
               </span>
-              <span className="inline-flex whitespace-nowrap rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 sm:text-sm">
-                {stage.name || "Not provided"}
-              </span>
-              <span className="inline-flex whitespace-nowrap rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
+
+              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
+                <FaClock className="text-[10px] text-purple-700" />
                 {daysSince(application.updated_at)} Days
               </span>
             </div>
@@ -144,6 +150,16 @@ export default function ApplicationDetails({
                   <Clock className="h-4 w-4 text-orange-500" />
                   Upload Required Documents
                 </button>
+              ) : appDetails.stage_statuses?.some(
+                  (status) => status.is_requires_reason
+                ) ? (
+                <button
+                  onClick={openProgramDecisionPopup}
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                >
+                  <Clock className="h-4 w-4 text-blue-500" />
+                  Submit Program Decision
+                </button>
               ) : (
                 <span></span>
               )}
@@ -153,7 +169,10 @@ export default function ApplicationDetails({
 
         <div className="space-y-1">
           <p className="text-xs text-text-muted sm:text-p2">
-            Application created: {application?.updated_at ? formatDate(application.updated_at) : "N/A"}
+            Application created:{" "}
+            {application?.updated_at
+              ? formatDate(application.updated_at)
+              : "N/A"}
           </p>
         </div>
       </div>
@@ -268,7 +287,7 @@ export default function ApplicationDetails({
 
               <div>
                 <dt className="text-sm font-medium text-text-primary">
-                  Student Gender
+                  Gender
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
                   <FaUser className="text-text-muted" />
@@ -396,7 +415,7 @@ export default function ApplicationDetails({
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">
-                    Years
+                    Study Period
                   </dt>
                   <dd className="text-sm text-text-muted">
                     {previousEducation.start_date && previousEducation.end_date
@@ -407,7 +426,9 @@ export default function ApplicationDetails({
                   </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">Academic Grade</dt>
+                  <dt className="text-sm font-medium text-text-primary">
+                    GPA / Grade
+                  </dt>
                   <dd className="text-sm font-bold text-text-muted">
                     {previousEducation.grade || "Not provided"}
                   </dd>
@@ -472,9 +493,15 @@ export default function ApplicationDetails({
           isOpen={showRequiredActionPopup}
           onClose={closeRequiredActionPopup}
           applicationId={application.id}
-          onConfirm={(id) =>
-            console.log("Confirmed required action for application:", id)
-          }
+        />
+      )}
+
+      {application && showProgramDecisionPopup && (
+        <ProgramDecision
+          isOpen={showProgramDecisionPopup}
+          onClose={closeProgramDecisionPopup}
+          applicationId={application.id}
+          universityId={application.program?.university?.id || ""}
         />
       )}
     </section>

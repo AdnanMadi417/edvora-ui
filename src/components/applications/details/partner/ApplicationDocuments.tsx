@@ -167,7 +167,7 @@ export default function ApplicationDocuments({
                       if (!doc.file_key) return;
                       handleDownload(doc.file_key);
                     }}
-                    className="group rounded-full border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
+                    className="group rounded-full cursor-pointer border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
                     title="Download Document"
                     aria-label="Download Document"
                     disabled={!doc.file_key}

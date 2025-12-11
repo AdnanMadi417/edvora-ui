@@ -190,13 +190,23 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
+
+                  <button
+                    className="group rounded-full cursor-pointer border border-transparent bg-green-100 p-2 text-green-700 transition-all duration-200 hover:border-green-300 hover:bg-green-200 hover:text-green-800 focus-visible:ring-2 focus-visible:ring-green-500"
+                    title="Approved"
+                    aria-label="Approved"
+                    disabled={!doc.file_key}
+                  >
+                    <CheckCircle className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                  </button>
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       if (!doc.file_key) return;
                       handleDownload(doc.file_key);
                     }}
-                    className="group rounded-full border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
+                    className="group rounded-full cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     aria-label="Download Document"
                     disabled={!doc.file_key}
@@ -210,14 +220,14 @@ export default function ApplicationDocuments({
                       setSelectedDoc(doc);
                       setShowResubmitPopup(true);
                     }}
-                    className="group rounded-full border border-transparent bg-amber-50 p-2 text-amber-600 transition-all duration-200 hover:border-amber-200 hover:bg-amber-100 hover:text-amber-700 focus-visible:ring-2 focus-visible:ring-amber-400"
+                    className="group rounded-full border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
                     title="Resubmit Document"
                     aria-label="Resubmit Document"
                   >
                     <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
-
                 </div>
+
               </div>
             ))}
           </div>

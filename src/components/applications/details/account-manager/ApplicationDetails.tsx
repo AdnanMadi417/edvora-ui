@@ -15,10 +15,11 @@ import {
   FaGraduationCap,
   FaPhoneAlt,
   FaUsers,
+  FaClock,
+  FaStream,
 } from "react-icons/fa";
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { Clock } from 'lucide-react';
 
 interface ApplicationDetailsProps {
   application: any;
@@ -27,8 +28,6 @@ interface ApplicationDetailsProps {
 export default function ApplicationDetails({
   application,
 }: ApplicationDetailsProps) {
-
-  // console.log("📝 Application Data from Backend:", application);
 
   function daysSince(dateString: string) {
     if (!dateString) return 0;
@@ -58,11 +57,9 @@ export default function ApplicationDetails({
     return value ? "Male" : "Female";
   };
 
-
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 pt-0 shadow-sm sm:p-6">
-
         <ApplicationAccountManagerTopBar application={application} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
@@ -71,19 +68,18 @@ export default function ApplicationDetails({
           </span>
 
           <div className="min-w-0 flex-1 space-y-3">
-
             <h3 className="break-words text-base font-semibold text-gray-800">
               Review {application.program?.name}
             </h3>
 
             <div className="flex flex-wrap gap-2">
-              <span className="inline-flex whitespace-nowrap rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700 sm:text-sm">
-                Normal Priority
+              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
+                <FaStream  className="text-[10px] text-amber-700" />
+                Stage: {stage.name || "Not provided"}
               </span>
-              <span className="inline-flex whitespace-nowrap rounded-full bg-yellow-100 px-3 py-1 text-xs font-medium text-yellow-700 sm:text-sm">
-                {stage.name || "Not provided"}
-              </span>
-              <span className="inline-flex whitespace-nowrap rounded-full bg-purple-100 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
+
+              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
+                <FaClock  className="text-[10px] text-purple-700" />
                 {daysSince(application.updated_at)} Days
               </span>
             </div>
@@ -126,7 +122,10 @@ export default function ApplicationDetails({
 
         <div className="space-y-1">
           <p className="text-xs text-text-muted sm:text-p2">
-            Application created: {application?.updated_at ? formatDate(application.updated_at) : "N/A"}
+            Application created:{" "}
+            {application?.updated_at
+              ? formatDate(application.updated_at)
+              : "N/A"}
           </p>
         </div>
       </div>
@@ -241,10 +240,10 @@ export default function ApplicationDetails({
 
               <div>
                 <dt className="text-sm font-medium text-text-primary">
-                  Student Gender
+                  Gender
                 </dt>
                 <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
-                  <FaUser  className="text-text-muted" />
+                  <FaUser className="text-text-muted" />
                   {formatGender(student.gender)}
                 </dd>
               </div>
@@ -369,7 +368,7 @@ export default function ApplicationDetails({
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-text-primary">
-                    Years
+                    Study Period
                   </dt>
                   <dd className="text-sm text-text-muted">
                     {previousEducation.start_date && previousEducation.end_date
@@ -380,7 +379,9 @@ export default function ApplicationDetails({
                   </dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">Academic Grade</dt>
+                  <dt className="text-sm font-medium text-text-primary">
+                    GPA / Grade
+                  </dt>
                   <dd className="text-sm font-bold text-text-muted">
                     {previousEducation.grade || "Not provided"}
                   </dd>

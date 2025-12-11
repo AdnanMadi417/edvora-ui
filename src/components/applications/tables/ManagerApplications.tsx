@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ChevronUp,
   ChevronDown,
@@ -10,39 +10,39 @@ import {
   Clock,
   User,
   Building,
-  AlertTriangle,
   GraduationCap,
   CalendarCheck,
   BadgeCheck,
-  Settings
-} from "lucide-react";
-import avatar from "/public/img/avatars/user.png";
-import Image from "next/image";
-import Link from "next/link";
-import EmptyData from "components/emptyData/EmptyTableData";
-import Cookies from "js-cookie";
-import api from "lib/useApi";
+  Settings,
+} from 'lucide-react';
+import avatar from '/public/img/avatars/user.png';
+import Image from 'next/image';
+import Link from 'next/link';
+import EmptyData from 'components/emptyData/EmptyTableData';
+import Cookies from 'js-cookie';
+import api from 'lib/useApi';
 
 const ModernApplicationsTable = () => {
   const [applications, setApplications] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all_status');
+  const [filterStages, setFilterStages] = useState('all_stages');
   const [loading, setLoading] = useState(true);
 
   const itemsPerPage = 10;
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterStatus ]);
+  }, [searchTerm, filterStatus]);
 
   useEffect(() => {
     const fetchApplications = async () => {
       setLoading(true);
       try {
-        const token = Cookies.get("token");
-        const managerId = localStorage.getItem("managerId");
+        const token = Cookies.get('token');
+        const managerId = localStorage.getItem('managerId');
 
         if (!token || !managerId) return;
 
@@ -62,13 +62,13 @@ const ModernApplicationsTable = () => {
           stage: app.stage,
           status: app.status,
           updatedAt: app.updated_at,
-          nextAction: app.next_action || "-",
+          nextAction: app.next_action || '-',
         }));
 
 
         setApplications(mappedApps);
       } catch (err) {
-        console.error("Error fetching applications:", err);
+        console.error('Error fetching applications:', err);
       } finally {
         setLoading(false);
       }
@@ -80,7 +80,7 @@ const ModernApplicationsTable = () => {
   const handleSort = (key) => {
     setSortConfig((prev) => ({
       key,
-      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
 
@@ -89,39 +89,48 @@ const ModernApplicationsTable = () => {
 
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (app) =>
-          app.studentName.toLowerCase().includes(term) ||
-          app.studentEmail.toLowerCase().includes(term) ||
-          app.university.toLowerCase().includes(term) ||
-          app.applicationName.toLowerCase().includes(term) ||
-          app.partner.toLowerCase().includes(term) ||
-          app.stage.toLowerCase().includes(term)
+      filtered = filtered.filter((app) =>
+        app.studentName.toLowerCase().includes(term) ||
+        app.studentEmail.toLowerCase().includes(term) ||
+        app.university.toLowerCase().includes(term) ||
+        app.applicationName.toLowerCase().includes(term) ||
+        app.partner.toLowerCase().includes(term) ||
+        app.stage.toLowerCase().includes(term),
       );
     }
 
-    if (filterStatus !== "all")
+    if (filterStatus !== 'all_status') {
       filtered = filtered.filter(
-        (app) => app.status.toLowerCase() === filterStatus.toLowerCase()
+        (app) =>
+          app.status?.toLowerCase().replace(/\s+/g, '_') === filterStatus,
       );
+    }
+
+    if (filterStages !== 'all_stages') {
+      filtered = filtered.filter(
+        (app) =>
+          app.stage?.toLowerCase().replace(/\s+/g, '_') === filterStages,
+      );
+    }
 
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        const aVal = a[sortConfig.key]?.toString().toLowerCase() ?? "";
-        const bVal = b[sortConfig.key]?.toString().toLowerCase() ?? "";
-        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+        const aVal = a[sortConfig.key]?.toString().toLowerCase() ?? '';
+        const bVal = b[sortConfig.key]?.toString().toLowerCase() ?? '';
+
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
       });
     }
 
     return filtered;
-  }, [applications, searchTerm, filterStatus , sortConfig]);
+  }, [applications, searchTerm, filterStatus, filterStages, sortConfig]);
 
   const totalPages = Math.ceil(filteredAndSortedApplications.length / itemsPerPage);
   const paginatedApplications = filteredAndSortedApplications.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const goPrev = () => setCurrentPage((p) => Math.max(p - 1, 1));
@@ -130,45 +139,45 @@ const ModernApplicationsTable = () => {
   const StatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<string, any> = {
       new_application: {
-        bg: "bg-blue-50 border-blue-200",
-        text: "text-blue-700",
-        dot: "bg-blue-600",
-        label: "New Application",
+        bg: 'bg-blue-50 border-blue-200',
+        text: 'text-blue-700',
+        dot: 'bg-blue-600',
+        label: 'New Application',
       },
       under_review_by_account_manager: {
-        bg: "bg-yellow-50 border-yellow-200",
-        text: "text-yellow-700",
-        dot: "bg-yellow-600",
-        label: "Under Review by Account Manager",
+        bg: 'bg-yellow-50 border-yellow-200',
+        text: 'text-yellow-700',
+        dot: 'bg-yellow-600',
+        label: 'Under Review by Account Manager',
       },
       correction_requested_by_account_manager: {
-        bg: "bg-orange-50 border-orange-200",
-        text: "text-orange-700",
-        dot: "bg-orange-600",
-        label: "Correction Requested by Account Manager",
+        bg: 'bg-orange-50 border-orange-200',
+        text: 'text-orange-700',
+        dot: 'bg-orange-600',
+        label: 'Correction Requested by Account Manager',
       },
       approved_from_stage_1: {
-        bg: "bg-green-50 border-green-200",
-        text: "text-green-700",
-        dot: "bg-green-600",
-        label: "Approved",
+        bg: 'bg-green-50 border-green-200',
+        text: 'text-green-700',
+        dot: 'bg-green-600',
+        label: 'Approved',
       },
       rejected: {
-        bg: "bg-red-50 border-red-200",
-        text: "text-red-700",
-        dot: "bg-red-600",
-        label: "Rejected",
+        bg: 'bg-red-50 border-red-200',
+        text: 'text-red-700',
+        dot: 'bg-red-600',
+        label: 'Rejected',
       },
     };
 
-    const normalizedStatus = status?.toLowerCase().replace(/\s+/g, "_");
+    const normalizedStatus = status?.toLowerCase().replace(/\s+/g, '_');
 
     const config =
       statusConfig[normalizedStatus] || {
-        bg: "bg-gray-100 border-gray-200",
-        text: "text-gray-700",
-        dot: "bg-gray-400",
-        label: status || "Unknown",
+        bg: 'bg-gray-100 border-gray-200',
+        text: 'text-gray-700',
+        dot: 'bg-gray-400',
+        label: status || 'Unknown',
       };
 
     return (
@@ -182,18 +191,16 @@ const ModernApplicationsTable = () => {
     );
   };
 
-
   const SortIndicator = ({ field }) => {
     if (sortConfig.key !== field) {
       return <ChevronUp className="h-4 w-4 text-text-muted opacity-0 transition-opacity group-hover:opacity-100" />;
     }
-    return sortConfig.direction === "asc" ? (
+    return sortConfig.direction === 'asc' ? (
       <ChevronUp className="h-4 w-4 text-accent" />
     ) : (
       <ChevronDown className="h-4 w-4 text-accent" />
     );
   };
-
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
@@ -211,6 +218,7 @@ const ModernApplicationsTable = () => {
           </div>
 
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
+
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
               <input
@@ -218,8 +226,21 @@ const ModernApplicationsTable = () => {
                 placeholder="Search applications by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full text-text-muted border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-full text-text-muted border border-default px-4 py-2.5 pl-10 pr-4 text-sm outline-0 placeholder:text-text-muted focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
+            </div>
+
+            <div className="relative flex-1 sm:flex-none">
+              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
+              <select
+                value={filterStages}
+                onChange={(e) => setFilterStages(e.target.value)}
+                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:text-blue-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+              >
+                <option value="all_stages">All Stages</option>
+                <option value="application_review">Application Review</option>
+                <option value="offer_letter">Offer Letter</option>
+              </select>
             </div>
 
             <div className="relative flex-1 sm:flex-none">
@@ -229,21 +250,20 @@ const ModernApplicationsTable = () => {
                 onChange={(e) => setFilterStatus(e.target.value)}
                 className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:text-blue-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
-                <option value="all">All Status</option>
-                <option value="New Application">New Application</option>
-                <option value="Under Review by Account Manager">Under Review</option>
-                <option value="Correction Requested by Account Manager">Correction Requested</option>
-                <option value="Approved (from Stage 1)">Approved</option>
-                <option value="Rejected">Rejected</option>
-
-
+                <option value="all_status">All Status</option>
+                <option value="new_application">New Application</option>
+                <option value="under_review_by_account_manager">Under Review</option>
+                <option value="correction_requested_by_account_manager">Correction Requested</option>
+                <option value="approved_from_stage_1">Approved</option>
+                <option value="rejected">Rejected</option>
               </select>
             </div>
 
             <button
               onClick={() => {
-                setSearchTerm("");
-                setFilterStatus("all");
+                setSearchTerm('');
+                setFilterStatus('all_status');
+                setFilterStages('all_stages');
               }}
               className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error sm:w-auto"
             >
@@ -259,7 +279,7 @@ const ModernApplicationsTable = () => {
           <thead>
           <tr className="border-b border-default bg-card">
             <th
-              onClick={() => handleSort("studentName")}
+              onClick={() => handleSort('studentName')}
               className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
@@ -270,7 +290,7 @@ const ModernApplicationsTable = () => {
             </th>
 
             <th
-              onClick={() => handleSort("applicationName")}
+              onClick={() => handleSort('applicationName')}
               className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="min-w-[250px] flex items-center gap-2">
@@ -281,7 +301,7 @@ const ModernApplicationsTable = () => {
             </th>
 
             <th
-              onClick={() => handleSort("partner")}
+              onClick={() => handleSort('partner')}
               className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
@@ -292,7 +312,7 @@ const ModernApplicationsTable = () => {
             </th>
 
             <th
-              onClick={() => handleSort("stage")}
+              onClick={() => handleSort('stage')}
               className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
@@ -303,7 +323,7 @@ const ModernApplicationsTable = () => {
             </th>
 
             <th
-              onClick={() => handleSort("status")}
+              onClick={() => handleSort('status')}
               className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
@@ -321,7 +341,7 @@ const ModernApplicationsTable = () => {
             </th>
 
             <th
-              onClick={() => handleSort("updatedAt")}
+              onClick={() => handleSort('updatedAt')}
               className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
             >
               <div className="flex min-w-[150px] items-center gap-2">
@@ -361,7 +381,8 @@ const ModernApplicationsTable = () => {
               >
                 <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-default">
+                    <div
+                      className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-default">
                       <Image
                         width={40}
                         height={40}
@@ -392,7 +413,9 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="px-6 py-4">
-                  <div className="text-text-muted">{app.stage}</div>
+                  <div className="text-text-muted">
+                    {app.stage}
+                  </div>
                 </td>
 
                 <td className="px-6 py-4 min-w-[150px]">
@@ -406,10 +429,10 @@ const ModernApplicationsTable = () => {
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-1 text-text-muted">
                     <Calendar className="h-3 w-3" />
-                    {new Date(app.updatedAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "2-digit",
+                    {new Date(app.updatedAt).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      year: '2-digit',
                     })}
                   </div>
                 </td>
@@ -437,21 +460,21 @@ const ModernApplicationsTable = () => {
       <div className="sticky bottom-0 rounded-b-lg border border-default bg-card px-6 py-4">
         <div className="flex flex-col items-center justify-between gap-3 text-sm text-text-muted md:flex-row">
           <div>
-            Showing{" "}
+            Showing{' '}
             <span className="font-medium">
               {(currentPage - 1) * itemsPerPage + 1}
-            </span>{" "}
-            to{" "}
+            </span>{' '}
+            to{' '}
             <span className="font-normal">
               {Math.min(
                 currentPage * itemsPerPage,
-                filteredAndSortedApplications.length
+                filteredAndSortedApplications.length,
               )}
-            </span>{" "}
-            of{" "}
+            </span>{' '}
+            of{' '}
             <span className="font-normal">
               {filteredAndSortedApplications.length}
-            </span>{" "}
+            </span>{' '}
             results
           </div>
 
