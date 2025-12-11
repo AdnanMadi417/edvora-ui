@@ -60,11 +60,6 @@ export default function PartnerPage({ params }: PartnerPageProps) {
 
   const handleConfirmHold = (reason: string) => {
     setShowHoldPopup(false);
-    console.log(
-      "Partner placed on hold:",
-      partner?.partnerID,
-      reason
-    );
   };
 
   const handleApprove = () => {
@@ -74,7 +69,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
 
   const handleConfirmCancel = (reason: string) => {
     setShowCancelPopup(false);
-    console.log("Partner cancelled:", partner?.partnerID, reason);
+
   };
 
   return (

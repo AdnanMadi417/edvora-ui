@@ -1,89 +1,113 @@
-import React, { useState } from "react";
-import { User, GraduationCap, Phone, Upload, FileText, Check } from "lucide-react";
-import NewApplicationSuccess from "../../popups/NewApplicationSuccess";
+import React, { useState, useEffect } from "react";
 import {
-  ENGLISH_TEST_OPTIONS,
-  GENDER_OPTIONS,
-  MALAYSIAN_UNIVERSITIES,
-  MASTER_PROGRAMS,
-  QUALIFICATION_OPTIONS,
-} from "constants/lists";
+  User,
+  GraduationCap,
+  Phone,
+  Upload,
+  FileText,
+  Trash,
+  File,
+} from "lucide-react";
+import { ENGLISH_TEST_OPTIONS, QUALIFICATION_OPTIONS } from "constants/lists";
+import { useToast } from "components/context/ToastContext";
+import api from "lib/useApi";
+import Cookies from "js-cookie";
+import { useUniversities } from "hooks/useUniversities";
+import { InputField, SelectField, RadioField } from "components/form";
+import {
+  getPresignedUploads,
+  uploadFilesToSpaces,
+} from "services/uploadService";
+import { useMe } from "hooks/useMe";
+import Loading from "components/loading/Loading";
 
-const InputField = ({
-  label,
-  field,
-  type = "text",
-  required = true,
-  placeholder = "",
-  formData,
-  errors,
-  updateFormData,
-}) => (
-  <div className="mb-4">
-    <label className="block text-p2 font-medium text-text-primary">
-      {label} {required && <span className="text-red-600">*</span>}
-    </label>
+interface Student {
+  name: string;
+  birthday: string;
+  nationality: string;
+  passport_number: string;
+  email: string;
+  phone: string;
+  current_address: string;
+  gender: string | null;
+  emergency_contacts: {
+    name: string;
+    relation: string;
+    phone: string;
+    email: string;
+  }[];
+  english_proficiencies: {
+    test_type: string;
+    score: string;
+    test_date: string;
+  }[];
+  previous_educations: {
+    institution_name: string;
+    qualification: string;
+    start_date: string;
+    end_date: string;
+    grade: string;
+  }[];
+}
 
-    <input
-      type={type}
-      value={formData[field] ?? ""}
-      onChange={(e) => updateFormData(field, e.target.value)}
-      placeholder={placeholder}
-      className={`mt-2 flex h-12 w-full items-center justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1  focus:ring-blue-500 ${
-        errors[field] ? "border-red-500" : "border-default"
-      }`}
-    />
+interface DocumentItem {
+  document_type_id: string;
+  file_url: string;
+  file_key?: string;
+  name?: string;
+  size?: string;
+  raw?: File;
+  uploading?: boolean;
+  progress?: number;
+}
 
-    {errors[field] && (
-      <p className="mt-1 text-xs text-red-600">{errors[field]}</p>
-    )}
-  </div>
-);
+type DocumentType = {
+  id: string;
+  type: string;
+  description: string;
+};
 
-const SelectField = ({
-  label,
-  field,
-  options,
-  required = true,
-  formData,
-  errors,
-  updateFormData,
-}) => (
-  <div className="mb-4">
-    <label className="block text-p2 font-medium text-text-primary">
-      {label} {required && <span className="text-red-600">*</span>}
-    </label>
+interface FormDataType {
+  program_id: string;
+  university_id: string;
+  intake_date: string;
+  student_id: string;
+  student: Student;
+  documents: DocumentItem[];
+  is_draft: boolean;
+}
 
-    <select
-      value={formData[field] ?? ""}
-      onChange={(e) => updateFormData(field, e.target.value)}
-      className={`mt-2 flex h-12 w-full items-center justify-center rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-        errors[field] ? "border-red-500" : "border-default"
-      }`}
-    >
-      <option value="">Select ...</option>
-      {options.map((opt, index) => {
-        // If option is an object with label/value
-        if (typeof opt === "object" && opt !== null) {
-          return (
-            <option key={opt.value || index} value={opt.value || ""}>
-              {opt.label || ""}
-            </option>
-          );
-        }
-        return (
-          <option key={opt + index} value={opt}>
-            {opt}
-          </option>
-        );
-      })}
-    </select>
+const getNestedValue = (obj, path) => {
+  if (!path) return undefined;
+  return path
+    .split(/[\.\[\]]/)
+    .filter(Boolean)
+    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
+};
 
-    {errors[field] && (
-      <p className="mt-1 text-xs text-red-600">{errors[field]}</p>
-    )}
-  </div>
-);
+const setNestedValue = (obj, path, value) => {
+  const keys = path.split(/[\.\[\]]/).filter(Boolean);
+  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
+  let cur = newObj;
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i];
+    const nextKey = keys[i + 1];
+    const isLast = i === keys.length - 1;
+    const nextIsIndex = !isNaN(Number(nextKey));
+
+    if (isLast) {
+      cur[k] = value;
+    } else {
+      if (cur[k] === undefined || cur[k] === null) {
+        cur[k] = nextIsIndex ? [] : {};
+      } else {
+        cur[k] = Array.isArray(cur[k]) ? [...cur[k]] : { ...cur[k] };
+      }
+      cur = cur[k];
+    }
+  }
+  return newObj;
+};
 
 const stages = [
   { id: 1, name: "Personal Details", icon: User },
@@ -92,105 +116,143 @@ const stages = [
   { id: 4, name: "Emergency Contact", icon: Phone },
   { id: 5, name: "Documents Upload", icon: Upload },
 ];
-const REQUIRED_DOCUMENTS = [
-  "High School Certificate",
-  "Bachelor Certificate with Transcripts (For Master & PhD)",
-  "Master Certificate with Transcripts (For PhD)",
-  "Photo with White Background",
-  "Passport Copy",
-  "IELTS or TOEFL Certificate (if available)",
-];
-
 
 export default function StudentApplication() {
   const [stage, setStage] = useState(1);
   const [completedStages, setCompletedStages] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const {
+    universities,
+    loading: universitiesLoading,
+    error: universitiesError,
+  } = useUniversities();
+  const { user, loading: userLoading, error: userError } = useMe();
+  const [documentTypes, setDocumentTypes] = useState<
+    { id: string; type: string; description: string }[]
+  >([]);
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    lastName: "",
-    dateOfBirth: "",
-    gender: "",
-    nationality: "",
-    passportNumber: "",
-    email: "",
-    phone: "",
-    fullAddress: "",
-    parentName: "",
-    parentPhone: "",
-    parentEmail: "",
+  const getCurrentDate = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
-    highestQualification: "",
-    institutionName: "",
-    fieldOfStudy: "",
-    graduationYear: "",
-    gpa: "",
-    englishTest: "",
-    testScore: "",
-
-    emergencyName: "",
-    emergencyRelationship: "",
-    emergencyPhone: "",
-    emergencyEmail: "",
-    emergencyAddress: "",
-
-    universityName: "",
-    programName: "",
-    intakeYear: "",
-
-    uploadedDocs: [],
+  const [formData, setFormData] = useState<FormDataType>({
+    program_id: "",
+    university_id: "",
+    intake_date: getCurrentDate().toString(),
+    student_id: "",
+    student: {
+      name: "",
+      birthday: "",
+      nationality: "",
+      passport_number: "",
+      email: "",
+      phone: "",
+      current_address: "",
+      gender: null,
+      emergency_contacts: [{ name: "", relation: "", phone: "", email: "" }],
+      english_proficiencies: [{ test_type: "", score: "", test_date: "" }],
+      previous_educations: [
+        {
+          institution_name: "",
+          qualification: "",
+          start_date: "",
+          end_date: "",
+          grade: "",
+        },
+      ],
+    },
+    documents: [],
+    is_draft: false,
   });
 
   const [errors, setErrors] = useState({});
 
-  const updateFormData = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
+  const updateFormData = (fieldPath, value) => {
+    setFormData((prev) => setNestedValue(prev, fieldPath, value));
+    setErrors((prev) => setNestedValue(prev || {}, fieldPath, ""));
+  };
+
+  const addCompletedStage = (s) => {
+    setCompletedStages((prev) => {
+      const set = new Set(prev);
+      set.add(s);
+      return Array.from(set).sort((a, b) => a - b);
+    });
   };
 
   const validateStage = (stageNum) => {
     const newErrors = {};
 
     switch (stageNum) {
-      case 1:
-        if (!formData.fullName) newErrors.fullName = "Name is required";
-        if (!formData.email) newErrors.email = "Email is required";
-        if (!formData.phone) newErrors.phone = "Phone is required";
-        if (!formData.nationality)
-          newErrors.nationality = "Nationality is required";
+      case 1: {
+        if (!getNestedValue(formData, "student.name"))
+          newErrors["student.name"] = "Name is required";
+        if (!getNestedValue(formData, "student.birthday"))
+          newErrors["student.birthday"] = "Birthday is required";
+        if (formData.student.gender === null)
+          newErrors["student.gender"] = "Gender is required";
+        if (!getNestedValue(formData, "student.email"))
+          newErrors["student.email"] = "Email is required";
+        if (!getNestedValue(formData, "student.phone"))
+          newErrors["student.phone"] = "Phone is required";
+        if (!getNestedValue(formData, "student.nationality"))
+          newErrors["student.nationality"] = "Nationality is required";
+        if (!getNestedValue(formData, "student.passport_number"))
+          newErrors["student.passport_number"] = "Passport number is required";
         break;
+      }
 
-      case 2:
-        if (!formData.highestQualification)
-          newErrors.highestQualification = "Qualification is required";
-        if (!formData.institutionName)
-          newErrors.institutionName = "Institution name is required";
-        if (!formData.fieldOfStudy)
-          newErrors.fieldOfStudy = "Field of study is required";
-        if (!formData.graduationYear)
-          newErrors.graduationYear = "Graduation year is required";
-        if (!formData.englishTest)
-          newErrors.englishTest = "Please select a test";
+      case 2: {
+        const prevEdu =
+          getNestedValue(formData, "student.previous_educations[0]") || {};
+        if (!prevEdu.qualification)
+          newErrors["student.previous_educations[0].qualification"] =
+            "Qualification is required";
+        if (!prevEdu.institution_name)
+          newErrors["student.previous_educations[0].institution_name"] =
+            "Institution name is required";
+        if (!prevEdu.end_date)
+          newErrors["student.previous_educations[0].end_date"] =
+            "Graduation year is required";
+
+        const eng =
+          getNestedValue(formData, "student.english_proficiencies[0]") || {};
+        if (!eng.test_type)
+          newErrors["student.english_proficiencies[0].test_type"] =
+            "Please select a test";
+
         break;
+      }
 
-      case 3:
-        if (!formData.universityName)
-          newErrors.universityName = "University name is required";
-        if (!formData.programName)
-          newErrors.programName = "Program name is required";
-        if (!formData.intakeYear)
-          newErrors.intakeYear = "Intake year is required";
+      case 3: {
+        if (!formData.university_id)
+          newErrors["university_id"] = "University is required";
+        if (!formData.program_id)
+          newErrors["program_id"] = "Program is required";
         break;
+      }
 
-      case 4:
+      case 4: {
+        const ec =
+          getNestedValue(formData, "student.emergency_contacts[0]") || {};
+        if (ec.name && !ec.phone)
+          newErrors["student.emergency_contacts[0].phone"] =
+            "Phone is required for emergency contact";
         break;
+      }
 
-      case 5:
-        if (formData.uploadedDocs.length === 0)
-          newErrors.uploadedDocs = "Please upload at least one document";
+      case 5: {
+        if (!formData.documents || formData.documents.length === 0)
+          newErrors["documents"] = "Please upload at least one document";
+        break;
+      }
+
+      default:
         break;
     }
 
@@ -198,46 +260,285 @@ export default function StudentApplication() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const nextStage = () => {
+  const nextStage = async () => {
     if (validateStage(stage)) {
-      if (!completedStages.includes(stage)) {
-        setCompletedStages((prev) => [...prev, stage]);
+      addCompletedStage(stage);
+      setStage((s) => Math.min(s + 1, stages.length));
+    } else {
+    }
+  };
+
+  const prevStage = () => setStage((s) => Math.max(1, s - 1));
+
+  const canAccessStage = (id) => {
+    if (id === 1) return true;
+    if (id === stage) return true;
+    return completedStages.includes(id - 1);
+  };
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const token = Cookies.get("token");
+        const partnerId = localStorage.getItem("partnerId");
+
+      } catch (err) {
+        console.error("Error during initial fetch:", err);
+      } finally {
+        setLoading(false);
       }
-      setStage(stage + 1);
-    }
-  };
+    };
 
-  const prevStage = () => setStage(stage - 1);
+    fetchApplications();
+  }, []);
 
-  const canAccessStage = (id) => id === 1 || completedStages.includes(id - 1);
+  useEffect(() => {
+    updateFormData("program_id", "");
+  }, [formData.university_id]);
 
-  const handleSubmit = () => {
-    if (validateStage(5)) {
-      setShowPopup(true);
-      setTimeout(() => {
-        setShowPopup(false);
-        location.reload();
-      }, 3000);
-    }
-  };
+  useEffect(() => {
+    const fetchDocumentTypes = async () => {
+      try {
+        const token = Cookies.get("token");
+        const res = await api.get("/document-types", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
 
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    const mapped = files.map((f) => ({
-      name: f.name,
-      size: (f.size / 1024).toFixed(2) + " KB",
-      type: f.type,
+        setDocumentTypes(res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch document types", err);
+      }
+    };
+
+    fetchDocumentTypes();
+  }, []);
+
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    document_type_id: string
+  ) => {
+    const files: File[] = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    const placeholders: DocumentItem[] = files.map((file) => ({
+      document_type_id,
+      file_url: "",
+      file_key: "",
+      name: file.name,
+      size: (file.size / 1024).toFixed(2) + " KB",
+      raw: file,
+      uploading: true,
+      progress: 0,
     }));
-    updateFormData("uploadedDocs", [...formData.uploadedDocs, ...mapped]);
+
+    setFormData((prev) => {
+      const docs = prev.documents.filter(
+        (d) => d.document_type_id !== document_type_id
+      );
+      return { ...prev, documents: [...docs, ...placeholders] };
+    });
+
+    try {
+
+      const presigned = await getPresignedUploads(files, "documents");
+
+      const results = await uploadFilesToSpaces(
+        files,
+        presigned,
+        (fileIndex, pct) => {
+          // Update progress in state
+          setFormData((prev) => {
+            const docs = [...prev.documents];
+            const idx = docs.findIndex((d) => d.raw === files[fileIndex]);
+            if (idx !== -1) {
+              docs[idx] = { ...docs[idx], progress: pct };
+            }
+            return { ...prev, documents: docs };
+          });
+        }
+      );
+
+      setFormData((prev) => {
+        const docs = [...prev.documents];
+        files.forEach((file, i) => {
+          const idx = docs.findIndex((d) => d.raw === file);
+          if (idx !== -1) {
+            docs[idx] = {
+              ...docs[idx],
+              uploading: false,
+              progress: 100,
+              file_url: results[i].public_url,
+              file_key: results[i].file_key,
+            };
+          }
+        });
+        return { ...prev, documents: docs };
+      });
+
+      showToast("Files uploaded successfully", "success");
+    } catch (err: any) {
+      console.error("Error uploading files:", err);
+      showToast(err?.message || "Upload failed", "error");
+
+      setFormData((prev) => ({
+        ...prev,
+        documents: prev.documents.map((d) =>
+          d.uploading ? { ...d, uploading: false } : d
+        ),
+      }));
+    }
   };
 
-  const removeDocument = (index) => {
-    const newDocs = formData.uploadedDocs.filter((_, i) => i !== index);
-    updateFormData("uploadedDocs", newDocs);
+  const removeDocument = async (document_type_id: string) => {
+    const doc = formData.documents.find(
+      (d) => d.document_type_id === document_type_id
+    );
+    if (!doc) return;
+
+    if (doc.file_key) {
+      try {
+        const token = Cookies.get("token");
+        await api.delete("/storage/file", {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          data: { file_key: doc.file_key },
+        });
+        showToast("File deleted from storage successfully", "success");
+      } catch (err) {
+        console.error(err);
+        showToast("Failed to delete file from storage", "error");
+        return;
+      }
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      documents: prev.documents.filter(
+        (d) => d.document_type_id !== document_type_id
+      ),
+    }));
   };
+
+  const handleSubmit = async () => {
+    const allValid =
+      validateStage(1) &&
+      validateStage(2) &&
+      validateStage(3) &&
+      validateStage(4) &&
+      validateStage(5);
+
+    if (!allValid) return;
+
+    const uploadingFiles = formData.documents?.filter((d) => d.uploading);
+    if (uploadingFiles?.length > 0) {
+      showToast("Please wait for all files to finish uploading.", "error");
+      return;
+    }
+
+    const missingDocs = documentTypes.filter((docType) => {
+      return !formData.documents.some(
+        (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
+      );
+    });
+
+    if (missingDocs.length > 0) {
+
+      showToast(
+        `Please upload all required documents: ${missingDocs
+          .map((d) => d.type)
+          .join(", ")}`,
+        "error"
+      );
+      return;
+    }
+
+    if (missingDocs.length > 0) {
+      showToast(
+        `Please upload all required documents: ${missingDocs
+          .map((d) => d.type)
+          .join(", ")}`,
+        "error"
+      );
+      return;
+    }
+
+    const payload: any = {
+      program_id: formData.program_id,
+      university_id: formData.university_id,
+      intake_date: formData.intake_date,
+      student: {
+        ...formData.student,
+
+        english_proficiencies: formData.student.english_proficiencies.map(
+          (e) => ({
+            test_type: e.test_type || "N/A",
+            score: e.score || "",
+            test_date: e.test_date
+              ? new Date(e.test_date).toISOString().split("T")[0]
+              : getCurrentDate(),
+          })
+        ),
+
+        previous_educations: formData.student.previous_educations.map((p) => ({
+          institution_name: p.institution_name || "N/A",
+          qualification: p.qualification || "N/A",
+          start_date: p.start_date
+            ? new Date(p.start_date).toISOString().split("T")[0]
+            : getCurrentDate(),
+          end_date: p.end_date
+            ? new Date(p.end_date).toISOString().split("T")[0]
+            : getCurrentDate(),
+          grade: p.grade || "N/A",
+        })),
+
+        emergency_contacts: formData.student.emergency_contacts.map((c) => ({
+          name: c.name || "",
+          relation: c.relation || "",
+          phone: c.phone || "",
+          email: c.email || "",
+        })),
+      },
+      documents: formData.documents.map((d) => ({
+        document_type_id: d.document_type_id,
+        file_url: d.file_url,
+        file_key: d.file_key,
+      })),
+
+      is_draft: !!formData.is_draft,
+    };
+
+    if (!formData.student_id) delete payload.student_id;
+
+    try {
+      const token = Cookies.get("token");
+      const res = await api.post(
+        `/partners/${user.partner_id}/applications`,
+        payload,
+        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+      );
+      showToast("Application submitted successfully.", "success");
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } catch (err: any) {
+      console.error("Error submitting application:", err);
+      const msg =
+        err?.response?.data?.message || "Failed to submit application.";
+      showToast(msg, "error");
+    }
+  };
+
+  if (loading || universitiesLoading) {
+    return (
+      <section className="mx-auto mt-5 max-w-5xl">
+        <div className="rounded-lg border border-gray-200 bg-card p-6">
+          <Loading text="Fetching application data..." />
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section className="mx-auto mt-5 max-w-5xl">
+    <section className="mx-auto mt-5">
       <div className="rounded-lg border border-gray-200 bg-card p-6">
         <div className="mb-6 flex items-start gap-x-3 border-b-2 border-gray-100 pb-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
@@ -320,7 +621,7 @@ export default function StudentApplication() {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <InputField
                   label="Full Name"
-                  field="fullName"
+                  field="student.name"
                   placeholder="Ahmad bin Ali"
                   formData={formData}
                   errors={errors}
@@ -328,7 +629,7 @@ export default function StudentApplication() {
                 />
                 <InputField
                   label="Date of Birth"
-                  field="dateOfBirth"
+                  field="student.birthday"
                   placeholder="DD/MM/YYYY"
                   type="date"
                   required={false}
@@ -336,17 +637,22 @@ export default function StudentApplication() {
                   errors={errors}
                   updateFormData={updateFormData}
                 />
-                <SelectField
+
+                <RadioField
                   label="Gender"
-                  field="gender"
-                  options={GENDER_OPTIONS}
+                  field="student.gender"
+                  options={[
+                    { label: "Male", value: true },
+                    { label: "Female", value: false },
+                  ]}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
+
                 <InputField
                   label="Nationality"
-                  field="nationality"
+                  field="student.nationality"
                   placeholder="Malaysian"
                   formData={formData}
                   errors={errors}
@@ -354,7 +660,7 @@ export default function StudentApplication() {
                 />
                 <InputField
                   label="Passport Number"
-                  field="passportNumber"
+                  field="student.passport_number"
                   placeholder="A1234567"
                   formData={formData}
                   errors={errors}
@@ -362,7 +668,7 @@ export default function StudentApplication() {
                 />
                 <InputField
                   label="Email Address"
-                  field="email"
+                  field="student.email"
                   type="email"
                   placeholder="ahmad.ali@gmail.com"
                   formData={formData}
@@ -371,7 +677,7 @@ export default function StudentApplication() {
                 />
                 <InputField
                   label="Phone Number"
-                  field="phone"
+                  field="student.phone"
                   type="tel"
                   placeholder="+60123456789"
                   formData={formData}
@@ -381,52 +687,8 @@ export default function StudentApplication() {
                 <div className="md:col-span-2">
                   <InputField
                     label="Street Address"
-                    field="fullAddress"
+                    field="student.current_address"
                     placeholder="No. 123, Jalan Tun Razak, Kuala Lumpur"
-                    formData={formData}
-                    errors={errors}
-                    updateFormData={updateFormData}
-                  />
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <div className="mb-2 flex items-center">
-                  <h5 className="text-lg font-semibold text-gray-900">
-                    Parent / Guardian Information
-                  </h5>
-                  <div className="ml-4 flex-1 border-t-2 border-gray-900 opacity-70"></div>
-                </div>
-                <p className="mb-3 text-sm text-gray-800">
-                  Optional information for parent or guardian contact.
-                </p>
-
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  <InputField
-                    label="Parent's Name"
-                    field="parentName"
-                    placeholder="Abdul Rahman bin Ismail"
-                    required={false}
-                    formData={formData}
-                    errors={errors}
-                    updateFormData={updateFormData}
-                  />
-                  <InputField
-                    label="Parent's Phone"
-                    field="parentPhone"
-                    type="tel"
-                    placeholder="+60129876543"
-                    required={false}
-                    formData={formData}
-                    errors={errors}
-                    updateFormData={updateFormData}
-                  />
-                  <InputField
-                    label="Parent's Email"
-                    field="parentEmail"
-                    type="email"
-                    placeholder="parent@example.com"
-                    required={false}
                     formData={formData}
                     errors={errors}
                     updateFormData={updateFormData}
@@ -438,7 +700,6 @@ export default function StudentApplication() {
 
           {stage === 2 && (
             <div>
-
               <div className="mb-6">
                 <div className="mb-2 flex items-center">
                   <h4 className="text-lg font-semibold text-gray-900">
@@ -454,44 +715,49 @@ export default function StudentApplication() {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <SelectField
                   label="Highest Qualification"
-                  field="highestQualification"
+                  field="student.previous_educations[0].qualification"
                   options={QUALIFICATION_OPTIONS}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
-
                 <InputField
                   label="Institution Name"
-                  field="institutionName"
+                  field="student.previous_educations[0].institution_name"
                   placeholder="University of Malaya"
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
-
                 <InputField
                   label="Field of Study"
-                  field="fieldOfStudy"
+                  field="student.previous_educations[0].field_of_study"
                   placeholder="Computer Science"
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
-
                 <InputField
-                  label="Graduation Year"
-                  field="graduationYear"
+                  label="Started Date"
+                  field="student.previous_educations[0].start_date"
                   type="number"
-                  placeholder="2023"
+                  placeholder="2022"
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
-
+                <InputField
+                  label="Graduation Year"
+                  field="student.previous_educations[0].end_date"
+                  type="number"
+                  placeholder="2025"
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
                 <InputField
                   label="GPA / Grade"
-                  field="gpa"
+                  field="student.previous_educations[0].grade"
                   placeholder="3.75 / 4.0"
                   formData={formData}
                   errors={errors}
@@ -506,17 +772,25 @@ export default function StudentApplication() {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <SelectField
                   label="Test Type"
-                  field="englishTest"
+                  field="student.english_proficiencies[0].test_type"
                   options={ENGLISH_TEST_OPTIONS}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
-
                 <InputField
                   label="Overall Score"
-                  field="testScore"
+                  field="student.english_proficiencies[0].score"
                   placeholder="7.0"
+                  required={false}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Test Date"
+                  field="student.english_proficiencies[0].test_date"
+                  type="date"
                   required={false}
                   formData={formData}
                   errors={errors}
@@ -528,7 +802,6 @@ export default function StudentApplication() {
 
           {stage === 3 && (
             <div>
-
               <div className="mb-6">
                 <div className="mb-2 flex items-center">
                   <h4 className="text-lg font-semibold text-gray-900">
@@ -541,12 +814,14 @@ export default function StudentApplication() {
                 </p>
               </div>
 
-
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <SelectField
                   label="University"
-                  field="universityName"
-                  options={MALAYSIAN_UNIVERSITIES}
+                  field="university_id"
+                  options={universities.map((u) => ({
+                    value: String(u.id),
+                    label: u.name,
+                  }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
@@ -554,18 +829,14 @@ export default function StudentApplication() {
 
                 <SelectField
                   label="Program"
-                  field="programName"
-                  options={MASTER_PROGRAMS}
-                  formData={formData}
-                  errors={errors}
-                  updateFormData={updateFormData}
-                />
-
-                <InputField
-                  label="Intake Year"
-                  field="intakeYear"
-                  type="number"
-                  placeholder="2025"
+                  field="program_id"
+                  options={(
+                    universities.find((u) => u.id === formData.university_id)
+                      ?.programs || []
+                  ).map((p) => ({
+                    value: p.id,
+                    label: p.name,
+                  }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
@@ -576,7 +847,6 @@ export default function StudentApplication() {
 
           {stage === 4 && (
             <div>
-
               <div className="mb-6">
                 <div className="mb-2 flex items-center">
                   <h4 className="text-lg font-semibold text-gray-900">
@@ -585,34 +855,33 @@ export default function StudentApplication() {
                   <div className="ml-4 flex-1 border-t-2 border-gray-900 opacity-70"></div>
                 </div>
                 <p className="text-sm text-gray-800">
-                  You may provide an emergency contact for safety purposes. This is not required.
+                  You may provide an emergency contact for safety purposes. This
+                  is not required.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <InputField
                   label="Contact Name"
-                  field="emergencyName"
+                  field="student.emergency_contacts[0].name"
                   placeholder="Ahmad bin Ismail"
                   formData={formData}
                   errors={errors}
                   required={false}
                   updateFormData={updateFormData}
                 />
-
                 <InputField
                   label="Relationship"
-                  field="emergencyRelationship"
+                  field="student.emergency_contacts[0].relation"
                   placeholder="Father / Mother / Guardian"
                   formData={formData}
                   errors={errors}
                   required={false}
                   updateFormData={updateFormData}
                 />
-
                 <InputField
                   label="Phone Number"
-                  field="emergencyPhone"
+                  field="student.emergency_contacts[0].phone"
                   type="tel"
                   placeholder="+60123456789"
                   formData={formData}
@@ -620,22 +889,20 @@ export default function StudentApplication() {
                   required={false}
                   updateFormData={updateFormData}
                 />
-
                 <InputField
                   label="Email Address"
-                  field="emergencyEmail"
+                  field="student.emergency_contacts[0].email"
                   type="email"
-                  required={false}
                   placeholder="ahmad.ismail@example.com"
                   formData={formData}
                   errors={errors}
+                  required={false}
                   updateFormData={updateFormData}
                 />
-
                 <div className="md:col-span-2">
                   <InputField
                     label="Address"
-                    field="emergencyAddress"
+                    field="student.emergency_contacts[0].address"
                     required={false}
                     placeholder="No. 123, Jalan Bukit Bintang, Kuala Lumpur"
                     formData={formData}
@@ -649,7 +916,6 @@ export default function StudentApplication() {
 
           {stage === 5 && (
             <div>
-
               <div className="mb-6">
                 <div className="mb-2 flex items-center">
                   <h4 className="text-lg font-semibold text-gray-900">
@@ -658,90 +924,57 @@ export default function StudentApplication() {
                   <div className="ml-4 flex-1 border-t-2 border-gray-900 opacity-70"></div>
                 </div>
                 <p className="text-sm text-gray-800">
-                  Please upload all necessary documents to complete your application.
+                  Please upload all necessary documents to complete your
+                  application.
                 </p>
               </div>
 
-              <div className="p-4 m-y-2">
-                <h4 className="mb-3 text-sm font-semibold text-gray-800">
-                  Required Documents
-                </h4>
+              <div className="space-y-6">
+                {documentTypes.map((docType) => (
+                  <div
+                    key={docType.id}
+                    className="relative flex items-center justify-between rounded-md border border-default bg-white p-5 backdrop-blur transition-all duration-300 hover:shadow-sm"
+                  >
+                    <p className="mb-2 flex items-center justify-between font-medium text-blue-800 sm:mb-0">
+                      <File className="mr-2 h-4 w-4 text-blue-900" />
 
-                <ul className="space-y-0">
-                  {REQUIRED_DOCUMENTS.map((doc, index) => (
-                    <li
-                      key={index}
-                      className="flex items-start gap-2 rounded-md p-0 "
-                    >
-                      <Check className="mt-1 text-blue-700 w-4 h-4 flex-shrink-0" />
-                      <span className="text-p2 text-text-muted">{doc}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-
-              <div className="mb-4">
-                <label className="block">
-                  <div className="cursor-pointer rounded-md border-2 border-dashed p-8 text-center hover:border-blue-500">
-                    <Upload
-                      size={40}
-                      className="mx-auto mb-2 text-text-muted"
-                    />
-                    <p className="text-sm">Click to upload or drag and drop</p>
-                    <p className="text-xs text-text-muted">
-                      PDF, PNG, JPG (MAX 10MB)
+                      <span>
+                        {docType.type.charAt(0).toUpperCase() +
+                          docType.type.slice(1)}
+                      </span>
                     </p>
+
+                    <div className="flex items-center gap-3">
+
+                      <button
+                        type="button"
+                        onClick={() => removeDocument(docType.id)}
+                        className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-text-error text-text-error px-4 py-2.5 text-sm transition hover:border-text-error hover:text-text-error sm:w-auto"
+                      >
+                        <Trash className="h-4 w-4" />
+                        <span className="hidden sm:inline">Remove</span>
+                      </button>
+
+                      <label
+                        className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-blue-600 hover:text-blue-600 sm:w-auto"
+                      >
+                        <Upload className="h-4 w-4" />
+                        <span className="hidden sm:inline">Upload</span>
+                        <input
+                          type="file"
+                          className="hidden"
+                          onChange={(e) => handleFileUpload(e, docType.id)}
+                        />
+                      </label>
+                    </div>
+
+
                   </div>
-
-                  <input
-                    type="file"
-                    multiple
-                    accept=".pdf,.jpg,.jpeg,.png"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
-
-                {errors.uploadedDocs && (
-                  <p className="mt-2 text-xs text-red-600">
-                    {errors.uploadedDocs}
-                  </p>
-                )}
+                ))}
               </div>
 
-              {formData.uploadedDocs.length > 0 && (
-                <div>
-                  <h5 className="mb-2 font-semibold text-text-primary">
-                    Uploaded Documents:
-                  </h5>
-
-                  <div className="space-y-2">
-                    {formData.uploadedDocs.map((doc, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-between rounded-md border bg-card p-3"
-                      >
-                        <div className="flex items-center gap-3">
-                          <FileText size={20} className="text-blue-500" />
-                          <div>
-                            <p className="text-sm font-medium">{doc.name}</p>
-                            <p className="text-xs text-text-muted">
-                              {doc.size}
-                            </p>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() => removeDocument(idx)}
-                          className="text-sm text-red-600"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              {errors.documents && (
+                <p className="mt-2 text-xs text-red-600">{errors.documents}</p>
               )}
             </div>
           )}
@@ -778,8 +1011,6 @@ export default function StudentApplication() {
               </button>
             )}
           </div>
-
-          {showPopup && <NewApplicationSuccess />}
         </div>
       </div>
     </section>

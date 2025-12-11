@@ -10,13 +10,7 @@ import Link from "next/link";
 import avatar from "/public/img/avatars/user.png";
 import api from "../../lib/useApi";
 import { useRouter } from "next/navigation";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
+import { useMe } from "hooks/useMe";
 
 const Navbar = ({
                   onOpenSidenav,
@@ -35,19 +29,7 @@ const Navbar = ({
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get("/auth/me");
-        setUser(res.data);
-      } catch (err) {
-        console.error("Failed to fetch user", err);
-      }
-    };
-    fetchUser();
-  }, []);
+  const { user, loading, error } = useMe(); // useMe hook
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -74,14 +56,18 @@ const Navbar = ({
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await api.post("/auth/logout");
+      await api.post("/auth/logout").catch(() => {});
     } catch (err) {
       console.error("Logout API error:", err);
     }
+
     localStorage.clear();
     sessionStorage.clear();
     deleteAllCookies();
-    await router.push("/auth/sign-in");
+
+    setTimeout(() => {
+      router.push("/auth/sign-in");
+    }, 100);
   };
 
   return (
@@ -114,7 +100,6 @@ const Navbar = ({
       </div>
 
       <div className="relative mt-3 flex w-fit items-center gap-4 rounded-full border border-default bg-card px-2 py-2">
-
         <span
           className="flex h-5 w-5 cursor-pointer items-center justify-center xl:hidden"
           onClick={onOpenSidenav}
@@ -137,10 +122,9 @@ const Navbar = ({
           classNames="py-2 top-8 -left-[180px] w-max"
         >
           <div className="flex flex-col w-56 rounded-[12px] border border-default bg-card shadow-sm text-sm">
-
             <div className="flex items-center gap-2 p-4">
               <p className="text-text-primary font-semibold">
-                Hey, {user ? user.name : "User"}
+                Hey, {loading ? "Loading..." : user?.name || "User"}
               </p>
             </div>
 
@@ -163,9 +147,7 @@ const Navbar = ({
                 className="group flex items-center gap-2 rounded-lg px-3 py-2 font-medium text-failed transition-colors duration-200 hover:bg-failed/10 hover:text-failed-hover disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <LogOut className="h-4 w-4 text-failed group-hover:text-failed-hover" />
-                <span>
-                  {isLoggingOut ? "Logging out..." : "Logout"}
-                </span>
+                <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
               </button>
             </div>
           </div>
