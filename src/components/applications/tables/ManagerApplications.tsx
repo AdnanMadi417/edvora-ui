@@ -90,26 +90,26 @@ const ModernApplicationsTable = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter((app) =>
-        app.studentName.toLowerCase().includes(term) ||
-        app.studentEmail.toLowerCase().includes(term) ||
-        app.university.toLowerCase().includes(term) ||
-        app.applicationName.toLowerCase().includes(term) ||
-        app.partner.toLowerCase().includes(term) ||
-        app.stage.toLowerCase().includes(term),
+        (app.studentName?.toLowerCase() ?? '').includes(term) ||
+        (app.studentEmail?.toLowerCase() ?? '').includes(term) ||
+        (app.university?.toLowerCase() ?? '').includes(term) ||
+        (app.applicationName?.toLowerCase() ?? '').includes(term) ||
+        (app.partner?.toLowerCase() ?? '').includes(term) ||
+        (app.stage?.toLowerCase() ?? '').includes(term)
       );
     }
 
     if (filterStatus !== 'all_status') {
       filtered = filtered.filter(
         (app) =>
-          app.status?.toLowerCase().replace(/\s+/g, '_') === filterStatus,
+          (app.status?.toLowerCase().replace(/\s+/g, '_') ?? '') === filterStatus
       );
     }
 
     if (filterStages !== 'all_stages') {
       filtered = filtered.filter(
         (app) =>
-          app.stage?.toLowerCase().replace(/\s+/g, '_') === filterStages,
+          (app.stage?.toLowerCase().replace(/\s+/g, '_') ?? '') === filterStages
       );
     }
 

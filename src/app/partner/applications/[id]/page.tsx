@@ -7,8 +7,9 @@ import Cookies from "js-cookie";
 import EmptyData from "components/emptyData/EmptyData";
 import ApplicationDetails from "../../../../components/applications/details/partner/ApplicationDetails";
 import ApplicationDocuments from "../../../../components/applications/details/partner/ApplicationDocuments";
+import OfferLetterDecision from "../../../../components/applications/details/partner/OfferLetterDecision";
+import VisaTrackingTimeline from "../../../../components/applications/details/partner/VisaTrackingTimeline";
 import Loading from "components/loading/Loading";
-
 
 export default function ApplicationPage() {
   const { id } = useParams();
@@ -49,6 +50,8 @@ export default function ApplicationPage() {
     <>
       <ApplicationDetails application={application} />
       <ApplicationDocuments application={application} />
+      <OfferLetterDecision application={application} />
+      {/*<VisaTrackingTimeline application={application} />*/}
     </>
   );
 }

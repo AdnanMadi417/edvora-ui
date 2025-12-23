@@ -192,15 +192,6 @@ export default function ApplicationDocuments({
                 <div className="ml-4 flex flex-wrap gap-2">
 
                   <button
-                    className="group rounded-full cursor-pointer border border-transparent bg-green-100 p-2 text-green-700 transition-all duration-200 hover:border-green-300 hover:bg-green-200 hover:text-green-800 focus-visible:ring-2 focus-visible:ring-green-500"
-                    title="Approved"
-                    aria-label="Approved"
-                    disabled={!doc.file_key}
-                  >
-                    <CheckCircle className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
-
-                  <button
                     onClick={(e) => {
                       e.stopPropagation();
                       if (!doc.file_key) return;
