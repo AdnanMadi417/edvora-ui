@@ -240,6 +240,7 @@ const ModernApplicationsTable = () => {
                 <option value="all_stages">All Stages</option>
                 <option value="application_review">Application Review</option>
                 <option value="offer_letter">Offer Letter</option>
+                <option value="visa_processing">Visa Processing</option>
               </select>
             </div>
 

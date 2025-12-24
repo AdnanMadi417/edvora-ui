@@ -49,8 +49,8 @@ export default function ApplicationPage() {
   return (
     <>
       <ApplicationDetails application={application} />
-      <ApplicationDocuments application={application} />
       <OfferLetterDecision application={application} />
+      <ApplicationDocuments application={application} />
       {/*<VisaTrackingTimeline application={application} />*/}
     </>
   );

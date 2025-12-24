@@ -45,8 +45,8 @@ export default function ApplicationPage() {
   return (
     <>
       <ApplicationDetails application={application} />
-      <ApplicationDocuments application={application} />
       <OfferLetterCard application={application} />
+      <ApplicationDocuments application={application} />
     </>
   );
 }

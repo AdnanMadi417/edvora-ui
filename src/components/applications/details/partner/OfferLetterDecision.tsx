@@ -3,6 +3,7 @@ import { FaFilePdf } from "react-icons/fa";
 import { Download } from "lucide-react";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { submitOfferLetterDecision } from "services/offerLetterService";
+import { useToast } from "../../../context/ToastContext";
 
 export type OfferLetterDecisionType = "accept" | "reject";
 
@@ -17,12 +18,32 @@ interface OfferLetterDecisionPayload {
 }
 
 export default function OfferLetterDecision({
-                                              application,
-                                            }: OfferLetterDecisionProps) {
+  application,
+}: OfferLetterDecisionProps) {
   const offerLetter = application?.offer_letter_document;
 
   const [downloading, setDownloading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const { showToast } = useToast();
+
+  const status = Number(offerLetter.status);
+
+  const isPending = status === 1;
+  const isAccepted = status === 2;
+  const isRejected = status === 3;
+
+  const getStatusLabel = (status: number | string) => {
+    switch (Number(status)) {
+      case 1:
+        return "Pending";
+      case 2:
+        return "Accepted";
+      case 3:
+        return "Rejected";
+      default:
+        return "Unknown";
+    }
+  };
 
   const handleDownload = async (fileKey?: string) => {
     if (!fileKey || downloading) return;
@@ -60,29 +81,34 @@ export default function OfferLetterDecision({
 
       await submitOfferLetterDecision(application.id, payload);
 
-      alert(
+      // Show toast for 2 seconds
+      showToast(
         decision === "accept"
-          ? "Offer accepted successfully"
-          : "Offer rejected successfully"
+          ? "Offer accepted successfully."
+          : "Offer rejected successfully.",
+        "success"
       );
 
-      // 🔁 Optional: refresh or update UI state here
+      // Reload page after 3 seconds
+      setTimeout(() => {
+        location.reload();
+      }, 3000);
     } catch (err: any) {
       console.error(err);
-      alert(err?.response?.data?.message || "Failed to submit decision");
+      showToast(
+        err?.response?.data?.message || "Failed to submit decision",
+        "error"
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
-
   if (!offerLetter) return null;
-
 
   return (
     <section>
       <div className="mb-5 mt-5 space-y-4 rounded-lg border border-default bg-card p-4 shadow-sm sm:p-6">
-
         <div className="flex items-start gap-4">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
             <FaFilePdf className="text-lg text-blue-700" />
@@ -92,11 +118,10 @@ export default function OfferLetterDecision({
             <h3 className="text-lg font-semibold text-gray-900">
               University Offer Letter
             </h3>
-            <span
-              className="mt-1 inline-flex text-sm text-text-muted items-center gap-2 rounded-full px-3 py-1 font-semibold">
+
+            <span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">
               <FaFilePdf className="h-3 w-3" />
-              Status {" "}
-              {offerLetter.status}
+              Status {getStatusLabel(offerLetter.status)}
             </span>
           </div>
         </div>
@@ -114,9 +139,7 @@ export default function OfferLetterDecision({
           <div className="flex items-center gap-3">
             <FaFilePdf className="text-2xl text-red-500" />
             <div className="min-w-0">
-              <p className="truncate font-medium text-gray-900">
-                {offerLetter.file_key.split("/").pop()}
-              </p>
+              <p className="truncate font-medium text-gray-900">Offer Letter</p>
               <p className="text-xs text-gray-500">
                 PDF • Uploaded on{" "}
                 {new Date(offerLetter.created_at).toLocaleDateString()}
@@ -134,26 +157,29 @@ export default function OfferLetterDecision({
           </button>
         </div>
 
-        <p className="text-sm text-text-muted">
-          Please review the offer letter carefully before accepting or rejecting.
-        </p>
+        {!isAccepted && (
+          <p className="text-sm text-text-muted">
+            Please review the offer letter carefully before accepting or
+            rejecting.
+          </p>
+        )}
 
         <div className="flex flex-col justify-end gap-3 sm:flex-row">
           <button
             onClick={() => handleDecision("accept")}
             disabled={submitting}
-            className="rounded-full border border-blue-500 px-4 py-2.5 text-sm text-blue-500 transition hover:border-blue-700 hover:text-blue-700 disabled:opacity-50"
+            className="rounded-full border border-blue-500 px-4 py-2.5 text-sm text-blue-500"
           >
             Accept Offer
           </button>
 
-          <button
-            onClick={() => handleDecision("reject")}
-            disabled={submitting}
-            className="rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error disabled:opacity-50"
-          >
-            Reject Offer
-          </button>
+          {/*<button*/}
+          {/*  onClick={() => handleDecision("reject")}*/}
+          {/*  disabled={submitting}*/}
+          {/*  className="rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error disabled:opacity-50"*/}
+          {/*>*/}
+          {/*  Reject Offer*/}
+          {/*</button>*/}
         </div>
       </div>
     </section>

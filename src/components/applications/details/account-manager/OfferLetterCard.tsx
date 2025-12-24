@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { Download } from "lucide-react";
 import { getDocumentDownloadUrl } from "services/documentService";
-import {
-  FaFilePdf,
-} from "react-icons/fa";
+import { FaFilePdf } from "react-icons/fa";
 
 interface OfferLetterDecisionProps {
   application: any;
@@ -13,6 +11,19 @@ export default function OfferLetterDecision({
   application,
 }: OfferLetterDecisionProps) {
   const offerLetter = application?.offer_letter_document;
+
+  const getStatusLabel = (status: number | string) => {
+    switch (Number(status)) {
+      case 1:
+        return "Pending";
+      case 2:
+        return "Accepted";
+      case 3:
+        return "Rejected";
+      default:
+        return "Unknown";
+    }
+  };
 
   const [downloading, setDownloading] = useState(false);
 
@@ -45,11 +56,9 @@ export default function OfferLetterDecision({
             <h3 className="text-lg font-semibold text-gray-900">
               University Offer Letter
             </h3>
-            <span
-              className="mt-1 inline-flex text-sm text-text-muted items-center gap-2 rounded-full px-3 py-1 font-semibold">
+            <span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">
               <FaFilePdf className="h-3 w-3" />
-              Status {" "}
-              {offerLetter.status}
+              Status {getStatusLabel(offerLetter.status)}
             </span>
           </div>
         </div>
@@ -58,9 +67,7 @@ export default function OfferLetterDecision({
           <div className="flex items-center gap-3">
             <FaFilePdf className="text-2xl text-red-500" />
             <div className="min-w-0">
-              <p className="truncate font-medium text-gray-900">
-                {offerLetter.file_key.split("/").pop()}
-              </p>
+              <p className="truncate font-medium text-gray-900">Offer Letter</p>
               <p className="text-xs text-gray-500">
                 PDF • Uploaded on{" "}
                 {new Date(offerLetter.created_at).toLocaleDateString()}

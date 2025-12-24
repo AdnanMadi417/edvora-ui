@@ -308,6 +308,8 @@ export default function UpdateStatusPopup({
 
       if (isUniversityApproved && offerLetterFile) {
 
+        showToast('Uploading offer letter...', 'info');
+
         const presigned = await getPresignedUploads(
           [offerLetterFile],
           'documents',
