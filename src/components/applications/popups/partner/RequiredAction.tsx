@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Pause, XCircle } from "lucide-react";
+import { FaExclamationCircle } from "react-icons/fa";
 import api from "../../../../lib/useApi";
 import { FaFileAlt } from "react-icons/fa";
 import { useToast } from "components/context/ToastContext";
@@ -56,7 +57,6 @@ export default function RequiredAction({
 
     showToast(`File uploaded successfully.`, "success");
   };
-
 
   const handleConfirm = async () => {
     try {
@@ -160,11 +160,24 @@ export default function RequiredAction({
                             key={doc.id}
                             className="flex flex-col items-start justify-between gap-3 border-b border-gray-100 pb-3 last:border-b-0 sm:flex-row sm:items-center"
                           >
-                            <div className="flex items-center gap-2">
-                              <FaFileAlt className="h-5 w-5 text-blue-600" />
-                              <span className="text-sm font-medium text-text-muted">
-                                {doc.description} ({doc.type})
-                              </span>
+                            <div className="block">
+                              <div className="flex items-center gap-2">
+                                <FaFileAlt className="h-5 w-5 text-blue-600" />
+                                <span className="text-sm font-medium text-text-muted">
+                                  {doc.description} ({doc.type})
+                                </span>
+                              </div>
+                              {appDetails.correction_reason && (
+                                <div className="flex items-center gap-2 pl-7">
+                                  <span className="flex items-center gap-1 text-xs font-medium tracking-wider text-text-muted">
+                                    <FaExclamationCircle className="" />
+                                    Reason:
+                                  </span>
+                                  <span className="text-sm text-text-muted">
+                                    {appDetails.correction_reason}
+                                  </span>
+                                </div>
+                              )}
                             </div>
 
                             <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">

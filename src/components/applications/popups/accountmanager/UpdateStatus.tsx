@@ -1,18 +1,21 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   XCircle,
   Clock,
-  Plus,
   Trash2,
   AlertCircle,
   Pause,
   CheckCircle,
-} from "lucide-react";
-import api from "../../../../lib/useApi";
-import { useToast } from "../../../context/ToastContext";
-import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
+} from 'lucide-react';
+import api from '../../../../lib/useApi';
+import { useToast } from '../../../context/ToastContext';
+import NoDocumentsRequired from 'components/emptyData/NoDocumentsRequired';
+import {
+  getPresignedUploads,
+  uploadFilesToSpaces,
+} from 'services/uploadService';
 
 interface DocumentRequest {
   id: string;
@@ -40,14 +43,14 @@ interface DocumentRequestListProps {
 }
 
 const DocumentRequestList = ({
-  documents,
-  setDocuments,
-  documentTypes,
-}: DocumentRequestListProps) => {
+                               documents,
+                               setDocuments,
+                               documentTypes,
+                             }: DocumentRequestListProps) => {
   const addDocument = () => {
     setDocuments([
       ...documents,
-      { id: Date.now().toString(), type: [], reason: "" },
+      { id: Date.now().toString(), type: [], reason: '' },
     ]);
   };
 
@@ -60,10 +63,10 @@ const DocumentRequestList = ({
   const updateDocument = (
     id: string,
     field: keyof DocumentRequest,
-    value: any
+    value: any,
   ) => {
     setDocuments(
-      documents.map((doc) => (doc.id === id ? { ...doc, [field]: value } : doc))
+      documents.map((doc) => (doc.id === id ? { ...doc, [field]: value } : doc)),
     );
   };
 
@@ -75,7 +78,7 @@ const DocumentRequestList = ({
       ? doc.type.filter((t) => t !== typeId)
       : [...doc.type, typeId];
 
-    updateDocument(docId, "type", newTypes);
+    updateDocument(docId, 'type', newTypes);
   };
 
   return (
@@ -140,14 +143,6 @@ const DocumentRequestList = ({
           </div>
         </div>
       ))}
-
-      <button
-        onClick={addDocument}
-        className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-blue-300 bg-blue-50/50 px-4 py-3 text-p2 font-medium text-blue-700 hover:border-blue-400 hover:bg-blue-100"
-      >
-        <Plus className="h-4 w-4" />
-        Add Another Document
-      </button>
     </div>
   );
 };
@@ -160,67 +155,68 @@ interface UpdateStatusPopupProps {
 }
 
 export default function UpdateStatusPopup({
-  isOpen,
-  onClose,
-  onConfirm,
-  application,
-}: UpdateStatusPopupProps) {
-  const [selectedStatus, setSelectedStatus] = useState<string>("");
-  const [reason, setReason] = useState("");
-  const [notes, setNotes] = useState("");
+                                            isOpen,
+                                            onClose,
+                                            onConfirm,
+                                            application,
+                                          }: UpdateStatusPopupProps) {
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [reason, setReason] = useState('');
+  const [notes, setNotes] = useState('');
   const [documents, setDocuments] = useState<DocumentRequest[]>([
-    { id: "1", type: [], reason: "" },
+    { id: '1', type: [], reason: '' },
   ]);
   const [statusOptions, setStatusOptions] = useState<StatusOption[]>([]);
   const [documentTypes, setDocumentTypes] = useState<
     { id: string; label: string }[]
   >([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
+  const selectedOption = statusOptions.find((opt) => opt.id === selectedStatus);
 
   const getStatusStyle = (name: string) => {
     const lower = name.toLowerCase();
-    if (lower.includes("approve"))
+    if (lower.includes('approve'))
       return {
         icon: CheckCircle,
-        color: "text-green-600",
-        bgColor: "bg-green-50",
-        borderColor: "border-green-200",
+        color: 'text-green-600',
+        bgColor: 'bg-green-50',
+        borderColor: 'border-green-200',
       };
-    if (lower.includes("reject") || lower.includes("denied"))
+    if (lower.includes('reject') || lower.includes('denied'))
       return {
         icon: XCircle,
-        color: "text-red-600",
-        bgColor: "bg-red-50",
-        borderColor: "border-red-200",
+        color: 'text-red-600',
+        bgColor: 'bg-red-50',
+        borderColor: 'border-red-200',
       };
-    if (lower.includes("review"))
+    if (lower.includes('review'))
       return {
         icon: Clock,
-        color: "text-yellow-600",
-        bgColor: "bg-yellow-50",
-        borderColor: "border-yellow-200",
+        color: 'text-yellow-600',
+        bgColor: 'bg-yellow-50',
+        borderColor: 'border-yellow-200',
       };
-    if (lower.includes("pending") || lower.includes("waiting"))
+    if (lower.includes('pending') || lower.includes('waiting'))
       return {
         icon: Pause,
-        color: "text-gray-600",
-        bgColor: "bg-gray-50",
-        borderColor: "border-gray-200",
+        color: 'text-gray-600',
+        bgColor: 'bg-gray-50',
+        borderColor: 'border-gray-200',
       };
-    if (lower.includes("correction"))
+    if (lower.includes('correction'))
       return {
         icon: AlertCircle,
-        color: "text-orange-600",
-        bgColor: "bg-orange-50",
-        borderColor: "border-orange-200",
+        color: 'text-orange-600',
+        bgColor: 'bg-orange-50',
+        borderColor: 'border-orange-200',
       };
     return {
       icon: Clock,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200",
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-50',
+      borderColor: 'border-blue-200',
     };
   };
 
@@ -236,24 +232,24 @@ export default function UpdateStatusPopup({
           (appData.document_types || []).map((d: any) => ({
             id: d.id,
             label: d.description || d.type,
-          }))
+          })),
         );
 
         const options: StatusOption[] = (appData.stage_statuses || []).map(
           (s: any) => {
             const matchingAction = (appData.available_actions || []).find(
-              (a) => a.status === s.name
+              (a) => a.status === s.name,
             );
             return {
               id: s.id,
               label: s.name,
-              description: s.description ?? "",
-              nextAction: matchingAction?.next_action ?? "",
+              description: s.description ?? '',
+              nextAction: matchingAction?.next_action ?? '',
               ...getStatusStyle(s.name),
               requiresReason: !!s.is_requires_reason,
               requiresDocumentSelection: !!s.is_requires_document_selection,
             };
-          }
+          },
         );
 
         setStatusOptions(options);
@@ -266,48 +262,109 @@ export default function UpdateStatusPopup({
     fetchApplicationDetails();
   }, [isOpen, application?.id]);
 
-  const selectedOption = statusOptions.find((opt) => opt.id === selectedStatus);
   const requiresReason = selectedOption?.requiresReason || false;
   const requiresDocuments = selectedOption?.requiresDocumentSelection || false;
 
+  const isUniversityApproved = selectedOption?.label === 'University Approved';
+  const [offerLetterFile, setOfferLetterFile] = useState<File | null>(null);
+
   const validateForm = () => {
-    if (!selectedStatus) return setError("Please select a status"), false;
-    if (requiresReason && !reason.trim())
-      return setError("Reason is required for this status"), false;
-    if (requiresDocuments && documents.some((doc) => !doc.type))
-      return setError("Please select a document type for all documents"), false;
-    setError("");
+    if (!selectedStatus) {
+      setError('Please select a status');
+      return false;
+    }
+
+    if (requiresReason && !reason.trim()) {
+      setError('Reason is required for this status');
+      return false;
+    }
+
+    if (requiresDocuments && !isUniversityApproved) {
+      if (documents.some((doc) => doc.type.length === 0)) {
+        setError('Please select at least one document type');
+        return false;
+      }
+    }
+
+    if (isUniversityApproved && !offerLetterFile) {
+      setError('Please upload the offer letter');
+      return false;
+    }
+
+    setError('');
     return true;
   };
 
   const handleConfirm = async () => {
     if (!validateForm() || !application?.id) return;
+
+
     setIsSubmitting(true);
 
     try {
-      const selectedDocumentTypeIds: string[] = requiresDocuments
-        ? documents.flatMap((doc) => doc.type).filter(Boolean)
-        : [];
+      let uploadedFileKey = '';
+      let uploadedFileUrl = '';
+
+
+      if (isUniversityApproved && offerLetterFile) {
+
+        showToast('Uploading offer letter...', 'info');
+
+        const presigned = await getPresignedUploads(
+          [offerLetterFile],
+          'documents',
+        );
+
+        const results = await uploadFilesToSpaces(
+          [offerLetterFile],
+          presigned,
+        );
+
+        const uploadedFile = results?.[0];
+
+        if (!uploadedFile?.file_key || !uploadedFile?.public_url) {
+          throw new Error('Offer letter upload failed');
+        }
+
+        showToast('Offer letter uploaded successfully.', 'success');
+
+        uploadedFileKey = uploadedFile.file_key;
+        uploadedFileUrl = uploadedFile.public_url;
+
+        await api.post(
+          `/applications/${application.id}/offer-letter`,
+          {
+            file_key: uploadedFileKey,
+            file_url: uploadedFileUrl,
+          },
+        );
+      }
 
       const payload = {
         status_id: selectedStatus,
         reason_text: reason.trim(),
         notes: notes.trim(),
-        required_document_type_ids: selectedDocumentTypeIds,
+        required_document_type_ids:
+          requiresDocuments && !isUniversityApproved
+            ? documents.flatMap((doc) => doc.type)
+            : [],
       };
 
       await api.post(`/applications/${application.id}/status`, payload);
 
-      showToast("Status updated successfully.", "success");
+      showToast('Status updated successfully.', 'success');
 
       setTimeout(() => window.location.reload(), 2000);
 
       onConfirm(selectedStatus, reason, notes);
-
       handleClose();
     } catch (err: any) {
-      const msg = err.response?.data?.message || "Failed to update status.";
-      showToast(msg, "error");
+      const msg =
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to update status.';
+
+      showToast(msg, 'error');
       setError(msg);
     } finally {
       setIsSubmitting(false);
@@ -315,11 +372,11 @@ export default function UpdateStatusPopup({
   };
 
   const handleClose = () => {
-    setSelectedStatus("");
-    setReason("");
-    setNotes("");
-    setDocuments([{ id: "1", type: [], reason: "" }]);
-    setError("");
+    setSelectedStatus('');
+    setReason('');
+    setNotes('');
+    setDocuments([{ id: '1', type: [], reason: '' }]);
+    setError('');
     onClose();
   };
 
@@ -337,7 +394,8 @@ export default function UpdateStatusPopup({
         <div className="relative border-b border-default px-6 pb-4 pt-6">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
+              <div
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
                 <Clock className="h-6 w-6 text-blue-600" strokeWidth={2.5} />
               </div>
               <div>
@@ -345,19 +403,19 @@ export default function UpdateStatusPopup({
                   Update Application Status
                 </h5>
 
-                <div className="mt-1 flex items-center gap-2 text-sm text-gray-700">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
+                <div className="mt-1 flex items-center gap-2 text-sm text-text-muted">
+                  <CheckCircle className="h-4 w-4" />
                   <span className="font-medium">Stage:</span>
                   <span className="font-normal">
-                    {application?.stage?.name || "No Stage"}
+                    {application?.stage?.name || 'No Stage'}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-caption text-gray-600">
-                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                <div className="flex items-center gap-2 text-caption text-text-muted">
+                  <AlertCircle className="h-4 w-4 " />
                   <span className="font-medium">Status:</span>
                   <span className="font-normal">
-                    {application?.stage?.statuses?.[0]?.name || "No Status"}
+                    {application?.stage?.statuses?.[0]?.name || 'No Status'}
                   </span>
                 </div>
               </div>
@@ -417,17 +475,15 @@ export default function UpdateStatusPopup({
                 return (
                   <div
                     key={option.id}
-                    title={isDisabled ? "You cannot select this option." : ""}
-                    onClick={() =>
-                      !isDisabled && setSelectedStatus(option.id)
-                    }
+                    title={isDisabled ? 'You cannot select this option.' : ''}
+                    onClick={() => !isDisabled && setSelectedStatus(option.id)}
                     className={`rounded-md border p-4 transition-all 
     ${
                       isDisabled
-                        ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60"
+                        ? 'cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60'
                         : isSelected
                           ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
-                          : "cursor-pointer border-default bg-card hover:border-gray-300 hover:shadow"
+                          : 'cursor-pointer border-default bg-card hover:border-gray-300 hover:shadow'
                     }
   `}
                   >
@@ -437,8 +493,8 @@ export default function UpdateStatusPopup({
                           isSelected
                             ? option.color
                             : isDisabled
-                              ? "text-gray-400"
-                              : "text-gray-400"
+                              ? 'text-gray-400'
+                              : 'text-gray-400'
                         }`}
                       />
                       <div>
@@ -447,7 +503,7 @@ export default function UpdateStatusPopup({
                         </p>
                         {option.nextAction && (
                           <p className="mt-1 text-xs text-text-muted">
-                            <span className="font-medium">Next :</span>{" "}
+                            <span className="font-medium">Next :</span>{' '}
                             {option.nextAction}
                           </p>
                         )}
@@ -464,12 +520,92 @@ export default function UpdateStatusPopup({
             )}
           </div>
 
-          {requiresDocuments && (
+          {/* Document selection for ALL other statuses */}
+          {requiresDocuments && !isUniversityApproved && (
             <DocumentRequestList
               documents={documents}
               setDocuments={setDocuments}
               documentTypes={documentTypes}
             />
+          )}
+
+          {isUniversityApproved && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900">
+                Upload Offer Letter <span className="text-red-500">*</span>
+              </label>
+
+              <label
+                htmlFor="offer-letter"
+                className="
+    group relative flex cursor-pointer flex-col items-center justify-center
+    rounded-md border-2 border-dashed border-gray-300
+    bg-white px-6 py-10 text-center
+    transition-all duration-200
+    hover:border-blue-500 hover:bg-blue-50/40
+    disabled:cursor-not-allowed
+  "
+              >
+                <div
+                  className="
+      mb-4 flex h-14 w-14 items-center justify-center
+      rounded-full bg-blue-100 text-blue-600
+      transition
+    "
+                >
+                  <svg
+                    className="h-7 w-7"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 16V8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+                    />
+                  </svg>
+                </div>
+
+                <p className="text-sm font-semibold text-gray-800">
+                  Upload Offer Letter
+                </p>
+
+                <p className="mt-3 rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">
+                  PDF Max 5MB
+                </p>
+
+                <input
+                  id="offer-letter"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="hidden"
+                  disabled={isSubmitting}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    setOfferLetterFile(file || null);
+                  }}
+                />
+
+              </label>
+
+              {offerLetterFile && (
+                <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
+                  <span className="truncate text-sm text-text-muted">
+                    {offerLetterFile.name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setOfferLetterFile(null)}
+                    className="bg-background flex items-center justify-center outline-0 gap-2 border rounded-full border-red-500 text-red-500 px-4 py-2.5 text-sm text-text-muted transition hover:border-red-800 hover:text-red-800 sm:w-auto"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+
+            </div>
           )}
 
           {requiresReason && (
@@ -505,7 +641,7 @@ export default function UpdateStatusPopup({
             }
             className="rounded-full bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {isSubmitting ? "Updating..." : "Update Status"}
+            {isSubmitting ? 'Updating...' : 'Update Status'}
           </button>
         </div>
       </div>

@@ -77,26 +77,26 @@ const PartnerApplications = () => {
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter((app) =>
-        app.studentName.toLowerCase().includes(term) ||
-        app.studentEmail.toLowerCase().includes(term) ||
-        app.university.toLowerCase().includes(term) ||
-        app.applicationName.toLowerCase().includes(term) ||
-        app.partner.toLowerCase().includes(term) ||
-        app.stage.toLowerCase().includes(term),
+        (app.studentName?.toLowerCase() ?? '').includes(term) ||
+        (app.studentEmail?.toLowerCase() ?? '').includes(term) ||
+        (app.university?.toLowerCase() ?? '').includes(term) ||
+        (app.applicationName?.toLowerCase() ?? '').includes(term) ||
+        (app.partner?.toLowerCase() ?? '').includes(term) ||
+        (app.stage?.toLowerCase() ?? '').includes(term)
       );
     }
 
     if (filterStatus !== 'all_status') {
       filtered = filtered.filter(
         (app) =>
-          app.status?.toLowerCase().replace(/\s+/g, '_') === filterStatus,
+          (app.status?.toLowerCase().replace(/\s+/g, '_') ?? '') === filterStatus
       );
     }
 
     if (filterStages !== 'all_stages') {
       filtered = filtered.filter(
         (app) =>
-          app.stage?.toLowerCase().replace(/\s+/g, '_') === filterStages,
+          (app.stage?.toLowerCase().replace(/\s+/g, '_') ?? '') === filterStages
       );
     }
 
@@ -227,6 +227,7 @@ const PartnerApplications = () => {
                 <option value="all_stages">All Stages</option>
                 <option value="application_review">Application Review</option>
                 <option value="offer_letter">Offer Letter</option>
+                <option value="visa_processing">Visa Processing</option>
               </select>
             </div>
 

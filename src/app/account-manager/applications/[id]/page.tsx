@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import EmptyData from "components/emptyData/EmptyData";
 import ApplicationDetails from "../../../../components/applications/details/account-manager/ApplicationDetails";
 import ApplicationDocuments from "../../../../components/applications/details/account-manager/ApplicationDocuments";
+import OfferLetterCard from "../../../../components/applications/details/account-manager/OfferLetterCard";
 import Loading from "components/loading/Loading";
 
 
@@ -44,6 +45,7 @@ export default function ApplicationPage() {
   return (
     <>
       <ApplicationDetails application={application} />
+      <OfferLetterCard application={application} />
       <ApplicationDocuments application={application} />
     </>
   );
