@@ -51,7 +51,7 @@ export default function ApplicationPage() {
       <ApplicationDetails application={application} />
       <OfferLetterDecision application={application} />
       <ApplicationDocuments application={application} />
-      {/*<VisaTrackingTimeline application={application} />*/}
+      <VisaTrackingTimeline application={application} />
     </>
   );
 }

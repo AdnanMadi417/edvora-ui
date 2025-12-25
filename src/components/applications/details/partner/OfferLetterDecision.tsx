@@ -27,10 +27,9 @@ export default function OfferLetterDecision({
   const { showToast } = useToast();
 
   const status = Number(offerLetter.status);
+  const isVisaProcessing = application?.stage?.name === "Visa Processing";
 
-  const isPending = status === 1;
   const isAccepted = status === 2;
-  const isRejected = status === 3;
 
   const getStatusLabel = (status: number | string) => {
     switch (Number(status)) {
@@ -119,10 +118,10 @@ export default function OfferLetterDecision({
               University Offer Letter
             </h3>
 
-            <span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">
-              <FaFilePdf className="h-3 w-3" />
-              Status {getStatusLabel(offerLetter.status)}
-            </span>
+            {/*<span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">*/}
+            {/*  <FaFilePdf className="h-3 w-3" />*/}
+            {/*  Status {getStatusLabel(offerLetter.status)}*/}
+            {/*</span>*/}
           </div>
         </div>
 
@@ -157,7 +156,7 @@ export default function OfferLetterDecision({
           </button>
         </div>
 
-        {!isAccepted && (
+        {!isVisaProcessing && !isAccepted && (
           <p className="text-sm text-text-muted">
             Please review the offer letter carefully before accepting or
             rejecting.
@@ -165,13 +164,16 @@ export default function OfferLetterDecision({
         )}
 
         <div className="flex flex-col justify-end gap-3 sm:flex-row">
-          <button
-            onClick={() => handleDecision("accept")}
-            disabled={submitting}
-            className="rounded-full border border-blue-500 px-4 py-2.5 text-sm text-blue-500"
-          >
-            Accept Offer
-          </button>
+
+          {!isVisaProcessing && !isAccepted && (
+            <button
+              onClick={() => handleDecision("accept")}
+              disabled={submitting}
+              className="rounded-full border border-blue-500 px-4 py-2.5 text-sm text-blue-500"
+            >
+              Accept Offer
+            </button>
+          )}
 
           {/*<button*/}
           {/*  onClick={() => handleDecision("reject")}*/}

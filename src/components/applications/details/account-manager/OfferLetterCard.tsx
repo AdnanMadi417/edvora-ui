@@ -56,10 +56,10 @@ export default function OfferLetterDecision({
             <h3 className="text-lg font-semibold text-gray-900">
               University Offer Letter
             </h3>
-            <span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">
-              <FaFilePdf className="h-3 w-3" />
-              Status {getStatusLabel(offerLetter.status)}
-            </span>
+            {/*<span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">*/}
+            {/*  <FaFilePdf className="h-3 w-3" />*/}
+            {/*  Status {getStatusLabel(offerLetter.status)}*/}
+            {/*</span>*/}
           </div>
         </div>
 
