@@ -16,6 +16,8 @@ import {
   getPresignedUploads,
   uploadFilesToSpaces,
 } from 'services/uploadService';
+import { InputField} from "components/form";
+
 
 interface DocumentRequest {
   id: string;
@@ -268,6 +270,43 @@ export default function UpdateStatusPopup({
   const isUniversityApproved = selectedOption?.label === 'University Approved';
   const [offerLetterFile, setOfferLetterFile] = useState<File | null>(null);
 
+  const stageName = application?.stage?.name?.toLowerCase() || '';
+  const isVisaStage = stageName.includes('visa');
+
+  const selectedLabel = selectedOption?.label?.toLowerCase() || '';
+  const isVisaSetup = isVisaStage && selectedLabel.includes('visa setup');
+
+  const [formData, setFormData] = useState({
+    visa_fee_amount: '',
+  });
+
+  const [formErrors, setFormErrors] = useState<any>({});
+
+  const updateFormData = (field: string, value: any) => {
+    setFormData((prev) => {
+      const keys = field.split('.');
+      const updated = { ...prev };
+      let current: any = updated;
+
+      keys.forEach((key, index) => {
+        if (index === keys.length - 1) {
+          current[key] = value;
+        } else {
+          current[key] = current[key] || {};
+          current = current[key];
+        }
+      });
+
+      return updated;
+    });
+
+    // clear error when user types
+    setFormErrors((prev: any) => ({
+      ...prev,
+      [field]: undefined,
+    }));
+  };
+
   const validateForm = () => {
     if (!selectedStatus) {
       setError('Please select a status');
@@ -291,13 +330,22 @@ export default function UpdateStatusPopup({
       return false;
     }
 
+    if (isVisaSetup) {
+      if (!formData.visa_fee_amount || Number(formData.visa_fee_amount) <= 0) {
+        setFormErrors({
+          visa_fee_amount: 'Visa fee amount is required',
+        });
+        setError('Please enter visa fee amount');
+        return false;
+      }
+    }
+
     setError('');
     return true;
   };
 
   const handleConfirm = async () => {
     if (!validateForm() || !application?.id) return;
-
 
     setIsSubmitting(true);
 
@@ -340,6 +388,38 @@ export default function UpdateStatusPopup({
         );
       }
 
+      if (isVisaSetup) {
+        setIsSubmitting(true);
+
+        try {
+          await api.patch(
+            `/applications/${application.id}/visa-case`,
+            {
+              visa_fee_amount: Number(formData.visa_fee_amount),
+            }
+          );
+
+          showToast(
+            'Visa fee saved. Waiting for partner payment.',
+            'success'
+          );
+
+          // setTimeout(() => window.location.reload(), 1500);
+          handleClose();
+          return;
+        } catch (err: any) {
+          const msg =
+            err.response?.data?.message ||
+            err.message ||
+            'Failed to save visa fee';
+
+          showToast(msg, 'error');
+          setError(msg);
+        } finally {
+          setIsSubmitting(false);
+        }
+      }
+
       const payload = {
         status_id: selectedStatus,
         reason_text: reason.trim(),
@@ -354,7 +434,7 @@ export default function UpdateStatusPopup({
 
       showToast('Status updated successfully.', 'success');
 
-      setTimeout(() => window.location.reload(), 2000);
+      // setTimeout(() => window.location.reload(), 2000);
 
       onConfirm(selectedStatus, reason, notes);
       handleClose();
@@ -622,6 +702,20 @@ export default function UpdateStatusPopup({
               />
             </div>
           )}
+
+          {isVisaSetup && (
+            <InputField
+              label="Visa Fee Amount"
+              field="visa_fee_amount"
+              type="number"
+              placeholder="Enter visa fee amount"
+              required
+              formData={formData}
+              errors={formErrors}
+              updateFormData={updateFormData}
+            />
+          )}
+
         </div>
 
         <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
@@ -637,7 +731,8 @@ export default function UpdateStatusPopup({
             disabled={
               !selectedStatus ||
               isSubmitting ||
-              (requiresReason && !reason.trim())
+              (requiresReason && !reason.trim()) ||
+              (isVisaSetup && !formData.visa_fee_amount)
             }
             className="rounded-full bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ChevronDown,
   Clock,
@@ -9,16 +9,46 @@ import {
   History,
   Globe,
 } from "lucide-react";
-import { applications } from "components/data/applications";
+import api from "../../../../lib/useApi";
 
 interface VisaTrackingTimelineProps {
-  params?: { id: string };
+  application: any;
 }
 
-export default function TimeLine({ params }: VisaTrackingTimelineProps) {
+export default function VisaTrackingTimeline({
+                                               application,
+                                             }: VisaTrackingTimelineProps) {
   const [showTimeline, setShowTimeline] = useState(false);
+  const [visaCase, setVisaCase] = useState<any>(null);
+  const [correctionStatusId, setCorrectionStatusId] = useState<string | null>(
+    null
+  );
 
-  const timelineEvents = applications[0]?.history?.events || [];
+  useEffect(() => {
+    if (!application?.id) return;
+
+    const fetchApplicationDetails = async () => {
+      try {
+        const res = await api.get(
+          `/applications/${application.id}/visa-case`
+        );
+        setVisaCase(res.data);
+      } catch (err: any) {
+        if (err?.response?.status === 404) {
+          console.log("ℹ️ Visa case not created yet");
+          setVisaCase(null);
+        } else {
+          console.error(err);
+        }
+      }
+
+    };
+
+    fetchApplicationDetails();
+  }, [application?.id]);
+
+  // ⛔ Debug only — UI stays the same
+  const timelineEvents: any[] = [];
 
   const getTimelineIcon = (description: string) => {
     const descLower = description.toLowerCase();
@@ -105,23 +135,16 @@ export default function TimeLine({ params }: VisaTrackingTimelineProps) {
                   </div>
                 </div>
               ))}
+
+              {timelineEvents.length === 0 && (
+                <p className="text-sm text-text-muted">
+                  (Debug) Timeline data will appear here
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </section>
   );
 }
