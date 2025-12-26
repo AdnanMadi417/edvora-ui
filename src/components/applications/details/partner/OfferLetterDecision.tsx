@@ -26,23 +26,7 @@ export default function OfferLetterDecision({
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
 
-  const status = Number(offerLetter.status);
   const isVisaProcessing = application?.stage?.name === "Visa Processing";
-
-  const isAccepted = status === 2;
-
-  const getStatusLabel = (status: number | string) => {
-    switch (Number(status)) {
-      case 1:
-        return "Pending";
-      case 2:
-        return "Accepted";
-      case 3:
-        return "Rejected";
-      default:
-        return "Unknown";
-    }
-  };
 
   const handleDownload = async (fileKey?: string) => {
     if (!fileKey || downloading) return;
@@ -80,7 +64,6 @@ export default function OfferLetterDecision({
 
       await submitOfferLetterDecision(application.id, payload);
 
-      // Show toast for 2 seconds
       showToast(
         decision === "accept"
           ? "Offer accepted successfully."
@@ -88,7 +71,6 @@ export default function OfferLetterDecision({
         "success"
       );
 
-      // Reload page after 3 seconds
       setTimeout(() => {
         location.reload();
       }, 3000);
@@ -117,11 +99,6 @@ export default function OfferLetterDecision({
             <h3 className="text-lg font-semibold text-gray-900">
               University Offer Letter
             </h3>
-
-            {/*<span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">*/}
-            {/*  <FaFilePdf className="h-3 w-3" />*/}
-            {/*  Status {getStatusLabel(offerLetter.status)}*/}
-            {/*</span>*/}
           </div>
         </div>
 
@@ -156,7 +133,7 @@ export default function OfferLetterDecision({
           </button>
         </div>
 
-        {!isVisaProcessing && !isAccepted && (
+        {!isVisaProcessing && (
           <p className="text-sm text-text-muted">
             Please review the offer letter carefully before accepting or
             rejecting.
@@ -165,7 +142,7 @@ export default function OfferLetterDecision({
 
         <div className="flex flex-col justify-end gap-3 sm:flex-row">
 
-          {!isVisaProcessing && !isAccepted && (
+          {!isVisaProcessing && (
             <button
               onClick={() => handleDecision("accept")}
               disabled={submitting}
