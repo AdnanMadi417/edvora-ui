@@ -438,7 +438,7 @@ export default function ApplicationDetails({
           </div>
 
           <div>
-            <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <FaPhoneAlt className="text-xs text-red-600" />
                 <h4 className="text-p2 font-semibold tracking-wide text-red-700">
@@ -447,42 +447,43 @@ export default function ApplicationDetails({
               </div>
 
               <dl className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
                   <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaUser className="text-text-secondary" /> Name
+                    <FaUser /> Name
                   </dt>
-                  <dd className="text-sm font-normal text-text-primary">
+                  <dd className="min-w-0 break-words text-sm text-text-primary">
                     {emergencyContact.name || "Not provided"}
                   </dd>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
                   <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaUsers className="text-text-secondary" /> Relation
+                    <FaUsers /> Relation
                   </dt>
-                  <dd className="text-sm font-normal text-text-primary">
+                  <dd className="min-w-0 text-sm text-text-primary">
                     {emergencyContact.relation || "Not provided"}
                   </dd>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
                   <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaPhoneAlt className="text-text-secondary" /> Phone
+                    <FaPhoneAlt /> Phone
                   </dt>
-                  <dd className="text-sm font-normal text-text-primary">
+                  <dd className="min-w-0 text-sm text-text-primary">
                     {emergencyContact.phone || "Not provided"}
                   </dd>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
                   <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaEnvelope className="text-text-secondary" /> Email
+                    <FaEnvelope /> Email
                   </dt>
-                  <dd className="break-words text-sm font-normal text-text-primary">
+                  <dd className="min-w-0 break-all text-sm text-text-primary">
                     {emergencyContact.email || "Not provided"}
                   </dd>
                 </div>
               </dl>
+
             </div>
           </div>
         </div>

@@ -38,7 +38,7 @@ export default function UploadDoc({
   };
 
   const handleConfirm = () => {
-    if (!documentTypeId) return; // safety check
+    if (!documentTypeId) return;
     onConfirm(selectedFile, documentTypeId);
     setSelectedFile(null);
   };

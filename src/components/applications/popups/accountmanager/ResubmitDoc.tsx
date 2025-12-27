@@ -11,7 +11,6 @@ interface HoldPopupProps {
   onClose: () => void;
   applicationId: string;
   docId: string;
-  statusId: string | null;
 }
 
 export default function HoldPopup({
@@ -19,13 +18,11 @@ export default function HoldPopup({
   onClose,
   applicationId,
   docId,
-  statusId,
 }: HoldPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({ reason: "" });
   const [errors, setErrors] = useState<{ reason?: string }>({});
   const { showToast } = useToast();
-  const [currentStatus, setCurrentStatus] = useState<string>("");
 
   useEffect(() => {
     if (isOpen) {
@@ -35,26 +32,6 @@ export default function HoldPopup({
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const fetchStatus = async () => {
-      try {
-        const res = await api.get(`/applications/${applicationId}`);
-
-        const status =
-          typeof res.data.stage_status === "string"
-            ? res.data.stage_status
-            : res.data.stage_status?.name || "Unknown";
-        setCurrentStatus(status);
-      } catch (err) {
-        setCurrentStatus("Unknown");
-      }
-    };
-
-    fetchStatus();
-  }, [isOpen, applicationId]);
 
   const updateFormData = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -66,45 +43,32 @@ export default function HoldPopup({
       return;
     }
 
-    if (!statusId) {
-      showToast("Unable to get status ID", "error");
-
-      setTimeout(() => {
-        setFormData({ reason: "" });
-        setErrors({});
-        onClose();
-      }, 1500);
-      return;
-    }
-
     try {
-      await api.post(`/applications/${applicationId}/status`, {
-        status_id: statusId,
-        reason_text: formData.reason,
-        notes: "",
-        required_document_type_ids: [docId],
-      });
+      await api.patch(
+        `/applications/${applicationId}/correction-request`,
+        {
+          reason_text: formData.reason,
+          required_document_type_ids: [docId],
+        }
+      );
 
-      const res = await api.get(`/applications/${applicationId}`);
-      const status =
-        typeof res.data.stage_status === "string"
-          ? res.data.stage_status
-          : res.data.stage_status?.name || "Unknown";
-      setCurrentStatus(status);
-
-      showToast("Status updated successfully", "success");
+      showToast("Correction request sent successfully", "success");
 
       setTimeout(() => {
         setFormData({ reason: "" });
         setErrors({});
         onClose();
-      }, 100);
+      }, 300);
 
       setTimeout(() => {
         window.location.reload();
-      }, 3000);
-    } catch (err) {
-      showToast("Failed to update status", "error");
+      }, 2000);
+    } catch (err: any) {
+      if (err.response?.status === 422) {
+        showToast("Validation error. Please check the input.", "error");
+      } else {
+        showToast("Failed to send correction request", "error");
+      }
 
       setTimeout(() => {
         setFormData({ reason: "" });
