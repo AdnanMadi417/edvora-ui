@@ -51,6 +51,13 @@ pipelines:
             - echo "  ${IMAGE_FULL}"
             - echo "  ${IMAGE_NAME}:staging-latest"
 
+      - step:
+          name: Send alert to Slack
+          script:
+            - pipe: atlassian/slack-notify:2.3.1
+              variables:
+                WEBHOOK_URL: $WEBHOOK_URL
+                MESSAGE: '"[$NODE_ENV] Unibexs UI build has exited with status $build_status"'
 definitions:
   services:
     docker:
