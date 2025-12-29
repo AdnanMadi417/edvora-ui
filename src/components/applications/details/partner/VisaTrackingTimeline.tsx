@@ -5,18 +5,17 @@ import {
   CreditCard,
   Download,
   Wallet,
-  CheckCircle,
   FileText,
   Calendar,
-  DollarSign,
+  Plane,
   XCircle,
   Receipt,
 } from "lucide-react";
 import { useVisaCase } from "hooks/useVisaCase";
 import { useVisaPayments } from "hooks/useVisaPayments";
 import VisaPaymentConfirmation from "../../../applications/popups/partner/VisaPaymentConfirmation";
+import ArrivalDate from "../../../applications/popups/partner/ArrivalDate";
 import { getDocumentDownloadUrl } from "../../../../services/documentService";
-import api from "lib/useApi";
 import { useToast } from "../../../context/ToastContext";
 
 interface VisaTrackingTimelineProps {
@@ -26,9 +25,9 @@ interface VisaTrackingTimelineProps {
 export default function VisaTrackingTimeline({
                                                application,
                                              }: VisaTrackingTimelineProps) {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const { showToast } = useToast();
+  const [isVisaPopupOpen, setIsVisaPopupOpen] = useState(false);
+  const [isArrivalPopupOpen, setIsArrivalPopupOpen] = useState(false);
+
   const {
     visaCase,
     loading: visaLoading,
@@ -55,31 +54,6 @@ export default function VisaTrackingTimeline({
       alert("Download failed");
     } finally {
       setDownloading(false);
-    }
-  };
-
-  const handleApprove = async (paymentId: string) => {
-    if (loading) return;
-
-    setLoading(true);
-    try {
-      const res = await api.post(
-        `/applications/${application.id}/visa-payments/${paymentId}/review`,
-        {
-          status: "approved",
-          review_notes: "Approved by manager",
-        }
-      );
-
-      console.log("Approved payment:", res.data);
-      showToast("Payment approved successfully!", "success");
-
-      // Optionally refresh the visaPayments list
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to approve payment", "error");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -158,8 +132,8 @@ export default function VisaTrackingTimeline({
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setIsPopupOpen(true)}
-                  className="flex w-fit items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-600 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                  onClick={() => setIsVisaPopupOpen(true)}
+                  className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-600 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
                   <Wallet className="h-4 w-4 text-blue-600" />
                   Continue Payment
@@ -171,7 +145,7 @@ export default function VisaTrackingTimeline({
           </div>
         </div>
 
-        <div className="p-6 ">
+        <div className="p-6 pb-0">
           {visaPayments.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-12">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
@@ -204,7 +178,7 @@ export default function VisaTrackingTimeline({
                   className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-gray-300"
                 >
                   <div className="p-5">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                    <div className="flex gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div className="flex-1 space-y-3">
                         <div className="flex items-center gap-2">
                           <div className="flex h-9 w-9 items-center justify-center rounded-full border-blue-600 bg-blue-50">
@@ -281,13 +255,111 @@ export default function VisaTrackingTimeline({
           )}
         </div>
 
-        {isPopupOpen && (
+        <div className="p-6 border-b border-gray-200">
+          <div className="relative rounded-lg border border-gray-200 p-6">
+            <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
+
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="max-w-xl">
+                <h3 className="text-sm font-semibold text-slate-900">
+                  Confirm Arrival Date
+                </h3>
+
+                <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                  Select your arrival date and upload your flight details.
+                </p>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="flex w-fit items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-600 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                  onClick={() => setIsArrivalPopupOpen(true)}
+                >
+                  <Plane className="h-4 w-4 text-blue-600" />
+                  Confirm Arrival
+                </button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Arrival Documents
+            </h3>
+            <p className="text-sm text-text-muted">
+              Travel and arrival-related files
+            </p>
+          </div>
+
+          <div className="p-6 pt-0">
+            {!application?.arrival_documents ||
+            application.arrival_documents.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-10">
+                <FileText className="h-8 w-8 text-gray-400" />
+                <p className="mt-2 text-sm text-text-muted">
+                  No arrival documents uploaded
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {application.arrival_documents.map((doc: any) => (
+                  <div
+                    key={doc.id}
+                    className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+                        <FileText className="h-5 w-5 text-green-600" />
+                      </div>
+
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {doc.document_type}
+                        </p>
+                        <p className="text-xs text-text-muted">
+                          Uploaded on{" "}
+                          {new Date(doc.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleDownload(doc.file_key)}
+                      disabled={downloading}
+                      className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                      title="Download document"
+                    >
+                      <Download className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+        </div>
+
+        {isVisaPopupOpen && (
           <VisaPaymentConfirmation
-            isOpen={isPopupOpen}
-            onClose={() => setIsPopupOpen(false)}
+            isOpen={isVisaPopupOpen}
+            onClose={() => setIsVisaPopupOpen(false)}
             applicationId={application.id}
           />
         )}
+
+        {isArrivalPopupOpen && (
+          <ArrivalDate
+            isOpen={isArrivalPopupOpen}
+            onClose={() => setIsArrivalPopupOpen(false)}
+            applicationId={application.id}
+          />
+        )}
+
       </div>
     </section>
   );

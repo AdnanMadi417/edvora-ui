@@ -22,8 +22,8 @@ interface VisaTrackingTimelineProps {
 }
 
 export default function VisaTrackingTimeline({
-                                               application,
-                                             }: VisaTrackingTimelineProps) {
+  application,
+}: VisaTrackingTimelineProps) {
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
@@ -137,7 +137,7 @@ export default function VisaTrackingTimeline({
           </div>
         </div>
 
-        <div className="p-6 ">
+        <div className="p-6 border-b border-gray-200 ">
           {visaPayments.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-12">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
@@ -199,8 +199,8 @@ export default function VisaTrackingTimeline({
                             <span>
                               {payment.submitted_at
                                 ? new Date(
-                                  payment.submitted_at
-                                ).toLocaleString()
+                                    payment.submitted_at
+                                  ).toLocaleString()
                                 : "—"}
                             </span>
                           </div>
@@ -234,7 +234,7 @@ export default function VisaTrackingTimeline({
                                   <Download className="h-4 w-4 text-green-600" />
                                 </button>
 
-                                {payment.status !== 'approved' && (
+                                {payment.status !== "approved" && (
                                   <button
                                     onClick={() => handleApprove(payment.id)}
                                     disabled={loading}
@@ -244,7 +244,6 @@ export default function VisaTrackingTimeline({
                                     <CheckCircle className="h-4 w-4 text-blue-600" />
                                   </button>
                                 )}
-
                               </div>
                             ))}
                           </div>
@@ -256,6 +255,65 @@ export default function VisaTrackingTimeline({
               ))}
             </div>
           )}
+        </div>
+
+        <div >
+
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Arrival Documents
+            </h3>
+            <p className="text-sm text-text-muted">
+              Travel and arrival-related files
+            </p>
+          </div>
+
+          <div className="p-6 pt-0">
+            {!application?.arrival_documents ||
+            application.arrival_documents.length === 0 ? (
+              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-10">
+                <FileText className="h-8 w-8 text-gray-400" />
+                <p className="mt-2 text-sm text-text-muted">
+                  No arrival documents uploaded
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {application.arrival_documents.map((doc: any) => (
+                  <div
+                    key={doc.id}
+                    className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+                        <FileText className="h-5 w-5 text-green-600" />
+                      </div>
+
+                      <div>
+                        <p className="font-medium text-gray-900">
+                          {doc.document_type}
+                        </p>
+                        <p className="text-xs text-text-muted">
+                          Uploaded on{" "}
+                          {new Date(doc.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleDownload(doc.file_key)}
+                      disabled={downloading}
+                      className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                      title="Download document"
+                    >
+                      <Download className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
         </div>
 
         {isPopupOpen && (

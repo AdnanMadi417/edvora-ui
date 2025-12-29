@@ -47,19 +47,23 @@ export default function OfferLetterDecision({
   return (
     <section>
       <div className="mb-5 mt-5 space-y-4 rounded-lg border border-default bg-card p-4 shadow-sm sm:p-6">
+
         <div className="flex items-start gap-4">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
             <FaFilePdf className="text-lg text-blue-700" />
           </span>
 
           <div className="flex-1">
+
             <h3 className="text-lg font-semibold text-gray-900">
               University Offer Letter
             </h3>
-            {/*<span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">*/}
-            {/*  <FaFilePdf className="h-3 w-3" />*/}
-            {/*  Status {getStatusLabel(offerLetter.status)}*/}
-            {/*</span>*/}
+
+            <span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">
+              <FaFilePdf className="h-3 w-3" />
+              Status {getStatusLabel(offerLetter.status)}
+            </span>
+
           </div>
         </div>
 
@@ -84,6 +88,7 @@ export default function OfferLetterDecision({
             <Download className="h-4 w-4 transition-transform group-hover:scale-110" />
           </button>
         </div>
+
       </div>
     </section>
   );
