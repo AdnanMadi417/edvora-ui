@@ -1,29 +1,16 @@
 import { useState } from "react";
+import { FaFilePdf } from "react-icons/fa";
 import { Download } from "lucide-react";
 import { getDocumentDownloadUrl } from "services/documentService";
-import { FaFilePdf } from "react-icons/fa";
 
 interface OfferLetterDecisionProps {
   application: any;
 }
 
 export default function OfferLetterDecision({
-  application,
-}: OfferLetterDecisionProps) {
+                                              application,
+                                            }: OfferLetterDecisionProps) {
   const offerLetter = application?.offer_letter_document;
-
-  const getStatusLabel = (status: number | string) => {
-    switch (Number(status)) {
-      case 1:
-        return "Pending";
-      case 2:
-        return "Accepted";
-      case 3:
-        return "Rejected";
-      default:
-        return "Unknown";
-    }
-  };
 
   const [downloading, setDownloading] = useState(false);
 
@@ -47,24 +34,25 @@ export default function OfferLetterDecision({
   return (
     <section>
       <div className="mb-5 mt-5 space-y-4 rounded-lg border border-default bg-card p-4 shadow-sm sm:p-6">
-
         <div className="flex items-start gap-4">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
             <FaFilePdf className="text-lg text-blue-700" />
           </span>
 
           <div className="flex-1">
-
             <h3 className="text-lg font-semibold text-gray-900">
               University Offer Letter
             </h3>
-
-            <span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">
-              <FaFilePdf className="h-3 w-3" />
-              Status {getStatusLabel(offerLetter.status)}
-            </span>
-
           </div>
+        </div>
+
+        <div className="rounded-md border border-green-200 bg-green-50 p-4">
+          <p className="text-sm font-medium text-green-800">
+            🎉 Congratulations!
+          </p>
+          <p className="mt-1 text-sm text-green-700">
+            You have been offered admission. Please review your offer letter.
+          </p>
         </div>
 
         <div className="mt-4 flex items-center justify-between rounded-md border border-gray-200 p-4">

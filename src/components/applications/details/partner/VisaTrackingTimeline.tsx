@@ -16,7 +16,6 @@ import { useVisaPayments } from "hooks/useVisaPayments";
 import VisaPaymentConfirmation from "../../../applications/popups/partner/VisaPaymentConfirmation";
 import ArrivalDate from "../../../applications/popups/partner/ArrivalDate";
 import { getDocumentDownloadUrl } from "../../../../services/documentService";
-import { useToast } from "../../../context/ToastContext";
 
 interface VisaTrackingTimelineProps {
   application: any;
