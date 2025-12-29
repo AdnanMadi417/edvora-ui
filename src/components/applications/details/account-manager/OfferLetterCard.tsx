@@ -1,29 +1,16 @@
 import { useState } from "react";
+import { FaFilePdf } from "react-icons/fa";
 import { Download } from "lucide-react";
 import { getDocumentDownloadUrl } from "services/documentService";
-import { FaFilePdf } from "react-icons/fa";
 
 interface OfferLetterDecisionProps {
   application: any;
 }
 
 export default function OfferLetterDecision({
-  application,
-}: OfferLetterDecisionProps) {
+                                              application,
+                                            }: OfferLetterDecisionProps) {
   const offerLetter = application?.offer_letter_document;
-
-  const getStatusLabel = (status: number | string) => {
-    switch (Number(status)) {
-      case 1:
-        return "Pending";
-      case 2:
-        return "Accepted";
-      case 3:
-        return "Rejected";
-      default:
-        return "Unknown";
-    }
-  };
 
   const [downloading, setDownloading] = useState(false);
 
@@ -56,11 +43,16 @@ export default function OfferLetterDecision({
             <h3 className="text-lg font-semibold text-gray-900">
               University Offer Letter
             </h3>
-            {/*<span className="mt-1 inline-flex items-center gap-2 py-1 text-sm font-semibold text-text-muted">*/}
-            {/*  <FaFilePdf className="h-3 w-3" />*/}
-            {/*  Status {getStatusLabel(offerLetter.status)}*/}
-            {/*</span>*/}
           </div>
+        </div>
+
+        <div className="rounded-md border border-green-200 bg-green-50 p-4">
+          <p className="text-sm font-medium text-green-800">
+            🎉 Congratulations!
+          </p>
+          <p className="mt-1 text-sm text-green-700">
+            You have been offered admission. Please review your offer letter.
+          </p>
         </div>
 
         <div className="mt-4 flex items-center justify-between rounded-md border border-gray-200 p-4">
@@ -84,6 +76,7 @@ export default function OfferLetterDecision({
             <Download className="h-4 w-4 transition-transform group-hover:scale-110" />
           </button>
         </div>
+
       </div>
     </section>
   );

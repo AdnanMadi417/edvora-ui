@@ -132,6 +132,8 @@ export default function StudentApplication() {
     { id: string; type: string; description: string }[]
   >([]);
 
+  const [initOnly, setInitOnly] = useState(true);
+
   const getCurrentDate = () => {
     const d = new Date();
     const year = d.getFullYear();
@@ -293,14 +295,29 @@ export default function StudentApplication() {
   }, []);
 
   useEffect(() => {
-    updateFormData("program_id", "");
-  }, [formData.university_id]);
+    const fetchDocumentTypes = async () => {
+      const token = Cookies.get("token");
+
+      const res = await api.get("/document-types", {
+        params: { init_only: initOnly },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      setDocumentTypes(res.data || []);
+    };
+
+    fetchDocumentTypes();
+  }, [initOnly]);
 
   useEffect(() => {
     const fetchDocumentTypes = async () => {
       try {
         const token = Cookies.get("token");
+
         const res = await api.get("/document-types", {
+          params: {
+            init_only: true, // or false
+          },
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
@@ -445,7 +462,7 @@ export default function StudentApplication() {
       showToast(
         `Please upload all required documents: ${missingDocs
           .map((d) => d.type)
-          .join(", ")}`,
+          .join(",")}`,
         "error"
       );
       return;
@@ -555,7 +572,7 @@ export default function StudentApplication() {
         </div>
 
         <div className="relative mb-8">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fit,_minmax(100px,_1fr))]">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fit,_minmax(150px,_1fr))]">
             {stages.map((s, index) => {
               const Icon = s.icon;
               const isActive = s.id === stage;
@@ -980,7 +997,7 @@ export default function StudentApplication() {
           )}
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-2 sm:flex-row">
+        <div className="flex items-center justify-between gap-2 sm:flex-row">
           <div className="text-sm text-text-muted">
             Step {stage} of {stages.length} — {completedStages.length} completed
           </div>
