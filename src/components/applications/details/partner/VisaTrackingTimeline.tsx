@@ -27,6 +27,21 @@ export default function VisaTrackingTimeline({
   const [isVisaPopupOpen, setIsVisaPopupOpen] = useState(false);
   const [isArrivalPopupOpen, setIsArrivalPopupOpen] = useState(false);
 
+  const stageName = application?.stage?.name;
+  const stageStatuses = application?.stage?.statuses || [];
+
+  const showVisaPayment =
+    stageName === "Visa Processing" &&
+    stageStatuses.some(
+      (s: any) => s.name === "Waiting for Payment"
+    );
+
+  const showArrivalConfirmation =
+    stageName === "Student Arrival & Enrollment" &&
+    stageStatuses.some(
+      (s: any) => s.name === "Waiting Partner to confirm arrival date"
+    );
+
   const {
     visaCase,
     loading: visaLoading,
@@ -112,37 +127,37 @@ export default function VisaTrackingTimeline({
           </div>
         </div>
 
-        <div className="p-6 pb-0">
-          <div className="relative rounded-lg border border-gray-200 p-6">
-            <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
+        {showVisaPayment && (
+          <div className="p-6 pb-0">
+            <div className="relative rounded-lg border border-gray-200 p-6">
+              <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="max-w-xl">
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Complete your visa payment
-                </h3>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="max-w-xl">
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    Complete your visa payment
+                  </h3>
 
-                <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                  Choose a payment method and upload your payment proof to
-                  continue with the visa application process.
-                </p>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                    Choose a payment method and upload your payment proof to
+                    continue with the visa application process.
+                  </p>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsVisaPopupOpen(true)}
+                    className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-200"
+                  >
+                    <Wallet className="h-4 w-4" />
+                    Continue Payment
+                  </button>
+                </div>
               </div>
-
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setIsVisaPopupOpen(true)}
-                  className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-600 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  <Wallet className="h-4 w-4 text-blue-600" />
-                  Continue Payment
-                </button>
-              </div>
-
-
             </div>
           </div>
-        </div>
+        )}
 
         <div className="p-6 pb-0">
           {visaPayments.length === 0 ? (
@@ -254,35 +269,36 @@ export default function VisaTrackingTimeline({
           )}
         </div>
 
-        <div className="p-6 border-b border-gray-200">
-          <div className="relative rounded-lg border border-gray-200 p-6">
-            <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
+        {showArrivalConfirmation && (
+          <div className="p-6 border-b border-gray-200">
+            <div className="relative rounded-lg border border-gray-200 p-6">
+              <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
 
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="max-w-xl">
-                <h3 className="text-sm font-semibold text-slate-900">
-                  Confirm Arrival Date
-                </h3>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="max-w-xl">
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    Confirm Arrival Date
+                  </h3>
 
-                <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                  Select your arrival date and upload your flight details.
-                </p>
-              </div>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                    Select your arrival date and upload your flight details.
+                  </p>
+                </div>
 
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  className="flex w-fit items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-600 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
-                  onClick={() => setIsArrivalPopupOpen(true)}
-                >
-                  <Plane className="h-4 w-4 text-blue-600" />
-                  Confirm Arrival
-                </button>
-
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsArrivalPopupOpen(true)}
+                    className="flex w-fit items-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-200"
+                  >
+                    <Plane className="h-4 w-4" />
+                    Confirm Arrival
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div>
 

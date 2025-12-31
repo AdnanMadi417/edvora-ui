@@ -9,6 +9,7 @@ import ApplicationDetails from "../../../../components/applications/details/part
 import ApplicationDocuments from "../../../../components/applications/details/partner/ApplicationDocuments";
 import OfferLetterDecision from "../../../../components/applications/details/partner/OfferLetterDecision";
 import VisaTrackingTimeline from "../../../../components/applications/details/partner/VisaTrackingTimeline";
+import ApplicationCommission from "../../../../components/applications/details/partner/ApplicationCommission";
 import Loading from "components/loading/Loading";
 
 export default function ApplicationPage() {
@@ -52,6 +53,7 @@ export default function ApplicationPage() {
       <OfferLetterDecision application={application} />
       <ApplicationDocuments application={application} />
       <VisaTrackingTimeline application={application} />
+      <ApplicationCommission application={application} />
     </>
   );
 }

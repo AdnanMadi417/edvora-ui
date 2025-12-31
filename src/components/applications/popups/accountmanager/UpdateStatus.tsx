@@ -282,6 +282,11 @@ export default function UpdateStatusPopup({
 
   const [formErrors, setFormErrors] = useState<any>({});
 
+  const [commissionPaymentFile, setCommissionPaymentFile] =
+    useState<File | null>(null);
+
+  const isCommissionPaid = selectedOption?.label === "Commission Paid";
+
   const handleOfferLetterUpload = async () => {
     if (!isUniversityApproved || !offerLetterFile) return;
 
@@ -350,12 +355,43 @@ export default function UpdateStatusPopup({
       reason_text: reason.trim(),
       notes: notes.trim(),
       required_document_type_ids:
-        requiresDocuments && !isUniversityApproved
+        requiresDocuments &&
+        !isUniversityApproved &&
+        !isCommissionPaid
           ? documents.flatMap((doc) => doc.type)
           : [],
     });
 
     showToast("Status updated successfully.", "success");
+  };
+
+  const handleCommissionPaymentUpload = async () => {
+    if (!isCommissionPaid || !commissionPaymentFile) return;
+
+    showToast("Uploading commission payment proof...", "info");
+
+    const presigned = await getPresignedUploads(
+      [commissionPaymentFile],
+      "documents"
+    );
+
+    const results = await uploadFilesToSpaces(
+      [commissionPaymentFile],
+      presigned
+    );
+
+    const uploaded = results?.[0];
+
+    if (!uploaded?.file_key || !uploaded?.public_url) {
+      throw new Error("Commission payment proof upload failed");
+    }
+
+    await api.post(`/applications/${application.id}/commission-payment-document`, {
+      file_key: uploaded.file_key,
+      file_url: uploaded.public_url,
+    });
+
+    showToast("Commission payment proof uploaded successfully.", "success");
   };
 
   const updateFormData = (field: string, value: any) => {
@@ -425,6 +461,11 @@ export default function UpdateStatusPopup({
       return false;
     }
 
+    if (isCommissionPaid && !commissionPaymentFile) {
+      setError("Please upload commission payment proof");
+      return false;
+    }
+
     setError("");
     return true;
   };
@@ -470,6 +511,16 @@ export default function UpdateStatusPopup({
         await handleVisaSetup();
         if (offerLetterFile) await handleOfferLetterUpload();
         if (visaDocumentFile) await handleVisaIssuedUpload();
+      } else if (isCommissionPaid) {
+        if (!commissionPaymentFile) {
+          setError("Please upload commission payment proof");
+          showToast("Commission payment proof is required.", "error");
+          setIsSubmitting(false);
+          return;
+        }
+
+        await handleCommissionPaymentUpload();
+        await handleStatusUpdate();
       } else {
         await handleStatusUpdate();
 
@@ -640,7 +691,7 @@ export default function UpdateStatusPopup({
             )}
           </div>
 
-          {requiresDocuments && !isUniversityApproved && !isVisaIssued && (
+          {requiresDocuments && !isUniversityApproved && !isVisaIssued && !isCommissionPaid &&(
             <DocumentRequestList
               documents={documents}
               setDocuments={setDocuments}
@@ -815,6 +866,75 @@ export default function UpdateStatusPopup({
                     type="button"
                     onClick={() => setVisaDocumentFile(null)}
                     className="bg-background flex items-center justify-center gap-2 rounded-full border border-red-500 px-4 py-2.5 text-sm text-red-500 outline-0 transition hover:border-red-800 hover:text-red-800 sm:w-auto"
+                  >
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {isCommissionPaid && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900">
+                Upload Commission Payment Proof{" "}
+                <span className="text-red-500">*</span>
+              </label>
+
+              <label
+                htmlFor="commission-payment"
+                className="
+        group relative flex cursor-pointer flex-col items-center justify-center
+        rounded-md border-2 border-dashed border-gray-300
+        bg-white px-6 py-10 text-center
+        transition-all duration-200
+        hover:border-blue-500 hover:bg-blue-50/40
+      "
+              >
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <svg
+                    className="h-7 w-7"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 16V8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+                    />
+                  </svg>
+                </div>
+
+                <p className="text-sm font-semibold text-gray-800">
+                  Select Commission Payment Proof
+                </p>
+                <p className="mt-2 text-xs text-gray-600">
+                  PDF, JPG, PNG – Max 5MB
+                </p>
+
+                <input
+                  id="commission-payment"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="hidden"
+                  disabled={isSubmitting}
+                  onChange={(e) =>
+                    setCommissionPaymentFile(e.target.files?.[0] || null)
+                  }
+                />
+              </label>
+
+              {commissionPaymentFile && (
+                <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
+                  <span className="truncate text-sm text-text-muted">
+                    {commissionPaymentFile.name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCommissionPaymentFile(null)}
+                    className="rounded-full border border-red-500 px-4 py-2 text-sm text-red-500 hover:border-red-700 hover:text-red-700"
                   >
                     Remove
                   </button>

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Pause, XCircle } from "lucide-react";
 import { FaExclamationCircle } from "react-icons/fa";
+import { FaRegFileLines } from "react-icons/fa6";
 import api from "../../../../lib/useApi";
 import { FaFileAlt } from "react-icons/fa";
 import { useToast } from "components/context/ToastContext";
@@ -158,18 +159,18 @@ export default function RequiredAction({
                         {appDetails.document_types.map((doc: any) => (
                           <li
                             key={doc.id}
-                            className="flex flex-col items-start justify-between gap-3 border-b border-gray-100 pb-3 last:border-b-0 sm:flex-row sm:items-center"
+                            className="block border-b border-gray-100 pb-3 last:border-b-0 sm:flex-row sm:items-center"
                           >
                             <div className="block">
-                              <div className="flex items-center gap-2">
-                                <FaFileAlt className="h-5 w-5 text-blue-600" />
-                                <span className="text-sm font-medium text-text-muted">
+                              <div className="mb-2 flex items-center gap-2">
+                                <FaRegFileLines />
+                                <span className="text-sm font-medium">
                                   {doc.description} ({doc.type})
                                 </span>
                               </div>
                               {appDetails.correction_reason && (
                                 <div className="flex items-center gap-2 pl-7">
-                                  <span className="flex items-center gap-1 text-xs font-medium tracking-wider text-text-muted">
+                                  <span className="flex items-center gap-1 text-xs font-medium tracking-wider">
                                     <FaExclamationCircle className="" />
                                     Reason:
                                   </span>
@@ -180,13 +181,13 @@ export default function RequiredAction({
                               )}
                             </div>
 
-                            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
+                            <div className="w-full">
                               <label
                                 htmlFor={`file-${doc.id}`}
-                                className="flex cursor-pointer items-center gap-2 rounded-md border-2 border-dashed border-gray-300 px-4 py-2 text-sm text-text-muted transition-colors hover:border-blue-500 hover:bg-blue-50"
+                                className="flex cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-4 text-center text-sm transition hover:border-blue-500 hover:bg-blue-50"
                               >
                                 <svg
-                                  className="h-5 w-5 text-text-muted"
+                                  className="h-6 w-6 text-text-muted"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -198,8 +199,12 @@ export default function RequiredAction({
                                     d="M7 16v4h10v-4m-5-12v12m0 0l-3-3m3 3l3-3"
                                   />
                                 </svg>
-                                {selectedFiles[doc.id]?.name ||
-                                  "Click to upload"}
+
+                                <span className="font-medium">
+                                  {selectedFiles[doc.id]?.name ||
+                                    "Upload document"}
+                                </span>
+
                                 <input
                                   id={`file-${doc.id}`}
                                   type="file"

@@ -66,6 +66,7 @@ export default function ArrivalDateConfirmation({
       });
 
       showToast('Arrival date submitted successfully', 'success');
+      setTimeout(() => window.location.reload(), 2000);
       onClose();
     } catch (err) {
       console.error(err);

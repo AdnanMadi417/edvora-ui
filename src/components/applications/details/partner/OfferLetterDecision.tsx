@@ -26,7 +26,12 @@ export default function OfferLetterDecision({
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
 
-  const isVisaProcessing = application?.stage?.name === "Visa Processing";
+  const currentStatus =
+    application?.stage?.statuses?.[0]?.name;
+
+  const isUniversityApproved =
+    currentStatus === "University Approved";
+
 
   const handleDownload = async (fileKey?: string) => {
     if (!fileKey || downloading) return;
@@ -133,33 +138,36 @@ export default function OfferLetterDecision({
           </button>
         </div>
 
-        {!isVisaProcessing && (
-          <p className="text-sm text-text-muted">
-            Please review the offer letter carefully before accepting or
-            rejecting.
-          </p>
+        {isUniversityApproved && (
+          <>
+            <p className="text-sm text-text-muted">
+              Please review the offer letter carefully before accepting or rejecting.
+            </p>
+
+            <div className="flex flex-col justify-end gap-3 sm:flex-row">
+              <button
+                onClick={() => handleDecision("accept")}
+                disabled={submitting}
+                className="rounded-full border border-blue-500 px-4 py-2.5 text-sm text-blue-500 transition-all hover:border-blue-700 hover:text-blue-700 "
+              >
+                Accept Offer
+              </button>
+
+              {/* Reject button if needed later */}
+              {/*
+      <button
+        onClick={() => handleDecision("reject")}
+        disabled={submitting}
+        className="rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error disabled:opacity-50"
+      >
+        Reject Offer
+      </button>
+      */}
+            </div>
+          </>
         )}
 
-        <div className="flex flex-col justify-end gap-3 sm:flex-row">
 
-          {!isVisaProcessing && (
-            <button
-              onClick={() => handleDecision("accept")}
-              disabled={submitting}
-              className="rounded-full border border-blue-500 px-4 py-2.5 text-sm text-blue-500"
-            >
-              Accept Offer
-            </button>
-          )}
-
-          {/*<button*/}
-          {/*  onClick={() => handleDecision("reject")}*/}
-          {/*  disabled={submitting}*/}
-          {/*  className="rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error disabled:opacity-50"*/}
-          {/*>*/}
-          {/*  Reject Offer*/}
-          {/*</button>*/}
-        </div>
       </div>
     </section>
   );

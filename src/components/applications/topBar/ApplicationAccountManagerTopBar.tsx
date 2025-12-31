@@ -9,9 +9,8 @@ import {
   XCircle,
   ExternalLink,
 } from "lucide-react";
-import HoldPopup from "components/applications/popups/Hold";
+import HoldPopup from "../popups/accountmanager/Hold";
 import UpdateStatus from "../popups/accountmanager/UpdateStatus";
-import CancelPopup from "components/applications/popups/Cancel";
 
 interface Props {
   application: any;
@@ -23,7 +22,6 @@ export default function ApplicationAccountManagerTopBar({ application }: Props) 
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showHoldPopup, setShowHoldPopup] = useState(false);
-  const [showCancelPopup, setShowCancelPopup] = useState(false);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -58,15 +56,6 @@ export default function ApplicationAccountManagerTopBar({ application }: Props) 
 
   const handleConfirmHold = (reason: string) => {
     setShowHoldPopup(false);
-  };
-
-  const handleCancel = () => {
-    setIsDropdownOpen(false);
-    setShowCancelPopup(true);
-  };
-
-  const handleConfirmCancel = (reason: string) => {
-    setShowCancelPopup(false);
   };
 
   const handleUpdateStatus = () => {
@@ -121,29 +110,14 @@ export default function ApplicationAccountManagerTopBar({ application }: Props) 
                           <Clock className="h-4 w-4" />
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium">Hold</div>
+                          <div className="font-medium">Update Application Status</div>
                           <div className="text-xs text-slate-500">
-                            Pause this application
+                            Manage the application’s status
                           </div>
                         </div>
                       </button>
 
                       <div className="my-1 h-px bg-slate-100" />
-
-                      <button
-                        onClick={handleCancel}
-                        className="group flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-red-50 hover:text-red-900"
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 group-hover:bg-red-200">
-                          <XCircle className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium">Cancel</div>
-                          <div className="text-xs text-slate-500">
-                            Reject this application
-                          </div>
-                        </div>
-                      </button>
 
                       <div className="my-1 h-px bg-slate-100" />
 
@@ -175,13 +149,7 @@ export default function ApplicationAccountManagerTopBar({ application }: Props) 
         onClose={() => setShowHoldPopup(false)}
         onConfirm={handleConfirmHold}
         applicationId={application?.id}
-      />
-
-      <CancelPopup
-        isOpen={showCancelPopup}
-        onClose={() => setShowCancelPopup(false)}
-        onConfirm={handleConfirmCancel}
-        applicationId={application?.id}
+        currentStatus={application.lifecycle_status}
       />
 
       {application && showUpdatePopup && (

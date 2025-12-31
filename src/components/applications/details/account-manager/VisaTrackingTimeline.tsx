@@ -69,10 +69,10 @@ export default function VisaTrackingTimeline({
         }
       );
 
-      console.log("Approved payment:", res.data);
       showToast("Payment approved successfully!", "success");
 
-      // Optionally refresh the visaPayments list
+      setTimeout(() => window.location.reload(), 2000);
+
     } catch (err) {
       console.error(err);
       showToast("Failed to approve payment", "error");
