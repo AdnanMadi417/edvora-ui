@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { Download, CheckCircle, Receipt , XCircle} from 'lucide-react';
 import api from "../../../../lib/useApi";
 import { getDocumentDownloadUrl } from "../../../../services/documentService";
-import Dispute from "../../popups/partner/UploadDisputeDocument";
+import Dispute from "../../popups/partner/UpdatedDispute";
+import { useToast } from "../../../context/ToastContext";
 
 interface ApplicationCommissionProps {
   application: any;
@@ -20,6 +21,7 @@ export default function ApplicationCommission({
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
   const [showDispute, setShowDispute] = useState(false);
+  const { showToast } = useToast();
 
   const fetchActionData = async () => {
     if (!application?.id) return;
@@ -53,7 +55,6 @@ export default function ApplicationCommission({
 
   const hasActions = !!confirmAction || !!disputeAction;
 
-// Hide entire section if no data
   if (!hasCommissions && !hasActions) {
     return null;
   }
@@ -81,13 +82,18 @@ export default function ApplicationCommission({
       await api.post(`/applications/${application.id}/status`, {
         status_id: confirmAction.target_status_id,
         reason_text: null,
-        notes: "",
+        notes: "Partner commission confirmed successfully",
       });
 
       await fetchActionData();
-      refetchApplication();
+
+      showToast("Commission confirmed successfully", "success");
+      setTimeout(() => window.location.reload(), 2000);
+
     } catch {
       setError("Failed to confirm commission");
+      showToast("Failed to confirm commission", "error");
+      setTimeout(() => window.location.reload(), 2000);
     } finally {
       setLoading(false);
     }
@@ -119,11 +125,11 @@ export default function ApplicationCommission({
             </div>
           </div>
 
-          {error && (
-            <div className="mx-6 mt-4 rounded-lg bg-red-50 p-4 text-sm text-red-800">
-              {error}
-            </div>
-          )}
+          {/*{error && (*/}
+          {/*  <div className="mx-6 mt-4 rounded-lg bg-red-50 p-4 text-sm text-red-800">*/}
+          {/*    {error}*/}
+          {/*  </div>*/}
+          {/*)}*/}
 
           <div className="space-y-4 p-6">
             {application.commissions?.map((commission: any) => (
