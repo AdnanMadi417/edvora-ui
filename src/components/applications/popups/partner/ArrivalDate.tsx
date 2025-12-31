@@ -44,7 +44,6 @@ export default function ArrivalDateConfirmation({
       if (ticketFile) {
         showToast('Uploading travel ticket...', 'info');
 
-        // Presigned upload
         const presigned = await getPresignedUploads([ticketFile], 'travel_ticket');
         const results = await uploadFilesToSpaces([ticketFile], presigned);
         const uploaded = results?.[0];
@@ -59,7 +58,6 @@ export default function ArrivalDateConfirmation({
         };
       }
 
-      // Patch arrival date with optional ticket
       await api.patch(`/applications/${applicationId}/arrival-date`, {
         arrival_date: arrivalDate,
         ...ticketData,
@@ -99,7 +97,6 @@ export default function ArrivalDateConfirmation({
       >
         <div className="relative overflow-hidden rounded-2xl bg-white text-sm shadow-2xl ring-1 ring-black/5">
 
-          {/* Header */}
           <div className="relative border-b border-gray-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2.5">
@@ -125,9 +122,8 @@ export default function ArrivalDateConfirmation({
             </div>
           </div>
 
-          {/* Body */}
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
-            {/* Arrival Date */}
+
             <div className="space-y-2">
               <label className="block font-medium text-gray-900">
                 Arrival Date<span className="text-red-500">*</span>
@@ -141,9 +137,8 @@ export default function ArrivalDateConfirmation({
               />
             </div>
 
-            {/* Travel Ticket Upload */}
             <div className="space-y-2">
-              <label className="block font-medium text-gray-900">Travel Ticket (optional)</label>
+              <label className="block font-medium text-gray-900">Travel Ticket</label>
               <label
                 htmlFor="ticket_file"
                 className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-8 text-center transition hover:border-blue-500 hover:bg-blue-50/30"
@@ -178,7 +173,6 @@ export default function ArrivalDateConfirmation({
             </div>
           </div>
 
-          {/* Footer */}
           <div className="border-t border-gray-200 px-6 py-4">
             <div className="flex justify-end gap-3">
               <button

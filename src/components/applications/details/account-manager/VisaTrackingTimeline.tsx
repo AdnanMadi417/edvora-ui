@@ -39,6 +39,11 @@ export default function VisaTrackingTimeline({
     error: paymentsError,
   } = useVisaPayments(application?.id || "");
 
+  const hasVisaPayments =
+    Array.isArray(visaPayments) && visaPayments.length > 0;
+
+  const hasVisaCase = !!visaCase
+
   const [downloading, setDownloading] = useState(false);
 
   const handleDownload = async (fileKey?: string) => {
@@ -71,7 +76,7 @@ export default function VisaTrackingTimeline({
 
       showToast("Payment approved successfully!", "success");
 
-      setTimeout(() => window.location.reload(), 2000);
+      setTimeout(() => location.reload(), 300);
 
     } catch (err) {
       console.error(err);
@@ -81,11 +86,9 @@ export default function VisaTrackingTimeline({
     }
   };
 
-  if (visaLoading || paymentsLoading) return <p>Loading visa details...</p>;
-  // if (visaError || paymentsError)
-  //   return <p className="text-red-500">Error loading visa information</p>;
-
-  if (!visaCase) return null;
+  if (!hasVisaCase && !hasVisaPayments) {
+    return null;
+  }
 
   return (
     <section className="mb-6 mt-6 rounded-lg bg-card">
