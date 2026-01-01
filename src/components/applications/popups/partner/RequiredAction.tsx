@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Pause, XCircle } from "lucide-react";
-import { FaExclamationCircle } from "react-icons/fa";
+import { AlertCircle, CheckCircle, Clock, Pause, XCircle } from 'lucide-react';
 import { FaRegFileLines } from "react-icons/fa6";
 import api from "../../../../lib/useApi";
 import { FaFileAlt } from "react-icons/fa";
@@ -106,33 +105,39 @@ export default function RequiredAction({
         className="w-full max-w-lg transform transition-all"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-card shadow-lg">
-          <div className="flex items-start justify-between border-b border-default px-6 pb-4 pt-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
-                <Pause className="h-6 w-6 text-amber-600" strokeWidth={2.5} />
+        <div className="relative overflow-hidden rounded-2xl bg-card shadow-lg ">
+
+          <div className="relative border-b border-default px-6 pb-4 pt-6">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100">
+                  <Pause className="h-6 w-6 text-amber-600" strokeWidth={2.5} />
+                </div>
+                <div>
+                  <h5 className="text-lg font-bold text-gray-900">
+                    Required Application Actions
+                  </h5>
+
+                  <div className="mt-1 flex items-center gap-2 text-sm text-text-muted">
+                    <span className="font-normal">
+                    <span className="font-medium">Next Action: {" "}</span>
+                      {appDetails ? `${appDetails.next_action}` : "Loading..."}
+                  </span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h5 className="text-h4 font-bold text-gray-900">
-                  Required Application Actions
-                </h5>
-                <p className="mt-0.5 text-caption text-text-muted">
-                  {appDetails
-                    ? `Next Action: ${appDetails.next_action}`
-                    : "Loading..."}
-                </p>
-              </div>
+
+              <button
+                onClick={onClose}
+                aria-label="Close dialog"
+                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+              >
+                <XCircle className="h-5 w-5" strokeWidth={2} />
+              </button>
             </div>
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              className="group flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-            >
-              <XCircle className="h-5 w-5" strokeWidth={2} />
-            </button>
           </div>
 
-          <div className="space-y-4 px-6 py-4">
+          <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
             {loading ? (
               <p className="text-text-muted">Loading...</p>
             ) : appDetails ? (
@@ -159,35 +164,36 @@ export default function RequiredAction({
                         {appDetails.document_types.map((doc: any) => (
                           <li
                             key={doc.id}
-                            className="block border-b border-gray-100 pb-3 last:border-b-0 sm:flex-row sm:items-center"
+                            className="block gap-4 rounded-md border border-gray-200 p-4 transition"
                           >
-                            <div className="block">
-                              <div className="mb-2 flex items-center gap-2">
-                                <FaRegFileLines />
-                                <span className="text-sm font-medium">
-                                  {doc.description} ({doc.type})
+
+                            <div className="block mb-4 sm:flex-1">
+                              <div className="flex items-center gap-2">
+                                <FaRegFileLines className="text-blue-500" />
+                                <span className="text-sm font-semibold text-gray-800 uppercase">
+                                  {doc.description}
                                 </span>
                               </div>
+
                               {appDetails.correction_reason && (
-                                <div className="flex items-center gap-2 pl-7">
-                                  <span className="flex items-center gap-1 text-xs font-medium tracking-wider">
-                                    <FaExclamationCircle className="" />
-                                    Reason:
-                                  </span>
-                                  <span className="text-sm text-text-muted">
-                                    {appDetails.correction_reason}
+                                <div className="mt-1 flex items-center gap-2">
+                                  <span className="text-xs font-medium text-orange-400">
+                                    Reason: {" "}
+                                    <span className="text-text-muted">
+                                      {appDetails.correction_reason}
+                                    </span>
                                   </span>
                                 </div>
                               )}
                             </div>
 
-                            <div className="w-full">
+                            <div className="w-full ">
                               <label
                                 htmlFor={`file-${doc.id}`}
-                                className="flex cursor-pointer items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-4 text-center text-sm transition hover:border-blue-500 hover:bg-blue-50"
+                                className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-4 text-center text-sm font-medium text-gray-600 transition hover:border-blue-500 hover:bg-blue-50"
                               >
                                 <svg
-                                  className="h-6 w-6 text-text-muted"
+                                  className="h-6 w-6 text-gray-400"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -199,12 +205,10 @@ export default function RequiredAction({
                                     d="M7 16v4h10v-4m-5-12v12m0 0l-3-3m3 3l3-3"
                                   />
                                 </svg>
-
-                                <span className="font-medium">
+                                <span className="truncate">
                                   {selectedFiles[doc.id]?.name ||
                                     "Upload document"}
                                 </span>
-
                                 <input
                                   id={`file-${doc.id}`}
                                   type="file"
@@ -238,15 +242,17 @@ export default function RequiredAction({
           <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
             <button
               onClick={onClose}
-              className="rounded-full border border-default bg-card px-5 py-2.5 text-p2 text-text-muted hover:bg-gray-50"
+              className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
             >
+              <XCircle className="h-4 w-4" />
               Cancel
             </button>
             <button
               onClick={handleConfirm}
               disabled={Object.values(selectedFiles).every((file) => !file)}
-              className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-p2 text-white hover:from-amber-600 hover:to-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-full border border-amber-600 bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700 transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
             >
+              <CheckCircle className="h-4 w-4" />
               Confirm
             </button>
           </div>

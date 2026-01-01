@@ -154,15 +154,17 @@ export default function HoldPopup({
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleClose}
-                className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
               >
+                <XCircle className="h-4 w-4" />
                 Cancel
               </button>
               <button
                 onClick={handleConfirm}
                 disabled={isConfirming}
-                className="flex items-center justify-center gap-2 rounded-full bg-orange-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-amber-600 bg-amber-100 text-amber-700 px-4 py-2 text-sm font-medium transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
               >
+                <CheckCircle className="h-4 w-4" />
                 {isConfirming ? "Updating..." : "Confirm"}
               </button>
             </div>

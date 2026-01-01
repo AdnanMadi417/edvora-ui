@@ -1,6 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
-import { Download } from "lucide-react";
+import { CheckCircle, Download } from 'lucide-react';
 import { getDocumentDownloadUrl } from "services/documentService";
 import { submitOfferLetterDecision } from "services/offerLetterService";
 import { useToast } from "../../../context/ToastContext";
@@ -78,7 +78,7 @@ export default function OfferLetterDecision({
 
       setTimeout(() => {
         location.reload();
-      }, 3000);
+      }, 1500);
     } catch (err: any) {
       console.error(err);
       showToast(
@@ -148,8 +148,9 @@ export default function OfferLetterDecision({
               <button
                 onClick={() => handleDecision("accept")}
                 disabled={submitting}
-                className="rounded-full border border-blue-500 px-4 py-2.5 text-sm text-blue-500 transition-all hover:border-blue-700 hover:text-blue-700 "
+                className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200"
               >
+                <CheckCircle className="h-4 w-4" />
                 Accept Offer
               </button>
 

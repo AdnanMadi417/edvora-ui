@@ -7,7 +7,10 @@ import {
   FileText,
   Trash,
   File,
-} from "lucide-react";
+  CheckCircle,
+  ChevronLeft,
+  ChevronRight, Trash2,
+} from 'lucide-react';
 import { ENGLISH_TEST_OPTIONS, QUALIFICATION_OPTIONS } from "constants/lists";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
@@ -392,9 +395,9 @@ export default function StudentApplication() {
         return { ...prev, documents: docs };
       });
 
-      showToast("Files uploaded successfully", "success");
+      showToast("File uploaded successfully", "success");
     } catch (err: any) {
-      console.error("Error uploading files:", err);
+      console.error("Error uploading file:", err);
       showToast(err?.message || "Upload failed", "error");
 
       setFormData((prev) => ({
@@ -966,10 +969,10 @@ export default function StudentApplication() {
                       <button
                         type="button"
                         onClick={() => removeDocument(docType.id)}
-                        className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-text-error text-text-error px-4 py-2.5 text-sm transition hover:border-text-error hover:text-text-error sm:w-auto"
+                        className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                       >
-                        <Trash className="h-4 w-4" />
-                        <span className="hidden sm:inline">Remove</span>
+                        <Trash2 className="h-4 w-4" />
+                        Remove
                       </button>
 
                       <label
@@ -1006,8 +1009,9 @@ export default function StudentApplication() {
             {stage > 1 && (
               <button
                 onClick={prevStage}
-                className="rounded-full border px-6 py-2 text-text-muted hover:bg-gray-100"
+                className="flex items-center justify-center gap-2 rounded-full border border-gray-600 bg-gray-100 text-gray-700 px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:bg-gray-200 disabled:opacity-50"
               >
+                <ChevronLeft className="h-4 w-4" />
                 Previous
               </button>
             )}
@@ -1015,15 +1019,17 @@ export default function StudentApplication() {
             {stage < stages.length ? (
               <button
                 onClick={nextStage}
-                className="rounded-full bg-blue-600 px-6 py-2 text-white hover:bg-blue-700"
+                className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
               >
                 Next
+                <ChevronRight className="h-4 w-4" />
               </button>
             ) : (
               <button
                 onClick={handleSubmit}
-                className="rounded-full bg-green-600 px-6 py-2 text-white hover:bg-green-700"
-              >
+                className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 text-green-700 px-4 py-2 text-sm font-medium transition hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
+                >
+                <CheckCircle className="h-4 w-4" />
                 Submit Application
               </button>
             )}

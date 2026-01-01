@@ -17,7 +17,9 @@ import {
   FaUsers,
   FaClock,
   FaStream,
-} from "react-icons/fa";
+  FaCheckCircle
+
+} from 'react-icons/fa';
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
 
@@ -26,8 +28,8 @@ interface ApplicationDetailsProps {
 }
 
 export default function ApplicationDetails({
-  application,
-}: ApplicationDetailsProps) {
+                                             application,
+                                           }: ApplicationDetailsProps) {
 
   function daysSince(dateString: string) {
     if (!dateString) return 0;
@@ -57,6 +59,20 @@ export default function ApplicationDetails({
     return value ? "Male" : "Female";
   };
 
+  const statusText = {
+    1: "Active",
+    2: "On Hold",
+    3: "Cancelled",
+  }[application.lifecycle_status] ?? "Not provided";
+
+  const statusClass = {
+    1: "border-green-200 bg-green-50 text-green-700",
+    2: "border-yellow-200 bg-yellow-50 text-yellow-700",
+    3: "border-red-200 bg-red-50 text-red-700",
+  }[application.lifecycle_status] ?? "border-gray-200 bg-gray-50 text-gray-600";
+
+
+
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 pt-0 shadow-sm sm:p-6">
@@ -74,12 +90,17 @@ export default function ApplicationDetails({
 
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
-                <FaStream  className="text-[10px] text-amber-700" />
+                <FaStream className="text-[10px] text-amber-700" />
                 Stage: {stage.name || "Not provided"}
               </span>
 
+              <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm ${statusClass}`}>
+                <FaCheckCircle className="text-[10px]" />
+                Status: {statusText}
+              </span>
+
               <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
-                <FaClock  className="text-[10px] text-purple-700" />
+                <FaClock className="text-[10px] text-purple-700" />
                 {daysSince(application.updated_at)} Days
               </span>
             </div>
@@ -373,8 +394,8 @@ export default function ApplicationDetails({
                   <dd className="text-sm text-text-muted">
                     {previousEducation.start_date && previousEducation.end_date
                       ? `${formatDate(
-                          previousEducation.start_date
-                        )} - ${formatDate(previousEducation.end_date)}`
+                        previousEducation.start_date
+                      )} - ${formatDate(previousEducation.end_date)}`
                       : "Not provided"}
                   </dd>
                 </div>

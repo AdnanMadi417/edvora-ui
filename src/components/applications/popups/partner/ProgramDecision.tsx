@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { XCircle, RefreshCcw } from "lucide-react";
+import { XCircle, RefreshCcw, CheckCircle } from 'lucide-react';
 import { useUniversities } from "hooks/useUniversities";
 import api from "lib/useApi";
 import { InputField, SelectField } from "components/form";
@@ -150,17 +150,19 @@ export default function ProgramDecisionModal({
           <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
             <button
               onClick={onClose}
-              className="rounded-full border border-default bg-card px-5 py-2.5 text-p2 text-text-muted hover:bg-gray-50"
               disabled={loading}
+              className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
             >
+              <XCircle className="h-4 w-4" />
               Cancel
             </button>
 
             <button
               onClick={handleSubmit}
               disabled={loading || !formData.note.trim() || !formData.program_id}
-              className="rounded-full bg-blue-500 px-5 py-2.5 text-p2 text-white hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
             >
+              <CheckCircle className="h-4 w-4" />
               {loading ? "Submitting..." : "Confirm"}
             </button>
 

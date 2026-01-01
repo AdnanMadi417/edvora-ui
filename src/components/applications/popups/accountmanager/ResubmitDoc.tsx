@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, AlertCircle, RotateCcw } from "lucide-react";
+import { XCircle, AlertCircle, RotateCcw, CheckCircle } from 'lucide-react';
 import InputField from "components/form/InputField";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
@@ -151,21 +151,26 @@ export default function HoldPopup({
           </div>
 
           <div className="border-t border-default px-6 py-5">
+
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleClose}
-                className="rounded-full border border-default bg-card px-5 py-2.5 text-p2 font-medium text-gray-700 hover:bg-gray-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
               >
+                <XCircle className="h-4 w-4" />
                 Cancel
               </button>
+
               <button
                 onClick={handleConfirm}
                 disabled={!formData.reason.trim()}
-                className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-p2 font-medium text-white disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-amber-600 bg-amber-100 text-amber-700 px-4 py-2 text-sm font-medium transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
               >
-                Confirm Request
+                <CheckCircle className="h-4 w-4" />
+                Confirm
               </button>
             </div>
+
           </div>
         </div>
       </div>

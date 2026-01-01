@@ -172,88 +172,77 @@ export default function VisaTrackingTimeline({
                   key={payment.id}
                   className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-gray-300"
                 >
-                  <div className="p-5">
-                    <div className="flex justify-between gap-4 lg:flex-row lg:items-start">
-                      <div className="flex-1 space-y-3">
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full border-blue-600 bg-blue-50">
-                            <FileText className="h-4 w-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-text-muted">
-                              Reference
-                            </p>
-                            <p className="font-mono text-sm font-semibold text-gray-900">
-                              {payment.payment_reference || "N/A"}
-                            </p>
-                          </div>
-                        </div>
 
-                        <div className="flex flex-wrap gap-x-6 gap-y-2">
-                          {/*<div className="flex items-center gap-2 text-sm">*/}
-                          {/*  <DollarSign className="h-4 w-4 text-text-muted" />*/}
-                          {/*  <span className="font-medium text-gray-900">*/}
-                          {/*    {payment.amount ?? "—"} {payment.currency || ""}*/}
-                          {/*  </span>*/}
-                          {/*</div>*/}
+                  <div className="flex flex-col sm:flex-row justify-between gap-4 p-5">
 
-                          <div className="flex items-center gap-2 text-sm text-text-muted">
-                            <Calendar className="h-4 w-4 text-text-muted" />
-                            <span>
-                              {payment.submitted_at
-                                ? new Date(
-                                    payment.submitted_at
-                                  ).toLocaleString()
-                                : "—"}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-end gap-2">
-                        <p className="text-sm font-medium text-text-muted">
-                          Documents
+                    <div className="space-y-3">
+                      <div className="bg-gray-50 py-5 px-4 w-full sm:w-fit rounded-md">
+                        <p className="flex gap-2 text-sm font-medium">
+                          <FileText className="h-4 w-4" />
+                          Visa Payment
                         </p>
-                        {payment.documents.length === 0 ? (
-                          <div className="flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5">
-                            <XCircle className="h-3.5 w-3.5 text-red-500" />
-                            <span className="text-sm font-medium text-red-600">
-                              No documents
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="flex flex-wrap gap-2">
-                            {payment.documents.map((doc) => (
-                              <div
-                                key={doc.id}
-                                className="flex justify-end gap-3"
-                              >
-                                <button
-                                  onClick={() => handleDownload(doc.file_key)}
-                                  disabled={downloading}
-                                  className="group rounded-full border border-green-600 bg-green-50 p-2 text-green-700 transition hover:border-green-700 hover:bg-green-100 disabled:opacity-50"
-                                  title="Download Document"
-                                >
-                                  <Download className="h-4 w-4 text-green-600" />
-                                </button>
 
-                                {payment.status !== "approved" && (
-                                  <button
-                                    onClick={() => handleApprove(payment.id)}
-                                    disabled={loading}
-                                    className="group rounded-full border border-blue-600 bg-blue-50 p-2 text-blue-700 transition hover:border-blue-700 hover:bg-blue-100 disabled:opacity-50"
-                                    title="Approve Payment"
-                                  >
-                                    <CheckCircle className="h-4 w-4 text-blue-600" />
-                                  </button>
-                                )}
-                              </div>
-                            ))}
+                        <p className="mt-1 font-mono text-sm font-semibold text-gray-900 break-all">
+        <span className="font-medium text-text-muted">
+          Payment Reference:
+        </span>{" "}
+                          {payment.payment_reference || "N/A"}
+                        </p>
+
+                        <div className="flex flex-wrap gap-x-6 gap-y-2 mt-2">
+                          <div className="flex items-center gap-2 text-sm text-text-muted">
+                            <Calendar className="h-4 w-4" />
+                            <span>
+            {payment.submitted_at
+              ? new Date(payment.submitted_at).toLocaleString()
+              : "—"}
+          </span>
                           </div>
-                        )}
+                        </div>
                       </div>
                     </div>
+
+                    <div className="flex flex-col items-end sm:items-end gap-2">
+                      <p className="text-sm font-medium text-text-muted">
+                        Documents
+                      </p>
+
+                      {payment.documents.length === 0 ? (
+                        <div className="flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5">
+                          <XCircle className="h-3.5 w-3.5 text-red-500" />
+                          <span className="text-sm font-medium text-red-600">
+          No documents
+        </span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap gap-2 justify-start sm:justify-end">
+                          {payment.documents.map((doc) => (
+                            <div key={doc.id} className="flex gap-3">
+                              <button
+                                onClick={() => handleDownload(doc.file_key)}
+                                disabled={downloading}
+                                className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                              >
+                                <Download className="h-4 w-4" />
+                              </button>
+
+                              {payment.status !== "approved" && (
+                                <button
+                                  onClick={() => handleApprove(payment.id)}
+                                  disabled={loading}
+                                  className="rounded-full border border-blue-600 bg-blue-50 p-2 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                                >
+                                  <CheckCircle className="h-4 w-4" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
                   </div>
+
                 </div>
               ))}
             </div>
