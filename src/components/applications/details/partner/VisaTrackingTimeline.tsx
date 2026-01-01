@@ -10,6 +10,7 @@ import {
   Plane,
   XCircle,
   Receipt,
+  CheckCircle,
 } from "lucide-react";
 import { useVisaCase } from "hooks/useVisaCase";
 import { useVisaPayments } from "hooks/useVisaPayments";
@@ -22,8 +23,8 @@ interface VisaTrackingTimelineProps {
 }
 
 export default function VisaTrackingTimeline({
-                                               application,
-                                             }: VisaTrackingTimelineProps) {
+  application,
+}: VisaTrackingTimelineProps) {
   const [isVisaPopupOpen, setIsVisaPopupOpen] = useState(false);
   const [isArrivalPopupOpen, setIsArrivalPopupOpen] = useState(false);
 
@@ -32,9 +33,7 @@ export default function VisaTrackingTimeline({
 
   const showVisaPayment =
     stageName === "Visa Processing" &&
-    stageStatuses.some(
-      (s: any) => s.name === "Waiting for Payment"
-    );
+    stageStatuses.some((s: any) => s.name === "Waiting for Payment");
 
   const showArrivalConfirmation =
     stageName === "Student Arrival & Enrollment" &&
@@ -148,7 +147,7 @@ export default function VisaTrackingTimeline({
                   <button
                     type="button"
                     onClick={() => setIsVisaPopupOpen(true)}
-                    className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200"
+                    className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200"
                   >
                     <Wallet className="h-4 w-4" />
                     Continue Payment
@@ -191,73 +190,63 @@ export default function VisaTrackingTimeline({
                   key={payment.id}
                   className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:border-gray-300"
                 >
-                  <div className="p-5">
-                    <div className="flex gap-4 lg:flex-row lg:items-start lg:justify-between">
-                      <div className="flex-1 space-y-3">
-                        <div className="bg-gray-50 py-5 px-4 w-fit rounded-md">
-                          <p className=" flex gap-2 text-sm font-medium">
-                            <FileText className="h-4 w-4 " />
-                            Visa Payment</p>
+                  <div className="flex flex-col justify-between gap-4 p-5 sm:flex-row">
+                    <div className="space-y-3">
+                      <div className="w-full rounded-md bg-gray-50 px-4 py-5 sm:w-fit">
+                        <p className="flex gap-2 text-sm font-medium">
+                          <FileText className="h-4 w-4" />
+                          Visa Payment
+                        </p>
 
-                          <p className="mt-1 font-mono text-sm font-semibold text-gray-900 truncate">
-                            <span className="font-medium text-text-muted">Payment Reference: </span>
-                            {payment.payment_reference || "N/A"}
-                          </p>
+                        <p className="mt-1 break-all font-mono text-sm font-semibold text-gray-900">
+                          <span className="font-medium text-text-muted">
+                            Payment Reference:
+                          </span>{" "}
+                          {payment.payment_reference || "N/A"}
+                        </p>
 
-                          <div className="flex flex-wrap gap-x-6 gap-y-2">
-                            {/*<div className="flex items-center gap-2 text-sm">*/}
-                            {/*  <DollarSign className="h-4 w-4 text-text-muted" />*/}
-                            {/*  <span className="font-medium text-gray-900">*/}
-                            {/*    {payment.amount ?? "—"} {payment.currency || ""}*/}
-                            {/*  </span>*/}
-                            {/*</div>*/}
-
-                            <div className="flex items-center gap-2 text-sm text-text-muted">
-                              <Calendar className="h-4 w-4 text-text-muted" />
-                              <span>
+                        <div className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
+                          <div className="flex items-center gap-2 text-sm text-text-muted">
+                            <Calendar className="h-4 w-4" />
+                            <span>
                               {payment.submitted_at
                                 ? new Date(
-                                  payment.submitted_at
-                                ).toLocaleString()
+                                    payment.submitted_at
+                                  ).toLocaleString()
                                 : "—"}
                             </span>
-                            </div>
                           </div>
                         </div>
                       </div>
+                    </div>
 
-                      <div className="flex flex-col items-end gap-2 lg:items-end">
-                        <p className="text-sm font-medium text-text-muted">
-                          Documents
-                        </p>
-                        {payment.documents.length === 0 ? (
-                          <div className="flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5">
-                            <XCircle className="h-3.5 w-3.5 text-red-500" />
-                            <span className="text-sm font-medium text-red-600">
-                              No documents
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="flex flex-wrap gap-2">
-                            {payment.documents.map((doc) => (
-                              <div
-                                key={doc.id}
-                                className="flex justify-end gap-3"
+                    <div className="flex flex-col items-end gap-2 sm:items-end">
+                      <p className="text-sm font-medium text-text-muted">
+                        Documents
+                      </p>
+
+                      {payment.documents.length === 0 ? (
+                        <div className="flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5">
+                          <XCircle className="h-3.5 w-3.5 text-red-500" />
+                          <span className="text-sm font-medium text-red-600">
+                            No documents
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-wrap justify-start gap-2 sm:justify-end">
+                          {payment.documents.map((doc) => (
+                            <div key={doc.id} className="flex gap-3">
+                              <button
+                                onClick={() => handleDownload(doc.file_key)}
+                                disabled={downloading}
+                                className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 hover:bg-green-100 disabled:opacity-50"
                               >
-                                <button
-                                  onClick={() => handleDownload(doc.file_key)}
-                                  disabled={downloading}
-                                  className="group rounded-full border border-green-600 bg-green-50 p-2 text-green-700 transition hover:border-green-700 hover:bg-green-100 disabled:opacity-50"
-                                  title="Download Document"
-                                >
-                                  <Download className="h-4 w-4 text-green-600" />
-                                </button>
-
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                                <Download className="h-4 w-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -267,7 +256,7 @@ export default function VisaTrackingTimeline({
         </div>
 
         {showArrivalConfirmation && (
-          <div className="p-6 border-b border-gray-200">
+          <div className="border-b border-gray-200 p-6">
             <div className="relative rounded-lg border border-gray-200 p-6">
               <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
 
@@ -286,7 +275,7 @@ export default function VisaTrackingTimeline({
                   <button
                     type="button"
                     onClick={() => setIsArrivalPopupOpen(true)}
-                    className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
                   >
                     <Plane className="h-4 w-4" />
                     Confirm Arrival
@@ -298,7 +287,6 @@ export default function VisaTrackingTimeline({
         )}
 
         <div>
-
           <div className="p-6">
             <h3 className="text-lg font-semibold text-gray-900">
               Arrival Documents
@@ -353,7 +341,6 @@ export default function VisaTrackingTimeline({
               </div>
             )}
           </div>
-
         </div>
 
         {isVisaPopupOpen && (
@@ -371,7 +358,6 @@ export default function VisaTrackingTimeline({
             applicationId={application.id}
           />
         )}
-
       </div>
     </section>
   );
