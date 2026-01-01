@@ -175,37 +175,34 @@ export default function VisaTrackingTimeline({
                   <div className="p-5">
                     <div className="flex justify-between gap-4 lg:flex-row lg:items-start">
                       <div className="flex-1 space-y-3">
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-full border-blue-600 bg-blue-50">
-                            <FileText className="h-4 w-4 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-text-muted">
-                              Reference
-                            </p>
-                            <p className="font-mono text-sm font-semibold text-gray-900">
-                              {payment.payment_reference || "N/A"}
-                            </p>
-                          </div>
-                        </div>
+                        <div className="bg-gray-50 py-5 px-4 w-fit rounded-md">
+                          <p className=" flex gap-2 text-sm font-medium">
+                            <FileText className="h-4 w-4 " />
+                            Visa Payment</p>
 
-                        <div className="flex flex-wrap gap-x-6 gap-y-2">
-                          {/*<div className="flex items-center gap-2 text-sm">*/}
-                          {/*  <DollarSign className="h-4 w-4 text-text-muted" />*/}
-                          {/*  <span className="font-medium text-gray-900">*/}
-                          {/*    {payment.amount ?? "—"} {payment.currency || ""}*/}
-                          {/*  </span>*/}
-                          {/*</div>*/}
+                          <p className="mt-1 font-mono text-sm font-semibold text-gray-900 truncate">
+                            <span className="font-medium text-text-muted">Payment Reference: </span>
+                            {payment.payment_reference || "N/A"}
+                          </p>
 
-                          <div className="flex items-center gap-2 text-sm text-text-muted">
-                            <Calendar className="h-4 w-4 text-text-muted" />
-                            <span>
+                          <div className="flex flex-wrap gap-x-6 gap-y-2">
+                            {/*<div className="flex items-center gap-2 text-sm">*/}
+                            {/*  <DollarSign className="h-4 w-4 text-text-muted" />*/}
+                            {/*  <span className="font-medium text-gray-900">*/}
+                            {/*    {payment.amount ?? "—"} {payment.currency || ""}*/}
+                            {/*  </span>*/}
+                            {/*</div>*/}
+
+                            <div className="flex items-center gap-2 text-sm text-text-muted">
+                              <Calendar className="h-4 w-4 text-text-muted" />
+                              <span>
                               {payment.submitted_at
                                 ? new Date(
-                                    payment.submitted_at
-                                  ).toLocaleString()
+                                  payment.submitted_at
+                                ).toLocaleString()
                                 : "—"}
                             </span>
+                            </div>
                           </div>
                         </div>
                       </div>

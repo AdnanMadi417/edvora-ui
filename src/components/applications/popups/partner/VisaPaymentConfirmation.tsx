@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, Wallet, CreditCard } from "lucide-react";
+import { XCircle, Wallet, CreditCard, Trash2, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import {
   getPresignedUploads,
@@ -140,36 +140,31 @@ export default function VisaPaymentConfirmation({
       >
         <div className="relative overflow-hidden rounded-2xl bg-white text-sm shadow-2xl ring-1 ring-black/5">
 
-          {/* Header */}
-          <div className="relative border-b border-gray-200 px-6 pb-4 pt-6">
+          <div className="relative border-b border-default px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
                   <CreditCard className="h-6 w-6 text-blue-600" strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h5 className="text-h4 font-bold text-gray-900">
+                  <h5 className="text-lg font-bold text-gray-900">
                     Visa Application Fee Payment
                   </h5>
-                  <p className="mt-1 text-caption text-text-muted">
-                    Complete your visa fee payment and upload the receipt.
-                  </p>
                 </div>
               </div>
+
               <button
                 onClick={handleClose}
                 aria-label="Close dialog"
-                className="group flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600"
+                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 <XCircle className="h-5 w-5" strokeWidth={2} />
               </button>
             </div>
           </div>
 
-          {/* Body */}
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
 
-            {/* Payment Methods */}
             <div className="flex items-center gap-2">
               <Wallet className="h-4 w-4 text-blue-600" />
               <h4 className="text-sm font-semibold text-gray-900">Payment Methods</h4>
@@ -188,7 +183,7 @@ export default function VisaPaymentConfirmation({
                     onClick={() => setSelectedMethod(method.id)}
                     className={`cursor-pointer rounded-md border p-4 transition-all hover:shadow-sm ${
                       selectedMethod === method.id
-                        ? "border-blue-600 bg-blue-50/40"
+                        ? "border-gray-400 bg-blue-50/40"
                         : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                     }`}
                   >
@@ -202,7 +197,6 @@ export default function VisaPaymentConfirmation({
               </ul>
             )}
 
-            {/* Upload Receipt */}
             <div className="space-y-2">
               <label className="block font-medium text-gray-900">
                 Upload Payment Receipt <span className="text-red-500">*</span>
@@ -240,8 +234,9 @@ export default function VisaPaymentConfirmation({
                   <button
                     type="button"
                     onClick={() => setPaymentReference(null)}
-                    className="flex items-center justify-center gap-2 rounded-full border border-red-500 px-4 py-2.5 text-sm text-red-500 transition hover:border-red-800 hover:text-red-800"
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                   >
+                    <Trash2 className="h-4 w-4" />
                     Remove
                   </button>
                 </div>
@@ -249,20 +244,21 @@ export default function VisaPaymentConfirmation({
             </div>
           </div>
 
-          {/* Footer */}
           <div className="border-t border-gray-200 px-6 py-4">
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleClose}
-                className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
               >
+                <XCircle className="h-4 w-4" />
                 Cancel
               </button>
               <button
                 disabled={!paymentReference || !selectedMethod || isSubmitting}
                 onClick={handleConfirmUpload}
-                className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-500/40 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
               >
+                <CheckCircle className="h-4 w-4" />
                 {isSubmitting ? "Submitting..." : "Confirm Upload"}
               </button>
             </div>

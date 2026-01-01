@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { CheckCircle, Pause, XCircle } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, Pause, XCircle } from 'lucide-react';
 import { FaRegFileLines } from "react-icons/fa6";
 import api from "../../../../lib/useApi";
 import { FaFileAlt } from "react-icons/fa";
@@ -106,27 +106,35 @@ export default function RequiredAction({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative overflow-hidden rounded-2xl bg-card shadow-lg ">
-          <div className="flex items-start justify-between border-b border-gray-200 px-6 pb-4 pt-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 ring-1 ring-amber-200">
-                <Pause className="h-6 w-6 text-amber-600" strokeWidth={2.5} />
+
+          <div className="relative border-b border-default px-6 pb-4 pt-6">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100">
+                  <Pause className="h-6 w-6 text-amber-600" strokeWidth={2.5} />
+                </div>
+                <div>
+                  <h5 className="text-lg font-bold text-gray-900">
+                    Required Application Actions
+                  </h5>
+
+                  <div className="mt-1 flex items-center gap-2 text-sm text-text-muted">
+                    <span className="font-normal">
+                    <span className="font-medium">Next Action: {" "}</span>
+                      {appDetails ? `${appDetails.next_action}` : "Loading..."}
+                  </span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h5 className="text-lg font-bold text-gray-900">
-                  Required Application Actions
-                </h5>
-                <p className="mt-1 text-sm text-gray-500">
-                  {appDetails ? `Next Action: ${appDetails.next_action}` : "Loading..."}
-                </p>
-              </div>
+
+              <button
+                onClick={onClose}
+                aria-label="Close dialog"
+                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+              >
+                <XCircle className="h-5 w-5" strokeWidth={2} />
+              </button>
             </div>
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              className="group flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-            >
-              <XCircle className="h-5 w-5" strokeWidth={2} />
-            </button>
           </div>
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">

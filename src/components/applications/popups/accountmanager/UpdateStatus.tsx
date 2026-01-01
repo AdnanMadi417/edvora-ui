@@ -125,7 +125,7 @@ const DocumentRequestList = ({
               })}
             </div>
 
-            <div className="grid max-h-48 grid-cols-2 gap-2 overflow-y-auto rounded-md border border-gray-200 p-2">
+            <div className="grid grid-cols-1 gap-2 p-2">
               {documentTypes.map((d) => (
                 <label
                   key={d.id}
@@ -767,8 +767,9 @@ export default function UpdateStatusPopup({
                   <button
                     type="button"
                     onClick={() => setOfferLetterFile(null)}
-                    className="bg-background flex items-center justify-center gap-2 rounded-full border border-red-500 px-4 py-2.5  text-sm text-red-500 outline-0 transition hover:border-red-800 hover:text-red-800 sm:w-auto"
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                   >
+                    <Trash2 className="h-4 w-4" />
                     Remove
                   </button>
                 </div>
@@ -865,8 +866,9 @@ export default function UpdateStatusPopup({
                   <button
                     type="button"
                     onClick={() => setVisaDocumentFile(null)}
-                    className="bg-background flex items-center justify-center gap-2 rounded-full border border-red-500 px-4 py-2.5 text-sm text-red-500 outline-0 transition hover:border-red-800 hover:text-red-800 sm:w-auto"
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                   >
+                    <Trash2 className="h-4 w-4" />
                     Remove
                   </button>
                 </div>
@@ -934,8 +936,9 @@ export default function UpdateStatusPopup({
                   <button
                     type="button"
                     onClick={() => setCommissionPaymentFile(null)}
-                    className="rounded-full border border-red-500 px-4 py-2 text-sm text-red-500 hover:border-red-700 hover:text-red-700"
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                   >
+                    <Trash2 className="h-4 w-4" />
                     Remove
                   </button>
                 </div>

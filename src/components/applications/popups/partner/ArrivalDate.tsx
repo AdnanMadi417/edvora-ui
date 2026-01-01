@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, Plane, Upload } from "lucide-react";
+import { XCircle, Plane, Upload, Trash2, CheckCircle } from 'lucide-react';
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import api from "../../../../lib/useApi";
 import { useToast } from "../../../context/ToastContext";
+import { InputField } from "components/form";
+
 
 interface ArrivalDateConfirmationProps {
   isOpen: boolean;
@@ -23,6 +25,15 @@ export default function ArrivalDateConfirmation({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
 
+  const [formData, setFormData] = useState({
+    arrival_date: "",
+  });
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+
+  const updateFormData = (field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
   useEffect(() => {
     if (isOpen) setIsVisible(true);
     else {
@@ -32,8 +43,8 @@ export default function ArrivalDateConfirmation({
   }, [isOpen]);
 
   const handleConfirm = async () => {
-    if (!arrivalDate) {
-      showToast('Please select an arrival date', 'error');
+    if (!formData.arrival_date) {
+      showToast("Please select an arrival date", "error");
       return;
     }
 
@@ -42,14 +53,14 @@ export default function ArrivalDateConfirmation({
 
       let ticketData = null;
       if (ticketFile) {
-        showToast('Uploading travel ticket...', 'info');
+        showToast("Uploading travel ticket...", "info");
 
-        const presigned = await getPresignedUploads([ticketFile], 'travel_ticket');
+        const presigned = await getPresignedUploads([ticketFile], "travel_ticket");
         const results = await uploadFilesToSpaces([ticketFile], presigned);
         const uploaded = results?.[0];
 
         if (!uploaded?.file_key || !uploaded?.public_url) {
-          throw new Error('Travel ticket upload failed');
+          throw new Error("Travel ticket upload failed");
         }
 
         ticketData = {
@@ -59,23 +70,23 @@ export default function ArrivalDateConfirmation({
       }
 
       await api.patch(`/applications/${applicationId}/arrival-date`, {
-        arrival_date: arrivalDate,
+        arrival_date: formData.arrival_date,
         ...ticketData,
       });
 
-      showToast('Arrival date submitted successfully', 'success');
+      showToast("Arrival date submitted successfully", "success");
       setTimeout(() => window.location.reload(), 2000);
-      onClose();
+      handleClose();
     } catch (err) {
       console.error(err);
-      showToast('Failed to submit arrival date', 'error');
+      showToast("Failed to submit arrival date", "error");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleClose = () => {
-    setArrivalDate("");
+    setFormData({ arrival_date: "" });
     setTicketFile(null);
     onClose();
   };
@@ -104,7 +115,7 @@ export default function ArrivalDateConfirmation({
                   <Plane className="h-6 w-6 text-blue-600" strokeWidth={2.5} />
                 </div>
                 <div>
-                  <h5 className="text-h4 font-bold text-gray-900">
+                  <h5 className="text-h4 font-bold text-gray-900 sm:text-lg">
                     Confirm Arrival Date
                   </h5>
                   <p className="mt-1 text-caption text-text-muted">
@@ -125,15 +136,14 @@ export default function ArrivalDateConfirmation({
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
 
             <div className="space-y-2">
-              <label className="block font-medium text-gray-900">
-                Arrival Date<span className="text-red-500">*</span>
-              </label>
-              <input
+              <InputField
+                label="Arrival Date"
+                field="arrival_date"
                 type="date"
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
-                value={arrivalDate}
-                onChange={(e) => setArrivalDate(e.target.value)}
                 required
+                formData={formData}
+                errors={formErrors}
+                updateFormData={updateFormData}
               />
             </div>
 
@@ -164,8 +174,9 @@ export default function ArrivalDateConfirmation({
                   <button
                     type="button"
                     onClick={() => setTicketFile(null)}
-                    className="flex items-center justify-center gap-2 rounded-full border border-red-500 px-4 py-2.5 text-sm text-red-500 transition hover:border-red-800 hover:text-red-800"
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                   >
+                    <Trash2 className="h-4 w-4" />
                     Remove
                   </button>
                 </div>
@@ -177,15 +188,17 @@ export default function ArrivalDateConfirmation({
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleClose}
-                className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
               >
+                <XCircle className="h-4 w-4" />
                 Cancel
               </button>
               <button
-                disabled={!arrivalDate || isSubmitting}
+                disabled={!formData.arrival_date || isSubmitting}
                 onClick={handleConfirm}
-                className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-500/40 disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
               >
+                <CheckCircle className="h-4 w-4" />
                 {isSubmitting ? "Submitting..." : "Confirm Arrival"}
               </button>
             </div>
