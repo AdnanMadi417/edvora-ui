@@ -14,6 +14,7 @@ import {
   CalendarCheck,
   BadgeCheck,
   Settings,
+  RefreshCw  ,
 } from 'lucide-react';
 import avatar from '/public/img/avatars/user.png';
 import Image from 'next/image';
@@ -266,8 +267,9 @@ const ModernApplicationsTable = () => {
                 setFilterStatus('all_status');
                 setFilterStages('all_stages');
               }}
-              className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error sm:w-auto"
+              className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-700 px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
             >
+              <RefreshCw className="h-4 w-4" />
               Clear
             </button>
           </div>
