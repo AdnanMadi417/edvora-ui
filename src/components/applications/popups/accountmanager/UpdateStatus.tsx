@@ -948,8 +948,9 @@ export default function UpdateStatusPopup({
           <button
             onClick={handleClose}
             disabled={isSubmitting}
-            className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
           >
+            <XCircle className="h-4 w-4" />
             Cancel
           </button>
           <button
@@ -960,8 +961,9 @@ export default function UpdateStatusPopup({
               (requiresReason && !reason.trim()) ||
               (isVisaSetupSelected && Number(formData.visa_fee_amount) <= 0)
             }
-            className="rounded-full bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
           >
+            <CheckCircle className="h-4 w-4" />
             {isSubmitting ? "Updating..." : "Update Status"}
           </button>
         </div>

@@ -392,9 +392,9 @@ export default function StudentApplication() {
         return { ...prev, documents: docs };
       });
 
-      showToast("Files uploaded successfully", "success");
+      showToast("File uploaded successfully", "success");
     } catch (err: any) {
-      console.error("Error uploading files:", err);
+      console.error("Error uploading file:", err);
       showToast(err?.message || "Upload failed", "error");
 
       setFormData((prev) => ({

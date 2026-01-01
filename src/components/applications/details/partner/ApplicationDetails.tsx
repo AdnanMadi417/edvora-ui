@@ -20,6 +20,7 @@ import {
   FaUsers,
   FaStream,
   FaClock,
+  FaCheckCircle
 } from "react-icons/fa";
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
@@ -30,8 +31,8 @@ interface ApplicationDetailsProps {
 }
 
 export default function ApplicationDetails({
-  application,
-}: ApplicationDetailsProps) {
+                                             application,
+                                           }: ApplicationDetailsProps) {
   function daysSince(dateString: string) {
     if (!dateString) return 0;
 
@@ -70,6 +71,19 @@ export default function ApplicationDetails({
     return value ? "Male" : "Female";
   };
 
+  const statusText = {
+    1: "Active",
+    2: "On Hold",
+    3: "Cancelled",
+  }[application.lifecycle_status] ?? "Not provided";
+
+  const statusClass = {
+    1: "border-green-200 bg-green-50 text-green-700",
+    2: "border-yellow-200 bg-yellow-50 text-yellow-700",
+    3: "border-red-200 bg-red-50 text-red-700",
+  }[application.lifecycle_status] ?? "border-gray-200 bg-gray-50 text-gray-600";
+
+
   useEffect(() => {
     const fetchDetails = async () => {
       const res = await api.get(`/applications/${application.id}`);
@@ -97,6 +111,11 @@ export default function ApplicationDetails({
               <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
                 <FaStream className="text-[10px] text-amber-700" />
                 Stage: {stage.name || "Not provided"}
+              </span>
+
+              <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm ${statusClass}`}>
+                <FaCheckCircle className="text-[10px]" />
+                Status: {statusText}
               </span>
 
               <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
@@ -151,8 +170,8 @@ export default function ApplicationDetails({
                   Upload Required Documents
                 </button>
               ) : appDetails.stage_statuses?.some(
-                  (status) => status.is_requires_reason
-                ) ? (
+                (status) => status.is_requires_reason
+              ) ? (
                 <button
                   onClick={openProgramDecisionPopup}
                   className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
@@ -420,8 +439,8 @@ export default function ApplicationDetails({
                   <dd className="text-sm text-text-muted">
                     {previousEducation.start_date && previousEducation.end_date
                       ? `${formatDate(
-                          previousEducation.start_date
-                        )} - ${formatDate(previousEducation.end_date)}`
+                        previousEducation.start_date
+                      )} - ${formatDate(previousEducation.end_date)}`
                       : "Not provided"}
                   </dd>
                 </div>
