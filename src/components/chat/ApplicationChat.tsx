@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { conversations } from "components/data/applications";
 
+import ChatWindow from "../chat/ChatInput";
+
 export default function EnhancedReplyChat() {
   const [messages, setMessages] = useState<Message[]>(conversations);
 
@@ -322,6 +324,12 @@ export default function EnhancedReplyChat() {
           </button>
         </div>
       </footer>
+
+
+      <div className="h-full">
+        <ChatWindow applicationId={applicationId} />
+      </div>
+
 
       <style jsx>{`
         @keyframes fadeIn {
