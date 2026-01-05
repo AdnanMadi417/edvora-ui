@@ -9,12 +9,10 @@ import { useToast } from "../../../context/ToastContext";
 
 interface ApplicationCommissionProps {
   application: any;
-  refetchApplication: () => void;
 }
 
 export default function ApplicationCommission({
                                                 application,
-                                                refetchApplication,
                                               }: ApplicationCommissionProps) {
   const [actionData, setActionData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -203,7 +201,6 @@ export default function ApplicationCommission({
             onSuccess={() => {
               setShowDispute(false);
               fetchActionData();
-              refetchApplication();
             }}
           />
         )}
