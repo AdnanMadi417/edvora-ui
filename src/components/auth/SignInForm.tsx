@@ -86,7 +86,6 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
           {loading ? "Signing in..." : "Sign In"}
         </button>
 
-
       </form>
 
     </div>
