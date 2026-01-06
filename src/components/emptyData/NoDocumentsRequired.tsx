@@ -1,3 +1,4 @@
+
 import React from "react";
 import emptyPng from "/public/img/dashboards/empty-data-icon.png";
 import Image from "next/image";
