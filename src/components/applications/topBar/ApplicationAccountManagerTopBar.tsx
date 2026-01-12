@@ -6,7 +6,6 @@ import {
   ChevronLeft,
   MoreVertical,
   Clock,
-  XCircle,
   ExternalLink,
 } from "lucide-react";
 import HoldPopup from "../popups/accountmanager/Hold";
