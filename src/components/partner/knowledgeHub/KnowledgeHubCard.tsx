@@ -21,18 +21,15 @@ import {
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { useAllPrograms } from "../../../hooks/programs/useProgramsList";
-import { useAllFields } from "../../../hooks/programs/useFieldsList";
 import NextButton from "../../ui/buttons/NextButton";
 import PrevButton from "../../../components/ui/buttons/PrevButton";
-import CreateApplicationIconButton from "../../ui/buttons/IconButton";
+import ApplyNowIconBtn from "../../ui/buttons/IconButton";
 import IconLinkBtn from "../../ui/links/IconLinkBtn";
 
 const KnowledgeHubCards = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all_status");
   const [filterStages, setFilterStages] = useState("all_stages");
-
-  const { fields, loading: fieldsLoading, error: fieldsError } = useAllFields();
 
   const {
     programs,
@@ -278,7 +275,7 @@ const KnowledgeHubCards = () => {
                           hoverBorderColor="hover:border-blue-800"
                         />
 
-                        <CreateApplicationIconButton
+                        <ApplyNowIconBtn
                           // onClick={}
                           icon={<CheckCircle className="h-5 w-5" />}
                           bgColor="bg-green-50"

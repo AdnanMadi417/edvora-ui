@@ -33,7 +33,7 @@ export default function OfferLetterDecision({
 
   return (
     <section>
-      <div className="mb-5 mt-5 space-y-4 rounded-lg border border-default bg-card p-4 shadow-sm sm:p-6">
+      <div className="mb-5 mt-5 space-y-4 rounded-lg border border-gray-200 bg-card p-4 shadow-sm sm:p-6">
         <div className="flex items-start gap-4">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
             <FaFilePdf className="text-lg text-blue-700" />

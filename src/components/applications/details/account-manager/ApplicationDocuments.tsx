@@ -91,7 +91,7 @@ export default function ApplicationDocuments({
   return (
     <section className="mb-6 mt-6 rounded-lg bg-card transition-all duration-300">
       <div
-        className={`group flex cursor-pointer items-center justify-between border border-default p-6 transition-all duration-300 ${
+        className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-6 transition-all duration-300 ${
           showDocs ? "rounded-t-lg" : "rounded-lg"
         }`}
         onClick={() => setShowDocs(!showDocs)}
@@ -128,12 +128,12 @@ export default function ApplicationDocuments({
             : "max-h-0 overflow-hidden opacity-0"
         }`}
       >
-        <div className="rounded-b-lg border border-t-0 border-default bg-card p-6">
+        <div className="rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
           <div className="space-y-4">
             {documents.map((doc: any, index: number) => (
               <div
                 key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-default p-5 backdrop-blur transition-all duration-300"
+                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
                 style={{
                   animation: showDocs
                     ? `slideIn 0.3s ease-out ${index * 0.08}s both`
