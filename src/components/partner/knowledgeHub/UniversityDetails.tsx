@@ -34,7 +34,7 @@ import {
   Percent,
   BadgePercent, ChevronLeft,
 } from 'lucide-react';
-import CardHeader from "../../../components/ui/CardHeader"
+import CardHeader from "../../ui/card/CardHeader"
 
 interface UniversityDetailsProps {
   id: string;
