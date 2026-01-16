@@ -14,7 +14,7 @@ import {
   BadgeCheck,
   Settings,
   CalendarCheck,
-  GraduationCap, RefreshCw,
+  GraduationCap, RefreshCw, ArrowRight, ArrowLeft,
 } from 'lucide-react';
 import avatar from "/public/img/avatars/user.png";
 import Image from "next/image";
@@ -22,6 +22,9 @@ import Link from "next/link";
 import EmptyData from "components/emptyData/EmptyTableData";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import NextButton from '../../ui/buttons/NextButton';
+import PrevButton from '../../ui/buttons/PrevButton';
+import ClearButton from '../../ui/buttons/DangerButton';
 
 const PartnerApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -192,7 +195,7 @@ const PartnerApplications = () => {
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-default bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -213,7 +216,7 @@ const PartnerApplications = () => {
                 placeholder="Search applications by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full border border-default px-4 py-2.5 pl-10 pr-4 text-sm text-text-muted outline-0 placeholder:text-text-muted focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-text-muted outline-0 placeholder:text-text-muted focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -222,7 +225,7 @@ const PartnerApplications = () => {
               <select
                 value={filterStages}
                 onChange={(e) => setFilterStages(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:text-blue-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-gray-200 py-2.5 pl-10 pr-8 text-sm outline-0 focus:text-blue-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all_stages">All Stages</option>
                 <option value="application_review">Application Review</option>
@@ -236,7 +239,7 @@ const PartnerApplications = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-default py-2.5 pl-10 pr-8 text-sm outline-0 focus:text-blue-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full cursor-pointer rounded-full border border-gray-200 py-2.5 pl-10 pr-8 text-sm outline-0 focus:text-blue-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               >
                 <option value="all_status">All Status</option>
                 <option value="new_application">New Application</option>
@@ -247,32 +250,31 @@ const PartnerApplications = () => {
               </select>
             </div>
 
-            <button
+            <Link
+              className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-text-muted outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+              href="/partner/applications/new-application"
+            >
+              New Application
+            </Link>
+
+            <ClearButton
               onClick={() => {
                 setSearchTerm("");
                 setFilterStatus('all_status');
                 setFilterStages('all_stages');
               }}
-              className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-700 px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Clear
-            </button>
+              text="Clear"
+              icon={<RefreshCw className="h-4 w-4" />}
+            />
 
-            <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href="/partner/applications/new-application"
-            >
-              New Application
-            </Link>
           </div>
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-default bg-card">
+      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-card">
         <table className="w-full">
           <thead>
-          <tr className="border-b border-default bg-card">
+          <tr className="border-b border-gray-200 bg-card">
             <th
               onClick={() => handleSort("studentName")}
               className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
@@ -344,7 +346,7 @@ const PartnerApplications = () => {
           </tr>
           </thead>
 
-          <tbody className="divide-border-default divide-y bg-primary">
+          <tbody className="divide-border-gray-200 divide-y bg-primary">
           {loading ? (
             <tr>
               <td
@@ -371,7 +373,7 @@ const PartnerApplications = () => {
               >
                 <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-default">
+                    <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-white border border-gray-200">
                       <Image
                         width={40}
                         height={40}
@@ -426,7 +428,7 @@ const PartnerApplications = () => {
                   <Link
                     href={`/partner/applications/${app.id}`}
                     aria-label="View Application"
-                    className="flex items-center justify-center gap-2 rounded-full border border-default p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
+                    className="flex items-center justify-center gap-2 rounded-full border border-gray-200 p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
                   >
                     <Eye className="h-4 w-4" />
                     <span>View</span>
@@ -441,7 +443,7 @@ const PartnerApplications = () => {
         </table>
       </div>
 
-      <div className="sticky bottom-0 rounded-b-lg border border-default bg-card px-6 py-4">
+      <div className="sticky bottom-0 rounded-b-lg border border-gray-200 bg-card px-6 py-4">
         <div className="flex flex-col items-center justify-between gap-2 text-sm text-text-muted md:flex-row">
           <div>
             Showing{" "}
@@ -463,24 +465,27 @@ const PartnerApplications = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <button
+
+            <PrevButton
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="rounded-full border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Previous
-            </button>
+              text="Previous"
+              icon={<ArrowLeft  className="h-4 w-4" />}
+            />
+
             <span className="px-2 text-text-muted">
               Page {currentPage} of {totalPages}
             </span>
-            <button
+
+            <NextButton
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="rounded-full border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Next
-            </button>
+              text="Next"
+              icon={<ArrowRight className="h-4 w-4" />}
+            />
+
           </div>
+
         </div>
       </div>
     </div>

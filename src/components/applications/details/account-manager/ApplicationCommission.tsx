@@ -26,7 +26,7 @@ export default function ApplicationCommissions({ application }: ApplicationCommi
   const total = commissions.reduce((sum: number, c: any) => sum + (c.amount || 0), 0);
 
   return (
-    <section className="mb-6 mt-6 rounded-lg border border-default bg-card p-6">
+    <section className="mb-6 mt-6 rounded-lg border border-gray-200 bg-card p-6">
       <div className="flex items-center gap-3 mb-4">
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
           <DollarSign className="text-xl text-green-700" />
@@ -48,7 +48,7 @@ export default function ApplicationCommissions({ application }: ApplicationCommi
           commissions.map((c: any, i: number) => {
             const status = statusMap[c.status] || statusMap.default;
             return (
-              <div key={c.id} className="flex items-center justify-between rounded-lg border border-default p-4">
+              <div key={c.id} className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center gap-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">{status.icon}</div>
                   <div>

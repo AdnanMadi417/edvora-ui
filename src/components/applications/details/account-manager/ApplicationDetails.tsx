@@ -75,7 +75,7 @@ export default function ApplicationDetails({
 
   return (
     <section>
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 pt-0 shadow-sm sm:p-6">
+      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
         <ApplicationAccountManagerTopBar application={application} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
@@ -151,7 +151,7 @@ export default function ApplicationDetails({
         </div>
       </div>
 
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-6 shadow-sm">
+      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <MdAssignmentTurnedIn className="text-xl text-blue-700" />
@@ -234,7 +234,7 @@ export default function ApplicationDetails({
         </div>
       </div>
 
-      <div className="mb-6 mt-6 space-y-6 rounded-xl border border-default bg-card p-6">
+      <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <FaUser className="text-xl text-blue-700" />
