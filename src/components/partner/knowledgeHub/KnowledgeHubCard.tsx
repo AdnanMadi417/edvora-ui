@@ -155,7 +155,7 @@ const KnowledgeHubCards = () => {
                     <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-500/80 via-blue-600/80 to-indigo-700/80" />
 
                     {/* Header */}
-                    <div className="relative border-b border-gray-200 px-4 py-6">
+                    <div className="relative px-5 py-4 ">
                       <div className="flex items-start gap-4">
 
                         <div className="relative flex-shrink-0">
@@ -183,7 +183,7 @@ const KnowledgeHubCards = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 px-4 py-3 text-xs">
+                    <div className="grid grid-cols-2 border-y border-gray-200 gap-2 px-5 py-4 text-xs">
                       <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 font-medium text-blue-700">
                         <MdSchool className="h-3.5 w-3.5" />
                         <span className="capitalize">
@@ -204,7 +204,7 @@ const KnowledgeHubCards = () => {
                       </div>
                     </div>
 
-                    <div className="px-4 py-3 text-xs">
+                    <div className="px-5 py-4 text-xs">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="flex items-center gap-2 font-medium text-slate-500">
