@@ -9,13 +9,20 @@ import {
   BadgePercent,
   ArrowRight,
   ArrowLeft,
+  GraduationCap,
+  Clock,
+  MapPin,
+  Calendar,
 } from "lucide-react";
 import {
   MdMenuBook,
   MdLocationOn,
   MdAccessTime,
-  MdOutlineDateRange,
   MdSchool,
+  MdAttachMoney,
+  MdEvent,
+  MdLaptop,
+  MdApartment,
 } from "react-icons/md";
 
 import Loading from "components/loading/Loading";
@@ -23,8 +30,8 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { useAllPrograms } from "../../../hooks/programs/useProgramsList";
 import NextButton from "../../ui/buttons/NextButton";
 import PrevButton from "../../../components/ui/buttons/PrevButton";
-import ApplyNowIconBtn from "../../ui/buttons/IconButton";
-import IconLinkBtn from "../../ui/links/IconLinkBtn";
+import ApplyNowBtn from "../../ui/buttons/Button";
+import LinkBtn from "../../ui/links/LinkBtn";
 
 const KnowledgeHubCards = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -42,6 +49,16 @@ const KnowledgeHubCards = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentPrograms = programs.slice(indexOfFirstItem, indexOfLastItem);
+
+  const formatDate = (date: string) =>
+    new Date(date).toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+
+  const sortDates = (dates: string[]) =>
+    [...dates].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
@@ -128,170 +145,168 @@ const KnowledgeHubCards = () => {
 
           {!programsError && programs.length > 0 && (
             <div className="block">
-              <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
                 {currentPrograms.map((program) => (
                   <div
                     key={program.id}
-                    className="relative overflow-hidden rounded-md border border-gray-200 bg-card shadow-sm"
+                    className="relative overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    {/* Header */}
+                    {/* Gradient Top Accent */}
+                    <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-500/80 via-blue-600/80 to-indigo-700/80" />
 
-                    <div className="bg-background flex h-[100px] items-center gap-4 overflow-hidden rounded-t-lg border-b border-gray-200 p-4">
-                      <div className="flex items-center gap-2">
-                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-white">
-                          <MdSchool className="h-6 w-6 text-blue-600" />
+                    {/* Header */}
+                    <div className="relative border-b border-gray-200 px-4 py-6">
+                      <div className="flex items-start gap-4">
+
+                        <div className="relative flex-shrink-0">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
+                            <GraduationCap className="h-6 w-6 text-white" />
+                          </div>
 
                           <span
-                            className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white ${
+                            className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-white ${
                               program.university?.is_active
-                                ? "bg-green-500"
+                                ? "bg-emerald-500"
                                 : "bg-red-500"
                             }`}
-                          ></span>
+                          />
                         </div>
 
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-text-primary">
+                        <div className="min-w-0 flex-1">
+                          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900">
                             {program.name}
-                          </span>
-                          <span className="text-xsm text-text-muted">
+                          </h3>
+                          <p className="mt-1 text-xs text-slate-500">
                             {program.university?.name}
-                          </span>
+                          </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Details */}
-                    <div className="px-6 py-4">
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <div className="flex items-center gap-1">
-                            <MdMenuBook className="h-4 w-4" />
-                            <span>Level</span>
-                          </div>
-                          <span className="text-text-muted">
-                            {program.qualification_level}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between text-sm">
-                          <div className="flex items-center gap-1">
-                            <MdLocationOn className="h-4 w-4" />
-                            <span>Location</span>
-                          </div>
-                          <span className="text-text-muted">
-                            ({program.university?.country})
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between text-sm">
-                          <div className="flex items-center gap-1">
-                            <MdAccessTime className="h-4 w-4" />
-                            <span>Duration</span>
-                          </div>
-                          <span className="text-text-muted">
-                            {/*{program.duration}*/}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between text-sm">
-                          <div className="flex items-center gap-1">
-                            <MdSchool className="h-4 w-4" />
-                            <span>Mode of Study</span>
-                          </div>
-                          <span className="text-text-muted">
-                            {/*{program.mode}*/}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between text-sm">
-                          <div className="flex items-center gap-1">
-                            <MdOutlineDateRange className="h-4 w-4" />
-                            <span>Next Intake</span>
-                          </div>
-                          <span className="text-text-muted">
-                            {/*{program.intake}*/}
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between text-sm">
-                          <div className="flex items-center gap-1">
-                            <MdOutlineDateRange className="h-4 w-4" />
-                            <span>Deadline</span>
-                          </div>
-                          <span className="text-text-muted">
-                            {/*{program.deadline}*/}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-3 border-t border-gray-200 px-6 py-4 text-center">
-                      <div>
-                        <div className="flex items-center justify-center gap-1 text-sm font-semibold text-black">
-                          <BadgePercent className="h-4 w-4" />
-                          <span>{program.commission_rate ?? "-"}</span>
-                        </div>
-                        <span className="text-xs text-text-muted">
-                          Commission
+                    <div className="grid grid-cols-2 gap-2 px-4 py-3 text-xs">
+                      <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 font-medium text-blue-700">
+                        <MdSchool className="h-3.5 w-3.5" />
+                        <span className="capitalize">
+                          {program.qualification_level}
                         </span>
                       </div>
 
-                      <div className="border-l border-gray-200">
-                        <div className="text-sm font-semibold text-black">
-                          {program.tuition_fee ?? "-"}
+                      <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 font-medium text-slate-700">
+                        {program.is_online ? (
+                          <>
+                            <MdLaptop className="h-3.5 w-3.5" /> Online
+                          </>
+                        ) : (
+                          <>
+                            <MdApartment className="h-3.5 w-3.5" /> On Campus
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="px-4 py-3 text-xs">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="flex items-center gap-2 font-medium text-slate-500">
+                            <MdAccessTime className="h-4 w-4" /> Duration
+                          </span>
+                          <span className="text-sm font-semibold text-slate-900">
+                            {program.duration
+                              ? `${program.duration} years`
+                              : "Not provided"}
+                          </span>
                         </div>
-                        <span className="text-xs text-text-muted">Tuition</span>
+
+                        <div className="flex items-center justify-between">
+                          <span className="flex items-center gap-2 font-medium text-slate-500">
+                            <MdAttachMoney className="h-4 w-4" /> Tuition
+                          </span>
+                          <span className="text-sm font-semibold text-slate-900">
+                            {program.tuition_fee
+                              ? `$${program.tuition_fee.toLocaleString()}`
+                              : "Not provided"}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="flex items-center gap-2 font-medium text-slate-500">
+                            <MapPin className="h-4 w-4" /> Country
+                          </span>
+                          <span className="text-sm font-semibold text-slate-900">
+                            {program.university?.country}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="flex items-center gap-2 font-medium text-slate-500">
+                            <Calendar className="h-4 w-4" /> Next Intake
+                          </span>
+
+                          {program.intake_dates?.length ? (
+                            <span className="text-sm font-semibold text-blue-700">
+                              {formatDate(
+                                program.next_intake ??
+                                  sortDates(program.intake_dates)[0]
+                              )}
+                            </span>
+                          ) : (
+                            <span className="text-xs text-slate-400">
+                              Intake not announced
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-5 py-4">
+                      <div>
+                        <div className="text-xs text-gray-500">
+                          First-Year Cost
+                        </div>
+                        <div className="mt-1 text-lg font-bold text-slate-900">
+                          {program.first_year_tuition
+                            ? `$${program.first_year_tuition.toLocaleString()}`
+                            : "Not provided"}
+                        </div>
                       </div>
 
-                      <div className="border-l border-gray-200">
-                        <div className="text-sm font-semibold text-black">
-                          {/* You can add rating here if you have it */}-
-                        </div>
-                        <span className="text-xs text-text-muted">Rating</span>
+                      <div className="flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
+                        <BadgePercent className="h-4 w-4" />
+                        {program.commission_rate ?? "-"}%
                       </div>
                     </div>
 
                     {/* Footer */}
-                    <div className="bg-background flex justify-between gap-3 border-t border-gray-200 px-6 py-4">
-                      <div className="flex items-center text-xs text-text-muted">
-                        <span className="uppercase tracking-wide">Created</span>
-                        <span className="ml-2 font-medium text-black">
-                          {/*{program.createdAt}*/}
-                        </span>
-                      </div>
+                    <div className="flex flex-col gap-2 border-t border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+                      <LinkBtn
+                        href={`/partner/knowledgeHub/${program.id}`}
+                        icon={<MdMenuBook className="h-4 w-4" />}
+                        label="View"
+                        title="View details"
+                        bgColor="bg-blue-50"
+                        textColor="text-blue-600"
+                        borderColor="border border-blue-600"
+                        hoverTextColor="hover:text-blue-800"
+                        hoverBorderColor="hover:border-blue-800"
+                        className="w-full sm:w-auto"
+                      />
 
-                      <div className="flex gap-3">
-
-                        <IconLinkBtn
-                          href={`/partner/knowledgeHub/${program.id}`}
-                          icon={<MdMenuBook className="h-5 w-5" />}
-                          title="View details"
-                          bgColor="bg-blue-50"
-                          textColor="text-blue-600"
-                          borderColor="border border-blue-800"
-                          hoverTextColor="hover:text-blue-800"
-                          hoverBorderColor="hover:border-blue-800"
-                        />
-
-                        <ApplyNowIconBtn
-                          // onClick={}
-                          icon={<CheckCircle className="h-5 w-5" />}
-                          bgColor="bg-green-50"
-                          textColor="text-green-600"
-                          borderColor="border-green-800"
-                          hoverTextColor="hover:text-green-800"
-                          hoverBorderColor="hover:border-green-800"
-                        />
-                      </div>
+                      <ApplyNowBtn
+                        icon={<CheckCircle className="h-4 w-4" />}
+                        text="Apply"
+                        bgColor="bg-green-50"
+                        textColor="text-green-700"
+                        borderColor="border-green-600"
+                        hoverTextColor="hover:text-green-800"
+                        hoverBorderColor="hover:border-green-800"
+                        className="w-full sm:w-auto"
+                      />
                     </div>
                   </div>
                 ))}
               </div>
 
               <div className=" flex justify-between border-t border-gray-200 p-6">
-
                 {programs.length > 0 && (
                   <div className="flex items-center gap-1 text-sm font-medium text-text-muted">
                     Showing
@@ -339,9 +354,7 @@ const KnowledgeHubCards = () => {
                     icon={<ArrowRight className="h-4 w-4" />}
                   />
                 </div>
-
               </div>
-
             </div>
           )}
         </div>

@@ -443,32 +443,32 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             iconColor="text-blue-600"
           />
 
-          <div className="grid grid-cols-1 gap-4 px-6 pb-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-3">
             <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-center">
-              <div className="flex items-center justify-center gap-1 text-base font-semibold text-gray-900 md:text-lg">
+              <div className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 md:text-lg">
                 <BadgePercent className="h-5 w-5 text-blue-600" />
                 10%
               </div>
-              <p className="mt-1 text-sm text-gray-500 md:text-lg">
+              <p className="mt-1 text-sm text-gray-900 md:text-lg">
                 Commission
               </p>
             </div>
 
             <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-center">
-              <div className="flex items-center justify-center gap-1 text-base font-semibold text-gray-900 md:text-lg">
+              <div className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 md:text-lg">
                 <MdStar className="h-5 w-5 text-yellow-500" />
                 300RM
               </div>
-              <p className="mt-1 text-sm text-gray-500 md:text-lg">
+              <p className="mt-1 text-sm text-gray-900 md:text-lg">
                 Total Amount
               </p>
             </div>
 
             <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-center">
-              <div className="text-base md:text-lg font-semibold text-gray-900">
+              <div className="text-base md:text-lg font-semibold text-gray-800">
                 One-time / year
               </div>
-              <p className="mt-1 text-sm text-gray-500 md:text-lg">Commission Type</p>
+              <p className="mt-1 text-sm text-gray-900 md:text-lg">Commission Type</p>
             </div>
           </div>
 

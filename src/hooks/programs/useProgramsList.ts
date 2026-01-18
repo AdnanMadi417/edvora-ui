@@ -19,12 +19,48 @@ export type University = {
 export type Program = {
   id: string;
   name: string;
-  tuition_fee: number;
-  commission_rate?: number;
-  qualification_level: string;
-  field_of_study?: FieldOfStudy;
-  university: University;
+
+  tuition_fee: number | null;
+  first_year_tuition: number | null;
+
+  intake_dates: string[] | null;
+  next_intake: string | null;
+
+  duration: number | null;
+
+  yearly_fees: number[];
+  one_time_fees: number[];
+
+  english_required_score: number | null;
+
+  overview: string | null;
+  curriculum: string | null;
+
+  is_on_campus: boolean;
+  is_online: boolean;
+
+  commission_rate: number | null;
+
+  qualification_level: "bachelor" | "master" | "phd" | string;
+
+  field_of_study: {
+    id: string;
+    name: string;
+    code: string;
+    is_active: boolean;
+  };
+
+  university: {
+    id: string;
+    name: string;
+    country: string;
+    is_active: boolean;
+    description: string | null;
+    state: string | null;
+    intake_months: string[] | null;
+  };
 };
+
 
 export type GetProgramsParams = {
   level?: "undergraduate" | "graduate";
