@@ -1,9 +1,7 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import avatar from "/public/img/avatars/user.png";
 import {
   MdMenuBook,
   MdSchool,
@@ -32,38 +30,28 @@ import {
   CheckCircle,
   MinusCircle,
   Percent,
-  BadgePercent, ChevronLeft,
-} from 'lucide-react';
-import CardHeader from "../../ui/card/CardHeader"
+  BadgePercent,
+  ChevronLeft,
+} from "lucide-react";
+import CardHeader from "../../ui/card/CardHeader";
+import Link from "next/link";
+import { useProgram } from "../../../hooks/programs/useProgram";
+import Loading from "components/loading/Loading";
 
 interface UniversityDetailsProps {
   id: string;
 }
 
 const UniversityDetails = ({ id }: UniversityDetailsProps) => {
-  const programDetails = [
-    { label: "Level", value: "Master", icon: MdMenuBook },
-    { label: "Field / Faculty", value: "Engineering", icon: MdSchool },
-    { label: "Duration", value: "2 years (4 semesters)", icon: MdAccessTime },
-    {
-      label: "Intake(s)",
-      value: "January 2026, September 2026",
-      icon: MdEvent,
-    },
-    { label: "Campus", value: "Downtown Campus", icon: MdLocationCity },
-    { label: "City / Country", value: "Toronto, Canada", icon: MdPublic },
-    { label: "Class Type", value: "On-campus (Physical)", icon: MdGroups },
-    {
-      label: "English Requirement",
-      value: "IELTS 6.5 (min 6.0 each band) or TOEFL iBT 93",
-      icon: MdLanguage,
-    },
-  ];
-
   const router = useRouter();
   const handleBack = () => {
     router.push("/partner/knowledgeHub/");
   };
+  const {
+    program,
+    loading: programLoading,
+    error: programError,
+  } = useProgram(id);
 
   const requiredDocuments = [
     { label: "Passport", required: true },
@@ -72,30 +60,34 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     { label: "Curriculum Vitae (CV)", required: false },
   ];
 
+  if (!program) return <Loading text="Loading program details..." />;
+
   return (
     <>
       <div className="mt-6">
         <div className="rounded-md border border-default bg-card shadow-sm">
-
-          <div className="flex justify-between border-b border-gray-100 p-6">
-
+          <div className="flex justify-between border-b border-gray-200 p-6">
             <div className="flex items-center gap-4">
-              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border">
-                <Image
-                  src={avatar}
-                  alt="Program Avatar"
-                  width={56}
-                  height={56}
-                  className="h-14 w-14 object-cover"
+              <div className="relative flex-shrink-0">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
+                  <GraduationCap className="h-8 w-8 text-white" />
+                </div>
+
+                <span
+                  className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-white ${
+                    program.field_of_study?.is_active
+                      ? "bg-emerald-500"
+                      : "bg-red-500"
+                  }`}
                 />
               </div>
 
               <div className="min-w-0">
                 <h3 className="line-clamp-2 text-lg font-semibold text-text-primary">
-                  Master of Manufacturing Engineering
+                  {program?.name ?? "Not Provided"}
                 </h3>
                 <p className="mt-1 truncate text-sm text-text-muted">
-                  University of Toronto
+                  {program?.university?.name ?? "Not Provided"}
                 </p>
               </div>
             </div>
@@ -109,35 +101,179 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <span className="hidden sm:inline">Back to Programs</span>
               </button>
             </div>
+          </div>
 
+          <div className="p-6 pb-0">
+            <div className="p-6 rounded-md border border-gray-200 bg-gray-50 shadow-sm">
+              <h4 className="flex items-center gap-3 text-lg font-semibold text-text-primary">
+                <BookOpen className="h-5 w-5 text-slate-500" />
+                University Overview
+              </h4>
+
+              {program?.university?.description && (
+                <div className="mt-4">
+                  <h5 className="text-sm font-medium text-slate-800">About University</h5>
+                  <p className="mt-1 text-sm leading-relaxed text-gray-700">
+                    {program.university.description}
+                  </p>
+                </div>
+              )}
+
+              {program?.overview && (
+                <div className="mt-4">
+                  <h5 className="text-sm font-medium text-slate-800">Program Overview</h5>
+                  <p className="mt-1 text-sm leading-relaxed text-gray-700">
+                    {program.overview}
+                  </p>
+                </div>
+              )}
+
+              {program?.curriculum && (
+                <div className="mt-4">
+                  <h5 className="text-sm font-medium text-slate-800">Curriculum</h5>
+                  <p className="mt-1 text-sm leading-relaxed text-gray-700">
+                    {program.curriculum}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
-            {programDetails.map((item, index) => (
-              <div
-                key={index}
-                className={`flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3`}
-              >
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
-                  <item.icon className="h-4 w-4" />
-                </div>
-
-                <div className="min-w-0">
-                  <p className="text-xs text-text-muted">{item.label}</p>
-                  <p className="mt-0.5 text-sm font-medium text-text-primary">
-                    {item.value}
-                  </p>
-                </div>
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+                <MdMenuBook className="h-4 w-4" />
               </div>
-            ))}
-          </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-muted">Country</p>
+                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                  {program?.university?.country ?? "Not Provided"}
+                </p>
+              </div>
+            </div>
 
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+                <MdMenuBook className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-muted">State / Province</p>
+                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                  {program?.university?.state ?? "Not Provided"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+                <MdMenuBook className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-muted">Level</p>
+                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                  {program?.qualification_level ?? "Not Provided"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+                <MdSchool className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-muted">Field / Faculty</p>
+                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                  {program?.field_of_study?.name ?? "Not Provided"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+                <MdAccessTime className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-muted">Duration</p>
+                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                  {program?.duration
+                    ? `${program.duration} years`
+                    : "Not Provided"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+                <MdEvent className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-muted">Intake(s)</p>
+                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                  {program?.intake_dates?.length
+                    ? program.intake_dates.join(", ")
+                    : program?.next_intake ?? "Not Provided"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+                <MdLocationCity className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-muted">Campus</p>
+                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                  {program?.is_on_campus ? "On-campus" : "Online"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+                <MdPublic className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-muted">City / Country</p>
+                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                  {program?.university
+                    ? `${program.university.name}, ${program.university.country}`
+                    : "Not Provided"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+                <MdGroups className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-muted">Class Type</p>
+                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                  {program?.is_online ? "Online" : "On-campus (Physical)"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+                <MdLanguage className="h-4 w-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-muted">English Requirement</p>
+                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                  {program?.english_required_score
+                    ? `Min score: ${program.english_required_score}`
+                    : "Not Provided"}
+                </p>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
 
       <div className="mt-6">
         <div className="rounded-md border border-default bg-card shadow-sm">
-
           <CardHeader
             icon={CreditCard}
             title="Fees & Cost Breakdown"
@@ -147,54 +283,61 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             iconColor="text-blue-600"
           />
 
-          <div className="p-6 border-b border-gray-200">
+          <div className="border-b border-gray-200 p-6">
             <h4 className="flex items-center gap-3 text-lg font-semibold text-text-primary">
               <CreditCard className="h-5 w-5 text-slate-500" />
               Tuition Fees
             </h4>
 
             <div className="mt-6 overflow-hidden rounded-md border border-slate-200 ">
-
               <div className="grid grid-cols-2 bg-blue-50">
-                <div className="flex items-center gap-3 px-5 py-4 text-xs md:text-sm font-semibold text-slate-800">
+                <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">
                   <Calendar className="h-4 w-4 text-blue-600" />
                   Year / Semester
                 </div>
 
-                <div className="flex items-center gap-3 px-5 py-4 text-sx md:text-sm font-semibold text-slate-800 md:justify-end">
+                <div className="text-sx flex items-center gap-3 px-5 py-4 font-semibold text-slate-800 md:justify-end md:text-sm">
                   <Banknote className="h-4 w-4 text-blue-600" />
                   Tuition Fee
                 </div>
               </div>
 
-              {[
-                { year: "Year 1", fee: "RM 10,000" },
-                { year: "Year 2", fee: "RM 10,000" },
-                { year: "Year 3", fee: "RM 10,000" },
-                { year: "Year 4", fee: "RM 10,000" },
-                { year: "Total amount ", fee: "RM 40,000" },
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50 "
-                >
-                  <div className="px-5 py-4 text-sm text-slate-700">
-                    {item.year}
-                  </div>
+              <div className="overflow-hidden">
+                {program?.yearly_fees?.map((item, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
+                  >
+                    <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
+                      Year {item.year}
+                    </div>
 
-                  <div className="px-5 py-4 text-sm font-medium text-slate-900 md:text-right">
-                    {item.fee}
+                    <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
+                      RM {item.fee.toLocaleString()}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+
+                {/* Total row */}
+                {program?.yearly_fees?.length > 0 && (
+                  <div className="grid grid-cols-2 border-t border-slate-200 bg-gray-50 font-semibold">
+                    <div className="px-5 py-4 text-sm text-slate-700">
+                      Total amount
+                    </div>
+                    <div className="px-5 py-4 text-sm text-slate-900 md:text-right">
+                      {/*${totalFee.toLocaleString()}*/}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           <div className="border-b border-gray-100 p-6">
             <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
-                  <Banknote className="h-5 w-5 text-blue-600" />
-                </span>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
+                <Banknote className="h-5 w-5 text-blue-600" />
+              </span>
 
               <div className="min-w-0">
                 <h4 className="text-base font-semibold tracking-tight text-slate-900">
@@ -209,7 +352,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
             <div className="mt-6 overflow-hidden rounded-md border border-slate-200">
               <div className="grid grid-cols-2 bg-blue-50">
-                <div className="flex items-center gap-3 px-5 py-4 text-xs md:text-sm font-semibold text-slate-800">
+                <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">
                   <Layers className="h-4 w-4 text-blue-600" />
                   Fees Type
                 </div>
@@ -220,39 +363,39 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 </div>
               </div>
 
-              {[
-                { type: "Registration Fee", amount: "RM 500" },
-                { type: "Administration Fee", amount: "RM 1,200" },
-                { type: "Admission Fee", amount: "RM 800" },
-                { type: "Service Fee", amount: "RM 600" },
-                {
-                  type: "Visa Application Fee (estimated)",
-                  amount: "RM 1,500",
-                },
-                { type: "Bond / Deposit", amount: "RM 5,000" },
-                { type: "Total Fess", amount: "RM 35,000" },
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
-                >
-                  <div className="px-5 py-4 text-xs md:text-sm text-slate-700">
-                    {item.type}
-                  </div>
+              <div className="overflow-hidden">
+                {program?.one_time_fees?.map((item, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
+                  >
+                    <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
+                      {item.description ?? "Fee"}
+                    </div>
 
-                  <div className="px-5 py-4 text-xs md:text-sm font-medium text-slate-900 md:text-right">
-                    {item.amount}
+                    <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
+                      RM {item.fee.toLocaleString()}
+                    </div>
+                  </div>
+                ))}
+
+                <div className="grid grid-cols-2 border-t border-slate-200 bg-gray-50 font-semibold">
+                  <div className="px-5 py-4 text-sm text-slate-700">
+                    Total amount
+                  </div>
+                  <div className="px-5 py-4 text-sm text-slate-900 md:text-right">
+                    {/*${totalFee.toLocaleString()}*/}
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
           </div>
 
           <div className="p-6">
             <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
-                  <Award className="h-5 w-5 text-blue-600" />
-                </span>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
+                <Award className="h-5 w-5 text-blue-600" />
+              </span>
 
               <div className="min-w-0">
                 <h4 className="text-base font-semibold tracking-tight text-slate-900">
@@ -293,21 +436,19 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                     <p className="mt-2 text-sm text-slate-500">
                       Apply before{" "}
                       <span className="font-medium text-slate-700">
-                          December 31, 2025
-                        </span>
+                        December 31, 2025
+                      </span>
                     </p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-
         </div>
       </div>
 
       <div className="mt-6">
         <div className="rounded-md border border-default bg-card shadow-sm">
-
           <CardHeader
             icon={ClipboardCheck}
             title="Entry Requirements"
@@ -433,7 +574,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
       <div className="mt-6">
         <div className="relative overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500" />
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500/80 via-blue-600/80 to-indigo-700/80" />
 
           <CardHeader
             icon={Percent}
@@ -465,10 +606,12 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-center">
-              <div className="text-base md:text-lg font-semibold text-gray-800">
+              <div className="text-base font-semibold text-gray-800 md:text-lg">
                 One-time / year
               </div>
-              <p className="mt-1 text-sm text-gray-900 md:text-lg">Commission Type</p>
+              <p className="mt-1 text-sm text-gray-900 md:text-lg">
+                Commission Type
+              </p>
             </div>
           </div>
 
@@ -489,10 +632,23 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           </div>
 
           <div className="flex justify-end p-6">
-            <button className="flex items-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition hover:border-green-700 hover:bg-green-200 disabled:opacity-50">
+            <Link
+              href={{
+                pathname: "/partner/applications/apply-for-program",
+                // query: {
+                //   program_id: program.id,
+                //   university_id: program.university.id,
+                //   intake_date:
+                //     program.intake_dates?.[0] ??
+                //     program.university.intake_months?.[0] ??
+                //     new Date().toISOString().split("T")[0],
+                // },
+              }}
+              className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
+            >
               <CheckCircle className="h-4 w-4" />
-              Create Application
-            </button>
+              Apply Now
+            </Link>
           </div>
         </div>
       </div>

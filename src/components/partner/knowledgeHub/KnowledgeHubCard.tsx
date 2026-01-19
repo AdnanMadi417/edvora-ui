@@ -10,17 +10,14 @@ import {
   ArrowRight,
   ArrowLeft,
   GraduationCap,
-  Clock,
   MapPin,
   Calendar,
 } from "lucide-react";
 import {
   MdMenuBook,
-  MdLocationOn,
   MdAccessTime,
   MdSchool,
   MdAttachMoney,
-  MdEvent,
   MdLaptop,
   MdApartment,
 } from "react-icons/md";
@@ -30,8 +27,8 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { useAllPrograms } from "../../../hooks/programs/useProgramsList";
 import NextButton from "../../ui/buttons/NextButton";
 import PrevButton from "../../../components/ui/buttons/PrevButton";
-import ApplyNowBtn from "../../ui/buttons/Button";
 import LinkBtn from "../../ui/links/LinkBtn";
+import Link from 'next/link';
 
 const KnowledgeHubCards = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -149,13 +146,13 @@ const KnowledgeHubCards = () => {
                 {currentPrograms.map((program) => (
                   <div
                     key={program.id}
-                    className="relative overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                    className="relative overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm transition-all"
                   >
                     {/* Gradient Top Accent */}
                     <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-500/80 via-blue-600/80 to-indigo-700/80" />
 
                     {/* Header */}
-                    <div className="relative px-5 py-4 ">
+                    <div className="relative px-5 py-4 flex items-center h-[100px]">
                       <div className="flex items-start gap-4">
 
                         <div className="relative flex-shrink-0">
@@ -260,7 +257,7 @@ const KnowledgeHubCards = () => {
 
                     <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-5 py-4">
                       <div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-slate-800">
                           First-Year Cost
                         </div>
                         <div className="mt-1 text-lg font-bold text-slate-900">
@@ -291,16 +288,25 @@ const KnowledgeHubCards = () => {
                         className="w-full sm:w-auto"
                       />
 
-                      <ApplyNowBtn
-                        icon={<CheckCircle className="h-4 w-4" />}
-                        text="Apply"
-                        bgColor="bg-green-50"
-                        textColor="text-green-700"
-                        borderColor="border-green-600"
-                        hoverTextColor="hover:text-green-800"
-                        hoverBorderColor="hover:border-green-800"
-                        className="w-full sm:w-auto"
-                      />
+                      <Link
+                        href={{
+                          pathname: "/partner/applications/apply-for-program",
+                          query: {
+                            program_id: program.id,
+                            university_id: program.university.id,
+                            intake_date:
+                              program.intake_dates?.[0] ??
+                              program.university.intake_months?.[0] ??
+                              new Date().toISOString().split("T")[0],
+                          },
+                        }}
+                        title="Apply Now"
+                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 text-green-700 px-4 py-2 text-sm font-medium transition hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
+                      >
+                        <CheckCircle className="h-4 w-4" />
+                        Apply
+                      </Link>
+
                     </div>
                   </div>
                 ))}
