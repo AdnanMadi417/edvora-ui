@@ -140,9 +140,10 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           </div>
 
           <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
+
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
-                <MdMenuBook className="h-4 w-4" />
+                <MdPublic className="h-4 w-4" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-text-muted">Country</p>
@@ -154,7 +155,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
-                <MdMenuBook className="h-4 w-4" />
+                <MdLocationCity className="h-4 w-4" />
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-text-muted">State / Province</p>
