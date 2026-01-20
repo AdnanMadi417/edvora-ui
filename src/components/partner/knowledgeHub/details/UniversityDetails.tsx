@@ -21,11 +21,8 @@ import {
   CircleDollarSign,
   Award,
   ClipboardCheck,
-  Scale,
   BookOpen,
   GraduationCap,
-  Download,
-  Eye,
   FileText,
   CheckCircle,
   Percent,
@@ -293,10 +290,22 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           />
 
           <div className="border-b border-gray-200 p-6">
-            <h4 className="flex items-center gap-3 text-lg font-semibold text-text-primary">
-              <CreditCard className="h-5 w-5 text-slate-500" />
-              Tuition Fees
-            </h4>
+
+            <div className="flex items-start gap-3">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
+                    <Banknote className="h-5 w-5 text-blue-600" />
+                  </span>
+
+              <div className="min-w-0">
+                <h4 className="text-base font-semibold tracking-tight text-slate-900">
+                  Tuition Fee
+                </h4>
+                <p className="mt-1 text-sm leading-relaxed text-slate-500">
+                  A transparent overview of tuition fees .
+
+                </p>
+              </div>
+            </div>
 
             <div className="mt-6 overflow-hidden rounded-md border border-slate-200 ">
               <div className="grid grid-cols-2 bg-blue-50">
@@ -330,18 +339,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 ) : (
                   <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
                     No yearly fees available
-                  </div>
-                )}
-
-                {/* Total row */}
-                {program?.yearly_fees?.length > 0 && (
-                  <div className="grid grid-cols-2 border-t border-slate-200 bg-gray-50 font-semibold">
-                    <div className="px-5 py-4 text-sm text-slate-700">
-                      Total amount
-                    </div>
-                    <div className="px-5 py-4 text-sm text-slate-900 md:text-right">
-                      {/*${totalFee.toLocaleString()}*/}
-                    </div>
                   </div>
                 )}
               </div>
@@ -413,48 +410,43 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <h4 className="text-base font-semibold tracking-tight text-slate-900">
                   Scholarships & Discounts
                 </h4>
-                <p className="mt-1 text-sm leading-relaxed text-slate-500">
+                <p className="felx mt-1 gap-2 text-sm leading-relaxed text-slate-500">
                   Explore available scholarships and tuition discounts
                 </p>
               </div>
             </div>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <div className="rounded-md border border-slate-200 bg-white p-5">
-                <div className="flex items-start gap-3">
-                  <div className="min-w-0">
-                    <h5 className="text-sm font-semibold text-slate-900">
-                      Merit-based Scholarship
-                    </h5>
-                    <p className="mt-1 text-xl font-bold text-blue-600">
-                      RM 20,000 – RM 50,000
-                    </p>
-                    <p className="mt-2 text-sm text-slate-500">
-                      Minimum 3.5 GPA and exceptional academic record required
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {program?.has_scholarship && program.scholarships.length > 0 ? (
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                {program.scholarships.map((item) => (
+                  <div
+                    key={item.id}
+                    className="rounded-md border border-slate-200 bg-white p-5"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="min-w-0">
 
-              <div className="rounded-md border border-slate-200 bg-white p-5">
-                <div className="flex items-start gap-3">
-                  <div className="min-w-0">
-                    <h5 className="text-sm font-semibold text-slate-900">
-                      Early Bird Discount
-                    </h5>
-                    <p className="mt-1 text-xl font-bold text-green-600">
-                      RM 10,000
-                    </p>
-                    <p className="mt-2 text-sm text-slate-500">
-                      Apply before{" "}
-                      <span className="font-medium text-slate-700">
-                        December 31, 2025
-                      </span>
-                    </p>
+                        <h5 className="text-sm font-semibold text-slate-900">
+                          {item.name}
+                        </h5>
+
+                        <p className="mt-1 text-xl font-bold text-blue-600">
+                          RM {item.max_amount.toLocaleString()}{" "}
+                        </p>
+
+                        <p className="mt-2 text-sm text-slate-500">
+                          {item.description}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
-            </div>
+            ) : (
+              <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
+                No scholarship available
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -512,49 +504,40 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           />
 
           <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2 lg:grid-cols-3">
-            <div className="relative flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 p-6 ">
-              <div className="flex items-center justify-center gap-2 text-2xl font-bold text-blue-700">
-                <BadgePercent className="h-6 w-6" />
-                {commission?.rate ?? 0}%
-              </div>
-              <p className="text-sm font-semibold tracking-wide text-blue-900">
-                Commission
+            <div className="relative flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 shadow-md transition-transform">
+              <span className="text-3xl font-bold text-indigo-700">
+                RM {commission?.rate?.toLocaleString() ?? 0}
+              </span>
+              <p className="text-sm font-semibold text-indigo-900">
+                Commission Rate
               </p>
-              <div className="absolute right-3 top-2 h-1.5 w-1.5 animate-pulse rounded-full bg-blue-600" />
+              <span className="absolute right-3 top-3 h-2 w-2 animate-pulse rounded-full bg-indigo-600" />
             </div>
 
-            <div className="relative flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 ">
-              <div className="flex items-center justify-center gap-2 text-2xl font-bold text-yellow-600">
-                <MdStar className="h-6 w-6" />
-                300 RM
-              </div>
-              <p className="text-sm font-semibold tracking-wide text-yellow-900">
-                Total Amount
-              </p>
-              <div className="absolute right-3 top-2 h-1.5 w-1.5 animate-pulse rounded-full bg-yellow-600" />
-            </div>
-
-            <div className="relative flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 p-6 ">
-              <div className="text-2xl font-bold text-gray-800">
-                {commission?.type ?? "One-time / year"}
-              </div>
-              <p className="text-sm font-semibold tracking-wide text-gray-900">
+            <div className="relative flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-md transition-transform">
+              <span className="text-2xl font-bold text-green-700">
+                {commission?.type === "one_time_per_year"
+                  ? "One-time / year"
+                  : commission?.type === "percentage"
+                  ? "Percentage"
+                  : commission?.type}
+              </span>
+              <p className="text-sm font-semibold text-green-900">
                 Commission Type
               </p>
-              <div className="absolute right-3 top-2 h-1.5 w-1.5 animate-pulse rounded-full bg-gray-600" />
+              <span className="absolute right-3 top-3 h-2 w-2 animate-pulse rounded-full bg-green-600" />
             </div>
           </div>
 
-          <div className="mx-6 mb-6 flex gap-3 rounded-md border border-orange-200 bg-orange-50 p-4">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-100">
-              <MdStar className="h-4 w-4 text-orange-600" />
+          <div className="mx-6 mb-6 flex items-start gap-3 rounded-xl border border-yellow-200 bg-yellow-50 p-4 shadow-inner">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100">
+              <MdStar className="h-5 w-5 text-yellow-600" />
             </div>
-
             <div>
-              <h5 className="text-sm font-semibold text-orange-800">
+              <h5 className="text-sm font-semibold text-yellow-800">
                 Special Notes
               </h5>
-              <p className="mt-1 text-sm text-orange-700">
+              <p className="mt-1 text-sm text-yellow-700">
                 {commission?.notes ??
                   "Commission paid 30 days after the student completes the first semester of each academic year."}
               </p>
@@ -574,7 +557,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                     new Date().toISOString().split("T")[0],
                 },
               }}
-              className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 shadow-md transition-transform hover:scale-105 hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
             >
               <CheckCircle className="h-4 w-4" />
               Apply Now

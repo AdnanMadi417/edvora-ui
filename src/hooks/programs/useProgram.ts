@@ -19,6 +19,15 @@ export type University = {
   intake_months: string[] | null;
 };
 
+export type Scholarship = {
+  id: string;
+  type: string;
+  coverage_percent: number;
+  max_amount: number;
+  name: string ;
+  description: string;
+};
+
 type YearlyFee = {
   year: number;
   fee: number;
@@ -60,7 +69,7 @@ export type Program = {
   class_type: "physical" | "online" | string;
 
   has_scholarship: boolean;
-  scholarships: any[];
+  scholarships: Scholarship[];
 
   commission: Commission | null;
 
