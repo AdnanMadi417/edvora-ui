@@ -290,10 +290,7 @@ const KnowledgeHubCards = () => {
                         </div>
                       </div>
 
-                      {/*<div className="flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">*/}
-                      {/*  <BadgePercent className="h-4 w-4" />*/}
-                      {/*  {program.commission_rate ?? "-"}%*/}
-                      {/*</div>*/}
+
                     </div>
 
                     {/* Footer */}
@@ -324,7 +321,7 @@ const KnowledgeHubCards = () => {
                           },
                         }}
                         title="Apply Now"
-                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
+                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 shadow-md transition-transform hover:scale-105 hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
                       >
                         <CheckCircle className="h-4 w-4" />
                         Apply

@@ -26,7 +26,6 @@ import {
   FileText,
   CheckCircle,
   Percent,
-  BadgePercent,
   ChevronLeft,
 } from "lucide-react";
 import CardHeader from "../../../ui/card/CardHeader";
@@ -56,8 +55,8 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           <div className="flex justify-between border-b border-gray-200 p-6">
             <div className="flex items-center gap-4">
               <div className="relative flex-shrink-0">
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
-                  <GraduationCap className="h-8 w-8 text-white" />
+                <div className="flex  h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
+                  <GraduationCap className="h-5 w-5 md:h-8 md:w-8 text-white" />
                 </div>
 
                 <span

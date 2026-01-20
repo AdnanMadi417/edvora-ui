@@ -31,13 +31,13 @@ const LinkBtn = ({
       href={href}
       title={title || label}
       className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition justify-center p-2
-        ${bgColor} ${textColor} ${borderColor} ${hoverTextColor} ${hoverBorderColor} disabled:opacity-50
+        ${bgColor} ${textColor} ${borderColor} ${hoverTextColor} ${hoverBorderColor} disabled:opacity-50 shadow-md transition-transform hover:scale-105
         ${className || ''}`}
     >
       {icon}
 
       {label && (
-        <span className="text-sm font-medium whitespace-nowrap">
+        <span className="text-sm font-medium whitespace-nowrap ">
           {label}
         </span>
       )}
