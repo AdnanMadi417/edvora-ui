@@ -12,6 +12,7 @@ import {
   GraduationCap,
   MapPin,
   Calendar,
+  MinusCircle,
 } from "lucide-react";
 import {
   MdMenuBook,
@@ -22,13 +23,13 @@ import {
   MdApartment,
 } from "react-icons/md";
 
-import Loading from "components/loading/Loading";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
-import { useAllPrograms } from "../../../hooks/programs/useProgramsList";
-import NextButton from "../../ui/buttons/NextButton";
-import PrevButton from "../../../components/ui/buttons/PrevButton";
-import LinkBtn from "../../ui/links/LinkBtn";
-import Link from 'next/link';
+import Loading from "../../../loading/Loading";
+import NoMessagesFound from "../../../emptyData/NoMessagesFound";
+import { useAllPrograms } from "../../../../hooks/programs/useProgramsList";
+import NextButton from "../../../ui/buttons/NextButton";
+import PrevButton from "../../../ui/buttons/PrevButton";
+import LinkBtn from "../../../ui/links/LinkBtn";
+import Link from "next/link";
 
 const KnowledgeHubCards = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -152,9 +153,8 @@ const KnowledgeHubCards = () => {
                     <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-500/80 via-blue-600/80 to-indigo-700/80" />
 
                     {/* Header */}
-                    <div className="relative px-5 py-4 flex items-center h-[100px]">
+                    <div className="relative flex h-[100px] items-center px-5 py-4">
                       <div className="flex items-start gap-4">
-
                         <div className="relative flex-shrink-0">
                           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
                             <GraduationCap className="h-6 w-6 text-white" />
@@ -162,7 +162,7 @@ const KnowledgeHubCards = () => {
 
                           <span
                             className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-white ${
-                              program.university?.is_active
+                              program.field_of_study?.is_active
                                 ? "bg-emerald-500"
                                 : "bg-red-500"
                             }`}
@@ -180,7 +180,7 @@ const KnowledgeHubCards = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 border-y border-gray-200 gap-2 px-5 py-4 text-xs">
+                    <div className="grid grid-cols-2 gap-2 border-y border-gray-200 px-5 py-4 text-xs">
                       <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 font-medium text-blue-700">
                         <MdSchool className="h-3.5 w-3.5" />
                         <span className="capitalize">
@@ -239,19 +239,30 @@ const KnowledgeHubCards = () => {
                             <Calendar className="h-4 w-4" /> Next Intake
                           </span>
 
-                          {program.intake_dates?.length ? (
-                            <span className="text-sm font-semibold text-blue-700">
-                              {formatDate(
-                                program.next_intake ??
-                                  sortDates(program.intake_dates)[0]
-                              )}
-                            </span>
-                          ) : (
-                            <span className="text-xs text-slate-400">
-                              Intake not announced
-                            </span>
-                          )}
+                          <span>
+                            {program?.next_intake
+                              ? formatDate(program.next_intake)
+                              : "Intake not announced"}
+                          </span>
                         </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="flex items-center gap-2 font-medium text-slate-500">
+                            {program.has_scholarship ? (
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <MinusCircle className="h-4 w-4 text-red-500" />
+                            )}
+                            Scholarship
+                          </span>
+
+                          <span className="text-slate-900">
+                            {program.has_scholarship
+                              ? "Available"
+                              : "Not available"}
+                          </span>
+                        </div>
+
                       </div>
                     </div>
 
@@ -267,10 +278,10 @@ const KnowledgeHubCards = () => {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">
-                        <BadgePercent className="h-4 w-4" />
-                        {program.commission_rate ?? "-"}%
-                      </div>
+                      {/*<div className="flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-700">*/}
+                      {/*  <BadgePercent className="h-4 w-4" />*/}
+                      {/*  {program.commission_rate ?? "-"}%*/}
+                      {/*</div>*/}
                     </div>
 
                     {/* Footer */}
@@ -301,18 +312,18 @@ const KnowledgeHubCards = () => {
                           },
                         }}
                         title="Apply Now"
-                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 text-green-700 px-4 py-2 text-sm font-medium transition hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
+                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
                       >
                         <CheckCircle className="h-4 w-4" />
                         Apply
                       </Link>
-
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className=" flex justify-between border-t border-gray-200 p-6">
+              <div className="border-t border-gray-200 p-4 sm:p-6 grid grid-cols-1 gap-4 items-center md:flex md:justify-between md:items-center">
+
                 {programs.length > 0 && (
                   <div className="flex items-center gap-1 text-sm font-medium text-text-muted">
                     Showing

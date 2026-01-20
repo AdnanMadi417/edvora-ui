@@ -14,6 +14,9 @@ export type University = {
   name: string;
   country: string;
   is_active: boolean;
+  description: string | null;
+  state: string | null;
+  intake_months: string[] | null;
 };
 
 type YearlyFee = {
@@ -21,9 +24,15 @@ type YearlyFee = {
   fee: number;
 };
 
-type OneTimeFees = {
+type OneTimeFee = {
   description: string;
   fee: number;
+};
+
+export type Commission = {
+  rate: number | null;
+  type: string | null;
+  notes: string | null;
 };
 
 export type Program = {
@@ -39,9 +48,7 @@ export type Program = {
   duration: number | null;
 
   yearly_fees: YearlyFee[];
-
-  One_time_fees: OneTimeFees[];
-  one_time_fees: { description: string; fee: number }[];
+  one_time_fees: OneTimeFee[];
 
   english_required_score: number | null;
 
@@ -50,29 +57,25 @@ export type Program = {
 
   is_on_campus: boolean;
   is_online: boolean;
+  class_type: "physical" | "online" | string;
 
-  commission_rate: number | null;
+  has_scholarship: boolean;
+  scholarships: any[];
+
+  commission: Commission | null;
 
   qualification_level: "bachelor" | "master" | "phd" | string;
 
-  field_of_study: {
+  field_of_study: FieldOfStudy;
+  university: University;
+
+  required_documents: {
     id: string;
-    name: string;
+    type: string;
     code: string;
-    is_active: boolean;
-  };
-
-  university: {
-    id: string;
-    name: string;
-    country: string;
-    is_active: boolean;
-    description: string | null;
-    state: string | null;
-    intake_months: string[] | null;
-  };
+    description: string;
+  }[];
 };
-
 
 export type GetProgramsParams = {
   level?: "undergraduate" | "graduate";
@@ -82,6 +85,8 @@ export type GetProgramsParams = {
 
 export function useProgram(programId: string) {
   const [program, setProgram] = useState<Program | null>(null);
+  const [requiredDocuments, setRequiredDocuments] = useState<Program["required_documents"]>([]);
+  const [commission, setCommission] = useState<Program["commission"] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,7 +100,10 @@ export function useProgram(programId: string) {
         const res = await api.get(`/knowledge-hub/programs/${programId}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
-        setProgram(res.data);
+        setProgram(res.data.program)
+        setRequiredDocuments(res.data.required_documents);
+        setCommission(res.data.commission || null);
+
       } catch (err) {
         setError("Failed to fetch program");
         console.error(err);
@@ -107,5 +115,5 @@ export function useProgram(programId: string) {
     fetchProgram();
   }, [programId]);
 
-  return { program, loading, error };
+  return { program, requiredDocuments, commission, loading, error };
 }

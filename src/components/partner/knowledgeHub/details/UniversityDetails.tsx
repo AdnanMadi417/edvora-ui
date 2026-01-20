@@ -33,10 +33,10 @@ import {
   BadgePercent,
   ChevronLeft,
 } from "lucide-react";
-import CardHeader from "../../ui/card/CardHeader";
+import CardHeader from "../../../ui/card/CardHeader";
 import Link from "next/link";
-import { useProgram } from "../../../hooks/programs/useProgram";
-import Loading from "components/loading/Loading";
+import { useProgram } from "../../../../hooks/programs/useProgram";
+import Loading from "../../../loading/Loading";
 
 interface UniversityDetailsProps {
   id: string;
@@ -47,18 +47,8 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const handleBack = () => {
     router.push("/partner/knowledgeHub/");
   };
-  const {
-    program,
-    loading: programLoading,
-    error: programError,
-  } = useProgram(id);
 
-  const requiredDocuments = [
-    { label: "Passport", required: true },
-    { label: "Academic Transcripts (A Level)", required: true },
-    { label: "English Certificate (IELTS / TOEFL)", required: true },
-    { label: "Curriculum Vitae (CV)", required: false },
-  ];
+  const { program, requiredDocuments, commission, loading, error } = useProgram(id);
 
   if (!program) return <Loading text="Loading program details..." />;
 
@@ -86,7 +76,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <h3 className="line-clamp-2 text-lg font-semibold text-text-primary">
                   {program?.name ?? "Not Provided"}
                 </h3>
-                <p className="mt-1 truncate text-sm text-text-muted">
+                <p className="mt-1 break-words text-sm text-text-muted">
                   {program?.university?.name ?? "Not Provided"}
                 </p>
               </div>
@@ -104,43 +94,48 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           </div>
 
           <div className="p-6 pb-0">
-            <div className="p-6 rounded-md border border-gray-200 bg-gray-50 shadow-sm">
-              <h4 className="flex items-center gap-3 text-lg font-semibold text-text-primary">
-                <BookOpen className="h-5 w-5 text-slate-500" />
-                University Overview
-              </h4>
 
-              {program?.university?.description && (
-                <div className="mt-4">
-                  <h5 className="text-sm font-medium text-slate-800">About University</h5>
-                  <p className="mt-1 text-sm leading-relaxed text-gray-700">
-                    {program.university.description}
-                  </p>
-                </div>
-              )}
+            <h4 className="flex items-center gap-3 text-lg font-semibold text-text-primary">
+              <BookOpen className="h-5 w-5 text-slate-500" />
+              University Overview
+            </h4>
 
-              {program?.overview && (
-                <div className="mt-4">
-                  <h5 className="text-sm font-medium text-slate-800">Program Overview</h5>
-                  <p className="mt-1 text-sm leading-relaxed text-gray-700">
-                    {program.overview}
-                  </p>
-                </div>
-              )}
+            {program?.university?.description && (
+              <div className="mt-4">
+                <h5 className="text-sm font-medium text-slate-800">
+                  About University
+                </h5>
+                <p className="mt-1 text-sm leading-relaxed text-gray-700">
+                  {program.university.description}
+                </p>
+              </div>
+            )}
 
-              {program?.curriculum && (
-                <div className="mt-4">
-                  <h5 className="text-sm font-medium text-slate-800">Curriculum</h5>
-                  <p className="mt-1 text-sm leading-relaxed text-gray-700">
-                    {program.curriculum}
-                  </p>
-                </div>
-              )}
-            </div>
+            {program?.overview && (
+              <div className="mt-4">
+                <h5 className="text-sm font-medium text-slate-800">
+                  Program Overview
+                </h5>
+                <p className="mt-1 text-sm leading-relaxed text-gray-700">
+                  {program.overview}
+                </p>
+              </div>
+            )}
+
+            {program?.curriculum && (
+              <div className="mt-4">
+                <h5 className="text-sm font-medium text-slate-800">
+                  Curriculum
+                </h5>
+                <p className="mt-1 text-sm leading-relaxed text-gray-700">
+                  {program.curriculum}
+                </p>
+              </div>
+            )}
+
           </div>
 
           <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
-
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
                 <MdPublic className="h-4 w-4" />
@@ -204,16 +199,32 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              {/* Icon */}
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
                 <MdEvent className="h-4 w-4" />
               </div>
+
+              {/* Content */}
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">Intake(s)</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
-                  {program?.intake_dates?.length
-                    ? program.intake_dates.join(", ")
-                    : program?.next_intake ?? "Not Provided"}
-                </p>
+                <p className="text-xs text-text-muted">Intake Dates</p>
+
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-text-primary">
+                  {program?.university.intake_months?.length ? (
+                    program.university.intake_months.map((date, index) => (
+                      <span
+                        key={`${date}-${index}`}
+                        className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 transition hover:border-green-600"
+                      >
+                        <span className="h-2 w-2 rounded-full border-2 border-green-600" />
+                        <span className="font-medium capitalize text-text-primary">
+                          {date}
+                        </span>
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-sm font-medium capitalize text-text-primary">Not Provided</span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -268,7 +279,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 </p>
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -304,20 +314,27 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
 
               <div className="overflow-hidden">
-                {program?.yearly_fees?.map((item, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
-                  >
-                    <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
-                      Year {item.year}
-                    </div>
 
-                    <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                      RM {item.fee.toLocaleString()}
+                {program?.yearly_fees && program.yearly_fees.length > 0 ? (
+                  program?.yearly_fees?.map((item, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
+                    >
+                      <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
+                        Year {item.year}
+                      </div>
+
+                      <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
+                        RM {item.fee.toLocaleString()}
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="px-5 py-4 text-xs text-slate-500 md:text-sm col-span-2 text-center">
+                    No yearly fees available
                   </div>
-                ))}
+                )}
 
                 {/* Total row */}
                 {program?.yearly_fees?.length > 0 && (
@@ -365,29 +382,28 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
 
               <div className="overflow-hidden">
-                {program?.one_time_fees?.map((item, index) => (
-                  <div
-                    key={index}
-                    className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
-                  >
-                    <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
-                      {item.description ?? "Fee"}
-                    </div>
 
-                    <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                      RM {item.fee.toLocaleString()}
-                    </div>
-                  </div>
-                ))}
+                {program?.one_time_fees && program.one_time_fees.length > 0 ? (
+                  program.one_time_fees.map((item, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
+                    >
+                      <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
+                        {item.description ?? "Fee"}
+                      </div>
 
-                <div className="grid grid-cols-2 border-t border-slate-200 bg-gray-50 font-semibold">
-                  <div className="px-5 py-4 text-sm text-slate-700">
-                    Total amount
+                      <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
+                        RM {item.fee.toLocaleString()}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="px-5 py-4 text-xs text-slate-500 md:text-sm col-span-2 text-center">
+                    No one-time fees available
                   </div>
-                  <div className="px-5 py-4 text-sm text-slate-900 md:text-right">
-                    {/*${totalFee.toLocaleString()}*/}
-                  </div>
-                </div>
+                )}
+
               </div>
             </div>
           </div>
@@ -461,7 +477,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           <div className="block space-y-4 border-b border-gray-100 p-6">
             <div className="rounded-md border border-slate-200 p-5">
               <div className="flex items-start gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50">
                   <GraduationCap className="h-5 w-5 text-blue-600" />
                 </span>
 
@@ -478,8 +494,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="space-y-4 rounded-md border border-slate-200 p-5">
+
               <div className="flex items-start gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-50">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-50">
                   <BookOpen className="h-5 w-5 text-green-600" />
                 </span>
 
@@ -538,9 +555,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {requiredDocuments.map((item, index) => (
+              {requiredDocuments.map((item) => (
                 <div
-                  key={index}
+                  key={item.id}
                   className="group flex items-start gap-4 rounded-md border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:bg-blue-50/30"
                 >
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 group-hover:bg-blue-100">
@@ -549,26 +566,20 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-900">
-                      {item.label}
+                      {item.description ?? item.type ?? "Document"}
                     </p>
 
                     <div className="mt-2">
-                      {item.required ? (
-                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
-                          <CheckCircle className="h-3 w-3" />
-                          Required
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 sm:text-sm">
-                          <MinusCircle className="h-3 w-3" />
-                          Optional
-                        </span>
-                      )}
+                      <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
+                        <CheckCircle className="h-3 w-3" />
+                        Required
+                      </span>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
+
           </div>
         </div>
       </div>
@@ -585,11 +596,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             iconColor="text-blue-600"
           />
 
-          <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-center">
               <div className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 md:text-lg">
                 <BadgePercent className="h-5 w-5 text-blue-600" />
-                10%
+                {commission?.rate ?? 0}%
               </div>
               <p className="mt-1 text-sm text-gray-900 md:text-lg">
                 Commission
@@ -608,7 +619,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
             <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-center">
               <div className="text-base font-semibold text-gray-800 md:text-lg">
-                One-time / year
+                {commission?.type ?? "One-time / year"}
               </div>
               <p className="mt-1 text-sm text-gray-900 md:text-lg">
                 Commission Type
@@ -636,14 +647,14 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             <Link
               href={{
                 pathname: "/partner/applications/apply-for-program",
-                // query: {
-                //   program_id: program.id,
-                //   university_id: program.university.id,
-                //   intake_date:
-                //     program.intake_dates?.[0] ??
-                //     program.university.intake_months?.[0] ??
-                //     new Date().toISOString().split("T")[0],
-                // },
+                query: {
+                  program_id: program.id,
+                  university_id: program.university.id,
+                  intake_date:
+                    program.intake_dates?.[0] ??
+                    program.university.intake_months?.[0] ??
+                    new Date().toISOString().split("T")[0],
+                },
               }}
               className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
             >

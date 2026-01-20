@@ -36,6 +36,8 @@ export type Program = {
   overview: string | null;
   curriculum: string | null;
 
+  has_scholarship: string | null;
+
   is_on_campus: boolean;
   is_online: boolean;
 
