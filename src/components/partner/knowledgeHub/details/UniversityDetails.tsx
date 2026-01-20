@@ -28,7 +28,6 @@ import {
   Eye,
   FileText,
   CheckCircle,
-  MinusCircle,
   Percent,
   BadgePercent,
   ChevronLeft,
@@ -48,7 +47,8 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     router.push("/partner/knowledgeHub/");
   };
 
-  const { program, requiredDocuments, commission, loading, error } = useProgram(id);
+  const { program, requiredDocuments, commission, loading, error } =
+    useProgram(id);
 
   if (!program) return <Loading text="Loading program details..." />;
 
@@ -94,7 +94,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           </div>
 
           <div className="p-6 pb-0">
-
             <h4 className="flex items-center gap-3 text-lg font-semibold text-text-primary">
               <BookOpen className="h-5 w-5 text-slate-500" />
               University Overview
@@ -132,7 +131,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 </p>
               </div>
             )}
-
           </div>
 
           <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
@@ -199,12 +197,10 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              {/* Icon */}
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
                 <MdEvent className="h-4 w-4" />
               </div>
 
-              {/* Content */}
               <div className="min-w-0">
                 <p className="text-xs text-text-muted">Intake Dates</p>
 
@@ -222,7 +218,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                       </span>
                     ))
                   ) : (
-                    <span className="text-sm font-medium capitalize text-text-primary">Not Provided</span>
+                    <span className="text-sm font-medium capitalize text-text-primary">
+                      Not Provided
+                    </span>
                   )}
                 </div>
               </div>
@@ -314,7 +312,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
 
               <div className="overflow-hidden">
-
                 {program?.yearly_fees && program.yearly_fees.length > 0 ? (
                   program?.yearly_fees?.map((item, index) => (
                     <div
@@ -331,7 +328,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                     </div>
                   ))
                 ) : (
-                  <div className="px-5 py-4 text-xs text-slate-500 md:text-sm col-span-2 text-center">
+                  <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
                     No yearly fees available
                   </div>
                 )}
@@ -382,7 +379,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
 
               <div className="overflow-hidden">
-
                 {program?.one_time_fees && program.one_time_fees.length > 0 ? (
                   program.one_time_fees.map((item, index) => (
                     <div
@@ -399,11 +395,10 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                     </div>
                   ))
                 ) : (
-                  <div className="px-5 py-4 text-xs text-slate-500 md:text-sm col-span-2 text-center">
+                  <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
                     No one-time fees available
                   </div>
                 )}
-
               </div>
             </div>
           </div>
@@ -474,86 +469,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             iconColor="text-blue-600"
           />
 
-          <div className="block space-y-4 border-b border-gray-100 p-6">
-            <div className="rounded-md border border-slate-200 p-5">
-              <div className="flex items-start gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50">
-                  <GraduationCap className="h-5 w-5 text-blue-600" />
-                </span>
-
-                <div className="min-w-0">
-                  <h5 className="text-sm font-semibold text-slate-900">
-                    Academic Requirement
-                  </h5>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                    A Level: Minimum BBB with Mathematics and Physics or
-                    equivalent alternative qualifications
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4 rounded-md border border-slate-200 p-5">
-
-              <div className="flex items-start gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-green-50">
-                  <BookOpen className="h-5 w-5 text-green-600" />
-                </span>
-
-                <div className="min-w-0">
-                  <h5 className="text-sm font-semibold text-slate-900">
-                    English Requirement
-                  </h5>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
-                    IELTS 6.5 (minimum 6.0 each band), TOEFL iBT 93, or
-                    equivalent
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between rounded-md border border-dashed border-slate-300 bg-slate-50 px-5 py-4">
-                <div className="flex items-center gap-3 text-sm text-slate-600">
-                  <Scale className="h-4 w-4 text-slate-500" />
-                  View qualification equivalency
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    className="group cursor-pointer rounded-full border border-green-600 bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-700 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
-                    title="View Document"
-                    aria-label="View  Document"
-                  >
-                    <Eye className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
-
-                  <button
-                    className="group cursor-pointer rounded-full border border-blue-600 bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-700 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
           <div className="space-y-4 p-6">
-            <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
-                <FileText className="h-5 w-5 text-blue-600" />
-              </span>
-
-              <div className="min-w-0">
-                <h4 className="text-base font-semibold tracking-tight text-slate-900">
-                  Required Documents
-                </h4>
-                <p className="mt-1 text-sm leading-relaxed text-slate-500">
-                  Documents required for application and enrollment
-                </p>
-              </div>
-            </div>
-
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
               {requiredDocuments.map((item) => (
                 <div
@@ -579,7 +495,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 </div>
               ))}
             </div>
-
           </div>
         </div>
       </div>
@@ -596,34 +511,37 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             iconColor="text-blue-600"
           />
 
-          <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-center">
-              <div className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 md:text-lg">
-                <BadgePercent className="h-5 w-5 text-blue-600" />
+          <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="relative flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 p-6 ">
+              <div className="flex items-center justify-center gap-2 text-2xl font-bold text-blue-700">
+                <BadgePercent className="h-6 w-6" />
                 {commission?.rate ?? 0}%
               </div>
-              <p className="mt-1 text-sm text-gray-900 md:text-lg">
+              <p className="text-sm font-semibold tracking-wide text-blue-900">
                 Commission
               </p>
+              <div className="absolute right-3 top-2 h-1.5 w-1.5 animate-pulse rounded-full bg-blue-600" />
             </div>
 
-            <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-center">
-              <div className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 md:text-lg">
-                <MdStar className="h-5 w-5 text-yellow-500" />
-                300RM
+            <div className="relative flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-yellow-50 to-yellow-100 p-6 ">
+              <div className="flex items-center justify-center gap-2 text-2xl font-bold text-yellow-600">
+                <MdStar className="h-6 w-6" />
+                300 RM
               </div>
-              <p className="mt-1 text-sm text-gray-900 md:text-lg">
+              <p className="text-sm font-semibold tracking-wide text-yellow-900">
                 Total Amount
               </p>
+              <div className="absolute right-3 top-2 h-1.5 w-1.5 animate-pulse rounded-full bg-yellow-600" />
             </div>
 
-            <div className="rounded-md border border-gray-200 bg-gray-50 p-4 text-center">
-              <div className="text-base font-semibold text-gray-800 md:text-lg">
+            <div className="relative flex flex-col items-center justify-center gap-3 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 p-6 ">
+              <div className="text-2xl font-bold text-gray-800">
                 {commission?.type ?? "One-time / year"}
               </div>
-              <p className="mt-1 text-sm text-gray-900 md:text-lg">
+              <p className="text-sm font-semibold tracking-wide text-gray-900">
                 Commission Type
               </p>
+              <div className="absolute right-3 top-2 h-1.5 w-1.5 animate-pulse rounded-full bg-gray-600" />
             </div>
           </div>
 
@@ -637,8 +555,8 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 Special Notes
               </h5>
               <p className="mt-1 text-sm text-orange-700">
-                Commission paid 30 days after the student completes the first
-                semester of each academic year.
+                {commission?.notes ??
+                  "Commission paid 30 days after the student completes the first semester of each academic year."}
               </p>
             </div>
           </div>
