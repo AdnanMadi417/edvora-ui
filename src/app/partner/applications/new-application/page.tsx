@@ -1,12 +1,12 @@
 
 'use client';
 
-import StudentApplication from "../../../../components/partner/applications/form/StudentApplication"
+import StudentManualApplicationForm from "../../../../components/partner/applications/application-forms/StudentManualApplicationForm"
 
 export default function StudentApplicationForm() {
   return (
     <section className="min-[100vh]">
-      <StudentApplication/>
+      <StudentManualApplicationForm/>
     </section>
   );
 }

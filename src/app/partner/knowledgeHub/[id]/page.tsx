@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import UniversityDetails from "components/partner/knowledgeHub/UniversityDetails";
+import UniversityDetails from "../../../../components/partner/knowledgeHub/details/UniversityDetails";
 
 export default function UniversityDetailsPage() {
   const params = useParams();
