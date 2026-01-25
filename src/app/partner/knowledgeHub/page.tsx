@@ -1,6 +1,6 @@
 'use client';
 
-import KnowledgeHubCard from "../../../components/partner/knowledgeHub/card/KnowledgeHubCard";
+import KnowledgeHubCard from "../../../components/partner/knowledgeHub/KnowledgeHubCard";
 
 const Dashboard = () => {
   return (

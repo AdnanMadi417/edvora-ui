@@ -120,7 +120,7 @@ const stages = [
   { id: 5, name: "Documents Upload", icon: Upload },
 ];
 
-export default function StudentManualApplicationForm() {
+export default function StudentApplication() {
   const [stage, setStage] = useState(1);
   const [completedStages, setCompletedStages] = useState([]);
   const { showToast } = useToast();
