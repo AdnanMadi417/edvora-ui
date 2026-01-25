@@ -2,6 +2,7 @@
   "name": "horizon-tailwind-react-nextjs",
   "version": "3.0.0",
   "private": true,
+  "packageManager": "pnpm@10.28.1",
   "dependencies": {
     "@chakra-ui/hooks": "^2.1.4",
     "@chakra-ui/modal": "^2.2.9",
