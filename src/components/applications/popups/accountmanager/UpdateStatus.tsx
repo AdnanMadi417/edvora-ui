@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import {
   XCircle,
   Clock,
-  Plus,
   Trash2,
   AlertCircle,
   Pause,
@@ -13,6 +12,11 @@ import {
 import api from "../../../../lib/useApi";
 import { useToast } from "../../../context/ToastContext";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
+import {
+  getPresignedUploads,
+  uploadFilesToSpaces,
+} from "services/uploadService";
+import { InputField } from "components/form";
 
 interface DocumentRequest {
   id: string;
@@ -121,7 +125,7 @@ const DocumentRequestList = ({
               })}
             </div>
 
-            <div className="grid max-h-48 grid-cols-2 gap-2 overflow-y-auto rounded-md border border-gray-200 p-2">
+            <div className="grid grid-cols-1 gap-2 p-2">
               {documentTypes.map((d) => (
                 <label
                   key={d.id}
@@ -140,14 +144,6 @@ const DocumentRequestList = ({
           </div>
         </div>
       ))}
-
-      <button
-        onClick={addDocument}
-        className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-blue-300 bg-blue-50/50 px-4 py-3 text-p2 font-medium text-blue-700 hover:border-blue-400 hover:bg-blue-100"
-      >
-        <Plus className="h-4 w-4" />
-        Add Another Document
-      </button>
     </div>
   );
 };
@@ -178,6 +174,7 @@ export default function UpdateStatusPopup({
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
+  const selectedOption = statusOptions.find((opt) => opt.id === selectedStatus);
 
   const getStatusStyle = (name: string) => {
     const lower = name.toLowerCase();
@@ -266,47 +263,279 @@ export default function UpdateStatusPopup({
     fetchApplicationDetails();
   }, [isOpen, application?.id]);
 
-  const selectedOption = statusOptions.find((opt) => opt.id === selectedStatus);
   const requiresReason = selectedOption?.requiresReason || false;
   const requiresDocuments = selectedOption?.requiresDocumentSelection || false;
 
+  const isUniversityApproved = selectedOption?.label === "University Approved";
+  const [offerLetterFile, setOfferLetterFile] = useState<File | null>(null);
+
+  const currentStageName = application?.stage?.name?.toLowerCase() || "";
+  const isCurrentlyVisaSetup = currentStageName === "visa setup";
+  const isVisaSetupSelected = selectedOption?.label === "Visa Setup";
+
+  const [visaDocumentFile, setVisaDocumentFile] = useState<File | null>(null);
+  const isVisaIssued = selectedOption?.label === "Visa Issued";
+
+  const [formData, setFormData] = useState({
+    visa_fee_amount: "",
+  });
+
+  const [formErrors, setFormErrors] = useState<any>({});
+
+  const [commissionPaymentFile, setCommissionPaymentFile] =
+    useState<File | null>(null);
+
+  const isCommissionPaid = selectedOption?.label === "Commission Paid";
+
+  const handleOfferLetterUpload = async () => {
+    if (!isUniversityApproved || !offerLetterFile) return;
+
+    showToast("Uploading offer letter...", "info");
+
+    const presigned = await getPresignedUploads([offerLetterFile], "documents");
+    const results = await uploadFilesToSpaces([offerLetterFile], presigned);
+    const uploaded = results?.[0];
+
+    if (!uploaded?.file_key || !uploaded?.public_url) {
+      throw new Error("Offer letter upload failed");
+    }
+
+    await api.post(`/applications/${application.id}/offer-letter`, {
+      file_key: uploaded.file_key,
+      file_url: uploaded.public_url,
+    });
+
+    showToast("Offer letter uploaded successfully.", "success");
+  };
+
+  const handleVisaSetup = async () => {
+    if (!isVisaSetupSelected) return;
+
+    const amount = Number(formData.visa_fee_amount);
+    if (!amount || amount <= 0) {
+      throw new Error("Visa fee amount is required");
+    }
+
+    await api.patch(`/applications/${application.id}/visa-case`, {
+      visa_fee_amount: amount,
+      visa_reference_number: "UB" + Date.now(),
+      notes: "Visa fee amount updated by manager.",
+    });
+
+    showToast("Visa fee saved successfully", "success");
+  };
+
+  const handleVisaIssuedUpload = async () => {
+    if (selectedOption?.label !== "Visa Issued" || !visaDocumentFile) return;
+
+    showToast("Uploading visa document...", "info");
+
+    const presigned = await getPresignedUploads(
+      [visaDocumentFile],
+      "documents"
+    );
+    const results = await uploadFilesToSpaces([visaDocumentFile], presigned);
+    const uploaded = results?.[0];
+
+    if (!uploaded?.file_key || !uploaded?.public_url) {
+      throw new Error("Visa document upload failed");
+    }
+
+    await api.post(`/applications/${application.id}/visa-document`, {
+      file_key: uploaded.file_key,
+      file_url: uploaded.public_url,
+    });
+
+    showToast("Visa document uploaded successfully", "success");
+  };
+
+  const handleStatusUpdate = async () => {
+    await api.post(`/applications/${application.id}/status`, {
+      status_id: selectedStatus,
+      reason_text: reason.trim(),
+      notes: notes.trim(),
+      required_document_type_ids:
+        requiresDocuments &&
+        !isUniversityApproved &&
+        !isCommissionPaid
+          ? documents.flatMap((doc) => doc.type)
+          : [],
+    });
+
+    showToast("Status updated successfully.", "success");
+  };
+
+  const handleCommissionPaymentUpload = async () => {
+    if (!isCommissionPaid || !commissionPaymentFile) return;
+
+    showToast("Uploading commission payment proof...", "info");
+
+    const presigned = await getPresignedUploads(
+      [commissionPaymentFile],
+      "documents"
+    );
+
+    const results = await uploadFilesToSpaces(
+      [commissionPaymentFile],
+      presigned
+    );
+
+    const uploaded = results?.[0];
+
+    if (!uploaded?.file_key || !uploaded?.public_url) {
+      throw new Error("Commission payment proof upload failed");
+    }
+
+    await api.post(`/applications/${application.id}/commission-payment-document`, {
+      file_key: uploaded.file_key,
+      file_url: uploaded.public_url,
+    });
+
+    showToast("Commission payment proof uploaded successfully.", "success");
+  };
+
+  const updateFormData = (field: string, value: any) => {
+    setFormData((prev) => {
+      const keys = field.split(".");
+      const updated = { ...prev };
+      let current: any = updated;
+
+      keys.forEach((key, index) => {
+        if (index === keys.length - 1) {
+          current[key] = value;
+        } else {
+          current[key] = current[key] || {};
+          current = current[key];
+        }
+      });
+
+      return updated;
+    });
+
+    // clear error when user types
+    setFormErrors((prev: any) => ({
+      ...prev,
+      [field]: undefined,
+    }));
+  };
+
   const validateForm = () => {
-    if (!selectedStatus) return setError("Please select a status"), false;
-    if (requiresReason && !reason.trim())
-      return setError("Reason is required for this status"), false;
-    if (requiresDocuments && documents.some((doc) => !doc.type))
-      return setError("Please select a document type for all documents"), false;
+    if (!selectedStatus) {
+      setError("Please select a status");
+      return false;
+    }
+
+    if (requiresReason && !reason.trim()) {
+      setError("Reason is required for this status");
+      return false;
+    }
+
+    if (
+      requiresDocuments &&
+      !isUniversityApproved &&
+      selectedOption?.label !== "Visa Issued"
+    ) {
+      if (documents.some((doc) => doc.type.length === 0)) {
+        setError("Please select at least one document type");
+        return false;
+      }
+    }
+
+    if (isUniversityApproved && !offerLetterFile) {
+      setError("Please upload the offer letter");
+      return false;
+    }
+
+    if (isCurrentlyVisaSetup) {
+      if (!formData.visa_fee_amount || Number(formData.visa_fee_amount) <= 0) {
+        setFormErrors({
+          visa_fee_amount: "Visa fee amount is required",
+        });
+        setError("Please enter visa fee amount");
+        return false;
+      }
+    }
+
+    if (selectedOption?.label === "Visa Issued" && !visaDocumentFile) {
+      setError("Please upload the visa document");
+      return false;
+    }
+
+    if (isCommissionPaid && !commissionPaymentFile) {
+      setError("Please upload commission payment proof");
+      return false;
+    }
+
     setError("");
     return true;
   };
 
   const handleConfirm = async () => {
     if (!validateForm() || !application?.id) return;
+
     setIsSubmitting(true);
 
     try {
-      const selectedDocumentTypeIds: string[] = requiresDocuments
-        ? documents.flatMap((doc) => doc.type).filter(Boolean)
-        : [];
+      if (isVisaIssued) {
+        if (!visaDocumentFile) {
+          setError(
+            "You must upload the visa document before setting status to Visa Issued."
+          );
+          showToast(
+            "You must upload the visa document before setting status to Visa Issued.",
+            "error"
+          );
+          setIsSubmitting(false);
+          return;
+        }
 
-      const payload = {
-        status_id: selectedStatus,
-        reason_text: reason.trim(),
-        notes: notes.trim(),
-        required_document_type_ids: selectedDocumentTypeIds,
-      };
+        await handleVisaIssuedUpload();
+        await handleStatusUpdate();
+      } else if (isUniversityApproved) {
+        if (!offerLetterFile) {
+          setError(
+            "You must upload the offer letter before setting status to University Approved."
+          );
+          showToast(
+            "You must upload the offer letter before setting status to University Approved.",
+            "error"
+          );
+          setIsSubmitting(false);
+          return;
+        }
 
-      await api.post(`/applications/${application.id}/status`, payload);
+        await handleOfferLetterUpload();
+        await handleStatusUpdate();
+      } else if (isVisaSetupSelected) {
+        await handleStatusUpdate();
+        await handleVisaSetup();
+        if (offerLetterFile) await handleOfferLetterUpload();
+        if (visaDocumentFile) await handleVisaIssuedUpload();
+      } else if (isCommissionPaid) {
+        if (!commissionPaymentFile) {
+          setError("Please upload commission payment proof");
+          showToast("Commission payment proof is required.", "error");
+          setIsSubmitting(false);
+          return;
+        }
 
-      showToast("Status updated successfully.", "success");
+        await handleCommissionPaymentUpload();
+        await handleStatusUpdate();
+      } else {
+        await handleStatusUpdate();
 
-      setTimeout(() => window.location.reload(), 2000);
+        if (offerLetterFile) await handleOfferLetterUpload();
+        if (visaDocumentFile) await handleVisaIssuedUpload();
+      }
 
       onConfirm(selectedStatus, reason, notes);
-
       handleClose();
+      setTimeout(() => window.location.reload(), 2000);
     } catch (err: any) {
-      const msg = err.response?.data?.message || "Failed to update status.";
+      const msg =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to update application";
       showToast(msg, "error");
       setError(msg);
     } finally {
@@ -345,16 +574,16 @@ export default function UpdateStatusPopup({
                   Update Application Status
                 </h5>
 
-                <div className="mt-1 flex items-center gap-2 text-sm text-gray-700">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
+                <div className="mt-1 flex items-center gap-2 text-sm text-text-muted">
+                  <CheckCircle className="h-4 w-4" />
                   <span className="font-medium">Stage:</span>
                   <span className="font-normal">
                     {application?.stage?.name || "No Stage"}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-caption text-gray-600">
-                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                <div className="flex items-center gap-2 text-caption text-text-muted">
+                  <AlertCircle className="h-4 w-4 " />
                   <span className="font-medium">Status:</span>
                   <span className="font-normal">
                     {application?.stage?.statuses?.[0]?.name || "No Status"}
@@ -418,17 +647,15 @@ export default function UpdateStatusPopup({
                   <div
                     key={option.id}
                     title={isDisabled ? "You cannot select this option." : ""}
-                    onClick={() =>
-                      !isDisabled && setSelectedStatus(option.id)
-                    }
+                    onClick={() => !isDisabled && setSelectedStatus(option.id)}
                     className={`rounded-md border p-4 transition-all 
     ${
-                      isDisabled
-                        ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60"
-                        : isSelected
-                          ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
-                          : "cursor-pointer border-default bg-card hover:border-gray-300 hover:shadow"
-                    }
+      isDisabled
+        ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60"
+        : isSelected
+        ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
+        : "cursor-pointer border-default bg-card hover:border-gray-300 hover:shadow"
+    }
   `}
                   >
                     <div className="flex items-center gap-3">
@@ -437,8 +664,8 @@ export default function UpdateStatusPopup({
                           isSelected
                             ? option.color
                             : isDisabled
-                              ? "text-gray-400"
-                              : "text-gray-400"
+                            ? "text-gray-400"
+                            : "text-gray-400"
                         }`}
                       />
                       <div>
@@ -464,12 +691,90 @@ export default function UpdateStatusPopup({
             )}
           </div>
 
-          {requiresDocuments && (
+          {requiresDocuments && !isUniversityApproved && !isVisaIssued && !isCommissionPaid &&(
             <DocumentRequestList
               documents={documents}
               setDocuments={setDocuments}
               documentTypes={documentTypes}
             />
+          )}
+
+          {isUniversityApproved && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900">
+                Upload Offer Letter <span className="text-red-500">*</span>
+              </label>
+
+              <label
+                htmlFor="offer-letter"
+                className="
+    group relative flex cursor-pointer flex-col items-center justify-center
+    rounded-md border-2 border-dashed border-gray-300
+    bg-white px-6 py-10 text-center
+    transition-all duration-200
+    hover:border-blue-500 hover:bg-blue-50/40
+    disabled:cursor-not-allowed
+  "
+              >
+                <div
+                  className="
+      mb-4 flex h-14 w-14 items-center justify-center
+      rounded-full bg-blue-100 text-blue-600
+      transition
+    "
+                >
+                  <svg
+                    className="h-7 w-7"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 16V8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+                    />
+                  </svg>
+                </div>
+
+                <p className="text-sm font-semibold text-gray-800">
+                  Upload Offer Letter
+                </p>
+
+                <p className="mt-3 rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">
+                  PDF Max 5MB
+                </p>
+
+                <input
+                  id="offer-letter"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="hidden"
+                  disabled={isSubmitting}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    setOfferLetterFile(file || null);
+                  }}
+                />
+              </label>
+
+              {offerLetterFile && (
+                <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
+                  <span className="truncate text-sm text-text-muted">
+                    {offerLetterFile.name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setOfferLetterFile(null)}
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
           )}
 
           {requiresReason && (
@@ -486,14 +791,169 @@ export default function UpdateStatusPopup({
               />
             </div>
           )}
+
+          {isVisaSetupSelected && (
+            <InputField
+              label="Visa Fee Amount"
+              field="visa_fee_amount"
+              type="number"
+              placeholder="Enter visa fee amount"
+              required
+              formData={formData}
+              errors={formErrors}
+              updateFormData={updateFormData}
+            />
+          )}
+
+          {isVisaIssued && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900">
+                Upload Visa Document <span className="text-red-500">*</span>
+              </label>
+
+              <label
+                htmlFor="visa-document"
+                className="
+        group relative flex cursor-pointer flex-col items-center justify-center
+        rounded-md border-2 border-dashed border-gray-300
+        bg-white px-6 py-10 text-center
+        transition-all duration-200
+        hover:border-blue-500 hover:bg-blue-50/40
+        disabled:cursor-not-allowed
+      "
+              >
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <svg
+                    className="h-7 w-7"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 16V8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+                    />
+                  </svg>
+                </div>
+
+                <p className="text-sm font-semibold text-gray-800">
+                  Select Visa Document
+                </p>
+                <p className="mt-2 text-xs text-gray-600">
+                  PDF, JPG, PNG - Max 5MB
+                </p>
+
+                <input
+                  id="visa-document"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="hidden"
+                  disabled={isSubmitting}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    setVisaDocumentFile(file || null);
+                  }}
+                />
+              </label>
+
+              {visaDocumentFile && (
+                <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
+                  <span className="truncate text-sm text-text-muted">
+                    {visaDocumentFile.name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setVisaDocumentFile(null)}
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {isCommissionPaid && (
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-900">
+                Upload Commission Payment Proof{" "}
+                <span className="text-red-500">*</span>
+              </label>
+
+              <label
+                htmlFor="commission-payment"
+                className="
+        group relative flex cursor-pointer flex-col items-center justify-center
+        rounded-md border-2 border-dashed border-gray-300
+        bg-white px-6 py-10 text-center
+        transition-all duration-200
+        hover:border-blue-500 hover:bg-blue-50/40
+      "
+              >
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <svg
+                    className="h-7 w-7"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 16V8m0 0l-3 3m3-3l3 3M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"
+                    />
+                  </svg>
+                </div>
+
+                <p className="text-sm font-semibold text-gray-800">
+                  Select Commission Payment Proof
+                </p>
+                <p className="mt-2 text-xs text-gray-600">
+                  PDF, JPG, PNG – Max 5MB
+                </p>
+
+                <input
+                  id="commission-payment"
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="hidden"
+                  disabled={isSubmitting}
+                  onChange={(e) =>
+                    setCommissionPaymentFile(e.target.files?.[0] || null)
+                  }
+                />
+              </label>
+
+              {commissionPaymentFile && (
+                <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
+                  <span className="truncate text-sm text-text-muted">
+                    {commissionPaymentFile.name}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setCommissionPaymentFile(null)}
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Remove
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
           <button
             onClick={handleClose}
             disabled={isSubmitting}
-            className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
           >
+            <XCircle className="h-4 w-4" />
             Cancel
           </button>
           <button
@@ -501,10 +961,12 @@ export default function UpdateStatusPopup({
             disabled={
               !selectedStatus ||
               isSubmitting ||
-              (requiresReason && !reason.trim())
+              (requiresReason && !reason.trim()) ||
+              (isVisaSetupSelected && Number(formData.visa_fee_amount) <= 0)
             }
-            className="rounded-full bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
           >
+            <CheckCircle className="h-4 w-4" />
             {isSubmitting ? "Updating..." : "Update Status"}
           </button>
         </div>

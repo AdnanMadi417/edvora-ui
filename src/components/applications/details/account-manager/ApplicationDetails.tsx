@@ -17,7 +17,9 @@ import {
   FaUsers,
   FaClock,
   FaStream,
-} from "react-icons/fa";
+  FaCheckCircle
+
+} from 'react-icons/fa';
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
 
@@ -26,8 +28,8 @@ interface ApplicationDetailsProps {
 }
 
 export default function ApplicationDetails({
-  application,
-}: ApplicationDetailsProps) {
+                                             application,
+                                           }: ApplicationDetailsProps) {
 
   function daysSince(dateString: string) {
     if (!dateString) return 0;
@@ -57,9 +59,23 @@ export default function ApplicationDetails({
     return value ? "Male" : "Female";
   };
 
+  const statusText = {
+    1: "Active",
+    2: "On Hold",
+    3: "Cancelled",
+  }[application.lifecycle_status] ?? "Not provided";
+
+  const statusClass = {
+    1: "border-green-200 bg-green-50 text-green-700",
+    2: "border-yellow-200 bg-yellow-50 text-yellow-700",
+    3: "border-red-200 bg-red-50 text-red-700",
+  }[application.lifecycle_status] ?? "border-gray-200 bg-gray-50 text-gray-600";
+
+
+
   return (
     <section>
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-4 pt-0 shadow-sm sm:p-6">
+      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
         <ApplicationAccountManagerTopBar application={application} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
@@ -74,12 +90,17 @@ export default function ApplicationDetails({
 
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
-                <FaStream  className="text-[10px] text-amber-700" />
+                <FaStream className="text-[10px] text-amber-700" />
                 Stage: {stage.name || "Not provided"}
               </span>
 
+              <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm ${statusClass}`}>
+                <FaCheckCircle className="text-[10px]" />
+                Status: {statusText}
+              </span>
+
               <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
-                <FaClock  className="text-[10px] text-purple-700" />
+                <FaClock className="text-[10px] text-purple-700" />
                 {daysSince(application.updated_at)} Days
               </span>
             </div>
@@ -130,7 +151,7 @@ export default function ApplicationDetails({
         </div>
       </div>
 
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-6 shadow-sm">
+      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <MdAssignmentTurnedIn className="text-xl text-blue-700" />
@@ -213,7 +234,7 @@ export default function ApplicationDetails({
         </div>
       </div>
 
-      <div className="mb-6 mt-6 space-y-6 rounded-xl border border-default bg-card p-6">
+      <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <FaUser className="text-xl text-blue-700" />
@@ -373,8 +394,8 @@ export default function ApplicationDetails({
                   <dd className="text-sm text-text-muted">
                     {previousEducation.start_date && previousEducation.end_date
                       ? `${formatDate(
-                          previousEducation.start_date
-                        )} - ${formatDate(previousEducation.end_date)}`
+                        previousEducation.start_date
+                      )} - ${formatDate(previousEducation.end_date)}`
                       : "Not provided"}
                   </dd>
                 </div>
@@ -391,7 +412,7 @@ export default function ApplicationDetails({
           </div>
 
           <div>
-            <div className="rounded-lg border border-red-200 bg-red-50 p-6 shadow-sm">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <FaPhoneAlt className="text-xs text-red-600" />
                 <h4 className="text-p2 font-semibold tracking-wide text-red-700">
@@ -400,42 +421,43 @@ export default function ApplicationDetails({
               </div>
 
               <dl className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
                   <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaUser className="text-text-secondary" /> Name
+                    <FaUser /> Name
                   </dt>
-                  <dd className="text-sm font-normal text-text-primary">
+                  <dd className="min-w-0 break-words text-sm text-text-primary">
                     {emergencyContact.name || "Not provided"}
                   </dd>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
                   <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaUsers className="text-text-secondary" /> Relation
+                    <FaUsers /> Relation
                   </dt>
-                  <dd className="text-sm font-normal text-text-primary">
+                  <dd className="min-w-0 text-sm text-text-primary">
                     {emergencyContact.relation || "Not provided"}
                   </dd>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
                   <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaPhoneAlt className="text-text-secondary" /> Phone
+                    <FaPhoneAlt /> Phone
                   </dt>
-                  <dd className="text-sm font-normal text-text-primary">
+                  <dd className="min-w-0 text-sm text-text-primary">
                     {emergencyContact.phone || "Not provided"}
                   </dd>
                 </div>
 
-                <div className="flex items-center justify-between">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
                   <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaEnvelope className="text-text-secondary" /> Email
+                    <FaEnvelope /> Email
                   </dt>
-                  <dd className="break-words text-sm font-normal text-text-primary">
+                  <dd className="min-w-0 break-all text-sm text-text-primary">
                     {emergencyContact.email || "Not provided"}
                   </dd>
                 </div>
               </dl>
+
             </div>
           </div>
         </div>

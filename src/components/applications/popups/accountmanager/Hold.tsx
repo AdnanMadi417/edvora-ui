@@ -1,0 +1,176 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { XCircle, AlertCircle, CheckCircle, Pause } from "lucide-react";
+
+import api from "../../../../lib/useApi";
+import { useToast } from "../../../context/ToastContext";
+import SelectField from "components/form/SelectField";
+
+interface HoldPopupProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (status: string) => void;
+  applicationId?: string;
+  currentStatus?: string;
+}
+
+const statusOptions = [
+  { label: "Active", value: "1" },
+  { label: "Hold", value: "2" },
+  { label: "Cancel", value: "3" },
+];
+
+const statusMap: Record<string, string> = {
+  "1": "active",
+  "2": "hold",
+  "3": "cancel",
+};
+
+export default function HoldPopup({
+  isOpen,
+  onClose,
+  onConfirm,
+  applicationId,
+  currentStatus,
+}: HoldPopupProps) {
+  const [status, setStatus] = useState("1");
+  const [isVisible, setIsVisible] = useState(false);
+  const { showToast } = useToast();
+  const [isConfirming, setIsConfirming] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setStatus(currentStatus);
+      setIsVisible(true);
+    } else {
+      const timer = setTimeout(() => setIsVisible(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, currentStatus]);
+
+  useEffect(() => {
+    if (isOpen) setIsVisible(true);
+    else {
+      const timer = setTimeout(() => setIsVisible(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!isVisible) return null;
+
+  const handleConfirm = async () => {
+    if (!applicationId) return;
+
+    try {
+      setIsConfirming(true);
+      await api.patch(`/applications/${applicationId}/lifecycle-status`, {
+        status: statusMap[status],
+      });
+
+      showToast("Application status updated.");
+      onConfirm(statusMap[status]);
+      onClose();
+      setTimeout(() => location.reload(), 300);
+    } catch (error: any) {
+      console.error("Failed to update lifecycle status", error);
+      showToast("Failed to update application status.");
+    } finally {
+      setIsConfirming(false);
+    }
+  };
+  const handleClose = () => {
+    onClose();
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm transition-all duration-300"
+      onClick={handleClose}
+    >
+      <div
+        className={`w-full max-w-lg transform transition-all duration-300 ${
+          isOpen
+            ? "translate-y-0 scale-100 opacity-100"
+            : "translate-y-4 scale-95 opacity-0"
+        }`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative overflow-hidden rounded-2xl bg-card">
+          <div className="relative border-b border-default px-6 pb-4 pt-6">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
+                  <Pause className="h-6 w-6 text-amber-600" strokeWidth={2.5} />
+                </div>
+                <div>
+                  <h5 className="text-h4 font-bold text-gray-900">
+                    Update Application Status
+                  </h5>
+                  <p className="mt-0.5 text-caption text-text-muted">
+                    Select the desired lifecycle status.
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={handleClose}
+                aria-label="Close dialog"
+                className="group flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600"
+              >
+                <XCircle className="h-5 w-5" strokeWidth={2} />
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-3 px-6 py-4">
+
+            <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
+              <AlertCircle className="mt-0.5 h-5 w-5 text-amber-600 flex-shrink-0" />
+              <p className="text-p2 leading-relaxed text-text-primary">
+                This action will update the application's lifecycle status.
+              </p>
+            </div>
+
+
+            <div className="flex items-center gap-2 text-sm font-medium uppercase p-3">
+              {currentStatus === "1" && <CheckCircle className="h-4 w-4" />}
+              {currentStatus === "2" && <Pause className="h-4 w-4" />}
+              {currentStatus === "3" && <XCircle className="h-4 w-4" />}
+              <span>Application status: {statusMap[currentStatus || "1"]}</span>
+            </div>
+
+            <SelectField
+              label="Lifecycle Status"
+              field="lifecycle_status"
+              options={statusOptions}
+              formData={{ lifecycle_status: status }}
+              errors={{}}
+              updateFormData={(field, value) => setStatus(value)}
+            />
+          </div>
+
+          <div className="border-t border-default px-6 py-5">
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleClose}
+                className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
+              >
+                <XCircle className="h-4 w-4" />
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirm}
+                disabled={isConfirming}
+                className="flex items-center justify-center gap-2 rounded-full border border-amber-600 bg-amber-100 text-amber-700 px-4 py-2 text-sm font-medium transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
+              >
+                <CheckCircle className="h-4 w-4" />
+                {isConfirming ? "Updating..." : "Confirm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

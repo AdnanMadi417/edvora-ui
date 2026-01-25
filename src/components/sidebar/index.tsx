@@ -149,7 +149,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           />
         </header>
 
-        <div className="border-default border-y-thin px-6 py-4">
+        <div className="border-gray-200 border-y-thin px-6 py-4">
           {userError ? (
             <div className="text-center">
               <p className="text-p2 text-failed">Failed to load user</p>
@@ -197,7 +197,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           <Links routes={routes} />
         </nav>
 
-        <footer className="border-t border-default p-4">
+        <footer className="border-t border-gray-200 p-4">
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}

@@ -91,7 +91,7 @@ export default function ApplicationDocuments({
   return (
     <section className="mb-6 mt-6 rounded-lg bg-card transition-all duration-300">
       <div
-        className={`group flex cursor-pointer items-center justify-between border border-default p-6 transition-all duration-300 ${
+        className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-6 transition-all duration-300 ${
           showDocs ? "rounded-t-lg" : "rounded-lg"
         }`}
         onClick={() => setShowDocs(!showDocs)}
@@ -128,12 +128,12 @@ export default function ApplicationDocuments({
             : "max-h-0 overflow-hidden opacity-0"
         }`}
       >
-        <div className="rounded-b-lg border border-t-0 border-default bg-card p-6">
+        <div className="rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
           <div className="space-y-4">
             {documents.map((doc: any, index: number) => (
               <div
                 key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-default p-5 backdrop-blur transition-all duration-300"
+                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
                 style={{
                   animation: showDocs
                     ? `slideIn 0.3s ease-out ${index * 0.08}s both`
@@ -190,15 +190,6 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
-
-                  <button
-                    className="group rounded-full cursor-pointer border border-transparent bg-green-100 p-2 text-green-700 transition-all duration-200 hover:border-green-300 hover:bg-green-200 hover:text-green-800 focus-visible:ring-2 focus-visible:ring-green-500"
-                    title="Approved"
-                    aria-label="Approved"
-                    disabled={!doc.file_key}
-                  >
-                    <CheckCircle className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
 
                   <button
                     onClick={(e) => {

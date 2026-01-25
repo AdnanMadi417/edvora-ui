@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, AlertCircle, RotateCcw } from "lucide-react";
+import { XCircle, AlertCircle, RotateCcw, CheckCircle } from 'lucide-react';
 import InputField from "components/form/InputField";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
@@ -11,7 +11,6 @@ interface HoldPopupProps {
   onClose: () => void;
   applicationId: string;
   docId: string;
-  statusId: string | null;
 }
 
 export default function HoldPopup({
@@ -19,13 +18,11 @@ export default function HoldPopup({
   onClose,
   applicationId,
   docId,
-  statusId,
 }: HoldPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({ reason: "" });
   const [errors, setErrors] = useState<{ reason?: string }>({});
   const { showToast } = useToast();
-  const [currentStatus, setCurrentStatus] = useState<string>("");
 
   useEffect(() => {
     if (isOpen) {
@@ -35,26 +32,6 @@ export default function HoldPopup({
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const fetchStatus = async () => {
-      try {
-        const res = await api.get(`/applications/${applicationId}`);
-
-        const status =
-          typeof res.data.stage_status === "string"
-            ? res.data.stage_status
-            : res.data.stage_status?.name || "Unknown";
-        setCurrentStatus(status);
-      } catch (err) {
-        setCurrentStatus("Unknown");
-      }
-    };
-
-    fetchStatus();
-  }, [isOpen, applicationId]);
 
   const updateFormData = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -66,45 +43,32 @@ export default function HoldPopup({
       return;
     }
 
-    if (!statusId) {
-      showToast("Unable to get status ID", "error");
-
-      setTimeout(() => {
-        setFormData({ reason: "" });
-        setErrors({});
-        onClose();
-      }, 1500);
-      return;
-    }
-
     try {
-      await api.post(`/applications/${applicationId}/status`, {
-        status_id: statusId,
-        reason_text: formData.reason,
-        notes: "",
-        required_document_type_ids: [docId],
-      });
+      await api.patch(
+        `/applications/${applicationId}/correction-request`,
+        {
+          reason_text: formData.reason,
+          required_document_type_ids: [docId],
+        }
+      );
 
-      const res = await api.get(`/applications/${applicationId}`);
-      const status =
-        typeof res.data.stage_status === "string"
-          ? res.data.stage_status
-          : res.data.stage_status?.name || "Unknown";
-      setCurrentStatus(status);
-
-      showToast("Status updated successfully", "success");
+      showToast("Correction request sent successfully", "success");
 
       setTimeout(() => {
         setFormData({ reason: "" });
         setErrors({});
         onClose();
-      }, 100);
+      }, 300);
 
       setTimeout(() => {
         window.location.reload();
-      }, 3000);
-    } catch (err) {
-      showToast("Failed to update status", "error");
+      }, 2000);
+    } catch (err: any) {
+      if (err.response?.status === 422) {
+        showToast("Validation error. Please check the input.", "error");
+      } else {
+        showToast("Failed to send correction request", "error");
+      }
 
       setTimeout(() => {
         setFormData({ reason: "" });
@@ -187,21 +151,26 @@ export default function HoldPopup({
           </div>
 
           <div className="border-t border-default px-6 py-5">
+
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleClose}
-                className="rounded-full border border-default bg-card px-5 py-2.5 text-p2 font-medium text-gray-700 hover:bg-gray-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
               >
+                <XCircle className="h-4 w-4" />
                 Cancel
               </button>
+
               <button
                 onClick={handleConfirm}
                 disabled={!formData.reason.trim()}
-                className="rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-p2 font-medium text-white disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-amber-600 bg-amber-100 text-amber-700 px-4 py-2 text-sm font-medium transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
               >
-                Confirm Request
+                <CheckCircle className="h-4 w-4" />
+                Confirm
               </button>
             </div>
+
           </div>
         </div>
       </div>
