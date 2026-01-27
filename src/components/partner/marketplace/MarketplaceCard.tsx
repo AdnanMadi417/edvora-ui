@@ -7,8 +7,10 @@ import {
   MdChatBubbleOutline,
   MdTranslate,
   MdLocalAirport,
-  MdLocationOn,
   MdKeyboardArrowDown,
+  MdMap,
+  MdSchool,
+  MdVisibility ,
 } from "react-icons/md";
 
 import Loading from "../../loading/Loading";
@@ -16,7 +18,10 @@ import NoMessagesFound from "../../emptyData/NoMessagesFound";
 import { useAllPrograms } from "../../../hooks/programs/useProgramsList";
 import NextButton from "../../ui/buttons/NextButton";
 import PrevButton from "../../ui/buttons/PrevButton";
+import ViewDetails from "../../ui/buttons/Button";
 import Link from "next/link";
+import { useServiceProviders } from "hooks/serviceProviders/useServiceProviders";
+import ViewDetailsModal from "../../../components/partner/marketplace/popup/ViewDetailsModal"
 
 const MarketplaceCard = () => {
   const {
@@ -31,6 +36,10 @@ const MarketplaceCard = () => {
   const currentPrograms = programs.slice(indexOfFirstItem, indexOfLastItem);
   const [activeTab, setActiveTab] = useState(1);
   const [isOpen, setIsOpen] = useState(false);
+  const { serviceProviders, loading, error } = useServiceProviders();
+  const [showViewModal, setViewModal] = useState(true);
+
+  console.log(serviceProviders);
 
   const formatDate = (date: string) =>
     new Date(date).toLocaleDateString("en-US", {
@@ -43,7 +52,7 @@ const MarketplaceCard = () => {
     <div className="mt-6 overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
         <div className="relative border-b border-gray-200 p-6">
-          <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
+          <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-text-primary">
                 Partner Marketplace
@@ -69,7 +78,7 @@ const MarketplaceCard = () => {
 
           {!programsError && programs.length > 0 && (
             <div className="block">
-              <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 px-5 py-4 md:grid-cols-2 lg:grid-cols-3">
                 {currentPrograms.map((program) => (
                   <div
                     key={program.id}
@@ -155,7 +164,7 @@ const MarketplaceCard = () => {
                     <div className="space-y-2 px-5 pb-4 text-xs">
                       {activeTab === 1 && (
                         <>
-                          <div className="flex items-center justify-between border-b border-gray-100 py-2">
+                          <div className="flex items-center justify-between py-2">
                             <div className="flex items-center gap-2 font-medium text-slate-500">
                               <MdTranslate className="h-5 w-5" /> Languages
                             </div>
@@ -164,52 +173,95 @@ const MarketplaceCard = () => {
                             </div>
                           </div>
 
-                          <div className="border-b border-gray-100 py-2">
-                            <div className="mb-1 flex items-center gap-2 font-medium text-green-700">
-                              <MdLocalAirport className="h-5 w-5 text-green-600" />{" "}
-                              Services Offered
+                          {/* Coverage */}
+                          <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-slate-100">
+                            <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-800">
+                              <MdPublic className="h-5 w-5 text-emerald-600" />
+                              Coverage Area
                             </div>
-                            <ul className="ml-5 flex flex-col gap-1 text-xs text-slate-500">
-                              <li className="flex items-center gap-2">
-                                <span className="inline-block h-2 w-2 rounded-full bg-green-600" />
-                                Airport Pickup (Senai)
-                              </li>
-                              <li className="flex items-center gap-2">
-                                <span className="inline-block h-2 w-2 rounded-full bg-green-600" />
-                                Accommodation Search
-                              </li>
-                            </ul>
+
+                            <div className="grid gap-3">
+                              {/* Universities */}
+                              <div className="rounded-md bg-blue-50/70 p-3">
+                                <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-800">
+                                  <MdSchool className="h-5 w-5" />
+                                  Universities Served
+                                </div>
+                                <ul className="ml-5 space-y-1 text-xs text-slate-700">
+                                  <li className="list-disc">UTM Skudai</li>
+                                  <li className="list-disc">UIIA</li>
+                                </ul>
+                              </div>
+
+                              {/* Locations */}
+                              <div className="rounded-md bg-orange-50/70 p-3">
+                                <div className="mb-2 flex items-center gap-2 text-sm font-medium text-orange-800">
+                                  <MdMap className="h-5 w-5" />
+                                  Service Locations
+                                </div>
+
+                                <div className="flex flex-wrap gap-2">
+                                  {["Johor Bahru", "Skudai"].map((loc) => (
+                                    <span
+                                      key={loc}
+                                      className="rounded-full bg-white px-3 py-1 text-xs font-medium text-orange-800 ring-1 ring-orange-100"
+                                    >
+                                      {loc}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
                           </div>
 
-                          <div className="border-b border-gray-100 py-2">
-                            <div className="mb-1 flex items-center gap-2 font-medium text-blue-700">
-                              <MdLocationOn className="h-5 w-5 text-blue-500" />{" "}
-                              Universities Served
-                            </div>
-                            <ul className="ml-5 flex flex-col gap-1 text-xs text-slate-500">
-                              <li className="flex items-center gap-2">
-                                <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
-                                UTM Skudai
-                              </li>
-                              <li className="flex items-center gap-2">
-                                <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
-                                UIIA
-                              </li>
-                            </ul>
-                          </div>
+                          {/* Services */}
+                          <div className="rounded-md bg-white shadow-sm ring-1 ring-green-100">
+                            <button
+                              type="button"
+                              onClick={() => setIsOpen(!isOpen)}
+                              className="flex w-full items-center justify-between p-4 text-left"
+                              aria-expanded={isOpen}
+                            >
+                              <div className="flex items-center gap-2 text-sm font-semibold text-green-700">
+                                <MdLocalAirport className="h-5 w-5 text-green-600" />
+                                Services Offered
+                                <span className="ml-2 text-xs font-medium text-green-600">
+                                  2
+                                </span>
+                              </div>
 
-                          <div className="py-2">
-                            <div className="mb-2 flex items-center gap-2 font-medium text-orange-800">
-                              <MdLocationOn className="h-5 w-5 text-orange-500" />{" "}
-                              Service Locations
-                            </div>
-                            <div className="ml-5 flex flex-wrap gap-2">
-                              <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-800">
-                                Johor Bahru
-                              </span>
-                              <span className="rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-800">
-                                Skudai
-                              </span>
+                              <MdKeyboardArrowDown
+                                className={`h-5 w-5 text-green-600 transition-transform duration-300 ${
+                                  isOpen ? "rotate-180" : ""
+                                }`}
+                              />
+                            </button>
+
+                            <div
+                              className={`grid transition-all duration-300 ease-in-out ${
+                                isOpen
+                                  ? "grid-rows-[1fr] opacity-100"
+                                  : "grid-rows-[0fr] opacity-0"
+                              }`}
+                            >
+                              <div className="overflow-hidden">
+                                <div className="border-t border-slate-100 px-5 pb-5 pt-4">
+                                  <h4 className="mb-3 text-sm font-semibold text-slate-900">
+                                    What’s included
+                                  </h4>
+
+                                  <ul className="ml-4 space-y-2 text-xs text-slate-600">
+                                    <li className="flex items-center gap-2">
+                                      <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
+                                      Airport Pickup (Senai)
+                                    </li>
+                                    <li className="flex items-center gap-2">
+                                      <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
+                                      Accommodation Search
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </>
@@ -217,27 +269,27 @@ const MarketplaceCard = () => {
 
                       {activeTab === 2 && (
                         <>
-
-                          <div className="group relative overflow-hidden rounded-md bg-gradient-to-br from-emerald-500 to-green-600 p-6 shadow-sm transition-all">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+                          <div className="group relative overflow-hidden rounded-md bg-gradient-to-br from-emerald-500 to-green-600 px-5 py-4 shadow-sm transition-all">
+                            <div className="absolute right-0 top-0 -mr-16 -mt-16 h-32 w-32 rounded-full bg-white/10"></div>
                             <div className="relative flex items-center justify-between">
                               <div>
+                                <p className="text-sm font-semibold uppercase  tracking-wide text-emerald-100">
+                                  Packages Offered
+                                </p>
 
-                                <p className="text-sm font-semibold text-emerald-100  uppercase tracking-wide">Packages Offered</p>
-
-                                <div className="flex items-baseline gap-1 mt-1">
-                                  <span className="text-lg font-bold text-white">RM 200 - 350</span>
+                                <div className="mt-1 flex items-baseline gap-1">
+                                  <span className="text-lg font-bold text-white">
+                                    RM 200 - 350
+                                  </span>
                                 </div>
-
                               </div>
-                              <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full group-hover:bg-white/30 transition-colors">
+                              <div className="rounded-full bg-white/20 p-3 backdrop-blur-sm transition-colors group-hover:bg-white/30">
                                 <MdLocalAirport className="h-7 w-7 text-white" />
                               </div>
                             </div>
                           </div>
 
                           <div className="cursor-pointer rounded-md border border-gray-200 shadow-sm transition-all">
-
                             <div
                               className="flex items-center justify-between rounded-md px-5 py-4 transition-colors "
                               onClick={() => setIsOpen(!isOpen)}
@@ -265,40 +317,49 @@ const MarketplaceCard = () => {
                                   : "max-h-0 opacity-0"
                               } overflow-hidden`}
                             >
-                              <div className="px-6 pb-6 border-t border-gray-100 pt-4">
-                                <h4 className="text-sm font-semibold text-gray-900 mb-3">
+                              <div className="border-t border-gray-100 px-6 pb-6 pt-4">
+                                <h4 className="mb-3 text-sm font-semibold text-gray-900">
                                   Package Details
                                 </h4>
-                                <p className="text-sm text-gray-600 leading-relaxed">
-                                  This is the detailed content that opens when you click the header.
-                                  Replace this with your actual package information, itinerary details,
+                                <p className="text-sm leading-relaxed text-gray-600">
+                                  This is the detailed content that opens when
+                                  you click the header. Replace this with your
+                                  actual package information, itinerary details,
                                   or service descriptions.
                                 </p>
                                 <ul className="mt-4 space-y-2">
                                   <li className="flex items-center text-sm text-gray-600">
-                                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-3"></span>
+                                    <span className="mr-3 h-1.5 w-1.5 rounded-full bg-green-500"></span>
                                     Full transportation coverage
                                   </li>
                                   <li className="flex items-center text-sm text-gray-600">
-                                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-3"></span>
+                                    <span className="mr-3 h-1.5 w-1.5 rounded-full bg-green-500"></span>
                                     Professional tour guide
                                   </li>
                                   <li className="flex items-center text-sm text-gray-600">
-                                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mr-3"></span>
+                                    <span className="mr-3 h-1.5 w-1.5 rounded-full bg-green-500"></span>
                                     Meals and refreshments included
                                   </li>
                                 </ul>
                               </div>
                             </div>
-
                           </div>
-
                         </>
                       )}
                     </div>
 
                     {/* Footer */}
-                    <div className="flex justify-end gap-2 border-t border-gray-200 p-4">
+                    <div className="flex justify-between gap-2 border-t border-gray-200 p-4">
+                      <ViewDetails
+                        icon={<MdVisibility  className="h-4 w-4" />}
+                        text="Details"
+                        bgColor="bg-blue-50"
+                        textColor="text-blue-700"
+                        borderColor="border-blue-600"
+                        hoverTextColor="hover:text-blue-800"
+                        hoverBorderColor="hover:border-blue-700"
+                      />
+
                       <Link
                         href={{
                           pathname: "/partner/applications/apply-for-program",
@@ -315,7 +376,7 @@ const MarketplaceCard = () => {
                         className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 shadow-md transition-transform hover:scale-105 hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
                       >
                         <MdChatBubbleOutline className="h-4 w-4" />
-                        Contact Me
+                        Contact
                       </Link>
                     </div>
                   </div>
@@ -375,6 +436,11 @@ const MarketplaceCard = () => {
           )}
         </div>
       </div>
+
+      <ViewDetailsModal
+        isOpen={showViewModal}
+      />
+
     </div>
   );
 };

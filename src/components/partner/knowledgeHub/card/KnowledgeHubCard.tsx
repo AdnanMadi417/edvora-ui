@@ -131,7 +131,6 @@ const KnowledgeHubCards = () => {
         </div>
 
         <div className="block">
-          {/* CONTENT AREA */}
           {programsLoading && <Loading text="Fetching programs data..." />}
 
           {!programsError && !programsLoading && programs.length === 0 && (
@@ -147,153 +146,122 @@ const KnowledgeHubCards = () => {
                 {currentPrograms.map((program) => (
                   <div
                     key={program.id}
-                    className="relative overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm transition-all"
+                    className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md hover:-translate-y-1"
                   >
-                    {/* Gradient Top Accent */}
-                    <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-blue-500/80 via-blue-600/80 to-indigo-700/80" />
+                    {/* Top Accent */}
+                    <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-600" />
 
                     {/* Header */}
-                    <div className="relative flex h-[100px] items-center px-5 py-4">
-                      <div className="flex items-start gap-4">
-                        <div className="relative flex-shrink-0">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
-                            <GraduationCap className="h-6 w-6 text-white" />
-                          </div>
-
-                          <span
-                            className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-white ${
-                              program.field_of_study?.is_active
-                                ? "bg-emerald-500"
-                                : "bg-red-500"
-                            }`}
-                          />
+                    <div className="flex items-start gap-4 border-b border-gray-200 px-4 py-5">
+                      {/* Icon + Status */}
+                      <div className="relative flex-shrink-0">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
+                          <GraduationCap className="h-6 w-6 text-white" />
                         </div>
+                        <span
+                          className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-white ${
+                            program.field_of_study?.is_active ? "bg-emerald-500" : "bg-red-500"
+                          }`}
+                          title={program.field_of_study?.is_active ? "Active" : "Inactive"}
+                        />
+                      </div>
 
-                        <div className="min-w-0 flex-1">
-                          <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900">
-                            {program.name}
-                          </h3>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {program.university?.name}
-                          </p>
+                      {/* Program Info */}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="line-clamp-3 text-sm font-semibold text-slate-900">
+                          {program.name}
+                        </h3>
+
+                        <p className="flex items-center gap-2 text-xs text-slate-500 mt-1">
+                          <span className="line-clamp-1">{program.university?.name}</span>
+                          {program.qualification_level && (
+                            <span className="rounded-full border border-blue-700 px-2 py-0.5 text-blue-700 capitalize">
+            {program.qualification_level}
+          </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Body Info */}
+                    <div className="space-y-3 px-5 py-4 text-xs text-slate-700">
+                      {/* Duration & Tuition */}
+                      <div className="flex justify-between">
+      <span className="flex items-center gap-1.5 font-medium text-slate-500">
+        <MdAccessTime className="h-4 w-4" /> Duration
+      </span>
+                        <span className="text-xs font-medium text-slate-900">
+        {program.duration ? `${program.duration} years` : "Not provided"}
+      </span>
+                      </div>
+
+                      <div className="flex justify-between">
+      <span className="flex items-center gap-1.5 font-medium text-slate-500">
+        <MdAttachMoney className="h-4 w-4" /> First-Year Cost
+      </span>
+                        <span className="text-xs font-medium text-slate-900">
+        {program.first_year_tuition
+          ? `RM${program.first_year_tuition.toLocaleString()}`
+          : "Not provided"}
+      </span>
+                      </div>
+
+                      {/* Country & Next Intake */}
+                      <div className="flex justify-between">
+      <span className="flex items-center gap-1.5 font-medium text-slate-500">
+        <MapPin className="h-4 w-4" /> Country
+      </span>
+                        <span className="text-xs font-medium text-slate-900">
+        {program.university?.country || "Not provided"}
+      </span>
+                      </div>
+
+                      <div className="flex justify-between">
+      <span className="flex items-center gap-1.5 font-medium text-slate-500">
+        <Calendar className="h-4 w-4" /> Next Intake
+      </span>
+                        <span className="text-xs font-medium text-slate-900">
+        {program.next_intake
+          ? formatDate(program.next_intake)
+          : "Intake not announced"}
+      </span>
+                      </div>
+
+                      {/* Scholarship */}
+                      <div className="flex justify-between items-center gap-2">
+      <span className="flex items-center gap-1.5 font-medium text-slate-500">
+        {program.has_scholarship ? (
+          <CheckCircle className="h-4 w-4" />
+        ) : (
+          <MinusCircle className="h-4 w-4" />
+        )}
+        Scholarship
+      </span>
+                        <div
+                          className={`rounded-full px-3 py-1 text-xs font-medium ${
+                            program.has_scholarship
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-600"
+                          }`}
+                        >
+                          {program.has_scholarship ? "Available" : "Not Available"}
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 border-y border-gray-200 px-5 py-4 text-xs">
-                      <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 font-medium text-blue-700">
-                        <MdSchool className="h-3.5 w-3.5" />
-                        <span className="font-medium capitalize text-text-primary">
-                          {program.qualification_level}
-                        </span>
-                      </div>
-
-                      <div className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 font-medium text-slate-700">
-                        {program.is_online ? (
-                          <>
-                            <MdLaptop className="h-3.5 w-3.5" /> Online
-                          </>
-                        ) : (
-                          <>
-                            <MdApartment className="h-3.5 w-3.5" /> On Campus
-                          </>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="px-5 py-4 text-xs">
-                      <div className="space-y-2">
-                        {/* Duration */}
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5 font-medium text-slate-500">
-                            <MdAccessTime className="h-3.5 w-3.5" /> Duration
-                          </span>
-                          <span className="text-xs font-medium text-slate-900">
-                            {program.duration
-                              ? `${program.duration} years`
-                              : "Not provided"}
-                          </span>
-                        </div>
-
-                        {/* First-Year Cost */}
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5 font-medium text-slate-500">
-                            <MdAttachMoney className="h-3.5 w-3.5" /> First-Year
-                            Cost
-                          </span>
-                          <span className="text-xs font-medium text-slate-900">
-                            {program.first_year_tuition
-                              ? `RM${program.first_year_tuition.toLocaleString()}`
-                              : "Not provided"}
-                          </span>
-                        </div>
-
-                        {/* Country */}
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5 font-medium text-slate-500">
-                            <MapPin className="h-3.5 w-3.5" /> Country
-                          </span>
-                          <span className="text-xs font-medium text-slate-900">
-                            {program.university?.country}
-                          </span>
-                        </div>
-
-                        {/* Next Intake */}
-                        <div className="flex items-center justify-between">
-                          <span className="flex items-center gap-1.5 font-medium text-slate-500">
-                            <Calendar className="h-3.5 w-3.5" /> Next Intake
-                          </span>
-                          <span className="text-xs font-medium text-slate-900">
-                            {program?.next_intake
-                              ? formatDate(program.next_intake)
-                              : "Intake not announced"}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="flex items-center gap-1.5 font-medium text-slate-500">
-                            {program.has_scholarship ? (
-                              <CheckCircle className="h-3.5 w-3.5" />
-                            ) : (
-                              <MinusCircle className="h-3.5 w-3.5" />
-                            )}
-                            Scholarship
-                          </span>
-
-                          <span className="flex items-center gap-2 bg-white transition">
-                            <span
-                              className={`h-2 w-2 rounded-full border-2 ${
-                                program.has_scholarship
-                                  ? "border-green-600"
-                                  : "border-red-600"
-                              }`}
-                            />
-                            <span className="text-xs font-medium capitalize text-text-primary">
-                              {program.has_scholarship
-                                ? "Available"
-                                : "Not Available"}
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between border-t border-gray-200 bg-gray-50 px-5 py-4">
+                    {/* Commission */}
+                    <div className="flex items-center justify-between bg-slate-50 px-5 py-4">
                       <div>
-                        <div className="text-xs text-slate-800">
-                          Commission
-                        </div>
-                        <div className="mt-1 text-lg font-bold text-slate-900">
+                        <div className="text-xs text-slate-500">Your Commission</div>
+                        <div className="mt-1 text-lg font-semibold text-slate-900">
                           {program.first_year_tuition
                             ? `RM${program.first_year_tuition.toLocaleString()}`
                             : "Not provided"}
                         </div>
                       </div>
-
-
                     </div>
 
-                    {/* Footer */}
+                    {/* Footer Buttons */}
                     <div className="flex flex-col gap-2 border-t border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between">
                       <LinkBtn
                         href={`/partner/knowledgeHub/${program.id}`}
@@ -321,13 +289,14 @@ const KnowledgeHubCards = () => {
                           },
                         }}
                         title="Apply Now"
-                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 shadow-md transition-transform hover:scale-105 hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
+                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 shadow-md transition-transform hover:scale-105 hover:border-green-700 hover:bg-green-200 disabled:opacity-50 w-full sm:w-auto"
                       >
                         <CheckCircle className="h-4 w-4" />
                         Apply
                       </Link>
                     </div>
                   </div>
+
                 ))}
               </div>
 
