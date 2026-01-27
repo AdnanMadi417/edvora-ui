@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowRight, ArrowLeft, BadgeCheck, AlertCircle } from "lucide-react";
+import { ArrowRight, ArrowLeft, BadgeCheck, AlertCircle, CheckCircle } from 'lucide-react';
 import {
   MdPublic,
   MdChatBubbleOutline,
@@ -38,6 +38,7 @@ const MarketplaceCard = () => {
   const [openPackage, setOpenPackage] = useState<string | null>(null);
 
   const [showViewModal, setViewModal] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState<any>(null);
 
   useEffect(() => {
     if (serviceProviders.length) {
@@ -392,6 +393,7 @@ const MarketplaceCard = () => {
 
                     {/* Footer */}
                     <div className="flex justify-between gap-2 border-t border-gray-200 p-4">
+
                       <ViewDetails
                         icon={<MdVisibility className="h-4 w-4" />}
                         text="Details"
@@ -400,18 +402,24 @@ const MarketplaceCard = () => {
                         borderColor="border-blue-600"
                         hoverTextColor="hover:text-blue-800"
                         hoverBorderColor="hover:border-blue-700"
+                        onClick={() => {
+                          setSelectedProvider(program);
+                          setViewModal(true);
+                        }}
                       />
 
-                      <Link
-                        href={{
-                          pathname: "/partner/applications/apply-for-program",
+                      <button
+                        onClick={() => {
+                          if (!program?.whatsapp) return
+                          const number = program.whatsapp.replace("+", "")
+                          window.open(`https://wa.me/${number}`, "_blank")
                         }}
-                        title="Contact Me"
-                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 shadow-md transition-transform hover:scale-105 hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
+                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition hover:border-green-700 hover:bg-green-200 shadow-md hover:scale-105"
                       >
-                        <MdChatBubbleOutline className="h-4 w-4" />
+                        <CheckCircle className="h-4 w-4" />
                         Contact
-                      </Link>
+                      </button>
+
                     </div>
                   </div>
                 ))}
@@ -477,7 +485,12 @@ const MarketplaceCard = () => {
         </div>
       </div>
 
-      <ViewDetailsModal isOpen={showViewModal} />
+      <ViewDetailsModal
+        isOpen={showViewModal}
+        onClose={() => setViewModal(false)}
+        provider={selectedProvider}
+      />
+
     </div>
   );
 };
