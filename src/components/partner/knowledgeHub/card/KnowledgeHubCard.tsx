@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Search,
   Layers,
@@ -12,39 +12,55 @@ import {
   MapPin,
   Calendar,
   MinusCircle,
-} from "lucide-react";
-import { MdMenuBook, MdAccessTime, MdAttachMoney } from "react-icons/md";
+} from 'lucide-react';
+import { MdMenuBook, MdAccessTime, MdAttachMoney } from 'react-icons/md';
 
-import Loading from "../../../loading/Loading";
-import NoMessagesFound from "../../../emptyData/NoMessagesFound";
-import { useAllPrograms } from "../../../../hooks/programs/useProgramsList";
-import NextButton from "../../../ui/buttons/NextButton";
-import PrevButton from "../../../ui/buttons/PrevButton";
-import LinkBtn from "../../../ui/links/LinkBtn";
-import Link from "next/link";
+import Loading from '../../../loading/Loading';
+import NoMessagesFound from '../../../emptyData/NoMessagesFound';
+import { useAllPrograms } from '../../../../hooks/programs/useProgramsList';
+import NextButton from '../../../ui/buttons/NextButton';
+import PrevButton from '../../../ui/buttons/PrevButton';
+import LinkBtn from '../../../ui/links/LinkBtn';
+import Link from 'next/link';
 
 const KnowledgeHubCards = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all_status");
-  const [filterStages, setFilterStages] = useState("all_stages");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all_status');
+  const [filterStages, setFilterStages] = useState('all_stages');
 
   const {
     programs,
     loading: programsLoading,
     error: programsError,
   } = useAllPrograms({});
+  const filteredPrograms = programs.filter((program) => {
+    const term = searchTerm.toLowerCase();
+    const university = program.university?.name?.toLowerCase() || '';
+    const programName = program.name?.toLowerCase() || '';
+    const level = program.qualification_level?.toLowerCase() || '';
 
+    return (
+      university.includes(term) ||
+      programName.includes(term) ||
+      level.includes(term)
+    );
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPrograms = programs.slice(indexOfFirstItem, indexOfLastItem);
+  const currentPrograms = filteredPrograms.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
 
   const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
+    new Date(date).toLocaleDateString('en-US', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
     });
 
   const sortDates = (dates: string[]) =>
@@ -73,47 +89,15 @@ const KnowledgeHubCards = () => {
                 type="text"
                 placeholder="Search by university, program, or level..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearchChange}
                 className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-text-muted outline-0 placeholder:text-text-muted focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
-            <div className="relative flex-1 sm:flex-none">
-              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
-              <select
-                value={filterStages}
-                onChange={(e) => setFilterStages(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-gray-200 py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:text-blue-500 focus:ring-0 focus:ring-blue-500"
-              >
-                <option value="all_stages">All Universities</option>
-              </select>
-            </div>
-
-            <div className="relative flex-1 sm:flex-none">
-              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-gray-200 py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:text-blue-500 focus:ring-0 focus:ring-blue-500"
-              >
-                <option value="all_status">All Programs</option>
-              </select>
-            </div>
-
-            <div className="relative flex-1 sm:flex-none">
-              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-gray-200 py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:text-blue-500 focus:ring-0 focus:ring-blue-500"
-              >
-                <option value="all_status">All Levels</option>
-              </select>
-            </div>
 
             {/* Clear Button */}
             <button
-              onClick={() => setSearchTerm("")}
+              onClick={() => setSearchTerm('')}
               className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
             >
               <RefreshCw className="h-4 w-4" />
@@ -146,19 +130,20 @@ const KnowledgeHubCards = () => {
                     <div className="flex items-start gap-4 border-b border-gray-200 px-4 py-5">
 
                       <div className="relative flex-shrink-0">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
+                        <div
+                          className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
                           <GraduationCap className="h-6 w-6 text-white" />
                         </div>
                         <span
                           className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-white ${
                             program.field_of_study?.is_active
-                              ? "bg-emerald-500"
-                              : "bg-red-500"
+                              ? 'bg-emerald-500'
+                              : 'bg-red-500'
                           }`}
                           title={
                             program.field_of_study?.is_active
-                              ? "Active"
-                              : "Inactive"
+                              ? 'Active'
+                              : 'Inactive'
                           }
                         />
                       </div>
@@ -190,7 +175,7 @@ const KnowledgeHubCards = () => {
                         <span className="text-xs font-medium text-slate-900">
                           {program.duration
                             ? `${program.duration} years`
-                            : "Not provided"}
+                            : 'Not provided'}
                         </span>
                       </div>
 
@@ -201,7 +186,7 @@ const KnowledgeHubCards = () => {
                         <span className="text-xs font-medium text-slate-900">
                           {program.first_year_tuition
                             ? `RM${program.first_year_tuition.toLocaleString()}`
-                            : "Not provided"}
+                            : 'Not provided'}
                         </span>
                       </div>
 
@@ -210,7 +195,7 @@ const KnowledgeHubCards = () => {
                           <MapPin className="h-4 w-4" /> Country
                         </span>
                         <span className="text-xs font-medium text-slate-900">
-                          {program.university?.country || "Not provided"}
+                          {program.university?.country || 'Not provided'}
                         </span>
                       </div>
 
@@ -221,7 +206,7 @@ const KnowledgeHubCards = () => {
                         <span className="text-xs font-medium text-slate-900">
                           {program.next_intake
                             ? formatDate(program.next_intake)
-                            : "Intake not announced"}
+                            : 'Intake not announced'}
                         </span>
                       </div>
 
@@ -237,13 +222,13 @@ const KnowledgeHubCards = () => {
                         <div
                           className={`rounded-full px-3 py-1 text-xs font-medium ${
                             program.has_scholarship
-                              ? "bg-green-100 text-green-700"
-                              : "bg-red-100 text-red-600"
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-red-100 text-red-600'
                           }`}
                         >
                           {program.has_scholarship
-                            ? "Available"
-                            : "Not Available"}
+                            ? 'Available'
+                            : 'Not Available'}
                         </div>
                       </div>
                     </div>
@@ -256,12 +241,13 @@ const KnowledgeHubCards = () => {
                         <div className="mt-1 text-lg font-semibold text-slate-900">
                           {program.first_year_tuition
                             ? `RM${program.first_year_tuition.toLocaleString()}`
-                            : "Not provided"}
+                            : 'Not provided'}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 border-t border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div
+                      className="flex flex-col gap-2 border-t border-gray-200 p-4 sm:flex-row sm:items-center sm:justify-between">
                       <LinkBtn
                         href={`/partner/knowledgeHub/${program.id}`}
                         icon={<MdMenuBook className="h-4 w-4" />}
@@ -277,14 +263,14 @@ const KnowledgeHubCards = () => {
 
                       <Link
                         href={{
-                          pathname: "/partner/applications/apply-for-program",
+                          pathname: '/partner/applications/apply-for-program',
                           query: {
                             program_id: program.id,
                             university_id: program.university.id,
                             intake_date:
                               program.intake_dates?.[0] ??
                               program.university.intake_months?.[0] ??
-                              new Date().toISOString().split("T")[0],
+                              new Date().toISOString().split('T')[0],
                           },
                         }}
                         title="Apply Now"
@@ -298,7 +284,8 @@ const KnowledgeHubCards = () => {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex  md:justify-between">
+              <div
+                className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex  md:justify-between">
                 {programs.length > 0 && (
                   <div className="flex items-center gap-1 text-sm font-medium text-text-muted">
                     Showing
@@ -326,7 +313,7 @@ const KnowledgeHubCards = () => {
                   />
 
                   <span className="px-3 py-1 font-medium text-text-muted">
-                    Page {currentPage} of{" "}
+                    Page {currentPage} of{' '}
                     {Math.ceil(programs.length / itemsPerPage)}
                   </span>
 
@@ -335,8 +322,8 @@ const KnowledgeHubCards = () => {
                       setCurrentPage((prev) =>
                         Math.min(
                           prev + 1,
-                          Math.ceil(programs.length / itemsPerPage)
-                        )
+                          Math.ceil(programs.length / itemsPerPage),
+                        ),
                       )
                     }
                     disabled={

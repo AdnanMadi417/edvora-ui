@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { ArrowRight, ArrowLeft, BadgeCheck, AlertCircle, CheckCircle } from 'lucide-react';
 import {
   MdPublic,
-  MdChatBubbleOutline,
   MdTranslate,
   MdLocalAirport,
   MdKeyboardArrowDown,
@@ -18,7 +17,6 @@ import NoMessagesFound from "../../emptyData/NoMessagesFound";
 import NextButton from "../../ui/buttons/NextButton";
 import PrevButton from "../../ui/buttons/PrevButton";
 import ViewDetails from "../../ui/buttons/Button";
-import Link from "next/link";
 import { useServiceProviders } from "hooks/serviceProviders/useServiceProviders";
 import ViewDetailsModal from "../../../components/partner/marketplace/popup/ViewDetailsModal";
 
@@ -50,13 +48,6 @@ const MarketplaceCard = () => {
     }
   }, [serviceProviders]);
 
-  const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-
   return (
     <div className="mt-6 overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
@@ -75,7 +66,7 @@ const MarketplaceCard = () => {
         </div>
 
         <div className="block">
-          {/* CONTENT AREA */}
+
           {loading && <Loading text="Fetching service providers data..." />}
 
           {!error && !loading && serviceProviders.length === 0 && (
@@ -93,7 +84,7 @@ const MarketplaceCard = () => {
                     key={program.id}
                     className="relative overflow-hidden rounded-lg bg-white shadow-md transition-all"
                   >
-                    {/* Header */}
+
                     <div className="relative flex w-full items-center border-b border-gray-100 px-5 py-4">
                       <div className="flex w-full items-start justify-between">
                         <div className="flex items-start gap-4">
@@ -148,7 +139,6 @@ const MarketplaceCard = () => {
                       </div>
                     </div>
 
-                    {/* Tabs */}
                     <div className="px-5 py-3">
                       <div className="relative flex w-full rounded-full bg-gray-100 p-1 shadow-sm">
                         {[1, 2].map((tab) => (
@@ -172,7 +162,6 @@ const MarketplaceCard = () => {
                       </div>
                     </div>
 
-                    {/* Tab Content */}
                     <div className="space-y-2 px-5 pb-4 text-xs">
                       {(activeTab[program.id] ?? 1) === 1 && (
                         <>
@@ -195,7 +184,6 @@ const MarketplaceCard = () => {
                             </div>
                           </div>
 
-                          {/* Coverage */}
                           <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-slate-100">
                             <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-800">
                               <MdPublic className="h-5 w-5 text-emerald-600" />
@@ -222,7 +210,6 @@ const MarketplaceCard = () => {
                                 </ul>
                               </div>
 
-                              {/* Locations */}
                               <div className="rounded-md bg-orange-50/70 p-3">
                                 <div className="mb-2 flex items-center gap-2 text-sm font-medium text-orange-800">
                                   <MdMap className="h-5 w-5" />
@@ -391,7 +378,6 @@ const MarketplaceCard = () => {
                       )}
                     </div>
 
-                    {/* Footer */}
                     <div className="flex justify-between gap-2 border-t border-gray-200 p-4">
 
                       <ViewDetails
