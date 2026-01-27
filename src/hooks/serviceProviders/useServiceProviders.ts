@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
-import api from "lib/useApi"
 import Cookies from "js-cookie"
+import api from "lib/useApi"
 
 export interface PackageOffered {
   name: string
@@ -40,7 +40,8 @@ export function useServiceProviders() {
     const fetchServiceProviders = async () => {
       try {
         const token = Cookies.get("token")
-        const res = await api.get("/logistic-providers/", {
+
+        const res = await api.get("/logistic-providers", {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         })
 
