@@ -49,8 +49,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     percentage: "Percentage",
   };
 
-  const { program, requiredDocuments, commission, loading, error } =
-    useProgram(id);
+  const { program, requiredDocuments, commission,} = useProgram(id);
 
   if (!program) return <Loading text="Loading program details..." />;
 
