@@ -1,4 +1,4 @@
-import { MdDescription, MdPayments,MdNotifications,MdMenuBook,MdPostAdd } from "react-icons/md";
+import { MdDescription, MdPayments,MdNotifications,MdMenuBook,MdBusinessCenter } from "react-icons/md";
 import { IRoute } from "types/navigation";
 
 const partnerRoutes: IRoute[] = [
@@ -6,7 +6,7 @@ const partnerRoutes: IRoute[] = [
   { name: "Commission", layout: "/partner", path: "/commission", icon: MdPayments },
   { name: "Notifications", layout: "/partner", path: "/notifications", icon: MdNotifications },
   { name: "Knowledge Hub", layout: "/partner", path: "/knowledgeHub", icon: MdMenuBook },
-  // { name: "New Application", layout: "/partner", path: "/new-application", icon: MdPostAdd },
+  { name: "Partner Hub", layout: "/partner", path: "/marketplace", icon: MdBusinessCenter },
 ];
 
 export default partnerRoutes;
