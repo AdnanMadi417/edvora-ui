@@ -21,7 +21,6 @@ import {
   CircleDollarSign,
   Award,
   ClipboardCheck,
-  BookOpen,
   GraduationCap,
   FileText,
   CheckCircle,
@@ -43,8 +42,14 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     router.push("/partner/knowledgeHub/");
   };
 
-  const { program, requiredDocuments, commission, loading, error } =
-    useProgram(id);
+  const commissionLabel = {
+    one_time_per_year: "One-time (Yearly)",
+    monthly: "Monthly",
+    per_student: "Per Student",
+    percentage: "Percentage",
+  };
+
+  const { program, requiredDocuments, commission,} = useProgram(id);
 
   if (!program) return <Loading text="Loading program details..." />;
 
@@ -87,46 +92,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <span className="hidden sm:inline">Back to Programs</span>
               </button>
             </div>
-          </div>
-
-          <div className="p-6 pb-0">
-            <h4 className="flex items-center gap-3 text-lg font-semibold text-text-primary">
-              <BookOpen className="h-5 w-5 text-slate-500" />
-              University Overview
-            </h4>
-
-            {program?.university?.description && (
-              <div className="mt-4">
-                <h5 className="text-sm font-medium text-slate-800">
-                  About University
-                </h5>
-                <p className="mt-1 text-sm leading-relaxed text-gray-700">
-                  {program.university.description}
-                </p>
-              </div>
-            )}
-
-            {program?.overview && (
-              <div className="mt-4">
-                <h5 className="text-sm font-medium text-slate-800">
-                  Program Overview
-                </h5>
-                <p className="mt-1 text-sm leading-relaxed text-gray-700">
-                  {program.overview}
-                </p>
-              </div>
-            )}
-
-            {program?.curriculum && (
-              <div className="mt-4">
-                <h5 className="text-sm font-medium text-slate-800">
-                  Curriculum
-                </h5>
-                <p className="mt-1 text-sm leading-relaxed text-gray-700">
-                  {program.curriculum}
-                </p>
-              </div>
-            )}
           </div>
 
           <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
@@ -208,7 +173,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                         className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 transition hover:border-green-600"
                       >
                         <span className="h-2 w-2 rounded-full border-2 border-green-600" />
-                        <span className="font-medium capitalize text-text-primary">
+                        <span className="text-xs font-medium text-text-primary">
                           {date}
                         </span>
                       </span>
@@ -279,127 +244,113 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
       <div className="mt-6">
         <div className="rounded-md border border-default bg-card shadow-sm">
+
           <CardHeader
             icon={CreditCard}
-            title="Fees & Cost Breakdown"
-            description=" A transparent overview of tuition fees, mandatory costs, and
-                available scholarships."
+            title="Fees & Academic Requirements"
+            description="Comprehensive overview of tuition fees, mandatory one-time costs, available scholarships, and all academic entry requirements for program enrollment."
             iconBg="bg-blue-50"
             iconColor="text-blue-600"
           />
 
-          <div className="border-b border-gray-200 p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 border-b border-gray-200 p-6 gap-4 items-start">
 
-            <div className="flex items-start gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
-                    <Banknote className="h-5 w-5 text-blue-600" />
-                  </span>
-
+            <div>
               <div className="min-w-0">
                 <h4 className="text-base font-semibold tracking-tight text-slate-900">
                   Tuition Fee
                 </h4>
                 <p className="mt-1 text-sm leading-relaxed text-slate-500">
-                  A transparent overview of tuition fees .
-
+                  A transparent overview of tuition fees.
                 </p>
               </div>
-            </div>
 
-            <div className="mt-6 overflow-hidden rounded-md border border-slate-200 ">
-              <div className="grid grid-cols-2 bg-blue-50">
-                <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">
-                  <Calendar className="h-4 w-4 text-blue-600" />
-                  Year / Semester
-                </div>
+              <div className="mt-6 overflow-hidden rounded-md border border-slate-200">
 
-                <div className="text-sx flex items-center gap-3 px-5 py-4 font-semibold text-slate-800 md:justify-end md:text-sm">
-                  <Banknote className="h-4 w-4 text-blue-600" />
-                  Tuition Fee
-                </div>
-              </div>
-
-              <div className="overflow-hidden">
-                {program?.yearly_fees && program.yearly_fees.length > 0 ? (
-                  program?.yearly_fees?.map((item, index) => (
-                    <div
-                      key={index}
-                      className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
-                    >
-                      <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
-                        Year {item.year}
-                      </div>
-
-                      <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                        RM {item.fee.toLocaleString()}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
-                    No yearly fees available
+                <div className="grid grid-cols-2 bg-blue-50">
+                  <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">
+                    <Calendar className="h-4 w-4 text-blue-600" />
+                    Year / Semester
                   </div>
-                )}
+                  <div className="flex items-center gap-3 px-5 py-4 font-semibold text-slate-800 md:justify-end md:text-sm">
+                    <Banknote className="h-4 w-4 text-blue-600" />
+                    Tuition Fee
+                  </div>
+                </div>
+
+                <div className="overflow-hidden">
+                  {program?.yearly_fees?.length ? (
+                    program.yearly_fees.map((item, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
+                      >
+                        <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
+                          Year {item.year}
+                        </div>
+                        <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
+                          RM {item.fee.toLocaleString()}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
+                      No yearly fees available
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="border-b border-gray-100 p-6">
-            <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
-                <Banknote className="h-5 w-5 text-blue-600" />
-              </span>
-
+            <div>
               <div className="min-w-0">
                 <h4 className="text-base font-semibold tracking-tight text-slate-900">
                   Other Mandatory Fees
                 </h4>
                 <p className="mt-1 text-sm leading-relaxed text-slate-500">
-                  All fees listed are paid directly to the university or
-                  government
+                  All fees listed are paid directly to the university or government
                 </p>
               </div>
-            </div>
 
-            <div className="mt-6 overflow-hidden rounded-md border border-slate-200">
-              <div className="grid grid-cols-2 bg-blue-50">
-                <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">
-                  <Layers className="h-4 w-4 text-blue-600" />
-                  Fees Type
-                </div>
+              <div className="mt-6 overflow-hidden rounded-md border border-slate-200">
 
-                <div className="flex items-center gap-3 px-5 py-4 text-sm font-semibold text-slate-800 md:justify-end">
-                  <CircleDollarSign className="h-4 w-4 text-blue-600" />
-                  Amount
-                </div>
-              </div>
-
-              <div className="overflow-hidden">
-                {program?.one_time_fees && program.one_time_fees.length > 0 ? (
-                  program.one_time_fees.map((item, index) => (
-                    <div
-                      key={index}
-                      className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
-                    >
-                      <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
-                        {item.description ?? "Fee"}
-                      </div>
-
-                      <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                        RM {item.fee.toLocaleString()}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
-                    No one-time fees available
+                <div className="grid grid-cols-2 bg-blue-50">
+                  <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">
+                    <Layers className="h-4 w-4 text-blue-600" />
+                    Fees Type
                   </div>
-                )}
+                  <div className="flex items-center gap-3 px-5 py-4 text-sm font-semibold text-slate-800 md:justify-end">
+                    <CircleDollarSign className="h-4 w-4 text-blue-600" />
+                    Amount
+                  </div>
+                </div>
+
+                <div className="overflow-hidden">
+                  {program?.one_time_fees?.length ? (
+                    program.one_time_fees.map((item, index) => (
+                      <div
+                        key={index}
+                        className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
+                      >
+                        <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
+                          {item.description ?? "Fee"}
+                        </div>
+                        <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
+                          RM {item.fee.toLocaleString()}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
+                      No one-time fees available
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-6 border-b border-gray-200">
             <div className="flex items-start gap-3">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
                 <Award className="h-5 w-5 text-blue-600" />
@@ -447,45 +398,51 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
             )}
           </div>
-        </div>
-      </div>
 
-      <div className="mt-6">
-        <div className="rounded-md border border-default bg-card shadow-sm">
-          <CardHeader
-            icon={ClipboardCheck}
-            title="Entry Requirements"
-            description="Review all academic and admission requirements."
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-          />
+          <div className="p-6">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
+                <ClipboardCheck className="h-5 w-5 text-blue-600" />
+              </span>
 
-          <div className="space-y-4 p-6">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {requiredDocuments.map((item) => (
-                <div
-                  key={item.id}
-                  className="group flex items-start gap-4 rounded-md border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:bg-blue-50/30"
-                >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 group-hover:bg-blue-100">
-                    <FileText className="h-5 w-5 text-slate-600 group-hover:text-blue-600" />
-                  </div>
+              <div className="min-w-0">
+                <h4 className="text-base font-semibold tracking-tight text-slate-900">
+                  Entry Requirements
+                </h4>
+                <p className="felx mt-1 gap-2 text-sm leading-relaxed text-slate-500">
+                  Review all academic and admission requirements.
+                </p>
+              </div>
+            </div>
 
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-900">
-                      {item.description ?? item.type ?? "Document"}
-                    </p>
+            <div className="space-y-4 pt-6">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {requiredDocuments.map((item) => (
+                  <div
+                    key={item.id}
+                    className="group flex items-start gap-4 rounded-md border border-slate-200 bg-white p-5 transition hover:border-blue-200 hover:bg-blue-50/30"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 group-hover:bg-blue-100">
+                      <FileText className="h-5 w-5 text-slate-600 group-hover:text-blue-600" />
+                    </div>
 
-                    <div className="mt-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-slate-900">
+                        {item.description ?? item.type ?? "Document"}
+                      </p>
+
+                      <div className="mt-2">
                       <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
                         <CheckCircle className="h-3 w-3" />
                         Required
                       </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -515,11 +472,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
             <div className="relative flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-md transition-transform">
               <span className="text-2xl font-bold text-green-700">
-                {commission?.type === "one_time_per_year"
-                  ? "One-time / year"
-                  : commission?.type === "percentage"
-                  ? "Percentage"
-                  : commission?.type}
+
+                {commissionLabel[commission?.type] || "Not Provided"}
+
               </span>
               <p className="text-sm font-semibold text-green-900">
                 Commission Type
