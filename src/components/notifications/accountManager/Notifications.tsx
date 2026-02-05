@@ -91,7 +91,7 @@ export default function Notifications({ params }: PartnerNotificationProps) {
             </span>
             <span className="flex flex-col">
               <span>Notifications Center</span>
-              <span className="flex items-center gap-1 text-caption font-normal text-text-muted">
+              <span className="flex items-center gap-1 text-caption font-normal text-slate-500">
                 Pending {appDetailsList.length}{" "}
                 {appDetailsList.length === 1
                   ? "notification"
@@ -99,7 +99,7 @@ export default function Notifications({ params }: PartnerNotificationProps) {
               </span>
             </span>
           </h3>
-          <p className="text-p2 text-text-muted">
+          <p className="text-p2 text-slate-500">
             See updates about student applications and actions required.
           </p>
         </div>
@@ -126,9 +126,9 @@ export default function Notifications({ params }: PartnerNotificationProps) {
       >
         <div className="rounded-b-lg border border-t-0 border-default bg-card p-6">
           {loading ? (
-            <div className="py-10 text-center text-text-muted">Loading...</div>
+            <div className="py-10 text-center text-slate-500">Loading...</div>
           ) : appDetailsList.length === 0 ? (
-            <div className="flex items-center justify-center py-10 text-text-muted">
+            <div className="flex items-center justify-center py-10 text-slate-500">
               <Bell className="text-text-mute mr-2 h-5 w-5" /> No notifications yet
             </div>
           ) : (
@@ -156,7 +156,7 @@ export default function Notifications({ params }: PartnerNotificationProps) {
                         </h3>
                       </div>
 
-                      <p className="mb-1 text-p2 text-text-muted">
+                      <p className="mb-1 text-p2 text-slate-500">
                         {app.next_action}
                       </p>
 

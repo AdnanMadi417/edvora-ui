@@ -182,7 +182,7 @@ export default function StudentManualApplication() {
     is_draft: false,
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   const updateFormData = (fieldPath, value) => {
     setFormData((prev) => setNestedValue(prev, fieldPath, value));

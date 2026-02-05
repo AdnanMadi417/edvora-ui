@@ -63,7 +63,7 @@ const MarketplaceCard = () => {
               <h3 className="text-xl font-semibold text-text-primary">
                 Partner Marketplace
               </h3>
-              <p className="mt-1 text-sm text-text-muted">
+              <p className="mt-1 text-sm text-slate-500">
                 Browse and connect with verified logistics partners and service
                 providers
               </p>
@@ -361,7 +361,7 @@ const MarketplaceCard = () => {
 
               <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex md:items-center md:justify-between">
                 {serviceProviders.length > 0 && (
-                  <div className="flex items-center gap-1 text-sm font-medium text-text-muted">
+                  <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                     Showing
                     <span className="font-medium">
                       {(currentPage - 1) * itemsPerPage + 1}
@@ -391,7 +391,7 @@ const MarketplaceCard = () => {
                     icon={<ArrowLeft className="h-4 w-4" />}
                   />
 
-                  <span className="px-3 py-1 font-medium text-text-muted">
+                  <span className="px-3 py-1 font-medium text-slate-500">
                     Page {currentPage} of{" "}
                     {Math.ceil(serviceProviders.length / itemsPerPage)}
                   </span>

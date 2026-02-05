@@ -11,6 +11,7 @@ interface HoldPopupProps {
   onClose: () => void;
   applicationId: string;
   docId: string;
+  statusId: string;
 }
 
 export default function HoldPopup({
@@ -18,6 +19,7 @@ export default function HoldPopup({
   onClose,
   applicationId,
   docId,
+  statusId,
 }: HoldPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({ reason: "" });

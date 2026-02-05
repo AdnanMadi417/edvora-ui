@@ -25,7 +25,7 @@ export default function EmptyData({ title = "No data", subtitle = "No additional
 
           <p className="text-p2 font-medium text-text-primary">{title}</p>
 
-          <p className="text-caption font-normal text-text-muted">{subtitle}</p>
+          <p className="text-caption font-normal text-slate-600">{subtitle}</p>
         </div>
       </div>
     </section>
