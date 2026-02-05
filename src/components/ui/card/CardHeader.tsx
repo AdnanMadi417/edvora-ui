@@ -36,7 +36,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({
         </h3>
 
         {description && (
-          <p className="mt-1 text-sm text-text-muted">
+          <p className="mt-1 text-sm text-slate-500">
             {description}
           </p>
         )}

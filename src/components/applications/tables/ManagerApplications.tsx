@@ -197,7 +197,7 @@ const ModernApplicationsTable = () => {
 
   const SortIndicator = ({ field }) => {
     if (sortConfig.key !== field) {
-      return <ChevronUp className="h-4 w-4 text-text-muted opacity-0 transition-opacity group-hover:opacity-100" />;
+      return <ChevronUp className="h-4 w-4 text-slate-500 opacity-0 transition-opacity group-hover:opacity-100" />;
     }
     return sortConfig.direction === 'asc' ? (
       <ChevronUp className="h-4 w-4 text-accent" />
@@ -215,7 +215,7 @@ const ModernApplicationsTable = () => {
               <h3 className="text-xl font-semibold text-text-primary">
                 Applications Dashboard
               </h3>
-              <p className="mt-1 text-sm text-text-muted">
+              <p className="mt-1 text-sm text-slate-500">
                 Manage and track student applications
               </p>
             </div>
@@ -224,18 +224,18 @@ const ModernApplicationsTable = () => {
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
 
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <input
                 type="text"
                 placeholder="Search applications by email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full text-text-muted border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm outline-0 placeholder:text-text-muted focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-full text-slate-500 border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
             <div className="relative flex-1 sm:flex-none">
-              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
+              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <select
                 value={filterStages}
                 onChange={(e) => setFilterStages(e.target.value)}
@@ -249,7 +249,7 @@ const ModernApplicationsTable = () => {
             </div>
 
             <div className="relative flex-1 sm:flex-none">
-              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
+              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
@@ -368,13 +368,13 @@ const ModernApplicationsTable = () => {
           <tbody className="divide-border-gray-200 divide-y bg-primary">
           {loading ? (
             <tr>
-              <td colSpan={9} className="px-6 py-4 text-center text-p1 text-text-muted">
+              <td colSpan={9} className="px-6 py-4 text-center text-p1 text-slate-500">
                 Loading applications...
               </td>
             </tr>
           ) : paginatedApplications.length === 0 ? (
             <tr>
-              <td colSpan={9} className="px-6 py-8 text-center text-text-muted">
+              <td colSpan={9} className="px-6 py-8 text-center text-slate-500">
                 <EmptyData />
               </td>
             </tr>
@@ -399,7 +399,7 @@ const ModernApplicationsTable = () => {
 
                     <div className="w-full overflow-hidden">
                       <div className="truncate text-text-primary">{app.studentName}</div>
-                      <div className="truncate text-caption text-text-muted">
+                      <div className="truncate text-caption text-slate-500">
                         {app.studentEmail}
                       </div>
                     </div>
@@ -408,17 +408,17 @@ const ModernApplicationsTable = () => {
 
                 <td className="min-w-[250px] max-w-[300px] px-6 py-4">
                   <div className="text-text-primary">{app.applicationName}</div>
-                  <div className="truncate text-caption text-text-muted">
+                  <div className="truncate text-caption text-slate-500">
                     {app.university}
                   </div>
                 </td>
 
                 <td className="min-w-[200px] max-w-[250px] px-6 py-4">
-                  <div className="text-text-muted">{app.partner}</div>
+                  <div className="text-slate-500">{app.partner}</div>
                 </td>
 
                 <td className="px-6 py-4">
-                  <div className="text-text-muted">
+                  <div className="text-slate-500">
                     {app.stage}
                   </div>
                 </td>
@@ -428,11 +428,11 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="px-6 py-4 max-w-48">
-                  <div className="break-words text-text-muted">{app.nextAction}</div>
+                  <div className="break-words text-slate-500">{app.nextAction}</div>
                 </td>
 
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-1 text-text-muted">
+                  <div className="flex items-center gap-1 text-slate-500">
                     <Calendar className="h-3 w-3" />
                     {new Date(app.updatedAt).toLocaleDateString('en-US', {
                       month: 'short',
@@ -463,7 +463,7 @@ const ModernApplicationsTable = () => {
       </div>
 
       <div className="sticky bottom-0 rounded-b-lg border border-gray-200 bg-card px-6 py-4">
-        <div className="flex flex-col items-center justify-between gap-3 text-sm text-text-muted md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-3 text-sm text-slate-500 md:flex-row">
           <div>
             Showing{' '}
             <span className="font-medium">
@@ -492,7 +492,7 @@ const ModernApplicationsTable = () => {
               icon={<ArrowLeft  className="h-4 w-4" />}
             />
 
-            <span className="px-2 text-text-muted">
+            <span className="px-2 text-slate-500">
               Page {currentPage} of {totalPages}
             </span>
 

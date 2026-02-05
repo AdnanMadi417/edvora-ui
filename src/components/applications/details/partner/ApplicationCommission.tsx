@@ -116,7 +116,7 @@ export default function ApplicationCommission({
                 <h3 className="text-p3 font-semibold text-text-primary">
                   Partner Commission Details
                 </h3>
-                <span className="text-sm text-text-muted">
+                <span className="text-sm text-slate-500">
                   Current Status: {statusLabel}
                 </span>
               </div>

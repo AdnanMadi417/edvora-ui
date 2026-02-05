@@ -77,7 +77,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <h3 className="line-clamp-2 text-lg font-semibold text-text-primary">
                   {program?.name ?? "Not Provided"}
                 </h3>
-                <p className="mt-1 break-words text-sm text-text-muted">
+                <p className="mt-1 break-words text-sm text-slate-500">
                   {program?.university?.name ?? "Not Provided"}
                 </p>
               </div>
@@ -96,11 +96,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
           <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2">
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
                 <MdPublic className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">Country</p>
+                <p className="text-xs text-slate-500">Country</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
                   {program?.university?.country ?? "Not Provided"}
                 </p>
@@ -108,11 +108,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
                 <MdLocationCity className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">State / Province</p>
+                <p className="text-xs text-slate-500">State / Province</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
                   {program?.university?.state ?? "Not Provided"}
                 </p>
@@ -120,11 +120,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
                 <MdMenuBook className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">Level</p>
+                <p className="text-xs text-slate-500">Level</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
                   {program?.qualification_level ?? "Not Provided"}
                 </p>
@@ -132,11 +132,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
                 <MdSchool className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">Field / Faculty</p>
+                <p className="text-xs text-slate-500">Field / Faculty</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
                   {program?.field_of_study?.name ?? "Not Provided"}
                 </p>
@@ -144,11 +144,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
                 <MdAccessTime className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">Duration</p>
+                <p className="text-xs text-slate-500">Duration</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
                   {program?.duration
                     ? `${program.duration} years`
@@ -158,12 +158,12 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
                 <MdEvent className="h-4 w-4" />
               </div>
 
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">Intake Dates</p>
+                <p className="text-xs text-slate-500">Intake Dates</p>
 
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-text-primary">
                   {program?.university.intake_months?.length ? (
@@ -188,11 +188,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
                 <MdLocationCity className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">Campus</p>
+                <p className="text-xs text-slate-500">Campus</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
                   {program?.is_on_campus ? "On-campus" : "Online"}
                 </p>
@@ -200,11 +200,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
                 <MdPublic className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">City / Country</p>
+                <p className="text-xs text-slate-500">City / Country</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
                   {program?.university
                     ? `${program.university.name}, ${program.university.country}`
@@ -214,11 +214,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
                 <MdGroups className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">Class Type</p>
+                <p className="text-xs text-slate-500">Class Type</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
                   {program?.is_online ? "Online" : "On-campus (Physical)"}
                 </p>
@@ -226,11 +226,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-text-muted shadow-sm">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
                 <MdLanguage className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-text-muted">English Requirement</p>
+                <p className="text-xs text-slate-500">English Requirement</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
                   {program?.english_required_score
                     ? `Min score: ${program.english_required_score}`

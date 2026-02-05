@@ -35,7 +35,7 @@ export default function ApplicationCommissions({ application }: ApplicationCommi
           <h3 className="text-lg font-semibold text-text-primary">
             Commission Details
           </h3>
-          <p className="text-sm text-text-muted">
+          <p className="text-sm text-slate-500">
             Total: {formatCurrency(total)} ({commissions.length} {commissions.length === 1 ? "record" : "records"})
           </p>
         </div>

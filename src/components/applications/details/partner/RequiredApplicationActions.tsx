@@ -77,7 +77,7 @@ export default function RequiredApplicationActions({
 
           <span className="flex flex-col">
             <span>Required Application Actions</span>
-            <span className="mt-1 text-p2 font-normal text-text-muted">
+            <span className="mt-1 text-p2 font-normal text-slate-500">
               {appDetails.next_action || "Not provided"}
             </span>
           </span>

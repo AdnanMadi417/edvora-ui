@@ -75,7 +75,7 @@ export default function UploadDoc({
                   <h5 className="text-h4 font-bold text-gray-900">
                     Request Document Upload
                   </h5>
-                  <p className="mt-0.5 text-caption text-text-muted">
+                  <p className="mt-0.5 text-caption text-slate-500">
                     Ask the applicant to upload the required document.
                   </p>
                 </div>
@@ -124,7 +124,7 @@ export default function UploadDoc({
                     d="M7 16v4h10v-4m-5-12v12m0 0l-3-3m3 3l3-3"
                   />
                 </svg>
-                <span className="text-sm text-text-muted">
+                <span className="text-sm text-slate-500">
                   Click to upload or drag and drop
                 </span>
                 <input
@@ -136,7 +136,7 @@ export default function UploadDoc({
               </label>
 
               {selectedFile && (
-                <p className="mt-1 text-sm text-text-muted">
+                <p className="mt-1 text-sm text-slate-500">
                   Selected file:{" "}
                   {selectedFile.name}
                 </p>

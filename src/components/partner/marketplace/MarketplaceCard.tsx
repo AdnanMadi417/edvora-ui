@@ -1,7 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowRight, ArrowLeft, BadgeCheck, AlertCircle, CheckCircle } from 'lucide-react';
+import {
+  ArrowRight,
+  ArrowLeft,
+  BadgeCheck,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 import {
   MdPublic,
   MdTranslate,
@@ -66,7 +72,6 @@ const MarketplaceCard = () => {
         </div>
 
         <div className="block">
-
           {loading && <Loading text="Fetching service providers data..." />}
 
           {!error && !loading && serviceProviders.length === 0 && (
@@ -78,65 +83,49 @@ const MarketplaceCard = () => {
 
           {!error && serviceProviders.length > 0 && (
             <div className="block">
-              <div className="grid grid-cols-1 gap-4 px-5 py-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 items-stretch gap-6 p-6 md:grid-cols-2 lg:grid-cols-3">
                 {currentServiceProviders.map((program) => (
                   <div
                     key={program.id}
-                    className="relative overflow-hidden rounded-lg bg-white shadow-md transition-all"
+                    className="relative flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-md transition-all"
                   >
-
-                    <div className="relative flex w-full items-center border-b border-gray-100 px-5 py-4">
-                      <div className="flex w-full items-start justify-between">
-                        <div className="flex items-start gap-4">
-                          <div className="relative flex-shrink-0">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 shadow-inner">
-                              <span className="text-lg font-medium text-slate-900">
-                                {program.name?.[0]}
-                              </span>
-                            </div>
-
-                            <span
-                              title={
-                                program.is_active
-                                  ? "Verified Partner"
-                                  : "Unverified"
-                              }
-                              className={`absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-white ${
-                                program.is_active
-                                  ? "bg-emerald-500"
-                                  : "bg-red-500"
-                              }`}
-                            />
+                    <div className="flex items-center justify-between border-b bg-slate-50 px-5 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                            <span className="text-sm font-semibold text-slate-900">
+                              {program.name?.[0]}
+                            </span>
                           </div>
-
-                          <div className="min-w-0">
-                            <h3 className="line-clamp-2 text-sm font-semibold text-slate-900">
-                              {program.name}
-                            </h3>
-                            <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
-                              <MdPublic className="h-3.5 w-3.5" />
-                              {program.nationality
-                                ? program.nationality
-                                : "not provided"}
-                            </p>
-                          </div>
+                          <span
+                            className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${
+                              program.is_active
+                                ? "bg-emerald-500"
+                                : "bg-red-500"
+                            }`}
+                          />
                         </div>
 
-                        <span
-                          className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
-                            program.is_active
-                              ? "border-emerald-700 bg-emerald-100 text-emerald-700"
-                              : "border-red-700 bg-red-100 text-red-700"
-                          }`}
-                        >
-                          {program.is_active ? (
-                            <BadgeCheck size={14} />
-                          ) : (
-                            <AlertCircle size={14} />
-                          )}
-                          {program.is_active ? "Verified" : "Unverified"}
-                        </span>
+                        <div>
+                          <h3 className="line-clamp-1 text-sm font-semibold text-slate-900">
+                            {program.name}
+                          </h3>
+                          <p className="flex items-center gap-1 text-xs text-slate-500">
+                            <MdPublic className="h-3.5 w-3.5" />
+                            {program.nationality || "Not Provided"}
+                          </p>
+                        </div>
                       </div>
+
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                          program.is_active
+                            ? "border border-emerald-700 bg-emerald-100 text-emerald-700"
+                            : "border border-red-700 bg-red-100 text-red-700"
+                        }`}
+                      >
+                        {program.is_active ? "Verified" : "Unverified"}
+                      </span>
                     </div>
 
                     <div className="px-5 py-3">
@@ -156,7 +145,7 @@ const MarketplaceCard = () => {
                               }))
                             }
                           >
-                            {tab === 1 ? "Overview" : "Details"}
+                            {tab === 1 ? "Overview" : "Packages"}
                           </div>
                         ))}
                       </div>
@@ -180,112 +169,73 @@ const MarketplaceCard = () => {
                                       {lang}
                                     </span>
                                   ))
-                                : "not provided"}
+                                : "Not Provided"}
                             </div>
                           </div>
 
-                          <div className="rounded-md bg-white p-4 shadow-sm ring-1 ring-slate-100">
-                            <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-800">
-                              <MdPublic className="h-5 w-5 text-emerald-600" />
-                              Coverage Area
+                          <div className="grid gap-4">
+                            <div className="rounded-md bg-blue-50/70 p-3">
+                              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-800">
+                                <MdSchool className="h-5 w-5" />
+                                Universities Served
+                              </div>
+
+                              <ul className="ml-5 space-y-1 text-xs text-slate-700">
+                                {program.universities_served?.length ? (
+                                  program.universities_served.map((uni) => (
+                                    <li key={uni} className="list-disc">
+                                      {uni}
+                                    </li>
+                                  ))
+                                ) : (
+                                  <li className="list-disc">Not Provided</li>
+                                )}
+                              </ul>
                             </div>
 
-                            <div className="grid gap-3">
-                              <div className="rounded-md bg-blue-50/70 p-3">
-                                <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-800">
-                                  <MdSchool className="h-5 w-5" />
-                                  Universities Served
-                                </div>
-
-                                <ul className="ml-5 space-y-1 text-xs text-slate-700">
-                                  {program.universities_served?.length ? (
-                                    program.universities_served.map((uni) => (
-                                      <li key={uni} className="list-disc">
-                                        {uni}
-                                      </li>
-                                    ))
-                                  ) : (
-                                    <li className="list-disc">not provided</li>
-                                  )}
-                                </ul>
+                            <div className="rounded-md bg-orange-50/70 p-3">
+                              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-orange-800">
+                                <MdMap className="h-5 w-5" />
+                                Service Locations
                               </div>
 
-                              <div className="rounded-md bg-orange-50/70 p-3">
-                                <div className="mb-2 flex items-center gap-2 text-sm font-medium text-orange-800">
-                                  <MdMap className="h-5 w-5" />
-                                  Service Locations
-                                </div>
-
-                                <div className="flex flex-wrap gap-2">
-                                  {program.service_locations?.length ? (
-                                    program.service_locations.map(
-                                      (location) => (
-                                        <span
-                                          key={location}
-                                          className="rounded-full bg-white px-3 py-1 text-xs font-medium text-orange-800 ring-1 ring-orange-100"
-                                        >
-                                          {location}
-                                        </span>
-                                      )
-                                    )
-                                  ) : (
-                                    <li className="list-disc">not provided</li>
-                                  )}
-                                </div>
+                              <div className="flex flex-wrap gap-2">
+                                {program.service_locations?.length ? (
+                                  program.service_locations.map((location) => (
+                                    <span
+                                      key={location}
+                                      className="rounded-full bg-white px-3 py-1 text-xs font-medium text-orange-800 ring-1 ring-orange-100"
+                                    >
+                                      {location}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="list-disc px-3 py-1">
+                                    Not Provided
+                                  </span>
+                                )}
                               </div>
                             </div>
-                          </div>
 
-                          <div className="rounded-md bg-white shadow-sm ring-1 ring-green-100">
-                            <button
-                              type="button"
-                              onClick={() => setIsOpen(!isOpen)}
-                              className="flex w-full items-center justify-between p-4 text-left"
-                              aria-expanded={isOpen}
-                            >
-                              <div className="flex items-center gap-2 text-sm font-semibold text-green-700">
-                                <MdLocalAirport className="h-5 w-5 text-green-600" />
-                                Services Offered
-                              </div>
+                            {/*<div className="rounded-md bg-white p-3 shadow-sm ring-1 ring-green-100">*/}
+                            {/*  <div className="flex items-center gap-2 text-sm font-semibold text-green-700">*/}
+                            {/*    <MdLocalAirport className="h-5 w-5 text-green-600" />*/}
+                            {/*    Services Offered*/}
+                            {/*  </div>*/}
 
-                              <MdKeyboardArrowDown
-                                className={`h-5 w-5 text-green-600 transition-transform duration-300 ${
-                                  isOpen ? "rotate-180" : ""
-                                }`}
-                              />
-                            </button>
-
-                            <div
-                              className={`grid transition-all duration-300 ease-in-out ${
-                                isOpen
-                                  ? "grid-rows-[1fr] opacity-100"
-                                  : "grid-rows-[0fr] opacity-0"
-                              }`}
-                            >
-                              <div className="overflow-hidden">
-                                <div className="border-t border-slate-100 px-5 pb-5 pt-4">
-                                  <h4 className="mb-3 text-sm font-semibold text-slate-900">
-                                    What’s included
-                                  </h4>
-
-                                  <ul className="ml-4 space-y-2 text-xs text-slate-600">
-                                    {program.services_offered?.length
-                                      ? program.services_offered.map(
-                                          (service) => (
-                                            <li
-                                              key={service}
-                                              className="flex items-center gap-2"
-                                            >
-                                              <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
-                                              {service}
-                                            </li>
-                                          )
-                                        )
-                                      : "not provided"}
-                                  </ul>
-                                </div>
-                              </div>
-                            </div>
+                            {/*  <ul className="ml-4 mt-2 space-y-2 text-xs text-slate-600">*/}
+                            {/*    {program.services_offered?.length*/}
+                            {/*      ? program.services_offered.map((service) => (*/}
+                            {/*          <li*/}
+                            {/*            key={service}*/}
+                            {/*            className="list-disc"*/}
+                            {/*          >*/}
+                            {/*            {service}*/}
+                            {/*          </li>*/}
+                            {/*        ))*/}
+                            {/*      : "Not Provided"}*/}
+                            {/*  </ul>*/}
+                            {/*</div>*/}
                           </div>
                         </>
                       )}
@@ -378,8 +328,7 @@ const MarketplaceCard = () => {
                       )}
                     </div>
 
-                    <div className="flex justify-between gap-2 border-t border-gray-200 p-4">
-
+                    <div className="mt-auto flex justify-between gap-2 border-t border-gray-200 bg-slate-50 p-4">
                       <ViewDetails
                         icon={<MdVisibility className="h-4 w-4" />}
                         text="Details"
@@ -396,16 +345,15 @@ const MarketplaceCard = () => {
 
                       <button
                         onClick={() => {
-                          if (!program?.whatsapp) return
-                          const number = program.whatsapp.replace("+", "")
-                          window.open(`https://wa.me/${number}`, "_blank")
+                          if (!program?.whatsapp) return;
+                          const number = program.whatsapp.replace("+", "");
+                          window.open(`https://wa.me/${number}`, "_blank");
                         }}
-                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition hover:border-green-700 hover:bg-green-200 shadow-md hover:scale-105"
+                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 shadow-md transition hover:scale-105 hover:border-green-700 hover:bg-green-200"
                       >
                         <CheckCircle className="h-4 w-4" />
                         Contact
                       </button>
-
                     </div>
                   </div>
                 ))}
@@ -476,7 +424,6 @@ const MarketplaceCard = () => {
         onClose={() => setViewModal(false)}
         provider={selectedProvider}
       />
-
     </div>
   );
 };

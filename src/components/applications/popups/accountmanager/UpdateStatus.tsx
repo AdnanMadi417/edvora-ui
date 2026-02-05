@@ -574,7 +574,7 @@ export default function UpdateStatusPopup({
                   Update Application Status
                 </h5>
 
-                <div className="mt-1 flex items-center gap-2 text-sm text-text-muted">
+                <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                   <CheckCircle className="h-4 w-4" />
                   <span className="font-medium">Stage:</span>
                   <span className="font-normal">
@@ -582,7 +582,7 @@ export default function UpdateStatusPopup({
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-caption text-text-muted">
+                <div className="flex items-center gap-2 text-caption text-slate-500">
                   <AlertCircle className="h-4 w-4 " />
                   <span className="font-medium">Status:</span>
                   <span className="font-normal">
@@ -673,13 +673,13 @@ export default function UpdateStatusPopup({
                           {option.label}
                         </p>
                         {option.nextAction && (
-                          <p className="mt-1 text-xs text-text-muted">
+                          <p className="mt-1 text-xs text-slate-500">
                             <span className="font-medium">Next :</span>{" "}
                             {option.nextAction}
                           </p>
                         )}
                         {option.description && (
-                          <p className="mt-0.5 text-xs text-text-muted">
+                          <p className="mt-0.5 text-xs text-slate-500">
                             {option.description}
                           </p>
                         )}
@@ -761,7 +761,7 @@ export default function UpdateStatusPopup({
 
               {offerLetterFile && (
                 <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
-                  <span className="truncate text-sm text-text-muted">
+                  <span className="truncate text-sm text-slate-500">
                     {offerLetterFile.name}
                   </span>
                   <button
@@ -779,7 +779,7 @@ export default function UpdateStatusPopup({
 
           {requiresReason && (
             <div className="space-y-2">
-              <label className="block text-p2 font-medium text-text-muted">
+              <label className="block text-p2 font-medium text-slate-500">
                 Reason <span className="ml-1 text-red-500">*</span>
               </label>
               <textarea
@@ -787,7 +787,7 @@ export default function UpdateStatusPopup({
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Please provide a detailed reason..."
                 rows={4}
-                className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
           )}
@@ -860,7 +860,7 @@ export default function UpdateStatusPopup({
 
               {visaDocumentFile && (
                 <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
-                  <span className="truncate text-sm text-text-muted">
+                  <span className="truncate text-sm text-slate-500">
                     {visaDocumentFile.name}
                   </span>
                   <button
@@ -930,7 +930,7 @@ export default function UpdateStatusPopup({
 
               {commissionPaymentFile && (
                 <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
-                  <span className="truncate text-sm text-text-muted">
+                  <span className="truncate text-sm text-slate-500">
                     {commissionPaymentFile.name}
                   </span>
                   <button

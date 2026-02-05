@@ -97,7 +97,7 @@ export default function ProgramDecisionModal({
                 <h5 className="text-h4 font-bold text-gray-900">
                   Select Program
                 </h5>
-                <p className="mt-0.5 text-caption text-text-muted">
+                <p className="mt-0.5 text-caption text-slate-500">
                   Choose the new program and provide a reason.
                 </p>
               </div>

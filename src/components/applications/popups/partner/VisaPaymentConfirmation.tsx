@@ -188,7 +188,7 @@ export default function VisaPaymentConfirmation({
                     }`}
                   >
                     <p className="font-medium text-gray-900">{method.name}</p>
-                    <p className="mt-1 text-xs text-text-muted">{method.instructions}</p>
+                    <p className="mt-1 text-xs text-slate-500">{method.instructions}</p>
                     <p className="mt-2 text-xs font-medium">
                       Currency: <span className="font-normal">{method.currency}</span>
                     </p>
@@ -230,7 +230,7 @@ export default function VisaPaymentConfirmation({
 
               {paymentReference && (
                 <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
-                  <span className="truncate text-sm text-text-muted">{paymentReference.name}</span>
+                  <span className="truncate text-sm text-slate-500">{paymentReference.name}</span>
                   <button
                     type="button"
                     onClick={() => setPaymentReference(null)}

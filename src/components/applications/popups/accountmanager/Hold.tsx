@@ -107,7 +107,7 @@ export default function HoldPopup({
                   <h5 className="text-h4 font-bold text-gray-900">
                     Update Application Status
                   </h5>
-                  <p className="mt-0.5 text-caption text-text-muted">
+                  <p className="mt-0.5 text-caption text-slate-500">
                     Select the desired lifecycle status.
                   </p>
                 </div>

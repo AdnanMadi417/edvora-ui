@@ -89,7 +89,7 @@ export default function DisputeSubmissionModal({
                 <h5 className="text-h4 font-bold text-gray-900">
                   Submit a Dispute
                 </h5>
-                <p className="mt-1 text-caption text-text-muted">
+                <p className="mt-1 text-caption text-slate-500">
                   Raise a dispute regarding your application or payment.
                 </p>
               </div>

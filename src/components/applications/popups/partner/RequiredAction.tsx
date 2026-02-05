@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { AlertCircle, CheckCircle, Clock, Pause, XCircle } from 'lucide-react';
+import { CheckCircle, Pause, XCircle } from 'lucide-react';
 import { FaRegFileLines } from "react-icons/fa6";
 import api from "../../../../lib/useApi";
 import { FaFileAlt } from "react-icons/fa";
@@ -118,7 +118,7 @@ export default function RequiredAction({
                     Required Application Actions
                   </h5>
 
-                  <div className="mt-1 flex items-center gap-2 text-sm text-text-muted">
+                  <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <span className="font-normal">
                     <span className="font-medium">Next Action: {" "}</span>
                       {appDetails ? `${appDetails.next_action}` : "Loading..."}
@@ -139,7 +139,7 @@ export default function RequiredAction({
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
             {loading ? (
-              <p className="text-text-muted">Loading...</p>
+              <p className="text-slate-500">Loading...</p>
             ) : appDetails ? (
               <>
                 {appDetails.document_types?.length > 0 ? (
@@ -179,7 +179,7 @@ export default function RequiredAction({
                                 <div className="mt-1 flex items-center gap-2">
                                   <span className="text-xs font-medium text-orange-400">
                                     Reason: {" "}
-                                    <span className="text-text-muted">
+                                    <span className="text-slate-500">
                                       {appDetails.correction_reason}
                                     </span>
                                   </span>
