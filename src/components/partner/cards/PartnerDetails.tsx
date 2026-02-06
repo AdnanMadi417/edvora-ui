@@ -84,7 +84,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
       </div>
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-6 shadow-sm">
-        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
+        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <FaBuilding className="text-xl text-blue-700" />
           </span>
@@ -93,7 +93,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
 
         <div className="grid grid-cols-1 gap-4 text-p2 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           <div className="block">
-            <span className="mb-1 font-medium text-text-primary">
+            <span className="mb-1 font-medium text-slate-900">
               Business Name
             </span>
             <span className="flex items-center gap-2 text-text-muted">
@@ -103,7 +103,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
           </div>
 
           <div className="block">
-            <span className="mb-1 font-medium text-text-primary">
+            <span className="mb-1 font-medium text-slate-900">
               Registration Number
             </span>
             <span className="flex items-center gap-2 text-text-muted">
@@ -113,7 +113,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
           </div>
 
           <div className="block">
-            <span className="mb-1 font-medium text-text-primary">
+            <span className="mb-1 font-medium text-slate-900">
               Contact Person
             </span>
             <span className="flex items-center gap-2 text-text-muted">
@@ -123,7 +123,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
           </div>
 
           <div className="block">
-            <span className="mb-1 font-medium text-text-primary">
+            <span className="mb-1 font-medium text-slate-900">
               Business Address
             </span>
             <span className="flex items-center gap-2 text-text-muted">
@@ -135,7 +135,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
       </div>
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-6 shadow-sm">
-        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
+        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <FaEnvelope className="text-xl text-blue-700" />
           </span>
@@ -144,7 +144,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
 
         <div className="grid grid-cols-1 gap-4 text-p2 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           <div className="block">
-            <span className="mb-1 font-medium text-text-primary">Phone</span>
+            <span className="mb-1 font-medium text-slate-900">Phone</span>
             <span className="flex items-center gap-2 text-text-muted">
               <FaPhoneAlt />
               {partner.phoneContact?.trim() || "Not provided"}
@@ -152,7 +152,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
           </div>
 
           <div className="block">
-            <span className="mb-1 font-medium text-text-primary">Email</span>
+            <span className="mb-1 font-medium text-slate-900">Email</span>
             <span className="flex items-center gap-2 text-text-muted">
               <FaEnvelope />
               {partner.emailContact?.trim() || "Not provided"}
@@ -160,7 +160,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
           </div>
 
           <div className="block">
-            <span className="mb-1 font-medium text-text-primary">
+            <span className="mb-1 font-medium text-slate-900">
               Contact Person
             </span>
             <span className="flex items-center gap-2 text-text-muted">
@@ -170,7 +170,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
           </div>
 
           <div className="block">
-            <span className="mb-1 font-medium text-text-primary">Country</span>
+            <span className="mb-1 font-medium text-slate-900">Country</span>
             <span className="flex items-center gap-2 text-text-muted">
               <FaGlobeAsia />
               {partner.country?.trim() || "Not provided"}

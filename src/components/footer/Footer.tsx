@@ -7,7 +7,7 @@ const Footer = () => {
     <div className="flex w-full flex-col items-center justify-between px-1 pb-8 pt-3 lg:px-8 xl:flex-row">
       <p className="mb-4 text-center text-p2 font-medium text-slate-500 sm:!mb-0">
         ©{new Date().getFullYear()}{" "}
-        <span className="text-text-primary">
+        <span className="text-slate-900">
           <a
             href="#"
             onMouseEnter={() => setIsHovered(true)}

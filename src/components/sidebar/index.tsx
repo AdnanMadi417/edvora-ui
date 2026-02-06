@@ -129,7 +129,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
       >
         <button
           className="absolute right-4 top-4 rounded-md bg-primary p-1
-            text-text-primary transition-colors duration-200 hover:bg-card-hover
+            text-slate-900 transition-colors duration-200 hover:bg-card-hover
             hover:text-slate-500 xl:hidden"
           onClick={handleOverlayClick}
           aria-label="Close navigation menu"
@@ -175,7 +175,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
               <div className="min-w-0 flex-1">
                 {user ? (
                   <>
-                    <p className="truncate text-p2 font-semibold text-text-primary">
+                    <p className="truncate text-p2 font-semibold text-slate-900">
                       {user.name}
                     </p>
                     <p className="truncate text-caption text-slate-500">

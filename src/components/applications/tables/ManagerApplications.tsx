@@ -212,7 +212,7 @@ const ModernApplicationsTable = () => {
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-text-primary">
+              <h3 className="text-xl font-semibold text-slate-900">
                 Applications Dashboard
               </h3>
               <p className="mt-1 text-sm text-slate-500">
@@ -285,7 +285,7 @@ const ModernApplicationsTable = () => {
           <tr className="border-b border-gray-200 bg-card">
             <th
               onClick={() => handleSort('studentName')}
-              className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
@@ -296,7 +296,7 @@ const ModernApplicationsTable = () => {
 
             <th
               onClick={() => handleSort('applicationName')}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
             >
               <div className="min-w-[250px] flex items-center gap-2">
                 <GraduationCap className="h-4 w-4" />
@@ -307,7 +307,7 @@ const ModernApplicationsTable = () => {
 
             <th
               onClick={() => handleSort('partner')}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
                 <Building className="h-4 w-4" />
@@ -318,7 +318,7 @@ const ModernApplicationsTable = () => {
 
             <th
               onClick={() => handleSort('stage')}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
                 <Flag className="h-4 w-4" />
@@ -329,7 +329,7 @@ const ModernApplicationsTable = () => {
 
             <th
               onClick={() => handleSort('status')}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
             >
               <div className="flex items-center gap-2">
                 <BadgeCheck className="h-4 w-4" />
@@ -338,7 +338,7 @@ const ModernApplicationsTable = () => {
               </div>
             </th>
 
-            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
               <div className="flex items-center gap-2">
                 <CalendarCheck className="h-4 w-4" />
                 Next Action
@@ -347,7 +347,7 @@ const ModernApplicationsTable = () => {
 
             <th
               onClick={() => handleSort('updatedAt')}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-text-primary transition-colors hover:bg-secondary"
+              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
             >
               <div className="flex min-w-[150px] items-center gap-2">
                 <Clock className="h-4 w-4" />
@@ -356,7 +356,7 @@ const ModernApplicationsTable = () => {
               </div>
             </th>
 
-            <th className="px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 Actions
@@ -398,7 +398,7 @@ const ModernApplicationsTable = () => {
                     </div>
 
                     <div className="w-full overflow-hidden">
-                      <div className="truncate text-text-primary">{app.studentName}</div>
+                      <div className="truncate text-slate-900">{app.studentName}</div>
                       <div className="truncate text-caption text-slate-500">
                         {app.studentEmail}
                       </div>
@@ -407,7 +407,7 @@ const ModernApplicationsTable = () => {
                 </td>
 
                 <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                  <div className="text-text-primary">{app.applicationName}</div>
+                  <div className="text-slate-900">{app.applicationName}</div>
                   <div className="truncate text-caption text-slate-500">
                     {app.university}
                   </div>
@@ -446,7 +446,7 @@ const ModernApplicationsTable = () => {
                   <Link
                     href={`/account-manager/applications/${app.id}`}
                     aria-label="View Application"
-                    className="flex items-center justify-center gap-2 rounded-full border border-gray-200 p-2 text-caption text-text-primary transition hover:border-blue-700 hover:text-blue-700"
+                    className="flex items-center justify-center gap-2 rounded-full border border-gray-200 p-2 text-caption text-slate-900 transition hover:border-blue-700 hover:text-blue-700"
                   >
                     <Eye className="h-4 w-4" />
                     <span>View</span>

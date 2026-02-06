@@ -17,7 +17,7 @@ export default function EmptyData() {
             />
           </div>
 
-          <p className="text-p2 font-medium text-text-primary">No data found</p>
+          <p className="text-p2 font-medium text-slate-900">No data found</p>
 
           <p className="text-caption font-normal text-slate-600">
             There is no data available at the moment
