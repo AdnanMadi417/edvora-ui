@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import {
   Search,
-  Layers,
   RefreshCw,
   CheckCircle,
   ArrowRight,
@@ -25,14 +24,16 @@ import Link from 'next/link';
 
 const KnowledgeHubCards = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all_status');
-  const [filterStages, setFilterStages] = useState('all_stages');
 
   const {
     programs,
     loading: programsLoading,
     error: programsError,
   } = useAllPrograms({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const filteredPrograms = programs.filter((program) => {
     const term = searchTerm.toLowerCase();
     const university = program.university?.name?.toLowerCase() || '';
@@ -45,10 +46,6 @@ const KnowledgeHubCards = () => {
       level.includes(term)
     );
   });
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentPrograms = filteredPrograms.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +106,7 @@ const KnowledgeHubCards = () => {
         <div className="block">
           {programsLoading && <Loading text="Fetching programs data..." />}
 
-          {!programsError && !programsLoading && programs.length === 0 && (
+          {!programsError && !programsLoading && currentPrograms.length === 0 && (
             <NoMessagesFound
               title="No programs found"
               subtitle="Try adjusting your search or filters."
@@ -170,17 +167,6 @@ const KnowledgeHubCards = () => {
 
                       <div className="flex justify-between">
                         <span className="flex items-center gap-1.5 font-medium text-slate-500">
-                          <MdAccessTime className="h-4 w-4" /> Duration
-                        </span>
-                        <span className="text-xs font-medium text-slate-900">
-                          {program.duration
-                            ? `${program.duration} years`
-                            : 'Not provided'}
-                        </span>
-                      </div>
-
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5 font-medium text-slate-500">
                           <MdAttachMoney className="h-4 w-4" /> First-Year Cost
                         </span>
                         <span className="text-xs font-medium text-slate-900">
@@ -192,7 +178,18 @@ const KnowledgeHubCards = () => {
 
                       <div className="flex justify-between">
                         <span className="flex items-center gap-1.5 font-medium text-slate-500">
-                          <MapPin className="h-4 w-4" /> Country
+                          <MdAccessTime className="h-4 w-4" /> Duration
+                        </span>
+                        <span className="text-xs font-medium text-slate-900">
+                          {program.duration
+                            ? `${program.duration} years`
+                            : 'Not provided'}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="flex items-center gap-1.5 font-medium text-slate-500">
+                          <MapPin className="h-4 w-4" /> City
                         </span>
                         <span className="text-xs font-medium text-slate-900">
                           {program.university?.country || 'Not provided'}

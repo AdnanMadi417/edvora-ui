@@ -9,7 +9,6 @@ import {
   MdEvent,
   MdLocationCity,
   MdPublic,
-  MdGroups,
   MdLanguage,
   MdStar,
 } from "react-icons/md";
@@ -43,13 +42,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   };
 
   const commissionLabel = {
-    one_time_per_year: "One-time (Yearly)",
-    monthly: "Monthly",
+    one_time: "One-time",
     per_student: "Per Student",
-    percentage: "Percentage",
   };
 
-  const { program, requiredDocuments, commission,} = useProgram(id);
+  const { program, requiredDocuments, commission } = useProgram(id);
 
   if (!program) return <Loading text="Loading program details..." />;
 
@@ -60,8 +57,8 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           <div className="flex justify-between border-b border-gray-200 p-6">
             <div className="flex items-center gap-4">
               <div className="relative flex-shrink-0">
-                <div className="flex  h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
-                  <GraduationCap className="h-5 w-5 md:h-8 md:w-8 text-white" />
+                <div className="flex  h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm md:h-14 md:w-14">
+                  <GraduationCap className="h-5 w-5 text-white md:h-8 md:w-8" />
                 </div>
 
                 <span
@@ -204,23 +201,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <MdPublic className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-slate-500">City / Country</p>
+                <p className="text-xs text-slate-500">City </p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.university
-                    ? `${program.university.name}, ${program.university.country}`
+                    ? `${program.university.country}`
                     : "Not Provided"}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
-                <MdGroups className="h-4 w-4" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-slate-500">Class Type</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
-                  {program?.is_online ? "Online" : "On-campus (Physical)"}
                 </p>
               </div>
             </div>
@@ -244,7 +229,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
       <div className="mt-6">
         <div className="rounded-md border border-default bg-card shadow-sm">
-
           <CardHeader
             icon={CreditCard}
             title="Fees & Academic Requirements"
@@ -253,20 +237,15 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             iconColor="text-blue-600"
           />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 border-b border-gray-200 p-6 gap-4 items-start">
-
+          <div className="grid grid-cols-1 items-start gap-4 border-b border-gray-200 p-6 md:grid-cols-2">
             <div>
               <div className="min-w-0">
                 <h4 className="text-base font-semibold tracking-tight text-slate-900">
                   Tuition Fee
                 </h4>
-                <p className="mt-1 text-sm leading-relaxed text-slate-500">
-                  A transparent overview of tuition fees.
-                </p>
               </div>
 
               <div className="mt-6 overflow-hidden rounded-md border border-slate-200">
-
                 <div className="grid grid-cols-2 bg-blue-50">
                   <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">
                     <Calendar className="h-4 w-4 text-blue-600" />
@@ -307,13 +286,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <h4 className="text-base font-semibold tracking-tight text-slate-900">
                   Other Mandatory Fees
                 </h4>
-                <p className="mt-1 text-sm leading-relaxed text-slate-500">
-                  All fees listed are paid directly to the university or government
-                </p>
               </div>
 
               <div className="mt-6 overflow-hidden rounded-md border border-slate-200">
-
                 <div className="grid grid-cols-2 bg-blue-50">
                   <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">
                     <Layers className="h-4 w-4 text-blue-600" />
@@ -350,23 +325,20 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
           </div>
 
-          <div className="p-6 border-b border-gray-200">
-            <div className="flex items-start gap-3">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
-                <Award className="h-5 w-5 text-blue-600" />
-              </span>
+          {program?.has_scholarship && program?.scholarships?.length > 0 && (
+            <div className="border-b border-gray-200 p-6">
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
+                  <Award className="h-5 w-5 text-blue-600" />
+                </span>
 
-              <div className="min-w-0">
-                <h4 className="text-base font-semibold tracking-tight text-slate-900">
-                  Scholarships & Discounts
-                </h4>
-                <p className="felx mt-1 gap-2 text-sm leading-relaxed text-slate-500">
-                  Explore available scholarships and tuition discounts
-                </p>
+                <div className="min-w-0">
+                  <h4 className="text-base font-semibold tracking-tight text-slate-900">
+                    Scholarships & Discounts
+                  </h4>
+                </div>
               </div>
-            </div>
 
-            {program?.has_scholarship && program.scholarships.length > 0 ? (
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {program.scholarships.map((item) => (
                   <div
@@ -375,13 +347,12 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                   >
                     <div className="flex items-start gap-3">
                       <div className="min-w-0">
-
                         <h5 className="text-sm font-semibold text-slate-900">
                           {item.name}
                         </h5>
 
                         <p className="mt-1 text-xl font-bold text-blue-600">
-                          RM {item.max_amount.toLocaleString()}{" "}
+                          RM {item.max_amount.toLocaleString()}
                         </p>
 
                         <p className="mt-2 text-sm text-slate-500">
@@ -392,12 +363,8 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                   </div>
                 ))}
               </div>
-            ) : (
-              <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
-                No scholarship available
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="p-6">
             <div className="flex items-start gap-3">
@@ -432,17 +399,16 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                       </p>
 
                       <div className="mt-2">
-                      <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
-                        <CheckCircle className="h-3 w-3" />
-                        Required
-                      </span>
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
+                          <CheckCircle className="h-3 w-3" />
+                          Required
+                        </span>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
           </div>
         </div>
       </div>
@@ -465,16 +431,14 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 RM {commission?.rate?.toLocaleString() ?? 0}
               </span>
               <p className="text-sm font-semibold text-indigo-900">
-                Commission Rate
+                Commission amount
               </p>
               <span className="absolute right-3 top-3 h-2 w-2 animate-pulse rounded-full bg-indigo-600" />
             </div>
 
             <div className="relative flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-md transition-transform">
               <span className="text-2xl font-bold text-green-700">
-
-                {commissionLabel[commission?.type] || "Not Provided"}
-
+                {commissionLabel[commission?.type] || "One Time"}
               </span>
               <p className="text-sm font-semibold text-green-900">
                 Commission Type
@@ -493,7 +457,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </h5>
               <p className="mt-1 text-sm text-yellow-700">
                 {commission?.notes ??
-                  "Commission paid 30 days after the student completes the first semester of each academic year."}
+                  "Commission is generally paid within around 3 months, once the university completes its confirmation and payment process."}
               </p>
             </div>
           </div>

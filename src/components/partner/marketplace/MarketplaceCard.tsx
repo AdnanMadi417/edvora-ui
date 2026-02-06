@@ -1,16 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  ArrowRight,
-  ArrowLeft,
-  CheckCircle, Search,
-} from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle, Search } from "lucide-react";
 import {
   MdPublic,
-  MdTranslate,
   MdLocalAirport,
-  MdKeyboardArrowDown,
   MdMap,
   MdSchool,
   MdVisibility,
@@ -33,17 +27,15 @@ const MarketplaceCard = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
   const [searchTerm, setSearchTerm] = useState("");
-  const filteredProviders = serviceProviders.filter((provider) =>
-    provider.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    provider.nationality?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProviders = serviceProviders.filter(
+    (provider) =>
+      provider.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      provider.nationality?.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const currentServiceProviders = filteredProviders.slice(
     indexOfFirstItem,
     indexOfLastItem
   );
-
-  const [activeTab, setActiveTab] = useState<Record<string, number>>({});
-  const [openPackage, setOpenPackage] = useState<string | null>(null);
 
   const [showViewModal, setViewModal] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<any>(null);
@@ -54,7 +46,6 @@ const MarketplaceCard = () => {
       serviceProviders.forEach((p) => {
         defaults[p.id] = 1;
       });
-      setActiveTab(defaults);
     }
   }, [serviceProviders]);
 
@@ -62,7 +53,6 @@ const MarketplaceCard = () => {
     <div className="mt-6 overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
         <div className="relative border-b border-gray-200 p-6">
-
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-slate-900">
@@ -85,11 +75,9 @@ const MarketplaceCard = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="bg-background w-full rounded-full text-slate-500 border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+              className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
             />
-
           </div>
-
         </div>
 
         <div className="block">
@@ -149,204 +137,128 @@ const MarketplaceCard = () => {
                       </span>
                     </div>
 
-                    <div className="px-5 py-3">
-                      <div className="relative flex w-full rounded-full bg-gray-100 p-1 shadow-sm">
-                        {[1, 2].map((tab) => (
-                          <div
-                            key={tab}
-                            className={`flex-1 cursor-pointer rounded-full py-2 text-center text-sm font-medium transition-all duration-200 ${
-                              (activeTab[program.id] ?? 1) === tab
-                                ? "bg-white text-gray-900 shadow-md"
-                                : "text-gray-500 hover:text-gray-900"
-                            }`}
-                            onClick={() =>
-                              setActiveTab((prev) => ({
-                                ...prev,
-                                [program.id]: tab,
-                              }))
-                            }
-                          >
-                            {tab === 1 ? "Overview" : "Packages"}
-                          </div>
-                        ))}
+                    <div className="space-y-4 px-5 py-4 text-xs">
+                      <div className="flex items-center justify-between rounded-lg bg-slate-50 p-4">
+                        <div>
+                          <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                            Pricing
+                          </p>
+
+                          <p className="mt-1 text-base font-semibold text-slate-900">
+                            {program.price_range ? (
+                              <>
+                                RM {program.price_range.min_price}
+                                <span className="mx-1 text-slate-400">–</span>
+                                {program.price_range.max_price}
+                              </>
+                            ) : (
+                              <span className="text-slate-400">
+                                Not available
+                              </span>
+                            )}
+                          </p>
+
+                          <p className="mt-0.5 text-xs text-slate-500">
+                            Single services & packages
+                          </p>
+                        </div>
+
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
+                          <MdLocalAirport
+                            aria-hidden
+                            className="h-5 w-5 text-emerald-600"
+                          />
+                        </div>
                       </div>
-                    </div>
 
-                    <div className="space-y-2 px-5 pb-4 text-xs">
-                      {(activeTab[program.id] ?? 1) === 1 && (
-                        <>
-                          <div className="flex items-center justify-between py-2">
-                            <div className="flex items-center gap-2 font-medium text-slate-500">
-                              <MdTranslate className="h-5 w-5" /> Languages
-                            </div>
+                      <div className="flex gap-3">
+                        <MdSchool
+                          aria-hidden
+                          className="mt-0.5 h-5 w-5 text-blue-500"
+                        />
 
-                            <div className="flex flex-wrap gap-1">
-                              {program.languages?.length
-                                ? program.languages.map((lang) => (
-                                    <span
-                                      key={lang}
-                                      className="text-xs font-medium text-slate-900"
-                                    >
-                                      {lang}
-                                    </span>
-                                  ))
-                                : "Not Provided"}
-                            </div>
-                          </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-slate-800">
+                            Universities Served
+                          </p>
 
-                          <div className="grid gap-4">
-                            <div className="rounded-md bg-blue-50/70 p-3">
-                              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-800">
-                                <MdSchool className="h-5 w-5" />
-                                Universities Served
-                              </div>
+                          <ul className="ml-4 mt-1 space-y-1 text-xs text-slate-600">
+                            {program.universities_served?.length ? (
+                              program.universities_served.map((uni) => (
+                                <li key={uni} className="list-disc break-words">
+                                  {uni}
+                                </li>
+                              ))
+                            ) : (
+                              <li className="text-slate-400">Not provided</li>
+                            )}
+                          </ul>
+                        </div>
+                      </div>
 
-                              <ul className="ml-5 space-y-1 text-xs text-slate-700">
-                                {program.universities_served?.length ? (
-                                  program.universities_served.map((uni) => (
-                                    <li key={uni} className="list-disc">
-                                      {uni}
-                                    </li>
-                                  ))
-                                ) : (
-                                  <li className="list-disc">Not Provided</li>
-                                )}
+                      <div className="h-px bg-slate-100" />
+
+                      <div className="flex gap-3">
+                        <MdMap
+                          aria-hidden
+                          className="mt-0.5 h-5 w-5 text-orange-500"
+                        />
+
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-slate-800">
+                            Service Locations
+                          </p>
+
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {program.service_locations?.length ? (
+                              program.service_locations.map((location) => (
+                                <span
+                                  key={location}
+                                  className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700"
+                                >
+                                  {location}
+                                </span>
+                              ))
+                            ) : (
+                              <ul className="ml-4 mt-1 space-y-1 text-xs text-slate-600">
+                                <li className="text-slate-400">
+                                  Not provided
+                                </li>
                               </ul>
-                            </div>
-
-                            <div className="rounded-md bg-orange-50/70 p-3">
-                              <div className="mb-2 flex items-center gap-2 text-sm font-medium text-orange-800">
-                                <MdMap className="h-5 w-5" />
-                                Service Locations
-                              </div>
-
-                              <div className="flex flex-wrap gap-2">
-                                {program.service_locations?.length ? (
-                                  program.service_locations.map((location) => (
-                                    <span
-                                      key={location}
-                                      className="rounded-full bg-white px-3 py-1 text-xs font-medium text-orange-800 ring-1 ring-orange-100"
-                                    >
-                                      {location}
-                                    </span>
-                                  ))
-                                ) : (
-                                  <span className="list-disc px-3 py-1">
-                                    Not Provided
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            {/*<div className="rounded-md bg-white p-3 shadow-sm ring-1 ring-green-100">*/}
-                            {/*  <div className="flex items-center gap-2 text-sm font-semibold text-green-700">*/}
-                            {/*    <MdLocalAirport className="h-5 w-5 text-green-600" />*/}
-                            {/*    Services Offered*/}
-                            {/*  </div>*/}
-
-                            {/*  <ul className="ml-4 mt-2 space-y-2 text-xs text-slate-600">*/}
-                            {/*    {program.services_offered?.length*/}
-                            {/*      ? program.services_offered.map((service) => (*/}
-                            {/*          <li*/}
-                            {/*            key={service}*/}
-                            {/*            className="list-disc"*/}
-                            {/*          >*/}
-                            {/*            {service}*/}
-                            {/*          </li>*/}
-                            {/*        ))*/}
-                            {/*      : "Not Provided"}*/}
-                            {/*  </ul>*/}
-                            {/*</div>*/}
+                            )}
                           </div>
-                        </>
-                      )}
+                        </div>
+                      </div>
 
-                      {(activeTab[program.id] ?? 2) === 2 && (
-                        <>
-                          <div className="group relative overflow-hidden rounded-md bg-gradient-to-br from-emerald-500 to-green-600 px-5 py-4 shadow-sm transition-all">
-                            <div className="absolute right-0 top-0 -mr-16 -mt-16 h-32 w-32 rounded-full bg-white/10"></div>
-                            <div className="relative flex items-center justify-between">
-                              <div>
-                                <p className="text-sm font-semibold uppercase  tracking-wide text-emerald-100">
-                                  Packages Offered
-                                </p>
+                      <div className="h-px bg-slate-100" />
 
-                                <div className="mt-1 flex items-baseline gap-1">
-                                  <span className="text-lg font-bold text-white">
-                                    {program.price_range
-                                      ? `RM ${program.price_range.min_price} - ${program.price_range.max_price}`
-                                      : "Price not available"}
-                                  </span>
-                                </div>
-                              </div>
-                              <div className="rounded-full bg-white/20 p-3 backdrop-blur-sm transition-colors group-hover:bg-white/30">
-                                <MdLocalAirport className="h-7 w-7 text-white" />
-                              </div>
-                            </div>
-                          </div>
+                      <div className="flex gap-3">
+                        <MdLocalAirport
+                          aria-hidden
+                          className="mt-0.5 h-5 w-5 text-emerald-600"
+                        />
 
-                          {program.packages_offered?.map((pkg) => (
-                            <div
-                              key={pkg.name}
-                              className="cursor-pointer rounded-md border border-gray-200 shadow-sm transition-all"
-                            >
-                              <div
-                                className="flex items-center justify-between rounded-md px-5 py-4"
-                                onClick={() =>
-                                  setOpenPackage(
-                                    openPackage === pkg.name ? null : pkg.name
-                                  )
-                                }
-                              >
-                                <div className="flex flex-col">
-                                  <span className="text-sm font-semibold text-gray-900">
-                                    {pkg.name}
-                                  </span>
-                                  <span className="mt-1 inline-block rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-                                    RM {pkg.price}
-                                  </span>
-                                </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-slate-800">
+                            Services Offered
+                          </p>
 
-                                <MdKeyboardArrowDown
-                                  className={`h-6 w-6 text-gray-500 transition-transform ${
-                                    openPackage === pkg.name ? "rotate-180" : ""
-                                  }`}
-                                />
-                              </div>
-
-                              <div
-                                className={`transition-all duration-300 ${
-                                  openPackage === pkg.name
-                                    ? "max-h-96 opacity-100"
-                                    : "max-h-0 opacity-0"
-                                } overflow-hidden`}
-                              >
-                                <div className="border-t border-gray-100 px-6 pb-6 pt-4">
-                                  <h4 className="mb-3 text-sm font-semibold text-gray-900">
-                                    Package Details
-                                  </h4>
-
-                                  <p className="text-sm text-gray-600">
-                                    {pkg.description}
-                                  </p>
-
-                                  <ul className="mt-4 space-y-2">
-                                    {pkg.includes.map((item) => (
-                                      <li
-                                        key={item}
-                                        className="flex items-center text-sm text-gray-600"
-                                      >
-                                        <span className="mr-3 h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                                        {item}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </>
-                      )}
+                          <ul className="ml-4 mt-2 space-y-1.5 text-xs text-slate-600">
+                            {program.services_offered?.length ? (
+                              program.services_offered.map((service) => (
+                                <li
+                                  key={service}
+                                  className="list-disc break-words"
+                                >
+                                  {service}
+                                </li>
+                              ))
+                            ) : (
+                              <li className="text-slate-400">Not provided</li>
+                            )}
+                          </ul>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="mt-auto flex justify-between gap-2 border-t border-gray-200 bg-slate-50 p-4">
@@ -387,37 +299,33 @@ const MarketplaceCard = () => {
               <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                 Showing
                 <span className="font-medium">
-                      {(currentPage - 1) * itemsPerPage + 1}
-                    </span>
+                  {(currentPage - 1) * itemsPerPage + 1}
+                </span>
                 to
                 <span className="font-medium">
-                      {Math.min(
-                        currentPage * itemsPerPage,
-                        filteredProviders.length
-                      )}
-                    </span>
+                  {Math.min(
+                    currentPage * itemsPerPage,
+                    filteredProviders.length
+                  )}
+                </span>
                 of
-                <span className="font-medium">
-                      {filteredProviders.length}
-                    </span>
+                <span className="font-medium">{filteredProviders.length}</span>
                 Service Providers
               </div>
             )}
 
             <div className="flex items-center justify-end gap-2">
               <PrevButton
-                onClick={() =>
-                  setCurrentPage((prev) => Math.max(prev - 1, 1))
-                }
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
                 text="Prev"
                 icon={<ArrowLeft className="h-4 w-4" />}
               />
 
               <span className="px-3 py-1 font-medium text-slate-500">
-                    Page {currentPage} of{" "}
+                Page {currentPage} of{" "}
                 {Math.ceil(filteredProviders.length / itemsPerPage)}
-                  </span>
+              </span>
 
               <NextButton
                 onClick={() =>
@@ -437,7 +345,6 @@ const MarketplaceCard = () => {
               />
             </div>
           </div>
-
         </div>
       </div>
 
