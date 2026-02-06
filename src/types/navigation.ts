@@ -5,4 +5,5 @@ export interface IRoute {
   layout: string;
   path: string;
   icon: IconType;
+  children?: IRoute[];
 }

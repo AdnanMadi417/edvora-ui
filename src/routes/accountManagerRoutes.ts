@@ -9,12 +9,12 @@ const accountManagerRoutes: IRoute[] = [
         icon: MdAssignment,
     },
 
-    {
-        name: "Partners",
-        layout: "/account-manager",
-        path: "/partners",
-        icon: MdHandshake,
-    },
+    // {
+    //     name: "Partners",
+    //     layout: "/account-manager",
+    //     path: "/partners",
+    //     icon: MdHandshake,
+    // },
 
     // {
     //     name: "Commission",

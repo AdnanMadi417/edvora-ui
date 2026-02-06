@@ -164,7 +164,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             <div className="flex items-center gap-3">
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-full bg-accent-light text-h5 font-medium text-accent"
+                rounded-full bg-accent-light text-h5 font-medium text-blue-700"
               >
                 {user ? (
                   user.name[0].toUpperCase()
