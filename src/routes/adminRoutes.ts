@@ -1,5 +1,5 @@
 import { IRoute } from "../types/navigation";
-import { MdAssignment, MdBusinessCenter,MdAddBusiness ,MdSchool,MdAccountBalance} from 'react-icons/md';
+import { MdAssignment, MdBusinessCenter,MdAddBusiness} from 'react-icons/md';
 
 const AdminRoutes: IRoute[] = [
   {

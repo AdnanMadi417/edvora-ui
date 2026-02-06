@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  ArrowRight,
-  ArrowLeft,
-  BadgeCheck,
-  AlertCircle,
-  CheckCircle,
-} from "lucide-react";
+import { ArrowRight, ArrowLeft, CheckCircle, Search } from "lucide-react";
 import {
   MdPublic,
   MdTranslate,
@@ -24,21 +18,27 @@ import NextButton from "../../../ui/buttons/NextButton";
 import PrevButton from "../../../ui/buttons/PrevButton";
 import ViewDetails from "../../../ui/buttons/Button";
 import { useServiceProviders } from "../../../../hooks/serviceProviders/useServiceProviders";
-import ViewDetailsModal from "../../../partner/marketplace/popup/ViewDetailsModal";
+import ViewDetailsModal from "../../../admin/logisticalService/popup/ViewDetailsModal";
 
-const MarketplaceCard = () => {
+const LogisticalServiceProviderCard = () => {
   const { serviceProviders, loading, error } = useServiceProviders();
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentServiceProviders = serviceProviders.slice(
+  const [searchTerm, setSearchTerm] = useState("");
+  const filteredProviders = serviceProviders.filter(
+    (provider) =>
+      provider.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      provider.nationality?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const currentServiceProviders = filteredProviders.slice(
     indexOfFirstItem,
     indexOfLastItem
   );
+
   const [activeTab, setActiveTab] = useState<Record<string, number>>({});
-  const [isOpen, setIsOpen] = useState(false);
   const [openPackage, setOpenPackage] = useState<string | null>(null);
 
   const [showViewModal, setViewModal] = useState(false);
@@ -61,27 +61,41 @@ const MarketplaceCard = () => {
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-text-primary">
-                Partner Marketplace
+                Logistical Service Providers
               </h3>
               <p className="mt-1 text-sm text-slate-500">
-                Browse and connect with verified logistics partners and service
-                providers
+                Manage, review, and maintain all registered logistics partners
+                and services
               </p>
             </div>
+          </div>
+
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
+            <input
+              type="text"
+              placeholder="Search logistic partner by name..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+              className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+            />
           </div>
         </div>
 
         <div className="block">
           {loading && <Loading text="Fetching service providers data..." />}
 
-          {!error && !loading && serviceProviders.length === 0 && (
+          {!error && !loading && filteredProviders.length === 0 && (
             <NoMessagesFound
               title="No service providers found"
               subtitle="Try adjusting your search or filters."
             />
           )}
 
-          {!error && serviceProviders.length > 0 && (
+          {!error && filteredProviders.length > 0 && (
             <div className="block">
               <div className="grid grid-cols-1 items-stretch gap-6 p-6 md:grid-cols-2 lg:grid-cols-3">
                 {currentServiceProviders.map((program) => (
@@ -358,64 +372,60 @@ const MarketplaceCard = () => {
                   </div>
                 ))}
               </div>
-
-              <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex md:items-center md:justify-between">
-                {serviceProviders.length > 0 && (
-                  <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
-                    Showing
-                    <span className="font-medium">
-                      {(currentPage - 1) * itemsPerPage + 1}
-                    </span>
-                    to
-                    <span className="font-medium">
-                      {Math.min(
-                        currentPage * itemsPerPage,
-                        serviceProviders.length
-                      )}
-                    </span>
-                    of
-                    <span className="font-medium">
-                      {serviceProviders.length}
-                    </span>
-                    Service Providers
-                  </div>
-                )}
-
-                <div className="flex items-center justify-end gap-2">
-                  <PrevButton
-                    onClick={() =>
-                      setCurrentPage((prev) => Math.max(prev - 1, 1))
-                    }
-                    disabled={currentPage === 1}
-                    text="Prev"
-                    icon={<ArrowLeft className="h-4 w-4" />}
-                  />
-
-                  <span className="px-3 py-1 font-medium text-slate-500">
-                    Page {currentPage} of{" "}
-                    {Math.ceil(serviceProviders.length / itemsPerPage)}
-                  </span>
-
-                  <NextButton
-                    onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(
-                          prev + 1,
-                          Math.ceil(serviceProviders.length / itemsPerPage)
-                        )
-                      )
-                    }
-                    disabled={
-                      currentPage ===
-                      Math.ceil(serviceProviders.length / itemsPerPage)
-                    }
-                    text="Next"
-                    icon={<ArrowRight className="h-4 w-4" />}
-                  />
-                </div>
-              </div>
             </div>
           )}
+
+          <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex md:items-center md:justify-between">
+            {filteredProviders.length > 0 && (
+              <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
+                Showing
+                <span className="font-medium">
+                  {(currentPage - 1) * itemsPerPage + 1}
+                </span>
+                to
+                <span className="font-medium">
+                  {Math.min(
+                    currentPage * itemsPerPage,
+                    filteredProviders.length
+                  )}
+                </span>
+                of
+                <span className="font-medium">{filteredProviders.length}</span>
+                Service Providers
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2">
+              <PrevButton
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                text="Prev"
+                icon={<ArrowLeft className="h-4 w-4" />}
+              />
+
+              <span className="px-3 py-1 font-medium text-slate-500">
+                Page {currentPage} of{" "}
+                {Math.ceil(filteredProviders.length / itemsPerPage)}
+              </span>
+
+              <NextButton
+                onClick={() =>
+                  setCurrentPage((prev) =>
+                    Math.min(
+                      prev + 1,
+                      Math.ceil(filteredProviders.length / itemsPerPage)
+                    )
+                  )
+                }
+                disabled={
+                  currentPage ===
+                  Math.ceil(filteredProviders.length / itemsPerPage)
+                }
+                text="Next"
+                icon={<ArrowRight className="h-4 w-4" />}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -428,4 +438,4 @@ const MarketplaceCard = () => {
   );
 };
 
-export default MarketplaceCard;
+export default LogisticalServiceProviderCard;

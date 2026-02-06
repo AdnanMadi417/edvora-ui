@@ -125,7 +125,6 @@ export default function Links({ routes }: { routes: IRoute[] }) {
               </div>
             )}
 
-            {/* Parent active indicator */}
             {isActive && (
               <div className="absolute right-0 top-1 h-[calc(100%-8px)] max-h-[36px] w-1 rounded-md bg-blue-700" />
             )}
