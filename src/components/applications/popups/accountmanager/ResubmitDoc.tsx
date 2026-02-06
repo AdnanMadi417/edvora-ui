@@ -135,7 +135,7 @@ export default function HoldPopup({
           <div className="space-y-5 px-6 py-4">
             <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
               <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
-              <p className="text-p2 leading-relaxed text-text-primary">
+              <p className="text-p2 leading-relaxed text-slate-900">
                 This action will request the applicant to re-upload or fix
                 documents. Please include clear instructions or reasons to
                 ensure proper resubmission.

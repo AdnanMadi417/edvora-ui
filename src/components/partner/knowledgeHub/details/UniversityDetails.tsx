@@ -74,7 +74,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
 
               <div className="min-w-0">
-                <h3 className="line-clamp-2 text-lg font-semibold text-text-primary">
+                <h3 className="line-clamp-2 text-lg font-semibold text-slate-900">
                   {program?.name ?? "Not Provided"}
                 </h3>
                 <p className="mt-1 break-words text-sm text-slate-500">
@@ -101,7 +101,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">Country</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.university?.country ?? "Not Provided"}
                 </p>
               </div>
@@ -113,7 +113,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">State / Province</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.university?.state ?? "Not Provided"}
                 </p>
               </div>
@@ -125,7 +125,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">Level</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.qualification_level ?? "Not Provided"}
                 </p>
               </div>
@@ -137,7 +137,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">Field / Faculty</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.field_of_study?.name ?? "Not Provided"}
                 </p>
               </div>
@@ -149,7 +149,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">Duration</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.duration
                     ? `${program.duration} years`
                     : "Not Provided"}
@@ -165,7 +165,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">Intake Dates</p>
 
-                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-text-primary">
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-slate-900">
                   {program?.university.intake_months?.length ? (
                     program.university.intake_months.map((date, index) => (
                       <span
@@ -173,13 +173,13 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                         className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 transition hover:border-green-600"
                       >
                         <span className="h-2 w-2 rounded-full border-2 border-green-600" />
-                        <span className="text-xs font-medium text-text-primary">
+                        <span className="text-xs font-medium text-slate-900">
                           {date}
                         </span>
                       </span>
                     ))
                   ) : (
-                    <span className="text-sm font-medium capitalize text-text-primary">
+                    <span className="text-sm font-medium capitalize text-slate-900">
                       Not Provided
                     </span>
                   )}
@@ -193,7 +193,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">Campus</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.is_on_campus ? "On-campus" : "Online"}
                 </p>
               </div>
@@ -205,7 +205,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">City / Country</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.university
                     ? `${program.university.name}, ${program.university.country}`
                     : "Not Provided"}
@@ -219,7 +219,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">Class Type</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.is_online ? "Online" : "On-campus (Physical)"}
                 </p>
               </div>
@@ -231,7 +231,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">English Requirement</p>
-                <p className="mt-0.5 text-sm font-medium capitalize text-text-primary">
+                <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.english_required_score
                     ? `Min score: ${program.english_required_score}`
                     : "Not Provided"}

@@ -31,7 +31,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({
       </div>
 
       <div className="min-w-0">
-        <h3 className="text-lg font-semibold text-text-primary">
+        <h3 className="text-lg font-semibold text-slate-900">
           {title}
         </h3>
 

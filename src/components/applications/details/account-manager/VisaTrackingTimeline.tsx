@@ -100,7 +100,7 @@ export default function VisaTrackingTimeline({
                 <CreditCard className="text-xl text-blue-700" />
               </span>
               <div>
-                <h3 className="text-p3 font-semibold text-text-primary">
+                <h3 className="text-p3 font-semibold text-slate-900">
                   Visa Payment
                 </h3>
                 <span className="text-sm text-slate-500">

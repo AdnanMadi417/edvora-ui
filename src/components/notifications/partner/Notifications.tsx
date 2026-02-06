@@ -90,7 +90,7 @@ export default function Notifications({ params }: PartnerNotificationProps) {
         onClick={() => setShowNotifications(!showNotifications)}
       >
         <div className="flex flex-col gap-2">
-          <h3 className="text-p3 flex items-center gap-3 font-semibold text-text-primary">
+          <h3 className="text-p3 flex items-center gap-3 font-semibold text-slate-900">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <Bell className="text-xl text-blue-700" />
             </span>
@@ -156,7 +156,7 @@ export default function Notifications({ params }: PartnerNotificationProps) {
 
                     <div className="min-w-0 flex-1">
                       <div className="mb-1 flex items-center gap-2">
-                        <h3 className="truncate text-base font-semibold text-text-primary">
+                        <h3 className="truncate text-base font-semibold text-slate-900">
                           {app.stage}
                         </h3>
                       </div>

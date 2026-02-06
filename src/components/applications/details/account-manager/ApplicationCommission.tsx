@@ -32,7 +32,7 @@ export default function ApplicationCommissions({ application }: ApplicationCommi
           <DollarSign className="text-xl text-green-700" />
         </span>
         <div>
-          <h3 className="text-lg font-semibold text-text-primary">
+          <h3 className="text-lg font-semibold text-slate-900">
             Commission Details
           </h3>
           <p className="text-sm text-slate-500">

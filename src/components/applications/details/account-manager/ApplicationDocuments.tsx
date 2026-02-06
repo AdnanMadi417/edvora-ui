@@ -97,7 +97,7 @@ export default function ApplicationDocuments({
         onClick={() => setShowDocs(!showDocs)}
       >
         <div className="flex flex-col gap-2">
-          <h3 className="text-p3 flex items-center gap-2 font-semibold text-text-primary">
+          <h3 className="text-p3 flex items-center gap-2 font-semibold text-slate-900">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <FolderOpen className="text-xl text-blue-700" />
             </span>

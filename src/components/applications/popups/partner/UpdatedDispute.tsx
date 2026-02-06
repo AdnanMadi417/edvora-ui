@@ -107,7 +107,7 @@ export default function DisputeSubmissionModal({
 
             <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-5 shadow-sm">
               <AlertCircle className="mt-0.5 h-6 w-6 flex-shrink-0 text-red-600" />
-              <p className="text-p2 leading-relaxed text-text-primary">
+              <p className="text-p2 leading-relaxed text-slate-900">
                 This action will submit your dispute for review by the manager.
                 Please provide a valid reason for the dispute to ensure proper processing.
               </p>

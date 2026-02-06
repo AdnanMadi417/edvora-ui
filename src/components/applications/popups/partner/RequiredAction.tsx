@@ -148,7 +148,7 @@ export default function RequiredAction({
                       <div className="flex h-8 w-8 items-center justify-center">
                         <FaFileAlt className="h-4 w-4" />
                       </div>
-                      <h3 className="truncate text-base font-semibold text-text-primary">
+                      <h3 className="truncate text-base font-semibold text-slate-900">
                         {appDetails.status ||
                           appDetails.stage_statuses?.[0]?.name ||
                           "Not provided"}
