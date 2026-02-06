@@ -104,7 +104,7 @@ const Navbar = ({
           className="flex h-5 w-5 cursor-pointer items-center justify-center xl:hidden"
           onClick={onOpenSidenav}
         >
-          <FiAlignJustify className="h-5 w-5 text-text-muted" />
+          <FiAlignJustify className="h-5 w-5 text-slate-600" />
         </span>
 
         <Dropdown

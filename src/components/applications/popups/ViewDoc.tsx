@@ -50,7 +50,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
                     Document Preview
                   </h5>
                   <div className="flex items-center gap-2">
-                    <span className="text-p2 font-medium text-text-muted">
+                    <span className="text-p2 font-medium text-slate-600">
                       {doc.name}
                     </span>
 

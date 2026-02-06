@@ -49,7 +49,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
               <h2 className="text-lg font-semibold text-gray-800">
                 {partner.businessName}
               </h2>
-              <p className="text-sm text-text-muted">
+              <p className="text-sm text-slate-600">
                 <span className="font-medium text-text-secondary">
                   Partner Type :
                 </span>{" "}
@@ -71,7 +71,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
           </div>
 
           <div className="space-y-1 text-right">
-            <p className="text-xs text-text-muted">Registered on</p>
+            <p className="text-xs text-slate-600">Registered on</p>
             <p className="text-sm font-medium text-text-secondary">
               {new Date(partner.registeredAt).toLocaleDateString("en-MY")}
             </p>
@@ -96,7 +96,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
             <span className="mb-1 font-medium text-slate-900">
               Business Name
             </span>
-            <span className="flex items-center gap-2 text-text-muted">
+            <span className="flex items-center gap-2 text-slate-600">
               <FaRegAddressCard />
               {partner.businessName?.trim() || "Not provided"}
             </span>
@@ -106,7 +106,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
             <span className="mb-1 font-medium text-slate-900">
               Registration Number
             </span>
-            <span className="flex items-center gap-2 text-text-muted">
+            <span className="flex items-center gap-2 text-slate-600">
               <FaIdBadge />
               {partner.registrationNumber?.trim() || "Not provided"}
             </span>
@@ -116,7 +116,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
             <span className="mb-1 font-medium text-slate-900">
               Contact Person
             </span>
-            <span className="flex items-center gap-2 text-text-muted">
+            <span className="flex items-center gap-2 text-slate-600">
               <FaUserTie />
               {partner.contactPerson?.trim() || "Not provided"}
             </span>
@@ -126,7 +126,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
             <span className="mb-1 font-medium text-slate-900">
               Business Address
             </span>
-            <span className="flex items-center gap-2 text-text-muted">
+            <span className="flex items-center gap-2 text-slate-600">
               <FaMapMarkerAlt />
               {partner.businessAddress?.trim() || "Not provided"}
             </span>
@@ -145,7 +145,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
         <div className="grid grid-cols-1 gap-4 text-p2 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           <div className="block">
             <span className="mb-1 font-medium text-slate-900">Phone</span>
-            <span className="flex items-center gap-2 text-text-muted">
+            <span className="flex items-center gap-2 text-slate-600">
               <FaPhoneAlt />
               {partner.phoneContact?.trim() || "Not provided"}
             </span>
@@ -153,7 +153,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
 
           <div className="block">
             <span className="mb-1 font-medium text-slate-900">Email</span>
-            <span className="flex items-center gap-2 text-text-muted">
+            <span className="flex items-center gap-2 text-slate-600">
               <FaEnvelope />
               {partner.emailContact?.trim() || "Not provided"}
             </span>
@@ -163,7 +163,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
             <span className="mb-1 font-medium text-slate-900">
               Contact Person
             </span>
-            <span className="flex items-center gap-2 text-text-muted">
+            <span className="flex items-center gap-2 text-slate-600">
               <FaUserTie />
               {partner.contactPerson?.trim() || "Not provided"}
             </span>
@@ -171,7 +171,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
 
           <div className="block">
             <span className="mb-1 font-medium text-slate-900">Country</span>
-            <span className="flex items-center gap-2 text-text-muted">
+            <span className="flex items-center gap-2 text-slate-600">
               <FaGlobeAsia />
               {partner.country?.trim() || "Not provided"}
             </span>

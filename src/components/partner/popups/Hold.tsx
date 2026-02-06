@@ -33,7 +33,7 @@ const InputField = ({
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className="w-full rounded-md border border-default px-4 py-3 text-p2 transition-all duration-200 placeholder:text-text-muted outline-none focus:none"
+      className="w-full rounded-md border border-default px-4 py-3 text-p2 transition-all duration-200 placeholder:text-slate-600 outline-none focus:none"
     />
   </div>
 );
@@ -99,7 +99,7 @@ export default function HoldPartnerPopup({
                   <h5 className="text-h4 font-bold text-gray-900">
                     Hold Partner
                   </h5>
-                  <p className="mt-0.5 text-caption text-text-muted">
+                  <p className="mt-0.5 text-caption text-slate-600">
                     Temporarily pause this partner’s activities
                   </p>
                 </div>

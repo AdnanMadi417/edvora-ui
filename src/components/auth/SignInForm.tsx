@@ -38,7 +38,7 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
       >
         <div className="mb-6 text-center">
           <h1 className="text-3xl font-extrabold text-gray-900">Sign In</h1>
-          <p className="mt-2 text-text-muted">
+          <p className="mt-2 text-slate-600">
             Enter your email and password to access your account
           </p>
         </div>
@@ -70,7 +70,7 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
             <Checkbox id="remember" />
             <label
               htmlFor="remember"
-              className="ml-2 cursor-pointer text-p2 font-normal text-text-muted"
+              className="ml-2 cursor-pointer text-p2 font-normal text-slate-600"
             >
               Keep me logged in
             </label>

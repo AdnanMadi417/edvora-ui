@@ -49,13 +49,13 @@ export default function UnauthorizedPage() {
         </h1>
 
         <p
-          className="mb-2 text-base leading-relaxed text-text-muted"
+          className="mb-2 text-base leading-relaxed text-slate-600"
         >
           You don't have permission to access this page.
         </p>
 
         <p
-          className="text-sm text-text-muted"
+          className="text-sm text-slate-600"
         >
           Redirecting automatically in {countdown} seconds
         </p>

@@ -43,7 +43,7 @@ export default function NewApplicationSuccess({ onClose }) {
                 <h5 className="text-h5 font-bold text-gray-900">
                   Application Submitted!
                 </h5>
-                <p className="mt-0.5 text-caption text-text-muted">
+                <p className="mt-0.5 text-caption text-slate-600">
                   Your applicants’ information has been received successfully.
                 </p>
               </div>
