@@ -231,25 +231,6 @@ const LogisticalServiceProviderCard = () => {
                               </div>
                             </div>
 
-                            {/*<div className="rounded-md bg-white p-3 shadow-sm ring-1 ring-green-100">*/}
-                            {/*  <div className="flex items-center gap-2 text-sm font-semibold text-green-700">*/}
-                            {/*    <MdLocalAirport className="h-5 w-5 text-green-600" />*/}
-                            {/*    Services Offered*/}
-                            {/*  </div>*/}
-
-                            {/*  <ul className="ml-4 mt-2 space-y-2 text-xs text-slate-600">*/}
-                            {/*    {program.services_offered?.length*/}
-                            {/*      ? program.services_offered.map((service) => (*/}
-                            {/*          <li*/}
-                            {/*            key={service}*/}
-                            {/*            className="list-disc"*/}
-                            {/*          >*/}
-                            {/*            {service}*/}
-                            {/*          </li>*/}
-                            {/*        ))*/}
-                            {/*      : "Not Provided"}*/}
-                            {/*  </ul>*/}
-                            {/*</div>*/}
                           </div>
                         </>
                       )}
