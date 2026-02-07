@@ -92,7 +92,7 @@ const Navbar = ({
         <p className="text-lg font-bold capitalize sm:text-2xl lg:text-3xl">
           <NavLink
             href="#"
-            className="font-bold text-text-primary no-underline capitalize"
+            className="font-bold text-slate-900 no-underline capitalize"
           >
             {brandText}
           </NavLink>
@@ -104,7 +104,7 @@ const Navbar = ({
           className="flex h-5 w-5 cursor-pointer items-center justify-center xl:hidden"
           onClick={onOpenSidenav}
         >
-          <FiAlignJustify className="h-5 w-5 text-text-muted" />
+          <FiAlignJustify className="h-5 w-5 text-slate-600" />
         </span>
 
         <Dropdown
@@ -123,19 +123,19 @@ const Navbar = ({
         >
           <div className="flex flex-col w-56 rounded-[12px] border border-default bg-card shadow-sm text-sm">
             <div className="flex items-center gap-2 p-4">
-              <p className="text-text-primary font-semibold">
+              <p className="text-slate-900 font-semibold">
                 Hey, {loading ? "Loading..." : user?.name || "User"}
               </p>
             </div>
 
             <div className="border-t border-default" />
 
-            <div className="flex flex-col px-3 py-2 text-text-primary">
+            <div className="flex flex-col px-3 py-2 text-slate-900">
               <Link
                 href=""
-                className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-text-primary"
+                className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-slate-900"
               >
-                <Settings className="h-4 w-4 text-text-secondary group-hover:text-text-primary" />
+                <Settings className="h-4 w-4 text-text-secondary group-hover:text-slate-900" />
                 <span>Profile Settings</span>
               </Link>
 

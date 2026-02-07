@@ -11,6 +11,7 @@ interface HoldPopupProps {
   onClose: () => void;
   applicationId: string;
   docId: string;
+  statusId: string;
 }
 
 export default function HoldPopup({
@@ -18,6 +19,7 @@ export default function HoldPopup({
   onClose,
   applicationId,
   docId,
+  statusId,
 }: HoldPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({ reason: "" });
@@ -114,7 +116,7 @@ export default function HoldPopup({
                   <h5 className="text-h4 font-bold text-gray-900">
                     Request Resubmission
                   </h5>
-                  <p className="mt-0.5 text-caption text-text-muted">
+                  <p className="mt-0.5 text-caption text-slate-500">
                     Ask the applicant to correct or re-upload this document.
                   </p>
                 </div>
@@ -133,7 +135,7 @@ export default function HoldPopup({
           <div className="space-y-5 px-6 py-4">
             <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
               <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
-              <p className="text-p2 leading-relaxed text-text-primary">
+              <p className="text-p2 leading-relaxed text-slate-900">
                 This action will request the applicant to re-upload or fix
                 documents. Please include clear instructions or reasons to
                 ensure proper resubmission.

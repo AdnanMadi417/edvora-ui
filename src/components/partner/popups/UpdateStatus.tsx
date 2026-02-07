@@ -65,7 +65,7 @@ const DocumentRequestList = () => {
           )}
 
           <div>
-            <label className="mb-2 block text-p2 font-medium text-text-muted">
+            <label className="mb-2 block text-p2 font-medium text-slate-600">
               Document Type {index + 1}
             </label>
             <select
@@ -84,7 +84,7 @@ const DocumentRequestList = () => {
           </div>
 
           <div>
-            <label className="mb-2 block text-p2 font-medium text-text-muted">
+            <label className="mb-2 block text-p2 font-medium text-slate-600">
               Reason for Request
             </label>
             <textarea
@@ -92,7 +92,7 @@ const DocumentRequestList = () => {
               onChange={(e) => updateDocument(doc.id, "reason", e.target.value)}
               placeholder="Why is this document needed?"
               rows={3}
-              className="w-full rounded-md border border-default px-4 py-2.5 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+              className="w-full rounded-md border border-default px-4 py-2.5 text-p2 outline-none transition-all duration-200 placeholder:text-slate-600 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
             />
           </div>
         </div>
@@ -133,7 +133,7 @@ const InputField = ({
   isTextarea = false,
 }: InputFieldProps) => (
   <div className="space-y-2">
-    <label htmlFor={id} className="block text-p2 font-medium text-text-muted">
+    <label htmlFor={id} className="block text-p2 font-medium text-slate-600">
       {label}
       {required && <span className="ml-1 text-red-500">*</span>}
     </label>
@@ -144,7 +144,7 @@ const InputField = ({
         onChange={onChange}
         placeholder={placeholder}
         rows={4}
-        className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+        className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
       />
     ) : (
       <input
@@ -153,7 +153,7 @@ const InputField = ({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+        className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-slate-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
       />
     )}
   </div>
@@ -304,7 +304,7 @@ export default function UpdateStatusPopup({
               <button
                 onClick={handleClose}
                 aria-label="Close dialog"
-                className="group relative flex h-10 w-10 items-center justify-center rounded-full text-text-muted transition-all duration-200 hover:bg-gray-100 hover:text-text-muted active:scale-95"
+                className="group relative flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition-all duration-200 hover:bg-gray-100 hover:text-slate-600 active:scale-95"
               >
                 <XCircle className="h-5 w-5 transition-transform duration-200 " />
               </button>
@@ -354,7 +354,7 @@ export default function UpdateStatusPopup({
                         >
                           <Icon
                             className={`h-5 w-5 ${
-                              isSelected ? option.color : "text-text-muted"
+                              isSelected ? option.color : "text-slate-600"
                             }`}
                             strokeWidth={2}
                           />
@@ -441,13 +441,13 @@ export default function UpdateStatusPopup({
             <p className="text-sm sm:text-p2 text-gray-600 text-center sm:text-left">
               Acting as:{" "}
               <span className="font-semibold text-gray-900">Ammar</span>{" "}
-              <span className="text-text-muted">(Account Manager)</span>
+              <span className="text-slate-600">(Account Manager)</span>
             </p>
 
             <div className="flex justify-center sm:justify-end gap-3 w-full sm:w-auto">
               <button
                 onClick={handleClose}
-                className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm sm:text-p2 font-medium text-text-muted transition-all duration-200 hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm sm:text-p2 font-medium text-slate-600 transition-all duration-200 hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
               >
                 Cancel
               </button>

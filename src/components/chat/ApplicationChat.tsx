@@ -108,7 +108,7 @@ export default function AgentPartnerChat({
                 >
                   {msg.message_text}
 
-                  <span className="mt-1 block text-right text-xs text-text-muted">
+                  <span className="mt-1 block text-right text-xs text-slate-600">
                     {formatTime(msg.created_at)}
                   </span>
                 </div>

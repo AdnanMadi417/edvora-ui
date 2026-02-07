@@ -118,7 +118,7 @@ export default function ArrivalDateConfirmation({
                   <h5 className="text-h4 font-bold text-gray-900 sm:text-lg">
                     Confirm Arrival Date
                   </h5>
-                  <p className="mt-1 text-caption text-text-muted">
+                  <p className="mt-1 text-caption text-slate-500">
                     Select your planned arrival date and upload your travel ticket.
                   </p>
                 </div>
@@ -170,7 +170,7 @@ export default function ArrivalDateConfirmation({
 
               {ticketFile && (
                 <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
-                  <span className="truncate text-sm text-text-muted">{ticketFile.name}</span>
+                  <span className="truncate text-sm text-slate-500">{ticketFile.name}</span>
                   <button
                     type="button"
                     onClick={() => setTicketFile(null)}

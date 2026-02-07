@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import {
   Search,
-  Layers,
   RefreshCw,
   CheckCircle,
   ArrowRight,
@@ -25,14 +24,16 @@ import Link from 'next/link';
 
 const KnowledgeHubCards = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all_status');
-  const [filterStages, setFilterStages] = useState('all_stages');
 
   const {
     programs,
     loading: programsLoading,
     error: programsError,
   } = useAllPrograms({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const filteredPrograms = programs.filter((program) => {
     const term = searchTerm.toLowerCase();
     const university = program.university?.name?.toLowerCase() || '';
@@ -45,10 +46,6 @@ const KnowledgeHubCards = () => {
       level.includes(term)
     );
   });
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentPrograms = filteredPrograms.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,10 +69,10 @@ const KnowledgeHubCards = () => {
         <div className="relative border-b border-gray-200 p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-text-primary">
+              <h3 className="text-xl font-semibold text-slate-900">
                 Knowledge Hub
               </h3>
-              <p className="mt-1 text-sm text-text-muted">
+              <p className="mt-1 text-sm text-slate-500">
                 Explore and manage all programs, universities, and learning
                 resources
               </p>
@@ -84,13 +81,13 @@ const KnowledgeHubCards = () => {
 
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-text-muted" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <input
                 type="text"
                 placeholder="Search by university, program, or level..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-text-muted outline-0 placeholder:text-text-muted focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -109,7 +106,7 @@ const KnowledgeHubCards = () => {
         <div className="block">
           {programsLoading && <Loading text="Fetching programs data..." />}
 
-          {!programsError && !programsLoading && programs.length === 0 && (
+          {!programsError && !programsLoading && currentPrograms.length === 0 && (
             <NoMessagesFound
               title="No programs found"
               subtitle="Try adjusting your search or filters."
@@ -170,17 +167,6 @@ const KnowledgeHubCards = () => {
 
                       <div className="flex justify-between">
                         <span className="flex items-center gap-1.5 font-medium text-slate-500">
-                          <MdAccessTime className="h-4 w-4" /> Duration
-                        </span>
-                        <span className="text-xs font-medium text-slate-900">
-                          {program.duration
-                            ? `${program.duration} years`
-                            : 'Not provided'}
-                        </span>
-                      </div>
-
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5 font-medium text-slate-500">
                           <MdAttachMoney className="h-4 w-4" /> First-Year Cost
                         </span>
                         <span className="text-xs font-medium text-slate-900">
@@ -192,7 +178,18 @@ const KnowledgeHubCards = () => {
 
                       <div className="flex justify-between">
                         <span className="flex items-center gap-1.5 font-medium text-slate-500">
-                          <MapPin className="h-4 w-4" /> Country
+                          <MdAccessTime className="h-4 w-4" /> Duration
+                        </span>
+                        <span className="text-xs font-medium text-slate-900">
+                          {program.duration
+                            ? `${program.duration} years`
+                            : 'Not provided'}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between">
+                        <span className="flex items-center gap-1.5 font-medium text-slate-500">
+                          <MapPin className="h-4 w-4" /> City
                         </span>
                         <span className="text-xs font-medium text-slate-900">
                           {program.university?.country || 'Not provided'}
@@ -234,15 +231,13 @@ const KnowledgeHubCards = () => {
                     </div>
 
                     <div className="flex items-center justify-between bg-slate-50 px-5 py-4">
-                      <div>
-                        <div className="text-xs text-slate-500">
-                          Your Commission
-                        </div>
-                        <div className="mt-1 text-lg font-semibold text-slate-900">
-                          {program.first_year_tuition
-                            ? `RM${program.first_year_tuition.toLocaleString()}`
-                            : 'Not provided'}
-                        </div>
+                      <div className="text-xs text-slate-500">
+                        Your Commission
+                      </div>
+                      <div className="mt-1 text-lg font-semibold text-slate-900">
+                        {program.first_year_tuition
+                          ? `RM${program.first_year_tuition.toLocaleString()}`
+                          : 'Not provided'}
                       </div>
                     </div>
 
@@ -287,7 +282,7 @@ const KnowledgeHubCards = () => {
               <div
                 className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex  md:justify-between">
                 {programs.length > 0 && (
-                  <div className="flex items-center gap-1 text-sm font-medium text-text-muted">
+                  <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                     Showing
                     <span className="font-medium">
                       {(currentPage - 1) * itemsPerPage + 1}
@@ -312,7 +307,7 @@ const KnowledgeHubCards = () => {
                     icon={<ArrowLeft className="h-4 w-4" />}
                   />
 
-                  <span className="px-3 py-1 font-medium text-text-muted">
+                  <span className="px-3 py-1 font-medium text-slate-500">
                     Page {currentPage} of{' '}
                     {Math.ceil(programs.length / itemsPerPage)}
                   </span>

@@ -97,7 +97,7 @@ export default function ProgramDecisionModal({
                 <h5 className="text-h4 font-bold text-gray-900">
                   Select Program
                 </h5>
-                <p className="mt-0.5 text-caption text-text-muted">
+                <p className="mt-0.5 text-caption text-slate-500">
                   Choose the new program and provide a reason.
                 </p>
               </div>
@@ -115,7 +115,7 @@ export default function ProgramDecisionModal({
           <div className="space-y-4 px-6 py-4">
             <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
               <RefreshCcw className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
-              <p className="text-p2 leading-relaxed text-text-primary">
+              <p className="text-p2 leading-relaxed text-slate-900">
                 The university has requested that this applicant’s program be
                 updated. Please select the new program and provide a brief
                 reason. This helps ensure accurate documentation and smooth

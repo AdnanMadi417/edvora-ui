@@ -90,13 +90,13 @@ export default function Notifications({ params }: PartnerNotificationProps) {
         onClick={() => setShowNotifications(!showNotifications)}
       >
         <div className="flex flex-col gap-2">
-          <h3 className="text-p3 flex items-center gap-3 font-semibold text-text-primary">
+          <h3 className="text-p3 flex items-center gap-3 font-semibold text-slate-900">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <Bell className="text-xl text-blue-700" />
             </span>
             <span className="flex flex-col">
               <span>Notifications Center</span>
-              <span className="flex items-center gap-1 text-caption font-normal text-text-muted">
+              <span className="flex items-center gap-1 text-caption font-normal ">
                 Pending {appDetailsList.length}{" "}
                 {appDetailsList.length === 1
                   ? "notification"
@@ -104,7 +104,7 @@ export default function Notifications({ params }: PartnerNotificationProps) {
               </span>
             </span>
           </h3>
-          <p className="text-p2 text-text-muted">
+          <p className="text-p2 ">
             See updates about student applications and actions required.
           </p>
         </div>
@@ -131,9 +131,9 @@ export default function Notifications({ params }: PartnerNotificationProps) {
       >
         <div className="rounded-b-lg border border-t-0 border-default bg-card p-6">
           {loading ? (
-            <div className="py-10 text-center text-text-muted">Loading...</div>
+            <div className="py-10 text-center ">Loading...</div>
           ) : appDetailsList.length === 0 ? (
-            <div className="flex items-center justify-center py-10 text-text-muted">
+            <div className="flex items-center justify-center py-10 ">
               <Bell className="text-text-mute mr-2 h-5 w-5" /> No notifications yet
             </div>
           ) : (
@@ -156,12 +156,12 @@ export default function Notifications({ params }: PartnerNotificationProps) {
 
                     <div className="min-w-0 flex-1">
                       <div className="mb-1 flex items-center gap-2">
-                        <h3 className="truncate text-base font-semibold text-text-primary">
+                        <h3 className="truncate text-base font-semibold text-slate-900">
                           {app.stage}
                         </h3>
                       </div>
 
-                      <p className="mb-1 text-p2 text-text-muted">
+                      <p className="mb-1 text-p2 ">
                         {app.next_action}
                       </p>
 

@@ -107,7 +107,7 @@ export default function HoldPopup({
                   <h5 className="text-h4 font-bold text-gray-900">
                     Update Application Status
                   </h5>
-                  <p className="mt-0.5 text-caption text-text-muted">
+                  <p className="mt-0.5 text-caption text-slate-500">
                     Select the desired lifecycle status.
                   </p>
                 </div>
@@ -127,7 +127,7 @@ export default function HoldPopup({
 
             <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
               <AlertCircle className="mt-0.5 h-5 w-5 text-amber-600 flex-shrink-0" />
-              <p className="text-p2 leading-relaxed text-text-primary">
+              <p className="text-p2 leading-relaxed text-slate-900">
                 This action will update the application's lifecycle status.
               </p>
             </div>

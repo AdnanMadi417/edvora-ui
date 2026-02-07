@@ -140,7 +140,7 @@ export default function OfferLetterDecision({
 
         {isUniversityApproved && (
           <>
-            <p className="text-sm text-text-muted">
+            <p className="text-sm text-slate-500">
               Please review the offer letter carefully before accepting or rejecting.
             </p>
 
@@ -159,7 +159,7 @@ export default function OfferLetterDecision({
       <button
         onClick={() => handleDecision("reject")}
         disabled={submitting}
-        className="rounded-full border border-gray-200 px-4 py-2.5 text-sm text-text-muted transition hover:border-text-error hover:text-text-error disabled:opacity-50"
+        className="rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 transition hover:border-text-error hover:text-text-error disabled:opacity-50"
       >
         Reject Offer
       </button>

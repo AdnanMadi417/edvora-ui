@@ -50,7 +50,7 @@ export default function PartnerSummaryCards() {
                 </div>
               </div>
               <div>
-                <div className="text-sm font-medium text-text-muted">
+                <div className="text-sm font-medium text-slate-600">
                   {item.title}
                 </div>
                 <div className="text-2xl font-bold text-gray-900">{item.value}</div>

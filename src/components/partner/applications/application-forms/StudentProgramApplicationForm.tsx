@@ -182,7 +182,7 @@ export default function StudentManualApplication() {
     is_draft: false,
   });
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   const updateFormData = (fieldPath, value) => {
     setFormData((prev) => setNestedValue(prev, fieldPath, value));
@@ -566,7 +566,7 @@ export default function StudentManualApplication() {
             <h3 className="text-xl font-semibold text-gray-900">
               Apply for Program
             </h3>
-            <p className="text-sm text-text-muted">
+            <p className="text-sm text-slate-500">
               Complete all sections to submit your program application
             </p>
           </div>
@@ -601,8 +601,8 @@ export default function StudentManualApplication() {
                         : isActive
                           ? "scale-110 bg-blue-100 text-gray-900"
                           : canAccess
-                            ? "bg-gray-100 text-text-muted hover:bg-gray-200"
-                            : "bg-gray-100 text-gray-900"
+                            ? "bg-gray-100 text-slate-500 hover:bg-gray-200"
+                            : "bg-gray-100 text-slate-500"
                     }`}
                   >
                     <Icon size={20} />
@@ -610,11 +610,12 @@ export default function StudentManualApplication() {
 
                   <span
                     className={`px-1 text-xs sm:text-sm ${
-                      isActive ? "font-medium text-blue-900" : "text-blue-900"
+                      isActive ? "font-medium text-gray-900" : "text-slate-500"
                     }`}
                   >
                     {s.name}
                   </span>
+
                 </div>
               );
             })}
@@ -909,7 +910,7 @@ export default function StudentManualApplication() {
                     className="relative flex items-center justify-between rounded-md border border-default bg-white p-5 backdrop-blur transition-all duration-300 hover:shadow-sm"
                   >
                     <p className="mb-2 flex items-center justify-between font-medium text-blue-800 sm:mb-0">
-                      <File className="mr-2 h-4 w-4 text-blue-900" />
+                      <File className="mr-2 h-4 w-4 text-slate-500" />
 
                       <span>
                         {docType.type.charAt(0).toUpperCase() +
@@ -929,7 +930,7 @@ export default function StudentManualApplication() {
                       </button>
 
                       <label
-                        className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted transition hover:border-blue-600 hover:text-blue-600 sm:w-auto"
+                        className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-slate-500 transition hover:border-blue-600 hover:text-blue-600 sm:w-auto"
                       >
                         <Upload className="h-4 w-4" />
                         <span className="hidden sm:inline">Upload</span>
@@ -954,7 +955,7 @@ export default function StudentManualApplication() {
         </div>
 
         <div className="flex items-center justify-between gap-2 sm:flex-row">
-          <div className="text-sm text-text-muted">
+          <div className="text-sm text-slate-500">
             Step {stage} of {stages.length} — {completedStages.length} completed
           </div>
 

@@ -100,10 +100,10 @@ export default function VisaTrackingTimeline({
                 <CreditCard className="text-xl text-blue-700" />
               </span>
               <div>
-                <h3 className="text-p3 font-semibold text-text-primary">
+                <h3 className="text-p3 font-semibold text-slate-900">
                   Visa Payment
                 </h3>
-                <span className="text-sm text-text-muted">
+                <span className="text-sm text-slate-500">
                   Visa processing fee details
                 </span>
               </div>
@@ -113,7 +113,7 @@ export default function VisaTrackingTimeline({
 
         <div className="mt-4 grid grid-cols-1 gap-4 border-b border-gray-200 p-6 sm:grid-cols-2">
           <div>
-            <p className="mb-2 text-sm tracking-wide text-text-muted">
+            <p className="mb-2 text-sm tracking-wide text-slate-500">
               Visa Fee Amount
             </p>
             <p className="text-lg font-bold ">
@@ -124,7 +124,7 @@ export default function VisaTrackingTimeline({
           </div>
 
           <div>
-            <p className="mb-2 text-sm tracking-wide text-text-muted">
+            <p className="mb-2 text-sm tracking-wide text-slate-500">
               Created At
             </p>
             <p className="text-sm">
@@ -135,7 +135,7 @@ export default function VisaTrackingTimeline({
           </div>
 
           <div>
-            <p className="mb-2 text-sm tracking-wide text-text-muted">Notes</p>
+            <p className="mb-2 text-sm tracking-wide text-slate-500">Notes</p>
             <p className="text-sm">{visaCase.notes || "No notes"}</p>
           </div>
         </div>
@@ -149,7 +149,7 @@ export default function VisaTrackingTimeline({
               <p className="text-base font-medium text-gray-900">
                 No payments yet
               </p>
-              <p className="mt-1 text-sm text-text-muted">
+              <p className="mt-1 text-sm text-slate-500">
                 Your payment history will appear here
               </p>
             </div>
@@ -160,7 +160,7 @@ export default function VisaTrackingTimeline({
                   <h3 className="text-lg font-semibold text-gray-900">
                     Payment History
                   </h3>
-                  <p className="text-sm text-text-muted">
+                  <p className="text-sm text-slate-500">
                     {visaPayments.length} payment
                     {visaPayments.length !== 1 ? "s" : ""} recorded
                   </p>
@@ -183,14 +183,14 @@ export default function VisaTrackingTimeline({
                         </p>
 
                         <p className="mt-1 font-mono text-sm font-semibold text-gray-900 break-all">
-        <span className="font-medium text-text-muted">
+        <span className="font-medium text-slate-500">
           Payment Reference:
         </span>{" "}
                           {payment.payment_reference || "N/A"}
                         </p>
 
                         <div className="flex flex-wrap gap-x-6 gap-y-2 mt-2">
-                          <div className="flex items-center gap-2 text-sm text-text-muted">
+                          <div className="flex items-center gap-2 text-sm text-slate-500">
                             <Calendar className="h-4 w-4" />
                             <span>
             {payment.submitted_at
@@ -203,7 +203,7 @@ export default function VisaTrackingTimeline({
                     </div>
 
                     <div className="flex flex-col items-end sm:items-end gap-2">
-                      <p className="text-sm font-medium text-text-muted">
+                      <p className="text-sm font-medium text-slate-500">
                         Documents
                       </p>
 
@@ -255,7 +255,7 @@ export default function VisaTrackingTimeline({
             <h3 className="text-lg font-semibold text-gray-900">
               Arrival Documents
             </h3>
-            <p className="text-sm text-text-muted">
+            <p className="text-sm text-slate-500">
               Travel and arrival-related files
             </p>
           </div>
@@ -265,7 +265,7 @@ export default function VisaTrackingTimeline({
             application.arrival_documents.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-10">
                 <FileText className="h-8 w-8 text-gray-400" />
-                <p className="mt-2 text-sm text-text-muted">
+                <p className="mt-2 text-sm text-slate-500">
                   No arrival documents uploaded
                 </p>
               </div>
@@ -285,7 +285,7 @@ export default function VisaTrackingTimeline({
                         <p className="font-medium text-gray-900">
                           {doc.document_type}
                         </p>
-                        <p className="text-xs text-text-muted">
+                        <p className="text-xs text-slate-500">
                           Uploaded on{" "}
                           {new Date(doc.created_at).toLocaleDateString()}
                         </p>

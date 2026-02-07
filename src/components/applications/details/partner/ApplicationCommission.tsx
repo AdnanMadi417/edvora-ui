@@ -113,10 +113,10 @@ export default function ApplicationCommission({
                 <Receipt className="text-xl text-blue-700" />
               </span>
               <div>
-                <h3 className="text-p3 font-semibold text-text-primary">
+                <h3 className="text-p3 font-semibold text-slate-900">
                   Partner Commission Details
                 </h3>
-                <span className="text-sm text-text-muted">
+                <span className="text-sm text-slate-500">
                   Current Status: {statusLabel}
                 </span>
               </div>

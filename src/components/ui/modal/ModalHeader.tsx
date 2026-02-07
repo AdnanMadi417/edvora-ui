@@ -26,7 +26,7 @@ const ModalHeader: React.FC<ModalHeaderProps> = ({
                                                    iconBorder = "border-gray-200",
 
                                                    titleColor = "text-gray-900",
-                                                   descriptionColor = "text-text-muted",
+                                                   descriptionColor = "text-slate-600",
 
                                                    onClose,
                                                  }) => {

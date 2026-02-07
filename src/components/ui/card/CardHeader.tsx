@@ -31,12 +31,12 @@ const CardHeader: React.FC<CardHeaderProps> = ({
       </div>
 
       <div className="min-w-0">
-        <h3 className="text-lg font-semibold text-text-primary">
+        <h3 className="text-lg font-semibold text-slate-900">
           {title}
         </h3>
 
         {description && (
-          <p className="mt-1 text-sm text-text-muted">
+          <p className="mt-1 text-sm text-slate-500">
             {description}
           </p>
         )}
