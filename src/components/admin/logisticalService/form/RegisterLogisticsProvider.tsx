@@ -1,6 +1,6 @@
 "use client";
 
-import { Trash2, Truck, Plus, PlusCircle, CheckCircle } from 'lucide-react';
+import { Trash2, Truck, Plus, PlusCircle } from 'lucide-react';
 import React, { useState } from "react";
 
 import { useLogisticServices } from "../../../../hooks/serviceProviders/useLogisticServicesList";
@@ -201,7 +201,7 @@ export default function RegisterLogisticsProvider() {
     <section className="mx-auto mt-5">
       <div className="rounded-md border bg-slate-50 shadow-sm">
 
-        <div className="mb-6 flex items-start gap-x-4 rounded-t-xl border-b bg-white px-6 py-5">
+        <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <Truck className="text-blue-700" size={24} />
           </div>
@@ -216,10 +216,11 @@ export default function RegisterLogisticsProvider() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 px-6 py-5 ">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 px-6 py-5">
           <InputField
-            label="Name"
+            label="Provider Name"
             field="name"
+            placeholder="e.g. FastTrack Logistics"
             required
             formData={formData}
             errors={errors}
@@ -227,8 +228,9 @@ export default function RegisterLogisticsProvider() {
           />
 
           <InputField
-            label="Nationality"
+            label="Country / Nationality"
             field="nationality"
+            placeholder="e.g. Malaysia"
             required
             formData={formData}
             errors={errors}
@@ -236,8 +238,9 @@ export default function RegisterLogisticsProvider() {
           />
 
           <InputField
-            label="Phone Number"
+            label="Primary Contact Number"
             field="phone_number"
+            placeholder="e.g. +60 12 345 6789"
             required
             formData={formData}
             errors={errors}
@@ -245,15 +248,17 @@ export default function RegisterLogisticsProvider() {
           />
 
           <InputField
-            label="WhatsApp Number"
+            label="WhatsApp Contact"
             field="whatsapp"
+            placeholder="e.g. +60 12 345 6789"
             formData={formData}
             errors={errors}
+            required
             updateFormData={updateFormData}
           />
         </div>
 
-        <div className="px-6 py-5 ">
+        <div className="px-6 ">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-lg font-semibold text-slate-900">
               Packages Offered
@@ -442,7 +447,7 @@ export default function RegisterLogisticsProvider() {
           </p>
         )}
 
-        <div className="flex justify-end border-t rounded-b-xl bg-white px-6 py-5">
+        <div className="flex justify-end border-t rounded-b-xl px-6 py-5">
 
           <AddInclude
             icon={<PlusCircle className="h-5 w-5" />}
@@ -453,7 +458,9 @@ export default function RegisterLogisticsProvider() {
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
             onClick={handleSubmit}
-            disabled={loadingCreateLogisticsProvider}
+            disabled={
+              loadingCreateLogisticsProvider
+          }
           />
 
         </div>
