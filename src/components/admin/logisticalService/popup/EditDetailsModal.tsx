@@ -199,8 +199,6 @@ export default function EditDetailsModal({
     try {
       await editLogisticsProvider(provider.id, payload);
 
-      showToast("success" + "Logistics provider updated successfully");
-
       setFormData({
         name: "",
         nationality: "",
@@ -216,9 +214,12 @@ export default function EditDetailsModal({
 
       setErrors({});
 
+      showToast("success: Logistics provider updated successfully");
+
       setTimeout(() => {
-        router.push("/admin/logistics-providers");
+        location.reload();
       }, 1500);
+
     } catch (error) {
       showToast("error" + "Failed to update logistics provider");
     }

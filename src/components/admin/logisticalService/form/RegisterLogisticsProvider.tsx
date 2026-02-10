@@ -11,6 +11,7 @@ import { useCreateLogisticsProvider } from "../../../../hooks/serviceProviders/u
 
 import Loading from "../../../loading/Loading";
 import CheckBoxGroup from "../../../form/CheckBoxGroup";
+import CheckSimpleBoxGroup from "../../../form/CheckSimpleBoxGroup";
 import InputField from "../../../form/InputField";
 import AddInclude from "../../../ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
@@ -174,7 +175,7 @@ export default function RegisterLogisticsProvider() {
       setErrors({})
 
       setTimeout(() => {
-        router.push("/admin/logistics-providers")
+        router.push("/admin/logistical-service")
       }, 1500)
 
     } catch (error) {
@@ -258,7 +259,7 @@ export default function RegisterLogisticsProvider() {
           />
         </div>
 
-        <div className="px-6 ">
+        <div className="px-6">
           <div className="flex items-center justify-between mb-4">
             <h4 className="text-lg font-semibold text-slate-900">
               Packages Offered
@@ -399,16 +400,7 @@ export default function RegisterLogisticsProvider() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 gap-x-3 px-6 py-5 ">
-          <CheckBoxGroup
-            label="Logistic Services"
-            field="selectedServices"
-            options={logisticServices}
-            formData={formData}
-            updateFormData={updateFormData}
-            errors={errors}
-            required
-          />
+        <div className="grid grid-cols-1 gap-x-3 px-6 py-5">
 
           <CheckBoxGroup
             label="Languages"
@@ -420,7 +412,17 @@ export default function RegisterLogisticsProvider() {
             required
           />
 
-          <CheckBoxGroup
+          <CheckSimpleBoxGroup
+            label="Logistic Services"
+            field="selectedServices"
+            options={logisticServices}
+            formData={formData}
+            updateFormData={updateFormData}
+            errors={errors}
+            required
+          />
+
+          <CheckSimpleBoxGroup
             label="Universities"
             field="selectedUniversities"
             options={logisticUniversities}
@@ -430,7 +432,7 @@ export default function RegisterLogisticsProvider() {
             required
           />
 
-          <CheckBoxGroup
+          <CheckSimpleBoxGroup
             label="Locations"
             field="selectedLocations"
             options={logisticServiceLocations}
