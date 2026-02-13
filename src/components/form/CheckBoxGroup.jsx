@@ -31,7 +31,7 @@ const CheckBoxGroup = ({
         {label} {required && <span className="text-red-600">*</span>}
       </label>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
         {options.map((option) => {
           const selected = isSelected(option.id)
 

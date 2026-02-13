@@ -16,12 +16,21 @@ export type University = {
   is_active: boolean;
 };
 
+export type Branch = {
+  id: string;
+  name: string;
+  location: string;
+  state: string;
+};
+
 export type Program = {
   id: string;
   name: string;
 
   tuition_fee: number | null;
   first_year_tuition: number | null;
+
+  branch: Branch | null;
 
   intake_dates: string[] | null;
   next_intake: string | null;
@@ -41,16 +50,11 @@ export type Program = {
   is_on_campus: boolean;
   is_online: boolean;
 
-  commission_rate: number | null;
+  commission_amount: number | null;
 
   qualification_level: "bachelor" | "master" | "phd" | string;
 
-  field_of_study: {
-    id: string;
-    name: string;
-    code: string;
-    is_active: boolean;
-  };
+  field_of_study: FieldOfStudy;
 
   university: {
     id: string;

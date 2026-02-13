@@ -99,7 +99,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">Country</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
-                  {program?.university?.country ?? "Not Provided"}
+                  {program?.branch?.length
+                    ? program.branch.map(b => b.locations).join(", ")
+                    : "Not Provided"}
                 </p>
               </div>
             </div>
@@ -428,7 +430,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2 lg:grid-cols-3">
             <div className="relative flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-indigo-50 to-indigo-100 p-6 shadow-md transition-transform">
               <span className="text-3xl font-bold text-indigo-700">
-                RM {commission?.rate?.toLocaleString() ?? 0}
+                RM {commission?.amount?.toLocaleString() ?? 0}
               </span>
               <p className="text-sm font-semibold text-indigo-900">
                 Commission amount

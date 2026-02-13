@@ -10,7 +10,7 @@ import { useLogisticLanguages } from "../../../../hooks/serviceProviders/useLogi
 import { useLogisticUniversities } from "../../../../hooks/serviceProviders/useLogisticUniversitiesList";
 import { useEditLogisticsProvider } from "../../../../hooks/serviceProviders/useEditLogisticsProvider";
 
-import CheckBoxGroup from "../../../form/CheckBoxGroup";
+import CheckSimpleBoxGroup from "../../../form/CheckSimpleBoxGroup";
 import InputField from "../../../form/InputField";
 import AddInclude from "../../../ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
@@ -482,17 +482,8 @@ export default function EditDetailsModal({
             </div>
 
             <div className="grid grid-cols-1 gap-x-3">
-              <CheckBoxGroup
-                label="Logistic Services"
-                field="selectedServices"
-                options={logisticServices}
-                formData={formData}
-                updateFormData={updateFormData}
-                errors={errors}
-                required
-              />
 
-              <CheckBoxGroup
+              <CheckSimpleBoxGroup
                 label="Languages"
                 field="selectedLanguages"
                 options={logisticLanguages}
@@ -502,7 +493,17 @@ export default function EditDetailsModal({
                 required
               />
 
-              <CheckBoxGroup
+              <CheckSimpleBoxGroup
+                label="Logistic Services"
+                field="selectedServices"
+                options={logisticServices}
+                formData={formData}
+                updateFormData={updateFormData}
+                errors={errors}
+                required
+              />
+
+              <CheckSimpleBoxGroup
                 label="Universities"
                 field="selectedUniversities"
                 options={logisticUniversities}
@@ -512,7 +513,7 @@ export default function EditDetailsModal({
                 required
               />
 
-              <CheckBoxGroup
+              <CheckSimpleBoxGroup
                 label="Locations"
                 field="selectedLocations"
                 options={logisticServiceLocations}

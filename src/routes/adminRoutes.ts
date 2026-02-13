@@ -1,25 +1,46 @@
-import { IRoute } from "../types/navigation";
-import { MdAssignment, MdBusinessCenter,MdAddBusiness} from 'react-icons/md';
+import { IRoute } from '../types/navigation';
+import {
+  MdBusinessCenter,
+  MdAddBusiness,
+  MdSupervisorAccount,
+  MdPersonAdd,
+  MdDescription,
+} from 'react-icons/md';
 
 const AdminRoutes: IRoute[] = [
   {
-    name: "Admin",
+    name: "Applications",
     layout: "/admin",
-    path: "/default",
-    icon: MdAssignment,
+    path: "/applications",
+    icon: MdDescription,
   },
   {
-    name: "Logistical Service",
-    layout: "/admin",
-    path: "/logistical-service",
+    name: 'Account Managers',
+    layout: '/admin',
+    path: '/account-managers',
+    icon: MdSupervisorAccount,
+    children: [
+      {
+        name: 'Manage Account Managers',
+        layout: '/admin/account-managers',
+        path: '/manage',
+        icon: MdPersonAdd,
+      },
+
+    ],
+  },
+  {
+    name: 'Logistical Service',
+    layout: '/admin',
+    path: '/logistical-service',
     icon: MdBusinessCenter,
     children: [
       {
-        name: "Create Logistical Partner",
-        layout: "/admin/logistical-service",
-        path: "/create",
+        name: 'Create Logistical Partner',
+        layout: '/admin/logistical-service',
+        path: '/create',
         icon: MdAddBusiness,
-      }
+      },
     ],
   },
 ];

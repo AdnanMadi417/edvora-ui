@@ -10,13 +10,18 @@ import {
   GraduationCap,
   MapPin,
   Calendar,
-  MinusCircle,
+  MinusCircle, Layers,
 } from 'lucide-react';
 import { MdMenuBook, MdAccessTime, MdAttachMoney } from 'react-icons/md';
 
 import Loading from '../../../loading/Loading';
 import NoMessagesFound from '../../../emptyData/NoMessagesFound';
+
 import { useAllPrograms } from '../../../../hooks/programs/useProgramsList';
+import { useAllFields } from '../../../../hooks/programs/useFieldsList';
+import { useKnowledgeHubStates } from '../../../../hooks/programs/useProgramStates';
+
+import FilterSelectField from '../../../form/filter/FilterSelectField';
 import NextButton from '../../../ui/buttons/NextButton';
 import PrevButton from '../../../ui/buttons/PrevButton';
 import LinkBtn from '../../../ui/links/LinkBtn';
@@ -30,21 +35,33 @@ const KnowledgeHubCards = () => {
     loading: programsLoading,
     error: programsError,
   } = useAllPrograms({});
+  const { states, loading, error } = useKnowledgeHubStates();
+  const { fields, fieldsLoading, fieldsError } = useAllFields();
+
+  const [selectedState, setSelectedState] = useState<string>('all');
+  const [selectedField, setSelectedField] = useState<string>('all');
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const filteredPrograms = programs.filter((program) => {
     const term = searchTerm.toLowerCase();
-    const university = program.university?.name?.toLowerCase() || '';
-    const programName = program.name?.toLowerCase() || '';
-    const level = program.qualification_level?.toLowerCase() || '';
 
-    return (
-      university.includes(term) ||
-      programName.includes(term) ||
-      level.includes(term)
-    );
+    const matchesSearch =
+      program.university?.name?.toLowerCase().includes(term) ||
+      program.name?.toLowerCase().includes(term) ||
+      program.qualification_level?.toLowerCase().includes(term);
+
+    const matchesLocation =
+      selectedState === 'all' ||
+      program.branch?.state === selectedState;
+
+    const matchesField =
+      selectedField === 'all' ||
+      program.field_of_study?.name === selectedField;
+
+    return matchesSearch && matchesLocation && matchesField;
   });
   const currentPrograms = filteredPrograms.slice(indexOfFirstItem, indexOfLastItem);
 
@@ -91,10 +108,34 @@ const KnowledgeHubCards = () => {
               />
             </div>
 
+            <FilterSelectField
+              value={selectedState}
+              onChange={(val) => {
+                setSelectedState(val);
+                setCurrentPage(1);
+              }}
+              options={states}
+              icon={Layers}
+              defaultOption="All Locations"
+            />
 
-            {/* Clear Button */}
+            <FilterSelectField
+              value={selectedState}
+              onChange={(val) => {
+                setSelectedField(val);
+                setCurrentPage(1);
+              }}
+              options={fields}
+              icon={Layers}
+              defaultOption="All Fields"
+            />
+
             <button
-              onClick={() => setSearchTerm('')}
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedState('all');
+                setCurrentPage(1);
+              }}
               className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
             >
               <RefreshCw className="h-4 w-4" />
@@ -189,10 +230,11 @@ const KnowledgeHubCards = () => {
 
                       <div className="flex justify-between">
                         <span className="flex items-center gap-1.5 font-medium text-slate-500">
-                          <MapPin className="h-4 w-4" /> City
+                          <MapPin className="h-4 w-4" /> State
                         </span>
                         <span className="text-xs font-medium text-slate-900">
-                          {program.university?.country || 'Not provided'}
+                            {program.branch?.state ?? 'Not Provided'}
+
                         </span>
                       </div>
 
@@ -235,8 +277,8 @@ const KnowledgeHubCards = () => {
                         Your Commission
                       </div>
                       <div className="mt-1 text-lg font-semibold text-slate-900">
-                        {program.first_year_tuition
-                          ? `RM${program.first_year_tuition.toLocaleString()}`
+                        {program.commission_amount
+                          ? `RM${program.commission_amount.toLocaleString()}`
                           : 'Not provided'}
                       </div>
                     </div>

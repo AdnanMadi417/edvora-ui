@@ -11,8 +11,8 @@ export type FieldOfStudy = {
 
 export function useAllFields() {
   const [fields, setFields] = useState<FieldOfStudy[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
+  const [fieldsLoading, setLoading] = useState<boolean>(false);
+  const [fieldsError, setError] = useState<string>("");
 
   useEffect(() => {
     const fetchFields = async () => {
@@ -40,7 +40,7 @@ export function useAllFields() {
 
   return {
     fields,
-    loading,
-    error,
+    fieldsLoading,
+    fieldsError,
   };
 }
