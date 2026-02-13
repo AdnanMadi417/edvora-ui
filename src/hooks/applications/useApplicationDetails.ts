@@ -61,7 +61,7 @@ const useApplicationDetails = (applicationId?: string) => {
     setError(null);
 
     try {
-      const response = await api.get(`/applications/${applicationId}`, {
+      const response = await api.get(`/admin/applications/${applicationId}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
