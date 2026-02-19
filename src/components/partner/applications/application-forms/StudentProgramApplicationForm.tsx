@@ -548,7 +548,7 @@ export default function StudentManualApplication() {
   if (loading) {
     return (
       <section className="mx-auto mt-5 max-w-5xl">
-        <div className="rounded-lg border border-gray-200 bg-card p-6">
+        <div className="rounded-lg border border-slate-200 bg-card p-6">
           <Loading text="Fetching application data..." />
         </div>
       </section>
@@ -557,13 +557,13 @@ export default function StudentManualApplication() {
 
   return (
     <section className="mx-auto mt-5">
-      <div className="rounded-lg border border-gray-200 bg-card p-6">
-        <div className="mb-6 flex items-start gap-x-3 border-b-2 border-gray-100 pb-4">
+      <div className="rounded-lg border border-slate-200 bg-card p-6">
+        <div className="mb-6 flex items-start gap-x-3 border-b-2 border-slate-100 pb-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <FileText className="text-blue-700" size={24} />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-gray-900">
+            <h3 className="text-xl font-semibold text-slate-900">
               Apply for Program
             </h3>
             <p className="text-sm text-slate-500">
@@ -583,7 +583,7 @@ export default function StudentManualApplication() {
               return (
                 <div key={s.id} className="relative flex flex-col items-center">
                   {index < stages.length - 1 && (
-                    <div className="absolute -z-10 hidden bg-gray-300 sm:left-1/2 sm:top-6 sm:block sm:h-0.5 sm:w-full">
+                    <div className="absolute -z-10 hidden bg-slate-300 sm:left-1/2 sm:top-6 sm:block sm:h-0.5 sm:w-full">
                       <div
                         className={`h-full transition-all ${
                           isCompleted ? "w-full bg-blue-500" : "w-0"
@@ -599,10 +599,10 @@ export default function StudentManualApplication() {
                       isCompleted
                         ? "bg-blue-500 text-white"
                         : isActive
-                          ? "scale-110 bg-blue-100 text-gray-900"
+                          ? "scale-110 bg-blue-100 text-slate-900"
                           : canAccess
-                            ? "bg-gray-100 text-slate-500 hover:bg-gray-200"
-                            : "bg-gray-100 text-slate-500"
+                            ? "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                            : "bg-slate-100 text-slate-500"
                     }`}
                   >
                     <Icon size={20} />
@@ -610,7 +610,7 @@ export default function StudentManualApplication() {
 
                   <span
                     className={`px-1 text-xs sm:text-sm ${
-                      isActive ? "font-medium text-gray-900" : "text-slate-500"
+                      isActive ? "font-medium text-slate-900" : "text-slate-500"
                     }`}
                   >
                     {s.name}
@@ -622,17 +622,17 @@ export default function StudentManualApplication() {
           </div>
         </div>
 
-        <div className="mb-6 min-h-[400px] rounded-md border bg-gray-50 p-6">
+        <div className="mb-6 min-h-[400px] rounded-md border bg-slate-50 p-6">
           {stage === 1 && (
             <div className="mb-8">
               <div className="mb-6">
                 <div className="mb-2 flex items-center">
-                  <h4 className="text-lg font-semibold text-gray-900">
+                  <h4 className="text-lg font-semibold text-slate-900">
                     Personal Information
                   </h4>
-                  <div className="ml-4 flex-1 border-t-2 border-gray-900 opacity-70"></div>
+                  <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
                 </div>
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-slate-800">
                   Please fill in your personal details below.
                 </p>
               </div>
@@ -721,12 +721,12 @@ export default function StudentManualApplication() {
             <div>
               <div className="mb-6">
                 <div className="mb-2 flex items-center">
-                  <h4 className="text-lg font-semibold text-gray-900">
+                  <h4 className="text-lg font-semibold text-slate-900">
                     Educational Background
                   </h4>
-                  <div className="ml-4 flex-1 border-t-2 border-gray-900 opacity-70"></div>
+                  <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
                 </div>
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-slate-800">
                   Please fill in your educational background details below.
                 </p>
               </div>
@@ -784,7 +784,7 @@ export default function StudentManualApplication() {
                 />
               </div>
 
-              <h5 className="mb-2 mt-4 font-semibold text-gray-900">
+              <h5 className="mb-2 mt-4 font-semibold text-slate-900">
                 English Proficiency Test Results
               </h5>
 
@@ -823,12 +823,12 @@ export default function StudentManualApplication() {
             <div>
               <div className="mb-6">
                 <div className="mb-2 flex items-center">
-                  <h4 className="text-lg font-semibold text-gray-900">
+                  <h4 className="text-lg font-semibold text-slate-900">
                     Emergency Contact Information
                   </h4>
-                  <div className="ml-4 flex-1 border-t-2 border-gray-900 opacity-70"></div>
+                  <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
                 </div>
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-slate-800">
                   You may provide an emergency contact for safety purposes. This
                   is not required.
                 </p>
@@ -892,12 +892,12 @@ export default function StudentManualApplication() {
             <div>
               <div className="mb-6">
                 <div className="mb-2 flex items-center">
-                  <h4 className="text-lg font-semibold text-gray-900">
+                  <h4 className="text-lg font-semibold text-slate-900">
                     Upload Required Documents
                   </h4>
-                  <div className="ml-4 flex-1 border-t-2 border-gray-900 opacity-70"></div>
+                  <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
                 </div>
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-slate-800">
                   Please upload all necessary documents to complete your
                   application.
                 </p>
@@ -963,7 +963,7 @@ export default function StudentManualApplication() {
             {stage > 1 && (
               <button
                 onClick={prevStage}
-                className="flex items-center justify-center gap-2 rounded-full border border-gray-600 bg-gray-100 text-gray-700 px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:bg-gray-200 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-slate-600 bg-slate-100 text-slate-700 px-4 py-2 text-sm font-medium transition hover:border-slate-700 hover:bg-slate-200 disabled:opacity-50"
               >
                 <ChevronLeft className="h-4 w-4" />
                 Previous

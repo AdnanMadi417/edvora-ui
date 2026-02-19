@@ -13,6 +13,8 @@ import Loading from "../../../loading/Loading";
 import CheckBoxGroup from "../../../form/CheckBoxGroup";
 import CheckSimpleBoxGroup from "../../../form/CheckSimpleBoxGroup";
 import InputField from "../../../form/InputField";
+import SelectField from "../../../form/SelectField";
+import { COUNTRIES } from "../../../../constants/lists"
 import AddInclude from "../../../ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation"
@@ -228,15 +230,15 @@ export default function RegisterLogisticsProvider() {
             updateFormData={updateFormData}
           />
 
-          <InputField
-            label="Country / Nationality"
+          <SelectField
+            label="Country"
             field="nationality"
-            placeholder="e.g. Malaysia"
-            required
+            options={COUNTRIES.map(c => ({ label: c.name, value: c.code }))}
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
           />
+
 
           <InputField
             label="Primary Contact Number"

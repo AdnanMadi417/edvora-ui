@@ -1,11 +1,14 @@
-import { IRoute } from '../types/navigation';
+import { IRoute } from "../types/navigation";
 import {
   MdBusinessCenter,
   MdAddBusiness,
   MdSupervisorAccount,
   MdPersonAdd,
   MdDescription,
-} from 'react-icons/md';
+  MdSchool,
+} from "react-icons/md";
+import { MdOutlineLibraryBooks , MdLibraryAdd } from "react-icons/md";
+
 
 const AdminRoutes: IRoute[] = [
   {
@@ -15,30 +18,49 @@ const AdminRoutes: IRoute[] = [
     icon: MdDescription,
   },
   {
-    name: 'Account Managers',
-    layout: '/admin',
-    path: '/account-managers',
+    name: "Account Managers",
+    layout: "/admin",
+    path: "/account-managers",
     icon: MdSupervisorAccount,
     children: [
       {
-        name: 'Manage Account Managers',
-        layout: '/admin/account-managers',
-        path: '/manage',
+        name: "Create Account Managers",
+        layout: "/admin/account-managers",
+        path: "/create",
         icon: MdPersonAdd,
       },
-
     ],
   },
   {
-    name: 'Logistical Service',
-    layout: '/admin',
-    path: '/logistical-service',
+    name: "Knowledge Hub",
+    layout: "/admin",
+    path: "/knowledge-hub",
+    icon: MdOutlineLibraryBooks,
+    children: [
+      {
+        name: "Create Program",
+        layout: "/admin/knowledge-hub",
+        path: "/programs/create",
+        icon: MdLibraryAdd,
+      },
+      {
+        name: "Create University",
+        layout: "/admin/knowledge-hub",
+        path: "/universities/create",
+        icon: MdSchool,
+      },
+    ],
+  },
+  {
+    name: "Logistical Service",
+    layout: "/admin",
+    path: "/logistical-service",
     icon: MdBusinessCenter,
     children: [
       {
-        name: 'Create Logistical Partner',
-        layout: '/admin/logistical-service',
-        path: '/create',
+        name: "Create Logistical Partner",
+        layout: "/admin/logistical-service",
+        path: "/create",
         icon: MdAddBusiness,
       },
     ],
