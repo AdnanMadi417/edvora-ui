@@ -104,51 +104,49 @@ export default function ViewDetailsModal({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-xl bg-slate-50 p-4">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
-                  <MdTranslate className="h-4 w-4 text-slate-500" />
-                  Languages
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {provider?.languages?.length ? (
-                    provider.languages.map((lang) => (
-                      <span
-                        key={lang}
-                        className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm"
-                      >
+            <div className="rounded-xl px-4 py-5 bg-slate-50 border border-slate-100">
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <MdTranslate className="h-4 w-4 text-slate-500" />
+                Languages
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {provider?.languages?.length ? (
+                  provider.languages.map((lang) => (
+                    <span
+                      key={lang}
+                      className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 border border-slate-100"
+                    >
                         {lang}
                       </span>
-                    ))
-                  ) : (
-                    <span className="text-xs text-slate-400">Not provided</span>
-                  )}
-                </div>
-              </div>
-
-              <div className="rounded-xl bg-slate-50 p-4">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
-                  <MdPublic className="h-4 w-4 text-slate-500" />
-                  Locations
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {provider?.service_locations?.length ? (
-                    provider.service_locations.map((loc) => (
-                      <span
-                        key={loc}
-                        className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 shadow-sm"
-                      >
-                        {loc}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="text-xs text-slate-400">Not provided</span>
-                  )}
-                </div>
+                  ))
+                ) : (
+                  <span className="text-xs text-slate-400">Not provided</span>
+                )}
               </div>
             </div>
 
-            <div className="rounded-xl bg-white p-5 shadow-sm">
+            <div className="rounded-xl px-4 py-5 bg-slate-50 border border-slate-100">
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <MdPublic className="h-4 w-4 text-slate-500" />
+                Locations
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {provider?.service_locations?.length ? (
+                  provider.service_locations.map((loc) => (
+                    <span
+                      key={loc}
+                      className="rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700 border border-slate-100"
+                    >
+                        {loc}
+                      </span>
+                  ))
+                ) : (
+                  <span className="text-xs text-slate-400">Not provided</span>
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-xl px-4 py-5 bg-slate-50 border border-slate-100">
               <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-800">
                 <MdSchool className="h-5 w-5 text-blue-600" />
                 Universities Served
@@ -168,7 +166,7 @@ export default function ViewDetailsModal({
               </ul>
             </div>
 
-            <div className="rounded-xl bg-white p-5 shadow-sm">
+            <div className="rounded-xl px-4 py-5 bg-slate-50 border border-slate-100">
               <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-800">
                 <MdLocalAirport className="h-5 w-5 text-emerald-600" />
                 Services Offered
@@ -196,7 +194,7 @@ export default function ViewDetailsModal({
               {provider?.packages_offered?.map((pkg) => (
                 <div
                   key={pkg.name}
-                  className="rounded-xl border border-slate-200 bg-white"
+                  className="rounded-xl border bg-slate-50 border-slate-200 "
                 >
                   <button
                     onClick={() =>

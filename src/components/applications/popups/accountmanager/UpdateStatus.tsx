@@ -355,9 +355,7 @@ export default function UpdateStatusPopup({
       reason_text: reason.trim(),
       notes: notes.trim(),
       required_document_type_ids:
-        requiresDocuments &&
-        !isUniversityApproved &&
-        !isCommissionPaid
+        requiresDocuments && !isUniversityApproved && !isCommissionPaid
           ? documents.flatMap((doc) => doc.type)
           : [],
     });
@@ -386,10 +384,13 @@ export default function UpdateStatusPopup({
       throw new Error("Commission payment proof upload failed");
     }
 
-    await api.post(`/applications/${application.id}/commission-payment-document`, {
-      file_key: uploaded.file_key,
-      file_url: uploaded.public_url,
-    });
+    await api.post(
+      `/applications/${application.id}/commission-payment-document`,
+      {
+        file_key: uploaded.file_key,
+        file_url: uploaded.public_url,
+      }
+    );
 
     showToast("Commission payment proof uploaded successfully.", "success");
   };
@@ -691,13 +692,16 @@ export default function UpdateStatusPopup({
             )}
           </div>
 
-          {requiresDocuments && !isUniversityApproved && !isVisaIssued && !isCommissionPaid &&(
-            <DocumentRequestList
-              documents={documents}
-              setDocuments={setDocuments}
-              documentTypes={documentTypes}
-            />
-          )}
+          {requiresDocuments &&
+            !isUniversityApproved &&
+            !isVisaIssued &&
+            !isCommissionPaid && (
+              <DocumentRequestList
+                documents={documents}
+                setDocuments={setDocuments}
+                documentTypes={documentTypes}
+              />
+            )}
 
           {isUniversityApproved && (
             <div className="space-y-2">
@@ -767,7 +771,7 @@ export default function UpdateStatusPopup({
                   <button
                     type="button"
                     onClick={() => setOfferLetterFile(null)}
-                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4  py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                   >
                     <Trash2 className="h-4 w-4" />
                     Remove
@@ -866,7 +870,7 @@ export default function UpdateStatusPopup({
                   <button
                     type="button"
                     onClick={() => setVisaDocumentFile(null)}
-                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4  py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                   >
                     <Trash2 className="h-4 w-4" />
                     Remove
@@ -936,7 +940,7 @@ export default function UpdateStatusPopup({
                   <button
                     type="button"
                     onClick={() => setCommissionPaymentFile(null)}
-                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4  py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                   >
                     <Trash2 className="h-4 w-4" />
                     Remove
@@ -951,7 +955,7 @@ export default function UpdateStatusPopup({
           <button
             onClick={handleClose}
             disabled={isSubmitting}
-            className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
           >
             <XCircle className="h-4 w-4" />
             Cancel
@@ -964,7 +968,7 @@ export default function UpdateStatusPopup({
               (requiresReason && !reason.trim()) ||
               (isVisaSetupSelected && Number(formData.visa_fee_amount) <= 0)
             }
-            className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
           >
             <CheckCircle className="h-4 w-4" />
             {isSubmitting ? "Updating..." : "Update Status"}

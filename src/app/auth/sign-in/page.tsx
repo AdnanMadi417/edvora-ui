@@ -52,7 +52,7 @@ export default function SignInPage() {
       } else if ( role === "admin") {
         localStorage.setItem("adminId", user.admin_id || user.id);
         setTimeout(() => {
-          router.replace("/admin/default");
+          router.replace("/admin/applications");
         }, 100);
 
       } else {

@@ -19,8 +19,6 @@ import {
   ArrowRight,
   ArrowLeft,
 } from "lucide-react";
-import avatar from "/public/img/avatars/user.png";
-import Image from "next/image";
 import Link from "next/link";
 import EmptyData from "components/emptyData/EmptyTableData";
 import api from "lib/useApi";
@@ -380,14 +378,16 @@ const PartnerApplications = () => {
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-gray-200 bg-white">
-                        <Image
-                          width={40}
-                          height={40}
-                          className="h-10 w-10 rounded-full"
-                          src={avatar}
-                          alt={app.student_name}
-                        />
+
+                      <div
+                        className="flex h-10 w-10 shrink-0 items-center justify-center
+                rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
+                      >
+                        {app ? (
+                          app.student_name[0].toUpperCase()
+                        ) : (
+                          <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
+                        )}
                       </div>
 
                       <div className="w-full overflow-hidden">

@@ -9,6 +9,13 @@ export type FieldOfStudy = {
   is_active: boolean;
 };
 
+export type Branch = {
+  id: string;
+  name: string;
+  location: string;
+  state: string;
+};
+
 export type University = {
   id: string;
   name: string;
@@ -39,7 +46,7 @@ type OneTimeFee = {
 };
 
 export type Commission = {
-  rate: number | null;
+  amount: number | null;
   type: string | null;
   notes: string | null;
 };
@@ -56,6 +63,7 @@ export type Program = {
 
   duration: number | null;
 
+  branch: Branch[];
   yearly_fees: YearlyFee[];
   one_time_fees: OneTimeFee[];
 

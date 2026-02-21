@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
 import { LogOut, Settings } from "lucide-react";
 import NavLink from "components/link/NavLink";
-import Image from "next/image";
 import Link from "next/link";
-import avatar from "/public/img/avatars/user.png";
 import api from "../../lib/useApi";
 import { useRouter } from "next/navigation";
 import { useMe } from "hooks/useMe";
@@ -109,14 +107,20 @@ const Navbar = ({
 
         <Dropdown
           button={
+
             <div className="flex cursor-pointer items-center gap-2">
-              <Image
-                width={40}
-                height={40}
-                className="h-10 w-10 rounded-full"
-                src={avatar}
-                alt="Profile"
-              />
+
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center
+                rounded-full text-h5 font-medium text-blue-700 "
+              >
+                {user ? (
+                  user.name[0].toUpperCase()
+                ) : (
+                  <div className="h-5 w-5 animate-pulse rounded-full" />
+                )}
+              </div>
+
             </div>
           }
           classNames="py-2 top-8 -left-[180px] w-max"

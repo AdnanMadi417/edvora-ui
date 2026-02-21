@@ -1,12 +1,55 @@
 import { IRoute } from "../types/navigation";
-import { MdAssignment, MdBusinessCenter,MdAddBusiness} from 'react-icons/md';
+import {
+  MdBusinessCenter,
+  MdAddBusiness,
+  MdSupervisorAccount,
+  MdPersonAdd,
+  MdDescription,
+  MdSchool,
+} from "react-icons/md";
+import { MdOutlineLibraryBooks , MdLibraryAdd } from "react-icons/md";
+
 
 const AdminRoutes: IRoute[] = [
   {
-    name: "Admin",
+    name: "Applications",
     layout: "/admin",
-    path: "/default",
-    icon: MdAssignment,
+    path: "/applications",
+    icon: MdDescription,
+  },
+  {
+    name: "Account Managers",
+    layout: "/admin",
+    path: "/account-managers",
+    icon: MdSupervisorAccount,
+    children: [
+      {
+        name: "Create Account Managers",
+        layout: "/admin/account-managers",
+        path: "/create",
+        icon: MdPersonAdd,
+      },
+    ],
+  },
+  {
+    name: "Knowledge Hub",
+    layout: "/admin",
+    path: "/knowledge-hub",
+    icon: MdOutlineLibraryBooks,
+    children: [
+      {
+        name: "Create Program",
+        layout: "/admin/knowledge-hub",
+        path: "/programs/create",
+        icon: MdLibraryAdd,
+      },
+      {
+        name: "Create University",
+        layout: "/admin/knowledge-hub",
+        path: "/universities/create",
+        icon: MdSchool,
+      },
+    ],
   },
   {
     name: "Logistical Service",
@@ -19,7 +62,7 @@ const AdminRoutes: IRoute[] = [
         layout: "/admin/logistical-service",
         path: "/create",
         icon: MdAddBusiness,
-      }
+      },
     ],
   },
 ];

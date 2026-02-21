@@ -1,29 +1,37 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowRight, ArrowLeft, CheckCircle, Search } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowLeft,
+  CheckCircle,
+  Search,
+  XCircle,
+  MoreVertical,
+  Clock,
+} from "lucide-react";
 import {
   MdPublic,
-  MdTranslate,
-  MdLocalAirport,
-  MdMap,
-  MdSchool,
   MdVisibility,
+  MdOutlineSchool,
+  MdOutlineTranslate,
+  MdBuild,
 } from "react-icons/md";
 
 import Loading from "../../../loading/Loading";
 import NoMessagesFound from "../../../emptyData/NoMessagesFound";
 import NextButton from "../../../ui/buttons/NextButton";
 import PrevButton from "../../../ui/buttons/PrevButton";
-import ViewDetails from "../../../ui/buttons/Button";
 import { useServiceProviders } from "../../../../hooks/serviceProviders/useServiceProviders";
 import ViewDetailsModal from "../../../admin/logisticalService/popup/ViewDetailsModal";
+import EditDetailsModal from "../../../admin/logisticalService/popup/EditDetailsModal";
 
 const LogisticalServiceProviderCard = () => {
   const { serviceProviders, loading, error } = useServiceProviders();
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
+  const itemsPerPage = 2;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,6 +46,7 @@ const LogisticalServiceProviderCard = () => {
   );
 
   const [showViewModal, setViewModal] = useState(false);
+  const [showEditModal, setEditModal] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<any>(null);
 
   useEffect(() => {
@@ -92,18 +101,18 @@ const LogisticalServiceProviderCard = () => {
 
           {!error && filteredProviders.length > 0 && (
             <div className="block">
-              <div className="grid grid-cols-1 items-stretch gap-6 p-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 items-stretch gap-6 p-6 md:grid-cols-2 lg:grid-cols-2">
                 {currentServiceProviders.map((program) => (
                   <div
                     key={program.id}
-                    className="relative flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-md transition-all"
+                    className="relative flex h-full flex-col overflow-hidden rounded-lg border border-slate-200 bg-white transition-all hover:border-slate-300"
                   >
-                    <div className="flex items-center justify-between border-b bg-slate-50 px-5 py-3">
+                    <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-5 py-4">
                       <div className="flex items-center gap-3">
                         <div className="relative">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                            <span className="text-sm font-semibold text-slate-900">
-                              {program.name?.[0]}
+                            <span className="text-sm font-semibold uppercase text-slate-900">
+                              {program.name?.slice(0, 2)}
                             </span>
                           </div>
                           <span
@@ -116,8 +125,15 @@ const LogisticalServiceProviderCard = () => {
                         </div>
 
                         <div>
-                          <h3 className="line-clamp-1 text-sm font-semibold text-slate-900">
+                          <h3 className="md:text-md line-clamp-1 flex items-center gap-1 text-sm font-semibold text-slate-900">
                             {program.name}
+                            <span className="text-slate-400">
+                              {program.is_active ? (
+                                <CheckCircle className="h-4 w-4 text-emerald-500" />
+                              ) : (
+                                <XCircle className="h-4 w-4 text-red-500" />
+                              )}
+                            </span>
                           </h3>
                           <p className="flex items-center gap-1 text-xs text-slate-500">
                             <MdPublic className="h-3.5 w-3.5" />
@@ -126,132 +142,188 @@ const LogisticalServiceProviderCard = () => {
                         </div>
                       </div>
 
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-                          program.is_active
-                            ? "border border-emerald-700 bg-emerald-100 text-emerald-700"
-                            : "border border-red-700 bg-red-100 text-red-700"
-                        }`}
-                      >
-                        {program.is_active ? "Verified" : "Unverified"}
-                      </span>
-                    </div>
+                      <div className="relative">
+                        <button
+                          onClick={() =>
+                            setOpenDropdownId(
+                              openDropdownId === program.id ? null : program.id
+                            )
+                          }
+                          className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+                        >
+                          Actions
+                          <MoreVertical className="h-4 w-4" />
+                        </button>
 
-                    <div className="space-y-2 px-5 py-4 text-xs">
-                      <div className="group relative overflow-hidden rounded-md bg-gradient-to-br from-emerald-500 to-green-600 px-5 py-4 shadow-sm transition-all">
-                        <div className="absolute right-0 top-0 -mr-16 -mt-16 h-32 w-32 rounded-full bg-white/10"></div>
-                        <div className="relative flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-semibold uppercase  tracking-wide text-emerald-100">
-                              Packages Offered
-                            </p>
-
-                            <div className="mt-1 flex items-baseline gap-1">
-                              <span className="text-lg font-bold text-white">
-                                {program.price_range
-                                  ? `RM ${program.price_range.min_price} - ${program.price_range.max_price}`
-                                  : "Price not available"}
-                              </span>
+                        {openDropdownId === program.id && (
+                          <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
+                            <div className="p-2">
+                              <button
+                                className="group flex w-full flex-col gap-1 rounded-md bg-white px-4 py-3 text-left text-sm hover:bg-amber-50 "
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedProvider(program);
+                                  setEditModal(true);
+                                }}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-600 group-hover:bg-amber-200">
+                                    <Clock className="h-5 w-5" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <div className="font-semibold text-slate-900">
+                                      Update logistical service
+                                    </div>
+                                  </div>
+                                </div>
+                              </button>
                             </div>
                           </div>
-                          <div className="rounded-full bg-white/20 p-3 backdrop-blur-sm transition-colors group-hover:bg-white/30">
-                            <MdLocalAirport className="h-7 w-7 text-white" />
-                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-4 px-5 py-6">
+                      <div className="flex items-center justify-between rounded-md bg-slate-50 p-4">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Single Service
+                          </span>
+                          <p className="text-lg font-bold text-slate-900">
+                            From RM {program.price_range.min_price}
+                          </p>
+                        </div>
+
+                        <div className="h-12 w-[2px] bg-slate-200" />
+
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                            Package
+                          </span>
+                          <p className="text-lg font-bold text-slate-900">
+                            From RM {program.price_range.max_price}
+                          </p>
                         </div>
                       </div>
 
-                      <div className="flex items-center justify-between py-2">
-                        <div className="flex items-center gap-2 font-medium text-slate-500">
-                          <MdTranslate className="h-5 w-5" /> Languages
-                        </div>
-
-                        <div className="flex flex-wrap gap-1">
-                          {program.languages?.length
-                            ? program.languages.map((lang) => (
+                      <div className="rounded-md bg-slate-50 p-3">
+                        <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-600">
+                          <MdOutlineSchool className="h-5 w-5 text-slate-500" />
+                          Universities
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {program.universities_served?.length ? (
+                            program.universities_served
+                              .slice(0, 3)
+                              .map((uni) => (
                                 <span
-                                  key={lang}
-                                  className="text-xs font-medium text-slate-900"
+                                  key={uni}
+                                  className="rounded-full border bg-white px-3 py-1 text-xs font-medium text-slate-700"
                                 >
-                                  {lang}
-                                </span>
-                              ))
-                            : "Not Provided"}
-                        </div>
-                      </div>
-
-                      <div className="grid gap-4">
-                        <div className="rounded-md bg-blue-50/70 p-3">
-                          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-blue-800">
-                            <MdSchool className="h-5 w-5" />
-                            Universities Served
-                          </div>
-
-                          <ul className="ml-5 space-y-1 text-xs text-slate-700">
-                            {program.universities_served?.length ? (
-                              program.universities_served.map((uni) => (
-                                <li key={uni} className="list-disc">
                                   {uni}
-                                </li>
-                              ))
-                            ) : (
-                              <li className="list-disc">Not Provided</li>
-                            )}
-                          </ul>
-                        </div>
-
-                        <div className="rounded-md bg-orange-50/70 p-3">
-                          <div className="mb-2 flex items-center gap-2 text-sm font-medium text-orange-800">
-                            <MdMap className="h-5 w-5" />
-                            Service Locations
-                          </div>
-
-                          <div className="flex flex-wrap gap-2">
-                            {program.service_locations?.length ? (
-                              program.service_locations.map((location) => (
-                                <span
-                                  key={location}
-                                  className="rounded-full bg-white px-3 py-1 text-xs font-medium text-orange-800 ring-1 ring-orange-100"
-                                >
-                                  {location}
                                 </span>
                               ))
-                            ) : (
-                              <span className="list-disc px-3 py-1">
-                                Not Provided
+                          ) : (
+                            <span className="text-xs text-slate-400">
+                              Not provided
+                            </span>
+                          )}
+                          {program.universities_served?.length > 3 && (
+                            <button className="text-xs font-medium text-blue-600 hover:underline">
+                              +{program.universities_served.length - 3} more
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="rounded-md bg-slate-50 p-3">
+                        <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-600">
+                          <MdOutlineTranslate className="h-5 w-5 text-slate-500" />
+                          Languages
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {program.languages?.length ? (
+                            program.languages.slice(0, 3).map((lang) => (
+                              <span
+                                key={lang}
+                                className="rounded-full border bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                              >
+                                {lang}
                               </span>
-                            )}
-                          </div>
+                            ))
+                          ) : (
+                            <span className="text-xs text-slate-400">
+                              Not provided
+                            </span>
+                          )}
+                          {program.languages?.length > 3 && (
+                            <button className="text-xs font-medium text-blue-600 hover:underline">
+                              +{program.languages.length - 3} more
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="rounded-md bg-emerald-50 p-3">
+                        <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-emerald-700">
+                          <MdBuild className="h-5 w-5 text-emerald-600" />
+                          Services Offered
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {program.services_offered?.length ? (
+                            program.services_offered
+                              .slice(0, 3)
+                              .map((service) => (
+                                <span
+                                  key={service}
+                                  className="rounded-full border border-emerald-700 bg-white px-3 py-1 text-xs font-medium text-emerald-700"
+                                >
+                                  {service}
+                                </span>
+                              ))
+                          ) : (
+                            <span className="text-xs text-emerald-400">
+                              Not provided
+                            </span>
+                          )}
+                          {program.services_offered?.length > 3 && (
+                            <button className="text-xs font-medium text-emerald-700 hover:underline">
+                              +{program.services_offered.length - 3} more
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-auto flex justify-between gap-2 border-t border-gray-200 bg-slate-50 p-4">
-                      <ViewDetails
-                        icon={<MdVisibility className="h-4 w-4" />}
-                        text="Details"
-                        bgColor="bg-blue-50"
-                        textColor="text-blue-700"
-                        borderColor="border-blue-600"
-                        hoverTextColor="hover:text-blue-800"
-                        hoverBorderColor="hover:border-blue-700"
-                        onClick={() => {
+                    <div className="mt-auto flex gap-3 border-t border-slate-200 bg-slate-50 p-4">
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedProvider(program);
                           setViewModal(true);
                         }}
-                      />
+                        className="flex-1 flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition-all hover:scale-105 hover:shadow-sm hover:border-blue-700 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                      >
+                        <MdVisibility className="h-5 w-5" />
+                        Details
+                      </button>
 
                       <button
-                        onClick={() => {
+                        aria-label="Contact via WhatsApp"
+                        onClick={(e) => {
+                          e.stopPropagation();
                           if (!program?.whatsapp) return;
                           const number = program.whatsapp.replace("+", "");
                           window.open(`https://wa.me/${number}`, "_blank");
                         }}
-                        className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 shadow-md transition hover:scale-105 hover:border-green-700 hover:bg-green-200"
+                        className="flex-1 flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition-all hover:scale-105 hover:shadow-sm hover:border-green-700 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-400"
                       >
-                        <CheckCircle className="h-4 w-4" />
+                        <CheckCircle className="h-5 w-5" />
                         Contact
                       </button>
                     </div>
+
                   </div>
                 ))}
               </div>
@@ -315,6 +387,12 @@ const LogisticalServiceProviderCard = () => {
       <ViewDetailsModal
         isOpen={showViewModal}
         onClose={() => setViewModal(false)}
+        provider={selectedProvider}
+      />
+
+      <EditDetailsModal
+        isOpen={showEditModal}
+        onClose={() => setEditModal(false)}
         provider={selectedProvider}
       />
     </div>
