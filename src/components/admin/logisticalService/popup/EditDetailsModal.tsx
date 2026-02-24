@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, PlusCircle, Trash2 ,Edit2} from "lucide-react";
+import { Plus, PlusCircle, Trash2, Edit2 } from "lucide-react";
 import ModalHeader from "../../../ui/modal/ModalHeader";
 
 import { useLogisticServices } from "../../../../hooks/serviceProviders/useLogisticServicesList";
@@ -15,6 +15,8 @@ import InputField from "../../../form/InputField";
 import AddInclude from "../../../ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
+import SelectField from "../../../form/SelectField";
+import { COUNTRIES } from "../../../../constants/lists";
 
 export interface PackageOffered {
   name: string;
@@ -26,6 +28,7 @@ export interface PackageOffered {
 export interface FormData {
   name: string;
   nationality: string;
+  main_location: string;
   phone_number: string;
   whatsapp: string;
   is_active: boolean;
@@ -72,6 +75,7 @@ export default function EditDetailsModal({
   const [formData, setFormData] = useState({
     name: provider?.name || "",
     nationality: provider?.nationality || "",
+    main_location: provider?.main_location || "",
     phone_number: provider?.phone_number || "",
     whatsapp: provider?.whatsapp || "",
     is_active: provider?.is_active ?? true,
@@ -132,16 +136,25 @@ export default function EditDetailsModal({
   };
 
   useEffect(() => {
-    if (provider && logisticServices.length && logisticLanguages.length && logisticUniversities.length && logisticServiceLocations.length) {
+    if (
+      provider &&
+      logisticServices.length &&
+      logisticLanguages.length &&
+      logisticUniversities.length &&
+      logisticServiceLocations.length
+    ) {
       setFormData({
         name: provider.name || "",
         nationality: provider.nationality || "",
+        main_location: provider.main_location || "",
         phone_number: provider.phone_number || "",
         whatsapp: provider.whatsapp || "",
         is_active: provider.is_active ?? true,
         packages_offered: provider.packages_offered || [],
         selectedServices: provider.services_offered
-          .map((service) => logisticServices.find((s) => s.name === service)?.id)
+          .map(
+            (service) => logisticServices.find((s) => s.name === service)?.id
+          )
           .filter(Boolean) as string[],
         selectedLanguages: provider.languages
           .map((lang) => logisticLanguages.find((l) => l.name === lang)?.id)
@@ -150,7 +163,9 @@ export default function EditDetailsModal({
           .map((uni) => logisticUniversities.find((u) => u.name === uni)?.id)
           .filter(Boolean) as string[],
         selectedLocations: provider.service_locations
-          .map((loc) => logisticServiceLocations.find((l) => l.name === loc)?.id)
+          .map(
+            (loc) => logisticServiceLocations.find((l) => l.name === loc)?.id
+          )
           .filter(Boolean) as string[],
       });
     }
@@ -162,13 +177,14 @@ export default function EditDetailsModal({
     logisticServiceLocations,
   ]);
 
-
   const handleSubmit = async () => {
     const newErrors: FormErrors = {};
 
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.nationality)
       newErrors.nationality = "Nationality is required";
+    if (!formData.main_location)
+      newErrors.main_location = "Main Location is required";
     if (!formData.phone_number)
       newErrors.phone_number = "Phone number is required";
     if (!formData.selectedServices.length)
@@ -186,6 +202,7 @@ export default function EditDetailsModal({
     const payload = {
       name: formData.name,
       nationality: formData.nationality,
+      main_location: formData.main_location,
       phone_number: formData.phone_number,
       whatsapp: formData.whatsapp,
       is_active: formData.is_active,
@@ -202,6 +219,7 @@ export default function EditDetailsModal({
       setFormData({
         name: "",
         nationality: "",
+        main_location: "",
         phone_number: "",
         whatsapp: "",
         is_active: true,
@@ -219,7 +237,6 @@ export default function EditDetailsModal({
       setTimeout(() => {
         location.reload();
       }, 1500);
-
     } catch (error) {
       showToast("error" + "Failed to update logistics provider");
     }
@@ -268,11 +285,25 @@ export default function EditDetailsModal({
                 updateFormData={updateFormData}
               />
 
-              <InputField
-                label="Country / Nationality"
+              <SelectField
+                label="Nationality"
                 field="nationality"
-                placeholder="e.g. Malaysia"
-                required
+                options={COUNTRIES.map((c) => ({
+                  label: c.name,
+                  value: c.code,
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+
+              <SelectField
+                label="Current Residence"
+                field="main_location"
+                options={logisticServiceLocations.map((u) => ({
+                  value: u.name,
+                  label: u.name,
+                }))}
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
@@ -482,7 +513,6 @@ export default function EditDetailsModal({
             </div>
 
             <div className="grid grid-cols-1 gap-x-3">
-
               <CheckSimpleBoxGroup
                 label="Languages"
                 field="selectedLanguages"

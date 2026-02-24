@@ -18,6 +18,7 @@ export interface ServiceProvider {
   id: string
   name: string
   nationality: string
+  main_location: string
   universities_served: string[]
   service_locations: string[]
   languages: string[]

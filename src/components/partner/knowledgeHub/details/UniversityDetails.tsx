@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import CardHeader from "../../../ui/card/CardHeader";
 import Link from "next/link";
-import { useProgram } from "../../../../hooks/programs/useProgram";
+import { useProgram } from "../../../../hooks/knowledge-hub/programs/useProgram";
 import Loading from "../../../loading/Loading";
 
 interface UniversityDetailsProps {

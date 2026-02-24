@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from 'react';
 import { useRouter } from "next/navigation";
 import {
   MdMenuBook,
@@ -24,10 +24,10 @@ import {
   FileText,
   CheckCircle,
   Percent,
-  ChevronLeft,
-} from "lucide-react";
+  ChevronLeft, MoreVertical, Clock,
+} from 'lucide-react';
 import CardHeader from "../../../../ui/card/CardHeader";
-import { useProgram } from "../../../../../hooks/programs/useProgram";
+import { useProgram } from "../../../../../hooks/knowledge-hub/programs/useProgram";
 import Loading from "../../../../loading/Loading";
 
 interface UniversityDetailsProps {
@@ -35,9 +35,13 @@ interface UniversityDetailsProps {
 }
 
 const KnowledgeHubDetails = ({ id }: UniversityDetailsProps) => {
+
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+
   const router = useRouter();
   const handleBack = () => {
-    router.push("/admin/knowledge-hub/programs/");
+    router.push("/admin/knowledge-hub/");
   };
 
   const commissionLabel = {
@@ -87,6 +91,7 @@ const KnowledgeHubDetails = ({ id }: UniversityDetailsProps) => {
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
                 <span className="hidden sm:inline">Back to Programs</span>
               </button>
+
             </div>
           </div>
 

@@ -29,6 +29,7 @@ export interface PackageOffered {
 export interface FormData {
   name: string;
   nationality: string;
+  main_location: string;
   phone_number: string;
   whatsapp: string;
   is_active: boolean;
@@ -50,6 +51,7 @@ export default function RegisterLogisticsProvider() {
   const [formData, setFormData] = useState<FormData>({
     name: "",
     nationality: "",
+    main_location: "",
     phone_number: "",
     whatsapp: "",
     is_active: true,
@@ -133,6 +135,8 @@ export default function RegisterLogisticsProvider() {
       newErrors.phone_number = "Phone number is required"
     if (!formData.selectedServices.length)
       newErrors.selectedServices = "Please select at least one service"
+    if (!formData.main_location)
+      newErrors.main_location = "Please your location is required"
     if (!formData.selectedLanguages.length)
       newErrors.selectedLanguages = "Please select at least one language"
     if (!formData.selectedUniversities.length)
@@ -146,6 +150,7 @@ export default function RegisterLogisticsProvider() {
     const payload = {
       name: formData.name,
       nationality: formData.nationality,
+      main_location: formData.main_location,
       phone_number: formData.phone_number,
       whatsapp: formData.whatsapp,
       is_active: formData.is_active,
@@ -164,6 +169,7 @@ export default function RegisterLogisticsProvider() {
       setFormData({
         name: "",
         nationality: "",
+        main_location: "",
         phone_number: "",
         whatsapp: "",
         is_active: true,
@@ -239,6 +245,17 @@ export default function RegisterLogisticsProvider() {
             updateFormData={updateFormData}
           />
 
+          <SelectField
+            label="Current Address"
+            field="main_location"
+            options={logisticServiceLocations.map((u) => ({
+              value: u.name,
+              label: u.name,
+            }))}
+            formData={formData}
+            errors={errors}
+            updateFormData={updateFormData}
+          />
 
           <InputField
             label="Primary Contact Number"
@@ -314,6 +331,7 @@ export default function RegisterLogisticsProvider() {
                 <InputField
                   label="Package Name"
                   field="name"
+                  placeholder="e.g. FastTrack Logistics"
                   required
                   formData={{ name: pkg.name }}
                   errors={{}}
@@ -335,6 +353,7 @@ export default function RegisterLogisticsProvider() {
               <InputField
                 label="Description"
                 field="description"
+                placeholder="e.g. description"
                 formData={{ description: pkg.description }}
                 errors={{}}
                 updateFormData={(_, value) =>
@@ -395,8 +414,6 @@ export default function RegisterLogisticsProvider() {
                   />
                 </div>
               </div>
-
-
 
             </div>
           ))}

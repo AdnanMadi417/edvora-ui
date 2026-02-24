@@ -54,9 +54,6 @@ const useApplicationDetails = (applicationId?: string) => {
   const fetchApplicationDetails = useCallback(async () => {
     if (!applicationId) return;
 
-    console.log("Fetching application with ID:", applicationId);
-    console.log("Token:", token);
-
     setLoading(true);
     setError(null);
 
