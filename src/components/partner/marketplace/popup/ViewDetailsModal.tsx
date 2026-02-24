@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CheckCircle, Truck, XCircle } from "lucide-react";
+import { CheckCircle, Globe, MapPin, Truck, XCircle } from 'lucide-react';
 import ModalHeader from "../../../ui/modal/ModalHeader";
 import {
   MdKeyboardArrowDown,
@@ -104,7 +104,46 @@ export default function ViewDetailsModal({
               </div>
             </div>
 
+            <div className="space-y-3">
+
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <div className="flex items-center gap-2 text-slate-500">
+                  <MapPin className="h-4 w-4 text-slate-400" />
+                  <span>Current Residence</span>
+                </div>
+
+                {provider.main_location ? (
+                  <span className="truncate rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                    {provider.main_location}
+                  </span>
+                ) : (
+                  <span className="text-xs italic text-slate-400">
+                    Not provided
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between gap-4 text-sm">
+                <div className="flex items-center gap-2 text-slate-500">
+                  <Globe className="h-4 w-4 text-slate-400" />
+                  <span>Nationality</span>
+                </div>
+
+                {provider.nationality ? (
+                  <span className="truncate rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                    {provider.nationality}
+                  </span>
+                ) : (
+                  <span className="text-xs italic text-slate-400">
+                    Not provided
+                  </span>
+                )}
+              </div>
+
+            </div>
+
             <div className="rounded-xl px-4 py-5 bg-slate-50 border border-slate-100">
+
               <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
                 <MdTranslate className="h-4 w-4 text-slate-500" />
                 Languages

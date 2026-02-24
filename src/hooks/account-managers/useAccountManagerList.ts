@@ -6,6 +6,7 @@ export type AccountManager = {
   id: string;
   name: string;
   email: string;
+  assigned_partners_count: string;
   is_active: boolean;
 };
 

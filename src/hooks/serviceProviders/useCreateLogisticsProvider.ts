@@ -12,6 +12,7 @@ interface PackageOffered {
 export interface CreateLogisticsProviderPayload {
   name: string
   nationality: string
+  main_location: string
   phone_number: string
   whatsapp: string
   is_active: boolean

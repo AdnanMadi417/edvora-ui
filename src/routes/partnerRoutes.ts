@@ -38,7 +38,7 @@ const partnerRoutes: IRoute[] = [
   },
 
   {
-    name: "Partner Hub",
+    name: "Logistical Service",
     layout: "/partner",
     path: "/marketplace",
     icon: MdBusinessCenter,
