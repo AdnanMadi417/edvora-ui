@@ -282,10 +282,10 @@ const PartnerApplications = () => {
             <tr className="border-b border-gray-200 bg-card">
               <th
                 onClick={() => handleSort("studentName")}
-                className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
+                  <User className="h-4 w-4 text-slate-500" />
                   Student
                   <SortIndicator field="studentName" />
                 </div>
@@ -293,10 +293,10 @@ const PartnerApplications = () => {
 
               <th
                 onClick={() => handleSort("applicationName")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex min-w-[250px] items-center gap-2">
-                  <GraduationCap className="h-4 w-4" />
+                  <GraduationCap className="h-4 w-4 text-slate-500" />
                   University / Program
                   <SortIndicator field="applicationName" />
                 </div>
@@ -304,10 +304,10 @@ const PartnerApplications = () => {
 
               <th
                 onClick={() => handleSort("stage")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex items-center gap-2">
-                  <Flag className="h-4 w-4" />
+                  <Flag className="h-4 w-4 text-slate-500" />
                   Stage
                   <SortIndicator field="stage" />
                 </div>
@@ -315,10 +315,10 @@ const PartnerApplications = () => {
 
               <th
                 onClick={() => handleSort("status")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex items-center gap-2">
-                  <BadgeCheck className="h-4 w-4" />
+                  <BadgeCheck className="h-4 w-4 text-slate-500" />
                   Status
                   <SortIndicator field="status" />
                 </div>
@@ -326,17 +326,17 @@ const PartnerApplications = () => {
 
               <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
                 <div className="flex items-center gap-2">
-                  <CalendarCheck className="h-4 w-4" />
+                  <CalendarCheck className="h-4 w-4 text-slate-500" />
                   Next Action
                 </div>
               </th>
 
               <th
                 onClick={() => handleSort("updatedAt")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex min-w-[150px] items-center gap-2">
-                  <Clock className="h-4 w-4" />
+                  <Clock className="h-4 w-4 text-slate-500" />
                   Last Updated
                   <SortIndicator field="updatedAt" />
                 </div>
@@ -344,7 +344,7 @@ const PartnerApplications = () => {
 
               <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
                 <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-4 w-4 text-slate-500" />
                   Actions
                 </div>
               </th>

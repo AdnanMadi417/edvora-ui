@@ -195,10 +195,10 @@ const ModernApplicationsTable = () => {
             <tr className="border-b border-gray-200 bg-card">
               <th
                 onClick={() => handleSort("student_name")}
-                className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
+                  <User className="h-4 w-4 text-slate-500" />
                   Student
                   <SortIndicator field="student_name" />
                 </div>
@@ -206,10 +206,10 @@ const ModernApplicationsTable = () => {
 
               <th
                 onClick={() => handleSort("application-name")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex min-w-[250px] items-center gap-2">
-                  <GraduationCap className="h-4 w-4" />
+                  <GraduationCap className="h-4 w-4 text-slate-500" />
                   University / Program
                   <SortIndicator field="application-name" />
                 </div>
@@ -217,10 +217,10 @@ const ModernApplicationsTable = () => {
 
               <th
                 onClick={() => handleSort("partner_name")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4" />
+                  <Building className="h-4 w-4 text-slate-500" />
                   Ownership
                   <SortIndicator field="partner_name" />
                 </div>
@@ -228,32 +228,32 @@ const ModernApplicationsTable = () => {
 
               <th
                 onClick={() => handleSort("status")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex min-w-[250px] items-center gap-2">
-                  <BadgeCheck className="h-4 w-4" />
+                  <BadgeCheck className="h-4 w-4 text-slate-500" />
                   Stage / Status
                   <SortIndicator field="status" />
                 </div>
               </th>
 
               <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                <div className="flex items-center gap-2">
-                  <CalendarCheck className="h-4 w-4" />
+                <div className="flex items-center gap-2 ">
+                  <CalendarCheck className="h-4 w-4 text-slate-500" />
                   Next Action
                 </div>
               </th>
 
               <th className="group px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
                 <div className="flex min-w-[150px] items-center gap-2">
-                  <Clock className="h-4 w-4" />
+                  <Clock className="h-4 w-4 text-slate-500" />
                   Last Updated
                 </div>
               </th>
 
               <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
                 <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-4 w-4 text-slate-500" />
                   Actions
                 </div>
               </th>

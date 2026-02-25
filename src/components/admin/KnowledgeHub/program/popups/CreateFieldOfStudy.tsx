@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { PlusCircle, XCircle,ScrollText  } from "lucide-react";
+import { XCircle,Tag  } from "lucide-react";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "../../../../ui/buttons/Button";
@@ -123,7 +123,7 @@ export default function CreateFieldOfStudy({
           <ModalHeader
             title="Create New Field of Study"
             description="Add a new field of study into the knowledge hub."
-            icon={ScrollText }
+            icon={Tag  }
             iconBg="bg-blue-50"
             iconColor="text-blue-600"
             iconBorder="border-blue-200"
@@ -145,18 +145,23 @@ export default function CreateFieldOfStudy({
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <button
+
+            <Button
               onClick={onClose}
-              className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
-            >
-              <XCircle className="h-4 w-4" />
-              Cancel
-            </button>
+              disabled={fieldLoading}
+              icon={<XCircle  className="h-5 w-5" />}
+              text={fieldLoading ? "Cancelling..." : "Cancel"}
+              bgColor="bg-slate-50"
+              textColor="text-slate-700"
+              borderColor="border-slate-600"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-700"
+            />
 
             <Button
               onClick={handleCreate}
               disabled={fieldLoading}
-              icon={<PlusCircle className="h-5 w-5" />}
+              icon={<Tag  className="h-5 w-5" />}
               text={fieldLoading ? "Creating..." : "Create Field of Study"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"

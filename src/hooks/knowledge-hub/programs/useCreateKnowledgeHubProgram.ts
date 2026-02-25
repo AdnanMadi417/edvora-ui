@@ -20,7 +20,7 @@ export type CreateProgramPayload = {
   commission_type_id: string;
   commission_notes: string;
 
-  qualification_level: number;
+  qualification_id: string;
 
   yearly_fees?: Array<{
     year: number;

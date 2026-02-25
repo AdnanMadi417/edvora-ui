@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
-import { PlusCircle , ChevronsUpDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 const getNestedValue = (obj, path) => {
   if (!path) return undefined;
@@ -86,7 +86,7 @@ const CreatableSelectField = ({
           {selectedLabel || placeholder}
         </span>
         <span className="text-xs text-slate-500">
-          <ChevronsUpDown  className="h-5 w-5" />
+          <ChevronDown   className="h-5 w-5" />
         </span>
       </div>
 
