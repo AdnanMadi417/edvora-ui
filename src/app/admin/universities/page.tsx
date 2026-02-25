@@ -1,6 +1,6 @@
 "use client";
 
-import UniversitiesTable from "components/admin/KnowledgeHub/university/tables/KnowledgeHubTable";
+import UniversitiesTable from "../../../components/admin/KnowledgeHub/university/tables/UniversitiesTable";
 
 const universitiesTableOverview = () => {
   return (

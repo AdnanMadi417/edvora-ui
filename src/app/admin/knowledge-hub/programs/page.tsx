@@ -1,11 +1,11 @@
 "use client";
 
-import KnowledgeHubTable from "../../../../components/admin/KnowledgeHub/program/tables/KnowledgeHubTable";
+import ProgramsTable from "../../../../components/admin/KnowledgeHub/program/tables/ProgramsTable";
 
 const KnowledgeHubOverview = () => {
   return (
     <div>
-      <KnowledgeHubTable />
+      <ProgramsTable />
     </div>
   );
 };

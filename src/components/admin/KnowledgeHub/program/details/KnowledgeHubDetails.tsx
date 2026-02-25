@@ -206,9 +206,7 @@ const KnowledgeHubDetails = ({ id }: UniversityDetailsProps) => {
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">Country</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
-                  {program?.branch?.length
-                    ? program.branch.map(b => b.location).join(', ')
-                    : 'Not Provided'}
+                  {program?.university?.country ?? 'Not Provided'}
                 </p>
               </div>
             </div>
@@ -219,9 +217,9 @@ const KnowledgeHubDetails = ({ id }: UniversityDetailsProps) => {
                 <MdLocationCity className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-slate-500">State / Province</p>
+                <p className="text-xs text-slate-500">State</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
-                  {program?.university?.state ?? 'Not Provided'}
+                  {program && program.branch ? program.branch.state : "Not Provided"}
                 </p>
               </div>
             </div>

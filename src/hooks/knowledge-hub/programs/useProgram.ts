@@ -63,7 +63,7 @@ export type Program = {
 
   duration: number | null;
 
-  branch: Branch[];
+  branch: Branch;
   yearly_fees: YearlyFee[];
   one_time_fees: OneTimeFee[];
 

@@ -28,7 +28,7 @@ const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
       className={`flex items-center justify-center border rounded-full p-2 text-sm font-medium transition 
-        ${bgColor} ${textColor} ${borderColor} ${hoverTextColor} ${hoverBorderColor} disabled:opacity-50
+        ${bgColor} ${textColor} ${borderColor} ${hoverTextColor} ${hoverBorderColor} disabled:opacity-50 disabled:cursor-not-allowed
         ${className || ""}`}
     >
       {icon && <span className="flex items-center">{icon}</span>}

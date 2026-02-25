@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import api from "../../../lib/useApi";
+import { AxiosError } from "axios";
 
 export type CreateProgramPayload = {
   uni_id: string;
@@ -42,29 +43,41 @@ export type CreateProgramPayload = {
 };
 
 export function useCreateProgram() {
-  const [createProgramLoading, setLoading] = useState(false);
-  const [createProgramError, setError] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const requestCounter = useRef(0);
 
   const resetState = () => {
     setError("");
     setSuccess(false);
   };
 
+  const sanitizeArray = <T,>(arr?: T[]) => {
+    if (!arr) return [];
+
+    return arr.filter(
+      (v) => v !== null && v !== undefined && v !== ""
+    );
+  };
+
   const createProgram = async (payload: CreateProgramPayload) => {
+    const requestId = ++requestCounter.current;
+
     setLoading(true);
     resetState();
 
     try {
-
       const sanitizedPayload = {
         ...payload,
 
         name: payload.name?.trim(),
         overview: payload.overview?.trim(),
         curriculum: payload.curriculum?.trim(),
+        commission_notes: payload.commission_notes?.trim(),
 
-        intake_dates: payload.intake_dates ?? [],
+        intake_dates: sanitizeArray(payload.intake_dates),
         yearly_fees: payload.yearly_fees ?? [],
         one_time_fees: payload.one_time_fees ?? [],
 
@@ -78,18 +91,22 @@ export function useCreateProgram() {
         sanitizedPayload
       );
 
+      if (requestId !== requestCounter.current) return;
+
       setSuccess(true);
       return res.data;
-    } catch (err: any) {
-      console.error("Create program error:", err);
+    } catch (err: unknown) {
+      const error = err as AxiosError<any>;
 
-      const apiDetail = err?.response?.data?.detail;
+      console.error("Create program error:", error);
+
+      const apiDetail = error.response?.data?.detail;
 
       if (Array.isArray(apiDetail)) {
         setError(apiDetail[0]?.msg || "Failed to create program");
       } else {
         setError(
-          err?.response?.data?.message ||
+          error.response?.data?.message ||
           "Failed to create program"
         );
       }
@@ -102,8 +119,8 @@ export function useCreateProgram() {
 
   return {
     createProgram,
-    createProgramLoading,
-    createProgramError,
+    loading,
+    error,
     success,
     resetState,
   };

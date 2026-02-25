@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-import EmptyData from "components/emptyData/EmptyTableData";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
 import ClearButton from "components/ui/buttons/DangerButton";
@@ -23,6 +22,7 @@ import ClearButton from "components/ui/buttons/DangerButton";
 import { useAccountManagerList } from "hooks/account-managers/useAccountManagerList";
 import Link from "next/link";
 import { MdPersonAdd } from "react-icons/md";
+import NoMessagesFound from '../../../emptyData/NoMessagesFound';
 
 const ModernAccountManagersTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -175,7 +175,10 @@ const ModernAccountManagersTable = () => {
                   colSpan={8}
                   className="px-6 py-8 text-center text-slate-500"
                 >
-                  <EmptyData />
+                  <NoMessagesFound
+                    title="No account managers found"
+                    subtitle="There are currently no account managers available."
+                  />
                 </td>
               </tr>
             ) : (
