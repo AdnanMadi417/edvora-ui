@@ -10,7 +10,7 @@ import {
   ChevronLeft,
   ChevronRight, Trash2,
 } from 'lucide-react';
-import { ENGLISH_TEST_OPTIONS, NATIONALITIES, QUALIFICATION_OPTIONS } from 'constants/lists';
+import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from 'constants/lists';
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
