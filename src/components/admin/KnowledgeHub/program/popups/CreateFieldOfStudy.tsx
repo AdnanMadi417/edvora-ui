@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle,Tag  } from "lucide-react";
+import { XCircle, Tag } from "lucide-react";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "../../../../ui/buttons/Button";
@@ -20,11 +20,7 @@ export default function CreateFieldOfStudy({
   isOpen,
   onClose,
 }: CreateFieldOfStudyProps) {
-
-  const {
-    CreateFieldOfStudy,
-    fieldLoading
-  } = useCreateFieldOfStudy();
+  const { CreateFieldOfStudy, fieldLoading } = useCreateFieldOfStudy();
 
   const { showToast } = useToast();
 
@@ -119,11 +115,10 @@ export default function CreateFieldOfStudy({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-
           <ModalHeader
             title="Create New Field of Study"
             description="Add a new field of study into the knowledge hub."
-            icon={Tag  }
+            icon={Tag}
             iconBg="bg-blue-50"
             iconColor="text-blue-600"
             iconBorder="border-blue-200"
@@ -141,15 +136,13 @@ export default function CreateFieldOfStudy({
               errors={errors}
               updateFormData={updateFormData}
             />
-
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-
             <Button
               onClick={onClose}
               disabled={fieldLoading}
-              icon={<XCircle  className="h-5 w-5" />}
+              icon={<XCircle className="h-5 w-5" />}
               text={fieldLoading ? "Cancelling..." : "Cancel"}
               bgColor="bg-slate-50"
               textColor="text-slate-700"
@@ -160,8 +153,8 @@ export default function CreateFieldOfStudy({
 
             <Button
               onClick={handleCreate}
-              disabled={fieldLoading}
-              icon={<Tag  className="h-5 w-5" />}
+              disabled={fieldLoading || !formData.name.trim()}
+              icon={<Tag className="h-5 w-5" />}
               text={fieldLoading ? "Creating..." : "Create Field of Study"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"

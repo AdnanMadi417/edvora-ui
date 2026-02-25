@@ -1,18 +1,19 @@
 "use client";
 
 import React, {  useState } from 'react';
-import { Truck, PlusCircle} from 'lucide-react';
-
+import { GraduationCap, School, ChevronLeft } from 'lucide-react';
 import InputField from "../../../../form/InputField";
 import MultipleDatePickerModal from '../../../../form/MultipleDatePickerModal';
 
 import { useToast } from "components/context/ToastContext";
 import Button from '../../../../ui/buttons/Button';
 import { useCreateUniversity } from '../../../../../hooks/knowledge-hub/universities/useCreateKnowledgeHubUniversity';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterUniversity() {
   const { createUniversity, loading } = useCreateUniversity();
   const { showToast } = useToast();
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -23,6 +24,11 @@ export default function RegisterUniversity() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const isFormValid =
+    formData.name.trim() &&
+    formData.description.trim() &&
+    formData.intake_months.length > 0;
 
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({
@@ -62,13 +68,17 @@ export default function RegisterUniversity() {
     }
   };
 
+  const handleBack = () => {
+    router.push("/admin/universities");
+  };
+
   return (
     <section className="mx-auto mt-5">
       <div className="rounded-md border bg-slate-50 shadow-sm">
 
         <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <Truck className="text-blue-700" size={24} />
+            <School className="text-blue-700" size={24} />
           </div>
 
           <div>
@@ -112,12 +122,24 @@ export default function RegisterUniversity() {
           />
         </div>
 
-        <div className="flex justify-end border-t rounded-b-xl px-6 py-5">
+        <div className="flex justify-end gap-2 border-t rounded-b-xl px-6 py-5">
+
+          <Button
+            onClick={handleBack}
+            disabled={loading}
+            icon={<ChevronLeft  className="h-5 w-5" />}
+            text={"Back"}
+            bgColor="bg-slate-50"
+            textColor="text-slate-700"
+            borderColor="border-slate-600"
+            hoverTextColor="hover:text-slate-800"
+            hoverBorderColor="hover:border-slate-700"
+          />
 
           <Button
             onClick={handleCreate}
-            disabled={loading}
-            icon={<PlusCircle className="h-5 w-5" />}
+            disabled={loading || !isFormValid}
+            icon={<GraduationCap  className="h-5 w-5" />}
             text={loading ? "Creating..." : "Create University"}
             bgColor="bg-blue-50"
             textColor="text-blue-700"

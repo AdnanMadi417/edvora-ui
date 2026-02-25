@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, ChevronLeft, GraduationCap, Pencil, Trash2 } from 'lucide-react';
+import { CalendarPlus, ChevronLeft,ArrowLeft, GraduationCap, Pencil, Trash2 } from 'lucide-react';
 
 import { useUniversityDetails } from "hooks/knowledge-hub/universities/useUniversitiesDetails";
 import { useUpdateUniversity } from "hooks/knowledge-hub/universities/useEditUniversitiesDetails";
@@ -50,6 +50,7 @@ const UniversityEdit = ({ id }: Props) => {
     useUniversityDetails(id);
 
   const { deleteBranch, deleteLoading } = useDeleteBranch();
+  const [initialFormData, setInitialFormData] = React.useState<any>(null);
 
   const { states } = useKnowledgeHubStates();
 
@@ -111,7 +112,7 @@ const UniversityEdit = ({ id }: Props) => {
   React.useEffect(() => {
     if (!university) return;
 
-    setFormData({
+    const data = {
       name: university.name || "",
       country: university.country || "",
       description: university.description || "",
@@ -123,7 +124,10 @@ const UniversityEdit = ({ id }: Props) => {
         state_id: b.state_id ? String(b.state_id) : "",
       })),
       is_active: university.is_active ?? true,
-    });
+    };
+
+    setFormData(data);
+    setInitialFormData(data);
 
   }, [university, branches]);
   const updateFormData = (field: string, value: any) => {
@@ -132,6 +136,14 @@ const UniversityEdit = ({ id }: Props) => {
       [field]: value,
     }));
   };
+
+  const isFormChanged = React.useMemo(() => {
+    if (!initialFormData) return false;
+
+    return JSON.stringify(normalizePayload(formData)) !==
+      JSON.stringify(normalizePayload(initialFormData));
+
+  }, [formData, initialFormData]);
 
   const updateBranchField = (
     index: number,
@@ -335,13 +347,25 @@ const UniversityEdit = ({ id }: Props) => {
 
             </div>
           ))}
-        </div>      </div>
+        </div>
+      </div>
 
-      <div className="flex justify-end border-t p-6">
+      <div className="flex justify-end gap-2 border-t p-6">
+
+        <Button
+          onClick={handleBack}
+          icon={<ArrowLeft className="h-5 w-5" />}
+          text={ "Back"}
+          bgColor="bg-slate-50"
+          textColor="text-slate-700"
+          borderColor="border-slate-600"
+          hoverTextColor="hover:text-slate-800"
+          hoverBorderColor="hover:border-slate-700"
+        />
 
         <Button
           onClick={handleUpdate}
-          disabled={updateLoading}
+          disabled={updateLoading || !isFormChanged}
           icon={<Pencil className="h-5 w-5" />}
           text={updateLoading ? "Updating..." : "Save Changes"}
           bgColor="bg-blue-50"

@@ -30,7 +30,6 @@ import { useServiceProviders } from "../../../../hooks/serviceProviders/useServi
 
 import ViewDetailsModal from "../../../admin/logisticalService/popup/ViewDetailsModal";
 import EditDetailsModal from "../../../admin/logisticalService/popup/EditDetailsModal";
-// import DeleteProgramConfirmation from "../../KnowledgeHub/program/popups/DeleteProgramConfirmation";
 
 import Link from "next/link";
 
@@ -449,12 +448,6 @@ const LogisticalServiceProviderTable = () => {
         provider={selectedProvider}
       />
 
-      {/*<DeleteProgramConfirmation*/}
-      {/*  isOpen={isDeleteOpen}*/}
-      {/*  onClose={() => setIsDeleteOpen(false)}*/}
-      {/*  isDeleting={isDeleting}*/}
-      {/*  onConfirm={handleSelectAll}*/}
-      {/*/>*/}
     </div>
   );
 };

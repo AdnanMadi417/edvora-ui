@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { PlusCircle, XCircle, Building2 } from "lucide-react";
+import { XCircle, GitBranch } from "lucide-react";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "../../../../ui/buttons/Button";
@@ -44,6 +44,11 @@ export default function CreateBranch({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const isFormValid =
+    formData.name.trim() &&
+    formData.location.trim() &&
+    formData.state_id;
 
   useEffect(() => {
     if (isOpen) {
@@ -131,7 +136,7 @@ export default function CreateBranch({
           <ModalHeader
             title="Create New Branch"
             description="Add a new branch to this university."
-            icon={Building2}
+            icon={GitBranch}
             iconBg="bg-blue-50"
             iconColor="text-blue-600"
             iconBorder="border-blue-200"
@@ -174,18 +179,23 @@ export default function CreateBranch({
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <button
+
+            <Button
               onClick={onClose}
-              className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
-            >
-              <XCircle className="h-4 w-4" />
-              Cancel
-            </button>
+              disabled={branchLoading}
+              icon={<XCircle  className="h-5 w-5" />}
+              text={branchLoading ? "Cancelling..." : "Cancel"}
+              bgColor="bg-slate-50"
+              textColor="text-slate-700"
+              borderColor="border-slate-600"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-700"
+            />
 
             <Button
               onClick={handleCreate}
-              disabled={branchLoading}
-              icon={<PlusCircle className="h-5 w-5" />}
+              disabled={branchLoading || !isFormValid}
+              icon={<GitBranch className="h-5 w-5" />}
               text={branchLoading ? "Creating..." : "Create Branch"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"

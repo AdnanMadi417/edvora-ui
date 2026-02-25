@@ -8,14 +8,14 @@ import {
   Clock,
   ExternalLink,
 } from "lucide-react";
-import HoldPopup from "../popups/admin/Hold";
-import UpdateStatus from "../popups/admin/UpdateStatus";
+import HoldPopup from "../popups/accountmanager/Hold";
+import UpdateStatus from "../popups/accountmanager/UpdateStatus";
 
 interface Props {
   application: any;
 }
 
-export default function ApplicationAdminTopBar({ application }: Props) {
+export default function AccountManagerTopBar({ application }: Props) {
 
   const router = useRouter();
 
@@ -45,7 +45,7 @@ export default function ApplicationAdminTopBar({ application }: Props) {
 
   const handleBack = () => {
     setIsDropdownOpen(false);
-    router.push("/admin/applications");
+    router.push("/account-manager/applications");
   };
 
   const handleHold = () => {

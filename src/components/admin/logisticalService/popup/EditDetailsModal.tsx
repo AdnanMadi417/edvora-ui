@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, PlusCircle, Trash2, Edit2 } from "lucide-react";
+import { Plus, Trash2, Edit2, XCircle } from 'lucide-react';
 import ModalHeader from "../../../ui/modal/ModalHeader";
 
 import { useLogisticServices } from "../../../../hooks/serviceProviders/useLogisticServicesList";
@@ -12,7 +12,7 @@ import { useEditLogisticsProvider } from "../../../../hooks/serviceProviders/use
 
 import CheckSimpleBoxGroup from "../../../form/CheckSimpleBoxGroup";
 import InputField from "../../../form/InputField";
-import AddInclude from "../../../ui/buttons/Button";
+import Button from "../../../ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
 import SelectField from "../../../form/SelectField";
@@ -374,7 +374,7 @@ export default function EditDetailsModal({
                   Packages Offered
                 </h4>
 
-                <AddInclude
+                <Button
                   icon={<Plus className="h-5 w-5" />}
                   text="Add Package"
                   bgColor="bg-amber-50"
@@ -491,7 +491,7 @@ export default function EditDetailsModal({
                     </div>
 
                     <div className="mt-3 flex justify-end">
-                      <AddInclude
+                      <Button
                         icon={<Plus className="h-4 w-4" />}
                         text="Add Item"
                         bgColor="bg-amber-50"
@@ -561,9 +561,21 @@ export default function EditDetailsModal({
             )}
           </div>
 
-          <div className="flex justify-end border-t border-gray-200 px-6 py-4">
-            <AddInclude
-              icon={<PlusCircle className="h-5 w-5" />}
+          <div className="flex justify-end gap-2 border-t border-gray-200 px-6 py-4">
+
+            <Button
+              onClick={onClose}
+              icon={<XCircle  className="h-5 w-5" />}
+              text={"Cancel"}
+              bgColor="bg-slate-50"
+              textColor="text-slate-700"
+              borderColor="border-slate-600"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-700"
+            />
+
+            <Button
+              icon={<Edit2 className="h-5 w-5" />}
               text={
                 loadingEditLogisticsProvider ? "updating..." : "Update Service"
               }

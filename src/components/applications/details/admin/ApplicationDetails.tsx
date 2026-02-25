@@ -1,5 +1,5 @@
 import React from "react";
-import ApplicationAdminTopBar from "../../topBar/ApplicationAdminTopBar";
+import AdminTopBar from "../../topBar/AdminTopBar";
 
 import {
   FaTasks,
@@ -76,7 +76,7 @@ export default function ApplicationDetails({
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
-        <ApplicationAdminTopBar application={application} />
+        <AdminTopBar application={application} />
 
         <div className="flex flex-col items-start gap-4 sm:flex-row">
           <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">

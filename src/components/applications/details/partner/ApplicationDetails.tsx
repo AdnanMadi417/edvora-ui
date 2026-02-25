@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ApplicationPartnerTopBar from "../../topBar/ApplicationPartnerTopBar";
+import ApplicationPartnerTopBar from "../../topBar/PartnerTopBar";
 import RequiredAction from "components/applications/popups/partner/RequiredAction";
 import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
 import api from "../../../../lib/useApi";
