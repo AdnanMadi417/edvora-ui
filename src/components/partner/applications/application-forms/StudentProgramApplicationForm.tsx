@@ -10,7 +10,7 @@ import {
   ChevronLeft,
   ChevronRight, Trash2,
 } from 'lucide-react';
-import { ENGLISH_TEST_OPTIONS, QUALIFICATION_OPTIONS } from "constants/lists";
+import { ENGLISH_TEST_OPTIONS, NATIONALITIES, QUALIFICATION_OPTIONS } from 'constants/lists';
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
@@ -23,6 +23,7 @@ import { useMe } from "hooks/useMe";
 import Loading from "components/loading/Loading";
 
 import { useSearchParams } from "next/navigation";
+import { useAllQualifications } from '../../../../hooks/knowledge-hub/qualifications/useQualificationsList';
 
 interface Student {
   name: string;
@@ -125,6 +126,8 @@ export default function StudentManualApplication() {
   >([]);
 
   const [initOnly, setInitOnly] = useState(true);
+
+  const { qualifications } = useAllQualifications();
 
   const getCurrentDate = () => {
     const d = new Date();
@@ -669,14 +672,18 @@ export default function StudentManualApplication() {
                   updateFormData={updateFormData}
                 />
 
-                <InputField
+                <SelectField
                   label="Nationality"
                   field="student.nationality"
-                  placeholder="Malaysian"
+                  options={NATIONALITIES.map((q) => ({
+                    value: String(q.label),
+                    label: q.name,
+                  }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
+
                 <InputField
                   label="Passport Number"
                   field="student.passport_number"
@@ -732,14 +739,19 @@ export default function StudentManualApplication() {
               </div>
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+
                 <SelectField
                   label="Highest Qualification"
                   field="student.previous_educations[0].qualification"
-                  options={QUALIFICATION_OPTIONS}
+                  options={qualifications.map((q) => ({
+                    value: String(q.id),
+                    label: q.name,
+                  }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
+
                 <InputField
                   label="Institution Name"
                   field="student.previous_educations[0].institution_name"

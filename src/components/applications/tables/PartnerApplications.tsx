@@ -26,6 +26,8 @@ import Cookies from "js-cookie";
 import NextButton from "../../ui/buttons/NextButton";
 import PrevButton from "../../ui/buttons/PrevButton";
 import ClearButton from "../../ui/buttons/DangerButton";
+import Button from '../../ui/buttons/Button';
+import { useRouter } from 'next/navigation';
 
 const PartnerApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -35,6 +37,7 @@ const PartnerApplications = () => {
   const [filterStatus, setFilterStatus] = useState("all_status");
   const [filterStages, setFilterStages] = useState("all_stages");
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const itemsPerPage = 10;
 
@@ -195,6 +198,10 @@ const PartnerApplications = () => {
     );
   };
 
+  const handleApplicationRouter = () => {
+    router.push("/partner/applications/new-application");
+  };
+
   return (
     <div className="mt-6 overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
@@ -256,12 +263,16 @@ const PartnerApplications = () => {
               </select>
             </div>
 
-            <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href="/partner/applications/new-application"
-            >
-              New Application
-            </Link>
+            <Button
+              onClick={handleApplicationRouter}
+              icon={<User  className="h-5 w-5" />}
+              text={"Create Application"}
+              bgColor="bg-blue-50"
+              textColor="text-blue-700"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-blue-800"
+              hoverBorderColor="hover:border-blue-700"
+            />
 
             <ClearButton
               onClick={() => {

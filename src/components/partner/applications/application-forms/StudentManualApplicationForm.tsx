@@ -10,9 +10,13 @@ import {
   ChevronLeft,
   ChevronRight, Trash2,
 } from 'lucide-react';
-import { ENGLISH_TEST_OPTIONS, QUALIFICATION_OPTIONS } from "constants/lists";
+import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from "constants/lists";
 import { useToast } from "components/context/ToastContext";
+
 import api from "lib/useApi";
+import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
+
+
 import Cookies from "js-cookie";
 import { useUniversities } from "hooks/useUniversities";
 import { InputField, SelectField, RadioField } from "components/form";
@@ -124,11 +128,15 @@ export default function StudentManualApplicationForm() {
   const [completedStages, setCompletedStages] = useState([]);
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
+
   const {
     universities,
     loading: universitiesLoading,
     error: universitiesError,
   } = useUniversities();
+
+  const { qualifications } = useAllQualifications();
+
   const { user, loading: userLoading, error: userError } = useMe();
   const [documentTypes, setDocumentTypes] = useState<
     { id: string; type: string; description: string }[]
@@ -669,14 +677,18 @@ export default function StudentManualApplicationForm() {
                   updateFormData={updateFormData}
                 />
 
-                <InputField
+                <SelectField
                   label="Nationality"
                   field="student.nationality"
-                  placeholder="Malaysian"
+                  options={NATIONALITIES.map((q) => ({
+                    value: String(q.label),
+                    label: q.name,
+                  }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
+
                 <InputField
                   label="Passport Number"
                   field="student.passport_number"
@@ -735,7 +747,10 @@ export default function StudentManualApplicationForm() {
                 <SelectField
                   label="Highest Qualification"
                   field="student.previous_educations[0].qualification"
-                  options={QUALIFICATION_OPTIONS}
+                  options={qualifications.map((q) => ({
+                    value: String(q.id),
+                    label: q.name,
+                  }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
