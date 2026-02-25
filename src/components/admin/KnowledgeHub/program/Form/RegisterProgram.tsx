@@ -15,6 +15,9 @@ import SearchableSelect from "../../../../form/SearchableSelect";
 import CreateProgramButton from "../../../../ui/buttons/Button";
 import CreateUniversity from "components/admin/KnowledgeHub/university/popups/CreateUniversity";
 import CreateFieldOfStudy from "components/admin/KnowledgeHub/program/popups/CreateFieldOfStudy";
+import CreateBranch from "components/admin/KnowledgeHub/program/popups/CreateBranch";
+import CreateCommissionType from "components/admin/KnowledgeHub/program/popups/CreateCommissionType";
+
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
 
@@ -23,6 +26,7 @@ import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversi
 import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
 import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
 import { useAllBranches } from "hooks/knowledge-hub/universities/useBranchesList";
+import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
 
 export interface FormData {
   name: string;
@@ -38,8 +42,7 @@ export interface FormData {
   is_on_campus: boolean;
   is_online: boolean;
   has_scholarship: boolean;
-  commission_rate: number;
-  commission_type: number;
+  commission_type_id: string;
   commission_notes: string;
   qualification_level: number;
 
@@ -67,12 +70,17 @@ export interface FormData {
 type FormErrors = Partial<Record<keyof FormData, string>>;
 
 export default function RegisterProgram() {
+
   const [showUniversityPopup, setShowUniversityPopup] = useState(false);
+  const [showCommissionTypePopup, setShowCommissionTypePopup] = useState(false);
   const [showFieldOfStudyPopup, setShowFieldOfStudyPopup] = useState(false);
+  const [showBranchPopup, setShowBranchPopup] = useState(false);
+
   const { showToast } = useToast();
   const router = useRouter();
 
   const { createProgram, createProgramLoading } = useCreateProgram();
+  const { commissionTypes, commissionTypesLoading } = useCommissionTypes();
 
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -90,8 +98,7 @@ export default function RegisterProgram() {
     is_on_campus: false,
     is_online: false,
     has_scholarship: false,
-    commission_rate: 0,
-    commission_type: 1,
+    commission_type_id: "",
     commission_notes:
       "Commission paid 30 days after student completes first semester of each academic year.",
     qualification_level: 0,
@@ -100,7 +107,15 @@ export default function RegisterProgram() {
 
     yearly_fees: [],
     one_time_fees: [],
-    scholarships: [],
+    scholarships: [
+      {
+        type: 0,
+        coverage_percent: 0,
+        max_amount: 0,
+        name: "",
+        description: "",
+      },
+    ],
   });
 
   const { fields } = useAllFields();
@@ -108,35 +123,86 @@ export default function RegisterProgram() {
 
   const { universities } = useAllUniversities();
 
-  const updateFormData = <K extends keyof FormData>(
-    field: K,
-    value: FormData[K]
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  const updateFormData = (field: string, value: any) => {
+    setFormData((prev) => {
+      const updated = structuredClone(prev);
+
+      // Convert scholarships[0].type → scholarships.0.type
+      const keys = field.replace(/\[(\d+)\]/g, ".$1").split(".");
+
+      let current: any = updated;
+
+      for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i];
+
+        if (current[key] === undefined) {
+          current[key] = isNaN(Number(keys[i + 1])) ? {} : [];
+        }
+
+        current = current[key];
+      }
+
+      current[keys[keys.length - 1]] = value;
+
+      return updated;
+    });
   };
 
   const handleSubmit = async () => {
     try {
+
+      if (!formData.uni_id) {
+        showToast("University is required", "error");
+        return;
+      }
+
+      if (!formData.branch_id) {
+        showToast("Branch is required", "error");
+        return;
+      }
+
+      if (!formData.field_of_study_id) {
+        showToast("Field of study is required", "error");
+        return;
+      }
+
       const payload = {
         ...formData,
-        tuition_fee: Number(formData.tuition_fee),
-        duration: Number(formData.duration),
-        commission_rate: Number(formData.commission_rate),
-        qualification_level: Number(formData.qualification_level),
 
-        intake_dates: formData.intake_dates,
+        tuition_fee: Number(formData.tuition_fee || 0),
+        duration: Number(formData.duration || 0),
+        qualification_level: Number(formData.qualification_level || 3),
+        commission_amount: Number(formData.commission_amount || 0),
 
-        yearly_fees: formData.yearly_fees || [],
-        one_time_fees: formData.one_time_fees || [],
-        scholarships: formData.scholarships || [],
+        yearly_fees: (formData.yearly_fees || []).map((y) => ({
+          year: Number(y.year),
+          fee: Number(y.fee),
+        })),
+
+        one_time_fees: (formData.one_time_fees || []).map((f: any) => ({
+          description: f.description || "",
+          fee: Number(f.fee || 0),
+        })),
+
+        scholarships: formData.has_scholarship
+          ? (formData.scholarships || [])
+            .filter((s) => s.name && s.description)
+            .map((s) => ({
+              type: Number(s.type || 0),
+              coverage_percent: Number(s.coverage_percent || 0),
+              max_amount: Number(s.max_amount || 0),
+              name: s.name,
+              description: s.description,
+            }))
+          : [],
       };
 
       await createProgram(payload);
 
       showToast("Program created successfully", "success");
 
-      router.push("/dashboard/programs");
+      // router.push("/admin/knowledge-hub/programs");
+
     } catch (err: any) {
       const apiErrors = err?.response?.data?.detail;
 
@@ -219,8 +285,8 @@ export default function RegisterProgram() {
                   {
                     label: "Create Branch",
                     icon: <PlusCircle className="h-4 w-4" />,
-                    onClick: () => setShowFieldOfStudyPopup(true)
-                  }
+                    onClick: () => setShowBranchPopup(true),
+                  },
                 ]}
               />
 
@@ -379,32 +445,29 @@ export default function RegisterProgram() {
                 updateFormData={updateFormData}
               />
 
-              <SelectField
+              <SearchableSelect
                 label="Commission Type"
-                field="commission_type"
-                options={[
-                  { label: "Percentage", value: 1 },
-                  { label: "Fixed Amount", value: 2 },
+                field="commission_type_id"
+                options={commissionTypes.map((f) => ({
+                  value: String(f.id),
+                  label: f.name,
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+                actions={[
+                  {
+                    label: "Create Commission Type",
+                    icon: <PlusCircle className="h-4 w-4" />,
+                    onClick: () => setShowCommissionTypePopup(true)
+                  }
                 ]}
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
-
-              <InputField
-                label="Commission Rate (%)"
-                field="commission_rate"
-                type="number"
-                placeholder="e.g. 10"
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
               />
 
               <InputField
                 label="Qualification Level"
                 field="qualification_level"
-                type="number"
+                type="string"
                 placeholder="e.g. 3"
                 required
                 formData={formData}
@@ -470,12 +533,10 @@ export default function RegisterProgram() {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <SelectField
                 label="Scholarship Type"
-                field="type"
+                field="scholarships[0].type"
                 options={[
-                  { value: "full", label: "Full Scholarship" },
-                  { value: "partial", label: "Partial Scholarship" },
-                  { value: "merit", label: "Merit Based" },
-                  { value: "need", label: "Need Based" },
+                  { value: "0", label: "Full Scholarship" },
+                  { value: "1", label: "Partial Scholarship" },
                 ]}
                 formData={formData}
                 errors={errors}
@@ -484,7 +545,7 @@ export default function RegisterProgram() {
 
               <InputField
                 label="Coverage Percent"
-                field="coverage_percent"
+                field="scholarships[0].coverage_percent"
                 type="number"
                 placeholder="e.g. 10"
                 required
@@ -495,7 +556,7 @@ export default function RegisterProgram() {
 
               <InputField
                 label="Max Amount"
-                field="max_amount"
+                field="scholarships[0].max_amount"
                 type="number"
                 placeholder="e.g. 10000"
                 required
@@ -506,7 +567,7 @@ export default function RegisterProgram() {
 
               <InputField
                 label="Scholarship Name"
-                field="name"
+                field="scholarships[0].name"
                 placeholder="e.g.Scholarship"
                 type="text"
                 required
@@ -517,7 +578,7 @@ export default function RegisterProgram() {
 
               <InputField
                 label="Description"
-                field="description"
+                field="scholarships[0].description"
                 placeholder="e.g. Description Scholarship"
                 type="text"
                 required
@@ -549,9 +610,20 @@ export default function RegisterProgram() {
         onClose={() => setShowUniversityPopup(false)}
       />
 
+      <CreateCommissionType
+        isOpen={showCommissionTypePopup}
+        onClose={() => setShowCommissionTypePopup(false)}
+      />
+
       <CreateFieldOfStudy
         isOpen={showFieldOfStudyPopup}
         onClose={() => setShowFieldOfStudyPopup(false)}
+      />
+
+      <CreateBranch
+        isOpen={showBranchPopup}
+        onClose={() => setShowBranchPopup(false)}
+        universityId={formData.uni_id}
       />
 
     </section>

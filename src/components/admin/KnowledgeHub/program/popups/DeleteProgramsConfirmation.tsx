@@ -83,7 +83,7 @@ export default function DeleteProgramsConfirmation({
                   {programNames.map((name, index) => (
                     <li
                       key={index}
-                      className="inline-flex max-w-md items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm"
+                      className="inline-flex max-w-md items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700"
                     >
                       <span className="truncate">{name}</span>
                     </li>
@@ -100,14 +100,19 @@ export default function DeleteProgramsConfirmation({
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
 
-            <button
+            <DeleteBtn
+              icon={<XCircle className="h-5 w-5" />}
+              text={
+                isDeleting ? "Cancelling..." : "Cancel Program"
+              }
+              bgColor="bg-slate-50"
+              textColor="text-slate-700"
+              borderColor="border-slate-600"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-700"
               onClick={onClose}
               disabled={isDeleting}
-              className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 shadow-md  hover:scale-105 disabled:opacity-50"
-            >
-              <XCircle className="h-4 w-4" />
-              Cancel
-            </button>
+            />
 
             <DeleteBtn
               icon={<PlusCircle className="h-5 w-5" />}

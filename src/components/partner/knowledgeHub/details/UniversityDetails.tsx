@@ -41,11 +41,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     router.push("/partner/knowledgeHub/");
   };
 
-  const commissionLabel = {
-    one_time: "One-time",
-    per_student: "Per Student",
-  };
-
   const { program, requiredDocuments, commission } = useProgram(id);
 
   if (!program) return <Loading text="Loading program details..." />;
@@ -100,7 +95,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <p className="text-xs text-slate-500">Country</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.branch?.length
-                    ? program.branch.map(b => b.locations).join(", ")
+                    ? program.branch.map(b => b.location).join(", ")
                     : "Not Provided"}
                 </p>
               </div>
@@ -440,7 +435,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
             <div className="relative flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-md transition-transform">
               <span className="text-2xl font-bold text-green-700">
-                {commissionLabel[commission?.type] || "One Time"}
+                {commission?.type?? "One Time"}
               </span>
               <p className="text-sm font-semibold text-green-900">
                 Commission Type

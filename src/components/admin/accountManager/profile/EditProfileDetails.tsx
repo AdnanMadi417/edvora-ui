@@ -103,12 +103,12 @@ export default function EditProfileDetails({
   return (
     <section>
 
-      <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-card shadow-sm transition-all duration-300 hover:shadow-md">
+      <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-card shadow-sm transition-all duration-300">
 
         <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-5">
 
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-slate-700 transition-transform group-hover:scale-105">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-slate-700 transition-transform group-hover:scale-105">
               {manager.name?.charAt(0).toUpperCase() ?? "?"}
             </div>
 
@@ -131,7 +131,7 @@ export default function EditProfileDetails({
           </div>
         </div>
 
-        <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent" />
+        <div className="h-px w-full bg-slate-200" />
 
         <div className="space-y-6 p-6">
           <InputField
@@ -164,17 +164,18 @@ export default function EditProfileDetails({
           />
         </div>
 
-        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-slate-200 bg-card px-6 py-4 backdrop-blur-xl">
+        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-slate-200 bg-card px-6 py-4">
 
           <CancelBtn
             icon={<XCircle className="h-4 w-4" />}
             text={loading ? "Cancel..." : "Cancel Changes"}
             bgColor="bg-slate-50"
-            textColor="text-slate-700"
-            borderColor="border-slate-600"
-            hoverTextColor="hover:text-slate-800"
+            textColor="text-slate-500"
+            borderColor="border-slate-500"
+            hoverTextColor="hover:text-slate-700"
             hoverBorderColor="hover:border-slate-700"
             onClick={handleCancel}
+
           />
 
           <UpdatedBtn

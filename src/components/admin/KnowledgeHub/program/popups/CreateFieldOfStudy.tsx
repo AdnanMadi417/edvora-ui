@@ -70,6 +70,7 @@ export default function CreateFieldOfStudy({
       showToast("Field Of Study created successfully.");
 
       onClose();
+      setTimeout(() => location.reload(), 1500);
     } catch (err: any) {
       const apiErrors = err?.response?.data?.detail;
 

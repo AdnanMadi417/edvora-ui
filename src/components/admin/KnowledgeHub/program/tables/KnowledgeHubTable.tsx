@@ -25,18 +25,16 @@ import { AiOutlineBank } from "react-icons/ai";
 import { useAllPrograms } from "../../../../../hooks/knowledge-hub/programs/useProgramsList";
 import { useAllFields } from "../../../../../hooks/knowledge-hub/programs/useFieldsList";
 import { useKnowledgeHubStates } from "../../../../../hooks/knowledge-hub/programs/useProgramStates";
+import { useDeleteKnowledgeHubPrograms } from "../../../../../hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms";
 
 import FilterSelectField from "../../../../form/filter/FilterSelectField";
 
 import NextButton from "../../../../ui/buttons/NextButton";
 import PrevButton from "../../../../ui/buttons/PrevButton";
 
-import NoMessagesFound from "../../../../emptyData/NoMessagesFound";
 import EmptyData from "../../../../emptyData/EmptyTableData";
 
 import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
-import { useDeleteKnowledgeHubProgram } from "../../../../../hooks/knowledge-hub/programs/useDeleteKnowledgeHubProgram";
-import { useDeleteKnowledgeHubPrograms } from "../../../../../hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms";
 
 import Loading from "../../../../loading/Loading";
 import Link from "next/link";
@@ -56,18 +54,17 @@ const KnowledgeHubTable = () => {
 
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
-
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(
     null
   );
 
-  const { deleteProgram } = useDeleteKnowledgeHubProgram();
+  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteMode, setDeleteMode] = useState<"single" | "batch" | null>(null);
   const { deletePrograms } =
     useDeleteKnowledgeHubPrograms();
 
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [deleteMode, setDeleteMode] = useState<"single" | "batch" | null>(null);
   const { showToast } = useToast();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -182,22 +179,23 @@ const KnowledgeHubTable = () => {
 
   const handleDelete = async () => {
     try {
+      let ids: string[] = [];
 
       if (deleteMode === "single" && selectedProgramId) {
-        await deleteProgram(selectedProgramId);
+        ids = [selectedProgramId];
       }
 
       if (deleteMode === "batch") {
-        const ids = Object.keys(selectedPrograms).filter(
+        ids = Object.keys(selectedPrograms).filter(
           (id) => selectedPrograms[id]
         );
-
-        if (ids.length === 0) return;
-
-        await deletePrograms(ids);
       }
 
-      showToast( "Deleted successfully");
+      if (ids.length === 0) return;
+
+      await deletePrograms(ids);
+
+      showToast("Deleted successfully");
 
       setIsDeleteOpen(false);
       setDeleteMode(null);
@@ -209,8 +207,7 @@ const KnowledgeHubTable = () => {
       console.error(error);
       showToast("Delete failed");
     }
-  };
-  const selectedCount = Object.values(selectedPrograms).filter(Boolean).length;
+  };  const selectedCount = Object.values(selectedPrograms).filter(Boolean).length;
 
   const handleSelectProgram = (id: string) => {
     setSelectedPrograms((prev) => ({
@@ -602,11 +599,11 @@ const KnowledgeHubTable = () => {
                             <div className="flex items-center gap-2 text-sm">
                               {Program.has_scholarship ? (
                                 <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs text-green-600">
-                                  <XCircle className="h-4 w-4" /> Available
+                                  <CheckCircle className="h-4 w-4" /> Available
                                 </span>
                               ) : (
                                 <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs text-red-600">
-                                  <CheckCircle className="h-4 w-4" /> Not
+                                  <XCircle className="h-4 w-4" /> Not
                                   Available
                                 </span>
                               )}

@@ -7,6 +7,7 @@ import { CalendarPlus, ChevronLeft, GraduationCap, Pencil, Trash2 } from 'lucide
 import { useUniversityDetails } from "hooks/knowledge-hub/universities/useUniversitiesDetails";
 import { useUpdateUniversity } from "hooks/knowledge-hub/universities/useEditUniversitiesDetails";
 import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
+import { useDeleteBranch } from "hooks/knowledge-hub/universities/useDeleteBranch";
 
 import InputField from "../../../../../form/InputField";
 import MultipleDateInput from "../../../../../form/MultipleDateInput";
@@ -15,7 +16,8 @@ import SelectField from "../../../../../form/SelectField";
 import Button from '../../../../../ui/buttons/Button';
 import Loading from "../../../../../loading/Loading";
 import IconButton from '../../../../../ui/buttons/IconButton';
-
+import EmptyData from '../../../../../emptyData/EmptyTableData';
+import { useToast } from '../../../../../context/ToastContext';
 
 const normalizePayload = (formData: any) => {
   return {
@@ -42,9 +44,12 @@ interface Props {
 
 const UniversityEdit = ({ id }: Props) => {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const { university, branches, universityLoading } =
     useUniversityDetails(id);
+
+  const { deleteBranch, deleteLoading } = useDeleteBranch();
 
   const { states } = useKnowledgeHubStates();
 
@@ -70,11 +75,28 @@ const UniversityEdit = ({ id }: Props) => {
     }));
   };
 
-  const handleRemoveBranch = (index: number) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      branches: prev.branches.filter((_: any, i: number) => i !== index),
-    }));
+  const handleRemoveBranch = async (index: number) => {
+    const branch = formData.branches[index];
+
+    if (!branch) return;
+
+    try {
+
+      if (branch.id) {
+        await deleteBranch(id, branch.id);
+
+        showToast("Branch deleted successfully.");
+      }
+
+      setFormData((prev: any) => ({
+        ...prev,
+        branches: prev.branches.filter((_: any, i: number) => i !== index),
+      }));
+
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to delete branch.", "error");
+    }
   };
 
   const [formData, setFormData] = React.useState<any>({
@@ -138,7 +160,10 @@ const UniversityEdit = ({ id }: Props) => {
 
       await updateUniversity(payload);
 
-      alert("University updated successfully");
+      showToast("University created successfully.");
+
+      setTimeout(() => location.reload(), 1500);
+
     } catch (err) {
       console.error(err);
     }
@@ -149,13 +174,12 @@ const UniversityEdit = ({ id }: Props) => {
   }
 
   if (!university) {
-    return <p className="p-6">University not found.</p>;
+    return <EmptyData />;
   }
 
   return (
-    <div className="mt-6 rounded-md border bg-white shadow-sm">
+    <div className="mt-6 rounded-md border bg-white">
 
-      {/* Header */}
       <div className="flex justify-between border-b p-6">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
@@ -172,13 +196,17 @@ const UniversityEdit = ({ id }: Props) => {
           </div>
         </div>
 
-        <button
-          onClick={handleBack}
-          className="flex items-center gap-2 rounded-full px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          Back
-        </button>
+        <div className="flex items-center gap-2 sm:gap-6">
+          <button
+            onClick={handleBack}
+            className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
+          >
+            <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+            <span className="hidden sm:inline">Back to universities</span>
+          </button>
+
+        </div>
+
       </div>
 
       <div className="px-6 py-6 space-y-5">
@@ -272,6 +300,7 @@ const UniversityEdit = ({ id }: Props) => {
 
                 <InputField
                   label="Branch Name"
+                  placeholder="e.g Branch Name"
                   field="name"
                   formData={branch}
                   errors={{}}
@@ -282,6 +311,7 @@ const UniversityEdit = ({ id }: Props) => {
 
                 <InputField
                   label="Location"
+                  placeholder="e.g Location"
                   field="location"
                   formData={branch}
                   errors={{}}

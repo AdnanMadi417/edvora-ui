@@ -5,10 +5,10 @@ import { useParams } from "next/navigation";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 import EmptyData from "components/emptyData/EmptyData";
-import ApplicationDetails from "../../../../components/applications/details/account-manager/ApplicationDetails";
-import ApplicationDocuments from "../../../../components/applications/details/account-manager/ApplicationDocuments";
-import OfferLetterCard from "../../../../components/applications/details/account-manager/OfferLetterCard";
-import VisaTrackingTimeline from "../../../../components/applications/details/account-manager/VisaTrackingTimeline";
+import ApplicationDetails from "../../../../components/applications/details/admin/ApplicationDetails";
+import ApplicationDocuments from "../../../../components/applications/details/admin/ApplicationDocuments";
+import OfferLetterCard from "../../../../components/applications/details/admin/OfferLetterCard";
+import VisaTrackingTimeline from "../../../../components/applications/details/admin/VisaTrackingTimeline";
 import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -26,11 +26,11 @@ export default function ApplicationPage() {
     const fetchApplication = async () => {
       try {
         const token = Cookies.get("token");
-        const managerId = localStorage.getItem("managerId");
-        if (!managerId || !id) return;
+
+        if (!id) return;
 
         const res = await api.get(
-          `/account-managers/${managerId}/applications/${id}`,
+          `/admin/applications/${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 

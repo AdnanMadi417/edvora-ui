@@ -6,6 +6,7 @@ import { ChevronLeft, GraduationCap } from "lucide-react";
 import { useUniversityDetails } from "hooks/knowledge-hub/universities/useUniversitiesDetails";
 import Loading from "../../../../loading/Loading";
 import { MdEvent, MdLocationCity, MdPublic } from 'react-icons/md';
+import EmptyData from '../../../../emptyData/EmptyTableData';
 
 interface UniversityDetailsProps {
   id: string;
@@ -26,7 +27,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   }
 
   if (!university) {
-    return <p className="p-6">University not found.</p>;
+    return <EmptyData />;
   }
 
   return (

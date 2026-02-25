@@ -17,7 +17,7 @@ export type CreateProgramPayload = {
   has_scholarship: boolean;
 
   commission_amount: number;
-  commission_type: number;
+  commission_type_id: string;
   commission_notes: string;
 
   qualification_level: number;
@@ -56,12 +56,21 @@ export function useCreateProgram() {
     resetState();
 
     try {
+
       const sanitizedPayload = {
         ...payload,
-        intake_dates: payload.intake_dates || [],
-        yearly_fees: payload.yearly_fees || [],
-        one_time_fees: payload.one_time_fees || [],
-        scholarships: payload.scholarships || [],
+
+        name: payload.name?.trim(),
+        overview: payload.overview?.trim(),
+        curriculum: payload.curriculum?.trim(),
+
+        intake_dates: payload.intake_dates ?? [],
+        yearly_fees: payload.yearly_fees ?? [],
+        one_time_fees: payload.one_time_fees ?? [],
+
+        scholarships: payload.has_scholarship
+          ? payload.scholarships ?? []
+          : [],
       };
 
       const res = await api.post(
