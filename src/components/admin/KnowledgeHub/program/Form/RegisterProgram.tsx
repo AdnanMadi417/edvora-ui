@@ -1,9 +1,7 @@
 "use client";
 
-import { Truck, PlusCircle } from "lucide-react";
+import { BookOpen, CalendarPlus, ChevronLeft, PlusCircle, Trash2 } from 'lucide-react';
 import React, { useState } from "react";
-
-import Loading from "../../../../loading/Loading";
 
 import ToggleInput from "../../../../form/ToggleInput";
 import InputField from "../../../../form/InputField";
@@ -12,9 +10,12 @@ import SelectField from "../../../../form/SelectField";
 import MultipleDateInput from "../../../../form/MultipleDateInput";
 import SearchableSelect from "../../../../form/SearchableSelect";
 
-import CreateProgramButton from "../../../../ui/buttons/Button";
-import CreateUniversity from "components/admin/KnowledgeHub/university/popups/CreateUniversity";
+import { DURATION,  SCHOLARSHIP_TYPE } from 'constants/lists';
+
+import Button from '../../../../ui/buttons/Button';
+import CreateUniversity from "components/admin/KnowledgeHub/program/popups/CreateUniversity";
 import CreateFieldOfStudy from "components/admin/KnowledgeHub/program/popups/CreateFieldOfStudy";
+import CreateQualificationType from "components/admin/KnowledgeHub/program/popups/CreateQualificationType";
 import CreateBranch from "components/admin/KnowledgeHub/program/popups/CreateBranch";
 import CreateCommissionType from "components/admin/KnowledgeHub/program/popups/CreateCommissionType";
 
@@ -24,9 +25,10 @@ import { useRouter } from "next/navigation";
 import { useCreateProgram } from "hooks/knowledge-hub/programs/useCreateKnowledgeHubProgram";
 import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
 import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
-import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
 import { useAllBranches } from "hooks/knowledge-hub/universities/useBranchesList";
 import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
+import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
+import IconButton from '../../../../ui/buttons/IconButton';
 
 export interface FormData {
   name: string;
@@ -44,7 +46,7 @@ export interface FormData {
   has_scholarship: boolean;
   commission_type_id: string;
   commission_notes: string;
-  qualification_level: number;
+  qualification_id: string;
 
   commission_amount: number;
 
@@ -75,11 +77,12 @@ export default function RegisterProgram() {
   const [showCommissionTypePopup, setShowCommissionTypePopup] = useState(false);
   const [showFieldOfStudyPopup, setShowFieldOfStudyPopup] = useState(false);
   const [showBranchPopup, setShowBranchPopup] = useState(false);
+  const [showQualificationPopup, setShowQualificationPopup] = useState(false);
 
   const { showToast } = useToast();
   const router = useRouter();
 
-  const { createProgram, createProgramLoading } = useCreateProgram();
+  const { createProgram, loading } = useCreateProgram();
   const { commissionTypes, commissionTypesLoading } = useCommissionTypes();
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -101,7 +104,7 @@ export default function RegisterProgram() {
     commission_type_id: "",
     commission_notes:
       "Commission paid 30 days after student completes first semester of each academic year.",
-    qualification_level: 0,
+    qualification_id: "",
 
     commission_amount: 0,
 
@@ -119,17 +122,75 @@ export default function RegisterProgram() {
   });
 
   const { fields } = useAllFields();
+  const { qualifications } = useAllQualifications();
   const { branches } = useAllBranches(formData.uni_id);
 
   const { universities } = useAllUniversities();
 
+  const removeScholarship = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      scholarships: prev.scholarships.filter((_, i) => i !== index),
+    }));
+  };
+
+  const addScholarship = () => {
+    setFormData((prev) => ({
+      ...prev,
+      scholarships: [
+        ...prev.scholarships,
+        {
+          type: 0,
+          coverage_percent: 0,
+          max_amount: 0,
+          name: "",
+          description: "",
+        },
+      ],
+    }));
+  };
+
+  const isFormValid = React.useMemo(() => {
+    const basicValid =
+      formData.name.trim() !== "" &&
+      formData.uni_id !== "" &&
+      formData.branch_id !== "" &&
+      formData.field_of_study_id !== "" &&
+      formData.commission_type_id !== "" &&
+      formData.qualification_id !== "" &&
+      formData.english_required_score.trim() !== "" &&
+      formData.overview.trim() !== "" &&
+      formData.curriculum.trim() !== "" &&
+      formData.intake_dates.length > 0 &&
+      formData.tuition_fee > 0 &&
+      formData.duration > 0 &&
+      formData.commission_amount >= 0;
+
+    const yearlyFeesValid =
+      formData.yearly_fees.length === 0 ||
+      formData.yearly_fees.every(
+        (y) => y.year > 0 && y.fee > 0
+      );
+
+    const oneTimeFeesValid =
+      formData.one_time_fees.length === 0 ||
+      formData.one_time_fees.every(
+        (f) => f.description.trim() !== "" && f.fee > 0
+      );
+
+    return (
+      basicValid &&
+      yearlyFeesValid &&
+      oneTimeFeesValid
+    );
+  }, [formData]);
+
   const updateFormData = (field: string, value: any) => {
+
     setFormData((prev) => {
       const updated = structuredClone(prev);
 
-      // Convert scholarships[0].type → scholarships.0.type
       const keys = field.replace(/\[(\d+)\]/g, ".$1").split(".");
-
       let current: any = updated;
 
       for (let i = 0; i < keys.length - 1; i++) {
@@ -143,6 +204,10 @@ export default function RegisterProgram() {
       }
 
       current[keys[keys.length - 1]] = value;
+
+      if (field === "has_scholarship" && value === false) {
+        updated.scholarships = [];
+      }
 
       return updated;
     });
@@ -166,12 +231,27 @@ export default function RegisterProgram() {
         return;
       }
 
+      if (!formData.commission_type_id) {
+        showToast("Commission type is required", "error");
+        return;
+      }
+
+      if (!formData.qualification_id) {
+        showToast("Qualification level is required", "error");
+        return;
+      }
+
+      if (!formData.intake_dates.length) {
+        showToast("At least one intake date is required", "error");
+        return;
+      }
+
       const payload = {
         ...formData,
 
         tuition_fee: Number(formData.tuition_fee || 0),
         duration: Number(formData.duration || 0),
-        qualification_level: Number(formData.qualification_level || 3),
+        qualification_id: formData.qualification_id ,
         commission_amount: Number(formData.commission_amount || 0),
 
         yearly_fees: (formData.yearly_fees || []).map((y) => ({
@@ -201,7 +281,7 @@ export default function RegisterProgram() {
 
       showToast("Program created successfully", "success");
 
-      // router.push("/admin/knowledge-hub/programs");
+      router.push("/admin/knowledge-hub/programs");
 
     } catch (err: any) {
       const apiErrors = err?.response?.data?.detail;
@@ -222,12 +302,16 @@ export default function RegisterProgram() {
     }
   };
 
+  const handleBack = () => {
+    router.push("/admin/knowledge-hub/programs");
+  };
+
   return (
     <section className="mx-auto mt-5">
       <div className="rounded-md border bg-slate-50 shadow-sm">
         <div className="flex items-start gap-x-4 border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <Truck className="text-blue-700" size={24} />
+            <BookOpen  className="text-blue-700" size={24} />
           </div>
 
           <div>
@@ -338,11 +422,13 @@ export default function RegisterProgram() {
             </h3>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <InputField
+              <SelectField
                 label="Duration (Years)"
                 field="duration"
-                type="number"
-                placeholder="e.g. 3"
+                options={DURATION.map((d) => ({
+                  value: d.year,
+                  label: d.label,
+                }))}
                 required
                 formData={formData}
                 errors={errors}
@@ -464,20 +550,29 @@ export default function RegisterProgram() {
                 ]}
               />
 
-              <InputField
+              <SearchableSelect
                 label="Qualification Level"
-                field="qualification_level"
-                type="string"
-                placeholder="e.g. 3"
-                required
+                field="qualification_id"
+                options={qualifications.map((f) => ({
+                  value: String(f.id),
+                  label: f.name.charAt(0).toUpperCase() + f.name.slice(1),
+                }))}
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                actions={[
+                  {
+                    label: "Create Qualification Level",
+                    icon: <PlusCircle className="h-4 w-4" />,
+                    onClick: () => setShowQualificationPopup(true)
+                  }
+                ]}
               />
+
             </div>
           </div>
 
-          <div className="space-y-4 px-6 border-b border-slate-200">
+          <div className="space-y-4 px-6 py-5 border-b border-slate-200">
             <ArrayObjectField
               label="Yearly Fees"
               subLabel="Year"
@@ -525,82 +620,147 @@ export default function RegisterProgram() {
             />
           </div>
 
-          <div className="space-y-6 px-6 ">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Scholarship
-            </h3>
+          {formData.has_scholarship && (
+            <div className="space-y-6 px-6 border-t border-slate-200 py-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                  Scholarships
+                </h3>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <SelectField
-                label="Scholarship Type"
-                field="scholarships[0].type"
-                options={[
-                  { value: "0", label: "Full Scholarship" },
-                  { value: "1", label: "Partial Scholarship" },
-                ]}
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
+                <IconButton
+                  icon={<CalendarPlus className="h-4 w-4" />}
+                  bgColor="bg-blue-50"
+                  textColor="text-blue-700"
+                  borderColor="border-blue-600"
+                  hoverTextColor="hover:text-blue-800"
+                  hoverBorderColor="hover:border-blue-700"
+                  onClick={addScholarship}
+                />
 
-              <InputField
-                label="Coverage Percent"
-                field="scholarships[0].coverage_percent"
-                type="number"
-                placeholder="e.g. 10"
-                required
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
+              </div>
 
-              <InputField
-                label="Max Amount"
-                field="scholarships[0].max_amount"
-                type="number"
-                placeholder="e.g. 10000"
-                required
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
+              {formData.scholarships.map((_, index) => (
+                <div
+                  key={index}
+                  className="rounded-xl border border-slate-200 bg-white p-6 transition "
+                >
+                  {/* Header */}
+                  <div className="mb-5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
+                        {index + 1}
+                      </div>
 
-              <InputField
-                label="Scholarship Name"
-                field="scholarships[0].name"
-                placeholder="e.g.Scholarship"
-                type="text"
-                required
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">
+                          Scholarship
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Configure scholarship details
+                        </p>
+                      </div>
+                    </div>
 
-              <InputField
-                label="Description"
-                field="scholarships[0].description"
-                placeholder="e.g. Description Scholarship"
-                type="text"
-                required
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
+                    {formData.scholarships.length > 1 && (
+                      <IconButton
+                        icon={<Trash2 className="h-4 w-4" />}
+                        onClick={() => removeScholarship(index)}
+                        bgColor="bg-red-50"
+                        textColor="text-red-600"
+                        borderColor="border-red-200"
+                        hoverTextColor="hover:text-red-700"
+                        hoverBorderColor="hover:border-red-300"
+                      />
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <SelectField
+                      label="Scholarship Type"
+                      field={`scholarships[${index}].type`}
+                      options={SCHOLARSHIP_TYPE.map((d) => ({
+                        value: d.value,
+                        label: d.label,
+                      }))}
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                    />
+
+                    <InputField
+                      label="Coverage Percentage"
+                      field={`scholarships[${index}].coverage_percent`}
+                      type="number"
+                      placeholder="e.g. 50"
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                    />
+
+                    <InputField
+                      label="Maximum Amount"
+                      field={`scholarships[${index}].max_amount`}
+                      type="number"
+                      placeholder="e.g. 10000"
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                    />
+
+                    <InputField
+                      label="Scholarship Name"
+                      field={`scholarships[${index}].name`}
+                      placeholder="e.g. Excellence Award"
+                      type="text"
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                    />
+
+                    <div className="md:col-span-2">
+                      <InputField
+                        label="Description"
+                        field={`scholarships[${index}].description`}
+                        placeholder="Short description..."
+                        type="text"
+                        formData={formData}
+                        errors={errors}
+                        updateFormData={updateFormData}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
             </div>
-          </div>
+          )}
+
         </div>
 
-        <div className="flex justify-end border-t px-6 py-5">
-          <CreateProgramButton
-            icon={<PlusCircle className="h-5 w-5" />}
-            text={createProgramLoading ? "Creating..." : "Create Service"}
+        <div className="flex justify-end border-t px-6 py-5 gap-2">
+
+          <Button
+            onClick={handleBack}
+            disabled={loading}
+            icon={<ChevronLeft  className="h-5 w-5" />}
+            text={"Back"}
+            bgColor="bg-slate-50"
+            textColor="text-slate-700"
+            borderColor="border-slate-600"
+            hoverTextColor="hover:text-slate-800"
+            hoverBorderColor="hover:border-slate-700"
+          />
+
+          <Button
+            icon={<BookOpen className="h-5 w-5" />}
+            text={loading ? "Creating..." : "Create Program"}
             bgColor="bg-blue-50"
             textColor="text-blue-700"
             borderColor="border-blue-600"
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
             onClick={handleSubmit}
-            disabled={createProgramLoading}
+            disabled={loading || !isFormValid}
           />
         </div>
       </div>
@@ -613,6 +773,11 @@ export default function RegisterProgram() {
       <CreateCommissionType
         isOpen={showCommissionTypePopup}
         onClose={() => setShowCommissionTypePopup(false)}
+      />
+
+      <CreateQualificationType
+        isOpen={showQualificationPopup}
+        onClose={() => setShowQualificationPopup(false)}
       />
 
       <CreateFieldOfStudy
