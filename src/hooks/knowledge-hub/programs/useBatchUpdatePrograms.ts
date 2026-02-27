@@ -1,0 +1,47 @@
+import { useState } from "react";
+import api from "../../../lib/useApi";
+
+
+interface BatchUpdateProgramPayload {
+  program_ids: string[];
+
+  commission_amount?: number;
+  commission_type_id?: string;
+  commission_notes?: string;
+}
+
+export function useBatchUpdatePrograms() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const batchUpdatePrograms = async (
+    payload: BatchUpdateProgramPayload
+  ) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await api.put(
+        "/knowledge-hub/programs-batch",
+        payload
+      );
+
+      return res.data;
+    } catch (err: any) {
+      const errorMessage =
+        err?.response?.data?.detail ||
+        "Batch update programs failed";
+
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    batchUpdatePrograms,
+    loading,
+    error,
+  };
+}

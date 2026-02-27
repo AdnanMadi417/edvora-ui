@@ -275,8 +275,8 @@ const KnowledgeHubDetails = ({ id }: UniversityDetailsProps) => {
                 <p className="text-xs text-slate-500">Intake Dates</p>
 
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-slate-900">
-                  {program?.university.intake_months?.length ? (
-                    program.university.intake_months.map((date, index) => (
+                  {program?.intake_dates?.length ? (
+                    program.intake_dates.map((date, index) => (
                       <span
                         key={`${date}-${index}`}
                         className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 transition hover:border-green-600"

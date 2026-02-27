@@ -375,3 +375,17 @@ export const ENGLISH_TEST_OPTIONS = [
   { label: "EmSAT English", value: "EmSAT" },
   { label: "Qiyas English", value: "Qiyas" },
 ];
+
+export const DURATION = [
+  { year: 1, label: "One Year" },
+  { year: 3, label: "Bachelor (3 Years)" },
+  { year: 4, label: "Bachelor (4 Years)" },
+  { year: 2, label: "Master (2 Years)" },
+  { year: 5, label: "PhD (5 Years)" }
+];
+
+export const SCHOLARSHIP_TYPE = [
+  { value: "1", label: "Full Scholarship" },
+  { value: "2", label: "Partial Scholarship" },
+  { value: "3", label: "No Scholarship" }
+];

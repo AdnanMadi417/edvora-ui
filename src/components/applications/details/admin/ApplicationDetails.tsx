@@ -71,8 +71,6 @@ export default function ApplicationDetails({
     3: "border-red-200 bg-red-50 text-red-700",
   }[application.lifecycle_status] ?? "border-gray-200 bg-gray-50 text-gray-600";
 
-
-
   return (
     <section>
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
