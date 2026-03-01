@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  CalendarPlus,
   ChevronLeft,
   Clock,
   MoreVertical,
@@ -22,7 +21,6 @@ import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import { useToast } from "components/context/ToastContext";
 import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
 
 interface UniversityDetailsProps {
   id: string;
@@ -131,7 +129,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     <>
       <div className="mt-6">
         <div className="rounded-md border bg-card shadow-sm">
-          <div className="flex justify-between rounded-tl-md rounded-tr-md border-b bg-slate-50 p-6">
+          <div className="flex justify-between rounded-tl-md rounded-tr-md border-b bg-gray-50 p-6">
             <div className="block">
               <h2 className="text-lg font-semibold">
                 Application Required Fields
@@ -252,7 +250,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
           </div>
 
-          <div className="flex justify-end gap-2 border-t px-6 py-5">
+          <div className="flex justify-end gap-2 bg-gray-50 border-t rounded-b-md px-6 py-5">
             <Button
               onClick={handleBack}
               disabled={loading}
