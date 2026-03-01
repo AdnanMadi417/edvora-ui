@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 
 import { AccountManager } from "hooks/account-managers/useAccountManagerDetails";
 import InputField from "../../../form/InputField";
-import ToggleInput from "../../../form/ToggleInput";
+import ToggleInput from "../../../form/toggle/ToggleInput";
 import UpdatedBtn from "../../../ui/buttons/Button";
 import CancelBtn from "../../../ui/buttons/Button";
 import { useToast } from "../../../context/ToastContext";

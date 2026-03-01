@@ -6,7 +6,7 @@ import { PlusCircle, XCircle, BadgePercent } from 'lucide-react';
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "../../../../ui/buttons/Button";
 import InputField from "../../../../form/InputField";
-import ToggleInput from '../../../../form/ToggleInput';
+import ToggleInput from '../../../../form/toggle/ToggleInput';
 
 import { useCreateCommissionType } from "hooks/knowledge-hub/commission/useCreateCommissionType";
 import { useToast } from "components/context/ToastContext";

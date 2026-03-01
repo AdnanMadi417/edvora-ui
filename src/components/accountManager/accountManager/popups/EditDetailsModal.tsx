@@ -7,7 +7,7 @@ import { useToast } from "../../../context/ToastContext";
 import { useEditAccountManager } from "../../../../hooks/account-managers/useEditAccountManager";
 import InputField from "../../../form/InputField";
 import UpdatedBtn from "../../../ui/buttons/Button";
-import ToggleInput from '../../../form/ToggleInput';
+import ToggleInput from '../../../form/toggle/ToggleInput';
 
 interface EditAccountManagerModalProps {
   isOpen: boolean;

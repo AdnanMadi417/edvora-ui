@@ -1,14 +1,21 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Clock, GraduationCap, MoreVertical} from 'lucide-react';
+import {
+  ChevronLeft,
+  Clock,
+  FileText,
+  GraduationCap,
+  MoreVertical,
+  FileCheck,
+} from "lucide-react";
 
 import { useUniversityDetails } from "hooks/knowledge-hub/config-universities/useUniversityDetails";
 
 import Loading from "components/loading/Loading";
 
-import EmptyData from 'components/emptyData/EmptyTableData';
+import EmptyData from "components/emptyData/EmptyTableData";
 
 interface UniversityDetailsProps {
   id: string;
@@ -20,7 +27,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const { university, loading, error } = useUniversityDetails(id);
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-
 
   const handleBack = () => {
     router.push("/admin/config-universities");
@@ -39,12 +45,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   }
 
   if (!university) {
-    return <EmptyData  />;
+    return <EmptyData />;
   }
 
   return (
     <>
-
       <div className="mt-6">
         <div className="rounded-md border bg-card shadow-sm">
           <div className="flex justify-between border-b p-6">
@@ -65,7 +70,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <button
                   onClick={() =>
                     setOpenDropdownId(
-                      openDropdownId === university.id ? null : university.id,
+                      openDropdownId === university.id ? null : university.id
                     )
                   }
                   className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
@@ -75,16 +80,14 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 </button>
 
                 {openDropdownId === university.id && (
-                  <div
-                    className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
+                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
                     <div className="space-y-2 p-2">
                       <button
                         aria-label="Update Program Details"
                         className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:shadow-sm"
                         onClick={handleUpdate}
                       >
-                        <div
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
                           <Clock className="h-4 w-4" />
                         </div>
 
@@ -98,8 +101,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                         className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
                         onClick={handleBack}
                       >
-                        <div
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
                           <ChevronLeft className="h-4 w-4" />
                         </div>
 
@@ -112,7 +114,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 )}
               </div>
             </div>
-
           </div>
 
           <div className="px-6 py-6">
@@ -121,51 +122,108 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </h3>
 
             <div className="grid grid-cols-1 ">
-
               <p className="text-xs text-slate-500">
                 {university.description
                   ? university.description
                   : "Not Provided"}
               </p>
-
             </div>
-
           </div>
 
           <div className="border-t border-gray-200 px-6 py-6">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Required Fields
-            </h3>
+            <div className="mb-6 flex items-center justify-between">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                Required Fields Configuration
+              </h3>
+
+              <div className="text-xs text-slate-500">
+                {university?.required_fields?.filter((f) => f.is_required)
+                  .length || 0}{" "}
+                Required •{" "}
+                {university?.required_fields?.filter((f) => !f.is_required)
+                  .length || 0}{" "}
+                Optional
+              </div>
+            </div>
 
             {!university || university.required_fields.length === 0 ? (
               <p className="text-sm text-slate-500">
-                No required fields configured.
+                No field configuration available.
               </p>
             ) : (
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                {university.required_fields.map((field) => (
-                  <div
-                    key={field.id}
-                    className="rounded-md border border-gray-200 bg-gray-50 p-3"
-                  >
-                    <p className="text-sm font-medium text-slate-900">
-                      {field.field_name}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Key: {field.field_key}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Required: {field.is_required ? "Yes" : "No"}
-                    </p>
+              <>
+                {/* REQUIRED SECTION */}
+
+                <div className="mb-8">
+                  <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-900">
+                    Required Fields
+                  </h4>
+
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {university.required_fields
+                      ?.filter((field) => field.is_required)
+                      .map((field) => (
+                        <div
+                          key={field.id}
+                          className="group relative rounded-xl border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-slate-300 hover:shadow-sm"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex min-w-0 items-center gap-3">
+                              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition group-hover:bg-blue-100">
+                                <FileCheck className="h-4 w-4" />
+                              </span>
+
+                              <p className="truncate text-sm font-semibold text-slate-900">
+                                {field.field_name}
+                              </p>
+                            </div>
+
+                            <span className="shrink-0 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-blue-600">
+                              Required
+                            </span>
+                          </div>
+                        </div>
+                      ))}
                   </div>
-                ))}
-              </div>
+                </div>
+
+                <div>
+                  <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
+                    Optional Fields
+                  </h4>
+
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+                    {university.required_fields
+                      .filter((field) => !field.is_required)
+                      .map((field) => (
+                        <div
+                          key={field.id}
+                          className="group relative rounded-md border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-slate-300 hover:shadow-sm"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex min-w-0 items-center gap-3">
+                              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-50 text-slate-500">
+                                <FileText className="h-4 w-4" />
+                              </span>
+
+                              <p className="truncate text-sm font-semibold text-slate-900">
+                                {field.field_name}
+                              </p>
+                            </div>
+
+                            <span className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
+                              Required
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </>
             )}
           </div>
-
         </div>
       </div>
-
     </>
   );
 };

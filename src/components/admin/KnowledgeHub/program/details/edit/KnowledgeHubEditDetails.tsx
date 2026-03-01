@@ -8,7 +8,7 @@ import Loading from "../../../../../loading/Loading";
 import { DURATION,  SCHOLARSHIP_TYPE } from 'constants/lists';
 
 import InputField from "../../../../../form/InputField";
-import ToggleInput from "../../../../../form/ToggleInput";
+import ToggleInput from "../../../../../form/toggle/ToggleInput";
 import MultipleDateInput from "../../../../../form/MultipleDateInput";
 
 import Button from 'components/ui/buttons/Button';
@@ -279,7 +279,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
       showToast("Program updated successfully");
 
-      // router.push("/admin/knowledge-hub/programs");
+      router.push("/admin/knowledge-hub/programs");
     } catch (err) {
       console.error(err);
       showToast("Update failed");

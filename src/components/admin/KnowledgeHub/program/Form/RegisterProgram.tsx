@@ -3,7 +3,7 @@
 import { BookOpen, CalendarPlus, ChevronLeft, PlusCircle, Trash2 } from 'lucide-react';
 import React, { useState } from "react";
 
-import ToggleInput from "../../../../form/ToggleInput";
+import ToggleInput from "../../../../form/toggle/ToggleInput";
 import InputField from "../../../../form/InputField";
 import ArrayObjectField from "../../../../form/ArrayObjectField";
 import SelectField from "../../../../form/SelectField";
