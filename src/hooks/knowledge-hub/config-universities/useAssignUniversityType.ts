@@ -1,34 +1,39 @@
 import { useState } from "react";
-import api from "../../../lib/useApi";
+import api from "lib/useApi";
 import Cookies from "js-cookie";
 
-interface UpdateUniversityTypePayload {
+export interface AssignUniversityTypePayload {
   university_type_id: string | null;
 }
 
-interface UniversityTypeResponse {
+export interface UniversityTypeResponse {
   id: string;
   name: string;
   university_type_id: string | null;
   university_type_name: string | null;
 }
 
-export function useUpdateUniversityType(universityId: string) {
+export function useAssignUniversityType(
+  universityId: string | null
+) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>("");
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [data, setData] = useState<UniversityTypeResponse | null>(null);
+  const [data, setData] =
+    useState<UniversityTypeResponse | null>(null);
 
-  const updateUniversityType = async (
-    payload: UpdateUniversityTypePayload
+  const assignUniversityType = async (
+    payload: AssignUniversityTypePayload
   ) => {
-    if (!universityId) return;
-
-    setLoading(true);
-    setError("");
-    setSuccess(false);
+    if (!universityId) {
+      throw new Error("University ID is required");
+    }
 
     try {
+      setLoading(true);
+      setError("");
+      setSuccess(false);
+
       const token = Cookies.get("token");
 
       const res = await api.put(
@@ -50,7 +55,7 @@ export function useUpdateUniversityType(universityId: string) {
 
       setError(
         err?.response?.data?.detail?.[0]?.msg ||
-        "Failed to update university type"
+        "Failed to assign university type"
       );
 
       throw err;
@@ -60,7 +65,7 @@ export function useUpdateUniversityType(universityId: string) {
   };
 
   return {
-    updateUniversityType,
+    assignUniversityType,
     loading,
     error,
     success,

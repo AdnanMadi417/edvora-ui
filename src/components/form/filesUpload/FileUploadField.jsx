@@ -1,4 +1,4 @@
-import { Upload, Trash2, File } from "lucide-react";
+import { Upload, Trash2, FileCheck } from "lucide-react";
 import React from 'react';
 
 const FileUploadField = ({
@@ -68,8 +68,8 @@ const FileUploadField = ({
         <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 transition">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 truncate">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600">
-                <File className="h-5 w-5" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-600">
+                <FileCheck className="h-5 w-5" />
               </div>
 
               <div className="min-w-0">
