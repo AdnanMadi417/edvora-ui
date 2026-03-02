@@ -1,10 +1,18 @@
 import { useState, useEffect } from "react";
 import api from "../../../lib/useApi";
 
+export type ApplicationRequiredField = {
+  id: string;
+  field_key: string;
+  is_required: boolean;
+  field_name: string;
+};
+
 export interface University {
   id: string;
   name: string;
   description?: string;
+  required_fields: ApplicationRequiredField[];
 }
 
 export function useUniversityTypes() {

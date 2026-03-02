@@ -9,27 +9,27 @@ import {
   Settings,
   Eye,
   Pencil,
-  Globe,
-  Phone,
-  Image,
+  Building2,
+  PhoneCall,
+  UserRound,
+  Camera,
   MapPin,
-  GraduationCap, Trash2,
+  GraduationCap, Trash2, BadgeCheck,
 } from 'lucide-react';
-import { MdCancel, MdOutlineCategory, MdSchool, MdVerified } from 'react-icons/md';
+import { CheckCircle, XCircle } from "lucide-react";
 
-import { useGetUniversities } from "hooks/knowledge-hub/config-universities/useGetUniversities";
+import { useUniversityTypes } from "hooks/knowledge-hub/config-universities/useUniversityTypesQuery";
+import { useDeleteUniversityType } from 'hooks/knowledge-hub/config-universities/useDeleteUniversityType';
+
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
-
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
-
 import Loading from "components/loading/Loading";
-
 import Button from "components/ui/buttons/Button";
 import { useRouter } from "next/navigation";
+
 import DeleteUniversityConfirmation from '../../KnowledgeHub/university/popups/DeleteUniversityConfirmation';
-import { useDeleteUniversityType } from '../../../../hooks/knowledge-hub/config-universities/useDeleteUniversityType';
 import { useToast } from '../../../context/ToastContext';
 
 const UniversityManagementTable = () => {
@@ -45,10 +45,19 @@ const UniversityManagementTable = () => {
   const [selectedUniversityName, setSelectedUniversityName] =
     useState<string>("");
 
-  const { universitiesList, loading, error } = useGetUniversities();
+  const { universities, loading, error } = useUniversityTypes();
 
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
+
+  const isFieldRequired = (
+    requiredFields: any[],
+    fieldKey: string
+  ) => {
+    return requiredFields?.some(
+      (f) => f.field_key === fieldKey && f.is_required
+    );
+  };
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -57,7 +66,7 @@ const UniversityManagementTable = () => {
   const filteredUniversities = React.useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
 
-    return universitiesList.filter((university) => {
+    return universities.filter((university) => {
       const matchSearch =
         !term || university.name?.toLowerCase().includes(term);
 
@@ -67,7 +76,7 @@ const UniversityManagementTable = () => {
 
       return matchSearch && matchField;
     });
-  }, [universitiesList, searchTerm, selectedState, selectedField]);
+  }, [universities, searchTerm, selectedState, selectedField]);
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -114,27 +123,6 @@ const UniversityManagementTable = () => {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
-  };
-
-  const typeConfig: Record<string, any> = {
-    minimal: {
-      bg: "bg-blue-50 border-blue-200",
-      text: "text-blue-700",
-      dot: "bg-blue-600",
-      label: "Minimal",
-    },
-    extended: {
-      bg: "bg-green-50 border-green-200",
-      text: "text-green-700",
-      dot: "bg-green-600",
-      label: "Extended",
-    },
-    conditional: {
-      bg: "bg-orange-50 border-orange-200",
-      text: "text-orange-700",
-      dot: "bg-orange-600",
-      label: "Conditional",
-    },
   };
 
   const handleDelete = async () => {
@@ -232,60 +220,63 @@ const UniversityManagementTable = () => {
         <div className="block">
           <div className="overflow-x-auto rounded-lg rounded-b-none bg-card">
             <table className="w-full">
+
               <thead>
-                <tr className="border-b border-slate-200 bg-card">
-                  <th className="group min-w-[220px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-secondary">
-                    <div className="flex items-center gap-2">
-                      <MdSchool className="h-4 w-4 text-slate-500" />
-                      <span>University</span>
-                    </div>
-                  </th>
+              <tr className="border-b border-slate-200 bg-slate-50 ">
 
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                    <div className="flex min-w-[150px] items-center gap-2">
-                      <MdOutlineCategory className="h-4 w-4 text-slate-500" />
-                      <span>Type</span>
-                    </div>
-                  </th>
+                <th className="group min-w-[220px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-slate-500" />
+                    <span>University</span>
+                  </div>
+                </th>
 
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-slate-500" />
-                      <span>Phone</span>
-                    </div>
-                  </th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <PhoneCall className="h-4 w-4 text-slate-500" />
+                    <span>Number</span>
+                  </div>
+                </th>
 
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 text-slate-500" />
-                      <span>Address</span>
-                    </div>
-                  </th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-slate-500" />
+                    <span>Address</span>
+                  </div>
+                </th>
 
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                    <div className="flex items-center gap-2">
-                      <Image className="h-4 w-4 text-slate-500" />
-                      <span>Photo</span>
-                    </div>
-                  </th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <UserRound className="h-4 w-4 text-slate-500" />
+                    <span>Gender</span>
+                  </div>
+                </th>
 
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                    <div className="flex min-w-[180px] items-center gap-2">
-                      <Globe className="h-4 w-4 text-slate-500" />
-                      <span>English Certificate</span>
-                    </div>
-                  </th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <Camera className="h-4 w-4 text-slate-500" />
+                    <span>Photo</span>
+                  </div>
+                </th>
 
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                    <div className="flex items-center gap-2">
-                      <Settings className="h-4 w-4 text-slate-500" />
-                      <span>Actions</span>
-                    </div>
-                  </th>
-                </tr>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2 min-w-[120px]">
+                    <BadgeCheck className="h-4 w-4 text-slate-500" />
+                    <span>English Cert</span>
+                  </div>
+                </th>
+
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <Settings className="h-4 w-4 text-slate-500" />
+                    <span>Actions</span>
+                  </div>
+                </th>
+
+              </tr>
               </thead>
 
-              <tbody className="divide-border-slate-200 divide-y bg-primary">
+              <tbody className="divide-border-slate-200 divide-y bg-white">
                 {loading && (
                   <tr>
                     <td colSpan={8} className="px-6 py-8 text-center">
@@ -333,87 +324,55 @@ const UniversityManagementTable = () => {
                       </td>
 
                       <td className="px-6 py-4">
-                        <div className="flex justify-start">
-                          {(() => {
-                            const type = uni.university_type_name;
-
-                            const typeConfig: Record<string, any> = {
-                              minimal: {
-                                bg: "bg-blue-50 border-blue-200",
-                                text: "text-blue-700",
-                                dot: "bg-blue-600",
-                                label: "Minimal",
-                              },
-                              extended: {
-                                bg: "bg-green-50 border-green-200",
-                                text: "text-green-700",
-                                dot: "bg-green-600",
-                                label: "Extended",
-                              },
-                              conditional: {
-                                bg: "bg-orange-50 border-orange-200",
-                                text: "text-orange-700",
-                                dot: "bg-orange-600",
-                                label: "Conditional",
-                              },
-                            };
-
-                            const normalizedType = type
-                              ?.toLowerCase()
-                              .trim()
-                              .replace(/\s+/g, "_");
-
-                            const config = typeConfig[normalizedType] || {
-                              bg: "bg-gray-100 border-gray-200",
-                              text: "text-gray-700",
-                              dot: "bg-gray-400",
-                              label: type || "Not Provided",
-                            };
-
-                            return (
-                              <span
-                                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${config.bg} ${config.text}`}
-                                title={config.label}
-                              >
-                                <span
-                                  className={`h-2 w-2 rounded-full ${config.dot}`}
-                                ></span>
-                                <span className="truncate">{config.label}</span>
-                              </span>
-                            );
-                          })()}
+                        <div className="flex justify-center">
+                          {isFieldRequired(uni.required_fields, "student.phone") ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-red-500" />
+                          )}
                         </div>
                       </td>
 
                       <td className="px-6 py-4">
                         <div className="flex justify-center">
-                          <div className="rounded-lg bg-green-50 p-1.5 text-green-600 backdrop-blur-md">
-                            <MdVerified className="h-4 w-4" />
-                          </div>
+                          {isFieldRequired(
+                            uni.required_fields,
+                            "student.current_address"
+                          ) ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-red-500" />
+                          )}
                         </div>
                       </td>
 
                       <td className="px-6 py-4">
                         <div className="flex justify-center">
-                          <div className="rounded-lg bg-green-50 p-1.5 text-green-600 backdrop-blur-md">
-                            <MdVerified className="h-4 w-4" />
-                          </div>
+                          {isFieldRequired(uni.required_fields, "student.gender") ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-red-500" />
+                          )}
                         </div>
                       </td>
 
                       <td className="px-6 py-4">
                         <div className="flex justify-center">
-                          <div className="rounded-lg bg-green-50 p-1.5 text-green-600 backdrop-blur-md">
-                            <MdVerified className="h-4 w-4" />
-                          </div>
+                          {isFieldRequired(uni.required_fields, "student.english_proficiencies") ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-red-500" />
+                          )}
                         </div>
                       </td>
 
                       <td className="px-6 py-4">
                         <div className="flex justify-center">
-                          <div className="rounded-lg bg-green-50 p-1.5 text-green-600 backdrop-blur-md">
-                            <MdVerified className="h-4 w-4" />
-                          </div>
+                          {isFieldRequired(uni.required_fields, "student.photo") ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : (
+                            <XCircle className="h-5 w-5 text-red-500" />
+                          )}
                         </div>
                       </td>
 
@@ -464,8 +423,8 @@ const UniversityManagementTable = () => {
             </table>
           </div>
 
-          <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex  md:justify-between">
-            {universitiesList.length > 0 && (
+          <div className="grid grid-cols-1 items-center gap-4 border-t bg-slate-50 p-4 sm:p-6 md:flex  md:justify-between">
+            {universities.length > 0 && (
               <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                 Showing
                 <span className="font-medium">
@@ -475,11 +434,11 @@ const UniversityManagementTable = () => {
                 <span className="font-medium">
                   {Math.min(
                     currentPage * itemsPerPage,
-                    universitiesList.length
+                    universities.length
                   )}
                 </span>
                 of
-                <span className="font-medium">{universitiesList.length}</span>
+                <span className="font-medium">{universities.length}</span>
                 Universities
               </div>
             )}
@@ -494,7 +453,7 @@ const UniversityManagementTable = () => {
 
               <span className="px-3 py-1 font-medium text-slate-500">
                 Page {currentPage} of{" "}
-                {Math.ceil(universitiesList.length / itemsPerPage)}
+                {Math.ceil(universities.length / itemsPerPage)}
               </span>
 
               <NextButton
@@ -502,13 +461,13 @@ const UniversityManagementTable = () => {
                   setCurrentPage((prev) =>
                     Math.min(
                       prev + 1,
-                      Math.ceil(universitiesList.length / itemsPerPage)
+                      Math.ceil(universities.length / itemsPerPage)
                     )
                   )
                 }
                 disabled={
                   currentPage ===
-                  Math.ceil(universitiesList.length / itemsPerPage)
+                  Math.ceil(universities.length / itemsPerPage)
                 }
                 text="Next"
                 icon={<ArrowRight className="h-4 w-4" />}

@@ -133,9 +133,9 @@ export default function UniversityTypeForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 px-6 py-5">
           <InputField
-            label="Type Name"
+            label="Category Type"
             field="name"
-            placeholder="e.g. Public University"
+            placeholder="e.g. Type 1 - Minimal Submission"
             required
             formData={formData}
             errors={errors}
