@@ -199,7 +199,7 @@ const PartnerApplications = () => {
   };
 
   const handleApplicationRouter = () => {
-    router.push("/partner/applications/new-application");
+    router.push("/partner/applications/create");
   };
 
   return (

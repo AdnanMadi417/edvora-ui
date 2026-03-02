@@ -17,7 +17,6 @@ import {
   GraduationCap, Trash2, BadgeCheck,
 } from 'lucide-react';
 import { CheckCircle, XCircle } from "lucide-react";
-import { MdSchool, MdVerified } from 'react-icons/md';
 
 import { useUniversityTypes } from "hooks/knowledge-hub/config-universities/useUniversityTypesQuery";
 import { useDeleteUniversityType } from 'hooks/knowledge-hub/config-universities/useDeleteUniversityType';
