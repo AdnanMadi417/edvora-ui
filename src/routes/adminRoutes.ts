@@ -1,69 +1,56 @@
 import { IRoute } from "../types/navigation";
 import {
   MdBusinessCenter,
-  MdAddBusiness,
-  MdSupervisorAccount,
-  MdPersonAdd,
-  MdDescription,
+  MdHandshake,
+  MdAdminPanelSettings,
+  MdMenuBook,
   MdSchool,
+  MdManageAccounts,
+  MdAssignment,
 } from "react-icons/md";
-import { MdOutlineLibraryBooks , MdLibraryAdd } from "react-icons/md";
-
 
 const AdminRoutes: IRoute[] = [
   {
     name: "Applications",
     layout: "/admin",
     path: "/applications",
-    icon: MdDescription,
+    icon: MdAssignment,
   },
   {
     name: "Account Managers",
     layout: "/admin",
     path: "/account-managers",
-    icon: MdSupervisorAccount,
-    children: [
-      {
-        name: "Create Account Managers",
-        layout: "/admin/account-managers",
-        path: "/create",
-        icon: MdPersonAdd,
-      },
-    ],
+    icon: MdManageAccounts,
   },
   {
-    name: "Knowledge Hub",
+    name: "Partners",
     layout: "/admin",
-    path: "/knowledge-hub",
-    icon: MdOutlineLibraryBooks,
-    children: [
-      {
-        name: "Create Program",
-        layout: "/admin/knowledge-hub",
-        path: "/programs/create",
-        icon: MdLibraryAdd,
-      },
-      {
-        name: "Create University",
-        layout: "/admin/knowledge-hub",
-        path: "/universities/create",
-        icon: MdSchool,
-      },
-    ],
+    path: "/partners",
+    icon: MdHandshake,
+  },
+  {
+    name: "Universities",
+    layout: "/admin",
+    path: "/universities",
+    icon: MdSchool,
+  },
+  {
+    name: "University Configuration",
+    layout: "/admin",
+    path: "/config-universities",
+    icon: MdAdminPanelSettings,
+  },
+  {
+    name: "Programs",
+    layout: "/admin",
+    path: "/knowledge-hub/programs",
+    icon: MdMenuBook,
   },
   {
     name: "Logistical Service",
     layout: "/admin",
     path: "/logistical-service",
     icon: MdBusinessCenter,
-    children: [
-      {
-        name: "Create Logistical Partner",
-        layout: "/admin/logistical-service",
-        path: "/create",
-        icon: MdAddBusiness,
-      },
-    ],
   },
 ];
 

@@ -11,7 +11,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import ViewPopup from "components/applications/popups/ViewDoc";
-import HoldPopup from "../../popups/accountmanager/ResubmitDoc";
+import HoldPopup from "../../popups/admin/ResubmitDoc";
 import EmptyData from "components/emptyData/EmptyData";
 import { getDocumentDownloadUrl } from "services/documentService";
 import api from "lib/useApi"
@@ -37,7 +37,7 @@ export default function ApplicationDocuments({
         const appData = response.data;
 
         const correctionStatus = appData.stage_statuses?.find(
-          (s) => s.name === "Correction Requested by Account Manager"
+          (s) => s.name === "Correction Requested by Admin"
         );
 
         setCorrectionStatusId(correctionStatus?.id || null);

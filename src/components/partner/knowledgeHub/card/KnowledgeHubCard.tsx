@@ -17,9 +17,9 @@ import { MdMenuBook, MdAccessTime, MdAttachMoney } from 'react-icons/md';
 import Loading from '../../../loading/Loading';
 import NoMessagesFound from '../../../emptyData/NoMessagesFound';
 
-import { useAllPrograms } from '../../../../hooks/programs/useProgramsList';
-import { useAllFields } from '../../../../hooks/programs/useFieldsList';
-import { useKnowledgeHubStates } from '../../../../hooks/programs/useProgramStates';
+import { useAllPrograms } from '../../../../hooks/knowledge-hub/programs/useProgramsList';
+import { useAllFields } from '../../../../hooks/knowledge-hub/programs/useFieldsList';
+import { useKnowledgeHubStates } from '../../../../hooks/knowledge-hub/programs/useProgramStates';
 
 import FilterSelectField from '../../../form/filter/FilterSelectField';
 import NextButton from '../../../ui/buttons/NextButton';
@@ -35,7 +35,7 @@ const KnowledgeHubCards = () => {
     loading: programsLoading,
     error: programsError,
   } = useAllPrograms({});
-  const { states, loading, error } = useKnowledgeHubStates();
+  const { states, stateLoading, stateError } = useKnowledgeHubStates();
   const { fields, fieldsLoading, fieldsError } = useAllFields();
 
   const [selectedState, setSelectedState] = useState<string>('all');

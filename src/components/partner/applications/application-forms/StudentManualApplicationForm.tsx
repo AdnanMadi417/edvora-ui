@@ -5,14 +5,15 @@ import {
   Phone,
   Upload,
   FileText,
-  File,
-  CheckCircle,
-  ChevronLeft,
-  ChevronRight, Trash2,
+  ArrowLeft, ArrowRight,
 } from 'lucide-react';
-import { ENGLISH_TEST_OPTIONS, QUALIFICATION_OPTIONS } from "constants/lists";
+import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from "constants/lists";
 import { useToast } from "components/context/ToastContext";
+
 import api from "lib/useApi";
+import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
+import { useCreatePartnerApplication } from "hooks/applications/useCreatePartnerApplication";
+
 import Cookies from "js-cookie";
 import { useUniversities } from "hooks/useUniversities";
 import { InputField, SelectField, RadioField } from "components/form";
@@ -22,6 +23,10 @@ import {
 } from "services/uploadService";
 import { useMe } from "hooks/useMe";
 import Loading from "components/loading/Loading";
+import Button from "../../../ui/buttons/Button";
+import PrevButton from '../../../ui/buttons/PrevButton';
+import NextButton from '../../../ui/buttons/NextButton';
+import FileUploadField from '../../../form/filesUpload/FileUploadField';
 
 interface Student {
   name: string;
@@ -124,12 +129,24 @@ export default function StudentManualApplicationForm() {
   const [completedStages, setCompletedStages] = useState([]);
   const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
+
+  const { user } = useMe();
+  const partnerId = user?.partner_id;
+
   const {
     universities,
     loading: universitiesLoading,
     error: universitiesError,
   } = useUniversities();
-  const { user, loading: userLoading, error: userError } = useMe();
+
+  const {
+    createPartnerApplication,
+    loadingCreatePartnerApplication,
+    errorCreatePartnerApplication,
+  } = useCreatePartnerApplication(partnerId);
+
+  const { qualifications } = useAllQualifications();
+
   const [documentTypes, setDocumentTypes] = useState<
     { id: string; type: string; description: string }[]
   >([]);
@@ -285,7 +302,6 @@ export default function StudentManualApplicationForm() {
       try {
         const token = Cookies.get("token");
         const partnerId = localStorage.getItem("partnerId");
-
       } catch (err) {
         console.error("Error during initial fetch:", err);
       } finally {
@@ -358,7 +374,6 @@ export default function StudentManualApplicationForm() {
     });
 
     try {
-
       const presigned = await getPresignedUploads(files, "documents");
 
       const results = await uploadFilesToSpaces(
@@ -437,6 +452,41 @@ export default function StudentManualApplicationForm() {
     }));
   };
 
+  const isStageValid = (stageNum: number) => {
+    switch (stageNum) {
+      case 1:
+        return (
+          formData.student.name &&
+          formData.student.birthday &&
+          formData.student.gender !== null &&
+          formData.student.email &&
+          formData.student.phone &&
+          formData.student.nationality &&
+          formData.student.passport_number
+        );
+
+      case 2:
+        return (
+          formData.student.previous_educations[0]?.qualification &&
+          formData.student.previous_educations[0]?.institution_name &&
+          formData.student.previous_educations[0]?.end_date &&
+          formData.student.english_proficiencies[0]?.test_type
+        );
+
+      case 3:
+        return formData.university_id && formData.program_id;
+
+      case 4:
+        return true; // optional stage
+
+      case 5:
+        return formData.documents.length > 0;
+
+      default:
+        return true;
+    }
+  };
+
   const handleSubmit = async () => {
     const allValid =
       validateStage(1) &&
@@ -458,17 +508,6 @@ export default function StudentManualApplicationForm() {
         (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
       );
     });
-
-    if (missingDocs.length > 0) {
-
-      showToast(
-        `Please upload all required documents: ${missingDocs
-          .map((d) => d.type)
-          .join(",")}`,
-        "error"
-      );
-      return;
-    }
 
     if (missingDocs.length > 0) {
       showToast(
@@ -516,6 +555,7 @@ export default function StudentManualApplicationForm() {
           email: c.email || "",
         })),
       },
+
       documents: formData.documents.map((d) => ({
         document_type_id: d.document_type_id,
         file_url: d.file_url,
@@ -528,21 +568,16 @@ export default function StudentManualApplicationForm() {
     if (!formData.student_id) delete payload.student_id;
 
     try {
-      const token = Cookies.get("token");
-      const res = await api.post(
-        `/partners/${user.partner_id}/applications`,
-        payload,
-        { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-      );
+      await createPartnerApplication(payload);
+
       showToast("Application submitted successfully.", "success");
+
       setTimeout(() => {
         window.location.reload();
       }, 3000);
     } catch (err: any) {
       console.error("Error submitting application:", err);
-      const msg =
-        err?.response?.data?.message || "Failed to submit application.";
-      showToast(msg, "error");
+      showToast("Failed to submit application.", "error");
     }
   };
 
@@ -669,14 +704,18 @@ export default function StudentManualApplicationForm() {
                   updateFormData={updateFormData}
                 />
 
-                <InputField
+                <SelectField
                   label="Nationality"
                   field="student.nationality"
-                  placeholder="Malaysian"
+                  options={NATIONALITIES.map((q) => ({
+                    value: String(q.label),
+                    label: q.name,
+                  }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
+
                 <InputField
                   label="Passport Number"
                   field="student.passport_number"
@@ -735,7 +774,10 @@ export default function StudentManualApplicationForm() {
                 <SelectField
                   label="Highest Qualification"
                   field="student.previous_educations[0].qualification"
-                  options={QUALIFICATION_OPTIONS}
+                  options={qualifications.map((q) => ({
+                    value: String(q.id),
+                    label: q.name,
+                  }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
@@ -943,57 +985,35 @@ export default function StudentManualApplicationForm() {
                   <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
                 </div>
                 <p className="text-sm text-slate-800">
-                  Please upload all necessary documents to complete your
-                  application.
+                  Please upload all necessary documents to complete your application.
                 </p>
               </div>
 
               <div className="space-y-6">
                 {documentTypes.map((docType) => (
-                  <div
+                  <FileUploadField
                     key={docType.id}
-                    className="relative flex items-center justify-between rounded-md border border-default bg-white p-5 backdrop-blur transition-all duration-300 hover:shadow-sm"
-                  >
-                    <p className="mb-2 flex items-center justify-between font-medium text-blue-800 sm:mb-0">
-                      <File className="mr-2 h-4 w-4 text-slate-500" />
-
-                      <span>
-                        {docType.type.charAt(0).toUpperCase() +
-                          docType.type.slice(1)}
-                      </span>
-                    </p>
-
-                    <div className="flex items-center gap-3">
-
-                      <button
-                        type="button"
-                        onClick={() => removeDocument(docType.id)}
-                        className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Remove
-                      </button>
-
-                      <label
-                        className="bg-background flex items-center justify-center outline-0 gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-slate-500 transition hover:border-blue-600 hover:text-blue-600 sm:w-auto"
-                      >
-                        <Upload className="h-4 w-4" />
-                        <span className="hidden sm:inline">Upload</span>
-                        <input
-                          type="file"
-                          className="hidden"
-                          onChange={(e) => handleFileUpload(e, docType.id)}
-                        />
-                      </label>
-                    </div>
-
-
-                  </div>
+                    label={
+                      docType.type.charAt(0).toUpperCase() +
+                      docType.type.slice(1)
+                    }
+                    field="documents"
+                    documentTypeId={docType.id}
+                    formData={formData}
+                    updateFormData={updateFormData}
+                    errors={errors}
+                    uploadHandler={handleFileUpload}
+                    removeHandler={removeDocument}
+                    multiple={false}
+                    accept="application/pdf,image/*"
+                  />
                 ))}
               </div>
 
               {errors.documents && (
-                <p className="mt-2 text-xs text-red-600">{errors.documents}</p>
+                <p className="mt-2 text-xs text-red-600">
+                  {errors.documents}
+                </p>
               )}
             </div>
           )}
@@ -1006,34 +1026,31 @@ export default function StudentManualApplicationForm() {
 
           <div className="flex gap-3">
             {stage > 1 && (
-              <button
+              <PrevButton
                 onClick={prevStage}
-                className="flex items-center justify-center gap-2 rounded-full border border-slate-600 bg-slate-100 text-slate-700 px-4 py-2 text-sm font-medium transition hover:border-slate-700 hover:bg-slate-200 disabled:opacity-50"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </button>
+                text="Previous"
+                icon={<ArrowLeft className="h-4 w-4" />}
+                disabled={stage === 1}
+              />
             )}
 
             {stage < stages.length ? (
-              <button
+              <NextButton
                 onClick={nextStage}
-                className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </button>
+                text="Next"
+                icon={<ArrowRight className="h-4 w-4" />}
+                disabled={!isStageValid(stage)}
+              />
             ) : (
-              <button
+              <Button
                 onClick={handleSubmit}
-                className="flex items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 text-green-700 px-4 py-2 text-sm font-medium transition hover:border-green-700 hover:bg-green-200 disabled:opacity-50"
-                >
-                <CheckCircle className="h-4 w-4" />
-                Submit Application
-              </button>
+                disabled={loadingCreatePartnerApplication}
+                text="Submit Application"
+              />
             )}
           </div>
         </div>
+
       </div>
     </section>
   );

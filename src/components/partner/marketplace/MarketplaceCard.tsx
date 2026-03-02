@@ -132,7 +132,7 @@ const MarketplaceCard = () => {
                         </h3>
                         <p className="flex items-center gap-1 text-xs text-slate-500">
                           <MdPublic className="h-3.5 w-3.5" />
-                          {program.nationality || "Not Provided"}
+                          {program.main_location || "Not Provided"}
                         </p>
                       </div>
                     </div>

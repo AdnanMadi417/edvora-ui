@@ -1,220 +1,317 @@
 "use client";
 
-import { Trash2, Truck, Plus, PlusCircle } from 'lucide-react';
+import { BookOpen, CalendarPlus, ChevronLeft, PlusCircle, Trash2 } from 'lucide-react';
 import React, { useState } from "react";
 
-import { useLogisticServices } from "hooks/serviceProviders/useLogisticServicesList";
-import { useLogisticServiceLocations } from "hooks/serviceProviders/uselogisticServiceLocationsList";
-import { useLogisticLanguages } from "hooks/serviceProviders/useLogisticLanguages";
-import { useLogisticUniversities } from "hooks/serviceProviders/useLogisticUniversitiesList";
-import { useCreateLogisticsProvider } from "hooks/serviceProviders/useCreateLogisticsProvider";
-
-import Loading from "../../../../loading/Loading";
-import CheckBoxGroup from "../../../../form/CheckBoxGroup";
-import CheckSimpleBoxGroup from "../../../../form/CheckSimpleBoxGroup";
+import ToggleInput from "../../../../form/toggle/ToggleInput";
 import InputField from "../../../../form/InputField";
+import ArrayObjectField from "../../../../form/ArrayObjectField";
 import SelectField from "../../../../form/SelectField";
-import AddInclude from "../../../../ui/buttons/Button";
+import MultipleDateInput from "../../../../form/MultipleDateInput";
+import SearchableSelect from "../../../../form/SearchableSelect";
+
+import { DURATION,  SCHOLARSHIP_TYPE } from 'constants/lists';
+
+import Button from '../../../../ui/buttons/Button';
+import CreateUniversity from "components/admin/KnowledgeHub/program/popups/CreateUniversity";
+import CreateFieldOfStudy from "components/admin/KnowledgeHub/program/popups/CreateFieldOfStudy";
+import CreateQualificationType from "components/admin/KnowledgeHub/program/popups/CreateQualificationType";
+import CreateBranch from "components/admin/KnowledgeHub/program/popups/CreateBranch";
+import CreateCommissionType from "components/admin/KnowledgeHub/program/popups/CreateCommissionType";
+
 import { useToast } from "components/context/ToastContext";
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation";
 
-import { COUNTRIES } from "constants/lists"
-import { useUniversities } from "hooks/useUniversities";
-
-export interface PackageOffered {
-  name: string;
-  description: string;
-  price: number;
-  includes: string[];
-}
+import { useCreateProgram } from "hooks/knowledge-hub/programs/useCreateKnowledgeHubProgram";
+import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
+import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
+import { useAllBranches } from "hooks/knowledge-hub/universities/useBranchesList";
+import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
+import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
+import IconButton from '../../../../ui/buttons/IconButton';
 
 export interface FormData {
   name: string;
-  nationality: string;
-  phone_number: string;
-  whatsapp: string;
-  is_active: boolean;
+  uni_id: string;
+  branch_id: string;
+  field_of_study_id: string;
+  tuition_fee: number;
+  intake_dates: string[];
+  duration: number;
+  english_required_score: string;
+  overview: string;
+  curriculum: string;
+  is_on_campus: boolean;
+  is_online: boolean;
+  has_scholarship: boolean;
+  commission_type_id: string;
+  commission_notes: string;
+  qualification_id: string;
 
-  packages_offered: PackageOffered[];
+  commission_amount: number;
 
-  selectedServices: string[];
-  selectedLanguages: string[];
-  selectedUniversities: string[];
-  selectedLocations: string[];
+  yearly_fees: Array<{
+    year: number;
+    fee: number;
+  }>;
+
+  one_time_fees: Array<{
+    description: string;
+    fee: number;
+  }>;
+
+  scholarships: Array<{
+    type: number;
+    coverage_percent: number;
+    max_amount: number;
+    name: string;
+    description: string;
+  }>;
 }
 
 type FormErrors = Partial<Record<keyof FormData, string>>;
 
 export default function RegisterProgram() {
+
+  const [showUniversityPopup, setShowUniversityPopup] = useState(false);
+  const [showCommissionTypePopup, setShowCommissionTypePopup] = useState(false);
+  const [showFieldOfStudyPopup, setShowFieldOfStudyPopup] = useState(false);
+  const [showBranchPopup, setShowBranchPopup] = useState(false);
+  const [showQualificationPopup, setShowQualificationPopup] = useState(false);
+
   const { showToast } = useToast();
-  const router = useRouter()
+  const router = useRouter();
+
+  const { createProgram, loading } = useCreateProgram();
+  const { commissionTypes, commissionTypesLoading } = useCommissionTypes();
+
   const [errors, setErrors] = useState<FormErrors>({});
+
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    nationality: "",
-    phone_number: "",
-    whatsapp: "",
-    is_active: true,
+    uni_id: "",
+    branch_id: "",
+    field_of_study_id: "",
+    tuition_fee: 0,
+    intake_dates: [],
+    duration: 0,
+    english_required_score: "",
+    overview: "",
+    curriculum: "",
+    is_on_campus: false,
+    is_online: false,
+    has_scholarship: false,
+    commission_type_id: "",
+    commission_notes:
+      "Commission paid 30 days after student completes first semester of each academic year.",
+    qualification_id: "",
 
-    packages_offered: [],
+    commission_amount: 0,
 
-    selectedServices: [],
-    selectedLanguages: [],
-    selectedUniversities: [],
-    selectedLocations: [],
+    yearly_fees: [],
+    one_time_fees: [],
+    scholarships: [
+      {
+        type: 0,
+        coverage_percent: 0,
+        max_amount: 0,
+        name: "",
+        description: "",
+      },
+    ],
   });
 
-  const {
-    universities,
-    loading: universitiesLoading,
-    error: universitiesError,
-  } = useUniversities();
+  const { fields } = useAllFields();
+  const { qualifications } = useAllQualifications();
+  const { branches } = useAllBranches(formData.uni_id);
 
-  const {
-    logisticServices,
-    loadingLogisticServices,
-  } = useLogisticServices();
+  const { universities } = useAllUniversities();
 
-  const {
-    logisticServiceLocations,
-    loadingServiceLocations,
-  } = useLogisticServiceLocations();
-
-  const {
-    logisticLanguages,
-    loadingLogisticLanguage,
-  } = useLogisticLanguages();
-
-  const {
-    logisticUniversities,
-    loadingLogisticUniversity,
-  } = useLogisticUniversities();
-
-  const {
-    createLogisticsProvider,
-    loadingCreateLogisticsProvider,
-    errorCreateLogisticsProvider,
-  } = useCreateLogisticsProvider()
-
-
-  const updateFormData = <K extends keyof FormData>(
-    field: K,
-    value: FormData[K]
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
-  };
-
-  const addPackage = () => {
+  const removeScholarship = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      packages_offered: [
-        ...prev.packages_offered,
-        { name: "", description: "", price: 0, includes: [] },
+      scholarships: prev.scholarships.filter((_, i) => i !== index),
+    }));
+  };
+
+  const addScholarship = () => {
+    setFormData((prev) => ({
+      ...prev,
+      scholarships: [
+        ...prev.scholarships,
+        {
+          type: 0,
+          coverage_percent: 0,
+          max_amount: 0,
+          name: "",
+          description: "",
+        },
       ],
     }));
   };
 
-  const updatePackage = (
-    index: number,
-    field: keyof PackageOffered,
-    value: any
-  ) => {
-    const updated = [...formData.packages_offered];
-    updated[index] = { ...updated[index], [field]: value };
-    setFormData((prev) => ({ ...prev, packages_offered: updated }));
-  };
+  const isFormValid = React.useMemo(() => {
+    const basicValid =
+      formData.name.trim() !== "" &&
+      formData.uni_id !== "" &&
+      formData.branch_id !== "" &&
+      formData.field_of_study_id !== "" &&
+      formData.commission_type_id !== "" &&
+      formData.qualification_id !== "" &&
+      formData.english_required_score.trim() !== "" &&
+      formData.overview.trim() !== "" &&
+      formData.curriculum.trim() !== "" &&
+      formData.intake_dates.length > 0 &&
+      formData.tuition_fee > 0 &&
+      formData.duration > 0 &&
+      formData.commission_amount >= 0;
 
-  const removePackage = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      packages_offered: prev.packages_offered.filter((_, i) => i !== index),
-    }));
+    const yearlyFeesValid =
+      formData.yearly_fees.length === 0 ||
+      formData.yearly_fees.every(
+        (y) => y.year > 0 && y.fee > 0
+      );
+
+    const oneTimeFeesValid =
+      formData.one_time_fees.length === 0 ||
+      formData.one_time_fees.every(
+        (f) => f.description.trim() !== "" && f.fee > 0
+      );
+
+    return (
+      basicValid &&
+      yearlyFeesValid &&
+      oneTimeFeesValid
+    );
+  }, [formData]);
+
+  const updateFormData = (field: string, value: any) => {
+
+    setFormData((prev) => {
+      const updated = structuredClone(prev);
+
+      const keys = field.replace(/\[(\d+)\]/g, ".$1").split(".");
+      let current: any = updated;
+
+      for (let i = 0; i < keys.length - 1; i++) {
+        const key = keys[i];
+
+        if (current[key] === undefined) {
+          current[key] = isNaN(Number(keys[i + 1])) ? {} : [];
+        }
+
+        current = current[key];
+      }
+
+      current[keys[keys.length - 1]] = value;
+
+      if (field === "has_scholarship" && value === false) {
+        updated.scholarships = [];
+      }
+
+      return updated;
+    });
   };
 
   const handleSubmit = async () => {
-    const newErrors: FormErrors = {}
-
-    if (!formData.name) newErrors.name = "Name is required"
-    if (!formData.nationality) newErrors.nationality = "Nationality is required"
-    if (!formData.phone_number)
-      newErrors.phone_number = "Phone number is required"
-    if (!formData.selectedServices.length)
-      newErrors.selectedServices = "Please select at least one service"
-    if (!formData.selectedLanguages.length)
-      newErrors.selectedLanguages = "Please select at least one language"
-    if (!formData.selectedUniversities.length)
-      newErrors.selectedUniversities = "Please select at least one university"
-    if (!formData.selectedLocations.length)
-      newErrors.selectedLocations = "Please select at least one location"
-
-    setErrors(newErrors)
-    if (Object.keys(newErrors).length > 0) return
-
-    const payload = {
-      name: formData.name,
-      nationality: formData.nationality,
-      phone_number: formData.phone_number,
-      whatsapp: formData.whatsapp,
-      is_active: formData.is_active,
-      packages_offered: formData.packages_offered,
-      service_ids: formData.selectedServices,
-      language_ids: formData.selectedLanguages,
-      university_ids: formData.selectedUniversities,
-      service_location_ids: formData.selectedLocations,
-    }
-
     try {
-      await createLogisticsProvider(payload)
 
-      showToast("success" + "Logistics provider created successfully")
+      if (!formData.uni_id) {
+        showToast("University is required", "error");
+        return;
+      }
 
-      setFormData({
-        name: "",
-        nationality: "",
-        phone_number: "",
-        whatsapp: "",
-        is_active: true,
-        packages_offered: [],
-        selectedServices: [],
-        selectedLanguages: [],
-        selectedUniversities: [],
-        selectedLocations: [],
-      })
+      if (!formData.branch_id) {
+        showToast("Branch is required", "error");
+        return;
+      }
 
-      setErrors({})
+      if (!formData.field_of_study_id) {
+        showToast("Field of study is required", "error");
+        return;
+      }
 
-      setTimeout(() => {
-        router.push("/admin/logistical-service")
-      }, 1500)
+      if (!formData.commission_type_id) {
+        showToast("Commission type is required", "error");
+        return;
+      }
 
-    } catch (error) {
-      showToast("error" + "Failed to create logistics provider")
+      if (!formData.qualification_id) {
+        showToast("Qualification level is required", "error");
+        return;
+      }
+
+      if (!formData.intake_dates.length) {
+        showToast("At least one intake date is required", "error");
+        return;
+      }
+
+      const payload = {
+        ...formData,
+
+        tuition_fee: Number(formData.tuition_fee || 0),
+        duration: Number(formData.duration || 0),
+        qualification_id: formData.qualification_id ,
+        commission_amount: Number(formData.commission_amount || 0),
+
+        yearly_fees: (formData.yearly_fees || []).map((y) => ({
+          year: Number(y.year),
+          fee: Number(y.fee),
+        })),
+
+        one_time_fees: (formData.one_time_fees || []).map((f: any) => ({
+          description: f.description || "",
+          fee: Number(f.fee || 0),
+        })),
+
+        scholarships: formData.has_scholarship
+          ? (formData.scholarships || [])
+            .filter((s) => s.name && s.description)
+            .map((s) => ({
+              type: Number(s.type || 0),
+              coverage_percent: Number(s.coverage_percent || 0),
+              max_amount: Number(s.max_amount || 0),
+              name: s.name,
+              description: s.description,
+            }))
+          : [],
+      };
+
+      await createProgram(payload);
+
+      showToast("Program created successfully", "success");
+
+      router.push("/admin/knowledge-hub/programs");
+
+    } catch (err: any) {
+      const apiErrors = err?.response?.data?.detail;
+
+      if (Array.isArray(apiErrors)) {
+        const newErrors: Record<string, string> = {};
+
+        apiErrors.forEach((e: any) => {
+          if (e?.loc?.[1]) {
+            newErrors[e.loc[1]] = e.msg;
+          }
+        });
+
+        setErrors(newErrors);
+      }
+
+      showToast("Failed to create program", "error");
     }
-  }
+  };
 
-  if (
-    loadingLogisticServices ||
-    loadingServiceLocations ||
-    loadingLogisticLanguage ||
-    loadingLogisticUniversity
-  ) {
-    return (
-      <section className="mx-auto mt-5 max-w-5xl">
-        <div className="rounded-lg border border-slate-200 bg-card p-6">
-          <Loading text="Fetching knowledge hub data..." />
-        </div>
-      </section>
-    );
-  }
+  const handleBack = () => {
+    router.push("/admin/knowledge-hub/programs");
+  };
 
   return (
     <section className="mx-auto mt-5">
       <div className="rounded-md border bg-slate-50 shadow-sm">
-
-        <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
+        <div className="flex items-start gap-x-4 border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <Truck className="text-blue-700" size={24} />
+            <BookOpen  className="text-blue-700" size={24} />
           </div>
 
           <div>
@@ -222,262 +319,478 @@ export default function RegisterProgram() {
               Register a new program
             </h3>
             <p className="text-sm text-slate-500">
-              Complete the required information to register a new knowledge hub program
+              Complete the required information to register a knowledge hub
+              program
             </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 px-6 py-5">
+        <div className="space-y-6">
 
-          <InputField
-            label="Program Name"
-            field="program_name"
-            placeholder="e.g. BSc Data Science"
-            required
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
+          <div className="space-y-6 px-6 pt-5 border-b border-slate-200">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Program Information
+            </h3>
 
-          <SelectField
-            label="University"
-            field="university_id"
-            options={universities.map((u) => ({
-              value: String(u.id),
-              label: u.name,
-            }))}
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 
-          <SelectField
-            label="Program"
-            field="program_id"
-            options={(
-              universities.find((u) => u.id === formData.university_id)
-                ?.programs || []
-            ).map((p) => ({
-              value: p.id,
-              label: p.name,
-            }))}
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
+              <SearchableSelect
+                label="University"
+                field="uni_id"
+                options={(universities ?? [])
+                  .filter((u) => u.is_active)
+                  .map((u) => ({
+                    value: u.id,
+                    label: u.name,
+                  }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+                actions={[
+                  {
+                    label: "Create University",
+                    icon: <PlusCircle className="h-4 w-4" />,
+                    onClick: () => setShowUniversityPopup(true)
+                  }
+                ]}
+              />
 
-          <InputField
-            label="Next Intake Date"
-            field="next_intake"
-            type="date"
-            required
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
+              <SearchableSelect
+                label="Branch"
+                field="branch_id"
+                options={branches.map((s) => ({
+                  value: String(s.id),
+                  label: s.name,
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+                actions={[
+                  {
+                    label: "Create Branch",
+                    icon: <PlusCircle className="h-4 w-4" />,
+                    onClick: () => setShowBranchPopup(true),
+                  },
+                ]}
+              />
 
-          <InputField
-            label="First Year Tuition Fee"
-            field="first_year_tuition"
-            type="number"
-            placeholder="e.g. 20000"
-            required
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
+              <InputField
+                label="Program Name"
+                field="name"
+                placeholder="e.g. BSc Data Science"
+                required
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
 
-          <InputField
-            label="Program Duration (Years)"
-            field="duration"
-            type="number"
-            placeholder="e.g. 2"
-            required
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
+              <SearchableSelect
+                label="Field of Study"
+                field="field_of_study_id"
+                options={fields.map((f) => ({
+                  value: String(f.id),
+                  label: f.name,
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+                actions={[
+                  {
+                    label: "Create Field of Study",
+                    icon: <PlusCircle className="h-4 w-4" />,
+                    onClick: () => setShowFieldOfStudyPopup(true)
+                  }
+                ]}
+              />
 
-          <SelectField
-            label="Class Type"
-            field="class_type"
-            options={[
-              { label: "On Campus", value: "physical" },
-              { label: "Online", value: "online" },
-            ]}
-            required
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
+              <InputField
+                label="Tuition Fee"
+                field="tuition_fee"
+                type="number"
+                placeholder="e.g. 20000"
+                required
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+            </div>
+          </div>
 
-        </div>
+          <div className="space-y-6 px-6 border-b border-slate-200">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Academic Details
+            </h3>
 
-        <div className="px-6">
-          <div className="flex items-center justify-between mb-4">
-            <h4 className="text-lg font-semibold text-slate-900">
-              Packages Offered
-            </h4>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <SelectField
+                label="Duration (Years)"
+                field="duration"
+                options={DURATION.map((d) => ({
+                  value: d.year,
+                  label: d.label,
+                }))}
+                required
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
 
-            <AddInclude
-              icon={<Plus className="h-5 w-5" />}
-              text="Add Package"
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
-              onClick={() => addPackage()}
+              <InputField
+                label="English Required Score"
+                field="english_required_score"
+                placeholder="e.g. IELTS 6.0"
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+
+              <InputField
+                label="Overview"
+                field="overview"
+                placeholder="Program overview..."
+                required
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+
+              <InputField
+                label="Curriculum"
+                field="curriculum"
+                placeholder="Program curriculum..."
+                required
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-6 px-6 border-b border-slate-200">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Delivery Mode
+            </h3>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <ToggleInput
+                label="On Campus"
+                field="is_on_campus"
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+
+              <ToggleInput
+                label="Online Available"
+                field="is_online"
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+
+              <ToggleInput
+                label="Has Scholarship"
+                field="has_scholarship"
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-6 px-6 pb-5 ">
+
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Intake Schedule
+            </h3>
+
+            <MultipleDateInput
+              label="Intake Dates"
+              field="intake_dates"
+              required
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
             />
 
           </div>
 
-          {formData.packages_offered.length === 0 && (
-            <div className="mb-3 rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-              <p className="text-sm font-medium text-slate-700">
-                No packages added yet
-              </p>
-              <p className="mt-1 text-xs text-slate-400">
-                Add a package to get started
-              </p>
+          <div className="space-y-6 px-6 border-b border-slate-200">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Commission Structure
+            </h3>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <InputField
+                label="Commission Amount"
+                field="commission_amount"
+                type="number"
+                placeholder="e.g. 10"
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+
+              <SearchableSelect
+                label="Commission Type"
+                field="commission_type_id"
+                options={commissionTypes.map((f) => ({
+                  value: String(f.id),
+                  label: f.name,
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+                actions={[
+                  {
+                    label: "Create Commission Type",
+                    icon: <PlusCircle className="h-4 w-4" />,
+                    onClick: () => setShowCommissionTypePopup(true)
+                  }
+                ]}
+              />
+
+              <SearchableSelect
+                label="Qualification Level"
+                field="qualification_id"
+                options={qualifications.map((f) => ({
+                  value: String(f.id),
+                  label: f.name.charAt(0).toUpperCase() + f.name.slice(1),
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+                actions={[
+                  {
+                    label: "Create Qualification Level",
+                    icon: <PlusCircle className="h-4 w-4" />,
+                    onClick: () => setShowQualificationPopup(true)
+                  }
+                ]}
+              />
+
+            </div>
+          </div>
+
+          <div className="space-y-4 px-6 py-5 border-b border-slate-200">
+            <ArrayObjectField
+              label="Yearly Fees"
+              subLabel="Year"
+              field="yearly_fees"
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+              fields={[
+                {
+                  key: "year",
+                  label: "Year",
+                  type: "text",
+                  placeholder: "Year",
+                },
+                {
+                  key: "fee",
+                  label: "Fee",
+                  type: "number",
+                  placeholder: "Fee",
+                },
+              ]}
+            />
+
+            <ArrayObjectField
+              label="One Time Fees"
+              subLabel="Fees"
+              field="one_time_fees"
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+              fields={[
+                {
+                  key: "description",
+                  label: "Description",
+                  type: "text",
+                  placeholder: "One Time Fees",
+                },
+                {
+                  key: "fee",
+                  label: "Fee",
+                  type: "number",
+                  placeholder: "Fee",
+                },
+              ]}
+            />
+          </div>
+
+          {formData.has_scholarship && (
+            <div className="space-y-6 px-6 border-t border-slate-200 py-6">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                  Scholarships
+                </h3>
+
+                <IconButton
+                  icon={<CalendarPlus className="h-4 w-4" />}
+                  bgColor="bg-blue-50"
+                  textColor="text-blue-700"
+                  borderColor="border-blue-600"
+                  hoverTextColor="hover:text-blue-800"
+                  hoverBorderColor="hover:border-blue-700"
+                  onClick={addScholarship}
+                />
+
+              </div>
+
+              {formData.scholarships.map((_, index) => (
+                <div
+                  key={index}
+                  className="rounded-xl border border-slate-200 bg-white p-6 transition "
+                >
+                  {/* Header */}
+                  <div className="mb-5 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
+                        {index + 1}
+                      </div>
+
+                      <div>
+                        <p className="text-sm font-semibold text-slate-800">
+                          Scholarship
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Configure scholarship details
+                        </p>
+                      </div>
+                    </div>
+
+                    {formData.scholarships.length > 1 && (
+                      <IconButton
+                        icon={<Trash2 className="h-4 w-4" />}
+                        onClick={() => removeScholarship(index)}
+                        bgColor="bg-red-50"
+                        textColor="text-red-600"
+                        borderColor="border-red-200"
+                        hoverTextColor="hover:text-red-700"
+                        hoverBorderColor="hover:border-red-300"
+                      />
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <SelectField
+                      label="Scholarship Type"
+                      field={`scholarships[${index}].type`}
+                      options={SCHOLARSHIP_TYPE.map((d) => ({
+                        value: d.value,
+                        label: d.label,
+                      }))}
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                    />
+
+                    <InputField
+                      label="Coverage Percentage"
+                      field={`scholarships[${index}].coverage_percent`}
+                      type="number"
+                      placeholder="e.g. 50"
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                    />
+
+                    <InputField
+                      label="Maximum Amount"
+                      field={`scholarships[${index}].max_amount`}
+                      type="number"
+                      placeholder="e.g. 10000"
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                    />
+
+                    <InputField
+                      label="Scholarship Name"
+                      field={`scholarships[${index}].name`}
+                      placeholder="e.g. Excellence Award"
+                      type="text"
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                    />
+
+                    <div className="md:col-span-2">
+                      <InputField
+                        label="Description"
+                        field={`scholarships[${index}].description`}
+                        placeholder="Short description..."
+                        type="text"
+                        formData={formData}
+                        errors={errors}
+                        updateFormData={updateFormData}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+
             </div>
           )}
 
-          {formData.packages_offered.map((pkg, index) => (
-            <div
-              key={index}
-              className="mb-6 rounded-md border bg-white p-5"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h5 className="font-medium text-slate-800">Package {index + 1}</h5>
-
-                <button
-                  type="button"
-                  onClick={() => removePackage(index)}
-                  className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Remove
-                </button>
-
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3">
-                <InputField
-                  label="Package Name"
-                  field="name"
-                  required
-                  formData={{ name: pkg.name }}
-                  errors={{}}
-                  updateFormData={(_, value) => updatePackage(index, "name", value)}
-                />
-
-                <InputField
-                  label="Price"
-                  field="price"
-                  type="number"
-                  formData={{ price: pkg.price }}
-                  errors={{}}
-                  updateFormData={(_, value) =>
-                    updatePackage(index, "price", Number(value))
-                  }
-                />
-              </div>
-
-              <InputField
-                label="Description"
-                field="description"
-                formData={{ description: pkg.description }}
-                errors={{}}
-                updateFormData={(_, value) =>
-                  updatePackage(index, "description", value)
-                }
-              />
-              <div className="mt-4">
-                <label className="block mb-2 text-sm font-medium text-slate-700">
-                  Includes
-                </label>
-
-                <div className="space-y-2">
-                  {pkg.includes.map((item, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2"
-                    >
-
-                      <input
-                        type="text"
-                        value={item}
-                        onChange={(e) => {
-                          const updated = [...pkg.includes];
-                          updated[i] = e.target.value;
-                          updatePackage(index, "includes", updated);
-                        }}
-                        className="flex-1 px-2 py-1 text-sm focus:outline-none"
-                        placeholder={`Include item ${i + 1}`}
-                      />
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const updated = pkg.includes.filter((_, idx) => idx !== i);
-                          updatePackage(index, "includes", updated);
-                        }}
-                        className="flex items-center justify-center rounded-full border border-red-600 text-red-600 p-1 transition hover:border-red-700 hover:text-red-700"
-                        aria-label="Remove item"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex justify-end mt-3">
-                  <AddInclude
-                    icon={<Plus className="h-4 w-4" />}
-                    text="Add Item"
-                    bgColor="bg-green-50"
-                    textColor="text-green-700"
-                    borderColor="border-green-600"
-                    hoverTextColor="hover:text-green-800"
-                    hoverBorderColor="hover:border-green-700"
-                    onClick={() =>
-                      updatePackage(index, "includes", [...pkg.includes, ""])
-                    }
-                  />
-                </div>
-              </div>
-
-
-
-            </div>
-          ))}
         </div>
 
-        {errorCreateLogisticsProvider && (
-          <p className="mt-3 text-sm text-red-600">
-            {errorCreateLogisticsProvider}
-          </p>
-        )}
+        <div className="flex justify-end border-t px-6 py-5 gap-2">
 
-        <div className="flex justify-end border-t rounded-b-xl px-6 py-5">
+          <Button
+            onClick={handleBack}
+            disabled={loading}
+            icon={<ChevronLeft  className="h-5 w-5" />}
+            text={"Back"}
+            bgColor="bg-slate-50"
+            textColor="text-slate-700"
+            borderColor="border-slate-600"
+            hoverTextColor="hover:text-slate-800"
+            hoverBorderColor="hover:border-slate-700"
+          />
 
-          <AddInclude
-            icon={<PlusCircle className="h-5 w-5" />}
-            text={loadingCreateLogisticsProvider ? "Creating..." : "Create Service"}
+          <Button
+            icon={<BookOpen className="h-5 w-5" />}
+            text={loading ? "Creating..." : "Create Program"}
             bgColor="bg-blue-50"
             textColor="text-blue-700"
             borderColor="border-blue-600"
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
             onClick={handleSubmit}
-            disabled={
-              loadingCreateLogisticsProvider
-            }
+            disabled={loading || !isFormValid}
           />
-
         </div>
       </div>
+
+      <CreateUniversity
+        isOpen={showUniversityPopup}
+        onClose={() => setShowUniversityPopup(false)}
+      />
+
+      <CreateCommissionType
+        isOpen={showCommissionTypePopup}
+        onClose={() => setShowCommissionTypePopup(false)}
+      />
+
+      <CreateQualificationType
+        isOpen={showQualificationPopup}
+        onClose={() => setShowQualificationPopup(false)}
+      />
+
+      <CreateFieldOfStudy
+        isOpen={showFieldOfStudyPopup}
+        onClose={() => setShowFieldOfStudyPopup(false)}
+      />
+
+      <CreateBranch
+        isOpen={showBranchPopup}
+        onClose={() => setShowBranchPopup(false)}
+        universityId={formData.uni_id}
+      />
+
     </section>
   );
 }

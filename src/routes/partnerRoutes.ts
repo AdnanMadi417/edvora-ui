@@ -1,10 +1,13 @@
 import {
-  MdDescription,
   MdPayments,
   MdNotifications,
   MdMenuBook,
   MdBusinessCenter,
-} from "react-icons/md";
+  MdSupervisorAccount,
+  MdDescription,
+  MdHandshake,
+  MdOutlineBusiness, MdAdminPanelSettings, MdSchool, MdManageAccounts, MdAssignment,
+} from 'react-icons/md';
 
 import type { IRoute } from "../types/navigation";
 
@@ -13,7 +16,7 @@ const partnerRoutes: IRoute[] = [
     name: "Applications",
     layout: "/partner",
     path: "/applications",
-    icon: MdDescription,
+    icon: MdManageAccounts,
   },
 
   // {
@@ -38,7 +41,7 @@ const partnerRoutes: IRoute[] = [
   },
 
   {
-    name: "Partner Hub",
+    name: "Logistical Service",
     layout: "/partner",
     path: "/marketplace",
     icon: MdBusinessCenter,

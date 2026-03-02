@@ -26,6 +26,8 @@ import Cookies from "js-cookie";
 import NextButton from "../../ui/buttons/NextButton";
 import PrevButton from "../../ui/buttons/PrevButton";
 import ClearButton from "../../ui/buttons/DangerButton";
+import Button from '../../ui/buttons/Button';
+import { useRouter } from 'next/navigation';
 
 const PartnerApplications = () => {
   const [applications, setApplications] = useState([]);
@@ -35,6 +37,7 @@ const PartnerApplications = () => {
   const [filterStatus, setFilterStatus] = useState("all_status");
   const [filterStages, setFilterStages] = useState("all_stages");
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const itemsPerPage = 10;
 
@@ -195,6 +198,10 @@ const PartnerApplications = () => {
     );
   };
 
+  const handleApplicationRouter = () => {
+    router.push("/partner/applications/create");
+  };
+
   return (
     <div className="mt-6 overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
@@ -256,12 +263,16 @@ const PartnerApplications = () => {
               </select>
             </div>
 
-            <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href="/partner/applications/new-application"
-            >
-              New Application
-            </Link>
+            <Button
+              onClick={handleApplicationRouter}
+              icon={<User  className="h-5 w-5" />}
+              text={"Create Application"}
+              bgColor="bg-blue-50"
+              textColor="text-blue-700"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-blue-800"
+              hoverBorderColor="hover:border-blue-700"
+            />
 
             <ClearButton
               onClick={() => {
@@ -282,10 +293,10 @@ const PartnerApplications = () => {
             <tr className="border-b border-gray-200 bg-card">
               <th
                 onClick={() => handleSort("studentName")}
-                className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
+                  <User className="h-4 w-4 text-slate-500" />
                   Student
                   <SortIndicator field="studentName" />
                 </div>
@@ -293,10 +304,10 @@ const PartnerApplications = () => {
 
               <th
                 onClick={() => handleSort("applicationName")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex min-w-[250px] items-center gap-2">
-                  <GraduationCap className="h-4 w-4" />
+                  <GraduationCap className="h-4 w-4 text-slate-500" />
                   University / Program
                   <SortIndicator field="applicationName" />
                 </div>
@@ -304,10 +315,10 @@ const PartnerApplications = () => {
 
               <th
                 onClick={() => handleSort("stage")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex items-center gap-2">
-                  <Flag className="h-4 w-4" />
+                  <Flag className="h-4 w-4 text-slate-500" />
                   Stage
                   <SortIndicator field="stage" />
                 </div>
@@ -315,10 +326,10 @@ const PartnerApplications = () => {
 
               <th
                 onClick={() => handleSort("status")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex items-center gap-2">
-                  <BadgeCheck className="h-4 w-4" />
+                  <BadgeCheck className="h-4 w-4 text-slate-500" />
                   Status
                   <SortIndicator field="status" />
                 </div>
@@ -326,17 +337,17 @@ const PartnerApplications = () => {
 
               <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
                 <div className="flex items-center gap-2">
-                  <CalendarCheck className="h-4 w-4" />
+                  <CalendarCheck className="h-4 w-4 text-slate-500" />
                   Next Action
                 </div>
               </th>
 
               <th
                 onClick={() => handleSort("updatedAt")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex min-w-[150px] items-center gap-2">
-                  <Clock className="h-4 w-4" />
+                  <Clock className="h-4 w-4 text-slate-500" />
                   Last Updated
                   <SortIndicator field="updatedAt" />
                 </div>
@@ -344,7 +355,7 @@ const PartnerApplications = () => {
 
               <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
                 <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4" />
+                  <Settings className="h-4 w-4 text-slate-500" />
                   Actions
                 </div>
               </th>

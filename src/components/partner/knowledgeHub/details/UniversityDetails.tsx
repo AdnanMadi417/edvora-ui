@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import CardHeader from "../../../ui/card/CardHeader";
 import Link from "next/link";
-import { useProgram } from "../../../../hooks/programs/useProgram";
+import { useProgram } from "../../../../hooks/knowledge-hub/programs/useProgram";
 import Loading from "../../../loading/Loading";
 
 interface UniversityDetailsProps {
@@ -39,11 +39,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const router = useRouter();
   const handleBack = () => {
     router.push("/partner/knowledgeHub/");
-  };
-
-  const commissionLabel = {
-    one_time: "One-time",
-    per_student: "Per Student",
   };
 
   const { program, requiredDocuments, commission } = useProgram(id);
@@ -99,9 +94,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">Country</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
-                  {program?.branch?.length
-                    ? program.branch.map(b => b.locations).join(", ")
-                    : "Not Provided"}
+                  {program?.university?.country ?? 'Not Provided'}
                 </p>
               </div>
             </div>
@@ -113,7 +106,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               <div className="min-w-0">
                 <p className="text-xs text-slate-500">State / Province</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
-                  {program?.university?.state ?? "Not Provided"}
+                  {program && program.branch ? program.branch.state : "Not Provided"}
                 </p>
               </div>
             </div>
@@ -165,8 +158,8 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <p className="text-xs text-slate-500">Intake Dates</p>
 
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-slate-900">
-                  {program?.university.intake_months?.length ? (
-                    program.university.intake_months.map((date, index) => (
+                  {program?.intake_dates?.length ? (
+                    program.intake_dates.map((date, index) => (
                       <span
                         key={`${date}-${index}`}
                         className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 transition hover:border-green-600"
@@ -440,7 +433,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
             <div className="relative flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-md transition-transform">
               <span className="text-2xl font-bold text-green-700">
-                {commissionLabel[commission?.type] || "One Time"}
+                {commission?.type?? "One Time"}
               </span>
               <p className="text-sm font-semibold text-green-900">
                 Commission Type
