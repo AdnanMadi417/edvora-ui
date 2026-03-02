@@ -35,7 +35,7 @@ const AdminRoutes: IRoute[] = [
     icon: MdSchool,
   },
   {
-    name: "University Management",
+    name: "University Configuration",
     layout: "/admin",
     path: "/config-universities",
     icon: MdAdminPanelSettings,

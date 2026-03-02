@@ -11,33 +11,41 @@ import {
   Pencil,
   Globe,
   Phone,
-  Users,
   Image,
-  MapPin, GraduationCap,
+  MapPin,
+  GraduationCap, Trash2,
 } from 'lucide-react';
-import { MdOutlineCategory, MdSchool, MdVerified } from "react-icons/md";
+import { MdCancel, MdOutlineCategory, MdSchool, MdVerified } from 'react-icons/md';
 
-import CreateUniversityType from "components/admin/configUniversities/popups/CreateUniversityType";
-
-import { useUniversityTypes } from "hooks/knowledge-hub/config-universities/useUniversityTypesQuery";
+import { useGetUniversities } from "hooks/knowledge-hub/config-universities/useGetUniversities";
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
-
 
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import Loading from "components/loading/Loading";
 
-import { useToast } from "components/context/ToastContext";
-import Button from '../../../../../ui/buttons/Button';
+import Button from "components/ui/buttons/Button";
+import { useRouter } from "next/navigation";
+import DeleteUniversityConfirmation from '../../KnowledgeHub/university/popups/DeleteUniversityConfirmation';
+import { useDeleteUniversityType } from '../../../../hooks/knowledge-hub/config-universities/useDeleteUniversityType';
+import { useToast } from '../../../context/ToastContext';
 
 const UniversityManagementTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
 
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const { showToast } = useToast();
+  const { deleteUniversityType, isDeleting } = useDeleteUniversityType();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedUniversityId, setSelectedUniversityId] = useState<
+    string | null
+  >(null);
+  const [selectedUniversityName, setSelectedUniversityName] =
+    useState<string>("");
 
-  const { universities, loading, error } = useUniversityTypes();
+  const { universitiesList, loading, error } = useGetUniversities();
 
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
@@ -49,7 +57,7 @@ const UniversityManagementTable = () => {
   const filteredUniversities = React.useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
 
-    return universities.filter((university) => {
+    return universitiesList.filter((university) => {
       const matchSearch =
         !term || university.name?.toLowerCase().includes(term);
 
@@ -59,7 +67,7 @@ const UniversityManagementTable = () => {
 
       return matchSearch && matchField;
     });
-  }, [universities, searchTerm, selectedState, selectedField]);
+  }, [universitiesList, searchTerm, selectedState, selectedField]);
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -108,6 +116,48 @@ const UniversityManagementTable = () => {
     setCurrentPage(1);
   };
 
+  const typeConfig: Record<string, any> = {
+    minimal: {
+      bg: "bg-blue-50 border-blue-200",
+      text: "text-blue-700",
+      dot: "bg-blue-600",
+      label: "Minimal",
+    },
+    extended: {
+      bg: "bg-green-50 border-green-200",
+      text: "text-green-700",
+      dot: "bg-green-600",
+      label: "Extended",
+    },
+    conditional: {
+      bg: "bg-orange-50 border-orange-200",
+      text: "text-orange-700",
+      dot: "bg-orange-600",
+      label: "Conditional",
+    },
+  };
+
+  const handleDelete = async () => {
+    if (!selectedUniversityId) return;
+
+    try {
+      await deleteUniversityType(selectedUniversityId);
+
+      showToast("University deleted successfully.");
+
+      setIsDeleteOpen(false);
+      setSelectedUniversityId(null);
+      setSelectedUniversityName("");
+
+      setTimeout(() => location.reload(), 2000);
+
+    } catch (error: any) {
+      showToast("Failed to delete university. Please try again.");
+    }
+  };
+
+  console.log("Deleting ID:", selectedUniversityId);
+
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedState, selectedField]);
@@ -118,6 +168,10 @@ const UniversityManagementTable = () => {
       setCurrentPage(totalPages);
     }
   }, [filteredUniversities, currentPage]);
+
+  const handleCreateLink = () => {
+    router.push(`/admin/config-universities/create`);
+  };
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
@@ -148,10 +202,9 @@ const UniversityManagementTable = () => {
             </div>
 
             <Button
-              onClick={() => setIsCreateOpen(true)}
-              disabled={loading}
-              icon={<GraduationCap  className="h-5 w-5" />}
-              text={loading ? "Creating..." : "Create University"}
+              onClick={handleCreateLink}
+              icon={<GraduationCap className="h-5 w-5" />}
+              text={loading ? "Creating..." : "Create University Type"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"
               borderColor="border-blue-600"
@@ -206,13 +259,6 @@ const UniversityManagementTable = () => {
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4 text-slate-500" />
                       <span>Address</span>
-                    </div>
-                  </th>
-
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4 text-slate-500" />
-                      <span>Parent</span>
                     </div>
                   </th>
 
@@ -288,16 +334,54 @@ const UniversityManagementTable = () => {
 
                       <td className="px-6 py-4">
                         <div className="flex justify-start">
-                          <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
-                            Type One
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex justify-center">
-                          <div className="rounded-lg bg-green-50 p-1.5 text-green-600 backdrop-blur-md">
-                            <MdVerified className="h-4 w-4" />
-                          </div>
+                          {(() => {
+                            const type = uni.university_type_name;
+
+                            const typeConfig: Record<string, any> = {
+                              minimal: {
+                                bg: "bg-blue-50 border-blue-200",
+                                text: "text-blue-700",
+                                dot: "bg-blue-600",
+                                label: "Minimal",
+                              },
+                              extended: {
+                                bg: "bg-green-50 border-green-200",
+                                text: "text-green-700",
+                                dot: "bg-green-600",
+                                label: "Extended",
+                              },
+                              conditional: {
+                                bg: "bg-orange-50 border-orange-200",
+                                text: "text-orange-700",
+                                dot: "bg-orange-600",
+                                label: "Conditional",
+                              },
+                            };
+
+                            const normalizedType = type
+                              ?.toLowerCase()
+                              .trim()
+                              .replace(/\s+/g, "_");
+
+                            const config = typeConfig[normalizedType] || {
+                              bg: "bg-gray-100 border-gray-200",
+                              text: "text-gray-700",
+                              dot: "bg-gray-400",
+                              label: type || "Not Provided",
+                            };
+
+                            return (
+                              <span
+                                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${config.bg} ${config.text}`}
+                                title={config.label}
+                              >
+                                <span
+                                  className={`h-2 w-2 rounded-full ${config.dot}`}
+                                ></span>
+                                <span className="truncate">{config.label}</span>
+                              </span>
+                            );
+                          })()}
                         </div>
                       </td>
 
@@ -332,27 +416,10 @@ const UniversityManagementTable = () => {
                           </div>
                         </div>
                       </td>
-
-                      {/*<td className="px-6 py-4">*/}
-                      {/*  <div className="flex justify-center">*/}
-                      {/*    <div*/}
-                      {/*      className={`rounded-lg p-1.5 backdrop-blur-md ${*/}
-                      {/*        uni.is_active*/}
-                      {/*          ? "bg-green-50 text-green-600"*/}
-                      {/*          : "bg-slate-50 text-slate-400"*/}
-                      {/*      }`}*/}
-                      {/*    >*/}
-                      {/*      {uni.is_active? (*/}
-                      {/*        <MdVerified className="h-4 w-4" />*/}
-                      {/*      ) : (*/}
-                      {/*        <MdCancel  className="h-4 w-4" />*/}
-                      {/*      )}*/}
-                      {/*    </div>*/}
-                      {/*  </div>*/}
-                      {/*</td>*/}
 
                       <td className="px-6 py-4">
                         <div className="flex items-start gap-2">
+
                           <a
                             role="menuitem"
                             aria-label="View University"
@@ -373,6 +440,22 @@ const UniversityManagementTable = () => {
                             <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                           </a>
 
+                          <div className="h-6 border-l border-slate-200" />
+
+                          <button
+                            role="menuitem"
+                            aria-label="Delete University"
+                            onClick={() => {
+                              setSelectedUniversityId(uni.id);
+                              setSelectedUniversityName(uni.name);
+                              setIsDeleteOpen(true);
+                            }}
+                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                          >
+                            <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
+                          </button>
+
+
                         </div>
                       </td>
                     </tr>
@@ -382,7 +465,7 @@ const UniversityManagementTable = () => {
           </div>
 
           <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex  md:justify-between">
-            {universities.length > 0 && (
+            {universitiesList.length > 0 && (
               <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                 Showing
                 <span className="font-medium">
@@ -390,10 +473,13 @@ const UniversityManagementTable = () => {
                 </span>
                 to
                 <span className="font-medium">
-                  {Math.min(currentPage * itemsPerPage, universities.length)}
+                  {Math.min(
+                    currentPage * itemsPerPage,
+                    universitiesList.length
+                  )}
                 </span>
                 of
-                <span className="font-medium">{universities.length}</span>
+                <span className="font-medium">{universitiesList.length}</span>
                 Universities
               </div>
             )}
@@ -408,7 +494,7 @@ const UniversityManagementTable = () => {
 
               <span className="px-3 py-1 font-medium text-slate-500">
                 Page {currentPage} of{" "}
-                {Math.ceil(universities.length / itemsPerPage)}
+                {Math.ceil(universitiesList.length / itemsPerPage)}
               </span>
 
               <NextButton
@@ -416,12 +502,13 @@ const UniversityManagementTable = () => {
                   setCurrentPage((prev) =>
                     Math.min(
                       prev + 1,
-                      Math.ceil(universities.length / itemsPerPage)
+                      Math.ceil(universitiesList.length / itemsPerPage)
                     )
                   )
                 }
                 disabled={
-                  currentPage === Math.ceil(universities.length / itemsPerPage)
+                  currentPage ===
+                  Math.ceil(universitiesList.length / itemsPerPage)
                 }
                 text="Next"
                 icon={<ArrowRight className="h-4 w-4" />}
@@ -431,9 +518,12 @@ const UniversityManagementTable = () => {
         </div>
       </div>
 
-      <CreateUniversityType
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
+      <DeleteUniversityConfirmation
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        universityName={selectedUniversityName}
       />
 
     </div>
