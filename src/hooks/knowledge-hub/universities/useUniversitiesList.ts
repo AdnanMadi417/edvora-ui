@@ -7,6 +7,10 @@ export interface University {
   country: string;
   is_active: boolean;
   description?: string;
+
+  university_type_id: string;
+  university_type_name: string;
+
   intake_months?: string[];
 }
 

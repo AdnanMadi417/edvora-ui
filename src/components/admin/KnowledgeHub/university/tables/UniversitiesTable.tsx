@@ -16,24 +16,23 @@ import {
   ChevronDown,
   GraduationCap,
 } from 'lucide-react';
-import { MdSchool } from "react-icons/md";
+import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-import { useDeleteUniversity } from "../../../../../hooks/knowledge-hub/universities/useDeleteKnowledgeHubUniversity";
+import { useDeleteUniversity } from "hooks/knowledge-hub/universities/useDeleteKnowledgeHubUniversity";
+import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
 
-import NextButton from "../../../../ui/buttons/NextButton";
-import PrevButton from "../../../../ui/buttons/PrevButton";
-import Link from "../../../../ui/links/LinkBtn";
+import NextButton from "components/ui/buttons/NextButton";
+import PrevButton from "components/ui/buttons/PrevButton";
+import Link from "components/ui/links/LinkBtn";
 
-import NoMessagesFound from "../../../../emptyData/NoMessagesFound";
+import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import DeleteUniversityConfirmation from "components/admin/KnowledgeHub/university/popups/DeleteUniversityConfirmation";
 import CreateUniversity from "components/admin/KnowledgeHub/university/popups/CreateUniversity";
 import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
 
-import { useAllUniversities } from "../../../../../hooks/knowledge-hub/universities/useUniversitiesList";
-
-import Loading from "../../../../loading/Loading";
+import Loading from "components/loading/Loading";
 
 import { useToast } from "components/context/ToastContext";
 
@@ -277,6 +276,13 @@ const UniversitiesTable = () => {
                   </div>
                 </th>
 
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex min-w-[150px] items-center gap-2">
+                    <MdOutlineCategory className="h-4 w-4 text-slate-500" />
+                    <span>Type</span>
+                  </div>
+                </th>
+
                 <th className="group px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
                   <div className="flex min-w-[120px] items-center gap-2">
                     <Calendar className="h-4 w-4 text-slate-500" />
@@ -344,6 +350,59 @@ const UniversitiesTable = () => {
                           {uni.name}
                         </h3>
                       </div>
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="flex justify-start">
+                      {(() => {
+                        const type = uni.university_type_name;
+
+                        const typeConfig: Record<string, any> = {
+                          minimal: {
+                            bg: "bg-blue-50 border-blue-200",
+                            text: "text-blue-700",
+                            dot: "bg-blue-600",
+                            label: "Minimal",
+                          },
+                          extended: {
+                            bg: "bg-green-50 border-green-200",
+                            text: "text-green-700",
+                            dot: "bg-green-600",
+                            label: "Extended",
+                          },
+                          conditional: {
+                            bg: "bg-orange-50 border-orange-200",
+                            text: "text-orange-700",
+                            dot: "bg-orange-600",
+                            label: "Conditional",
+                          },
+                        };
+
+                        const normalizedType = type
+                          ?.toLowerCase()
+                          .trim()
+                          .replace(/\s+/g, "_");
+
+                        const config = typeConfig[normalizedType] || {
+                          bg: "bg-gray-100 border-gray-200",
+                          text: "text-gray-700",
+                          dot: "bg-gray-400",
+                          label: type || "Not Provided",
+                        };
+
+                        return (
+                          <span
+                            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-semibold ${config.bg} ${config.text}`}
+                            title={config.label}
+                          >
+                                <span
+                                  className={`h-2 w-2 rounded-full ${config.dot}`}
+                                ></span>
+                                <span className="truncate">{config.label}</span>
+                              </span>
+                        );
+                      })()}
                     </div>
                   </td>
 
