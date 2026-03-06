@@ -406,7 +406,7 @@ const UniversitiesTable = () => {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 min-w-[250px]">
                     <div className="flex flex-wrap gap-2">
                       {uni.intake_months &&
                       uni.intake_months.length > 0 ? (

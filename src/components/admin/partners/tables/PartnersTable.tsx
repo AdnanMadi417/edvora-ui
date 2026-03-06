@@ -13,10 +13,13 @@ import {
   PhoneCall,
   BadgeCheck,
   UserCog,
-} from "lucide-react";
+  Handshake,
+  Trash2, Eye, Pencil,
+} from 'lucide-react';
 
 import { useAllPartners } from "hooks/partners/usePartnersList";
 import { useAccountManagerList } from "hooks/account-managers/useAccountManagerList";
+import { useDeletePartner } from "hooks/partners/useDeletePartner";
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
@@ -25,8 +28,13 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import AssignPartnerManager from "components/admin/partners/popups/AssignPartnerManager";
 
 import Loading from "components/loading/Loading";
+import Link from "components/ui/links/LinkBtn";
+import DeletePartner from "components/admin/partners/popups/DeletePartner";
+import { useToast } from "../../../context/ToastContext";
+import { useRouter } from "next/navigation";
 
 const PartnersTable = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
 
   const { partners, partnersLoading, partnersError } = useAllPartners();
@@ -37,18 +45,29 @@ const PartnersTable = () => {
 
   const [selectedState, setSelectedState] = useState<string>("all");
 
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const { deletePartner, loading } = useDeletePartner();
+  const { showToast } = useToast();
+
+  const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(
+    null
+  );
+  const [selectedPartnerName, setSelectedPartnerName] =
+    useState<string>("");
+
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
   const filteredPartners = partners.filter((partner) => {
     const term = searchTerm.toLowerCase();
 
-    const matchesSearch = partner.name
-      .toLowerCase()
-      .match(searchTerm.toLowerCase());
-
-    return matchesSearch;
+    return (
+      partner.name?.toLowerCase().includes(term) ||
+      partner.email?.toLowerCase().includes(term)
+    );
   });
 
   const [sortConfig, setSortConfig] = useState<{
@@ -92,15 +111,6 @@ const PartnersTable = () => {
   const selectedCount = Object.values(selectedPartners).filter(Boolean).length;
 
   useEffect(() => {
-    if (currentPartners.length) {
-      const defaults = {};
-      currentPartners.forEach((p) => {
-        defaults[p.id] = 1;
-      });
-    }
-  }, [filteredPartners]);
-
-  useEffect(() => {
     setselectedPartners((prev) => {
       const updated: Record<string, boolean> = { ...prev };
       filteredPartners.forEach((p) => {
@@ -110,12 +120,30 @@ const PartnersTable = () => {
       });
       return updated;
     });
-  }, [filteredPartners]);
+  }, [filteredPartners, sortConfig]);
 
   const managerOptions = accountManagers.map((m) => ({
     label: m.name,
     value: m.id,
   }));
+
+  const handleDelete = async () => {
+    if (!selectedPartnerId) return;
+
+    try {
+      await deletePartner(selectedPartnerId);
+
+      showToast("Partner deleted successfully.");
+
+      setIsDeleteOpen(false);
+      setSelectedPartnerId(null);
+      setSelectedPartnerName("");
+
+      router.refresh();
+    } catch (error: any) {
+      showToast("Failed to delete partner. Please try again.");
+    }
+  };
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
@@ -155,6 +183,17 @@ const PartnersTable = () => {
               Clear
             </button>
 
+            <Link
+              href={`/admin/partners/create`}
+              icon={<Handshake className="h-5 w-5" />}
+              label={"Register Partner"}
+              bgColor="bg-blue-50"
+              textColor="text-blue-700"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-blue-800"
+              hoverBorderColor="hover:border-blue-700"
+            />
+
             {selectedCount > 0 && (
               <div className="flex items-center gap-2 text-sm text-slate-500">
                 {selectedCount} selected
@@ -165,181 +204,202 @@ const PartnersTable = () => {
       </div>
 
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
-
         <div className="block">
-
           <div className="overflow-x-auto rounded-lg rounded-b-none bg-card">
             <table className="w-full">
-
               <thead>
-              <tr className="border-b border-slate-200 bg-card">
-                <th className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-slate-500" />
-                    <span>Partner Name</span>
-                  </div>
-                </th>
+                <tr className="border-b border-slate-200 bg-card">
+                  <th className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-slate-500" />
+                      <span>Partner Name</span>
+                    </div>
+                  </th>
 
-                <th className="group min-w-[220px] max-w-[260px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <PhoneCall className="h-4 w-4 text-slate-500" />
-                    <span>Contact Info</span>
-                  </div>
-                </th>
+                  <th className="group min-w-[220px] max-w-[260px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <PhoneCall className="h-4 w-4 text-slate-500" />
+                      <span>Contact Info</span>
+                    </div>
+                  </th>
 
-                <th className="group min-w-[220px] max-w-[260px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <UserCog className="h-4 w-4 text-slate-500" />
-                    <span>Assigned Manager</span>
-                  </div>
-                </th>
+                  <th className="group min-w-[220px] max-w-[260px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <UserCog className="h-4 w-4 text-slate-500" />
+                      <span>Assigned Manager</span>
+                    </div>
+                  </th>
 
-                <th className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <BadgeCheck className="h-4 w-4 text-slate-500" />
-                    <span>Status</span>
-                  </div>
-                </th>
+                  <th className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <BadgeCheck className="h-4 w-4 text-slate-500" />
+                      <span>Status</span>
+                    </div>
+                  </th>
 
-                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                  <div className="flex items-center gap-2">
-                    <Settings className="h-4 w-4 text-slate-500" />
-                    <span>Actions</span>
-                  </div>
-                </th>
-              </tr>
+                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                    <div className="flex items-center gap-2">
+                      <Settings className="h-4 w-4 text-slate-500" />
+                      <span>Actions</span>
+                    </div>
+                  </th>
+                </tr>
               </thead>
 
               <tbody className="divide-border-slate-200 divide-y bg-primary">
-
-              {partnersLoading && (
-                <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center">
-                    <Loading text="Fetching Partners data..." />
-                  </td>
-                </tr>
-              )}
-
-              {!partnersError &&
-                !partnersLoading &&
-                currentPartners.length === 0 && (
+                {partnersLoading && (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center">
-                      <NoMessagesFound
-                        title="No partners found"
-                        subtitle="There are currently no partners available."
-                      />
+                      <Loading text="Fetching Partners data..." />
                     </td>
                   </tr>
                 )}
 
-              {!partnersError && currentPartners.map((partner) => (
-                <tr
-                  key={partner.id}
-                  className="hover:bg-primary/10 group transition-colors"
-                >
-                  <td className="min-w-[220px] max-w-[320px] px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex-shrink-0">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                          {partner.name
-                            ? partner.name.slice(0, 2).toUpperCase()
-                            : "NA"}
-                        </div>
-
-                        <span
-                          className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${
-                            partner.is_active
-                              ? "bg-emerald-500"
-                              : "bg-slate-300"
-                          }`}
-                          title={
-                            partner.is_active ? "Active" : "Inactive"
-                          }
+                {!partnersError &&
+                  !partnersLoading &&
+                  currentPartners.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-8 text-center">
+                        <NoMessagesFound
+                          title="No partners found"
+                          subtitle="There are currently no partners available."
                         />
-                      </div>
+                      </td>
+                    </tr>
+                  )}
 
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-slate-900">
-                          {partner.name || "Unknown Partner"}
+                {!partnersError &&
+                  currentPartners.map((partner) => (
+                    <tr
+                      key={partner.id}
+                      className="hover:bg-primary/10 group transition-colors"
+                    >
+                      <td className="min-w-[220px] max-w-[320px] px-6 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="relative flex-shrink-0">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                              {partner.name
+                                ? partner.name.slice(0, 2).toUpperCase()
+                                : "NA"}
+                            </div>
+                          </div>
+
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium text-slate-900">
+                              {partner.name || "Unknown Partner"}
+                            </div>
+
+                            <div className="truncate text-xs text-slate-500">
+                              {partner.country || "Not Provided"}
+                            </div>
+                          </div>
                         </div>
+                      </td>
 
-                        <div className="truncate text-xs text-slate-500">
-                          {partner.country || "—"}
+                      <td className="px-6 py-4">
+                        <div className="min-w-0 space-y-1">
+                          <div className="truncate text-sm text-slate-900">
+                            {partner.phone || "No phone"}
+                          </div>
+
+                          <div className="truncate text-xs text-slate-500">
+                            {partner.email || "No email"}
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  </td>
+                      </td>
 
-                  <td className="px-6 py-4">
-                    <div className="min-w-0 space-y-1">
-                      <div className="truncate text-sm text-slate-900">
-                        {partner.phone || "No phone"}
-                      </div>
+                      <td className="px-6 py-4">
+                        <div className="truncate text-sm text-slate-900">
+                          {partner.assigned_manager_name || (
+                            <span className="text-sm text-slate-400">
+                              Unassigned
+                            </span>
+                          )}
+                        </div>
+                      </td>
 
-                      <div className="truncate text-xs text-slate-500">
-                        {partner.email || "No email"}
-                      </div>
-                    </div>
-                  </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 text-sm">
+                          {partner.is_active ? (
+                            <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
+                              <CheckCircle className="h-3 w-3" /> Active
+                            </span>
+                          ) : (
+                            <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
+                              <XCircle className="h-3 w-3" /> Not Active
+                            </span>
+                          )}
+                        </div>
+                      </td>
 
-                  <td className="px-6 py-4">
-                    <div className="truncate text-sm text-slate-900">
-                      {partner.assigned_manager_name || (
-                        <span className="text-xs text-slate-400">
-                                  Unassigned
-                                </span>
-                      )}
-                    </div>
-                  </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-2">
 
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      {partner.is_active ? (
-                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
-                                  <XCircle className="h-3 w-3" /> Active
-                                </span>
-                      ) : (
-                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
-                                  <CheckCircle className="h-3 w-3" /> Not Active
-                                </span>
-                      )}
-                    </div>
-                  </td>
+                          <a
+                            role="menuitem"
+                            aria-label="View University"
+                            href={`/admin/partners/${partner.id}`}
+                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                          >
+                            <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
+                          </a>
 
-                  <td className="px-6 py-4">
-                    <div className="flex items-center justify-center gap-2">
-                      <button
-                        role="menuitem"
-                        aria-label="Assign Manager"
-                        onClick={() => {
-                          setSelectedPartner(partner);
-                          setIsAssignModalOpen(true);
-                        }}
-                        className="flex items-center justify-center rounded-full p-2 hover:bg-slate-100"
-                      >
-                        <UserCog className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                ))}
+                          <div className="h-6 border-l border-slate-200" />
 
+                          <a
+                            role="menuitem"
+                            aria-label="View University"
+                            href={`/admin/partners/${partner.id}/edit`}
+                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                          >
+                            <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
+                          </a>
+
+                          <div className="h-6 border-l border-slate-200" />
+
+                          <button
+                            role="menuitem"
+                            aria-label="Assign Manager"
+                            onClick={() => {
+                              setSelectedPartner(partner);
+                              setIsAssignModalOpen(true);
+                            }}
+                            className="flex items-center justify-center rounded-full p-2 hover:bg-slate-100"
+                          >
+                            <UserCog className="h-4 w-4 text-slate-500 hover:text-slate-700" />
+                          </button>
+
+                          <div className="h-6 border-l border-slate-200" />
+
+                          <button
+                            role="menuitem"
+                            aria-label="Delete Partner"
+                            onClick={() => {
+                              setSelectedPartnerId(partner.id);
+                              setIsDeleteOpen(true);
+                            }}
+                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                          >
+                            <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
-
           </div>
           <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex  md:justify-between">
             {partners.length > 0 && (
               <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                 Showing
                 <span className="font-medium">
-                      {(currentPage - 1) * itemsPerPage + 1}
-                    </span>
+                  {(currentPage - 1) * itemsPerPage + 1}
+                </span>
                 to
                 <span className="font-medium">
-                      {Math.min(currentPage * itemsPerPage, partners.length)}
-                    </span>
+                  {Math.min(currentPage * itemsPerPage, partners.length)}
+                </span>
                 of
                 <span className="font-medium">{partners.length}</span>
                 Partners
@@ -348,18 +408,16 @@ const PartnersTable = () => {
 
             <div className="flex justify-end gap-2">
               <PrevButton
-                onClick={() =>
-                  setCurrentPage((prev) => Math.max(prev - 1, 1))
-                }
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
                 text="Prev"
                 icon={<ArrowLeft className="h-4 w-4" />}
               />
 
               <span className="px-3 py-1 font-medium text-slate-500">
-                    Page {currentPage} of{" "}
+                Page {currentPage} of{" "}
                 {Math.ceil(partners.length / itemsPerPage)}
-                  </span>
+              </span>
 
               <NextButton
                 onClick={() =>
@@ -378,10 +436,15 @@ const PartnersTable = () => {
               />
             </div>
           </div>
-
         </div>
-
       </div>
+
+      <DeletePartner
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDelete}
+        isDeleting={loading}
+      />
 
       {isAssignModalOpen && selectedPartner && (
         <AssignPartnerManager
@@ -392,7 +455,6 @@ const PartnersTable = () => {
           managerOptions={managerOptions}
         />
       )}
-
     </div>
   );
 };

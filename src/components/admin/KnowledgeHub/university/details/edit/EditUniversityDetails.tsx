@@ -174,7 +174,7 @@ const UniversityEdit = ({ id }: Props) => {
 
       showToast("University created successfully.");
 
-      setTimeout(() => location.reload(), 1500);
+      setTimeout(() => router.refresh(), 1500);
 
     } catch (err) {
       console.error(err);

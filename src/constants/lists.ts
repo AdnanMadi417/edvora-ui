@@ -389,3 +389,8 @@ export const SCHOLARSHIP_TYPE = [
   { value: "2", label: "Partial Scholarship" },
   { value: "3", label: "No Scholarship" }
 ];
+
+export const PARTNER_TYPE = [
+  { value: "individual", label: "Individual" },
+  { value: "Business", label: "Business" },
+];

@@ -2,12 +2,13 @@
 
 import React, {  useState } from 'react';
 import { GraduationCap, School, ChevronLeft } from 'lucide-react';
-import InputField from "../../../../form/InputField";
-import MultipleDatePickerModal from '../../../../form/MultipleDatePickerModal';
+
+import InputField from "components/form/InputField";
+import MultipleDatePickerModal from 'components/form/MultipleDatePickerModal';
 
 import { useToast } from "components/context/ToastContext";
-import Button from '../../../../ui/buttons/Button';
-import { useCreateUniversity } from '../../../../../hooks/knowledge-hub/universities/useCreateKnowledgeHubUniversity';
+import Button from 'components/ui/buttons/Button';
+import { useCreateUniversity } from 'hooks/knowledge-hub/universities/useCreateKnowledgeHubUniversity';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterUniversity() {
@@ -74,24 +75,29 @@ export default function RegisterUniversity() {
 
   return (
     <section className="mx-auto mt-5">
-      <div className="rounded-md border bg-slate-50 shadow-sm">
 
-        <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <School className="text-blue-700" size={24} />
+      <div className="mt-6 rounded-md border bg-white">
+
+        <div className="flex justify-between border-b p-6">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
+              <School className="h-6 w-6 text-white" />
+            </div>
+
+            <div>
+              <h2 className="text-lg font-semibold">
+                Register a new university
+              </h2>
+              <p className="text-sm text-slate-500">
+                Complete the required information to register a new knowledge hub university
+              </p>
+            </div>
           </div>
 
-          <div>
-            <h3 className="text-xl font-semibold text-slate-900">
-              Register a new university
-            </h3>
-            <p className="text-sm text-slate-500">
-              Complete the required information to register a new knowledge hub university
-            </p>
-          </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-x-3 px-6 py-5">
+        <div className="px-6 py-6 space-y-5">
+
           <InputField
             label="University Name"
             field="name"
@@ -120,10 +126,10 @@ export default function RegisterUniversity() {
             errors={errors}
             updateFormData={updateFormData}
           />
+
         </div>
 
-        <div className="flex justify-end gap-2 border-t rounded-b-xl px-6 py-5">
-
+        <div className="flex justify-end gap-2 border-t p-6">
           <Button
             onClick={handleBack}
             disabled={loading}
@@ -149,7 +155,10 @@ export default function RegisterUniversity() {
           />
 
         </div>
+
       </div>
+
+
     </section>
   );
 }
