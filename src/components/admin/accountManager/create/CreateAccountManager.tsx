@@ -1,6 +1,6 @@
 "use client";
 
-import { PlusCircle, User } from "lucide-react";
+import { ChevronLeft, UserRoundPlus, User } from 'lucide-react';
 import React, { useState } from "react";
 
 import InputField from "../../../form/InputField";
@@ -9,6 +9,7 @@ import { useCreateAccountManager } from "hooks/account-managers/useCreateAccount
 
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
+import Button from '../../../ui/buttons/Button';
 
 export interface FormData {
   name: string;
@@ -30,7 +31,7 @@ export default function RegisterAccountManager() {
     email: "",
     password: "",
     confirm_password: "",
-    is_active: false,
+    is_active: true,
   });
 
   const { createAccountManager, loadingCreateAccountManager, errorCreateAccountManager } =
@@ -40,6 +41,12 @@ export default function RegisterAccountManager() {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
+
+  const isFormValid =
+    formData.name.trim() &&
+    formData.email.trim() &&
+    formData.password.trim() &&
+    formData.confirm_password.trim()
 
   const handleSubmit = async () => {
     const newErrors: FormErrors = {};
@@ -72,7 +79,7 @@ export default function RegisterAccountManager() {
     try {
       await createAccountManager(payload);
 
-      showToast("Account manager created successfully");
+      showToast("Partner created successfully");
 
       setFormData({
         name: "",
@@ -84,11 +91,15 @@ export default function RegisterAccountManager() {
       setErrors({});
 
       setTimeout(() => {
-       location.reload();
+        location.reload();
       }, 1500);
     } catch (error) {
       showToast("Failed to create account manager. This email already exists, please try again with another email address.");
     }
+  };
+
+  const handleBack = () => {
+    router.push("/admin/partners");
   };
 
   return (
@@ -96,7 +107,7 @@ export default function RegisterAccountManager() {
       <div className="rounded-md border bg-slate-50 shadow-sm">
         <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <User className="text-blue-700" size={24} />
+            <UserRoundPlus className="text-blue-700" size={24} />
           </div>
           <div>
             <h3 className="text-xl font-semibold text-slate-900">
@@ -158,9 +169,22 @@ export default function RegisterAccountManager() {
 
         </div>
 
-        <div className="flex justify-end border-t rounded-b-xl px-6 py-5">
+        <div className="flex justify-end border-t gap-2 rounded-b-xl px-6 py-5">
+
+          <Button
+            onClick={handleBack}
+            disabled={loadingCreateAccountManager}
+            icon={<ChevronLeft  className="h-5 w-5" />}
+            text={"Back"}
+            bgColor="bg-slate-50"
+            textColor="text-slate-700"
+            borderColor="border-slate-600"
+            hoverTextColor="hover:text-slate-800"
+            hoverBorderColor="hover:border-slate-700"
+          />
+
           <CreateAccount
-            icon={<PlusCircle className="h-5 w-5" />}
+            icon={<UserRoundPlus className="h-5 w-5" />}
             text={loadingCreateAccountManager ? "Creating..." : "Create Account"}
             bgColor="bg-blue-50"
             textColor="text-blue-700"
@@ -168,8 +192,9 @@ export default function RegisterAccountManager() {
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
             onClick={handleSubmit}
-            disabled={loadingCreateAccountManager}
+            disabled={loadingCreateAccountManager || !isFormValid}
           />
+
         </div>
       </div>
     </section>
