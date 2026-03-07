@@ -5,10 +5,8 @@ import { useParams } from "next/navigation";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 import EmptyData from "components/emptyData/EmptyData";
-import ApplicationDetails from "../../../../components/applications/details/admin/ApplicationDetails";
-import ApplicationDocuments from "../../../../components/applications/details/admin/ApplicationDocuments";
-import OfferLetterCard from "../../../../components/applications/details/admin/OfferLetterCard";
-import VisaTrackingTimeline from "../../../../components/applications/details/admin/VisaTrackingTimeline";
+import ApplicationDetails from "components/applications/details/admin/ApplicationDetails";
+import ApplicationDocuments from "components/applications/details/admin/ApplicationDocuments";
 import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -51,9 +49,7 @@ export default function ApplicationPage() {
   return (
     <>
       <ApplicationDetails application={application} />
-      <OfferLetterCard application={application} />
       <ApplicationDocuments application={application} />
-      <VisaTrackingTimeline application={application} />
 
       <button
         onClick={() => setChatOpen((v) => !v)}

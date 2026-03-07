@@ -16,29 +16,29 @@ import {
   XCircle,
   Globe,
   Trash2,
-} from "lucide-react";
+} from 'lucide-react';
 import { MdSchool, MdLibraryAdd } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 
-import { useAllPrograms } from "../../../../../hooks/knowledge-hub/programs/useProgramsList";
-import { useAllFields } from "../../../../../hooks/knowledge-hub/programs/useFieldsList";
-import { useKnowledgeHubStates } from "../../../../../hooks/knowledge-hub/programs/useProgramStates";
-import { useDeleteKnowledgeHubPrograms } from "../../../../../hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms";
-import { useBatchUpdatePrograms } from "../../../../../hooks/knowledge-hub/programs/useBatchUpdatePrograms";
+import { useAllPrograms } from "hooks/knowledge-hub/programs/useProgramsList";
+import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
+import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
+import { useDeleteKnowledgeHubPrograms } from "hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms";
 
-import FilterSelectField from "../../../../form/filter/FilterSelectField";
+import FilterSelectField from "components/form/filter/FilterSelectField";
 
-import NextButton from "../../../../ui/buttons/NextButton";
-import PrevButton from "../../../../ui/buttons/PrevButton";
+import NextButton from "components/ui/buttons/NextButton";
+import PrevButton from "components/ui/buttons/PrevButton";
 
 import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
 import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/BatchUpdatePrograms";
 
-import Loading from "../../../../loading/Loading";
-import NoMessagesFound from '../../../../emptyData/NoMessagesFound';
+import Loading from "components/loading/Loading";
+import NoMessagesFound from 'components/emptyData/NoMessagesFound';
 
 import Link from "next/link";
 import { useToast } from "components/context/ToastContext";
+import { useAllUniversities } from '../../../../../hooks/knowledge-hub/universities/useUniversitiesList';
 
 const ProgramsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,9 +51,11 @@ const ProgramsTable = () => {
 
   const { states } = useKnowledgeHubStates();
   const { fields} = useAllFields();
+  const { universities } = useAllUniversities();
 
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
+  const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(
     null
   );
@@ -78,6 +80,7 @@ const ProgramsTable = () => {
     const hasSearch = normalizedSearch.length > 0;
     const hasStateFilter = selectedState !== "all";
     const hasFieldFilter = selectedField !== "all";
+    const hasUniversityFilter = selectedUniversity !== "all";
 
     return programs.filter((program) => {
 
@@ -98,9 +101,12 @@ const ProgramsTable = () => {
       const matchesField =
         !hasFieldFilter || program.field_of_study?.name === selectedField;
 
-      return matchesSearch && matchesState && matchesField;
+      const matchesUniversity =
+        !hasUniversityFilter || program.university?.name === selectedUniversity;
+
+      return matchesSearch && matchesState && matchesField && matchesUniversity;
     });
-  }, [programs, searchTerm, selectedState, selectedField]);
+  }, [programs, searchTerm, selectedState, selectedField , selectedUniversity]);
 
   const currentPrograms = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -221,8 +227,9 @@ const ProgramsTable = () => {
             </div>
           </div>
 
-          <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
-            <div className="relative w-full sm:w-64">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
+
+            <div className="relative w-full sm:w-64 flex-shrink-0">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <input
                 type="text"
@@ -233,75 +240,95 @@ const ProgramsTable = () => {
               />
             </div>
 
-            <FilterSelectField
-              value={selectedState}
-              onChange={(val) => {
-                setSelectedState(val);
-                setCurrentPage(1);
-              }}
-              options={states}
-              icon={Globe}
-              defaultOption="All Locations"
-            />
+            <div className="w-full sm:w-48 flex-shrink-0">
+              <FilterSelectField
+                value={selectedState}
+                onChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
+                options={states}
+                icon={Globe}
+                defaultOption="All Locations"
+              />
+            </div>
 
-            <FilterSelectField
-              value={selectedField}
-              onChange={(val) => {
-                setSelectedField(val);
-                setCurrentPage(1);
-              }}
-              options={fields}
-              icon={MdSchool}
-              defaultOption="All Fields"
-            />
+            <div className="w-full sm:w-48 flex-shrink-0">
+              <FilterSelectField
+                value={selectedField}
+                onChange={(val) => {
+                  setSelectedField(val);
+                  setCurrentPage(1);
+                }}
+                options={fields}
+                icon={MdSchool}
+                defaultOption="All Fields"
+              />
 
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setSelectedState("all");
-                setSelectedField("all");
-                setCurrentPage(1);
-              }}
-              className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Clear
-            </button>
+            </div>
 
-            <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href="/admin/knowledge-hub/programs/create"
-            >
-              <MdLibraryAdd className="h-4 w-4" />
-              Create Program
-            </Link>
+            <div className="w-full sm:w-48 flex-shrink-0">
+              <FilterSelectField
+                value={selectedUniversity}
+                onChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
+                options={universities}
+                icon={MdSchool}
+                defaultOption="All Universities"
+              />
+            </div>
 
-            {selectedCount > 0 && (
-              <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
-                <button
-                  onClick={() => {
-                    setDeleteMode("batch");
-                    setIsDeleteOpen(true);
-                  }}
-                  className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-red-500 px-4 py-2.5 text-sm text-red-500 outline-0 transition hover:border-red-700 hover:text-red-700 sm:w-auto"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete Programs
-                </button>
+            <div className="w-full sm:w-auto flex-shrink-0">
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedState("all");
+                  setSelectedField("all");
+                  setSelectedUniversity("all");
+                  setCurrentPage(1);
+                }}
+                className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Clear
+              </button>
+            </div>
 
-                <button
-                  onClick={() => setIsBatchUpdateOpen(true)}
-                  className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
-                  <Pencil className="h-4 w-4" />
-                  Update Programs
-                </button>
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
 
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                  {selectedCount} selected
+              <Link
+                className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+                href="/admin/knowledge-hub/programs/create"
+              >
+                <MdLibraryAdd className="h-4 w-4" />
+                Create Program
+              </Link>
+
+              {selectedCount > 0 && (
+                <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
+                  <button
+                    onClick={() => {
+                      setDeleteMode("batch");
+                      setIsDeleteOpen(true);
+                    }}
+                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-red-500 px-4 py-2.5 text-sm text-red-500 outline-0 transition hover:border-red-700 hover:text-red-700 sm:w-auto"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete Programs
+                  </button>
+
+                  <button
+                    onClick={() => setIsBatchUpdateOpen(true)}
+                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
+                    <Pencil className="h-4 w-4" />
+                    Update Programs
+                  </button>
+
+                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                    {selectedCount} selected
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+
           </div>
+
         </div>
       </div>
 

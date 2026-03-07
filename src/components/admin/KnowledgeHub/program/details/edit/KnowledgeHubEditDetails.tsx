@@ -4,12 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GraduationCap, Trash2, PlusCircle, MoreVertical, ChevronLeft, CalendarPlus } from 'lucide-react';
 
-import Loading from "../../../../../loading/Loading";
 import { DURATION,  SCHOLARSHIP_TYPE } from 'constants/lists';
-
-import InputField from "../../../../../form/InputField";
-import ToggleInput from "../../../../../form/toggle/ToggleInput";
-import MultipleDateInput from "../../../../../form/MultipleDateInput";
+import Loading from "components/loading/Loading";
 
 import Button from 'components/ui/buttons/Button';
 import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
@@ -18,21 +14,25 @@ import { useToast } from "components/context/ToastContext";
 
 import { useProgram } from "hooks/knowledge-hub/programs/useProgram";
 import { useDeleteKnowledgeHubPrograms } from "hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms";
-import { useUpdateProgram,UpdateProgramPayload } from "../../../../../../hooks/knowledge-hub/programs/useUpdateProgram";
-import { useCommissionTypes } from '../../../../../../hooks/knowledge-hub/commission/useCommissionTypes';
-import SearchableSelect from '../../../../../form/SearchableSelect';
-import ArrayObjectField from '../../../../../form/ArrayObjectField';
-import SelectField from '../../../../../form/SelectField';
+import { useUpdateProgram,UpdateProgramPayload } from "hooks/knowledge-hub/programs/useUpdateProgram";
+import { useCommissionTypes } from 'hooks/knowledge-hub/commission/useCommissionTypes';
+import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
+import { useAllBranches } from 'hooks/knowledge-hub/universities/useBranchesList';
+import { useAllFields } from 'hooks/knowledge-hub/programs/useFieldsList';
+import { useAllQualifications } from 'hooks/knowledge-hub/qualifications/useQualificationsList';
+
+import InputField from "components/form/InputField";
+import ToggleInput from "components/form/toggle/ToggleInput";
+import MultipleDateInput from "components/form/MultipleDateInput";
+import SearchableSelect from 'components/form/SearchableSelect';
+import ArrayObjectField from 'components/form/ArrayObjectField';
+import SelectField from 'components/form/SelectField';
 import CreateUniversity from '../../../university/popups/CreateUniversity';
 import CreateCommissionType from '../../popups/CreateCommissionType';
 import CreateFieldOfStudy from '../../popups/CreateFieldOfStudy';
 import CreateBranch from '../../popups/CreateBranch';
-import { useAllUniversities } from '../../../../../../hooks/knowledge-hub/universities/useUniversitiesList';
-import { useAllBranches } from '../../../../../../hooks/knowledge-hub/universities/useBranchesList';
-import { useAllFields } from '../../../../../../hooks/knowledge-hub/programs/useFieldsList';
-import { useAllQualifications } from '../../../../../../hooks/knowledge-hub/qualifications/useQualificationsList';
 
-import IconButton from '../../../../../ui/buttons/IconButton';
+import IconButton from 'components/ui/buttons/IconButton';
 import NoMessagesFound from 'components/emptyData/NoMessagesFound';
 
 
@@ -56,7 +56,6 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   const { commissionTypes } =
     useCommissionTypes();
   const { qualifications } = useAllQualifications();
-
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
