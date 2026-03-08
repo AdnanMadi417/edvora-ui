@@ -9,6 +9,7 @@ import Link from "next/link";
 import api from "../../lib/useApi";
 import { useRouter } from "next/navigation";
 import { useMe } from "hooks/useMe";
+import { profileRouteMap } from "components/navbar/config/navigation";
 
 const Navbar = ({
                   onOpenSidenav,
@@ -27,7 +28,12 @@ const Navbar = ({
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { user, loading, error } = useMe(); // useMe hook
+  const { user, loading, error } = useMe();
+
+  const getProfileRoute = (role?: string) => {
+    if (!role) return "/auth/sign-in";
+    return profileRouteMap[role] || "/profile";
+  };
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -136,7 +142,7 @@ const Navbar = ({
 
             <div className="flex flex-col px-3 py-2 text-slate-900">
               <Link
-                href=""
+                href={getProfileRoute(user?.role)}
                 className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-slate-900"
               >
                 <Settings className="h-4 w-4 text-text-secondary group-hover:text-slate-900" />
