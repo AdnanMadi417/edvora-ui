@@ -14,7 +14,7 @@ import {
   Trash2,
   ChevronUp,
   ChevronDown,
-  GraduationCap,
+  GraduationCap, CreditCard,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
@@ -217,6 +217,7 @@ const UniversitiesTable = () => {
           </div>
 
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
+
             <div className="relative w-full sm:w-64">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <input
@@ -240,6 +241,17 @@ const UniversitiesTable = () => {
               <RefreshCw className="h-4 w-4" />
               Clear
             </button>
+
+            <Link
+              href={`/admin/universities/payment-methods`}
+              icon={<CreditCard  className="h-5 w-5" />}
+              label={"Payment Methods"}
+              bgColor="bg-teal-50"
+              textColor="text-teal-700"
+              borderColor="border-teal-600"
+              hoverTextColor="hover:text-teal-800"
+              hoverBorderColor="hover:border-teal-700"
+            />
 
             <Link
               href={`/admin/universities/create`}
