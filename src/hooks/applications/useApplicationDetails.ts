@@ -62,7 +62,6 @@ const useApplicationDetails = (applicationId?: string) => {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
-      console.log("API response:", response.data);
       setData(response.data);
     } catch (err) {
       console.error("API error:", err);
