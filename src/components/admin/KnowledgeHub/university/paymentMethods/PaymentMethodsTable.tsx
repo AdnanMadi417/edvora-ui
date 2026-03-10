@@ -306,7 +306,6 @@ const PaymentMethodsTable = () => {
                         <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                       </a>
 
-
                       <div className="h-6 border-l border-slate-200" />
 
                       <a
@@ -394,7 +393,6 @@ const PaymentMethodsTable = () => {
           </div>
 
         </div>
-
 
       </div>
 

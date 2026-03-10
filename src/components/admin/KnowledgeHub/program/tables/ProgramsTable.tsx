@@ -129,9 +129,6 @@ const ProgramsTable = () => {
       year: "numeric",
     });
 
-  const sortDates = (dates: string[]) =>
-    [...dates].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-
   const [selectedPrograms, setSelectedPrograms] = useState<
     Record<string, boolean>
   >({});
@@ -171,6 +168,7 @@ const ProgramsTable = () => {
       showToast("Delete failed");
     }
   };
+
   const selectedCount = Object.values(selectedPrograms).filter(Boolean).length;
 
   const handleSelectProgram = (id: string) => {

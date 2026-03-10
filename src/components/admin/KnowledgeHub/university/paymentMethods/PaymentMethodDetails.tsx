@@ -38,7 +38,6 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
   const [selectedPaymentMethodName, setSelectedPaymentMethodName] =
     useState<string>("");
 
-
   const { paymentMethod,error, loading } = usePaymentMethod(id);
 
   const handleBack = () => {
@@ -57,7 +56,7 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
       setSelectedPaymentId(null);
       setSelectedPaymentMethodName("");
 
-      setTimeout(() => router.refresh(), 2000);
+      setTimeout(() => router.push("/admin/universities/payment-methods"), 2000);
 
     } catch (error: any) {
       showToast("Failed to delete university. Please try again.");
@@ -65,7 +64,7 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
   };
 
   if (loading) {
-    return <Loading text="Loading university details..." />;
+    return <Loading text="Loading payment methods details..." />;
   }
 
   if (!paymentMethod) {

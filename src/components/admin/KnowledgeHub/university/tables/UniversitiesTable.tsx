@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Search,
   RefreshCw,
@@ -14,7 +14,7 @@ import {
   Trash2,
   ChevronUp,
   ChevronDown,
-  GraduationCap, CreditCard,
+  GraduationCap, CreditCard, Wallet,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
@@ -181,6 +181,50 @@ const UniversitiesTable = () => {
     }
   }, [filteredUniversities, currentPage]);
 
+  const [selectedPrograms, setSelectedPrograms] = useState<
+    Record<string, boolean>
+  >({});
+
+  const handleSelectProgram = (id: string) => {
+    setSelectedPrograms((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const selectedCount = Object.values(selectedPrograms).filter(Boolean).length;
+
+  useEffect(() => {
+    setSelectedPrograms((prev) => {
+      const updated: Record<string, boolean> = { ...prev };
+      filteredUniversities.forEach((p) => {
+        if (!(p.id in updated)) {
+          updated[p.id] = false;
+        }
+      });
+      return updated;
+    });
+  }, [filteredUniversities]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedState, selectedField]);
+
+  const selectedProgramIds = useMemo(() => {
+    return Object.keys(selectedPrograms).filter(
+      (id) => selectedPrograms[id]
+    );
+  }, [selectedPrograms]);
+
+  const handleSelectAll = () => {
+    const allSelected = Object.values(selectedPrograms).every(Boolean);
+    const newSelection: Record<string, boolean> = {};
+    Object.keys(selectedPrograms).forEach((id) => {
+      newSelection[id] = !allSelected;
+    });
+    setSelectedPrograms(newSelection);
+  };
+
   const handleDelete = async () => {
     if (!selectedUniversityId) return;
 
@@ -216,9 +260,9 @@ const UniversitiesTable = () => {
             </div>
           </div>
 
-          <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
 
-            <div className="relative w-full sm:w-64">
+            <div className="relative w-full sm:w-64 flex-shrink-0">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <input
                 type="text"
@@ -264,7 +308,24 @@ const UniversitiesTable = () => {
               hoverBorderColor="hover:border-slate-700"
             />
 
+            {selectedCount > 0 && (
+              <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
+
+                <button
+                  // onClick={() => setIsBatchUpdateOpen(true)}
+                  className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
+                  <Wallet className="h-4 w-4" />
+                  Assign Payment Methods
+                </button>
+
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  {selectedCount} selected
+                </div>
+              </div>
+            )}
+
           </div>
+
         </div>
       </div>
 
@@ -276,7 +337,21 @@ const UniversitiesTable = () => {
             <table className="w-full">
 
               <thead>
+
               <tr className="border-b border-slate-200 bg-card">
+
+                <td className="pl-6">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600"
+                    checked={
+                      Object.values(selectedPrograms).length > 0 &&
+                      Object.values(selectedPrograms).every(Boolean)
+                    }
+                    onChange={handleSelectAll}
+                  />
+                </td>
+
                 <th
                   onClick={() => handleSort("name")}
                   className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
@@ -344,6 +419,17 @@ const UniversitiesTable = () => {
                   key={uni.id}
                   className="hover:bg-primary/10 group transition-colors"
                 >
+
+                  <td className="pl-6">
+                    <input
+                      type="checkbox"
+                      aria-label={`Select ${uni.name}`}
+                      checked={selectedPrograms[uni.id] || false}
+                      onChange={() => handleSelectProgram(uni.id)}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600"
+                    />
+                  </td>
+
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div
@@ -571,7 +657,6 @@ const UniversitiesTable = () => {
           </div>
 
         </div>
-
 
       </div>
 

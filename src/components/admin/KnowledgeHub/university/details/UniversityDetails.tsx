@@ -1,26 +1,41 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, GraduationCap } from "lucide-react";
+import {
+  ChevronLeft, CreditCard,
+  GraduationCap,
+  MoreVertical,
+  Settings,
+} from 'lucide-react';
 import { useUniversityDetails } from "hooks/knowledge-hub/universities/useUniversitiesDetails";
 import Loading from "../../../../loading/Loading";
-import { MdEvent, MdLocationCity, MdPublic } from 'react-icons/md';
-import EmptyData from '../../../../emptyData/EmptyTableData';
+import { MdEvent, MdLocationCity, MdPublic } from "react-icons/md";
+import EmptyData from "../../../../emptyData/EmptyTableData";
+import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
+import AssignPaymentMethods from "components/admin/KnowledgeHub/university/popups/AssignPaymentMethods";
 
 interface UniversityDetailsProps {
   id: string;
 }
 
+function Setting(props: { className: string }) {
+  return null;
+}
+
 const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const router = useRouter();
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+
+  const [isUniversityTypeModalOpen, setIsUniversityTypeModalOpen] = useState(false);
+  const [isPaymentMethodsModalOpen, setIsPaymentMethodsModalOpen] = useState(false);
+  const [activeUniversity, setActiveUniversity] = useState<any>(null);
+
+  const { university, branches, universityLoading } = useUniversityDetails(id);
 
   const handleBack = () => {
     router.push("/admin/universities");
   };
-
-  const { university, branches, universityLoading } =
-    useUniversityDetails(id);
 
   if (universityLoading) {
     return <Loading text="Loading university details..." />;
@@ -32,7 +47,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
   return (
     <>
-
       <div className="mt-6">
         <div className="rounded-md border bg-card shadow-sm">
           <div className="flex justify-between border-b p-6">
@@ -42,24 +56,79 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
 
               <div>
-                <h2 className="text-lg font-semibold">
-                  {university.name}
-                </h2>
-                <p className="text-sm text-slate-500">
-                  {university.country}
-                </p>
+                <h2 className="text-lg font-semibold">{university.name}</h2>
+                <p className="text-sm text-slate-500">{university.country}</p>
               </div>
             </div>
 
             <div className="flex items-center gap-2 sm:gap-6">
-              <button
-                onClick={handleBack}
-                className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
-              >
-                <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="hidden sm:inline">Back to universities</span>
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() =>
+                    setOpenDropdownId(
+                      openDropdownId === university.id ? null : university.id
+                    )
+                  }
+                  className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+                >
+                  Actions
+                  <MoreVertical className="h-4 w-4" />
+                </button>
 
+                {openDropdownId === university.id && (
+                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
+                    <div className="space-y-2 p-2">
+                      <button
+                        aria-label="Update Program Details"
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:shadow-sm"
+                        onClick={() => {
+                          setActiveUniversity(university);
+                          setIsUniversityTypeModalOpen(true);
+                        }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
+                          <Settings className="h-4 w-4" />
+                        </div>
+
+                        <span className="font-semibold text-slate-900">
+                          Assign University Type
+                        </span>
+                      </button>
+
+                      <button
+                        aria-label="Assign Payment Methods"
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent  px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-100 hover:shadow-sm"
+                        onClick={() => {
+                          setActiveUniversity(university);
+                          setIsPaymentMethodsModalOpen(true);
+                        }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700 transition-colors group-hover:bg-blue-200">
+                          <CreditCard className="h-4 w-4" />
+                        </div>
+
+                        <span className="font-semibold text-slate-900">
+                          Assign Payment Methods
+                        </span>
+                      </button>
+
+                      <button
+                        aria-label="Back to Programs"
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
+                        onClick={handleBack}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
+                          <ChevronLeft className="h-4 w-4" />
+                        </div>
+
+                        <span className="font-semibold text-slate-900">
+                          Back to Universities
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -76,9 +145,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Country</p>
                   <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
-                    {university.country
-                      ? university.country
-                      : "Not Provided"}
+                    {university.country ? university.country : "Not Provided"}
                   </p>
                 </div>
               </div>
@@ -113,7 +180,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 </div>
               </div>
             </div>
-
           </div>
 
           <div className="border-t border-gray-200 px-6 py-6">
@@ -159,9 +225,22 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
             )}
           </div>
-
         </div>
       </div>
+
+      <UpdateUniversityType
+        isOpen={isUniversityTypeModalOpen}
+        onClose={() => setIsUniversityTypeModalOpen(false)}
+        universityId={activeUniversity?.id || null}
+        initialData={activeUniversity}
+      />
+
+      <AssignPaymentMethods
+        isOpen={isPaymentMethodsModalOpen}
+        onClose={() => setIsPaymentMethodsModalOpen(false)}
+        universityId={activeUniversity?.id || null}
+        initialData={activeUniversity}
+      />
 
     </>
   );
