@@ -6,7 +6,7 @@ import {
   ChevronLeft,
   CreditCard,
   MoreVertical,
-  Settings, Trash2,
+  Trash2,
 } from 'lucide-react';
 
 import { usePaymentMethod } from "hooks/knowledge-hub/payment-methods/usePaymentMethodId";
@@ -14,7 +14,6 @@ import { useDeleteUniversity } from 'hooks/knowledge-hub/payment-methods/useDele
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
-import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
 import DeletePaymentConfirmation from './popups/DeletePaymentConfirmation';
 import { useToast } from 'components/context/ToastContext';
 
@@ -26,9 +25,6 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
   const router = useRouter();
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const { showToast } = useToast();
-
-  const [isUniversityTypeModalOpen, setIsUniversityTypeModalOpen] = useState(false);
-  const [activeUniversity, setActiveUniversity] = useState<any>(null);
 
   const { deletePayment, isDeleting } =useDeleteUniversity();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -103,22 +99,6 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
                 {openDropdownId === paymentMethod.id && (
                   <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
                     <div className="space-y-2 p-2">
-                      <button
-                        aria-label="Update Program Details"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:shadow-sm"
-                        onClick={() => {
-                          setActiveUniversity(paymentMethod);
-                          setIsUniversityTypeModalOpen(true);
-                        }}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
-                          <Settings className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-slate-900">
-                          Assign University Type
-                        </span>
-                      </button>
 
                       <button
                         aria-label="Back to Programs"
@@ -171,13 +151,6 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
 
         </div>
       </div>
-
-      <UpdateUniversityType
-        isOpen={isUniversityTypeModalOpen}
-        onClose={() => setIsUniversityTypeModalOpen(false)}
-        universityId={activeUniversity?.id || null}
-        initialData={activeUniversity}
-      />
 
       <DeletePaymentConfirmation
         isOpen={isDeleteOpen}

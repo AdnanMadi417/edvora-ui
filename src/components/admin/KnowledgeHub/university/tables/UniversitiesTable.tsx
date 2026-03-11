@@ -30,7 +30,7 @@ import Link from "components/ui/links/LinkBtn";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import DeleteUniversityConfirmation from "components/admin/KnowledgeHub/university/popups/DeleteUniversityConfirmation";
-import BatchAssignPaymentMethod  from "components/admin/KnowledgeHub/university/paymentMethods/popups/BatchAssignPaymentMethod ";
+import BatchAssignPaymentMethod  from "components/admin/KnowledgeHub/university/paymentMethods/popups/BatchAssignPaymentMethod";
 import CreateUniversity from "components/admin/KnowledgeHub/university/popups/CreateUniversity";
 import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
 
@@ -53,8 +53,6 @@ const UniversitiesTable = () => {
   const [selectedUniversity, setSelectedUniversity] = useState<any>(null);
 
   const [isBatchAssignOpen, setIsBatchAssignOpen] = useState(false);
-  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
-  const [selectedPaymentMethodName, setSelectedPaymentMethodName] = useState("");
 
   const [selectedUniversityId, setSelectedUniversityId] = useState<
     string | null
@@ -688,7 +686,6 @@ const UniversitiesTable = () => {
         isOpen={isBatchAssignOpen}
         onClose={() => setIsBatchAssignOpen(false)}
         selectedUniversityIds={selectedProgramIds}
-        paymentMethods={paymentMethods}
       />
 
       <CreateUniversity

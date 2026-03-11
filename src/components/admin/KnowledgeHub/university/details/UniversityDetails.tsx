@@ -3,33 +3,36 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  ChevronLeft, CreditCard,
+  ChevronLeft,
+  CreditCard,
   GraduationCap,
   MoreVertical,
   Settings,
-} from 'lucide-react';
+} from "lucide-react";
 import { useUniversityDetails } from "hooks/knowledge-hub/universities/useUniversitiesDetails";
+import { useUniversityPaymentMethods } from "hooks/knowledge-hub/universities/payment-methods/useUniversityPaymentMethods";
 import Loading from "../../../../loading/Loading";
 import { MdEvent, MdLocationCity, MdPublic } from "react-icons/md";
 import EmptyData from "../../../../emptyData/EmptyTableData";
 import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
 import AssignPaymentMethods from "components/admin/KnowledgeHub/university/popups/AssignPaymentMethods";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 interface UniversityDetailsProps {
   id: string;
-}
-
-function Setting(props: { className: string }) {
-  return null;
 }
 
 const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const router = useRouter();
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
-  const [isUniversityTypeModalOpen, setIsUniversityTypeModalOpen] = useState(false);
-  const [isPaymentMethodsModalOpen, setIsPaymentMethodsModalOpen] = useState(false);
+  const [isUniversityTypeModalOpen, setIsUniversityTypeModalOpen] =
+    useState(false);
+  const [isPaymentMethodsModalOpen, setIsPaymentMethodsModalOpen] =
+    useState(false);
   const [activeUniversity, setActiveUniversity] = useState<any>(null);
+
+  const { universityPaymentMethods, loading } = useUniversityPaymentMethods(id);
 
   const { university, branches, universityLoading } = useUniversityDetails(id);
 
@@ -225,6 +228,62 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
             )}
           </div>
+
+          <div className="border-t border-gray-200 px-6 py-6">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Payment Methods
+            </h3>
+
+            {universityPaymentMethods.length === 0 ? (
+              <p className="text-sm text-slate-500">No Payment Method found.</p>
+            ) : (
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                {universityPaymentMethods.map((payment) => (
+                  <div
+                    key={payment.id}
+                    className="flex items-start justify-between rounded-md border border-gray-200 bg-gray-50 p-4 transition hover:shadow-sm"
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm">
+                        <CreditCard className="h-4 w-4 text-slate-600" />
+                      </div>
+
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-slate-900">
+                          {payment.payment_method_name}
+                        </p>
+
+                        <p className="text-xs font-medium text-slate-700">
+                          {payment.currency}
+                        </p>
+
+                        {payment.instructions && (
+                          <p className="text-xs text-slate-500">
+                            {payment.instructions}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <span
+                      className={`inline-flex items-center whitespace-nowrap p-1 text-xs font-semibold
+    ${
+      payment.is_active
+        ? " text-green-700"
+        : "text-slate-500"
+    }`}
+                    >
+                      {payment.is_active ? (
+                        <FaCheckCircle className="text-[12px]" />
+                      ) : (
+                        <FaTimesCircle className="text-[12px]" />
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -237,9 +296,8 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
       <AssignPaymentMethods
         isOpen={isPaymentMethodsModalOpen}
-        onClose={() => setIsPaymentMethodsModalOpen(false)}
+        onClose={() => setIsUniversityTypeModalOpen(false)}
         universityId={activeUniversity?.id || null}
-        initialData={activeUniversity}
       />
 
     </>

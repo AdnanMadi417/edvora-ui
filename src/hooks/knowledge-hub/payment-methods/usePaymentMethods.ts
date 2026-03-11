@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import api from "../../../lib/useApi";
 
-export interface University {
+export interface PaymentMethod {
   id: string;
   name: string;
   description?: string;
 }
 
 export function useAllPaymentMethods() {
-  const [paymentMethods, setPaymentMethods] = useState<University[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
