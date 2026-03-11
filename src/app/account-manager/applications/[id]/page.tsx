@@ -11,6 +11,7 @@ import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import AgentPartnerChat from "components/chat/ApplicationChat";
+import { useUnreadCount } from '../../../../hooks/chat/useUnreadCount';
 
 export default function ApplicationPage() {
 
@@ -19,6 +20,10 @@ export default function ApplicationPage() {
   const [application, setApplication] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
+
+  const { unreadCount } = useUnreadCount({
+    applicationId,
+  });
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -56,7 +61,15 @@ export default function ApplicationPage() {
         aria-label={chatOpen ? "Close chat" : "Open chat"}
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:scale-105 hover:bg-blue-700"
       >
-        {chatOpen ? <X size={26} /> : <MessageCircle size={28} />}
+        <div className="relative">
+          {chatOpen ? <X size={26} /> : <MessageCircle size={28} />}
+
+          {unreadCount > 0 && !chatOpen && (
+            <span className="absolute -right-6 -top-6 flex h-5 w-5 border-3 border-slate-200  items-center justify-center rounded-full bg-red-500 text-xs font-medium">
+        {unreadCount}
+      </span>
+          )}
+        </div>
       </button>
 
       <AnimatePresence>
@@ -67,7 +80,7 @@ export default function ApplicationPage() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed bottom-24 right-6 z-50 w-96 overflow-hidden rounded-md border bg-card shadow-md dark:border-navy-700 dark:bg-navy-800"
+            className="fixed bottom-24 right-6 z-50 w-96 max-w-full overflow-hidden rounded-md border bg-card shadow-md dark:border-navy-700 dark:bg-navy-800"
           >
             <AgentPartnerChat
               applicationId={applicationId}

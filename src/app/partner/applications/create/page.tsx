@@ -1,7 +1,7 @@
 
 'use client';
 
-import StudentManualApplicationForm from "../../../../components/applications/form/StudentManualApplicationForm"
+import StudentManualApplicationForm from "../../../../components/applications/form/StudentRegistrationForm"
 
 export default function StudentApplicationForm() {
   return (
