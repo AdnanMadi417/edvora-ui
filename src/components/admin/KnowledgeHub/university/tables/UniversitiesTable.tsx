@@ -21,6 +21,7 @@ import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 import { useDeleteUniversity } from "hooks/knowledge-hub/universities/useDeleteKnowledgeHubUniversity";
 import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
+import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
@@ -29,6 +30,7 @@ import Link from "components/ui/links/LinkBtn";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import DeleteUniversityConfirmation from "components/admin/KnowledgeHub/university/popups/DeleteUniversityConfirmation";
+import BatchAssignPaymentMethod  from "components/admin/KnowledgeHub/university/paymentMethods/popups/BatchAssignPaymentMethod ";
 import CreateUniversity from "components/admin/KnowledgeHub/university/popups/CreateUniversity";
 import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
 
@@ -43,11 +45,16 @@ const UniversitiesTable = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { universities, loading, error } = useAllUniversities();
+  const { paymentMethods } = useAllPaymentMethods();
 
   const { deleteUniversity, isDeleting } = useDeleteUniversity();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [selectedUniversity, setSelectedUniversity] = useState<any>(null);
+
+  const [isBatchAssignOpen, setIsBatchAssignOpen] = useState(false);
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
+  const [selectedPaymentMethodName, setSelectedPaymentMethodName] = useState("");
 
   const [selectedUniversityId, setSelectedUniversityId] = useState<
     string | null
@@ -312,7 +319,9 @@ const UniversitiesTable = () => {
               <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
 
                 <button
-                  // onClick={() => setIsBatchUpdateOpen(true)}
+                  onClick={() => {
+                    setIsBatchAssignOpen(true);
+                  }}
                   className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
                   <Wallet className="h-4 w-4" />
                   Assign Payment Methods
@@ -673,6 +682,13 @@ const UniversitiesTable = () => {
         onClose={() => setIsUpdateOpen(false)}
         universityId={selectedUniversity?.id || null}
         initialData={selectedUniversity}
+      />
+
+      <BatchAssignPaymentMethod
+        isOpen={isBatchAssignOpen}
+        onClose={() => setIsBatchAssignOpen(false)}
+        selectedUniversityIds={selectedProgramIds}
+        paymentMethods={paymentMethods}
       />
 
       <CreateUniversity

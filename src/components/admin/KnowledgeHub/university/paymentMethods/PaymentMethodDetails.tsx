@@ -15,7 +15,7 @@ import { useDeleteUniversity } from 'hooks/knowledge-hub/payment-methods/useDele
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
-import DeletePaymentConfirmation from './DeletePaymentConfirmation';
+import DeletePaymentConfirmation from './popups/DeletePaymentConfirmation';
 import { useToast } from 'components/context/ToastContext';
 
 interface PaymentMethodDetailsProps {

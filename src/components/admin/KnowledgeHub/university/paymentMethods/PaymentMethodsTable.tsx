@@ -22,7 +22,7 @@ import PrevButton from "components/ui/buttons/PrevButton";
 
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
-import DeletePaymentConfirmation from "components/admin/KnowledgeHub/university/paymentMethods/DeletePaymentConfirmation";
+import DeletePaymentConfirmation from "./popups/DeletePaymentConfirmation";
 import CreatePayment from "components/admin/KnowledgeHub/university/paymentMethods/CreatePayment";
 
 import Loading from "components/loading/Loading";
@@ -44,6 +44,7 @@ const PaymentMethodsTable = () => {
   const [selectedPaymentId, setSelectedPaymentId] = useState<
     string | null
   >(null);
+
   const [selectedPaymentMethodName, setSelectedPaymentMethodName] =
     useState<string>("");
 

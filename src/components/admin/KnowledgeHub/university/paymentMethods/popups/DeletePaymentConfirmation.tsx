@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { Trash2, XCircle } from 'lucide-react';
-import ModalHeader from "components/ui/modal/ModalHeader";
-import DeleteBtn from '../../../../ui/buttons/Button';
-import Button from '../../../../ui/buttons/Button';
+import ModalHeader from "../../../../../ui/modal/ModalHeader";
+import DeleteBtn from '../../../../../ui/buttons/Button';
+import Button from '../../../../../ui/buttons/Button';
 
 interface DeletePaymentMethodConfirmationProps {
   isOpen: boolean;

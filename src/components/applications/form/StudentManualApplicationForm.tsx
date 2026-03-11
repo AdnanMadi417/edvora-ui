@@ -27,7 +27,6 @@ import Cookies from "js-cookie";
 import { useUniversities } from "hooks/useUniversities";
 import { InputField, SelectField, RadioField } from "components/form";
 import FileUploadField from "components/form/filesUpload/FileUploadField";
-import FileUploadToggleField from "components/form/filesUpload/FileUploadToggleField";
 
 import {
   getPresignedUploads,
@@ -39,6 +38,8 @@ import Button from "components/ui/buttons/Button";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
 import { useRouter } from 'next/navigation';
+import SearchableSelect from '../../form/SearchableSelect';
+import SearchableDropdown from '../../form/search/SearchableDropdown';
 
 interface Student {
   name: string;
@@ -146,11 +147,6 @@ export default function StudentManualApplicationForm() {
   const router = useRouter();
   const partnerId = user?.partner_id;
 
-  const [enabled, setEnabled] = useState(false);
-  const handleToggle = () => {
-    setEnabled((prev) => !prev);
-  };
-
   const {
     universities,
     loading: universitiesLoading,
@@ -168,6 +164,23 @@ export default function StudentManualApplicationForm() {
     loadingCreatePartnerApplication,
     errorCreatePartnerApplication,
   } = useCreatePartnerApplication(partnerId);
+
+  const validators = {
+    required: (value: any) =>
+      value !== undefined && value !== null && String(value).trim() !== "",
+
+    email: (value: string) =>
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+
+    phone: (value: string) =>
+      /^\+?[0-9]{8,15}$/.test(value),
+
+    passport: (value: string) =>
+      /^[A-Za-z0-9]{5,20}$/.test(value),
+
+    year: (value: string) =>
+      /^\d{4}$/.test(value),
+  };
 
   const {
     data: requiredFields,
@@ -209,6 +222,7 @@ export default function StudentManualApplicationForm() {
   const [documentTypes, setDocumentTypes] = useState<
     { id: string; type: string; code: string; description: string }[]
   >([]);
+  const safeDocumentTypes = documentTypes ?? [];
 
   const [initOnly, setInitOnly] = useState(true);
 
@@ -250,19 +264,13 @@ export default function StudentManualApplicationForm() {
     is_draft: false,
   });
 
+  const contact = formData.student.emergency_contacts[0];
+
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   const updateFormData = (fieldPath, value) => {
     setFormData((prev) => setNestedValue(prev, fieldPath, value));
     setErrors((prev) => setNestedValue(prev || {}, fieldPath, ""));
-  };
-
-  const addCompletedStage = (s) => {
-    setCompletedStages((prev) => {
-      const set = new Set(prev);
-      set.add(s);
-      return Array.from(set).sort((a, b) => a - b);
-    });
   };
 
   const validateStage = (stageNum: number) => {
@@ -272,63 +280,213 @@ export default function StudentManualApplicationForm() {
       newErrors[path] = message;
     };
 
+    // Helper to check required + format validators
+    const validateField = (
+      path: string,
+      value: any,
+      {
+        requiredType,
+        format,
+      }: { requiredType?: string; format?: keyof typeof validators } = {}
+    ) => {
+      if (requiredType && !validators.required(value)) {
+        addError(path, `${requiredType} is required`);
+      } else if (format && value && !validators[format](value)) {
+        const messages: Record<string, string> = {
+          email: "Invalid email format",
+          phone: "Invalid phone number format",
+          passport: "Invalid passport number",
+          year: "Invalid year format",
+        };
+        addError(path, messages[format]);
+      }
+    };
+
     if (stageNum === 1) {
-      if (!getNestedValue(formData, "student.name"))
-        addError("student.name", "Name is required");
+      validateField("student.name", getNestedValue(formData, "student.name"), {
+        requiredType: "Student name",
+      });
 
-      if (!formData.university_id)
-        addError("university_id", "University is required");
+      validateField(
+        "student.previous_educations[0].qualification",
+        getNestedValue(
+          formData,
+          "student.previous_educations[0].qualification"
+        ),
+        { requiredType: "Qualification" }
+      );
 
-      if (!formData.program_id)
-        addError("program_id", "Program is required");
-
-      const prevEdu =
-        getNestedValue(formData, "student.previous_educations[0]") || {};
-
-      if (!prevEdu.qualification)
-        addError(
-          "student.previous_educations[0].qualification",
-          "Qualification is required"
-        );
+      validateField("university_id", formData.university_id, {
+        requiredType: "University",
+      });
+      validateField("program_id", formData.program_id, {
+        requiredType: "Program",
+      });
     }
 
     if (stageNum === 2) {
       if (!formData.documents?.length) {
-        addError(
-          "documents",
-          "Please upload at least one required document"
+        addError("documents", "Please upload at least one document");
+      }
+      if (formData.documents?.some((d) => d.uploading)) {
+        addError("documents", "Please wait for file uploads to finish");
+      }
+
+      // Required document check
+      documentTypes.forEach((docType) => {
+        const uploaded = formData.documents.find(
+          (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
         );
+        if (!uploaded) {
+          addError(`documents.${docType.id}`, `${docType.type} is required`);
+        }
+      });
+    }
+
+    if (stageNum === 3 && hasStudentInfoFields) {
+      const student = formData.student;
+
+      if (
+        isFieldRequired("student.birthday") &&
+        !validators.required(student.birthday)
+      ) {
+        addError("student.birthday", "Date of birth is required");
+      }
+
+      if (isFieldRequired("student.gender") && student.gender === null) {
+        addError("student.gender", "Gender is required");
+      }
+
+      if (
+        isFieldRequired("student.nationality") &&
+        !validators.required(student.nationality)
+      ) {
+        addError("student.nationality", "Nationality is required");
+      }
+
+      if (isFieldRequired("student.passport_number")) {
+        if (!validators.required(student.passport_number)) {
+          addError("student.passport_number", "Passport number is required");
+        } else if (!validators.passport(student.passport_number)) {
+          addError("student.passport_number", "Invalid passport number");
+        }
+      }
+
+      if (isFieldRequired("student.email")) {
+        if (!validators.required(student.email)) {
+          addError("student.email", "Email is required");
+        } else if (!validators.email(student.email)) {
+          addError("student.email", "Invalid email format");
+        }
+      }
+
+      if (isFieldRequired("student.phone")) {
+        if (!validators.required(student.phone)) {
+          addError("student.phone", "Phone number is required");
+        } else if (!validators.phone(student.phone)) {
+          addError("student.phone", "Invalid phone number");
+        }
+      }
+
+      if (
+        isFieldRequired("student.current_address") &&
+        !validators.required(student.current_address)
+      ) {
+        addError("student.current_address", "Address is required");
       }
     }
 
-    if (stageNum === 3) {
-      if (hasStudentInfoFields) {
-        if (isFieldRequired("student.birthday") && !formData.student.birthday)
-          addError("student.birthday", "Date of birth is required");
+    if (stageNum === 3 && hasEducationalFields) {
+      const edu = formData.student.previous_educations[0];
 
-        if (isFieldRequired("student.gender") && formData.student.gender === null)
-          addError("student.gender", "Gender is required");
+      if (
+        isFieldRequired("student.previous_educations[0].institution_name") &&
+        !validators.required(edu.institution_name)
+      ) {
+        addError(
+          "student.previous_educations[0].institution_name",
+          "Institution name is required"
+        );
+      }
 
-        if (isFieldRequired("student.nationality") && !formData.student.nationality)
-          addError("student.nationality", "Nationality is required");
+      if (isFieldRequired("student.previous_educations[0].start_date")) {
+        if (!validators.required(edu.start_date)) {
+          addError(
+            "student.previous_educations[0].start_date",
+            "Start year is required"
+          );
+        } else if (!validators.year(edu.start_date)) {
+          addError(
+            "student.previous_educations[0].start_date",
+            "Invalid year format"
+          );
+        }
+      }
 
-        if (
-          isFieldRequired("student.passport_number") &&
-          !formData.student.passport_number
-        )
-          addError("student.passport_number", "Passport number is required");
+      if (isFieldRequired("student.previous_educations[0].end_date")) {
+        if (!validators.required(edu.end_date)) {
+          addError(
+            "student.previous_educations[0].end_date",
+            "Graduation year is required"
+          );
+        } else if (!validators.year(edu.end_date)) {
+          addError(
+            "student.previous_educations[0].end_date",
+            "Invalid year format"
+          );
+        }
+      }
+    }
 
-        if (isFieldRequired("student.email") && !formData.student.email)
-          addError("student.email", "Email is required");
+    if (stageNum === 3 && hasEmergencyFields) {
+      const contact = formData.student.emergency_contacts[0];
 
-        if (isFieldRequired("student.phone") && !formData.student.phone)
-          addError("student.phone", "Phone is required");
+      if (
+        isFieldRequired("student.emergency_contacts[0].name") &&
+        !validators.required(contact.name)
+      ) {
+        addError(
+          "student.emergency_contacts[0].name",
+          "Emergency contact name is required"
+        );
+      }
 
-        if (
-          isFieldRequired("student.current_address") &&
-          !formData.student.current_address
-        )
-          addError("student.current_address", "Address is required");
+      if (
+        isFieldRequired("student.emergency_contacts[0].relation") &&
+        !validators.required(contact.relation)
+      ) {
+        addError(
+          "student.emergency_contacts[0].relation",
+          "Relation to student is required"
+        );
+      }
+
+      if (isFieldRequired("student.emergency_contacts[0].phone")) {
+        if (!validators.required(contact.phone)) {
+          addError(
+            "student.emergency_contacts[0].phone",
+            "Emergency contact phone is required"
+          );
+        } else if (!validators.phone(contact.phone)) {
+          addError(
+            "student.emergency_contacts[0].phone",
+            "Invalid phone number format"
+          );
+        }
+      }
+
+      if (isFieldRequired("student.emergency_contacts[0].email")) {
+        if (!validators.required(contact.email)) {
+          addError(
+            "student.emergency_contacts[0].email",
+            "Emergency contact email is required"
+          );
+        } else if (!validators.email(contact.email)) {
+          addError(
+            "student.emergency_contacts[0].email",
+            "Invalid email format"
+          );
+        }
       }
     }
 
@@ -385,7 +543,7 @@ export default function StudentManualApplicationForm() {
 
     fetchDocumentTypes();
   }, [initOnly]);
-  
+
   useEffect(() => {
     if (partnerId && formData.university_id) {
       getRequiredFields(partnerId, formData.university_id);
@@ -707,7 +865,7 @@ export default function StudentManualApplicationForm() {
                   updateFormData={updateFormData}
                 />
 
-                <SelectField
+                <SearchableSelect
                   label="Study Level"
                   field="student.previous_educations[0].qualification"
                   options={qualifications.map((q) => ({
@@ -721,7 +879,7 @@ export default function StudentManualApplicationForm() {
                   updateFormData={updateFormData}
                 />
 
-                <SelectField
+                <SearchableSelect
                   label="University"
                   field="university_id"
                   options={universities.map((u) => ({
@@ -733,7 +891,7 @@ export default function StudentManualApplicationForm() {
                   updateFormData={updateFormData}
                 />
 
-                <SelectField
+                <SearchableSelect
                   label="Program / Major"
                   field="program_id"
                   options={(
@@ -767,48 +925,21 @@ export default function StudentManualApplicationForm() {
               </div>
 
               <div className="space-y-6">
-                {documentTypes?.length > 0 &&
-                  documentTypes
-                    .filter((docType) => docType.code !== "ielts")
-                    .map((docType) => (
-                      <FileUploadField
-                        key={docType.id}
-                        label={
-                          docType.type?.charAt(0).toUpperCase() +
-                          docType.type?.slice(1)
-                        }
-                        field="documents"
-                        documentTypeId={docType.id}
-                        formData={formData}
-                        updateFormData={updateFormData}
-                        errors={errors}
-                        uploadHandler={handleFileUpload}
-                        removeHandler={removeDocument}
-                        multiple={false}
-                        accept="application/pdf,image/*"
-                      />
-                    ))}
-
-                {documentTypes?.length > 0 &&
-                  documentTypes
-                    .filter((docType) => docType.code === "ielts")
-                    .map((docType) => (
-                      <FileUploadToggleField
-                        key={docType.id}
-                        toggleLabel="Enable upload"
-                        uploadLabel="Drag & drop or browse file"
-                        field="documents"
-                        documentTypeId={docType.id}
-                        formData={formData}
-                        errors={errors}
-                        required
-                        enabled={enabled}
-                        onToggle={handleToggle}
-                        uploadHandler={handleFileUpload}
-                        removeHandler={removeDocument}
-                        accept=".pdf,.png,.jpg"
-                      />
-                    ))}
+                {safeDocumentTypes.map((docType) => (
+                  <FileUploadField
+                    key={docType.id}
+                    label={docType.type}
+                    field="documents"
+                    documentTypeId={docType.id}
+                    formData={formData}
+                    updateFormData={updateFormData}
+                    errors={errors}
+                    uploadHandler={handleFileUpload}
+                    removeHandler={removeDocument}
+                    multiple={false}
+                    accept="application/pdf,image/*"
+                  />
+                ))}
               </div>
 
               {errors.documents && (
@@ -863,7 +994,7 @@ export default function StudentManualApplicationForm() {
                     )}
 
                     {isFieldRequired("student.nationality") && (
-                      <SelectField
+                      <SearchableDropdown
                         label="Nationality"
                         field="student.nationality"
                         options={NATIONALITIES.map((q) => ({
@@ -1018,7 +1149,7 @@ export default function StudentManualApplicationForm() {
                 </div>
               )}
 
-              {hasEducationalFields && (
+              {hasEmergencyFields && (
                 <div className="mb-8">
                   <h3 className="mb-4 font-semibold uppercase text-slate-900">
                     Parent / Guardian Information
@@ -1079,6 +1210,7 @@ export default function StudentManualApplicationForm() {
                   </div>
                 </div>
               )}
+
             </div>
           )}
 
@@ -1094,22 +1226,22 @@ export default function StudentManualApplicationForm() {
                 </p>
               </div>
 
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition ">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">
                 <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">
                   <Building2 className="h-4 w-4 text-blue-600" />
                   <h5 className="text-sm font-semibold text-slate-800 md:text-base">
-                    University & Program
+                    Application Info
                   </h5>
                 </div>
-
                 <div className="grid gap-3 p-5 text-sm md:grid-cols-2">
+
                   <div>
                     <div className="flex items-center gap-1 text-xs text-slate-500">
                       <School className="h-3.5 w-3.5" />
                       University
                     </div>
                     <p className="mt-1 font-medium text-slate-900">
-                      {universities.find((u) => u.id === formData.university_id)?.name || "-"}
+                      {universities.find(u => u.id === formData.university_id)?.name || "-"}
                     </p>
                   </div>
 
@@ -1120,32 +1252,31 @@ export default function StudentManualApplicationForm() {
                     </div>
                     <p className="mt-1 font-medium text-slate-900">
                       {universities
-                        .find((u) => u.id === formData.university_id)
-                        ?.programs?.find((p) => p.id === formData.program_id)?.name || "-"}
+                        .find(u => u.id === formData.university_id)
+                        ?.programs?.find(p => p.id === formData.program_id)?.name || "-"}
                     </p>
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Intake Date
+                  {formData.intake_date && (
+                    <div>
+                      <div className="flex items-center gap-1 text-xs text-slate-500">
+                        <Calendar className="h-3.5 w-3.5" />
+                        Intake Date
+                      </div>
+                      <p className="mt-1 font-medium text-slate-900">{formData.intake_date}</p>
                     </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.intake_date || "-"}
-                    </p>
-                  </div>
+                  )}
+
                 </div>
               </div>
 
               <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">
-
                 <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">
                   <User className="h-4 w-4 text-blue-600" />
                   <h5 className="text-sm font-semibold text-slate-800 md:text-base">
-                    Student Information
+                    Student Basic Information
                   </h5>
                 </div>
-
                 <div className="grid gap-4 p-5 text-sm md:grid-cols-2">
 
                   <div>
@@ -1153,9 +1284,7 @@ export default function StudentManualApplicationForm() {
                       <User className="h-3.5 w-3.5" />
                       Full Name
                     </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.name || "-"}
-                    </p>
+                    <p className="mt-1 font-medium text-slate-900">{formData.student.name || "-"}</p>
                   </div>
 
                   <div>
@@ -1163,34 +1292,27 @@ export default function StudentManualApplicationForm() {
                       <Calendar className="h-3.5 w-3.5" />
                       Date of Birth
                     </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.birthday || "-"}
-                    </p>
+                    <p className="mt-1 font-medium text-slate-900">{formData.student.birthday || "-"}</p>
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Users className="h-3.5 w-3.5" />
-                      Gender
+                  {formData.student.gender !== null && (
+                    <div>
+                      <div className="flex items-center gap-1 text-xs text-slate-500">
+                        <Users className="h-3.5 w-3.5" />
+                        Gender
+                      </div>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {formData.student.gender ? "Male" : "Female"}
+                      </p>
                     </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.gender === null
-                        ? "-"
-                        : formData.student.gender
-                          ? "Male"
-                          : "Female"}
-
-                    </p>
-                  </div>
+                  )}
 
                   <div>
                     <div className="flex items-center gap-1 text-xs text-slate-500">
                       <Globe className="h-3.5 w-3.5" />
                       Nationality
                     </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.nationality || "-"}
-                    </p>
+                    <p className="mt-1 font-medium text-slate-900">{formData.student.nationality || "-"}</p>
                   </div>
 
                   <div>
@@ -1198,9 +1320,7 @@ export default function StudentManualApplicationForm() {
                       <BadgeCheck className="h-3.5 w-3.5" />
                       Passport
                     </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.passport_number || "-"}
-                    </p>
+                    <p className="mt-1 font-medium text-slate-900">{formData.student.passport_number || "-"}</p>
                   </div>
 
                   <div>
@@ -1208,34 +1328,212 @@ export default function StudentManualApplicationForm() {
                       <Mail className="h-3.5 w-3.5" />
                       Email
                     </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.email || "-"}
-                    </p>
+                    <p className="mt-1 font-medium text-slate-900">{formData.student.email || "-"}</p>
                   </div>
 
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Phone className="h-3.5 w-3.5" />
-                      Phone
+                  {formData.student.phone && (
+                    <div>
+                      <div className="flex items-center gap-1 text-xs text-slate-500">
+                        <Phone className="h-3.5 w-3.5" />
+                        Phone
+                      </div>
+                      <p className="mt-1 font-medium text-slate-900">{formData.student.phone}</p>
                     </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.phone || "-"}
-                    </p>
-                  </div>
+                  )}
 
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <MapPin className="h-3.5 w-3.5" />
-                      Address
+                  {formData.student.current_address && (
+                    <div>
+                      <div className="flex items-center gap-1 text-xs text-slate-500">
+                        <MapPin className="h-3.5 w-3.5" />
+                        Address
+                      </div>
+                      <p className="mt-1 font-medium text-slate-900">{formData.student.current_address}</p>
                     </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.current_address || "-"}
-                    </p>
-                  </div>
-
+                  )}
                 </div>
-              </div> 
+              </div>
 
+                  {/*<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">*/}
+                  {/*  <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">*/}
+                  {/*    <Users className="h-4 w-4 text-blue-600" />*/}
+                  {/*    <h5 className="text-sm font-semibold text-slate-800 md:text-base">*/}
+                  {/*      Emergency Contact*/}
+                  {/*    </h5>*/}
+                  {/*  </div>*/}
+                  {/*  <div className="grid gap-4 p-5 text-sm md:grid-cols-2">*/}
+                  {/*    {formData.student.emergency_contact.name && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <User className="h-3.5 w-3.5" />*/}
+                  {/*          Name*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.emergency_contact.name}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.student.emergency_contact.relation && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <User className="h-3.5 w-3.5" />*/}
+                  {/*          Relation*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.emergency_contact.relation}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.student.emergency_contact.phone && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <Phone className="h-3.5 w-3.5" />*/}
+                  {/*          Phone*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.emergency_contact.phone}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.student.emergency_contact.email && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <Mail className="h-3.5 w-3.5" />*/}
+                  {/*          Email*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.emergency_contact.email}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*  </div>*/}
+                  {/*</div>*/}
+
+                  {/*/!* English Proficiency *!/*/}
+                  {/*<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">*/}
+                  {/*  <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">*/}
+                  {/*    <BookOpen className="h-4 w-4 text-blue-600" />*/}
+                  {/*    <h5 className="text-sm font-semibold text-slate-800 md:text-base">*/}
+                  {/*      English Proficiency*/}
+                  {/*    </h5>*/}
+                  {/*  </div>*/}
+                  {/*  <div className="grid gap-4 p-5 text-sm md:grid-cols-2">*/}
+                  {/*    {formData.student.english_proficiency.test_type && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <Book className="h-3.5 w-3.5" />*/}
+                  {/*          Test Type*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.english_proficiency.test_type}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.student.english_proficiency.score && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <Star className="h-3.5 w-3.5" />*/}
+                  {/*          Score*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.english_proficiency.score}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.student.english_proficiency.test_date && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <Calendar className="h-3.5 w-3.5" />*/}
+                  {/*          Test Date*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.english_proficiency.test_date}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*  </div>*/}
+                  {/*</div>*/}
+
+                  {/*/!* Previous Education *!/*/}
+                  {/*<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">*/}
+                  {/*  <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">*/}
+                  {/*    <Book className="h-4 w-4 text-blue-600" />*/}
+                  {/*    <h5 className="text-sm font-semibold text-slate-800 md:text-base">*/}
+                  {/*      Previous Education*/}
+                  {/*    </h5>*/}
+                  {/*  </div>*/}
+                  {/*  <div className="grid gap-4 p-5 text-sm md:grid-cols-2">*/}
+                  {/*    {formData.student.previous_education.institution_name && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <School className="h-3.5 w-3.5" />*/}
+                  {/*          Institution Name*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.previous_education.institution_name}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.student.previous_education.qualification && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <GraduationCap className="h-3.5 w-3.5" />*/}
+                  {/*          Qualification*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.previous_education.qualification}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.student.previous_education.start_date && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <Calendar className="h-3.5 w-3.5" />*/}
+                  {/*          Start Date*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.previous_education.start_date}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.student.previous_education.end_date && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <Calendar className="h-3.5 w-3.5" />*/}
+                  {/*          End Date*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.previous_education.end_date}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.student.previous_education.grade && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <Star className="h-3.5 w-3.5" />*/}
+                  {/*          Grade*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.previous_education.grade}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*  </div>*/}
+                  {/*</div>*/}
+
+                  {/*/!* Documents *!/*/}
+                  {/*<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">*/}
+                  {/*  <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">*/}
+                  {/*    <FileText className="h-4 w-4 text-blue-600" />*/}
+                  {/*    <h5 className="text-sm font-semibold text-slate-800 md:text-base">*/}
+                  {/*      Documents*/}
+                  {/*    </h5>*/}
+                  {/*  </div>*/}
+                  {/*  <div className="grid gap-4 p-5 text-sm md:grid-cols-2">*/}
+                  {/*    {formData.documents?.document_type_id && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <File className="h-3.5 w-3.5" />*/}
+                  {/*          Document Type*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.documents.document_type_id}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.documents?.file_key && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <Key className="h-3.5 w-3.5" />*/}
+                  {/*          File Key*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.documents.file_key}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*    {formData.documents?.file_url && (*/}
+                  {/*      <div>*/}
+                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
+                  {/*          <Link className="h-3.5 w-3.5" />*/}
+                  {/*          File URL*/}
+                  {/*        </div>*/}
+                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.documents.file_url}</p>*/}
+                  {/*      </div>*/}
+                  {/*    )}*/}
+                  {/*  </div>*/}
+                  {/*</div>*/}
 
             </div>
           )}
@@ -1248,6 +1546,7 @@ export default function StudentManualApplicationForm() {
           </div>
 
           <div className="flex gap-3">
+
             {stage > 1 && (
               <PrevButton
                 onClick={prevStage}
@@ -1267,11 +1566,12 @@ export default function StudentManualApplicationForm() {
             ) : (
               <Button
                 onClick={handleSubmit}
-                disabled={loadingCreatePartnerApplication}
                 text="Submit Application"
+                disabled={loadingCreatePartnerApplication}
               />
             )}
           </div>
+
         </div>
       </div>
     </section>
