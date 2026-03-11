@@ -243,7 +243,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                     key={payment.id}
                     className="group relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-blue-200 hover:shadow-md"
                   >
-                    {/* Header */}
+
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
