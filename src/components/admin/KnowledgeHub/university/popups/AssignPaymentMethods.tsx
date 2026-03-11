@@ -10,6 +10,7 @@ import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
 import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
 import { useUniversityPaymentMethods } from "hooks/knowledge-hub/universities/payment-methods/useUniversityPaymentMethods";
+import { useAssignPaymentMethod } from "hooks/knowledge-hub/universities/payment-methods/useAssignUniversityPayment";
 
 interface AssignPaymentUniversityProps {
   isOpen: boolean;
@@ -22,12 +23,13 @@ export default function AssignPaymentUniversity({
                                                   onClose,
                                                   universityId,
                                                 }: AssignPaymentUniversityProps) {
-  const { paymentMethods } = useAllPaymentMethods();
+
+  const { paymentMethods,loading } = useAllPaymentMethods();
+  const { universityPaymentMethods } = useUniversityPaymentMethods(universityId);
+  const { assignPaymentMethod, loading: assigning } = useAssignPaymentMethod();
 
   const { showToast } = useToast();
   const router = useRouter();
-
-  const { universityPaymentMethods, loading } = useUniversityPaymentMethods(universityId);
 
   const [formData, setFormData] = useState({
     payment_method_id: "",
@@ -52,12 +54,12 @@ export default function AssignPaymentUniversity({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
     };
 
-    if (isOpen) {
-      window.addEventListener("keydown", handleKeyDown);
-    }
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
@@ -73,33 +75,47 @@ export default function AssignPaymentUniversity({
     if (!formData.payment_method_id) return;
 
     try {
-      await assignPaymentMethod(
-        universityId,
-        {
-          payment_method_id: formData.payment_method_id,
-          instructions: formData.instructions?.trim() || undefined,
-          currency: formData.currency?.trim() || undefined,
-          is_active: formData.is_active,
-        }
-      );
+      await assignPaymentMethod(universityId, {
+        payment_method_id: formData.payment_method_id,
+        instructions: formData.instructions?.trim() || undefined,
+        currency: formData.currency?.trim() || undefined,
+        is_active: formData.is_active,
+      });
 
       showToast("Payment method assigned successfully.", "success");
-      onClose();
+
       router.refresh();
+      onClose();
+
     } catch (err: any) {
       const apiErrors = err?.response?.data?.detail;
+
       if (Array.isArray(apiErrors)) {
         const newErrors: Record<string, string> = {};
+
         apiErrors.forEach((e: any) => {
           if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
         });
+
         setErrors(newErrors);
       }
+
       showToast("Failed to assign payment method.", "error");
     }
   };
 
-  if (!isOpen) return null;
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+    } else {
+      const timer = setTimeout(() => setIsVisible(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!isVisible) return null;
 
   return (
     <div
@@ -133,10 +149,10 @@ export default function AssignPaymentUniversity({
                 value: String(p.id),
                 label: p.name,
               }))}
+              disabledOptions={universityPaymentMethods.map(p => String(p.payment_method_id))}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
-              disableOptions={universityPaymentMethods}
             />
 
             <InputField
@@ -169,7 +185,7 @@ export default function AssignPaymentUniversity({
             />
             <Button
               onClick={handleAssign}
-              disabled={!formData.payment_method_id || loading}
+              disabled={!formData.payment_method_id || assigning}
               icon={<CreditCard className="h-5 w-5" />}
               text={loading ? "Assigning..." : "Assign Payment Method"}
               bgColor="bg-blue-50"

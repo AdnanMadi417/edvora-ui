@@ -67,7 +67,7 @@ export default function BatchUniversities({
 
       showToast("Payment method assigned successfully.", "success");
       onClose();
-      router.refresh();
+      setTimeout(() => router.refresh(), 1500);
     } catch (err: any) {
       const apiErrors = err?.response?.data?.detail;
       if (Array.isArray(apiErrors)) {

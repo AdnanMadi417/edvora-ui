@@ -20,6 +20,7 @@ const CreatableSelectField = ({
                                 errors,
                                 updateFormData,
                                 placeholder = "Select...",
+                                disabledOptions = [],
                               }) => {
   const containerRef = useRef(null);
 
@@ -35,8 +36,8 @@ const CreatableSelectField = ({
   const selectedLabel = selectedOption?.label ?? selectedValue ?? "";
 
   const filteredOptions = useMemo(() => {
-    return options.filter((opt) =>
-      opt.label.toLowerCase().includes(search.toLowerCase())
+    return options.filter(
+      (opt) => opt.label && opt.label.toLowerCase().includes(search.toLowerCase())
     );
   }, [search, options]);
 
@@ -57,6 +58,8 @@ const CreatableSelectField = ({
   }, []);
 
   const handleSelect = (option) => {
+    if (disabledOptions.includes(option.value)) return;
+
     updateFormData(field, option.value);
     setIsOpen(false);
     setSearch("");
@@ -112,15 +115,25 @@ const CreatableSelectField = ({
           />
 
           <ul className="max-h-60 overflow-y-auto text-sm">
-            {filteredOptions.map((opt) => (
-              <li
-                key={opt.value}
-                onClick={() => handleSelect(opt)}
-                className="mt-2 flex h-10 w-full pointer items-center justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                {opt.label}
-              </li>
-            ))}
+
+            {filteredOptions.map((opt) => {
+              const isDisabled = disabledOptions.includes(opt.value);
+
+              return (
+                <li
+                  key={opt.value}
+                  onClick={() => !isDisabled && handleSelect(opt)}
+                  className={`mt-2 flex h-10 w-full items-center justify-start rounded-md border p-3 px-3 py-2 text-sm transition-colors
+        ${isDisabled
+                    ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                    : "cursor-pointer hover:bg-blue-50"
+                  }
+      `}
+                >
+                  {opt.label}
+                </li>
+              );
+            })}
 
             {!filteredOptions.length && (
               <div className="border-t mt-2 pt-2">

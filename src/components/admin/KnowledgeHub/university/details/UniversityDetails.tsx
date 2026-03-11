@@ -237,48 +237,65 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             {universityPaymentMethods.length === 0 ? (
               <p className="text-sm text-slate-500">No Payment Method found.</p>
             ) : (
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {universityPaymentMethods.map((payment) => (
                   <div
                     key={payment.id}
-                    className="flex items-start justify-between rounded-md border border-gray-200 bg-gray-50 p-4 transition hover:shadow-sm"
+                    className="group relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-blue-200 hover:shadow-md"
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white shadow-sm">
-                        <CreditCard className="h-4 w-4 text-slate-600" />
-                      </div>
+                    {/* Header */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
+                          <CreditCard className="h-5 w-5 text-blue-600" />
+                        </div>
 
-                      <div className="space-y-1">
-                        <p className="text-sm font-semibold text-slate-900">
-                          {payment.payment_method_name}
-                        </p>
-
-                        <p className="text-xs font-medium text-slate-700">
-                          {payment.currency}
-                        </p>
-
-                        {payment.instructions && (
-                          <p className="text-xs text-slate-500">
-                            {payment.instructions}
+                        <div>
+                          <p className="text-sm font-semibold text-slate-900">
+                            {payment.payment_method_name}
                           </p>
-                        )}
+
+                          {payment.currency && (
+                            <span className="mt-1 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
+                              {payment.currency}
+                            </span>
+                          )}
+                        </div>
                       </div>
+
+                      <span
+                        className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium
+          ${
+            payment.is_active
+              ? "bg-green-50 text-green-700"
+              : "bg-gray-100 text-gray-500"
+          }`}
+                      >
+                        {payment.is_active ? (
+                          <>
+                            <FaCheckCircle className="text-[12px]" />
+                            Active
+                          </>
+                        ) : (
+                          <>
+                            <FaTimesCircle className="text-[12px]" />
+                            Inactive
+                          </>
+                        )}
+                      </span>
                     </div>
 
-                    <span
-                      className={`inline-flex items-center whitespace-nowrap p-1 text-xs font-semibold
-    ${
-      payment.is_active
-        ? " text-green-700"
-        : "text-slate-500"
-    }`}
-                    >
-                      {payment.is_active ? (
-                        <FaCheckCircle className="text-[12px]" />
-                      ) : (
-                        <FaTimesCircle className="text-[12px]" />
-                      )}
-                    </span>
+                    {payment.instructions && (
+                      <div className="mt-4 border-t pt-3">
+                        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                          Instructions
+                        </p>
+
+                        <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                          {payment.instructions}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -296,10 +313,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
       <AssignPaymentMethods
         isOpen={isPaymentMethodsModalOpen}
-        onClose={() => setIsUniversityTypeModalOpen(false)}
+        onClose={() => setIsPaymentMethodsModalOpen(false)}
         universityId={activeUniversity?.id || null}
       />
-
     </>
   );
 };
