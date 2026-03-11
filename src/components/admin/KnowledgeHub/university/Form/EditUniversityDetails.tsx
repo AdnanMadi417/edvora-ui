@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import {
   CalendarPlus,
@@ -67,8 +67,6 @@ const UniversityEdit = ({ id }: Props) => {
   const { deleteBranch, deleteLoading } = useDeleteBranch();
   const [initialFormData, setInitialFormData] = React.useState<any>(null);
 
-  const [selectedMethods, setSelectedMethods] = useState<string[]>([]);
-
   const { states } = useKnowledgeHubStates();
 
   const stateOptions =
@@ -123,6 +121,15 @@ const UniversityEdit = ({ id }: Props) => {
     branches: [],
     is_active: true,
   });
+
+  const [selectedMethods, setSelectedMethods] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    if (!universityPaymentMethods) return;
+
+    setSelectedMethods(
+      universityPaymentMethods.map((p) => String(p.payment_method_id))
+    );
+  }, [universityPaymentMethods]);
 
   React.useEffect(() => {
     if (!university) return;
@@ -183,7 +190,7 @@ const UniversityEdit = ({ id }: Props) => {
 
       await updateUniversity(payload);
 
-      showToast("University created successfully.");
+      showToast("University updated successfully.");
 
       setTimeout(() => router.refresh(), 1500);
     } catch (err) {
