@@ -1,45 +1,32 @@
 import React, { useState, useEffect } from "react";
 import {
   User,
-  FileText,
-  ArrowLeft,
-  ArrowRight,
-  ClipboardList,
-  CheckCircle,
-  Calendar,
-  School,
   GraduationCap,
-  Building2,
-  Users,
-  Globe,
-  BadgeCheck,
-  Mail, Phone, MapPin,
+  Phone,
+  Upload,
+  FileText,
+  ArrowLeft, ArrowRight,
 } from 'lucide-react';
-import { NATIONALITIES } from "constants/lists";
-import { useToast } from "components/context/ToastContext";
+import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from "../../../constants/lists";
+import { useToast } from "../../context/ToastContext";
 
-import api from "lib/useApi";
-import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
-import { useCreatePartnerApplication } from "hooks/applications/useCreatePartnerApplication";
-import { useGetApplicationRequiredFields } from "hooks/applications/useApplicationRequiredFields";
+import api from "../../../lib/useApi";
+import { useAllQualifications } from "../../../hooks/knowledge-hub/qualifications/useQualificationsList";
+import { useCreatePartnerApplication } from "../../../hooks/applications/useCreatePartnerApplication";
 
 import Cookies from "js-cookie";
-import { useUniversities } from "hooks/useUniversities";
-import { InputField, SelectField, RadioField } from "components/form";
-import FileUploadField from "components/form/filesUpload/FileUploadField";
-
+import { useUniversities } from "../../../hooks/useUniversities";
+import { InputField, SelectField, RadioField } from "../../form";
 import {
   getPresignedUploads,
   uploadFilesToSpaces,
-} from "services/uploadService";
-import { useMe } from "hooks/useMe";
-import Loading from "components/loading/Loading";
-import Button from "components/ui/buttons/Button";
-import PrevButton from "components/ui/buttons/PrevButton";
-import NextButton from "components/ui/buttons/NextButton";
-import { useRouter } from 'next/navigation';
-import SearchableSelect from '../../form/SearchableSelect';
-import SearchableDropdown from '../../form/search/SearchableDropdown';
+} from "../../../services/uploadService";
+import { useMe } from "../../../hooks/useMe";
+import Loading from "../../loading/Loading";
+import Button from "../../ui/buttons/Button";
+import PrevButton from '../../ui/buttons/PrevButton';
+import NextButton from '../../ui/buttons/NextButton';
+import FileUploadField from '../../form/filesUpload/FileUploadField';
 
 interface Student {
   name: string;
@@ -81,12 +68,11 @@ interface DocumentItem {
   progress?: number;
 }
 
-interface DocumentType {
+type DocumentType = {
   id: string;
   type: string;
-  code: string;
   description: string;
-}
+};
 
 interface FormDataType {
   program_id: string;
@@ -131,10 +117,11 @@ const setNestedValue = (obj, path, value) => {
 };
 
 const stages = [
-  { id: 1, name: "Basic Information", icon: User },
-  { id: 2, name: "Documents", icon: FileText },
-  { id: 3, name: "Additional Information", icon: ClipboardList },
-  { id: 4, name: "Review & Submit", icon: CheckCircle },
+  { id: 1, name: "Personal Details", icon: User },
+  { id: 2, name: "Previous Education", icon: GraduationCap },
+  { id: 3, name: "University & Program", icon: GraduationCap },
+  { id: 4, name: "Emergency Contact", icon: Phone },
+  { id: 5, name: "Documents Upload", icon: Upload },
 ];
 
 export default function StudentManualApplicationForm() {
@@ -144,7 +131,6 @@ export default function StudentManualApplicationForm() {
   const [loading, setLoading] = useState(true);
 
   const { user } = useMe();
-  const router = useRouter();
   const partnerId = user?.partner_id;
 
   const {
@@ -153,76 +139,17 @@ export default function StudentManualApplicationForm() {
     error: universitiesError,
   } = useUniversities();
 
-  const universityMap = React.useMemo(() => {
-    return Object.fromEntries(
-      universities.map((u) => [u.id, u])
-    );
-  }, [universities]);
-
   const {
     createPartnerApplication,
     loadingCreatePartnerApplication,
     errorCreatePartnerApplication,
   } = useCreatePartnerApplication(partnerId);
 
-  const validators = {
-    required: (value: any) =>
-      value !== undefined && value !== null && String(value).trim() !== "",
-
-    email: (value: string) =>
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-
-    phone: (value: string) =>
-      /^\+?[0-9]{8,15}$/.test(value),
-
-    passport: (value: string) =>
-      /^[A-Za-z0-9]{5,20}$/.test(value),
-
-    year: (value: string) =>
-      /^\d{4}$/.test(value),
-  };
-
-  const {
-    data: requiredFields,
-    loading: requiredFieldsLoading,
-    getRequiredFields,
-  } = useGetApplicationRequiredFields();
-
-  const requiredFieldKeys =
-    requiredFields?.fields
-      ?.filter((f) => f.is_required)
-      ?.map((f) => f.field_key) || [];
-
-  const hasStudentInfoFields = requiredFieldKeys.some(
-    (key) =>
-      key.startsWith("student.") &&
-      !key.includes("previous_educations") &&
-      !key.includes("emergency_contacts")
-  );
-
-  const hasEducationalFields = requiredFieldKeys.some((key) =>
-    key.startsWith("student.previous_educations[0].")
-  );
-
-  const hasEmergencyFields = requiredFieldKeys.some((key) =>
-    key.startsWith("student.emergency_contacts[0].")
-  );
-
-  const isFieldRequired = (key: string) => {
-    return requiredFieldKeys.includes(key);
-  };
-
-  const shouldShowStage3 = requiredFieldKeys.length > 0;
-  const visibleStages = shouldShowStage3
-    ? stages
-    : stages.filter((s) => s.id !== 3);
-
   const { qualifications } = useAllQualifications();
 
   const [documentTypes, setDocumentTypes] = useState<
-    { id: string; type: string; code: string; description: string }[]
+    { id: string; type: string; description: string }[]
   >([]);
-  const safeDocumentTypes = documentTypes ?? [];
 
   const [initOnly, setInitOnly] = useState(true);
 
@@ -264,8 +191,6 @@ export default function StudentManualApplicationForm() {
     is_draft: false,
   });
 
-  const contact = formData.student.emergency_contacts[0];
-
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   const updateFormData = (fieldPath, value) => {
@@ -273,221 +198,83 @@ export default function StudentManualApplicationForm() {
     setErrors((prev) => setNestedValue(prev || {}, fieldPath, ""));
   };
 
-  const validateStage = (stageNum: number) => {
-    const newErrors: Record<string, string> = {};
+  const addCompletedStage = (s) => {
+    setCompletedStages((prev) => {
+      const set = new Set(prev);
+      set.add(s);
+      return Array.from(set).sort((a, b) => a - b);
+    });
+  };
 
-    const addError = (path: string, message: string) => {
-      newErrors[path] = message;
-    };
+  const validateStage = (stageNum) => {
+    const newErrors = {};
 
-    // Helper to check required + format validators
-    const validateField = (
-      path: string,
-      value: any,
-      {
-        requiredType,
-        format,
-      }: { requiredType?: string; format?: keyof typeof validators } = {}
-    ) => {
-      if (requiredType && !validators.required(value)) {
-        addError(path, `${requiredType} is required`);
-      } else if (format && value && !validators[format](value)) {
-        const messages: Record<string, string> = {
-          email: "Invalid email format",
-          phone: "Invalid phone number format",
-          passport: "Invalid passport number",
-          year: "Invalid year format",
-        };
-        addError(path, messages[format]);
-      }
-    };
-
-    if (stageNum === 1) {
-      validateField("student.name", getNestedValue(formData, "student.name"), {
-        requiredType: "Student name",
-      });
-
-      validateField(
-        "student.previous_educations[0].qualification",
-        getNestedValue(
-          formData,
-          "student.previous_educations[0].qualification"
-        ),
-        { requiredType: "Qualification" }
-      );
-
-      validateField("university_id", formData.university_id, {
-        requiredType: "University",
-      });
-      validateField("program_id", formData.program_id, {
-        requiredType: "Program",
-      });
-    }
-
-    if (stageNum === 2) {
-      if (!formData.documents?.length) {
-        addError("documents", "Please upload at least one document");
-      }
-      if (formData.documents?.some((d) => d.uploading)) {
-        addError("documents", "Please wait for file uploads to finish");
+    switch (stageNum) {
+      case 1: {
+        if (!getNestedValue(formData, "student.name"))
+          newErrors["student.name"] = "Name is required";
+        if (!getNestedValue(formData, "student.birthday"))
+          newErrors["student.birthday"] = "Birthday is required";
+        if (formData.student.gender === null)
+          newErrors["student.gender"] = "Gender is required";
+        if (!getNestedValue(formData, "student.email"))
+          newErrors["student.email"] = "Email is required";
+        if (!getNestedValue(formData, "student.phone"))
+          newErrors["student.phone"] = "Phone is required";
+        if (!getNestedValue(formData, "student.nationality"))
+          newErrors["student.nationality"] = "Nationality is required";
+        if (!getNestedValue(formData, "student.passport_number"))
+          newErrors["student.passport_number"] = "Passport number is required";
+        break;
       }
 
-      // Required document check
-      documentTypes.forEach((docType) => {
-        const uploaded = formData.documents.find(
-          (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
-        );
-        if (!uploaded) {
-          addError(`documents.${docType.id}`, `${docType.type} is required`);
-        }
-      });
-    }
+      case 2: {
+        const prevEdu =
+          getNestedValue(formData, "student.previous_educations[0]") || {};
+        if (!prevEdu.qualification)
+          newErrors["student.previous_educations[0].qualification"] =
+            "Qualification is required";
+        if (!prevEdu.institution_name)
+          newErrors["student.previous_educations[0].institution_name"] =
+            "Institution name is required";
+        if (!prevEdu.end_date)
+          newErrors["student.previous_educations[0].end_date"] =
+            "Graduation year is required";
 
-    if (stageNum === 3 && hasStudentInfoFields) {
-      const student = formData.student;
+        const eng =
+          getNestedValue(formData, "student.english_proficiencies[0]") || {};
+        if (!eng.test_type)
+          newErrors["student.english_proficiencies[0].test_type"] =
+            "Please select a test";
 
-      if (
-        isFieldRequired("student.birthday") &&
-        !validators.required(student.birthday)
-      ) {
-        addError("student.birthday", "Date of birth is required");
+        break;
       }
 
-      if (isFieldRequired("student.gender") && student.gender === null) {
-        addError("student.gender", "Gender is required");
+      case 3: {
+        if (!formData.university_id)
+          newErrors["university_id"] = "University is required";
+        if (!formData.program_id)
+          newErrors["program_id"] = "Program is required";
+        break;
       }
 
-      if (
-        isFieldRequired("student.nationality") &&
-        !validators.required(student.nationality)
-      ) {
-        addError("student.nationality", "Nationality is required");
+      case 4: {
+        const ec =
+          getNestedValue(formData, "student.emergency_contacts[0]") || {};
+        if (ec.name && !ec.phone)
+          newErrors["student.emergency_contacts[0].phone"] =
+            "Phone is required for emergency contact";
+        break;
       }
 
-      if (isFieldRequired("student.passport_number")) {
-        if (!validators.required(student.passport_number)) {
-          addError("student.passport_number", "Passport number is required");
-        } else if (!validators.passport(student.passport_number)) {
-          addError("student.passport_number", "Invalid passport number");
-        }
+      case 5: {
+        if (!formData.documents || formData.documents.length === 0)
+          newErrors["documents"] = "Please upload at least one document";
+        break;
       }
 
-      if (isFieldRequired("student.email")) {
-        if (!validators.required(student.email)) {
-          addError("student.email", "Email is required");
-        } else if (!validators.email(student.email)) {
-          addError("student.email", "Invalid email format");
-        }
-      }
-
-      if (isFieldRequired("student.phone")) {
-        if (!validators.required(student.phone)) {
-          addError("student.phone", "Phone number is required");
-        } else if (!validators.phone(student.phone)) {
-          addError("student.phone", "Invalid phone number");
-        }
-      }
-
-      if (
-        isFieldRequired("student.current_address") &&
-        !validators.required(student.current_address)
-      ) {
-        addError("student.current_address", "Address is required");
-      }
-    }
-
-    if (stageNum === 3 && hasEducationalFields) {
-      const edu = formData.student.previous_educations[0];
-
-      if (
-        isFieldRequired("student.previous_educations[0].institution_name") &&
-        !validators.required(edu.institution_name)
-      ) {
-        addError(
-          "student.previous_educations[0].institution_name",
-          "Institution name is required"
-        );
-      }
-
-      if (isFieldRequired("student.previous_educations[0].start_date")) {
-        if (!validators.required(edu.start_date)) {
-          addError(
-            "student.previous_educations[0].start_date",
-            "Start year is required"
-          );
-        } else if (!validators.year(edu.start_date)) {
-          addError(
-            "student.previous_educations[0].start_date",
-            "Invalid year format"
-          );
-        }
-      }
-
-      if (isFieldRequired("student.previous_educations[0].end_date")) {
-        if (!validators.required(edu.end_date)) {
-          addError(
-            "student.previous_educations[0].end_date",
-            "Graduation year is required"
-          );
-        } else if (!validators.year(edu.end_date)) {
-          addError(
-            "student.previous_educations[0].end_date",
-            "Invalid year format"
-          );
-        }
-      }
-    }
-
-    if (stageNum === 3 && hasEmergencyFields) {
-      const contact = formData.student.emergency_contacts[0];
-
-      if (
-        isFieldRequired("student.emergency_contacts[0].name") &&
-        !validators.required(contact.name)
-      ) {
-        addError(
-          "student.emergency_contacts[0].name",
-          "Emergency contact name is required"
-        );
-      }
-
-      if (
-        isFieldRequired("student.emergency_contacts[0].relation") &&
-        !validators.required(contact.relation)
-      ) {
-        addError(
-          "student.emergency_contacts[0].relation",
-          "Relation to student is required"
-        );
-      }
-
-      if (isFieldRequired("student.emergency_contacts[0].phone")) {
-        if (!validators.required(contact.phone)) {
-          addError(
-            "student.emergency_contacts[0].phone",
-            "Emergency contact phone is required"
-          );
-        } else if (!validators.phone(contact.phone)) {
-          addError(
-            "student.emergency_contacts[0].phone",
-            "Invalid phone number format"
-          );
-        }
-      }
-
-      if (isFieldRequired("student.emergency_contacts[0].email")) {
-        if (!validators.required(contact.email)) {
-          addError(
-            "student.emergency_contacts[0].email",
-            "Emergency contact email is required"
-          );
-        } else if (!validators.email(contact.email)) {
-          addError(
-            "student.emergency_contacts[0].email",
-            "Invalid email format"
-          );
-        }
-      }
+      default:
+        break;
     }
 
     setErrors(newErrors);
@@ -495,15 +282,11 @@ export default function StudentManualApplicationForm() {
   };
 
   const nextStage = async () => {
-    const isValid = validateStage(stage);
-
-    if (!isValid) return;
-
-    setCompletedStages((prev) =>
-      prev.includes(stage) ? prev : [...prev, stage]
-    );
-
-    setStage((s) => Math.min(s + 1, visibleStages.length));
+    if (validateStage(stage)) {
+      addCompletedStage(stage);
+      setStage((s) => Math.min(s + 1, stages.length));
+    } else {
+    }
   };
 
   const prevStage = () => setStage((s) => Math.max(1, s - 1));
@@ -545,16 +328,25 @@ export default function StudentManualApplicationForm() {
   }, [initOnly]);
 
   useEffect(() => {
-    if (partnerId && formData.university_id) {
-      getRequiredFields(partnerId, formData.university_id);
-    }
-  }, [partnerId, formData.university_id]);
+    const fetchDocumentTypes = async () => {
+      try {
+        const token = Cookies.get("token");
 
-  useEffect(() => {
-    if (!shouldShowStage3 && stage === 3) {
-      setStage(4);
-    }
-  }, [shouldShowStage3, stage]);
+        const res = await api.get("/document-types", {
+          params: {
+            init_only: true, // or false
+          },
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+
+        setDocumentTypes(res.data || []);
+      } catch (err) {
+        console.error("Failed to fetch document types", err);
+      }
+    };
+
+    fetchDocumentTypes();
+  }, []);
 
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -660,16 +452,50 @@ export default function StudentManualApplicationForm() {
     }));
   };
 
+  const isStageValid = (stageNum: number) => {
+    switch (stageNum) {
+      case 1:
+        return (
+          formData.student.name &&
+          formData.student.birthday &&
+          formData.student.gender !== null &&
+          formData.student.email &&
+          formData.student.phone &&
+          formData.student.nationality &&
+          formData.student.passport_number
+        );
+
+      case 2:
+        return (
+          formData.student.previous_educations[0]?.qualification &&
+          formData.student.previous_educations[0]?.institution_name &&
+          formData.student.previous_educations[0]?.end_date &&
+          formData.student.english_proficiencies[0]?.test_type
+        );
+
+      case 3:
+        return formData.university_id && formData.program_id;
+
+      case 4:
+        return true; // optional stage
+
+      case 5:
+        return formData.documents.length > 0;
+
+      default:
+        return true;
+    }
+  };
+
   const handleSubmit = async () => {
+    const allValid =
+      validateStage(1) &&
+      validateStage(2) &&
+      validateStage(3) &&
+      validateStage(4) &&
+      validateStage(5);
 
-    for (let s = 1; s <= visibleStages.length; s++) {
-      if (!validateStage(s)) return;
-    }
-
-    if (formData.documents?.some((d) => d.uploading)) {
-      showToast("Please wait for all files to finish uploading.", "error");
-      return;
-    }
+    if (!allValid) return;
 
     const uploadingFiles = formData.documents?.filter((d) => d.uploading);
     if (uploadingFiles?.length > 0) {
@@ -747,7 +573,7 @@ export default function StudentManualApplicationForm() {
       showToast("Application submitted successfully.", "success");
 
       setTimeout(() => {
-        router.push("/partner/applications");
+        window.location.reload();
       }, 3000);
     } catch (err: any) {
       console.error("Error submitting application:", err);
@@ -784,21 +610,18 @@ export default function StudentManualApplicationForm() {
 
         <div className="relative mb-8">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fit,_minmax(150px,_1fr))]">
-            {visibleStages.map((s, index) => {
+            {stages.map((s, index) => {
               const Icon = s.icon;
               const isActive = s.id === stage;
               const isCompleted = completedStages.includes(s.id);
               const canAccess = canAccessStage(s.id);
 
               return (
-                <div
-                  key={s.id}
-                  className="group relative flex flex-col items-center"
-                >
-                  {index < visibleStages.length - 1 && (
-                    <div className="absolute left-1/2 top-6 -z-10 hidden h-1 w-full bg-slate-200 sm:block">
+                <div key={s.id} className="relative flex flex-col items-center">
+                  {index < stages.length - 1 && (
+                    <div className="absolute -z-10 hidden bg-slate-300 sm:left-1/2 sm:top-6 sm:block sm:h-0.5 sm:w-full">
                       <div
-                        className={`h-full rounded-full transition-all duration-300 ${
+                        className={`h-full transition-all ${
                           isCompleted ? "w-full bg-blue-500" : "w-0"
                         }`}
                       />
@@ -808,28 +631,22 @@ export default function StudentManualApplicationForm() {
                   <button
                     onClick={() => canAccess && setStage(s.id)}
                     disabled={!canAccess}
-                    className={`relative mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-300
-      ${
-        isCompleted
-          ? "border-blue-500 bg-blue-500 text-white shadow-md"
-          : isActive
-          ? "scale-110 border-blue-700 bg-blue-50 text-blue-700 shadow-sm"
-          : canAccess
-          ? "border-slate-300 bg-white text-slate-500 hover:border-slate-400 hover:bg-slate-50"
-          : "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
-      }`}
+                    className={`mb-2 flex h-12 w-12 items-center justify-center rounded-full transition ${
+                      isCompleted
+                        ? "bg-blue-500 text-white"
+                        : isActive
+                        ? "scale-110 bg-blue-100 text-slate-900"
+                        : canAccess
+                        ? "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                        : "bg-slate-100 text-slate-500"
+                    }`}
                   >
-                    <Icon
-                      size={20}
-                      className="transition-transform duration-300 group-hover:scale-110"
-                    />
+                    <Icon size={20} />
                   </button>
 
                   <span
-                    className={`text-center text-xs transition-colors duration-300 sm:text-sm ${
-                      isActive
-                        ? "font-semibold text-blue-700"
-                        : "text-slate-500"
+                    className={`px-1 text-xs sm:text-sm ${
+                      isActive ? "font-medium text-slate-900" : "text-slate-500"
                     }`}
                   >
                     {s.name}
@@ -846,40 +663,220 @@ export default function StudentManualApplicationForm() {
               <div className="mb-6">
                 <div className="mb-2 flex items-center">
                   <h4 className="text-lg font-semibold text-slate-900">
-                    University & Student Information
+                    Personal Information
                   </h4>
                   <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
                 </div>
                 <p className="text-sm text-slate-800">
-                  Select your target university and provide student details.
+                  Please fill in your personal details below.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <InputField
-                  label="Student Full Name (as in passport)"
+                  label="Full Name"
                   field="student.name"
                   placeholder="Ahmad bin Ali"
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
+                <InputField
+                  label="Date of Birth"
+                  field="student.birthday"
+                  placeholder="DD/MM/YYYY"
+                  type="date"
+                  required={false}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
 
-                <SearchableSelect
-                  label="Study Level"
-                  field="student.previous_educations[0].qualification"
-                  options={qualifications.map((q) => ({
-                    value: String(q.id),
-                    label:
-                      q.name.charAt(0).toUpperCase() +
-                      q.name.slice(1).toLowerCase(),
+                <RadioField
+                  label="Gender"
+                  field="student.gender"
+                  options={[
+                    { label: "Male", value: true },
+                    { label: "Female", value: false },
+                  ]}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+
+                <SelectField
+                  label="Nationality"
+                  field="student.nationality"
+                  options={NATIONALITIES.map((q) => ({
+                    value: String(q.label),
+                    label: q.name,
                   }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
 
-                <SearchableSelect
+                <InputField
+                  label="Passport Number"
+                  field="student.passport_number"
+                  placeholder="A1234567"
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Email Address"
+                  field="student.email"
+                  type="email"
+                  placeholder="ahmad.ali@gmail.com"
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Phone Number"
+                  field="student.phone"
+                  type="tel"
+                  placeholder="+60123456789"
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <div className="md:col-span-2">
+                  <InputField
+                    label="Street Address"
+                    field="student.current_address"
+                    placeholder="No. 123, Jalan Tun Razak, Kuala Lumpur"
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {stage === 2 && (
+            <div>
+              <div className="mb-6">
+                <div className="mb-2 flex items-center">
+                  <h4 className="text-lg font-semibold text-slate-900">
+                    Educational Background
+                  </h4>
+                  <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
+                </div>
+                <p className="text-sm text-slate-800">
+                  Please fill in your educational background details below.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <SelectField
+                  label="Highest Qualification"
+                  field="student.previous_educations[0].qualification"
+                  options={qualifications.map((q) => ({
+                    value: String(q.id),
+                    label: q.name,
+                  }))}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Institution Name"
+                  field="student.previous_educations[0].institution_name"
+                  placeholder="University of Malaya"
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Field of Study"
+                  field="student.previous_educations[0].field_of_study"
+                  placeholder="Computer Science"
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Started Date"
+                  field="student.previous_educations[0].start_date"
+                  type="number"
+                  placeholder="2022"
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Graduation Year"
+                  field="student.previous_educations[0].end_date"
+                  type="number"
+                  placeholder="2025"
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="GPA / Grade"
+                  field="student.previous_educations[0].grade"
+                  placeholder="3.75 / 4.0"
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+              </div>
+
+              <h5 className="mb-2 mt-4 font-semibold text-slate-900">
+                English Proficiency Test Results
+              </h5>
+
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <SelectField
+                  label="Test Type"
+                  field="student.english_proficiencies[0].test_type"
+                  options={ENGLISH_TEST_OPTIONS}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Overall Score"
+                  field="student.english_proficiencies[0].score"
+                  placeholder="7.0"
+                  required={false}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Test Date"
+                  field="student.english_proficiencies[0].test_date"
+                  type="date"
+                  required={false}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+              </div>
+            </div>
+          )}
+
+          {stage === 3 && (
+            <div>
+              <div className="mb-6">
+                <div className="mb-2 flex items-center">
+                  <h4 className="text-lg font-semibold text-slate-900">
+                    University & Program Selection
+                  </h4>
+                  <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
+                </div>
+                <p className="text-sm text-slate-800">
+                  Please select your preferred university and program.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <SelectField
                   label="University"
                   field="university_id"
                   options={universities.map((u) => ({
@@ -891,8 +888,8 @@ export default function StudentManualApplicationForm() {
                   updateFormData={updateFormData}
                 />
 
-                <SearchableSelect
-                  label="Program / Major"
+                <SelectField
+                  label="Program"
                   field="program_id"
                   options={(
                     universities.find((u) => u.id === formData.university_id)
@@ -909,7 +906,76 @@ export default function StudentManualApplicationForm() {
             </div>
           )}
 
-          {stage === 2 && (
+          {stage === 4 && (
+            <div>
+              <div className="mb-6">
+                <div className="mb-2 flex items-center">
+                  <h4 className="text-lg font-semibold text-slate-900">
+                    Emergency Contact Information
+                  </h4>
+                  <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
+                </div>
+                <p className="text-sm text-slate-800">
+                  You may provide an emergency contact for safety purposes. This
+                  is not required.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <InputField
+                  label="Contact Name"
+                  field="student.emergency_contacts[0].name"
+                  placeholder="Ahmad bin Ismail"
+                  formData={formData}
+                  errors={errors}
+                  required={false}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Relationship"
+                  field="student.emergency_contacts[0].relation"
+                  placeholder="Father / Mother / Guardian"
+                  formData={formData}
+                  errors={errors}
+                  required={false}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Phone Number"
+                  field="student.emergency_contacts[0].phone"
+                  type="tel"
+                  placeholder="+60123456789"
+                  formData={formData}
+                  errors={errors}
+                  required={false}
+                  updateFormData={updateFormData}
+                />
+                <InputField
+                  label="Email Address"
+                  field="student.emergency_contacts[0].email"
+                  type="email"
+                  placeholder="ahmad.ismail@example.com"
+                  formData={formData}
+                  errors={errors}
+                  required={false}
+                  updateFormData={updateFormData}
+                />
+                <div className="md:col-span-2">
+                  <InputField
+                    label="Address"
+                    field="student.emergency_contacts[0].address"
+                    required={false}
+                    placeholder="No. 123, Jalan Bukit Bintang, Kuala Lumpur"
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {stage === 5 && (
             <div>
               <div className="mb-6">
                 <div className="mb-2 flex items-center">
@@ -919,16 +985,18 @@ export default function StudentManualApplicationForm() {
                   <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
                 </div>
                 <p className="text-sm text-slate-800">
-                  Please upload all necessary documents to complete your
-                  application.
+                  Please upload all necessary documents to complete your application.
                 </p>
               </div>
 
               <div className="space-y-6">
-                {safeDocumentTypes.map((docType) => (
+                {documentTypes.map((docType) => (
                   <FileUploadField
                     key={docType.id}
-                    label={docType.type}
+                    label={
+                      docType.type.charAt(0).toUpperCase() +
+                      docType.type.slice(1)
+                    }
                     field="documents"
                     documentTypeId={docType.id}
                     formData={formData}
@@ -943,610 +1011,20 @@ export default function StudentManualApplicationForm() {
               </div>
 
               {errors.documents && (
-                <p className="mt-2 text-xs text-red-600">{errors.documents}</p>
-              )}
-            </div>
-          )}
-
-          {stage === 3 && (
-            <div className="space-y-5">
-              <div className="border-b border-slate-100 pb-5">
-                <h4 className="text-xl font-semibold text-slate-900">
-                  Additional Required Details
-                </h4>
-                <p className="mt-1 text-sm text-slate-500">
-                  This university requires extended information. All fields are
-                  mandatory.
+                <p className="mt-2 text-xs text-red-600">
+                  {errors.documents}
                 </p>
-              </div>
-
-              {hasStudentInfoFields && (
-                <div className="mb-8">
-                  <h3 className="mb-4 font-semibold uppercase text-slate-900">
-                    Student Information
-                  </h3>
-
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {isFieldRequired("student.birthday") && (
-                      <InputField
-                        label="Date of Birth"
-                        field="student.birthday"
-                        placeholder="DD/MM/YYYY"
-                        type="date"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.gender") && (
-                      <RadioField
-                        label="Gender"
-                        field="student.gender"
-                        options={[
-                          { label: "Male", value: true },
-                          { label: "Female", value: false },
-                        ]}
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.nationality") && (
-                      <SearchableDropdown
-                        label="Nationality"
-                        field="student.nationality"
-                        options={NATIONALITIES.map((q) => ({
-                          value: String(q.label),
-                          label: q.name,
-                        }))}
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.passport_number") && (
-                      <InputField
-                        label="Passport Number"
-                        field="student.passport_number"
-                        placeholder="A1234567"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.email") && (
-                      <InputField
-                        label="Email Address"
-                        field="student.email"
-                        type="email"
-                        placeholder="ahmad.ali@gmail.com"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.phone") && (
-                      <InputField
-                        label="Phone Number"
-                        field="student.phone"
-                        type="tel"
-                        placeholder="+60123456789"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.current_address") && (
-                      <InputField
-                        label="Street Address"
-                        field="student.current_address"
-                        placeholder="No. 123, Jalan Tun Razak, Kuala Lumpur"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-                  </div>
-                </div>
               )}
-
-              {hasEducationalFields && (
-                <div className="mb-8">
-                  <h3 className="mb-4 font-semibold uppercase text-slate-900">
-                    Educational Background
-                  </h3>
-
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {isFieldRequired(
-                      "student.previous_educations[0].qualification"
-                    ) && (
-                      <SelectField
-                        label="Highest Qualification"
-                        field="student.previous_educations[0].qualification"
-                        options={qualifications.map((q) => ({
-                          value: String(q.id),
-                          label: q.name,
-                        }))}
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired(
-                      "student.previous_educations[0].institution_name"
-                    ) && (
-                      <InputField
-                        label="Institution Name"
-                        field="student.previous_educations[0].institution_name"
-                        placeholder="University of Malaya"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired(
-                      "student.previous_educations[0].field_of_study"
-                    ) && (
-                      <InputField
-                        label="Field of Study"
-                        field="student.previous_educations[0].field_of_study"
-                        placeholder="Computer Science"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired(
-                      "student.previous_educations[0].start_date"
-                    ) && (
-                      <InputField
-                        label="Started Year"
-                        field="student.previous_educations[0].start_date"
-                        type="number"
-                        placeholder="2022"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired(
-                      "student.previous_educations[0].end_date"
-                    ) && (
-                      <InputField
-                        label="Graduation Year"
-                        field="student.previous_educations[0].end_date"
-                        type="number"
-                        placeholder="2025"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired(
-                      "student.previous_educations[0].grade"
-                    ) && (
-                      <InputField
-                        label="GPA / Grade"
-                        field="student.previous_educations[0].grade"
-                        placeholder="3.75 / 4.0"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {hasEmergencyFields && (
-                <div className="mb-8">
-                  <h3 className="mb-4 font-semibold uppercase text-slate-900">
-                    Parent / Guardian Information
-                  </h3>
-
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {isFieldRequired("student.emergency_contacts[0].name") && (
-                      <InputField
-                        label="Contact Name"
-                        field="student.emergency_contacts[0].name"
-                        placeholder="Ahmad bin Ismail"
-                        formData={formData}
-                        errors={errors}
-                        required={false}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired(
-                      "student.emergency_contacts[0].relation"
-                    ) && (
-                      <InputField
-                        label="Relationship"
-                        field="student.emergency_contacts[0].relation"
-                        placeholder="Father / Mother / Guardian"
-                        formData={formData}
-                        errors={errors}
-                        required={false}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.emergency_contacts[0].phone") && (
-                      <InputField
-                        label="Phone Number"
-                        field="student.emergency_contacts[0].phone"
-                        type="tel"
-                        placeholder="+60123456789"
-                        formData={formData}
-                        errors={errors}
-                        required={false}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.emergency_contacts[0].email") && (
-                      <InputField
-                        label="Email Address"
-                        field="student.emergency_contacts[0].email"
-                        type="email"
-                        placeholder="ahmad.ismail@example.com"
-                        formData={formData}
-                        errors={errors}
-                        required={false}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-                  </div>
-                </div>
-              )}
-
-            </div>
-          )}
-
-          {stage === 4 && (
-            <div className="space-y-8">
-
-              <div className="border-b border-slate-200 pb-4">
-                <h4 className="text-xl font-semibold text-slate-900">
-                  Review Your Application
-                </h4>
-                <p className="text-sm text-slate-500">
-                  Please verify all information before submitting.
-                </p>
-              </div>
-
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">
-                <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">
-                  <Building2 className="h-4 w-4 text-blue-600" />
-                  <h5 className="text-sm font-semibold text-slate-800 md:text-base">
-                    Application Info
-                  </h5>
-                </div>
-                <div className="grid gap-3 p-5 text-sm md:grid-cols-2">
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <School className="h-3.5 w-3.5" />
-                      University
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {universities.find(u => u.id === formData.university_id)?.name || "-"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <GraduationCap className="h-3.5 w-3.5" />
-                      Program
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {universities
-                        .find(u => u.id === formData.university_id)
-                        ?.programs?.find(p => p.id === formData.program_id)?.name || "-"}
-                    </p>
-                  </div>
-
-                  {formData.intake_date && (
-                    <div>
-                      <div className="flex items-center gap-1 text-xs text-slate-500">
-                        <Calendar className="h-3.5 w-3.5" />
-                        Intake Date
-                      </div>
-                      <p className="mt-1 font-medium text-slate-900">{formData.intake_date}</p>
-                    </div>
-                  )}
-
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">
-                <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">
-                  <User className="h-4 w-4 text-blue-600" />
-                  <h5 className="text-sm font-semibold text-slate-800 md:text-base">
-                    Student Basic Information
-                  </h5>
-                </div>
-                <div className="grid gap-4 p-5 text-sm md:grid-cols-2">
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <User className="h-3.5 w-3.5" />
-                      Full Name
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">{formData.student.name || "-"}</p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Date of Birth
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">{formData.student.birthday || "-"}</p>
-                  </div>
-
-                  {formData.student.gender !== null && (
-                    <div>
-                      <div className="flex items-center gap-1 text-xs text-slate-500">
-                        <Users className="h-3.5 w-3.5" />
-                        Gender
-                      </div>
-                      <p className="mt-1 font-medium text-slate-900">
-                        {formData.student.gender ? "Male" : "Female"}
-                      </p>
-                    </div>
-                  )}
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Globe className="h-3.5 w-3.5" />
-                      Nationality
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">{formData.student.nationality || "-"}</p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <BadgeCheck className="h-3.5 w-3.5" />
-                      Passport
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">{formData.student.passport_number || "-"}</p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Mail className="h-3.5 w-3.5" />
-                      Email
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">{formData.student.email || "-"}</p>
-                  </div>
-
-                  {formData.student.phone && (
-                    <div>
-                      <div className="flex items-center gap-1 text-xs text-slate-500">
-                        <Phone className="h-3.5 w-3.5" />
-                        Phone
-                      </div>
-                      <p className="mt-1 font-medium text-slate-900">{formData.student.phone}</p>
-                    </div>
-                  )}
-
-                  {formData.student.current_address && (
-                    <div>
-                      <div className="flex items-center gap-1 text-xs text-slate-500">
-                        <MapPin className="h-3.5 w-3.5" />
-                        Address
-                      </div>
-                      <p className="mt-1 font-medium text-slate-900">{formData.student.current_address}</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-                  {/*<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">*/}
-                  {/*  <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">*/}
-                  {/*    <Users className="h-4 w-4 text-blue-600" />*/}
-                  {/*    <h5 className="text-sm font-semibold text-slate-800 md:text-base">*/}
-                  {/*      Emergency Contact*/}
-                  {/*    </h5>*/}
-                  {/*  </div>*/}
-                  {/*  <div className="grid gap-4 p-5 text-sm md:grid-cols-2">*/}
-                  {/*    {formData.student.emergency_contact.name && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <User className="h-3.5 w-3.5" />*/}
-                  {/*          Name*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.emergency_contact.name}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.student.emergency_contact.relation && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <User className="h-3.5 w-3.5" />*/}
-                  {/*          Relation*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.emergency_contact.relation}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.student.emergency_contact.phone && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <Phone className="h-3.5 w-3.5" />*/}
-                  {/*          Phone*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.emergency_contact.phone}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.student.emergency_contact.email && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <Mail className="h-3.5 w-3.5" />*/}
-                  {/*          Email*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.emergency_contact.email}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*  </div>*/}
-                  {/*</div>*/}
-
-                  {/*/!* English Proficiency *!/*/}
-                  {/*<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">*/}
-                  {/*  <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">*/}
-                  {/*    <BookOpen className="h-4 w-4 text-blue-600" />*/}
-                  {/*    <h5 className="text-sm font-semibold text-slate-800 md:text-base">*/}
-                  {/*      English Proficiency*/}
-                  {/*    </h5>*/}
-                  {/*  </div>*/}
-                  {/*  <div className="grid gap-4 p-5 text-sm md:grid-cols-2">*/}
-                  {/*    {formData.student.english_proficiency.test_type && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <Book className="h-3.5 w-3.5" />*/}
-                  {/*          Test Type*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.english_proficiency.test_type}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.student.english_proficiency.score && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <Star className="h-3.5 w-3.5" />*/}
-                  {/*          Score*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.english_proficiency.score}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.student.english_proficiency.test_date && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <Calendar className="h-3.5 w-3.5" />*/}
-                  {/*          Test Date*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.english_proficiency.test_date}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*  </div>*/}
-                  {/*</div>*/}
-
-                  {/*/!* Previous Education *!/*/}
-                  {/*<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">*/}
-                  {/*  <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">*/}
-                  {/*    <Book className="h-4 w-4 text-blue-600" />*/}
-                  {/*    <h5 className="text-sm font-semibold text-slate-800 md:text-base">*/}
-                  {/*      Previous Education*/}
-                  {/*    </h5>*/}
-                  {/*  </div>*/}
-                  {/*  <div className="grid gap-4 p-5 text-sm md:grid-cols-2">*/}
-                  {/*    {formData.student.previous_education.institution_name && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <School className="h-3.5 w-3.5" />*/}
-                  {/*          Institution Name*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.previous_education.institution_name}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.student.previous_education.qualification && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <GraduationCap className="h-3.5 w-3.5" />*/}
-                  {/*          Qualification*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.previous_education.qualification}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.student.previous_education.start_date && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <Calendar className="h-3.5 w-3.5" />*/}
-                  {/*          Start Date*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.previous_education.start_date}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.student.previous_education.end_date && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <Calendar className="h-3.5 w-3.5" />*/}
-                  {/*          End Date*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.previous_education.end_date}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.student.previous_education.grade && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <Star className="h-3.5 w-3.5" />*/}
-                  {/*          Grade*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.student.previous_education.grade}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*  </div>*/}
-                  {/*</div>*/}
-
-                  {/*/!* Documents *!/*/}
-                  {/*<div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">*/}
-                  {/*  <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">*/}
-                  {/*    <FileText className="h-4 w-4 text-blue-600" />*/}
-                  {/*    <h5 className="text-sm font-semibold text-slate-800 md:text-base">*/}
-                  {/*      Documents*/}
-                  {/*    </h5>*/}
-                  {/*  </div>*/}
-                  {/*  <div className="grid gap-4 p-5 text-sm md:grid-cols-2">*/}
-                  {/*    {formData.documents?.document_type_id && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <File className="h-3.5 w-3.5" />*/}
-                  {/*          Document Type*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.documents.document_type_id}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.documents?.file_key && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <Key className="h-3.5 w-3.5" />*/}
-                  {/*          File Key*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.documents.file_key}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*    {formData.documents?.file_url && (*/}
-                  {/*      <div>*/}
-                  {/*        <div className="flex items-center gap-1 text-xs text-slate-500">*/}
-                  {/*          <Link className="h-3.5 w-3.5" />*/}
-                  {/*          File URL*/}
-                  {/*        </div>*/}
-                  {/*        <p className="mt-1 font-medium text-slate-900">{formData.documents.file_url}</p>*/}
-                  {/*      </div>*/}
-                  {/*    )}*/}
-                  {/*  </div>*/}
-                  {/*</div>*/}
-
             </div>
           )}
         </div>
 
         <div className="flex items-center justify-between gap-2 sm:flex-row">
           <div className="text-sm text-slate-500">
-            Step {stage} of {visibleStages.length} — {completedStages.length}{" "}
-            completed
+            Step {stage} of {stages.length} — {completedStages.length} completed
           </div>
 
           <div className="flex gap-3">
-
             {stage > 1 && (
               <PrevButton
                 onClick={prevStage}
@@ -1556,23 +1034,23 @@ export default function StudentManualApplicationForm() {
               />
             )}
 
-            {stage < visibleStages.length ? (
+            {stage < stages.length ? (
               <NextButton
                 onClick={nextStage}
                 text="Next"
                 icon={<ArrowRight className="h-4 w-4" />}
-                disabled={loadingCreatePartnerApplication}
+                disabled={!isStageValid(stage)}
               />
             ) : (
               <Button
                 onClick={handleSubmit}
-                text="Submit Application"
                 disabled={loadingCreatePartnerApplication}
+                text="Submit Application"
               />
             )}
           </div>
-
         </div>
+
       </div>
     </section>
   );
