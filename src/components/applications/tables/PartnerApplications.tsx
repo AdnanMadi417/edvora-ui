@@ -225,7 +225,7 @@ const PartnerApplications = () => {
   };
 
   const handleApplicationRouter = () => {
-    router.push('/partner/applications/create');
+    router.push('/partner/applications/apply-now');
   };
 
   const handleClearFilters = () => {

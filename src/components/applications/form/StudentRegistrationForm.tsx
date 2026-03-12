@@ -6,31 +6,24 @@ import {
   ArrowRight,
   ClipboardList,
   CheckCircle,
-  Building2,
-  School,
-  GraduationCap,
-  Calendar,
-  Users,
-  Globe,
-  BadgeCheck,
-  Mail,
-  Phone,
-  MapPin,
-  File, XCircle,
 } from 'lucide-react';
-import { NATIONALITIES } from "constants/lists";
-import { useToast } from "components/context/ToastContext";
 
+import { useToast } from "components/context/ToastContext";
 import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
 import { useCreatePartnerApplication } from "hooks/applications/useCreatePartnerApplication";
 import { useGetApplicationRequiredFields } from "hooks/applications/useApplicationRequiredFields";
 import { useDocumentType } from "hooks/useDocumentType";
-
 import { useUniversities } from "hooks/useUniversities";
-import { InputField, SelectField, RadioField } from "components/form";
-import SearchableSelect from "../../form/SearchableSelect";
-import SearchableDropdown from "../../form/search/SearchableDropdown";
-import FileUploadField from "components/form/filesUpload/FileUploadField";
+import { useRemoveDocument } from "services/removeDocument";
+
+import { getCurrentDate } from "components/applications/form/utility-functions/getCurrentDate";
+import { updateFormData as updateNestedFormData } from "components/applications/form/utility-functions/updateFormData";
+import { validateFormData } from "components/applications/form/utility-functions/validateFormData";
+
+import StageReview from "./stages/StageReview";
+import StageBasicInfo from "components/applications/form/stages/StageBasicInfo";
+import StageDocuments from "components/applications/form/stages/StageDocuments";
+import StageAdditionalInfo from "components/applications/form/stages/StageAdditionalInfo";
 
 import {
   getPresignedUploads,
@@ -42,82 +35,8 @@ import Button from "components/ui/buttons/Button";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
 import { useRouter } from "next/navigation";
-import { useRemoveDocument } from "../../../services/removeDocument";
 
-interface Student {
-  name: string;
-  birthday: string;
-  nationality: string;
-  passport_number: string;
-  email: string;
-  phone: string;
-  current_address: string;
-  gender: string | null;
-  emergency_contacts: {
-    name: string;
-    relation: string;
-    phone: string;
-    email: string;
-  }[];
-  english_proficiencies: {
-    test_type: string;
-    score: string;
-    test_date: string;
-  }[];
-  previous_educations: {
-    institution_name: string;
-    qualification: string;
-    field_of_study?: string;
-    start_date: string;
-    end_date: string;
-    grade?: string;
-  }[];
-}
-
-interface DocumentItem {
-  document_type_id: string;
-  file_url: string;
-  file_key?: string;
-  name?: string;
-  size?: string;
-  raw?: File;
-  uploading?: boolean;
-  progress?: number;
-}
-
-interface FormDataType {
-  program_id: string;
-  university_id: string;
-  intake_date: string;
-  student_id: string;
-  student: Student;
-  documents: DocumentItem[];
-  is_draft: boolean;
-}
-
-const setNestedValue = (obj, path, value) => {
-  const keys = path.split(/[\.\[\]]/).filter(Boolean);
-  const newObj = Array.isArray(obj) ? [...obj] : { ...obj };
-  let cur = newObj;
-  for (let i = 0; i < keys.length; i++) {
-    const k = keys[i];
-    const nextKey = keys[i + 1];
-    const isLast = i === keys.length - 1;
-    const nextIsIndex = !isNaN(Number(nextKey));
-
-    if (isLast) {
-      cur[k] = value;
-    } else {
-      if (cur[k] === undefined || cur[k] === null) {
-        cur[k] = nextIsIndex ? [] : {};
-      } else {
-        cur[k] = Array.isArray(cur[k]) ? [...cur[k]] : { ...cur[k] };
-      }
-      cur = cur[k];
-    }
-  }
-  return newObj;
-};
+import { FormDataType, DocumentItem,Student } from "components/applications/form/utility-functions/types";
 
 const stages = [
   { id: 1, name: "Basic Information", icon: User },
@@ -130,7 +49,6 @@ export default function StudentRegistrationForm() {
   const [stage, setStage] = useState(1);
   const [completedStages, setCompletedStages] = useState([]);
   const { showToast } = useToast();
-  const [loading, setLoading] = useState(true);
 
   const { user } = useMe();
   const router = useRouter();
@@ -142,9 +60,6 @@ export default function StudentRegistrationForm() {
     error: universitiesError,
   } = useUniversities();
 
-  const universityMap = React.useMemo(() => {
-    return Object.fromEntries(universities.map((u) => [u.id, u]));
-  }, [universities]);
   const {
     createPartnerApplication,
     loadingCreatePartnerApplication,
@@ -158,51 +73,18 @@ export default function StudentRegistrationForm() {
   } = useGetApplicationRequiredFields();
 
   const { documentTypes } = useDocumentType(true);
+  const { qualifications } = useAllQualifications();
+  const safeDocumentTypes = documentTypes ?? [];
 
   const requiredFieldKeys =
     requiredFields?.fields
       ?.filter((f) => f.is_required)
       ?.map((f) => f.field_key) || [];
 
-  const hasStudentInfoFields = requiredFieldKeys.some(
-    (key) =>
-      key.startsWith("student.") &&
-      !key.includes("previous_educations") &&
-      !key.includes("emergency_contacts")
-  );
-
-  const hasEducationalFields = requiredFieldKeys.some(
-    (key) =>
-      key.startsWith("student.previous_educations") ||
-      key.startsWith("student.previous_educations[0].")
-  );
-
-  const hasEmergencyFields = requiredFieldKeys.some(
-    (key) =>
-      key.startsWith("student.emergency_contacts") ||
-      key.startsWith("student.emergency_contacts[0].")
-  );
-
-  const isFieldRequired = (key: string) => {
-    return requiredFieldKeys.includes(key);
-  };
-
   const shouldShowStage3 = requiredFieldKeys.length > 0;
   const visibleStages = shouldShowStage3
     ? stages
     : stages.filter((s) => s.id !== 3);
-
-  const { qualifications } = useAllQualifications();
-
-  const safeDocumentTypes = documentTypes ?? [];
-
-  const getCurrentDate = () => {
-    const d = new Date();
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
 
   const [formData, setFormData] = useState<FormDataType>({
     program_id: "",
@@ -211,7 +93,7 @@ export default function StudentRegistrationForm() {
     student_id: "",
     student: {
       name: "",
-      birthday: getCurrentDate().toString(),
+      birthday:"",
       nationality: "",
       passport_number: "",
       email: "",
@@ -239,127 +121,30 @@ export default function StudentRegistrationForm() {
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   const updateFormData = (fieldPath: string, value: any) => {
-    setFormData((prev) => {
-      const keys = fieldPath.split(/[\.\[\]]/).filter(Boolean);
-      const newState = { ...prev };
-
-      if (keys[0] === "student") {
-        if (
-          keys[1] === "emergency_contacts" &&
-          !newState.student.emergency_contacts?.length
-        ) {
-          newState.student.emergency_contacts = [
-            { name: "", relation: "", phone: "", email: "" },
-          ];
-        }
-        if (
-          keys[1] === "previous_educations" &&
-          !newState.student.previous_educations?.length
-        ) {
-          newState.student.previous_educations = [
-            {
-              institution_name: "",
-              qualification: "",
-              start_date: "",
-              end_date: "",
-              grade: "",
-            },
-          ];
-        }
-        if (
-          keys[1] === "english_proficiencies" &&
-          !newState.student.english_proficiencies?.length
-        ) {
-          newState.student.english_proficiencies = [
-            { test_type: "", score: "", test_date: "" },
-          ];
-        }
-      }
-
-      return setNestedValue(newState, fieldPath, value);
+    updateNestedFormData<FormDataType>({
+      fieldPath,
+      value,
+      setFormData,
+      setErrors,
     });
-
-    setErrors((prev) => ({ ...prev, [fieldPath]: undefined }));
   };
 
-  const validateStage = (stageNum: number) => {
-    const newErrors: Record<string, string> = {};
-
-    const addError = (path: string, message: string) => {
-      newErrors[path] = message;
-    };
-
-    const isEmpty = (value: any) =>
-      value === undefined || value === null || String(value).trim() === "";
-
-    const student = formData.student;
-
-    if (stageNum === 1) {
-      if (isEmpty(student.name))
-        addError("student.name", "Student name is required");
-      if (isEmpty(student.previous_educations[0]?.qualification))
-        addError(
-          "student.previous_educations[0].qualification",
-          "Qualification is required"
-        );
-      if (isEmpty(formData.university_id))
-        addError("university_id", "University is required");
-      if (isEmpty(formData.program_id))
-        addError("program_id", "Program is required");
-    }
-
-    if (stageNum === 2) {
-      if (!formData.documents?.length)
-        addError("documents", "Please upload at least one document");
-
-      safeDocumentTypes.forEach((docType) => {
-        const uploaded = formData.documents.find(
-          (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
-        );
-        if (!uploaded)
-          addError(`documents.${docType.id}`, `${docType.type} is required`);
-      });
-    }
-
-    if (stageNum === 3) {
-
-      Object.keys(student).forEach((key) => {
-        if (isFieldRequired(`student.${key}`)) {
-          const value = student[key as keyof Student];
-          if (isEmpty(value)) addError(`student.${key}`, `${key} is required`);
-        }
-      });
-
-      student.emergency_contacts?.forEach((c, idx) => {
-        ["name", "relation", "phone", "email"].forEach((f) => {
-          const key = `student.emergency_contacts[${idx}].${f}`;
-          if (isFieldRequired(key) && isEmpty(c[f as keyof typeof c])) {
-            addError(key, `${f} is required`);
-          }
-        });
-      });
-
-      // Check previous education
-      student.previous_educations?.forEach((edu, idx) => {
-        ["institution_name", "qualification", "start_date", "end_date"].forEach(
-          (f) => {
-            const key = `student.previous_educations[${idx}].${f}`;
-            if (isFieldRequired(key) && isEmpty(edu[f as keyof typeof edu])) {
-              addError(key, `${f.replace("_", " ")} is required`);
-            }
-          }
-        );
-      });
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const handleValidateStage = React.useCallback(
+    (stageNum: number) => {
+      const { isValid, errors } = validateFormData(
+        formData,
+        stageNum,
+        requiredFieldKeys,
+        safeDocumentTypes
+      );
+      setErrors(errors);
+      return isValid;
+    },
+    [formData, requiredFieldKeys, safeDocumentTypes]
+  );
 
   const nextStage = async () => {
-    const isValid = validateStage(stage);
-
-    if (!isValid) return;
+    if (!handleValidateStage(stage)) return;
 
     setCompletedStages((prev) =>
       prev.includes(stage) ? prev : [...prev, stage]
@@ -368,7 +153,12 @@ export default function StudentRegistrationForm() {
     setStage((s) => Math.min(s + 1, visibleStages.length));
   };
 
-  const prevStage = () => setStage((s) => Math.max(1, s - 1));
+  const prevStage = () => {
+    const currentIndex = visibleStages.findIndex((s) => s.id === stage);
+    if (currentIndex > 0) {
+      setStage(visibleStages[currentIndex - 1].id);
+    }
+  };
 
   const canAccessStage = (id) => {
     if (id === 1) return true;
@@ -470,68 +260,12 @@ export default function StudentRegistrationForm() {
   );
 
   const isStageValid = React.useMemo(() => {
-    // Validate current stage without setting errors (silent check)
-    const newErrors: Record<string, string> = {};
-    const student = formData.student;
-
-    const isEmpty = (value: any) =>
-      value === undefined || value === null || String(value).trim() === "";
-
-    if (stage === 1) {
-      if (isEmpty(student.name)) newErrors["student.name"] = "required";
-      if (isEmpty(student.previous_educations[0]?.qualification))
-        newErrors["student.previous_educations[0].qualification"] = "required";
-      if (isEmpty(formData.university_id)) newErrors["university_id"] = "required";
-      if (isEmpty(formData.program_id)) newErrors["program_id"] = "required";
-    }
-
-    if (stage === 2) {
-      safeDocumentTypes.forEach((docType) => {
-        const uploaded = formData.documents.find(
-          (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
-        );
-        if (!uploaded) newErrors[`documents.${docType.id}`] = "required";
-      });
-    }
-
-    if (stage === 3) {
-      // Student fields
-      Object.keys(student).forEach((key) => {
-        if (isFieldRequired(`student.${key}`)) {
-          const value = student[key as keyof Student];
-          if (isEmpty(value)) newErrors[`student.${key}`] = "required";
-        }
-      });
-
-      // Emergency contacts
-      student.emergency_contacts?.forEach((c, idx) => {
-        ["name", "relation", "phone", "email"].forEach((f) => {
-          const key = `student.emergency_contacts[${idx}].${f}`;
-          if (isFieldRequired(key) && isEmpty(c[f as keyof typeof c])) {
-            newErrors[key] = "required";
-          }
-        });
-      });
-
-      // Previous education
-      student.previous_educations?.forEach((edu, idx) => {
-        ["institution_name", "qualification", "start_date", "end_date"].forEach(
-          (f) => {
-            const key = `student.previous_educations[${idx}].${f}`;
-            if (isFieldRequired(key) && isEmpty(edu[f as keyof typeof edu])) {
-              newErrors[key] = "required";
-            }
-          }
-        );
-      });
-    }
-
-    return Object.keys(newErrors).length === 0;
-  }, [stage, formData, safeDocumentTypes, isFieldRequired]);
+    return validateFormData(formData, stage, requiredFieldKeys, documentTypes).isValid;
+  }, [stage, formData, requiredFieldKeys, documentTypes]);
 
   const handleSubmit = async () => {
     for (const s of visibleStages) {
-      if (!validateStage(s.id)) return;
+      if (!handleValidateStage(s.id)) return;
     }
 
     if (formData.documents?.some((d) => d.uploading)) {
@@ -546,6 +280,9 @@ export default function StudentRegistrationForm() {
     }
 
     const missingDocs = documentTypes.filter((docType) => {
+
+      if (!docType.is_required_init_app_doc) return false;
+
       return !formData.documents.some(
         (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
       );
@@ -567,49 +304,62 @@ export default function StudentRegistrationForm() {
     }
 
     const payload: any = {
-      program_id: formData.program_id,
-      university_id: formData.university_id,
-      intake_date: formData.intake_date,
+      program_id: formData.program_id || undefined,
+      university_id: formData.university_id || undefined,
+      intake_date: formData.intake_date || getCurrentDate(),
       student: {
-        ...formData.student,
+        name: formData.student.name || "",
+        birthday: formData.student.birthday || " ",
+        nationality: formData.student.nationality || "",
+        passport_number: formData.student.passport_number || "",
+        email: formData.student.email || "",
+        phone: formData.student.phone || "",
+        current_address: formData.student.current_address || "",
+        gender: formData.student.gender ?? "male",
 
-        english_proficiencies: formData.student.english_proficiencies.map(
-          (e) => ({
-            test_type: e.test_type || "N/A",
-            score: e.score || "",
+        emergency_contacts: formData.student.emergency_contacts
+          .filter((c) => c.name || c.phone)
+          .map((c) => ({
+            name: c.name,
+            relation: c.relation,
+            phone: c.phone,
+            email: c.email,
+          })),
+
+        english_proficiencies: formData.student.english_proficiencies
+          .filter((e) => e.test_type || e.score)
+          .map((e) => ({
+            test_type: e.test_type || undefined,
+            score: e.score || undefined,
             test_date: e.test_date
               ? new Date(e.test_date).toISOString().split("T")[0]
-              : getCurrentDate(),
-          })
-        ),
+              : undefined,
+          })),
 
-        previous_educations: formData.student.previous_educations.map((p) => ({
-          institution_name: p.institution_name || "N/A",
-          qualification: p.qualification || "N/A",
-          start_date: p.start_date
-            ? new Date(p.start_date).toISOString().split("T")[0]
-            : getCurrentDate(),
-          end_date: p.end_date
-            ? new Date(p.end_date).toISOString().split("T")[0]
-            : getCurrentDate(),
-          grade: p.grade || "N/A",
-        })),
-
-        emergency_contacts: formData.student.emergency_contacts.map((c) => ({
-          name: c.name || "",
-          relation: c.relation || "",
-          phone: c.phone || "",
-          email: c.email || "",
-        })),
+        previous_educations: formData.student.previous_educations
+          .filter((p) => p.institution_name)
+          .map((p) => ({
+            institution_name: p.institution_name,
+            qualification: p.qualification || undefined,
+            start_date: p.start_date
+              ? new Date(p.start_date).toISOString().split("T")[0]
+              : undefined,
+            end_date: p.end_date
+              ? new Date(p.end_date).toISOString().split("T")[0]
+              : undefined,
+            grade: p.grade || undefined,
+          })),
       },
 
-      documents: formData.documents.map((d) => ({
-        document_type_id: d.document_type_id,
-        file_url: d.file_url,
-        file_key: d.file_key,
-      })),
+      documents: formData.documents
+        .filter((d) => d.file_url && !d.uploading)
+        .map((d) => ({
+          document_type_id: d.document_type_id,
+          file_url: d.file_url,
+          file_key: d.file_key,
+        })),
 
-      is_draft: !!formData.is_draft,
+      is_draft: formData.is_draft ?? false,
     };
 
     if (!formData.student_id) delete payload.student_id;
@@ -714,538 +464,46 @@ export default function StudentRegistrationForm() {
         </div>
 
         <div className="mb-6 min-h-[400px] rounded-md border bg-slate-50 p-6">
+
           {stage === 1 && (
-            <div className="mb-8">
-              <div className="mb-6">
-                <div className="mb-2 flex items-center">
-                  <h4 className="text-lg font-semibold text-slate-900">
-                    University & Student Information
-                  </h4>
-                  <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
-                </div>
-                <p className="text-sm text-slate-800">
-                  Select your target university and provide student details.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <InputField
-                  label="Student Full Name (as in passport)"
-                  field="student.name"
-                  placeholder="Ahmad bin Ali"
-                  formData={formData}
-                  errors={errors}
-                  updateFormData={updateFormData}
-                />
-
-                <SearchableSelect
-                  label="Study Level"
-                  field="student.previous_educations[0].qualification"
-                  options={qualifications.map((q) => ({
-                    value: String(q.id),
-                    label:
-                      q.name.charAt(0).toUpperCase() +
-                      q.name.slice(1).toLowerCase(),
-                  }))}
-                  formData={formData}
-                  errors={errors}
-                  updateFormData={updateFormData}
-                />
-
-                <SearchableSelect
-                  label="University"
-                  field="university_id"
-                  options={universities.map((u) => ({
-                    value: String(u.id),
-                    label: u.name,
-                  }))}
-                  formData={formData}
-                  errors={errors}
-                  updateFormData={updateFormData}
-                />
-
-                <SearchableSelect
-                  label="Program / Major"
-                  field="program_id"
-                  options={(
-                    universities.find((u) => u.id === formData.university_id)
-                      ?.programs || []
-                  ).map((p) => ({
-                    value: p.id,
-                    label: p.name,
-                  }))}
-                  formData={formData}
-                  errors={errors}
-                  updateFormData={updateFormData}
-                />
-              </div>
-            </div>
+            <StageBasicInfo
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+              universities={universities}
+              qualifications={qualifications}
+            />
           )}
 
           {stage === 2 && (
-            <div>
-              <div className="mb-6">
-                <div className="mb-2 flex items-center">
-                  <h4 className="text-lg font-semibold text-slate-900">
-                    Upload Required Documents
-                  </h4>
-                  <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
-                </div>
-                <p className="text-sm text-slate-800">
-                  Please upload all necessary documents to complete your
-                  application.
-                </p>
-              </div>
-
-              <div className="space-y-6">
-                {safeDocumentTypes.map((docType) => (
-                  <FileUploadField
-                    key={docType.id}
-                    label={docType.type}
-                    field="documents"
-                    documentTypeId={docType.id}
-                    formData={formData}
-                    updateFormData={updateFormData}
-                    errors={{
-                      ...errors,
-                      documents: errors[`documents.${docType.id}`],
-                    }}
-                    uploadHandler={handleFileUpload}
-                    removeHandler={removeDocument}
-                    multiple={false}
-                    accept="application/pdf,image/*"
-                  />
-                ))}
-              </div>
-
-              {errors.documents && (
-                <p className="mt-2 text-xs text-red-600">{errors.documents}</p>
-              )}
-            </div>
+            <StageDocuments
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+              documentTypes={safeDocumentTypes}
+              handleFileUpload={handleFileUpload}
+              removeDocument={removeDocument}
+            />
           )}
 
           {stage === 3 && (
-            <div className="space-y-5">
-              <div className="border-b border-slate-100 pb-5">
-                <h4 className="text-xl font-semibold text-slate-900">
-                  Additional Required Details
-                </h4>
-                <p className="mt-1 text-sm text-slate-500">
-                  This university requires extended information. All fields are
-                  mandatory.
-                </p>
-              </div>
-
-              {hasStudentInfoFields && (
-                <div className="mb-8">
-                  <h3 className="mb-4 font-semibold uppercase text-slate-900">
-                    Student Information
-                  </h3>
-
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {isFieldRequired("student.birthday") && (
-                      <InputField
-                        label="Date of Birth"
-                        field="student.birthday"
-                        placeholder="DD/MM/YYYY"
-                        type="date"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.gender") && (
-                      <RadioField
-                        label="Gender"
-                        field="student.gender"
-                        options={[
-                          { label: "Male", value: true },
-                          { label: "Female", value: false },
-                        ]}
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.nationality") && (
-                      <SearchableDropdown
-                        label="Nationality"
-                        field="student.nationality"
-                        options={NATIONALITIES.map((q) => ({
-                          value: String(q.label),
-                          label: q.name,
-                        }))}
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.passport_number") && (
-                      <InputField
-                        label="Passport Number"
-                        field="student.passport_number"
-                        placeholder="A1234567"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.email") && (
-                      <InputField
-                        label="Email Address"
-                        field="student.email"
-                        type="email"
-                        placeholder="ahmad.ali@gmail.com"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.phone") && (
-                      <InputField
-                        label="Phone Number"
-                        field="student.phone"
-                        type="tel"
-                        placeholder="+60123456789"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
-                    {isFieldRequired("student.current_address") && (
-                      <InputField
-                        label="Street Address"
-                        field="student.current_address"
-                        placeholder="No. 123, Jalan Tun Razak, Kuala Lumpur"
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {hasEmergencyFields && (
-                <div className="mb-8">
-                  <h3 className="mb-4 font-semibold uppercase text-slate-900">
-                    Emergency Contacts
-                  </h3>
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    <InputField
-                      label="Name"
-                      field="student.emergency_contacts[0].name"
-                      placeholder="John Doe"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <InputField
-                      label="Relation"
-                      field="student.emergency_contacts[0].relation"
-                      placeholder="Father / Mother / Guardian"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <InputField
-                      label="Phone Number"
-                      field="student.emergency_contacts[0].phone"
-                      placeholder="+60123456789"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <InputField
-                      label="Email"
-                      field="student.emergency_contacts[0].email"
-                      placeholder="john.doe@gmail.com"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {hasEducationalFields && (
-                <div className="mb-8">
-                  <h3 className="mb-4 font-semibold uppercase text-slate-900">
-                    Educational Background
-                  </h3>
-
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                    <SelectField
-                      label="Highest Qualification"
-                      field="student.previous_educations[0].qualification"
-                      options={qualifications.map((q) => ({
-                        value: String(q.id),
-                        label: q.name,
-                      }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <InputField
-                      label="Institution Name"
-                      field="student.previous_educations[0].institution_name"
-                      placeholder="University of Malaya"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <InputField
-                      label="Field of Study"
-                      field="student.previous_educations[0].field_of_study"
-                      placeholder="Computer Science"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <InputField
-                      label="Started Year"
-                      field="student.previous_educations[0].start_date"
-                      type="number"
-                      placeholder="2022"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <InputField
-                      label="Graduation Year"
-                      field="student.previous_educations[0].end_date"
-                      type="number"
-                      placeholder="2025"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <InputField
-                      label="GPA / Grade"
-                      field="student.previous_educations[0].grade"
-                      placeholder="3.75 / 4.0"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
+            <StageAdditionalInfo
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+              requiredFieldKeys={requiredFieldKeys}
+              qualifications={qualifications}
+            />
           )}
 
           {stage === 4 && (
-            <div className="space-y-8">
-              <div className="border-b border-slate-200 pb-4">
-                <h4 className="text-xl font-semibold text-slate-900">
-                  Review Your Application
-                </h4>
-                <p className="text-sm text-slate-500">
-                  Please verify all information before submitting.
-                </p>
-              </div>
-
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">
-                <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">
-                  <Building2 className="h-4 w-4 text-blue-600" />
-                  <h5 className="text-sm font-semibold text-slate-800 md:text-base">
-                    Application Info
-                  </h5>
-                </div>
-                <div className="grid gap-3 p-5 text-sm md:grid-cols-2">
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <School className="h-3.5 w-3.5" />
-                      University
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {universities.find((u) => u.id === formData.university_id)
-                        ?.name || "-"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <GraduationCap className="h-3.5 w-3.5" />
-                      Program
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {universities
-                        .find((u) => u.id === formData.university_id)
-                        ?.programs?.find((p) => p.id === formData.program_id)
-                        ?.name || "-"}
-                    </p>
-                  </div>
-
-                  {formData.intake_date && (
-                    <div>
-                      <div className="flex items-center gap-1 text-xs text-slate-500">
-                        <Calendar className="h-3.5 w-3.5" />
-                        Intake Date
-                      </div>
-                      <p className="mt-1 font-medium text-slate-900">
-                        {formData.intake_date}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">
-                <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">
-                  <User className="h-4 w-4 text-blue-600" />
-                  <h5 className="text-sm font-semibold text-slate-800 md:text-base">
-                    Student Basic Information
-                  </h5>
-                </div>
-                <div className="grid gap-4 p-5 text-sm md:grid-cols-2">
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <User className="h-3.5 w-3.5" />
-                      Full Name
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.name || "-"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Date of Birth
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.birthday || "-"}
-                    </p>
-                  </div>
-
-                  {formData.student.gender !== null && (
-                    <div>
-                      <div className="flex items-center gap-1 text-xs text-slate-500">
-                        <Users className="h-3.5 w-3.5" />
-                        Gender
-                      </div>
-                      <p className="mt-1 font-medium text-slate-900">
-                        {formData.student.gender ? "Male" : "Female"}
-                      </p>
-                    </div>
-                  )}
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Globe className="h-3.5 w-3.5" />
-                      Nationality
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.nationality || "-"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <BadgeCheck className="h-3.5 w-3.5" />
-                      Passport
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.passport_number || "-"}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-1 text-xs text-slate-500">
-                      <Mail className="h-3.5 w-3.5" />
-                      Email
-                    </div>
-                    <p className="mt-1 font-medium text-slate-900">
-                      {formData.student.email || "-"}
-                    </p>
-                  </div>
-
-                  {formData.student.phone && (
-                    <div>
-                      <div className="flex items-center gap-1 text-xs text-slate-500">
-                        <Phone className="h-3.5 w-3.5" />
-                        Phone
-                      </div>
-                      <p className="mt-1 font-medium text-slate-900">
-                        {formData.student.phone}
-                      </p>
-                    </div>
-                  )}
-
-                  {formData.student.current_address && (
-                    <div>
-                      <div className="flex items-center gap-1 text-xs text-slate-500">
-                        <MapPin className="h-3.5 w-3.5" />
-                        Address
-                      </div>
-                      <p className="mt-1 font-medium text-slate-900">
-                        {formData.student.current_address}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">
-                <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">
-                  <FileText className="h-4 w-4 text-blue-600" />
-                  <h5 className="text-sm font-semibold text-slate-800 md:text-base">
-                    Documents
-                  </h5>
-                </div>
-
-                <div className="grid gap-4 p-5 text-sm grid-cols-1">
-                  {documentTypes.map((docType) => {
-
-                    const uploadedDoc = formData.documents?.find(
-                      (doc) => doc.document_type_id === docType.id
-                    );
-
-                    return (
-                      <div
-                        key={docType.id}
-                        className="flex items-center justify-between gap-2"
-                      >
-                        <div className="flex items-center gap-1 text-xs text-slate-500">
-                          <File className="h-3.5 w-3.5" />
-                          {docType.description}
-                        </div>
-                        <div className="mt-1">
-
-                            {uploadedDoc ? (
-                              <span className="flex items-center gap-1 text-green-600">
-                            <CheckCircle className="h-4 w-4" /> Uploaded
-                          </span>
-                            ) : (
-                              <span className="flex items-center gap-1 text-red-500">
-                            <XCircle className="h-4 w-4" /> Missing
-                          </span>
-                            )}
-
-                          </div>
-
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            <StageReview
+              formData={formData}
+              universities={universities}
+              documentTypes={documentTypes}
+            />
           )}
+
         </div>
 
         <div className="flex-col content-center justify-content items-center gap-2 space-y-2 sm:flex-row md:flex md:justify-between">
