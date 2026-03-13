@@ -7,7 +7,6 @@ interface Props {
   errors: Record<string, string | undefined>;
   updateFormData: (fieldPath: string, value: any) => void;
   universities: any[];
-  qualifications: any[];
 }
 
 export default function StageBasicInfo({
@@ -15,7 +14,6 @@ export default function StageBasicInfo({
                                           errors,
                                           updateFormData,
                                           universities,
-                                          qualifications,
                                         }: Props) {
   return (
     <div className="mb-8">
@@ -36,20 +34,6 @@ export default function StageBasicInfo({
           label="Student Full Name (as in passport)"
           field="student.name"
           placeholder="Ahmad bin Ali"
-          formData={formData}
-          errors={errors}
-          updateFormData={updateFormData}
-        />
-
-        <SearchableSelect
-          label="Study Level"
-          field="student.previous_educations[0].qualification"
-          options={qualifications.map((q) => ({
-            value: String(q.id),
-            label:
-              q.name.charAt(0).toUpperCase() +
-              q.name.slice(1).toLowerCase(),
-          }))}
           formData={formData}
           errors={errors}
           updateFormData={updateFormData}

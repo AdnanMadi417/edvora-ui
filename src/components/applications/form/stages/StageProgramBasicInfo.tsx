@@ -8,7 +8,6 @@ interface Props {
   errors: Record<string, string | undefined>;
   updateFormData: (fieldPath: string, value: any) => void;
   universities: any[];
-  qualifications: any[];
 }
 
 export default function StageBasicInfo({
@@ -16,11 +15,11 @@ export default function StageBasicInfo({
                                          errors,
                                          updateFormData,
                                          universities,
-                                         qualifications,
+
                                        }: Props) {
   return (
     <div className="mb-8">
-      {/* Header */}
+
       <div className="mb-6">
         <div className="mb-2 flex items-center">
           <h4 className="text-lg font-semibold text-slate-900">
@@ -33,7 +32,6 @@ export default function StageBasicInfo({
         </p>
       </div>
 
-      {/* Student Info */}
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <InputField
           label="Full Name (as in passport)"
@@ -44,22 +42,8 @@ export default function StageBasicInfo({
           updateFormData={updateFormData}
         />
 
-        <SearchableSelect
-          label="Study Level"
-          field="student.previous_educations[0].qualification"
-          options={qualifications.map((q) => ({
-            value: String(q.id),
-            label:
-              q.name.charAt(0).toUpperCase() +
-              q.name.slice(1).toLowerCase(),
-          }))}
-          formData={formData}
-          errors={errors}
-          updateFormData={updateFormData}
-        />
       </div>
 
-      {/* University & Program toggle */}
       <ToggleInput
         label="Change University & Program"
         field="showProgramFields"
