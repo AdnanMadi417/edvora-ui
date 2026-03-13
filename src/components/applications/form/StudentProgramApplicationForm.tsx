@@ -8,26 +8,26 @@ import {
   ArrowLeft,
   ArrowRight,
 } from "lucide-react";
-import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from "constants/lists";
-import { useToast } from "components/context/ToastContext";
-import api from "lib/useApi";
+import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from "../../../constants/lists";
+import { useToast } from "../../context/ToastContext";
+import api from "../../../lib/useApi";
 import Cookies from "js-cookie";
-import { InputField, SelectField, RadioField } from "components/form";
+import { InputField, SelectField, RadioField } from "../../form";
 import {
   getPresignedUploads,
   uploadFilesToSpaces,
-} from "services/uploadService";
-import { useMe } from "hooks/useMe";
-import Loading from "components/loading/Loading";
+} from "../../../services/uploadService";
+import { useMe } from "../../../hooks/useMe";
+import Loading from "../../loading/Loading";
 
 import { useSearchParams } from "next/navigation";
-import { useAllQualifications } from "../../../../hooks/knowledge-hub/qualifications/useQualificationsList";
-import PrevButton from "../../../ui/buttons/PrevButton";
-import NextButton from "../../../ui/buttons/NextButton";
-import Button from "../../../ui/buttons/Button";
+import { useAllQualifications } from "../../../hooks/knowledge-hub/qualifications/useQualificationsList";
+import PrevButton from "../../ui/buttons/PrevButton";
+import NextButton from "../../ui/buttons/NextButton";
+import Button from "../../ui/buttons/Button";
 
-import { useCreatePartnerApplication } from "../../../../hooks/applications/useCreatePartnerApplication";
-import FileUploadField from '../../../form/filesUpload/FileUploadField';
+import { useCreatePartnerApplication } from "../../../hooks/applications/useCreatePartnerApplication";
+import FileUploadField from '../../form/filesUpload/FileUploadField';
 
 interface Student {
   name: string;

@@ -45,7 +45,6 @@ export default function ProgramDecisionModal({
 
     const newErrors: any = {};
     if (!formData.program_id) newErrors.program_id = "Program is required";
-    if (!formData.note.trim()) newErrors.note = "Reason is required";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -137,14 +136,6 @@ export default function ProgramDecisionModal({
               updateFormData={updateFormData}
             />
 
-            <InputField
-              label="Reason"
-              field="note"
-              placeholder="Example: Program is more suitable"
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-            />
           </div>
 
           <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
@@ -159,7 +150,7 @@ export default function ProgramDecisionModal({
 
             <button
               onClick={handleSubmit}
-              disabled={loading || !formData.note.trim() || !formData.program_id}
+              disabled={loading || !formData.program_id}
               className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
             >
               <CheckCircle className="h-4 w-4" />

@@ -2,22 +2,33 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { CalendarPlus, ChevronLeft,ArrowLeft, GraduationCap, Pencil, Trash2 } from 'lucide-react';
+import {
+  CalendarPlus,
+  ChevronLeft,
+  ArrowLeft,
+  GraduationCap,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 
 import { useUniversityDetails } from "hooks/knowledge-hub/universities/useUniversitiesDetails";
 import { useUpdateUniversity } from "hooks/knowledge-hub/universities/useEditUniversitiesDetails";
 import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
 import { useDeleteBranch } from "hooks/knowledge-hub/universities/useDeleteBranch";
+import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
+import { useUniversityPaymentMethods } from "hooks/knowledge-hub/universities/payment-methods/useUniversityPaymentMethods";
+import { useDeleteUniversityPaymentMethod } from "hooks/knowledge-hub/universities/payment-methods/useDeletePaymentMethod";
+import { useAssignPaymentMethod } from "hooks/knowledge-hub/universities/payment-methods/useAssignUniversityPayment";
 
-import InputField from "../../../../../form/InputField";
-import MultipleDateInput from "../../../../../form/MultipleDateInput";
-import SelectField from "../../../../../form/SelectField";
+import InputField from "components/form/InputField";
+import MultipleDateInput from "components/form/MultipleDateInput";
+import SelectField from "components/form/SelectField";
 
-import Button from '../../../../../ui/buttons/Button';
-import Loading from "../../../../../loading/Loading";
-import IconButton from '../../../../../ui/buttons/IconButton';
-import EmptyData from '../../../../../emptyData/EmptyTableData';
-import { useToast } from '../../../../../context/ToastContext';
+import Button from "components/ui/buttons/Button";
+import Loading from "components/loading/Loading";
+import IconButton from "components/ui/buttons/IconButton";
+import EmptyData from "components/emptyData/EmptyTableData";
+import { useToast } from "components/context/ToastContext";
 
 const normalizePayload = (formData: any) => {
   return {
@@ -46,8 +57,12 @@ const UniversityEdit = ({ id }: Props) => {
   const router = useRouter();
   const { showToast } = useToast();
 
-  const { university, branches, universityLoading } =
-    useUniversityDetails(id);
+  const { university, branches, universityLoading } = useUniversityDetails(id);
+  const { universityPaymentMethods, loading } = useUniversityPaymentMethods(id);
+  const { paymentMethods } = useAllPaymentMethods();
+
+  const { assignPaymentMethod, loading: assigning } = useAssignPaymentMethod();
+  const { deletePaymentMethod, } = useDeleteUniversityPaymentMethod();
 
   const { deleteBranch, deleteLoading } = useDeleteBranch();
   const [initialFormData, setInitialFormData] = React.useState<any>(null);
@@ -82,7 +97,6 @@ const UniversityEdit = ({ id }: Props) => {
     if (!branch) return;
 
     try {
-
       if (branch.id) {
         await deleteBranch(id, branch.id);
 
@@ -93,7 +107,6 @@ const UniversityEdit = ({ id }: Props) => {
         ...prev,
         branches: prev.branches.filter((_: any, i: number) => i !== index),
       }));
-
     } catch (err) {
       console.error(err);
       showToast("Failed to delete branch.", "error");
@@ -108,6 +121,15 @@ const UniversityEdit = ({ id }: Props) => {
     branches: [],
     is_active: true,
   });
+
+  const [selectedMethods, setSelectedMethods] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    if (!universityPaymentMethods) return;
+
+    setSelectedMethods(
+      universityPaymentMethods.map((p) => String(p.payment_method_id))
+    );
+  }, [universityPaymentMethods]);
 
   React.useEffect(() => {
     if (!university) return;
@@ -128,7 +150,6 @@ const UniversityEdit = ({ id }: Props) => {
 
     setFormData(data);
     setInitialFormData(data);
-
   }, [university, branches]);
   const updateFormData = (field: string, value: any) => {
     setFormData((prev: any) => ({
@@ -140,16 +161,13 @@ const UniversityEdit = ({ id }: Props) => {
   const isFormChanged = React.useMemo(() => {
     if (!initialFormData) return false;
 
-    return JSON.stringify(normalizePayload(formData)) !==
-      JSON.stringify(normalizePayload(initialFormData));
-
+    return (
+      JSON.stringify(normalizePayload(formData)) !==
+      JSON.stringify(normalizePayload(initialFormData))
+    );
   }, [formData, initialFormData]);
 
-  const updateBranchField = (
-    index: number,
-    field: string,
-    value: any
-  ) => {
+  const updateBranchField = (index: number, field: string, value: any) => {
     setFormData((prev: any) => {
       const branchesCopy = JSON.parse(JSON.stringify(prev.branches));
 
@@ -172,12 +190,36 @@ const UniversityEdit = ({ id }: Props) => {
 
       await updateUniversity(payload);
 
-      showToast("University created successfully.");
+      showToast("University updated successfully.");
 
-      setTimeout(() => location.reload(), 1500);
-
+      setTimeout(() => router.refresh(), 1500);
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleAssignMethod = async (methodId: string) => {
+    try {
+      await assignPaymentMethod(id, { payment_method_id: methodId, is_active: true });
+      showToast("Payment method assigned successfully.", "success");
+      router.refresh();
+    } catch (err) {
+      showToast("Failed to assign payment method.", "error");
+    }
+  };
+
+  const handleRemoveMethod = async (methodId: string) => {
+    try {
+      const assigned = universityPaymentMethods.find(
+        (p) => String(p.payment_method_id) === methodId
+      );
+      if (!assigned) return;
+
+      await deletePaymentMethod(id, assigned.id);
+      showToast("Payment method removed successfully.", "success");
+      router.refresh(); // refresh data to remove Current badge
+    } catch {
+      showToast("Failed to delete payment method.", "error");
     }
   };
 
@@ -191,7 +233,6 @@ const UniversityEdit = ({ id }: Props) => {
 
   return (
     <div className="mt-6 rounded-md border bg-white">
-
       <div className="flex justify-between border-b p-6">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
@@ -199,12 +240,8 @@ const UniversityEdit = ({ id }: Props) => {
           </div>
 
           <div>
-            <h2 className="text-lg font-semibold">
-              {university.name}
-            </h2>
-            <p className="text-sm text-slate-500">
-              {university.country}
-            </p>
+            <h2 className="text-lg font-semibold">{university.name}</h2>
+            <p className="text-sm text-slate-500">{university.country}</p>
           </div>
         </div>
 
@@ -216,13 +253,10 @@ const UniversityEdit = ({ id }: Props) => {
             <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
             <span className="hidden sm:inline">Back to universities</span>
           </button>
-
         </div>
-
       </div>
 
-      <div className="px-6 py-6 space-y-5">
-
+      <div className="space-y-5 px-6 py-6">
         <h3 className="text-sm font-semibold uppercase text-slate-500">
           Edit University
         </h3>
@@ -261,12 +295,10 @@ const UniversityEdit = ({ id }: Props) => {
           errors={{}}
           updateFormData={updateFormData}
         />
-
       </div>
 
       <div className="border-t px-6 py-6">
-
-        <div className="flex justify-between items-center mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm font-semibold uppercase text-slate-500">
             Branches
           </h3>
@@ -280,16 +312,14 @@ const UniversityEdit = ({ id }: Props) => {
             hoverBorderColor="hover:border-blue-700"
             onClick={handleAddBranch}
           />
-
         </div>
 
-        <div className="grid gap-4 grid-cols-1">
+        <div className="grid grid-cols-1 gap-4">
           {formData.branches.map((branch: any, index: number) => (
             <div
               key={branch.id || index}
-              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm space-y-5"
+              className="space-y-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
             >
-
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h4 className="text-sm font-semibold text-slate-700">
                   Branch {index + 1}
@@ -307,9 +337,7 @@ const UniversityEdit = ({ id }: Props) => {
                 />
               </div>
 
-
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <InputField
                   label="Branch Name"
                   placeholder="e.g Branch Name"
@@ -342,20 +370,73 @@ const UniversityEdit = ({ id }: Props) => {
                     updateBranchField(index, f, v)
                   }
                 />
-
               </div>
-
             </div>
           ))}
         </div>
       </div>
 
-      <div className="flex justify-end gap-2 border-t p-6">
+      <div className="border-t px-6 py-6">
+        <h3 className="mb-4 text-sm font-semibold uppercase text-slate-500">
+          Payment Methods
+        </h3>
 
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {paymentMethods.map((method) => {
+            const isAssigned = universityPaymentMethods.some(
+              (p) => String(p.payment_method_id) === String(method.id)
+            );
+
+            const toggleMethod = async () => {
+              if (isAssigned) {
+                await handleRemoveMethod(String(method.id));
+              } else {
+                await handleAssignMethod(String(method.id));
+              }
+            };
+
+            return (
+              <label
+                key={method.id}
+                className={`group relative flex cursor-pointer items-center justify-between rounded-md border px-4 py-4 transition-all
+          ${isAssigned
+                  ? "border-blue-600 bg-blue-50 shadow-sm"
+                  : "border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm"
+                }`}
+              >
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-slate-800">{method.name}</span>
+                  <span className="text-xs text-slate-400">
+            {isAssigned ? "Enabled" : "Disabled"} – Click to toggle
+          </span>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={isAssigned}
+                    onChange={toggleMethod}
+                    className="peer sr-only"
+                  />
+                  <div className="h-6 w-11 rounded-full bg-slate-300 transition-colors peer-checked:bg-blue-600" />
+                  <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+                </div>
+
+                {isAssigned && (
+                  <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-blue-600" />
+                )}
+              </label>
+            );
+          })}
+        </div>
+
+      </div>
+
+      <div className="flex justify-end gap-2 border-t p-6">
         <Button
           onClick={handleBack}
           icon={<ArrowLeft className="h-5 w-5" />}
-          text={ "Back"}
+          text={"Back"}
           bgColor="bg-slate-50"
           textColor="text-slate-700"
           borderColor="border-slate-600"
@@ -374,9 +455,7 @@ const UniversityEdit = ({ id }: Props) => {
           hoverTextColor="hover:text-blue-800"
           hoverBorderColor="hover:border-blue-700"
         />
-
       </div>
-
     </div>
   );
 };

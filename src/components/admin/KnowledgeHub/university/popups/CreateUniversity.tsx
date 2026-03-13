@@ -90,6 +90,7 @@ export default function CreateUniversity({
       showToast("Failed to create university.");
     }
   };
+
   if (!isVisible) return null;
 
   return (

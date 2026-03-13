@@ -2,8 +2,6 @@ import React, { useState, useMemo, useEffect } from "react";
 import {
   ChevronUp,
   ChevronDown,
-  Search,
-  Layers,
   Flag,
   Eye,
   Calendar,
@@ -14,10 +12,9 @@ import {
   CalendarCheck,
   BadgeCheck,
   Settings,
-  RefreshCw,
   ArrowLeft,
-  ArrowRight,
-} from "lucide-react";
+  ArrowRight, UserSearch, GitBranch, RotateCcw,
+} from 'lucide-react';
 import Link from "next/link";
 import EmptyData from "components/emptyData/EmptyTableData";
 import Cookies from "js-cookie";
@@ -25,21 +22,28 @@ import api from "lib/useApi";
 import PrevButton from "../../ui/buttons/PrevButton";
 import NextButton from "../../ui/buttons/NextButton";
 import ClearButton from "../../ui/buttons/DangerButton";
+import FilterSelectField from '../../form/filter/FilterSelectField';
+import { MdSchool } from 'react-icons/md';
+import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
+import { useAllStages } from 'hooks/applications/useStages';
+import { useAllStageStatuses } from 'hooks/applications/useStageStatuses';
 
 const ModernApplicationsTable = () => {
   const [applications, setApplications] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all_status");
-  const [filterStages, setFilterStages] = useState("all_stages");
   const [loading, setLoading] = useState(true);
 
-  const itemsPerPage = 10;
+  const { universities } = useAllUniversities();
+  const { stages } = useAllStages();
+  const { stageStatuses, stageStatusesLoading } = useAllStageStatuses();
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, filterStatus]);
+  const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
+  const [selectedStages, setSelectedStages] = useState<string>("all");
+  const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
+
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchApplications = async () => {
@@ -59,20 +63,8 @@ const ModernApplicationsTable = () => {
 
         const appsArray = Array.isArray(res.data.items) ? res.data.items : [];
 
-        const mappedApps = appsArray.map((app) => ({
-          id: app.id,
-          studentName: app.student_name,
-          studentEmail: app.student_email,
-          university: app.university_name,
-          applicationName: app.program_name,
-          partner: app.partner_name,
-          stage: app.stage,
-          status: app.status,
-          updatedAt: app.updated_at,
-          nextAction: app.next_action || "-",
-        }));
+        setApplications(appsArray);
 
-        setApplications(mappedApps);
       } catch (err) {
         console.error("Error fetching applications:", err);
       } finally {
@@ -82,6 +74,10 @@ const ModernApplicationsTable = () => {
 
     fetchApplications();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedUniversity, selectedStages, selectedStageStatus]);
 
   const handleSort = (key) => {
     setSortConfig((prev) => ({
@@ -97,27 +93,32 @@ const ModernApplicationsTable = () => {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (app) =>
-          (app.studentName?.toLowerCase() ?? "").includes(term) ||
-          (app.studentEmail?.toLowerCase() ?? "").includes(term) ||
-          (app.university?.toLowerCase() ?? "").includes(term) ||
-          (app.applicationName?.toLowerCase() ?? "").includes(term) ||
-          (app.partner?.toLowerCase() ?? "").includes(term) ||
-          (app.stage?.toLowerCase() ?? "").includes(term)
+          (app.student_name?.toLowerCase() ?? "").includes(term) ||
+          (app.student_email?.toLowerCase() ?? "").includes(term) ||
+          (app.partner_name?.toLowerCase() ?? "").includes(term) ||
+          (app.account_manager_name?.toLowerCase() ?? "").includes(term) ||
+          (app.program_name?.toLowerCase() ?? "").includes(term) ||
+          (app.university_name?.toLowerCase() ?? "").includes(term)
       );
     }
 
-    if (filterStatus !== "all_status") {
+    if (selectedStageStatus !== "all" && !stageStatusesLoading) {
       filtered = filtered.filter(
         (app) =>
-          (app.status?.toLowerCase().replace(/\s+/g, "_") ?? "") ===
-          filterStatus
+          app.status?.toLowerCase().replace(/\s+/g, "_") ===
+          selectedStageStatus.toLowerCase()
       );
     }
 
-    if (filterStages !== "all_stages") {
+    if (selectedStages !== "all") {
       filtered = filtered.filter(
-        (app) =>
-          (app.stage?.toLowerCase().replace(/\s+/g, "_") ?? "") === filterStages
+        (app) => app.stage?.toLowerCase() === selectedStages.toLowerCase()
+      );
+    }
+
+    if (selectedUniversity !== "all") {
+      filtered = filtered.filter(
+        (app) => app.university_name?.toLowerCase() === selectedUniversity.toLowerCase()
       );
     }
 
@@ -125,7 +126,6 @@ const ModernApplicationsTable = () => {
       filtered.sort((a, b) => {
         const aVal = a[sortConfig.key]?.toString().toLowerCase() ?? "";
         const bVal = b[sortConfig.key]?.toString().toLowerCase() ?? "";
-
         if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
         if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
         return 0;
@@ -133,7 +133,15 @@ const ModernApplicationsTable = () => {
     }
 
     return filtered;
-  }, [applications, searchTerm, filterStatus, filterStages, sortConfig]);
+  }, [
+    applications,
+    searchTerm,
+    selectedUniversity,
+    selectedStages,
+    selectedStageStatus,
+    sortConfig,
+    stageStatusesLoading,
+  ]);
 
   const totalPages = Math.ceil(
     filteredAndSortedApplications.length / itemsPerPage
@@ -142,9 +150,6 @@ const ModernApplicationsTable = () => {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
-
-  const goPrev = () => setCurrentPage((p) => Math.max(p - 1, 1));
-  const goNext = () => setCurrentPage((p) => Math.min(p + 1, totalPages));
 
   const StatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<string, any> = {
@@ -213,6 +218,14 @@ const ModernApplicationsTable = () => {
     );
   };
 
+  const handleClearFilters = () => {
+    setSearchTerm("");
+    setSelectedUniversity("all");
+    setSelectedStages("all");
+    setSelectedStageStatus("all");
+    setSortConfig({ key: null, direction: "asc" });
+  };
+
   return (
     <div className="mt-6 overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
@@ -228,62 +241,56 @@ const ModernApplicationsTable = () => {
             </div>
           </div>
 
-          <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
+
+            <div className="relative w-full sm:w-64 flex-shrink-0">
+              <UserSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <input
                 type="text"
-                placeholder="Search applications by email..."
+                placeholder="Search applications..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
-            <div className="relative flex-1 sm:flex-none">
-              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
-              <select
-                value={filterStages}
-                onChange={(e) => setFilterStages(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-gray-200 py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:text-blue-500 focus:ring-0 focus:ring-blue-500"
-              >
-                <option value="all_stages">All Stages</option>
-                <option value="application_review">Application Review</option>
-                <option value="offer_letter">Offer Letter</option>
-                <option value="visa_processing">Visa Processing</option>
-              </select>
+            <div className="w-full sm:w-48 flex-shrink-0">
+              <FilterSelectField
+                value={selectedStages}
+                onChange={(val) => setSelectedStages(val)}
+                options={stages}
+                icon={GitBranch}
+                defaultOption="All Stages"
+              />
             </div>
 
-            <div className="relative flex-1 sm:flex-none">
-              <Layers className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="bg-background w-full cursor-pointer rounded-full border border-gray-200 py-2.5 pl-10 pr-8 text-sm outline-0 focus:border-blue-500 focus:text-blue-500 focus:ring-0 focus:ring-blue-500"
-              >
-                <option value="all_status">All Status</option>
-                <option value="new_application">New Application</option>
-                <option value="under_review_by_account_manager">
-                  Under Review
-                </option>
-                <option value="correction_requested_by_account_manager">
-                  Correction Requested
-                </option>
-                <option value="approved_from_stage_1">Approved</option>
-                <option value="rejected">Rejected</option>
-              </select>
+            <div className="w-full sm:w-48 flex-shrink-0">
+              <FilterSelectField
+                value={selectedStageStatus}
+                onChange={(val) => setSelectedStageStatus(val)}
+                options={stageStatuses.map((s) => s.name)}
+                icon={BadgeCheck}
+                defaultOption={stageStatusesLoading ? "Loading statuses..." : "All Statuses"}
+              />
+            </div>
+
+            <div className="w-full sm:w-48 flex-shrink-0">
+              <FilterSelectField
+                value={selectedUniversity}
+                onChange={(val) => setSelectedUniversity(val)}
+                options={universities}
+                icon={MdSchool}
+                defaultOption="All Universities"
+              />
             </div>
 
             <ClearButton
-              onClick={() => {
-                setSearchTerm("");
-                setFilterStatus("all_status");
-                setFilterStages("all_stages");
-              }}
+              onClick={handleClearFilters}
               text="Clear"
-              icon={<RefreshCw className="h-4 w-4" />}
+              icon={<RotateCcw className="h-4 w-4" />}
             />
           </div>
+
         </div>
       </div>
 
@@ -292,35 +299,35 @@ const ModernApplicationsTable = () => {
           <thead>
             <tr className="border-b border-gray-200 bg-card">
               <th
-                onClick={() => handleSort("studentName")}
+                onClick={() => handleSort("student_name")}
                 className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-slate-500" />
                   Student
-                  <SortIndicator field="studentName" />
+                  <SortIndicator field="student_name" />
                 </div>
               </th>
 
               <th
-                onClick={() => handleSort("applicationName")}
+                onClick={() => handleSort("program_name")}
                 className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex min-w-[250px] items-center gap-2">
                   <GraduationCap className="h-4 w-4 text-slate-500" />
                   University / Program
-                  <SortIndicator field="applicationName" />
+                  <SortIndicator field="program_name" />
                 </div>
               </th>
 
               <th
-                onClick={() => handleSort("partner")}
+                onClick={() => handleSort("partner_name")}
                 className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex items-center gap-2">
                   <Building className="h-4 w-4 text-slate-500" />
                   Partner
-                  <SortIndicator field="partner" />
+                  <SortIndicator field="partner_name" />
                 </div>
               </th>
 
@@ -354,13 +361,13 @@ const ModernApplicationsTable = () => {
               </th>
 
               <th
-                onClick={() => handleSort("updatedAt")}
+                onClick={() => handleSort("updated_at")}
                 className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
               >
                 <div className="flex min-w-[150px] items-center gap-2">
                   <Clock className="h-4 w-4 text-slate-500" />
                   Last Updated
-                  <SortIndicator field="updatedAt" />
+                  <SortIndicator field="updated_at" />
                 </div>
               </th>
 
@@ -399,6 +406,7 @@ const ModernApplicationsTable = () => {
                   className="hover:bg-primary/10 group transition-colors"
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
+
                     <div className="flex items-center gap-3">
                       <div
                         className="flex h-10 w-10 shrink-0 items-center justify-center
@@ -413,24 +421,24 @@ const ModernApplicationsTable = () => {
 
                       <div className="w-full overflow-hidden">
                         <div className="truncate text-slate-900">
-                          {app.studentName}
+                          {app.student_name}
                         </div>
                         <div className="truncate text-caption text-slate-500">
-                          {app.studentEmail}
+                          {app.student_email}
                         </div>
                       </div>
                     </div>
                   </td>
 
                   <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                    <div className="text-slate-900">{app.applicationName}</div>
+                    <div className="text-slate-900">{app.program_name}</div>
                     <div className="truncate text-caption text-slate-500">
-                      {app.university}
+                      {app.university_name}
                     </div>
                   </td>
 
                   <td className="min-w-[200px] max-w-[250px] px-6 py-4">
-                    <div className="text-slate-500">{app.partner}</div>
+                    <div className="text-slate-500">{app.program_name}</div>
                   </td>
 
                   <td className="px-6 py-4">
@@ -443,14 +451,14 @@ const ModernApplicationsTable = () => {
 
                   <td className="max-w-48 px-6 py-4">
                     <div className="break-words text-slate-500">
-                      {app.nextAction}
+                      {app.next_action}
                     </div>
                   </td>
 
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1 text-slate-500">
                       <Calendar className="h-3 w-3" />
-                      {new Date(app.updatedAt).toLocaleDateString("en-US", {
+                      {new Date(app.updated_at).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                         year: "2-digit",

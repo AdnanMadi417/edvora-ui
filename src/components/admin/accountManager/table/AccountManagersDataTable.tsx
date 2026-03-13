@@ -11,8 +11,8 @@ import {
   ArrowRight,
   Pencil,
   Users,
-  AlertCircle,
-} from "lucide-react";
+  AlertCircle, Trash2,
+} from 'lucide-react';
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 import PrevButton from "components/ui/buttons/PrevButton";
@@ -23,11 +23,18 @@ import { useAccountManagerList } from "hooks/account-managers/useAccountManagerL
 import Link from "next/link";
 import { MdPersonAdd } from "react-icons/md";
 import NoMessagesFound from '../../../emptyData/NoMessagesFound';
+import DeleteAccountManager from 'components/admin/accountManager/popups/DeleteAccountManager';
+import { useDeleteAccountManager } from 'hooks/account-managers/useDeleteAccountManager';
+import { useToast } from '../../../context/ToastContext';
 
 const ModernAccountManagersTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { accountManagers, loading } = useAccountManagerList();
+
+  const { showToast } = useToast();
+  const { deleteAccountManager } = useDeleteAccountManager();
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [searchTerm, setSearchTerm] = useState("");
@@ -69,6 +76,32 @@ const ModernAccountManagersTable = () => {
     const end = start + itemsPerPage;
     return filteredAndSortedAccountManagers.slice(start, end);
   }, [filteredAndSortedAccountManagers, currentPage]);
+
+  const [selectedUniversityId, setSelectedUniversityId] = useState<
+    string | null
+  >(null);
+  const [selectedAccountManager, setSelectedAccountManager] =
+    useState<string>("");
+
+  const handleDelete = async () => {
+    if (!selectedUniversityId) return;
+
+    try {
+      await deleteAccountManager(selectedUniversityId);
+
+      showToast("Account Manager deleted successfully.");
+
+      setIsDeleteOpen(false);
+      setSelectedUniversityId(null);
+      setSelectedAccountManager("");
+
+      setTimeout(() => location.reload(), 2000);
+
+    } catch (error: any) {
+      showToast("Failed to delete Account Manager . Please try again.");
+    }
+  };
+
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
@@ -137,7 +170,7 @@ const ModernAccountManagersTable = () => {
               </th>
 
               <th className="group px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
-                <div className="flex min-w-[120px] items-center gap-2">
+                <div className="flex min-w-[200px] items-center gap-2">
                   <Users className="h-4 w-4 text-slate-500" />
                   Assigned Partners
                 </div>
@@ -260,6 +293,22 @@ const ModernAccountManagersTable = () => {
                       >
                         <Pencil className="h-4 w-4 text-slate-500 transition-colors hover:text-slate-700" />
                       </Link>
+
+                      <div className="h-6 border-l border-slate-200" />
+
+                      <button
+                        role="menuitem"
+                        aria-label="Delete Account Manager"
+                        onClick={() => {
+                          setSelectedUniversityId(app.id);
+                          setSelectedAccountManager(app.name);
+                          setIsDeleteOpen(true);
+                        }}
+                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                      >
+                        <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
+                      </button>
+
                     </div>
                   </td>
                 </tr>
@@ -311,6 +360,15 @@ const ModernAccountManagersTable = () => {
           </div>
         </div>
       </div>
+
+      <DeleteAccountManager
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDelete}
+        isDeleting={loading}
+        AccountManager={selectedAccountManager}
+      />
+
     </div>
   );
 };

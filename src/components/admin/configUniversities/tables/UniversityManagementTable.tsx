@@ -144,8 +144,6 @@ const UniversityManagementTable = () => {
     }
   };
 
-  console.log("Deleting ID:", selectedUniversityId);
-
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedState, selectedField]);

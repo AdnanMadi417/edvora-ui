@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Search,
   RefreshCw,
@@ -14,13 +14,14 @@ import {
   Trash2,
   ChevronUp,
   ChevronDown,
-  GraduationCap,
+  GraduationCap, CreditCard, Wallet,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 import { useDeleteUniversity } from "hooks/knowledge-hub/universities/useDeleteKnowledgeHubUniversity";
 import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
+import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
@@ -29,6 +30,7 @@ import Link from "components/ui/links/LinkBtn";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import DeleteUniversityConfirmation from "components/admin/KnowledgeHub/university/popups/DeleteUniversityConfirmation";
+import BatchAssignPaymentMethod  from "components/admin/KnowledgeHub/university/paymentMethods/popups/BatchAssignPaymentMethod";
 import CreateUniversity from "components/admin/KnowledgeHub/university/popups/CreateUniversity";
 import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
 
@@ -43,11 +45,14 @@ const UniversitiesTable = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { universities, loading, error } = useAllUniversities();
+  const { paymentMethods } = useAllPaymentMethods();
 
   const { deleteUniversity, isDeleting } = useDeleteUniversity();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [selectedUniversity, setSelectedUniversity] = useState<any>(null);
+
+  const [isBatchAssignOpen, setIsBatchAssignOpen] = useState(false);
 
   const [selectedUniversityId, setSelectedUniversityId] = useState<
     string | null
@@ -181,6 +186,50 @@ const UniversitiesTable = () => {
     }
   }, [filteredUniversities, currentPage]);
 
+  const [selectedPrograms, setSelectedPrograms] = useState<
+    Record<string, boolean>
+  >({});
+
+  const handleSelectProgram = (id: string) => {
+    setSelectedPrograms((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
+
+  const selectedCount = Object.values(selectedPrograms).filter(Boolean).length;
+
+  useEffect(() => {
+    setSelectedPrograms((prev) => {
+      const updated: Record<string, boolean> = { ...prev };
+      filteredUniversities.forEach((p) => {
+        if (!(p.id in updated)) {
+          updated[p.id] = false;
+        }
+      });
+      return updated;
+    });
+  }, [filteredUniversities]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedState, selectedField]);
+
+  const selectedProgramIds = useMemo(() => {
+    return Object.keys(selectedPrograms).filter(
+      (id) => selectedPrograms[id]
+    );
+  }, [selectedPrograms]);
+
+  const handleSelectAll = () => {
+    const allSelected = Object.values(selectedPrograms).every(Boolean);
+    const newSelection: Record<string, boolean> = {};
+    Object.keys(selectedPrograms).forEach((id) => {
+      newSelection[id] = !allSelected;
+    });
+    setSelectedPrograms(newSelection);
+  };
+
   const handleDelete = async () => {
     if (!selectedUniversityId) return;
 
@@ -216,8 +265,9 @@ const UniversitiesTable = () => {
             </div>
           </div>
 
-          <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
-            <div className="relative w-full sm:w-64">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
+
+            <div className="relative w-full sm:w-64 flex-shrink-0">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <input
                 type="text"
@@ -242,6 +292,17 @@ const UniversitiesTable = () => {
             </button>
 
             <Link
+              href={`/admin/universities/payment-methods`}
+              icon={<CreditCard  className="h-5 w-5" />}
+              label={"Payment Methods"}
+              bgColor="bg-teal-50"
+              textColor="text-teal-700"
+              borderColor="border-teal-600"
+              hoverTextColor="hover:text-teal-800"
+              hoverBorderColor="hover:border-teal-700"
+            />
+
+            <Link
               href={`/admin/universities/create`}
               icon={<GraduationCap  className="h-5 w-5" />}
               label={loading ? "Creating..." : "Create University"}
@@ -252,7 +313,26 @@ const UniversitiesTable = () => {
               hoverBorderColor="hover:border-slate-700"
             />
 
+            {selectedCount > 0 && (
+              <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
+
+                <button
+                  onClick={() => {
+                    setIsBatchAssignOpen(true);
+                  }}
+                  className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
+                  <Wallet className="h-4 w-4" />
+                  Assign Payment Methods
+                </button>
+
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  {selectedCount} selected
+                </div>
+              </div>
+            )}
+
           </div>
+
         </div>
       </div>
 
@@ -264,7 +344,21 @@ const UniversitiesTable = () => {
             <table className="w-full">
 
               <thead>
+
               <tr className="border-b border-slate-200 bg-card">
+
+                <td className="pl-6">
+                  <input
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600"
+                    checked={
+                      Object.values(selectedPrograms).length > 0 &&
+                      Object.values(selectedPrograms).every(Boolean)
+                    }
+                    onChange={handleSelectAll}
+                  />
+                </td>
+
                 <th
                   onClick={() => handleSort("name")}
                   className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
@@ -332,6 +426,17 @@ const UniversitiesTable = () => {
                   key={uni.id}
                   className="hover:bg-primary/10 group transition-colors"
                 >
+
+                  <td className="pl-6">
+                    <input
+                      type="checkbox"
+                      aria-label={`Select ${uni.name}`}
+                      checked={selectedPrograms[uni.id] || false}
+                      onChange={() => handleSelectProgram(uni.id)}
+                      className="h-4 w-4 rounded border-slate-300 text-blue-600"
+                    />
+                  </td>
+
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div
@@ -406,7 +511,7 @@ const UniversitiesTable = () => {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4 min-w-[250px]">
                     <div className="flex flex-wrap gap-2">
                       {uni.intake_months &&
                       uni.intake_months.length > 0 ? (
@@ -560,7 +665,6 @@ const UniversitiesTable = () => {
 
         </div>
 
-
       </div>
 
       <DeleteUniversityConfirmation
@@ -576,6 +680,12 @@ const UniversitiesTable = () => {
         onClose={() => setIsUpdateOpen(false)}
         universityId={selectedUniversity?.id || null}
         initialData={selectedUniversity}
+      />
+
+      <BatchAssignPaymentMethod
+        isOpen={isBatchAssignOpen}
+        onClose={() => setIsBatchAssignOpen(false)}
+        selectedUniversityIds={selectedProgramIds}
       />
 
       <CreateUniversity
