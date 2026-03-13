@@ -1,27 +1,49 @@
-// validateFormData.ts
-import { FormDataType, DocumentItem, DocumentType,Student } from "components/applications/form/utility-functions/types";
+import { FormDataType, DocumentType, Student } from "components/applications/form/utility-functions/types";
 
 export type ValidationResult = {
   isValid: boolean;
   errors: Record<string, string>;
 };
 
-// validateFormData.ts
+const isEmpty = (value: any) =>
+  value === undefined || value === null || (typeof value === "string" && value.trim() === "");
 
-const validateContacts = (
+const validateStudentFields = (
+  student: Student,
+  requiredFieldKeys: string[],
+  errors: Record<string, string>
+) => {
+  const simpleFields: (keyof Student)[] = [
+    "birthday",
+    "nationality",
+    "passport_number",
+    "email",
+    "phone",
+    "current_address",
+    "gender",
+  ];
+
+  simpleFields.forEach((key) => {
+    const fullKey = `student.${key}`;
+    if (requiredFieldKeys.includes(fullKey) && isEmpty(student[key])) {
+      errors[fullKey] = "required";
+    }
+  });
+};
+
+const validateEmergencyContacts = (
   contacts: Student["emergency_contacts"],
-  requiredFieldKeys: string[]
-): Record<string, string> => {
-  const errors: Record<string, string> = {};
-  contacts.forEach((c, idx) => {
+  requiredFieldKeys: string[],
+  errors: Record<string, string>
+) => {
+  (contacts || []).forEach((contact, idx) => {
     ["name", "relation", "phone", "email"].forEach((f) => {
-      const key = `student.emergency_contacts[${idx}].${f}`;
-      if (requiredFieldKeys.includes(key) && !c[f as keyof typeof c]?.trim?.()) {
-        errors[key] = "required";
+      const fullKey = `student.emergency_contacts[${idx}].${f}`;
+      if (requiredFieldKeys.includes(fullKey) && isEmpty(contact[f as keyof typeof contact])) {
+        errors[fullKey] = "required";
       }
     });
   });
-  return errors;
 };
 
 const validateEducations = (
@@ -29,11 +51,11 @@ const validateEducations = (
   requiredFieldKeys: string[],
   errors: Record<string, string>
 ) => {
-  educations.forEach((edu, idx) => {
-    ["institution_name", "qualification", "start_date", "end_date"].forEach((f) => {
-      const key = `student.previous_educations[${idx}].${f}`;
-      if (requiredFieldKeys.includes(key) && !edu[f as keyof typeof edu]?.trim?.()) {
-        errors[key] = "required";
+  (educations || []).forEach((edu, idx) => {
+    ["qualification", "institution_name", "start_date", "end_date"].forEach((f) => {
+      const fullKey = `student.previous_educations[${idx}].${f}`;
+      if (requiredFieldKeys.includes(fullKey) && isEmpty(edu[f as keyof typeof edu])) {
+        errors[fullKey] = "required";
       }
     });
   });
@@ -48,49 +70,17 @@ export const validateFormData = (
   const newErrors: Record<string, string> = {};
   const student = formData.student;
 
-  const isEmpty = (value: any) =>
-    value === undefined || value === null || (typeof value === "string" && value.trim() === "");
-
-  // Stage 1: Basic Info
-  if (stageNum === 1) {
-    if (isEmpty(student.name)) newErrors["student.name"] = "required";
-    if (isEmpty(student.previous_educations?.[0]?.qualification))
-      newErrors["student.previous_educations[0].qualification"] = "required";
-    if (isEmpty(formData.university_id)) newErrors["university_id"] = "required";
-    if (isEmpty(formData.program_id)) newErrors["program_id"] = "required";
-  }
-
-  // Stage 2: Documents
-  if (stageNum === 2) {
-    documentTypes.forEach((docType) => {
-      if (!docType.is_required_init_app_doc) return;
-
-      const uploaded = formData.documents.find(
-        (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
-      );
-
-      if (!uploaded) {
-        newErrors[`documents.${docType.id}`] = "required";
-      }
-    });
-  }
-
-  // Stage 3: Additional Info
   if (stageNum === 3) {
-    // Basic student fields
-    Object.keys(student).forEach((key) => {
-      if (requiredFieldKeys.includes(`student.${key}`)) {
-        const value = student[key as keyof typeof student];
-        if (isEmpty(value)) newErrors[`student.${key}`] = "required";
-      }
-    });
 
-    // Contacts
-    validateContacts(student.emergency_contacts, requiredFieldKeys, newErrors);
+    validateStudentFields(student, requiredFieldKeys, newErrors);
 
-    // Previous educations
+    validateEmergencyContacts(student.emergency_contacts, requiredFieldKeys, newErrors);
+
     validateEducations(student.previous_educations, requiredFieldKeys, newErrors);
   }
 
-  return { isValid: Object.keys(newErrors).length === 0, errors: newErrors };
+  return {
+    isValid: Object.keys(newErrors).length === 0,
+    errors: newErrors,
+  };
 };

@@ -36,7 +36,7 @@ import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
 import { useRouter } from "next/navigation";
 
-import { FormDataType, DocumentItem,Student } from "components/applications/form/utility-functions/types";
+import { FormDataType, DocumentItem } from "components/applications/form/utility-functions/types";
 
 const stages = [
   { id: 1, name: "Basic Information", icon: User },
@@ -309,14 +309,13 @@ export default function StudentRegistrationForm() {
       intake_date: formData.intake_date || getCurrentDate(),
       student: {
         name: formData.student.name || "",
-        birthday: formData.student.birthday || " ",
+        birthday: formData.student.birthday || null,
         nationality: formData.student.nationality || "",
         passport_number: formData.student.passport_number || "",
         email: formData.student.email || "",
         phone: formData.student.phone || "",
         current_address: formData.student.current_address || "",
-        gender: formData.student.gender ?? "male",
-
+        gender: formData.student.gender === "female" ? false : true,
         emergency_contacts: formData.student.emergency_contacts
           .filter((c) => c.name || c.phone)
           .map((c) => ({

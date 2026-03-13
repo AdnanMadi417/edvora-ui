@@ -221,6 +221,108 @@ export default function ApplicationDetails({
         </div>
       </div>
 
+      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
+        <ApplicationPartnerTopBar application={{ id: application.id }} />
+
+        <div className="block space-y-2 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100/40 p-5">
+
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
+              <FaCogs className="text-xl text-blue-600" />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                Current Status
+              </span>
+
+              <span className="text-lg font-semibold text-slate-900">
+                {application.stage?.statuses?.[0]?.name ||
+                  application.stage?.name ||
+                  "Not provided"}
+              </span>
+
+              <span className="text-sm text-slate-600">
+                <span className="font-medium text-slate-700">Next action → </span>{" "}
+                {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ??
+                  "Not provided"}
+              </span>
+            </div>
+          </div>
+
+          {appDetails && (
+            <>
+              {appDetails.document_types?.length > 0 ? (
+                <button
+                  onClick={openRequiredActionPopup}
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
+                >
+                  <Clock className="h-4 w-4 text-orange-500" />
+                  Upload Required Documents
+                </button>
+              ) : appDetails.stage_statuses?.some(
+                (status) => status.is_requires_reason
+              ) ? (
+                <button
+                  onClick={openProgramDecisionPopup}
+                  className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                >
+                  <Clock className="h-4 w-4 text-blue-500" />
+                  Submit Program Decision
+                </button>
+              ) : (
+                <span></span>
+              )}
+            </>
+          )}
+
+        </div>
+
+        <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
+              <FaTasks className="text-lg text-slate-700" />
+            </div>
+
+            <div className="flex flex-col">
+              <h3 className="text-lg font-semibold text-slate-900">
+                Review {application.program?.name}
+              </h3>
+
+              <span className="text-sm text-slate-500">
+                  Applicant • {student.name || "Not provided"}
+                </span>
+            </div>
+          </div>
+
+          <div className="text-sm text-slate-500">
+            Updated{" "}
+            {application?.updated_at
+              ? formatDate(application.updated_at)
+              : "N/A"}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
+                <FaStream className="text-[10px] text-amber-700" />
+                Stage: {stage.name || "Not provided"}
+              </span>
+
+          <span
+            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm ${statusClass}`}
+          >
+                <FaCheckCircle className="text-[10px]" />
+                Status: {statusText}
+              </span>
+
+          <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
+                <FaClock className="text-[10px] text-purple-700" />
+            {daysSince(application.updated_at)} Days
+              </span>
+        </div>
+      </div>
+
       <OfferLetterDecision application={application} />
       <VisaTrackingTimeline application={application} />
 
@@ -443,7 +545,7 @@ export default function ApplicationDetails({
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-slate-900">Degree</dt>
                   <dd className="text-sm text-slate-500">
-                    {previousEducation.qualification || "Not provided"}
+                    {application.qualification_level || "Not provided"}
                   </dd>
                 </div>
                 <div className="flex justify-between">

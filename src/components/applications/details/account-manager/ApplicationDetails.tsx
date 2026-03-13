@@ -380,7 +380,7 @@ export default function ApplicationDetails({
                     Degree
                   </dt>
                   <dd className="text-sm text-slate-500">
-                    {previousEducation.qualification || "Not provided"}
+                    {application.qualification_level || "Not provided"}
                   </dd>
                 </div>
                 <div className="flex justify-between">
