@@ -38,7 +38,7 @@ export default function RequiredAction({
     const fetchApplication = async () => {
       setLoading(true);
       try {
-        const res = await api.get(`/applications/${applicationId}`);
+        const res = await api.get(`/application/${applicationId}`);
         setAppDetails(res.data);
       } catch (error) {
         console.error("Error fetching application:", error);

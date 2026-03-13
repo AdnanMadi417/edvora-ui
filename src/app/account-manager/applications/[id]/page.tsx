@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
-import api from "lib/useApi";
-import Cookies from "js-cookie";
 import EmptyData from "components/emptyData/EmptyData";
 import ApplicationDetails from "components/applications/details/admin/ApplicationDetails";
 import ApplicationDocuments from "components/applications/details/admin/ApplicationDocuments";
@@ -11,44 +9,28 @@ import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import AgentPartnerChat from "components/chat/ApplicationChat";
-import { useUnreadCount } from '../../../../hooks/chat/useUnreadCount';
+import { useUnreadCount } from 'hooks/chat/useUnreadCount';
+import { useAccountManagerApplication } from 'hooks/applications/useAccountManagerApplication';
+import { useMe } from 'hooks/useMe';
 
 export default function ApplicationPage() {
-
   const { id: applicationId } = useParams<{ id: string }>();
-  const { id } = useParams();
-  const [application, setApplication] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user } = useMe();
   const [chatOpen, setChatOpen] = useState(false);
+
+  const managerId = user?.id;
+
+  const { data: application, loading, error, refetch } = useAccountManagerApplication({
+    managerId: managerId || "",
+    applicationId: applicationId || "",
+  });
 
   const { unreadCount } = useUnreadCount({
     applicationId,
   });
 
-  useEffect(() => {
-    const fetchApplication = async () => {
-      try {
-        const token = Cookies.get("token");
-
-        if (!id) return;
-
-        const res = await api.get(
-          `/admin/applications/${id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        setApplication(res.data);
-      } catch (error) {
-        console.error("Error fetching application:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchApplication();
-  }, [id]);
-
   if (loading) return <Loading text="Fetching application data..." />;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
   if (!application) return <EmptyData />;
 
   return (

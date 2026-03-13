@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Download, CheckCircle, Receipt , XCircle} from 'lucide-react';
 import api from "../../../../lib/useApi";
 import { getDocumentDownloadUrl } from "../../../../services/documentService";
@@ -14,30 +14,13 @@ interface ApplicationCommissionProps {
 export default function ApplicationCommission({
                                                 application,
                                               }: ApplicationCommissionProps) {
-  const [actionData, setActionData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState("");
   const [showDispute, setShowDispute] = useState(false);
   const { showToast } = useToast();
 
-  const fetchActionData = async () => {
-    if (!application?.id) return;
-    try {
-      const res = await api.get(`/applications/${application.id}`);
-      setActionData(res.data);
-    } catch (err) {
-      console.error("Failed to fetch application data:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchActionData();
-  }, [application?.id]);
-
-  if (!application || !actionData) return null;
-
-  const { status: statusLabel, partner_actions } = actionData;
+  const { status: statusLabel, partner_actions } = application;
 
   const confirmAction = partner_actions?.find(
     (a: any) => a.target_status_code === "APPLICATION_COMPLETE"
@@ -83,8 +66,6 @@ export default function ApplicationCommission({
         notes: "Partner commission confirmed successfully",
       });
 
-      await fetchActionData();
-
       showToast("Commission confirmed successfully", "success");
       setTimeout(() => window.location.reload(), 2000);
 
@@ -97,11 +78,7 @@ export default function ApplicationCommission({
     }
   };
 
-  if (!application || !actionData) return null;
-
-  if (!hasCommissions && !hasActions) {
-    return null;
-  }
+  if (!application) return null;
 
   return (
     <>
@@ -192,7 +169,7 @@ export default function ApplicationCommission({
           </div>
         </div>
 
-        {actionData && disputeAction && (
+        {application && disputeAction && (
           <Dispute
             isOpen={showDispute}
             applicationId={application.id}
@@ -200,7 +177,6 @@ export default function ApplicationCommission({
             onClose={() => setShowDispute(false)}
             onSuccess={() => {
               setShowDispute(false);
-              fetchActionData();
             }}
           />
         )}

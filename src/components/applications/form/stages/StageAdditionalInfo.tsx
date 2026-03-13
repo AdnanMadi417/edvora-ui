@@ -31,10 +31,9 @@ export default function StageAdditionalInfo({
 
   const isFieldRequired = (key: string) => requiredFieldKeys.includes(key);
 
-  // Check if last education is complete
   const canAddEducation = () => {
     const lastEdu = student.previous_educations?.[student.previous_educations.length - 1];
-    if (!lastEdu) return true; // allow if no entries yet
+    if (!lastEdu) return true;
     return (
       lastEdu.qualification &&
       lastEdu.institution_name &&
@@ -212,7 +211,7 @@ export default function StageAdditionalInfo({
               hoverTextColor="hover:text-blue-800"
               hoverBorderColor="hover:border-blue-700"
               onClick={addEducation}
-              disabled={!canAddEducation()} // disabled if last entry incomplete
+              disabled={!canAddEducation()}
             />
           </div>
 
