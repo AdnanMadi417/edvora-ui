@@ -3,6 +3,8 @@ import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopB
 import RequiredAction from "components/applications/popups/partner/RequiredAction";
 import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
 
+import { useApplicationActions } from 'hooks/applications/stages/useApplicationActions';
+
 import {
   FaTasks,
   FaCogs,
@@ -48,6 +50,9 @@ export default function ApplicationDetails({
     if (!dateString) return "Not provided";
     return new Date(dateString).toLocaleDateString();
   }
+
+  const { actions, loading: actionsLoading } =
+    useApplicationActions(application?.id);
 
   const student = application.student || {};
   const program = application.program || {};
@@ -139,9 +144,9 @@ export default function ApplicationDetails({
             </div>
           </div>
 
-          {application && (
+          {actions && (
             <>
-              {application.document_types?.length > 0 ? (
+              {actions.document_types?.length > 0 ? (
                 <button
                   onClick={openRequiredActionPopup}
                   className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
@@ -149,7 +154,7 @@ export default function ApplicationDetails({
                   <Clock className="h-4 w-4 text-orange-500" />
                   Upload Required Documents
                 </button>
-              ) : application.stage_statuses?.some(
+              ) : actions.stage_statuses?.some(
                 (status) => status.is_requires_reason
               ) ? (
                 <button

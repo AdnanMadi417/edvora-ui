@@ -20,6 +20,7 @@ export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();
 
   const [application, setApplication] = useState<any>(null);
+
   const [loading, setLoading] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
 
