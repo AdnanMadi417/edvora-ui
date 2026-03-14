@@ -39,20 +39,13 @@ export default function ApplicationPage() {
           {chatOpen ? <X size={26} /> : <MessageCircle size={28} />}
 
           {unreadCount > 0 && !chatOpen && (
-            <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium">
+            <span className="absolute -right-6 -top-6 flex h-5 w-5 border-3 border-slate-200  items-center justify-center rounded-full bg-red-500 text-xs font-medium">
         {unreadCount}
       </span>
           )}
         </div>
       </button>
 
-      <button
-        onClick={() => setChatOpen((v) => !v)}
-        aria-label={chatOpen ? "Close chat" : "Open chat"}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:scale-105 hover:bg-blue-700"
-      >
-        {chatOpen ? <X size={26} /> : <MessageCircle size={28} />}
-      </button>
 
       <AnimatePresence>
         {chatOpen && (

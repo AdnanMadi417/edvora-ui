@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, Wallet, CreditCard, Trash2, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { XCircle, Wallet, CreditCard, Trash2, CheckCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import {
   getPresignedUploads,
@@ -10,6 +10,7 @@ import {
 import api from "../../../../lib/useApi";
 import { useToast } from "../../../context/ToastContext";
 import NoDocumentsRequired from "../../../emptyData/NoDocumentsRequired"
+import SearchableDropdown from '../../../form/search/SearchableDropdown';
 
 interface VisaPaymentConfirmationProps {
   isOpen: boolean;
@@ -170,31 +171,25 @@ export default function VisaPaymentConfirmation({
               <h4 className="text-sm font-semibold text-gray-900">Payment Methods</h4>
             </div>
 
+
             {methods.length === 0 ? (
               <NoDocumentsRequired
                 title="No payment methods available"
                 subtitle="Please check again later."
               />
             ) : (
-              <ul className="space-y-3">
-                {methods.map((method) => (
-                  <li
-                    key={method.id}
-                    onClick={() => setSelectedMethod(method.id)}
-                    className={`cursor-pointer rounded-md border p-4 transition-all hover:shadow-sm ${
-                      selectedMethod === method.id
-                        ? "border-gray-400 bg-blue-50/40"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    <p className="font-medium text-gray-900">{method.name}</p>
-                    <p className="mt-1 text-xs text-slate-500">{method.instructions}</p>
-                    <p className="mt-2 text-xs font-medium">
-                      Currency: <span className="font-normal">{method.currency}</span>
-                    </p>
-                  </li>
-                ))}
-              </ul>
+              <SearchableDropdown
+                label="Payment Method"
+                field="payment_method_id"
+                options={methods.map((m) => ({
+                  value: m.id,
+                  label: m.name,
+                }))}
+                formData={{ payment_method_id: selectedMethod }}
+                errors={{ payment_method_id: "" }}
+                updateFormData={(field, value) => setSelectedMethod(value as string)}
+                placeholder="Select a payment method..."
+              />
             )}
 
             <div className="space-y-2">
