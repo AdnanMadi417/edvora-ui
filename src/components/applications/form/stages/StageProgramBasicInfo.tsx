@@ -15,7 +15,6 @@ export default function StageBasicInfo({
                                          errors,
                                          updateFormData,
                                          universities,
-
                                        }: Props) {
   return (
     <div className="mb-8">
@@ -32,7 +31,7 @@ export default function StageBasicInfo({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1">
         <InputField
           label="Full Name (as in passport)"
           field="student.name"

@@ -315,7 +315,7 @@ export default function StudentRegistrationForm() {
         email: formData.student.email || "",
         phone: formData.student.phone || "",
         current_address: formData.student.current_address || "",
-        gender: formData.student.gender === "female" ? false : true,
+        gender: formData.student.gender ?? null,
         emergency_contacts: formData.student.emergency_contacts
           .filter((c) => c.name || c.phone)
           .map((c) => ({
@@ -470,8 +470,7 @@ export default function StudentRegistrationForm() {
               errors={errors}
               updateFormData={updateFormData}
               universities={universities}
-              qualifications={qualifications}
-            />
+f            />
           )}
 
           {stage === 2 && (

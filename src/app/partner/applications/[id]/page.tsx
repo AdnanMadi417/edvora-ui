@@ -14,7 +14,7 @@ import ApplicationDetails from "components/applications/details/partner/Applicat
 import ApplicationDocuments from "components/applications/details/partner/ApplicationDocuments";
 import ApplicationCommission from "components/applications/details/partner/ApplicationCommission";
 import AgentPartnerChat from "components/chat/ApplicationChat";
-import { useUnreadCount } from '../../../../hooks/chat/useUnreadCount';
+import { useUnreadCount } from 'hooks/chat/useUnreadCount';
 
 export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();
