@@ -22,7 +22,7 @@ import { useAssignPaymentMethod } from "hooks/knowledge-hub/universities/payment
 
 import InputField from "components/form/InputField";
 import MultipleDateInput from "components/form/MultipleDateInput";
-import SelectField from "components/form/SelectField";
+import SearchableDropdown from "components/form/search/SearchableDropdown";
 
 import Button from "components/ui/buttons/Button";
 import Loading from "components/loading/Loading";
@@ -54,8 +54,8 @@ interface Props {
 }
 
 const UniversityEdit = ({ id }: Props) => {
-  const router = useRouter();
   const { showToast } = useToast();
+  const router = useRouter();
 
   const { university, branches, universityLoading } = useUniversityDetails(id);
   const { universityPaymentMethods, loading } = useUniversityPaymentMethods(id);
@@ -100,16 +100,17 @@ const UniversityEdit = ({ id }: Props) => {
       if (branch.id) {
         await deleteBranch(id, branch.id);
 
-        showToast("Branch deleted successfully.");
+        showToast("Branch deleted successfully." , "success");
       }
 
       setFormData((prev: any) => ({
         ...prev,
         branches: prev.branches.filter((_: any, i: number) => i !== index),
       }));
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to delete branch.", "error");
+    }
+    catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to delete branch. ${backendMessage}`, "error");
     }
   };
 
@@ -190,11 +191,11 @@ const UniversityEdit = ({ id }: Props) => {
 
       await updateUniversity(payload);
 
-      showToast("University updated successfully.");
-
+      showToast("University updated successfully.", "success");
       setTimeout(() => router.refresh(), 1500);
-    } catch (err) {
-      console.error(err);
+    }catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to assign payment method. ${backendMessage}`, "error");
     }
   };
 
@@ -202,9 +203,10 @@ const UniversityEdit = ({ id }: Props) => {
     try {
       await assignPaymentMethod(id, { payment_method_id: methodId, is_active: true });
       showToast("Payment method assigned successfully.", "success");
-      router.refresh();
-    } catch (err) {
-      showToast("Failed to assign payment method.", "error");
+      setTimeout(() => router.refresh(), 1500);
+    } catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to assign payment method. ${backendMessage}`, "error");
     }
   };
 
@@ -217,9 +219,11 @@ const UniversityEdit = ({ id }: Props) => {
 
       await deletePaymentMethod(id, assigned.id);
       showToast("Payment method removed successfully.", "success");
-      router.refresh(); // refresh data to remove Current badge
-    } catch {
-      showToast("Failed to delete payment method.", "error");
+      router.refresh();
+    }
+    catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to delete payment method. ${backendMessage}`, "error");
     }
   };
 
@@ -360,7 +364,7 @@ const UniversityEdit = ({ id }: Props) => {
                   }
                 />
 
-                <SelectField
+                <SearchableDropdown
                   label="State"
                   field="state_id"
                   options={stateOptions}

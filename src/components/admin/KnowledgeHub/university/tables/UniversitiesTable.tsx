@@ -33,9 +33,7 @@ import DeleteUniversityConfirmation from "components/admin/KnowledgeHub/universi
 import BatchAssignPaymentMethod  from "components/admin/KnowledgeHub/university/paymentMethods/popups/BatchAssignPaymentMethod";
 import CreateUniversity from "components/admin/KnowledgeHub/university/popups/CreateUniversity";
 import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
-
 import Loading from "components/loading/Loading";
-
 import { useToast } from "components/context/ToastContext";
 
 const UniversitiesTable = () => {
@@ -186,21 +184,21 @@ const UniversitiesTable = () => {
     }
   }, [filteredUniversities, currentPage]);
 
-  const [selectedPrograms, setSelectedPrograms] = useState<
+  const [selectedUniversities, setSelectedUniversities] = useState<
     Record<string, boolean>
   >({});
 
-  const handleSelectProgram = (id: string) => {
-    setSelectedPrograms((prev) => ({
+  const handleSelectUniversity = (id: string) => {
+    setSelectedUniversities((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
   };
 
-  const selectedCount = Object.values(selectedPrograms).filter(Boolean).length;
+  const selectedCount = Object.values(selectedUniversities).filter(Boolean).length;
 
   useEffect(() => {
-    setSelectedPrograms((prev) => {
+    setSelectedUniversities((prev) => {
       const updated: Record<string, boolean> = { ...prev };
       filteredUniversities.forEach((p) => {
         if (!(p.id in updated)) {
@@ -215,19 +213,19 @@ const UniversitiesTable = () => {
     setCurrentPage(1);
   }, [searchTerm, selectedState, selectedField]);
 
-  const selectedProgramIds = useMemo(() => {
-    return Object.keys(selectedPrograms).filter(
-      (id) => selectedPrograms[id]
+  const selectedUniversityIds = useMemo(() => {
+    return Object.keys(selectedUniversities).filter(
+      (id) => selectedUniversities[id]
     );
-  }, [selectedPrograms]);
+  }, [selectedUniversities]);
 
   const handleSelectAll = () => {
-    const allSelected = Object.values(selectedPrograms).every(Boolean);
+    const allSelected = Object.values(selectedUniversities).every(Boolean);
     const newSelection: Record<string, boolean> = {};
-    Object.keys(selectedPrograms).forEach((id) => {
+    Object.keys(selectedUniversities).forEach((id) => {
       newSelection[id] = !allSelected;
     });
-    setSelectedPrograms(newSelection);
+    setSelectedUniversities(newSelection);
   };
 
   const handleDelete = async () => {
@@ -236,16 +234,17 @@ const UniversitiesTable = () => {
     try {
       await deleteUniversity(selectedUniversityId);
 
-      showToast("University deleted successfully.");
+      showToast("University deleted successfully.", "success");
 
       setIsDeleteOpen(false);
       setSelectedUniversityId(null);
       setSelectedUniversityName("");
 
       setTimeout(() => location.reload(), 2000);
-
-    } catch (error: any) {
-      showToast("Failed to delete university. Please try again.");
+    }
+    catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to delete university. ${backendMessage}`, "error");
     }
   };
 
@@ -352,8 +351,8 @@ const UniversitiesTable = () => {
                     type="checkbox"
                     className="h-4 w-4 rounded border-slate-300 text-blue-600"
                     checked={
-                      Object.values(selectedPrograms).length > 0 &&
-                      Object.values(selectedPrograms).every(Boolean)
+                      Object.values(selectedUniversities).length > 0 &&
+                      Object.values(selectedUniversities).every(Boolean)
                     }
                     onChange={handleSelectAll}
                   />
@@ -431,8 +430,8 @@ const UniversitiesTable = () => {
                     <input
                       type="checkbox"
                       aria-label={`Select ${uni.name}`}
-                      checked={selectedPrograms[uni.id] || false}
-                      onChange={() => handleSelectProgram(uni.id)}
+                      checked={selectedUniversities[uni.id] || false}
+                      onChange={() => handleSelectUniversity(uni.id)}
                       className="h-4 w-4 rounded border-slate-300 text-blue-600"
                     />
                   </td>
@@ -685,7 +684,7 @@ const UniversitiesTable = () => {
       <BatchAssignPaymentMethod
         isOpen={isBatchAssignOpen}
         onClose={() => setIsBatchAssignOpen(false)}
-        selectedUniversityIds={selectedProgramIds}
+        selectedUniversityIds={selectedUniversityIds}
       />
 
       <CreateUniversity
