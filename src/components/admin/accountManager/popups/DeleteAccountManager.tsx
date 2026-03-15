@@ -61,33 +61,23 @@ export default function DeleteUniversityConfirmation({
             onClose={onClose}
           />
 
-          <div className="px-7 py-6 text-sm">
-            <div className="space-y-5">
-
-              <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-50">
-                  <Trash2 className="h-4 w-4 text-red-600" />
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold text-slate-900">
-                    Delete Account Manager
-                  </h3>
-                  <p className="text-sm text-slate-500">
-                    Are you sure you want to delete this Account Manager?
-                  </p>
-                </div>
-              </div>
-
-              {AccountManager && (
-                <div className="rounded-md border border-slate-200 bg-white px-4 py-3">
-                  <p className="text-sm font-semibold text-slate-800">
-                    {AccountManager}
-                  </p>
-                </div>
-              )}
-
+          <div className="space-y-4 px-7 py-6">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900">
+                Confirm Deletion
+              </h3>
+              <p className="text-sm text-slate-500">
+                Are you sure you want to remove this account manager from the system?
+              </p>
             </div>
+
+            {AccountManager && (
+              <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="text-sm font-medium text-slate-800">
+                  {AccountManager}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
@@ -96,7 +86,7 @@ export default function DeleteUniversityConfirmation({
               onClick={onClose}
               disabled={isDeleting}
               icon={<XCircle  className="h-5 w-5" />}
-              text={isDeleting ? "Cancelling..." : "Cancel"}
+              text="Cancel"
               bgColor="bg-slate-50"
               textColor="text-slate-700"
               borderColor="border-slate-600"
@@ -107,7 +97,7 @@ export default function DeleteUniversityConfirmation({
             <DeleteBtn
               icon={<Trash2 className="h-5 w-5" />}
               text={
-                isDeleting ? "Deleting..." : "Delete Account Manager"
+                isDeleting ? "Deleting..." : "Delete Manager"
               }
               bgColor="bg-red-50"
               textColor="text-red-700"
