@@ -1,5 +1,6 @@
 "use client";
 
+import { AxiosError } from "axios";
 import React, { useEffect, useState } from "react";
 import {
   Search,
@@ -14,24 +15,29 @@ import {
   BadgeCheck,
   UserCog,
   Handshake,
-  Trash2, Eye, Pencil,
-} from 'lucide-react';
+  Trash2,
+  Eye,
+  Pencil,
+  Filter,
+} from "lucide-react";
 
 import { useAllPartners } from "hooks/partners/usePartnersList";
 import { useAccountManagerList } from "hooks/account-managers/useAccountManagerList";
 import { useDeletePartner } from "hooks/partners/useDeletePartner";
+import { useAllStages } from "hooks/applications/stages/useStages";
 
+import FilterSelectField from "components/form/filter/FilterSelectField";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
-
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import AssignPartnerManager from "components/admin/partners/popups/AssignPartnerManager";
-
 import Loading from "components/loading/Loading";
 import Link from "components/ui/links/LinkBtn";
 import DeletePartner from "components/admin/partners/popups/DeletePartner";
-import { useToast } from "../../../context/ToastContext";
+import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
+import { PARTNER_TYPE } from "constants/lists";
+
 
 const PartnersTable = () => {
   const router = useRouter();
@@ -43,7 +49,9 @@ const PartnersTable = () => {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<any>(null);
 
-  const [selectedState, setSelectedState] = useState<string>("all");
+  const { stages } = useAllStages();
+  const [selectedManager, setSelectedManager] = useState<string>("all");
+  const [selectedType, setSelectedType] = useState<string>("all");
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -53,22 +61,34 @@ const PartnersTable = () => {
   const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(
     null
   );
-  const [selectedPartnerName, setSelectedPartnerName] =
-    useState<string>("");
+  const [selectedPartnerName, setSelectedPartnerName] = useState<string>("");
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  const filteredPartners = partners.filter((partner) => {
-    const term = searchTerm.toLowerCase();
-
-    return (
-      partner.name?.toLowerCase().includes(term) ||
-      partner.email?.toLowerCase().includes(term)
-    );
-  });
+  const filteredPartners = partners
+    .filter((partner) => {
+      const term = searchTerm.toLowerCase();
+      return (
+        partner.name?.toLowerCase().includes(term) ||
+        partner.email?.toLowerCase().includes(term)
+      );
+    })
+    .filter((partner) => {
+      if (selectedManager === "all") return true;
+      return (
+        partner.assigned_manager_id &&
+        partner.assigned_manager_id === selectedManager
+      );
+    })
+    .filter((partner) => {
+      if (selectedType === "all") return true;
+      return (
+        partner.type === selectedType
+      );
+    });
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -104,14 +124,14 @@ const PartnersTable = () => {
     setCurrentPage(1);
   };
 
-  const [selectedPartners, setselectedPartners] = useState<
+  const [selectedPartners, setSelectedPartners] = useState<
     Record<string, boolean>
   >({});
 
   const selectedCount = Object.values(selectedPartners).filter(Boolean).length;
 
   useEffect(() => {
-    setselectedPartners((prev) => {
+    setSelectedPartners((prev) => {
       const updated: Record<string, boolean> = { ...prev };
       filteredPartners.forEach((p) => {
         if (!(p.id in updated)) {
@@ -133,15 +153,20 @@ const PartnersTable = () => {
     try {
       await deletePartner(selectedPartnerId);
 
-      showToast("Partner deleted successfully.");
+      showToast("Partner deleted successfully.", "success");
 
       setIsDeleteOpen(false);
       setSelectedPartnerId(null);
       setSelectedPartnerName("");
 
-      router.refresh();
-    } catch (error: any) {
-      showToast("Failed to delete partner. Please try again.");
+      router.push("/admin/partners");
+    } catch (err) {
+      const axiosError = err as AxiosError<{ message: string }>;
+      const backendMessage =
+        axiosError.response?.data?.message ||
+        "Failed to delete partner. Please try again.";
+
+      showToast(backendMessage, "error");
     }
   };
 
@@ -171,10 +196,36 @@ const PartnersTable = () => {
               />
             </div>
 
+            <div className="w-full flex-shrink-0 sm:w-48">
+              <FilterSelectField
+                value={selectedManager}
+                onChange={(val: string) => setSelectedManager(val)}
+                options={accountManagers.map((m) => ({
+                  label: m.name,
+                  value: m.id,
+                }))}
+                icon={UserCog}
+                defaultOption="All Managers"
+              />
+            </div>
+
+            <div className="w-full flex-shrink-0 sm:w-48">
+              <FilterSelectField
+                value={selectedType}
+                onChange={(val: string) => setSelectedType(val)}
+                options={PARTNER_TYPE.map((type) => ({
+                  label: type.label,
+                  value: type.value,
+                }))}
+                icon={Filter}
+                defaultOption="All Types"
+              />
+            </div>
+
             <button
               onClick={() => {
                 setSearchTerm("");
-                setSelectedState("all");
+                setSelectedManager("all");
                 setCurrentPage(1);
               }}
               className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
@@ -184,7 +235,7 @@ const PartnersTable = () => {
             </button>
 
             <Link
-              href={`/admin/partners/create`}
+              href={`/admin/partners/register-partner`}
               icon={<Handshake className="h-5 w-5" />}
               label={"Register Partner"}
               bgColor="bg-blue-50"
@@ -334,7 +385,6 @@ const PartnersTable = () => {
 
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-center gap-2">
-
                           <a
                             role="menuitem"
                             aria-label="View University"

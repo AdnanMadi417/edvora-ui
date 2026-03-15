@@ -2,17 +2,20 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Clock, MoreVertical, Save, Trash2 } from 'lucide-react';
+import { ChevronLeft, Save } from "lucide-react";
 
-import { usePartnerProfile, PartnerDetails } from "hooks/partners/usePartnerProfile";
+import {
+  usePartnerProfile,
+  PartnerDetails,
+} from "hooks/partners/usePartnerProfile";
 import { useUpdatePartnerProfile } from "hooks/partners/useUpdatePartnerProfile";
-import { useAccountManagerList } from "hooks/account-managers/useAccountManagerList";
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 
 import InputField from "components/form/InputField";
 import SelectField from "components/form/SelectField";
+import SearchableDropdown from "components/form/search/SearchableDropdown";
 
 import { COUNTRIES, PARTNER_TYPE } from "constants/lists";
 import Button from "components/ui/buttons/Button";
@@ -25,7 +28,6 @@ const EditPartnerProfile: React.FC<EditPartnerProfileProps> = () => {
   const { showToast } = useToast();
   const { partner, isPartnerLoading, partnerError } = usePartnerProfile();
   const { updateProfile, loading: isUpdating } = useUpdatePartnerProfile();
-  const { accountManagers } = useAccountManagerList();
 
   const [formData, setFormData] = useState<Partial<PartnerDetails>>({});
 
@@ -49,8 +51,21 @@ const EditPartnerProfile: React.FC<EditPartnerProfileProps> = () => {
     }));
   };
 
+  const isFormChanged = () => {
+    if (!partner) return false;
+
+    return (
+      formData.type !== partner.type ||
+      formData.country.trim() !== partner.country?.trim() ||
+      formData.phone.trim() !== partner.phone?.trim()
+    );
+  };
+
   const isFormValid =
-    !!formData.name && !!formData.country && !!formData.type && !!formData.phone;
+    !!formData.name &&
+    !!formData.country &&
+    !!formData.type &&
+    !!formData.phone;
 
   const handleBack = () => router.push("/partner/profile");
 
@@ -62,10 +77,12 @@ const EditPartnerProfile: React.FC<EditPartnerProfileProps> = () => {
         phone: formData.phone!,
       });
 
-      showToast("success: Profile updated successfully");
+      showToast("Profile updated successfully", "success");
       router.push("/partner/profile");
-    } catch (err) {
-      showToast("error: Failed to update profile");
+
+    } catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
 
@@ -73,9 +90,8 @@ const EditPartnerProfile: React.FC<EditPartnerProfileProps> = () => {
   if (partnerError || !partner) return <EmptyData />;
 
   return (
-    <div className="mt-6 max-w-4xl mx-auto">
+    <div className="mx-auto mt-6 max-w-4xl">
       <div className="rounded-md border bg-card shadow-sm">
-
         <div className="flex justify-between border-b px-6 py-5">
           <div className="flex items-center gap-4">
             <div className="relative flex-shrink-0">
@@ -93,45 +109,42 @@ const EditPartnerProfile: React.FC<EditPartnerProfileProps> = () => {
               <p className="text-sm text-slate-500">{partner.country}</p>
             </div>
           </div>
-
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 px-6 py-5">
+        <div className="grid grid-cols-1 gap-4 px-6 py-5 md:grid-cols-2">
+          <SearchableDropdown
+            label="Country"
+            field="country"
+            options={COUNTRIES.map((c) => ({
+              value: c.code,
+              label: c.name,
+            }))}
+            formData={formData}
+            errors={{}}
+            updateFormData={updateFormData}
+          />
 
-            <SelectField
-              label="Country"
-              field="country"
-              options={COUNTRIES.map((c) => ({
-                value: c.code,
-                label: c.name,
-              }))}
-              formData={formData}
-              errors={{}}
-              updateFormData={updateFormData}
-            />
+          <SelectField
+            label="Country"
+            field="type"
+            options={PARTNER_TYPE.map((type) => ({
+              value: type.value,
+              label: type.label,
+            }))}
+            formData={formData}
+            errors={{}}
+            updateFormData={updateFormData}
+          />
 
-            <SelectField
-              label="Partner Type"
-              field="type"
-              options={PARTNER_TYPE.map((p) => ({
-                value: p.value,
-                label: p.label,
-              }))}
-              formData={formData}
-              errors={{}}
-              updateFormData={updateFormData}
-            />
-
-            <InputField
-              label="Phone Number"
-              field="phone"
-              required
-              formData={formData}
-              errors={{}}
-              updateFormData={updateFormData}
-            />
-
-          </div>
+          <InputField
+            label="Phone Number"
+            field="phone"
+            required
+            formData={formData}
+            errors={{}}
+            updateFormData={updateFormData}
+          />
+        </div>
 
         <div className="flex justify-end gap-2 border-t px-6 py-5">
           <Button
@@ -151,7 +164,7 @@ const EditPartnerProfile: React.FC<EditPartnerProfileProps> = () => {
             textColor="text-blue-700"
             borderColor="border-blue-600"
             onClick={handleUpdate}
-            disabled={isUpdating || !isFormValid}
+            disabled={isUpdating || !isFormValid || !isFormChanged()}
           />
         </div>
       </div>
