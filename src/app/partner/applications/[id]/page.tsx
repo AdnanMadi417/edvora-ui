@@ -12,7 +12,6 @@ import Loading from "components/loading/Loading";
 
 import ApplicationDetails from "components/applications/details/partner/ApplicationDetails";
 import ApplicationDocuments from "components/applications/details/partner/ApplicationDocuments";
-import ApplicationCommission from "components/applications/details/partner/ApplicationCommission";
 import AgentPartnerChat from "components/chat/ApplicationChat";
 import { useUnreadCount } from 'hooks/chat/useUnreadCount';
 
@@ -20,6 +19,7 @@ export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();
 
   const [application, setApplication] = useState<any>(null);
+
   const [loading, setLoading] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
 
@@ -57,8 +57,6 @@ export default function ApplicationPage() {
     <>
       <ApplicationDetails application={application} />
       <ApplicationDocuments application={application} />
-      <ApplicationCommission application={application} />
-
       <button
         onClick={() => setChatOpen((v) => !v)}
         aria-label={chatOpen ? "Close chat" : "Open chat"}

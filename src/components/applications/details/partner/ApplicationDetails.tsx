@@ -3,6 +3,8 @@ import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopB
 import RequiredAction from "components/applications/popups/partner/RequiredAction";
 import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
 
+import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
+
 import {
   FaTasks,
   FaCogs,
@@ -26,6 +28,7 @@ import { MdAssignmentTurnedIn } from "react-icons/md";
 import { Clock } from "lucide-react";
 import OfferLetterDecision from "./OfferLetterDecision";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
+import ApplicationCommission from './ApplicationCommission';
 
 interface ApplicationDetailsProps {
   application: any;
@@ -48,6 +51,10 @@ export default function ApplicationDetails({
     if (!dateString) return "Not provided";
     return new Date(dateString).toLocaleDateString();
   }
+
+  const { actions, loading: actionsLoading } = useApplicationActions(
+    application?.id
+  );
 
   const student = application.student || {};
   const program = application.program || {};
@@ -92,7 +99,7 @@ export default function ApplicationDetails({
     (emergencyContact.name ||
       emergencyContact.relation ||
       emergencyContact.phone ||
-      emergencyContact.email)
+      emergencyContact.email);
 
   const hasEnglishProficiency =
     englishProficiency &&
@@ -109,12 +116,10 @@ export default function ApplicationDetails({
 
   return (
     <section>
-
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
         <ApplicationPartnerTopBar application={{ id: application.id }} />
 
         <div className="block space-y-2 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100/40 p-5">
-
           <div className="flex items-start gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
               <FaCogs className="text-xl text-blue-600" />
@@ -132,16 +137,38 @@ export default function ApplicationDetails({
               </span>
 
               <span className="text-sm text-slate-600">
-                <span className="font-medium text-slate-700">Next action → </span>{" "}
+                <span className="font-medium text-slate-700">
+                  Next action →{" "}
+                </span>{" "}
                 {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ??
                   "Not provided"}
+              </span>
+
+              <span className="text-sm text-slate-600">
+                {actions && actions.document_types?.length > 0 && (
+                  <div className="flex items-start gap-1">
+                    <span className="font-medium text-slate-700">
+                      Requested docs{" "}:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {actions.document_types.map((doc) => (
+                        <span
+                          key={doc.id}
+                          className="rounded-full p-1 text-xs font-medium text-slate-800"
+                        >
+                          {doc.type}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </span>
             </div>
           </div>
 
-          {application && (
+          {actions && (
             <>
-              {application.document_types?.length > 0 ? (
+              {actions.document_types?.length > 0 ? (
                 <button
                   onClick={openRequiredActionPopup}
                   className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
@@ -149,9 +176,9 @@ export default function ApplicationDetails({
                   <Clock className="h-4 w-4 text-orange-500" />
                   Upload Required Documents
                 </button>
-              ) : application.stage_statuses?.some(
-                (status) => status.is_requires_reason
-              ) ? (
+              ) : actions.stage_statuses?.some(
+                  (status) => status.is_requires_reason
+                ) ? (
                 <button
                   onClick={openProgramDecisionPopup}
                   className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
@@ -164,7 +191,6 @@ export default function ApplicationDetails({
               )}
             </>
           )}
-
         </div>
 
         <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
@@ -179,8 +205,8 @@ export default function ApplicationDetails({
               </h3>
 
               <span className="text-sm text-slate-500">
-                  Applicant • {student.name || "Not provided"}
-                </span>
+                Applicant • {student.name || "Not provided"}
+              </span>
             </div>
           </div>
 
@@ -193,27 +219,29 @@ export default function ApplicationDetails({
         </div>
 
         <div className="flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
-                <FaStream className="text-[10px] text-amber-700" />
-                Stage: {stage.name || "Not provided"}
-              </span>
+          <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
+            <FaStream className="text-[10px] text-amber-700" />
+            Stage: {stage.name || "Not provided"}
+          </span>
 
           <span
             className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm ${statusClass}`}
           >
-                <FaCheckCircle className="text-[10px]" />
-                Status: {statusText}
-              </span>
+            <FaCheckCircle className="text-[10px]" />
+            Status: {statusText}
+          </span>
 
           <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
-                <FaClock className="text-[10px] text-purple-700" />
+            <FaClock className="text-[10px] text-purple-700" />
             {daysSince(application.updated_at)} Days
-              </span>
+          </span>
         </div>
       </div>
 
       <OfferLetterDecision application={application} />
       <VisaTrackingTimeline application={application} />
+      <ApplicationCommission application={application} />
+
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
@@ -307,7 +335,6 @@ export default function ApplicationDetails({
         </h3>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-
           <div>
             <h4 className="mb-3 flex items-center gap-2 text-h6 font-semibold text-slate-900">
               <FaUser /> Personal Details
@@ -315,7 +342,9 @@ export default function ApplicationDetails({
             <dl className="space-y-3">
               {student.name && (
                 <div>
-                  <dt className="text-sm font-medium text-slate-900">Full Name</dt>
+                  <dt className="text-sm font-medium text-slate-900">
+                    Full Name
+                  </dt>
                   <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <FaUser className="text-slate-500" />
                     {student.name}
@@ -333,7 +362,9 @@ export default function ApplicationDetails({
               )}
               {student.birthday && (
                 <div>
-                  <dt className="text-sm font-medium text-slate-900">Date of Birth</dt>
+                  <dt className="text-sm font-medium text-slate-900">
+                    Date of Birth
+                  </dt>
                   <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <FaBirthdayCake className="text-slate-500" />
                     {formatDate(student.birthday)}
@@ -342,7 +373,9 @@ export default function ApplicationDetails({
               )}
               {student.nationality && (
                 <div>
-                  <dt className="text-sm font-medium text-slate-900">Nationality</dt>
+                  <dt className="text-sm font-medium text-slate-900">
+                    Nationality
+                  </dt>
                   <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <FaFlag className="text-slate-500" />
                     {student.nationality}
@@ -351,7 +384,9 @@ export default function ApplicationDetails({
               )}
               {student.passport_number && (
                 <div>
-                  <dt className="text-sm font-medium text-slate-900">Passport Number</dt>
+                  <dt className="text-sm font-medium text-slate-900">
+                    Passport Number
+                  </dt>
                   <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <FaIdCard className="text-slate-500" />
                     {student.passport_number}
@@ -360,7 +395,9 @@ export default function ApplicationDetails({
               )}
               {student.email && (
                 <div>
-                  <dt className="text-sm font-medium text-slate-900">Email Address</dt>
+                  <dt className="text-sm font-medium text-slate-900">
+                    Email Address
+                  </dt>
                   <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <FaEnvelope className="text-slate-500" />
                     {student.email}
@@ -369,7 +406,9 @@ export default function ApplicationDetails({
               )}
               {student.phone && (
                 <div>
-                  <dt className="text-sm font-medium text-slate-900">Phone Number</dt>
+                  <dt className="text-sm font-medium text-slate-900">
+                    Phone Number
+                  </dt>
                   <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <FaPhone className="text-slate-500" />
                     {student.phone}
@@ -378,7 +417,9 @@ export default function ApplicationDetails({
               )}
               {student.current_address && (
                 <div>
-                  <dt className="text-sm font-medium text-slate-900">Current Address</dt>
+                  <dt className="text-sm font-medium text-slate-900">
+                    Current Address
+                  </dt>
                   <dd className="mt-1 flex items-center gap-2 break-words text-sm text-slate-500">
                     <FaHome className="text-slate-500" />
                     {student.current_address}
@@ -396,20 +437,32 @@ export default function ApplicationDetails({
               <dl className="space-y-3">
                 {englishProficiency.test_type && (
                   <div className="flex justify-between">
-                    <dt className="text-sm font-medium text-slate-900">Test Name</dt>
-                    <dd className="text-sm text-slate-500">{englishProficiency.test_type}</dd>
+                    <dt className="text-sm font-medium text-slate-900">
+                      Test Name
+                    </dt>
+                    <dd className="text-sm text-slate-500">
+                      {englishProficiency.test_type}
+                    </dd>
                   </div>
                 )}
                 {englishProficiency.score && (
                   <div className="flex justify-between">
-                    <dt className="text-sm font-medium text-slate-900">Score</dt>
-                    <dd className="text-sm font-semibold text-slate-500">{englishProficiency.score}</dd>
+                    <dt className="text-sm font-medium text-slate-900">
+                      Score
+                    </dt>
+                    <dd className="text-sm font-semibold text-slate-500">
+                      {englishProficiency.score}
+                    </dd>
                   </div>
                 )}
                 {englishProficiency.test_date && (
                   <div className="flex justify-between">
-                    <dt className="text-sm font-medium text-slate-900">Test Date</dt>
-                    <dd className="text-sm text-slate-500">{formatDate(englishProficiency.test_date)}</dd>
+                    <dt className="text-sm font-medium text-slate-900">
+                      Test Date
+                    </dt>
+                    <dd className="text-sm text-slate-500">
+                      {formatDate(englishProficiency.test_date)}
+                    </dd>
                   </div>
                 )}
               </dl>
@@ -424,13 +477,19 @@ export default function ApplicationDetails({
               <dl className="space-y-3">
                 {application.qualification_level && (
                   <div className="flex justify-between">
-                    <dt className="text-sm font-medium text-slate-900">Degree</dt>
-                    <dd className="text-sm text-slate-500">{application.qualification_level}</dd>
+                    <dt className="text-sm font-medium text-slate-900">
+                      Degree
+                    </dt>
+                    <dd className="text-sm text-slate-500">
+                      {application.qualification_level}
+                    </dd>
                   </div>
                 )}
                 {previousEducation.institution_name && (
                   <div className="flex justify-between">
-                    <dt className="text-sm font-medium text-slate-900">Institution</dt>
+                    <dt className="text-sm font-medium text-slate-900">
+                      Institution
+                    </dt>
                     <dd className="max-w-[60%] break-words text-right text-sm text-slate-500">
                       {previousEducation.institution_name}
                     </dd>
@@ -438,16 +497,24 @@ export default function ApplicationDetails({
                 )}
                 {previousEducation.start_date && previousEducation.end_date && (
                   <div className="flex justify-between">
-                    <dt className="text-sm font-medium text-slate-900">Study Period</dt>
+                    <dt className="text-sm font-medium text-slate-900">
+                      Study Period
+                    </dt>
                     <dd className="text-sm text-slate-500">
-                      {`${formatDate(previousEducation.start_date)} - ${formatDate(previousEducation.end_date)}`}
+                      {`${formatDate(
+                        previousEducation.start_date
+                      )} - ${formatDate(previousEducation.end_date)}`}
                     </dd>
                   </div>
                 )}
                 {previousEducation.grade && (
                   <div className="flex justify-between">
-                    <dt className="text-sm font-medium text-slate-900">GPA / Grade</dt>
-                    <dd className="text-sm font-bold text-slate-500">{previousEducation.grade}</dd>
+                    <dt className="text-sm font-medium text-slate-900">
+                      GPA / Grade
+                    </dt>
+                    <dd className="text-sm font-bold text-slate-500">
+                      {previousEducation.grade}
+                    </dd>
                   </div>
                 )}
               </dl>
@@ -459,7 +526,9 @@ export default function ApplicationDetails({
               <div className="rounded-lg border border-red-200 bg-red-50 p-4 shadow-sm">
                 <div className="mb-3 flex items-center gap-2">
                   <FaPhoneAlt className="text-xs text-red-600" />
-                  <h4 className="text-p2 font-semibold tracking-wide text-red-700">Emergency Contact</h4>
+                  <h4 className="text-p2 font-semibold tracking-wide text-red-700">
+                    Emergency Contact
+                  </h4>
                 </div>
                 <dl className="space-y-4">
                   {emergencyContact.name && (
@@ -467,7 +536,9 @@ export default function ApplicationDetails({
                       <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
                         <FaUser /> Name
                       </dt>
-                      <dd className="min-w-0 break-words text-sm text-slate-900">{emergencyContact.name}</dd>
+                      <dd className="min-w-0 break-words text-sm text-slate-900">
+                        {emergencyContact.name}
+                      </dd>
                     </div>
                   )}
                   {emergencyContact.relation && (
@@ -475,7 +546,9 @@ export default function ApplicationDetails({
                       <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
                         <FaUsers /> Relation
                       </dt>
-                      <dd className="min-w-0 text-sm text-slate-900">{emergencyContact.relation}</dd>
+                      <dd className="min-w-0 text-sm text-slate-900">
+                        {emergencyContact.relation}
+                      </dd>
                     </div>
                   )}
                   {emergencyContact.phone && (
@@ -483,7 +556,9 @@ export default function ApplicationDetails({
                       <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
                         <FaPhoneAlt /> Phone
                       </dt>
-                      <dd className="min-w-0 text-sm text-slate-900">{emergencyContact.phone}</dd>
+                      <dd className="min-w-0 text-sm text-slate-900">
+                        {emergencyContact.phone}
+                      </dd>
                     </div>
                   )}
                   {emergencyContact.email && (
@@ -491,7 +566,9 @@ export default function ApplicationDetails({
                       <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
                         <FaEnvelope /> Email
                       </dt>
-                      <dd className="min-w-0 break-all text-sm text-slate-900">{emergencyContact.email}</dd>
+                      <dd className="min-w-0 break-all text-sm text-slate-900">
+                        {emergencyContact.email}
+                      </dd>
                     </div>
                   )}
                 </dl>
@@ -499,7 +576,6 @@ export default function ApplicationDetails({
             </div>
           )}
         </div>
-
       </div>
 
       {application && showRequiredActionPopup && (

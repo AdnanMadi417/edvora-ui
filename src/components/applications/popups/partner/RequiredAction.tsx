@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { CheckCircle, Pause, XCircle } from 'lucide-react';
 import { FaRegFileLines } from "react-icons/fa6";
 import api from "../../../../lib/useApi";
@@ -11,12 +11,13 @@ import {
   getPresignedUploads,
   uploadFilesToSpaces,
 } from "services/uploadService";
+import { useApplicationActions } from 'hooks/applications/stages/useApplicationActions';
 
 interface RequiredActionProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm?: (applicationId: string | number, selectedDocs?: string[]) => void;
-  applicationId: string | number;
+  applicationId: string ;
 }
 
 export default function RequiredAction({
@@ -25,30 +26,14 @@ export default function RequiredAction({
   onConfirm,
   applicationId,
 }: RequiredActionProps) {
-  const [appDetails, setAppDetails] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+
   const { showToast } = useToast();
   const [selectedFiles, setSelectedFiles] = useState<{
     [docId: string]: File | null;
   }>({});
 
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const fetchApplication = async () => {
-      setLoading(true);
-      try {
-        const res = await api.get(`/application/${applicationId}`);
-        setAppDetails(res.data);
-      } catch (error) {
-        console.error("Error fetching application:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchApplication();
-  }, [applicationId, isOpen]);
+  const { actions, loading } =
+    useApplicationActions(applicationId);
 
   const handleFileChange = (docId: string, file: File | null) => {
     if (!file) return;
@@ -121,7 +106,7 @@ export default function RequiredAction({
                   <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <span className="font-normal">
                     <span className="font-medium">Next Action: {" "}</span>
-                      {appDetails ? `${appDetails.next_action}` : "Loading..."}
+                      {actions ? `${actions.next_action}` : "Loading..."}
                   </span>
                   </div>
                 </div>
@@ -140,17 +125,17 @@ export default function RequiredAction({
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
             {loading ? (
               <p className="text-slate-500">Loading...</p>
-            ) : appDetails ? (
+            ) : actions ? (
               <>
-                {appDetails.document_types?.length > 0 ? (
+                {actions.document_types?.length > 0 ? (
                   <div>
                     <div className="mb-3 flex items-center gap-1">
                       <div className="flex h-8 w-8 items-center justify-center">
                         <FaFileAlt className="h-4 w-4" />
                       </div>
                       <h3 className="truncate text-base font-semibold text-slate-900">
-                        {appDetails.status ||
-                          appDetails.stage_statuses?.[0]?.name ||
+                        {actions.status ||
+                          actions.stage_statuses?.[0]?.name ||
                           "Not provided"}
                       </h3>
                     </div>
@@ -161,7 +146,7 @@ export default function RequiredAction({
                       </h4>
 
                       <ul className="space-y-2">
-                        {appDetails.document_types.map((doc: any) => (
+                        {actions.document_types.map((doc: any) => (
                           <li
                             key={doc.id}
                             className="block gap-4 rounded-md border border-gray-200 p-4 transition"
@@ -175,12 +160,12 @@ export default function RequiredAction({
                                 </span>
                               </div>
 
-                              {appDetails.correction_reason && (
+                              {actions.correction_reason && (
                                 <div className="mt-1 flex items-center gap-2">
                                   <span className="text-xs font-medium text-orange-400">
                                     Reason: {" "}
                                     <span className="text-slate-500">
-                                      {appDetails.correction_reason}
+                                      {actions.correction_reason}
                                     </span>
                                   </span>
                                 </div>

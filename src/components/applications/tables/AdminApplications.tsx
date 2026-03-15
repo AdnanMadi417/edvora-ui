@@ -23,8 +23,8 @@ import { useAdminApplications } from "hooks/applications/useAdminApplications";
 import { useAllUniversities } from '../../../hooks/knowledge-hub/universities/useUniversitiesList';
 import FilterSelectField from '../../form/filter/FilterSelectField';
 import { MdSchool } from 'react-icons/md';
-import { useAllStages } from 'hooks/applications/useStages';
-import { useAllStageStatuses } from 'hooks/applications/useStageStatuses';
+import { useAllStages } from '../../../hooks/applications/stages/useStages';
+import { useAllStageStatuses } from '../../../hooks/applications/stages/useStageStatuses';
 
 const ModernApplicationsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);

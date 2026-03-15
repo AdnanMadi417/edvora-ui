@@ -66,7 +66,7 @@ const CreatableSelectField = ({
   };
 
   return (
-    <div className="mb-4" ref={containerRef}>
+    <div className="mb-4 z-[9999]" ref={containerRef}>
 
       <label className="block text-sm font-medium text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}
@@ -114,7 +114,7 @@ const CreatableSelectField = ({
             }`}
           />
 
-          <ul className="max-h-60 overflow-y-auto text-sm">
+          <ul className="max-h-40 overflow-y-auto text-sm">
 
             {filteredOptions.map((opt) => {
               const isDisabled = disabledOptions.includes(opt.value);
