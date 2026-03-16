@@ -33,7 +33,7 @@ pipelines:
             # instrumentation env
             - echo "SIGNOZ_ENDPOINT=$SIGNOZ_ENDPOINT" >> .env.staging
             - echo "SIGNOZ_INGESTION_KEY=$SIGNOZ_INGESTION_KEY" >> .env.staging
-            - echo "SIGNOZ_SERVICE_NAME=${SIGNOZ_SERVICE_NAME:-unibexs-api}" >> .env.staging
+            - echo "SIGNOZ_SERVICE_NAME=${SIGNOZ_SERVICE_NAME:-unibexs-ui}" >> .env.staging
 
             # Build and push the Docker image
             - docker build
