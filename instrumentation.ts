@@ -13,8 +13,10 @@
  */
 
 export async function register() {
-  // Only run in the Node.js runtime, not the Edge runtime.
-  if (process.env.NEXT_RUNTIME !== 'nodejs') return;
+  // Skip the Edge runtime only. In standalone (`node server.js`) NEXT_RUNTIME
+  // is undefined, so guard against 'edge' explicitly rather than requiring
+  // the presence of 'nodejs' — that would silently skip standalone.
+  if (process.env.NEXT_RUNTIME === 'edge') return;
 
   const endpoint = process.env.SIGNOZ_ENDPOINT;
   if (!endpoint) return;
