@@ -195,6 +195,12 @@ const UniversitiesTable = () => {
     }));
   };
 
+  const selectedUniversityIds = useMemo(() => {
+    return Object.keys(selectedUniversities).filter(
+      (id) => selectedUniversities[id]
+    );
+  }, [selectedUniversities]);
+
   const selectedCount = Object.values(selectedUniversities).filter(Boolean).length;
 
   useEffect(() => {
@@ -212,12 +218,6 @@ const UniversitiesTable = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedState, selectedField]);
-
-  const selectedUniversityIds = useMemo(() => {
-    return Object.keys(selectedUniversities).filter(
-      (id) => selectedUniversities[id]
-    );
-  }, [selectedUniversities]);
 
   const handleSelectAll = () => {
     const allSelected = Object.values(selectedUniversities).every(Boolean);

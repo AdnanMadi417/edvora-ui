@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard } from "lucide-react";
+import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
+import { useBatchAssignPaymentMethod } from "hooks/knowledge-hub/payment-methods/useBatchAssignPaymentMethod";
+
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import InputField from "components/form/InputField";
 import MultiSelect from "components/form/search/MultiSelect";
 import { useToast } from "components/context/ToastContext";
-import { useRouter } from "next/navigation";
-import { useBatchAssignPaymentMethod } from "hooks/knowledge-hub/payment-methods/useBatchAssignPaymentMethod";
-import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
 
 interface BatchUniversitiesProps {
   isOpen: boolean;
@@ -33,7 +33,6 @@ export default function BatchUniversities({
   const { paymentMethods } = useAllPaymentMethods();
   const { batchAssignPaymentMethod, loading } = useBatchAssignPaymentMethod();
   const { showToast } = useToast();
-  const router = useRouter();
 
   const [formData, setFormData] = useState<FormData>({
     payment_method_ids: [],
@@ -77,8 +76,8 @@ export default function BatchUniversities({
       });
 
       showToast("Payment method assigned successfully.", "success");
+      setTimeout(() => location.reload(), 1500);
       onClose();
-      setTimeout(() => router.refresh(), 1500);
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
       showToast(`Failed to assign payment method. ${backendMessage}`, "error");
@@ -131,6 +130,7 @@ export default function BatchUniversities({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              required={false}
             />
 
             <InputField
@@ -140,6 +140,7 @@ export default function BatchUniversities({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              required={false}
             />
           </div>
 
