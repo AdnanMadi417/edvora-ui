@@ -27,26 +27,20 @@ import {
   ChevronLeft, MoreVertical, Clock, Trash2,
 } from 'lucide-react';
 
-import CardHeader from '../../../../ui/card/CardHeader';
+import { useProgram } from 'hooks/knowledge-hub/programs/useProgram';
+import { useDeleteKnowledgeHubPrograms, } from 'hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms';
+import { useCommissionTypes } from 'hooks/knowledge-hub/commission/useCommissionTypes';
 
-import { useProgram } from '../../../../../hooks/knowledge-hub/programs/useProgram';
-import {
-  useDeleteKnowledgeHubPrograms,
-} from '../../../../../hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms';
-import { useCommissionTypes } from '../../../../../hooks/knowledge-hub/commission/useCommissionTypes';
-
-
-import Loading from '../../../../loading/Loading';
+import { useToast } from 'components/context/ToastContext';
 import DeleteProgramsConfirmation from 'components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation';
-
-import { useToast } from '../../../../context/ToastContext';
-
+import CardHeader from 'components/ui/card/CardHeader';
+import Loading from 'components/loading/Loading';
 
 interface UniversityDetailsProps {
   id: string;
 }
 
-const KnowledgeHubDetails = ({ id }: UniversityDetailsProps) => {
+const ProgramDetails = ({ id }: UniversityDetailsProps) => {
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const { deletePrograms } =
@@ -603,4 +597,4 @@ const KnowledgeHubDetails = ({ id }: UniversityDetailsProps) => {
   );
 };
 
-export default KnowledgeHubDetails;
+export default ProgramDetails;

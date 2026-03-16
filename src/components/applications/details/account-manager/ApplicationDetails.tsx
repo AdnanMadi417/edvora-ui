@@ -1,5 +1,4 @@
 import React from "react";
-import AccountManagerTopBar from "../../topBar/AccountManagerTopBar";
 
 import {
   FaTasks,
@@ -22,9 +21,10 @@ import {
 } from 'react-icons/fa';
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import AdminTopBar from '../../topBar/AdminTopBar';
 import OfferLetterCard from '../admin/OfferLetterCard';
 import VisaTrackingTimeline from '../admin/VisaTrackingTimeline';
+import AccountManagerTopBar from "../../topBar/AccountManagerTopBar";
+
 
 interface ApplicationDetailsProps {
   application: any;
@@ -101,6 +101,7 @@ export default function ApplicationDetails({
     <section>
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
+
         <AccountManagerTopBar application={application} />
 
         <div className="flex items-start gap-4 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100/40 p-5">

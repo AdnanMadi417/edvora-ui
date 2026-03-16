@@ -3,12 +3,12 @@
 import React, {  useState } from 'react';
 import { GraduationCap, School, ChevronLeft } from 'lucide-react';
 
+
+import { useCreateUniversity } from 'hooks/knowledge-hub/universities/useCreateKnowledgeHubUniversity';
 import InputField from "components/form/InputField";
 import MultipleDatePickerModal from 'components/form/MultipleDatePickerModal';
-
 import { useToast } from "components/context/ToastContext";
 import Button from 'components/ui/buttons/Button';
-import { useCreateUniversity } from 'hooks/knowledge-hub/universities/useCreateKnowledgeHubUniversity';
 import { useRouter } from 'next/navigation';
 
 export default function RegisterUniversity() {
@@ -48,24 +48,23 @@ export default function RegisterUniversity() {
   const handleCreate = async () => {
     try {
       await createUniversity(formData);
+      showToast("University created successfully.", "success");
 
-      showToast("University created successfully.");
+      setTimeout(() => {
+        router.push("/admin/universities");
+      }, 2000);
 
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
+    } catch (error: any) {
+      const code = error?.response?.data?.code;
+      let message = "Please try again.";
 
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
+      if (code === "university_name_exists") {
+        message = "A university with this name already exists. Please use a different name.";
+      } else if (error?.response?.data?.message) {
+        message = error.response.data.message;
       }
-      showToast("Failed to create university.");
+
+      showToast(`Failed to create university. ${message}`, "error");
     }
   };
 

@@ -2,25 +2,18 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ChevronLeft,
-  Clock,
-  MoreVertical,
-  Save,
-} from "lucide-react";
-
-import InputField from "components/form/InputField";
-import SettingToggleInput from "components/form/toggle/SettingToggleInput";
+import { ChevronLeft, Clock, MoreVertical, Pencil } from "lucide-react";
 
 import { useUniversityDetails } from "hooks/knowledge-hub/config-universities/useUniversityDetails";
 import { useUpdateUniversityType } from "hooks/knowledge-hub/config-universities/useUpdateUniversityType";
 import { useApplicationSubmissionFields } from "hooks/knowledge-hub/config-universities/useApplicationSubmissionFields";
 
+import InputField from "components/form/InputField";
+import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import Loading from "components/loading/Loading";
-
 import EmptyData from "components/emptyData/EmptyTableData";
-import { useToast } from "components/context/ToastContext";
 import Button from "components/ui/buttons/Button";
+import { useToast } from "components/context/ToastContext";
 
 interface UniversityDetailsProps {
   id: string;
@@ -36,6 +29,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [initialFormData, setInitialFormData] = useState<Record<string, any> | null>(null);
+
+  const { updateUniversityType, loading } = useUpdateUniversityType(id);
 
   const fieldSource = React.useMemo(() => {
     const universityFields = university?.required_fields || [];
@@ -45,7 +41,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     return submissionFields || [];
   }, [university, submissionFields]);
 
-  const { updateUniversityType, loading } = useUpdateUniversityType(id);
+  const normalizePayload = (data: Record<string, any>) => ({
+    name: data?.name?.trim() || "",
+    description: data?.description?.trim() || "",
+    required_fields_map: data?.required_fields_map || {},
+  });
 
   const updateFormData = (field: string, value: any) => {
     setFormData((prev: any) => {
@@ -80,12 +80,16 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
       await updateUniversityType(payload);
 
-      showToast("University type updated successfully");
+      showToast("University type updated successfully", "success");
 
-      router.push(`/admin/config-universities/`);
-    } catch (err) {
-      console.error(err);
-      showToast("Update failed");
+      setTimeout (() => {
+        router.push(`/admin/config-universities/`);
+      })
+
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
+      showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
 
@@ -98,12 +102,24 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
       map[f.id] = Boolean(f.is_required);
     });
 
-    setFormData({
+    const initial = {
       name: university.name || "",
       description: university.description || "",
       required_fields_map: map,
-    });
+    };
+
+    setFormData(initial);
+    setInitialFormData(initial);
   }, [university]);
+
+  const isFormChanged = React.useMemo(() => {
+    if (!initialFormData) return false;
+
+    const current = normalizePayload(formData);
+    const initial = normalizePayload(initialFormData);
+
+    return JSON.stringify(current) !== JSON.stringify(initial);
+  }, [formData, initialFormData, normalizePayload]);
 
   const handleBack = () => {
     router.push("/admin/config-universities");
@@ -117,11 +133,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     return <Loading text="Loading university details..." />;
   }
 
-  if (error) {
-    return <EmptyData />;
-  }
-
-  if (!university) {
+  if (error || !university) {
     return <EmptyData />;
   }
 
@@ -129,7 +141,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     <>
       <div className="mt-6">
         <div className="rounded-md border bg-card shadow-sm">
-          <div className="flex justify-between rounded-tl-md rounded-tr-md border-b bg-gray-50 p-6">
+          <div className="flex justify-between rounded-tl-md rounded-tr-md border-b  p-6">
             <div className="block">
               <h2 className="text-lg font-semibold">
                 Application Required Fields
@@ -247,10 +259,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 No submission fields available.
               </p>
             )}
-
           </div>
 
-          <div className="flex justify-end gap-2 bg-gray-50 border-t rounded-b-md px-6 py-5">
+          <div className="flex justify-end gap-2 rounded-b-md border-t px-6 py-5">
             <Button
               onClick={handleBack}
               disabled={loading}
@@ -264,15 +275,15 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             />
 
             <Button
-              icon={<Save className="h-5 w-5" />}
-              text={loading ? "Saving..." : "Save Changes"}
+              icon={<Pencil className="h-5 w-5" />}
+              text={loading ? "Updating..." : "Save Changes"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"
               borderColor="border-blue-600"
               hoverTextColor="hover:text-blue-800"
               hoverBorderColor="hover:border-blue-700"
               onClick={handleUpdate}
-              disabled={loading}
+              disabled={loading || !isFormChanged}
             />
           </div>
         </div>

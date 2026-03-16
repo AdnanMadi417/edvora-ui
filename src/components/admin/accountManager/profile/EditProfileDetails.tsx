@@ -4,30 +4,24 @@ import {
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
+import InputField from "components/form/InputField";
+import ToggleInput from "components/form/toggle/ToggleInput";
+import Button from "components/ui/buttons/Button";
+import { useToast } from "components/context/ToastContext";
+
 import { AccountManager } from "hooks/account-managers/useAccountManagerDetails";
-import InputField from "../../../form/InputField";
-import ToggleInput from "../../../form/toggle/ToggleInput";
-import UpdatedBtn from "../../../ui/buttons/Button";
-import CancelBtn from "../../../ui/buttons/Button";
-import { useToast } from "../../../context/ToastContext";
-import { useEditAccountManager } from "../../../../hooks/account-managers/useEditAccountManager";
+import { useEditAccountManager } from "hooks/account-managers/useEditAccountManager";
 import { useRouter } from "next/navigation";
 
 interface EditProfileDetailsProps {
   manager: AccountManager;
 }
 
-interface EditAccountManagerModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  manager: any;
-}
-
 interface FormErrors {
   name?: string;
   email?: string;
   password?: string;
-  confirmPassword?: string;
+  confirm_password?: string;
 }
 
 export default function EditProfileDetails({
@@ -42,7 +36,7 @@ export default function EditProfileDetails({
     name: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    confirm_password: "",
     is_active: false,
   });
 
@@ -54,11 +48,22 @@ export default function EditProfileDetails({
         name: manager.name || "",
         email: manager.email || "",
         password: "",
-        confirmPassword: "",
+        confirm_password: "",
         is_active: manager.is_active ?? false,
       });
     }
   }, [manager]);
+
+  const isFormChanged = () => {
+    if (!manager) return false;
+
+    return (
+      formData.name !== manager.name ||
+      formData.email !== manager.email ||
+      formData.is_active !== (manager.is_active ?? false) ||
+      formData.password.trim() !== ""
+    );
+  };
 
   const updateField = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -70,29 +75,45 @@ export default function EditProfileDetails({
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.email) newErrors.email = "Email is required";
 
-    if (formData.password && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+    if (formData.password && formData.password !== formData.confirm_password) {
+      newErrors.confirm_password = "Passwords do not match";
     }
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
-    const payload = {
+    const payload: any = {
       name: formData.name,
       email: formData.email,
       is_active: formData.is_active,
-      ...(formData.password && { password: formData.password }),
     };
+
+    if (formData.password.trim()) {
+      payload.password = formData.password;
+    }
 
     try {
       await editAccountManager(payload);
-      showToast("Account Manager updated successfully");
+
+      showToast("Account Manager updated successfully", "success");
 
       setTimeout(() => {
         router.back();
       }, 3000);
-    } catch {
-      showToast("Failed to update Account Manager");
+
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message ||
+        "Please try again.";
+
+      showToast(`Failed to update Account Manager. ${backendMessage}`, "error");
+
+      if (error?.response?.data?.code === "email_already_exists") {
+        setErrors((prev) => ({
+          ...prev,
+          email: error.response.data.message,
+        }));
+      }
     }
   };
 
@@ -162,13 +183,40 @@ export default function EditProfileDetails({
             errors={errors}
             updateFormData={updateField}
           />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3">
+
+            <InputField
+              label="Password"
+              field="password"
+              type="password"
+              placeholder="At least 8 characters, letters & numbers"
+              required
+              formData={formData}
+              errors={errors}
+              updateFormData={updateField}
+            />
+
+            <InputField
+              label="Confirm Password"
+              field="confirm_password"
+              type="password"
+              placeholder="Repeat your password"
+              required
+              formData={formData}
+              errors={errors}
+              updateFormData={updateField}
+            />
+
+          </div>
+
         </div>
 
         <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-slate-200 bg-card px-6 py-4">
 
-          <CancelBtn
+          <Button
             icon={<XCircle className="h-4 w-4" />}
-            text={loading ? "Cancel..." : "Cancel Changes"}
+            text={loading ? "Cancelling..." : "Cancel"}
             bgColor="bg-slate-50"
             textColor="text-slate-500"
             borderColor="border-slate-500"
@@ -178,7 +226,7 @@ export default function EditProfileDetails({
 
           />
 
-          <UpdatedBtn
+          <Button
             icon={<Pencil className="h-4 w-4" />}
             text={loading ? "Saving..." : "Save Changes"}
             bgColor="bg-blue-50"
@@ -187,7 +235,7 @@ export default function EditProfileDetails({
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || !isFormChanged()}
           />
         </div>
       </div>

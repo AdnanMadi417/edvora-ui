@@ -3,12 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { Edit2 } from "lucide-react";
 
-import ModalHeader from "../../../ui/modal/ModalHeader";
-import AssignBtn from "../../../ui/buttons/Button";
-import { useToast } from "components/context/ToastContext";
-
 import { useAssignPartnerManager } from "hooks/partners/useAssignPartnerManager";
-import SelectField from "../../../form/SelectField";
+
+import ModalHeader from "components/ui/modal/ModalHeader";
+import Button from "components/ui/buttons/Button";
+import { useToast } from "components/context/ToastContext";
+import SelectField from "components/form/SelectField";
 
 interface Props {
   isOpen: boolean;
@@ -68,6 +68,10 @@ export default function AssignManagerModal({
 
   const closeModal = () => onClose();
 
+  const isSelectionChanged = () => {
+    return formData.manager_id !== (currentManagerId || "");
+  };
+
   const handleSubmit = async () => {
     if (!formData.manager_id) {
       setErrors({ manager_id: "Please select manager" });
@@ -80,12 +84,20 @@ export default function AssignManagerModal({
         manager_id: formData.manager_id,
       });
 
-      showToast("success: Manager assigned successfully");
+      showToast("success: Manager assigned successfully" , "success");
       onClose();
 
       setTimeout(() => location.reload(), 300);
-    } catch {
-      showToast("error: Failed to assign manager");
+    }catch (err: any) {
+      const backendMessage =
+        err?.response?.data?.message ||
+        "Failed to assign manager. Please try again.";
+
+      showToast(backendMessage, "error");
+
+      if (err?.response?.data?.code === "manager_not_available") {
+        setErrors({ manager_id: backendMessage });
+      }
     }
   };
 
@@ -142,7 +154,7 @@ export default function AssignManagerModal({
 
           <div className="flex items-center justify-end border-t border-gray-200 px-6 py-4">
             <div className=" flex gap-2">
-              <AssignBtn
+              <Button
                 icon={<Edit2 className="h-5 w-5" />}
                 text={loading ? "Assigning..." : "Assign Manager"}
                 bgColor="bg-amber-50"
@@ -151,7 +163,7 @@ export default function AssignManagerModal({
                 hoverTextColor="hover:text-amber-800"
                 hoverBorderColor="hover:border-amber-700"
                 onClick={handleSubmit}
-                disabled={loading}
+                disabled={loading || !isSelectionChanged()}
               />
             </div>
           </div>

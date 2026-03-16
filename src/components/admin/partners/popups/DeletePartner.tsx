@@ -59,21 +59,14 @@ export default function DeleteUniversityConfirmation({
             onClose={onClose}
           />
 
-          <div className="px-6 py-6 space-y-4">
-            <div className="rounded-md border border-red-200 bg-red-50 p-4">
-              <div className="flex gap-3">
-                <Trash2 className="h-5 w-5 text-red-600 flex-shrink-0" />
-
-                <div>
-                  <p className="text-sm font-medium text-red-700">
-                    Are you sure you want to delete this partner?
-                  </p>
-
-                  <p className="text-xs text-red-600 mt-1 leading-relaxed">
-                    All related partner data will be permanently removed from the system.
-                  </p>
-                </div>
-              </div>
+          <div className="space-y-4 px-7 py-6">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900">
+                Confirm Deletion
+              </h3>
+              <p className="text-sm text-slate-500">
+                Are you sure you want to remove this partner from the system?
+              </p>
             </div>
           </div>
 

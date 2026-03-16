@@ -438,7 +438,7 @@ const ModernApplicationsTable = () => {
                   </td>
 
                   <td className="min-w-[200px] max-w-[250px] px-6 py-4">
-                    <div className="text-slate-500">{app.program_name}</div>
+                    <div className="text-slate-500">{app.partner_name}</div>
                   </td>
 
                   <td className="px-6 py-4">

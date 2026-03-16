@@ -1,15 +1,16 @@
 "use client";
 
-import { ChevronLeft, UserRoundPlus, User } from 'lucide-react';
 import React, { useState } from "react";
+import { ChevronLeft} from 'lucide-react';
+import { MdAdminPanelSettings } from 'react-icons/md';
 
-import InputField from "../../../form/InputField";
-import CreateAccount from "../../../ui/buttons/Button";
+import InputField from "components/form/InputField";
+import Button from 'components/ui/buttons/Button';
+
 import { useCreateAccountManager } from "hooks/account-managers/useCreateAccountManager";
 
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
-import Button from '../../../ui/buttons/Button';
 
 export interface FormData {
   name: string;
@@ -79,7 +80,7 @@ export default function RegisterAccountManager() {
     try {
       await createAccountManager(payload);
 
-      showToast("Partner created successfully");
+      showToast("Account Manager created successfully", "success");
 
       setFormData({
         name: "",
@@ -91,15 +92,21 @@ export default function RegisterAccountManager() {
       setErrors({});
 
       setTimeout(() => {
-        location.reload();
+        router.push("/admin/account-managers");
       }, 1500);
     } catch (error) {
-      showToast("Failed to create account manager. This email already exists, please try again with another email address.");
+
+      const backendMessage =
+        error?.response?.data?.message ||
+        "Failed to create account manager. Please try again.";
+
+      showToast(`Failed to create account manager. ${backendMessage}`, "error");
+
     }
   };
 
   const handleBack = () => {
-    router.push("/admin/partners");
+    router.push("/admin/account-managers");
   };
 
   return (
@@ -107,14 +114,14 @@ export default function RegisterAccountManager() {
       <div className="rounded-md border bg-slate-50 shadow-sm">
         <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <UserRoundPlus className="text-blue-700" size={24} />
+            <MdAdminPanelSettings className="text-blue-700" size={24} />
           </div>
           <div>
             <h3 className="text-xl font-semibold text-slate-900">
-              Create a New Account Manager
+              Create a New Manager
             </h3>
             <p className="text-sm text-slate-500">
-              Please complete all required fields to create a new account manager.
+              Fill in the required information to create a new account manager.
             </p>
           </div>
         </div>
@@ -174,8 +181,8 @@ export default function RegisterAccountManager() {
           <Button
             onClick={handleBack}
             disabled={loadingCreateAccountManager}
-            icon={<ChevronLeft  className="h-5 w-5" />}
-            text={"Back"}
+            icon={<ChevronLeft className="h-5 w-5" />}
+            text="Back"
             bgColor="bg-slate-50"
             textColor="text-slate-700"
             borderColor="border-slate-600"
@@ -183,9 +190,9 @@ export default function RegisterAccountManager() {
             hoverBorderColor="hover:border-slate-700"
           />
 
-          <CreateAccount
-            icon={<UserRoundPlus className="h-5 w-5" />}
-            text={loadingCreateAccountManager ? "Creating..." : "Create Account"}
+          <Button
+            icon={<MdAdminPanelSettings className="h-5 w-5" />}
+            text={loadingCreateAccountManager ? "Creating Manager..." : "Create Manager"}
             bgColor="bg-blue-50"
             textColor="text-blue-700"
             borderColor="border-blue-600"

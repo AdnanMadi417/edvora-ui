@@ -3,15 +3,16 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, GitBranch } from "lucide-react";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "../../../../ui/buttons/Button";
-import InputField from "../../../../form/InputField";
-import SelectField from "../../../../form/SelectField";
+import { useBatchUpdatePrograms } from "hooks/knowledge-hub/programs/useBatchUpdatePrograms";
+import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
 
-import { useBatchUpdatePrograms } from "../../../../../hooks/knowledge-hub/programs/useBatchUpdatePrograms";
-import { useCommissionTypes } from "../../../../../hooks/knowledge-hub/commission/useCommissionTypes";
+import ModalHeader from "components/ui/modal/ModalHeader";
+import Button from "components/ui/buttons/Button";
+import InputField from "components/form/InputField";
+import SelectField from "components/form/SelectField";
+
 import { useToast } from "components/context/ToastContext";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 interface CreateBranchProps {
   isOpen: boolean;
@@ -29,13 +30,12 @@ export interface ProgramCommissionPayload {
 }
 
 export default function CreateBranch({
-                                       isOpen,
-                                       onClose,
-                                       selectedProgramIds,
-                                       onSuccess,
-                                     }: CreateBranchProps) {
-  const { batchUpdatePrograms, loading } =
-    useBatchUpdatePrograms();
+  isOpen,
+  onClose,
+  selectedProgramIds,
+  onSuccess,
+}: CreateBranchProps) {
+  const { batchUpdatePrograms, loading } = useBatchUpdatePrograms();
   const { showToast } = useToast();
   const { commissionTypes, commissionTypesLoading } = useCommissionTypes();
   const router = useRouter();
@@ -45,7 +45,9 @@ export default function CreateBranch({
   const [formData, setFormData] = useState({
     program_ids: [] as string[],
     commission_amount: "",
-    commission_type_id: "" || "Commission paid 30 days after student completes first semester of each academic year." ,
+    commission_type_id:
+      "" ||
+      "Commission paid 30 days after student completes first semester of each academic year.",
     commission_notes: "",
   });
 
@@ -112,27 +114,16 @@ export default function CreateBranch({
 
       showToast("Programs updated successfully.", "success");
 
-      onClose();
-      onSuccess?.();
+      setTimeout(() => {
+        router.push("/admin/knowledge-hub/programs");
+        onClose();
+        onSuccess?.();
+      }, 2000);
 
-      router.push("/admin/knowledge-hub/programs");
-
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
-      }
-
-      showToast("Failed to update programs.", "error");
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
+      showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
 
@@ -196,6 +187,7 @@ export default function CreateBranch({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              required={false}
             />
           </div>
 

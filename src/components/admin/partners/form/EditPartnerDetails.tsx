@@ -2,24 +2,23 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Save } from "lucide-react";
+import { ChevronLeft, Pencil } from "lucide-react";
 
 import { usePartnerDetails } from "hooks/partners/usePartnerDetails";
 import { useUpdatePartner } from "hooks/partners/useUpdatePartner";
 import { useAccountManagerList } from "hooks/account-managers/useAccountManagerList";
+import { useAssignPartnerManager } from 'hooks/partners/useAssignPartnerManager';
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
-
 import InputField from "components/form/InputField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import SelectField from "components/form/SelectField";
+import SearchableDropdown from "components/form/search/SearchableDropdown";
+import Button from "components/ui/buttons/Button";
+import { useToast } from 'components/context/ToastContext';
 
 import { COUNTRIES, PARTNER_TYPE } from "constants/lists";
-
-import Button from "components/ui/buttons/Button";
-import { useToast } from '../../../context/ToastContext';
-import { useAssignPartnerManager } from '../../../../hooks/partners/useAssignPartnerManager';
 
 interface PartnerDetailsProps {
   id: string;
@@ -29,6 +28,7 @@ const EditPartnerDetails = ({ id }: PartnerDetailsProps) => {
   const router = useRouter();
   const { showToast } = useToast();
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const { partner, isPartnerLoading } = usePartnerDetails(id);
   const { updatePartner, isUpdatingPartner } = useUpdatePartner();
   const { accountManagers } = useAccountManagerList();
@@ -36,6 +36,7 @@ const EditPartnerDetails = ({ id }: PartnerDetailsProps) => {
   const [formData, setFormData] = useState<any>({
     name: "",
     country: "",
+    email: "",
     type: "",
     phone: "",
     assigned_manager_name: "",
@@ -48,6 +49,7 @@ const EditPartnerDetails = ({ id }: PartnerDetailsProps) => {
       setFormData({
         name: partner.name || "",
         country: partner.country || "",
+        email: partner.email || "",
         type: partner.type || "",
         phone: partner.phone || "",
         manager_id: partner.assigned_manager_id || "",
@@ -65,39 +67,91 @@ const EditPartnerDetails = ({ id }: PartnerDetailsProps) => {
     }));
   };
 
+  const { assignManager, loading, error } = useAssignPartnerManager();
+
+  const isFormChanged = () => {
+    if (!partner) return false;
+
+    const currentManagerId = partner.assigned_manager_id || "";
+    const formManagerId = formData.manager_id || "";
+
+    return (
+      formData.name.trim() !== partner.name?.trim() ||
+      formData.country.trim() !== partner.country?.trim() ||
+      formData.email.trim() !== partner.email?.trim() ||
+      formData.type !== partner.type ||
+      formManagerId !== currentManagerId ||
+      formData.phone.trim() !== partner.phone?.trim() ||
+      formData.is_active !== (partner.is_active ?? false) ||
+      formData.is_verified !== (partner.is_verified ?? false) ||
+      (formData.password?.trim() ?? "") !== "" ||
+      (formData.confirm_password?.trim() ?? "") !== ""
+    );
+  };
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.type.trim()) newErrors.type = "Partner type is required";
+    if (!formData.phone.trim()) newErrors.phone = "Phone number is required";
+
+    if (
+      formData.password &&
+      formData.confirm_password &&
+      formData.password !== formData.confirm_password
+    ) {
+      newErrors.confirm_password = "Passwords do not match";
+    }
+
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+    if (formData.password && !passwordRegex.test(formData.password)) {
+      newErrors.password =
+        "Password must be at least 8 characters with 1 letter and 1 number";
+    }
+
+    return newErrors;
+  };
+
   const isFormValid =
-    formData.name && formData.country && formData.type && formData.phone;
+    formData.name.trim() !== "" &&
+    formData.country.trim() !== "" &&
+    formData.type.trim() !== "" &&
+    formData.phone.trim() !== "" &&
+    (formData.password?.trim() === "" ||
+    (formData.password?.trim() !== "" && !errors.password && !errors.confirm_password));
+
+  const handleUpdate = async () => {
+    const newErrors = validateForm();
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+
+    try {
+      await updatePartner(id, formData);
+
+      if (formData.manager_id) {
+        await assignManager(id, { manager_id: formData.manager_id });
+      }
+
+      showToast("Partner updated successfully", "success");
+      setTimeout(() => router.push("/admin/partners"), 3000);
+
+    } catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Update failed. ${backendMessage}`, "error");
+    }
+  };
 
   const handleBack = () => {
     router.push("/admin/partners");
   };
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const { assignManager, loading, error } = useAssignPartnerManager();
-
-  const handleUpdate = async () => {
-    try {
-      await updatePartner(id, formData);
-
-      if (formData.manager_id) {
-        await assignManager(id, {
-          manager_id: formData.manager_id,
-        });
-      }
-
-      showToast("success: Partner updated successfully");
-
-      setTimeout(() => router.push("/admin/partners"), 3000);
-
-    } catch (error) {
-      showToast("error: Update failed");
-    }
-  };
-  if (isPartnerLoading) {
+  if (isPartnerLoading || loading) {
     return <Loading text="Loading partner details..." />;
   }
 
-  if (!partner) {
+  if (!partner || error) {
     return <EmptyData />;
   }
 
@@ -146,7 +200,17 @@ const EditPartnerDetails = ({ id }: PartnerDetailsProps) => {
               updateFormData={updateFormData}
             />
 
-            <SelectField
+            <InputField
+              label="Email Address"
+              field="email"
+              type="email"
+              required
+              formData={formData}
+              errors={{}}
+              updateFormData={updateFormData}
+            />
+
+            <SearchableDropdown
               label="Country"
               field="country"
               options={COUNTRIES.map((c) => ({
@@ -173,6 +237,7 @@ const EditPartnerDetails = ({ id }: PartnerDetailsProps) => {
             <InputField
               label="Phone Number"
               field="phone"
+              placeholder="eg. 011-8243 9432"
               required
               formData={formData}
               errors={{}}
@@ -209,13 +274,24 @@ const EditPartnerDetails = ({ id }: PartnerDetailsProps) => {
               errors={{}}
               updateFormData={updateFormData}
             />
+
+            <InputField
+              label="Password"
+              field="password"
+              type="password"
+              placeholder="At least 8 characters, letters & numbers"
+              required
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+            />
+
           </div>
         </div>
 
         <div className="flex justify-end gap-2 border-t px-6 py-5">
           <Button
             onClick={handleBack}
-            disabled={isUpdatingPartner}
             icon={<ChevronLeft className="h-5 w-5" />}
             text="Back"
             bgColor="bg-slate-50"
@@ -226,15 +302,15 @@ const EditPartnerDetails = ({ id }: PartnerDetailsProps) => {
           />
 
           <Button
-            icon={<Save className="h-5 w-5" />}
-            text={isUpdatingPartner ? "Updating..." : "Update Partner"}
+            icon={<Pencil className="h-5 w-5" />}
+            text={loading ? "Saving..." : "Save Changes"}
             bgColor="bg-blue-50"
             textColor="text-blue-700"
             borderColor="border-blue-600"
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
             onClick={handleUpdate}
-            disabled={isUpdatingPartner || !isFormValid}
+            disabled={isUpdatingPartner || !isFormChanged() || !isFormValid}
           />
         </div>
       </div>

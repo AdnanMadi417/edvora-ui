@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   Search,
   RefreshCw,
@@ -14,26 +14,25 @@ import {
   UserRound,
   Camera,
   MapPin,
-  GraduationCap, Trash2, BadgeCheck,
+  PlusCircle, Trash2, BadgeCheck,
 } from 'lucide-react';
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle } from 'lucide-react';
 
-import { useUniversityTypes } from "hooks/knowledge-hub/config-universities/useUniversityTypesQuery";
+import { useUniversityTypes } from 'hooks/knowledge-hub/config-universities/useUniversityTypesQuery';
 import { useDeleteUniversityType } from 'hooks/knowledge-hub/config-universities/useDeleteUniversityType';
+import DeleteUniversityConfirmation from 'components/admin/KnowledgeHub/university/popups/DeleteUniversityConfirmation';
 
 
-import NextButton from "components/ui/buttons/NextButton";
-import PrevButton from "components/ui/buttons/PrevButton";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
-import Loading from "components/loading/Loading";
-import Button from "components/ui/buttons/Button";
-import { useRouter } from "next/navigation";
-
-import DeleteUniversityConfirmation from '../../KnowledgeHub/university/popups/DeleteUniversityConfirmation';
-import { useToast } from '../../../context/ToastContext';
+import NextButton from 'components/ui/buttons/NextButton';
+import PrevButton from 'components/ui/buttons/PrevButton';
+import Button from 'components/ui/buttons/Button';
+import NoMessagesFound from 'components/emptyData/NoMessagesFound';
+import Loading from 'components/loading/Loading';
+import { useToast } from 'components/context/ToastContext';
+import { useRouter } from 'next/navigation';
 
 const UniversityManagementTable = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
 
   const { showToast } = useToast();
@@ -43,19 +42,19 @@ const UniversityManagementTable = () => {
     string | null
   >(null);
   const [selectedUniversityName, setSelectedUniversityName] =
-    useState<string>("");
+    useState<string>('');
 
   const { universities, loading, error } = useUniversityTypes();
 
-  const [selectedState, setSelectedState] = useState<string>("all");
-  const [selectedField, setSelectedField] = useState<string>("all");
+  const [selectedState, setSelectedState] = useState<string>('all');
+  const [selectedField, setSelectedField] = useState<string>('all');
 
   const isFieldRequired = (
     requiredFields: any[],
-    fieldKey: string
+    fieldKey: string,
   ) => {
     return requiredFields?.some(
-      (f) => f.field_key === fieldKey && f.is_required
+      (f) => f.field_key === fieldKey && f.is_required,
     );
   };
 
@@ -71,7 +70,7 @@ const UniversityManagementTable = () => {
         !term || university.name?.toLowerCase().includes(term);
 
       const matchField =
-        selectedField === "all" ||
+        selectedField === 'all' ||
         (university as any).field_id === selectedField;
 
       return matchSearch && matchField;
@@ -80,10 +79,10 @@ const UniversityManagementTable = () => {
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
-    direction: "asc" | "desc";
+    direction: 'asc' | 'desc';
   }>({
-    key: "",
-    direction: "asc",
+    key: '',
+    direction: 'asc',
   });
 
   const sortedUniversities = React.useMemo(() => {
@@ -95,20 +94,20 @@ const UniversityManagementTable = () => {
 
       if (!aValue && !bValue) return 0;
 
-      if (typeof aValue === "boolean" && typeof bValue === "boolean") {
-        return sortConfig.direction === "asc"
+      if (typeof aValue === 'boolean' && typeof bValue === 'boolean') {
+        return sortConfig.direction === 'asc'
           ? Number(aValue) - Number(bValue)
           : Number(bValue) - Number(aValue);
       }
 
-      if (typeof aValue === "string") {
-        return sortConfig.direction === "asc"
-          ? aValue.localeCompare(bValue || "")
-          : (bValue || "").localeCompare(aValue || "");
+      if (typeof aValue === 'string') {
+        return sortConfig.direction === 'asc'
+          ? aValue.localeCompare(bValue || '')
+          : (bValue || '').localeCompare(aValue || '');
       }
 
-      if (typeof aValue === "number") {
-        return sortConfig.direction === "asc"
+      if (typeof aValue === 'number') {
+        return sortConfig.direction === 'asc'
           ? aValue - bValue
           : bValue - aValue;
       }
@@ -118,7 +117,7 @@ const UniversityManagementTable = () => {
   }, [filteredUniversities, sortConfig]);
   const currentUniversities = sortedUniversities.slice(
     indexOfFirstItem,
-    indexOfLastItem
+    indexOfLastItem,
   );
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -131,16 +130,19 @@ const UniversityManagementTable = () => {
     try {
       await deleteUniversityType(selectedUniversityId);
 
-      showToast("University deleted successfully.");
+      showToast('University deleted successfully.', 'success');
 
       setIsDeleteOpen(false);
       setSelectedUniversityId(null);
-      setSelectedUniversityName("");
+      setSelectedUniversityName('');
 
-      setTimeout(() => location.reload(), 2000);
+      setTimeout (() => {
+        router.push(`/admin/config-universities/`);
+      })
 
     } catch (error: any) {
-      showToast("Failed to delete university. Please try again.");
+      const backendMessage = error?.response?.data?.message || 'Please try again.';
+      showToast(`Failed to delete university. ${backendMessage}`, 'error');
     }
   };
 
@@ -189,8 +191,8 @@ const UniversityManagementTable = () => {
 
             <Button
               onClick={handleCreateLink}
-              icon={<GraduationCap className="h-5 w-5" />}
-              text={loading ? "Creating..." : "Create University Type"}
+              icon={<PlusCircle  className="h-5 w-5" />}
+              text={loading ? 'Creating...' : 'Create Type'}
               bgColor="bg-blue-50"
               textColor="text-blue-700"
               borderColor="border-blue-600"
@@ -200,9 +202,9 @@ const UniversityManagementTable = () => {
 
             <button
               onClick={() => {
-                setSearchTerm("");
-                setSelectedState("all");
-                setSelectedField("all");
+                setSearchTerm('');
+                setSelectedState('all');
+                setSelectedField('all');
                 setCurrentPage(1);
               }}
               className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
@@ -222,7 +224,8 @@ const UniversityManagementTable = () => {
               <thead>
               <tr className="border-b border-slate-200 bg-slate-50 ">
 
-                <th className="group min-w-[220px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors">
+                <th
+                  className="group min-w-[220px] px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors">
                   <div className="flex items-center gap-2">
                     <Building2 className="h-4 w-4 text-slate-500" />
                     <span>University</span>
@@ -275,153 +278,154 @@ const UniversityManagementTable = () => {
               </thead>
 
               <tbody className="divide-border-slate-200 divide-y bg-white">
-                {loading && (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-8 text-center">
-                      <Loading text="Fetching Universities data..." />
-                    </td>
-                  </tr>
-                )}
+              {loading && (
+                <tr>
+                  <td colSpan={8} className="px-6 py-8 text-center">
+                    <Loading text="Fetching Universities data..." />
+                  </td>
+                </tr>
+              )}
 
-                {!error && !loading && currentUniversities.length === 0 && (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-8 text-center">
-                      <NoMessagesFound
-                        title="No universities found"
-                        subtitle="There are currently no universities available."
-                      />
-                    </td>
-                  </tr>
-                )}
+              {!error && !loading && currentUniversities.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="px-6 py-8 text-center">
+                    <NoMessagesFound
+                      title="No universities found"
+                      subtitle="There are currently no universities available."
+                    />
+                  </td>
+                </tr>
+              )}
 
-                {!error &&
-                  currentUniversities.map((uni) => (
-                    <tr
-                      key={uni.id}
-                      className="hover:bg-primary/10 group transition-colors"
-                    >
-                      <td className="min-w-[200px] max-w-[300px] px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="flex h-10 w-10 shrink-0 items-center justify-center
+              {!error &&
+                currentUniversities.map((uni) => (
+                  <tr
+                    key={uni.id}
+                    className="hover:bg-primary/10 group transition-colors"
+                  >
+                    <td className="min-w-[200px] max-w-[300px] px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="flex h-10 w-10 shrink-0 items-center justify-center
                 rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
-                          >
-                            {uni ? (
-                              uni.name?.slice(0, 2).toUpperCase()
-                            ) : (
-                              <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
-                            )}
-                          </div>
-
-                          <div className="w-full min-w-0">
-                            <h3 className="truncate text-sm font-semibold text-slate-900">
-                              {uni.name}
-                            </h3>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="px-6 py-4">
-                        <div className="flex justify-center">
-                          {isFieldRequired(uni.required_fields, "student.phone") ? (
-                            <CheckCircle className="h-5 w-5 text-green-600" />
+                        >
+                          {uni ? (
+                            uni.name?.slice(0, 2).toUpperCase()
                           ) : (
-                            <XCircle className="h-5 w-5 text-red-500" />
+                            <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
                           )}
                         </div>
-                      </td>
 
-                      <td className="px-6 py-4">
-                        <div className="flex justify-center">
-                          {isFieldRequired(
-                            uni.required_fields,
-                            "student.current_address"
-                          ) ? (
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                          ) : (
-                            <XCircle className="h-5 w-5 text-red-500" />
-                          )}
+                        <div className="w-full min-w-0">
+                          <h3 className="truncate text-sm font-semibold text-slate-900">
+                            {uni.name}
+                          </h3>
                         </div>
-                      </td>
+                      </div>
+                    </td>
 
-                      <td className="px-6 py-4">
-                        <div className="flex justify-center">
-                          {isFieldRequired(uni.required_fields, "student.gender") ? (
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                          ) : (
-                            <XCircle className="h-5 w-5 text-red-500" />
-                          )}
-                        </div>
-                      </td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center">
+                        {isFieldRequired(uni.required_fields, 'student.phone') ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-500" />
+                        )}
+                      </div>
+                    </td>
 
-                      <td className="px-6 py-4">
-                        <div className="flex justify-center">
-                          {isFieldRequired(uni.required_fields, "student.english_proficiencies") ? (
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                          ) : (
-                            <XCircle className="h-5 w-5 text-red-500" />
-                          )}
-                        </div>
-                      </td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center">
+                        {isFieldRequired(
+                          uni.required_fields,
+                          'student.current_address',
+                        ) ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-500" />
+                        )}
+                      </div>
+                    </td>
 
-                      <td className="px-6 py-4">
-                        <div className="flex justify-center">
-                          {isFieldRequired(uni.required_fields, "student.photo") ? (
-                            <CheckCircle className="h-5 w-5 text-green-600" />
-                          ) : (
-                            <XCircle className="h-5 w-5 text-red-500" />
-                          )}
-                        </div>
-                      </td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center">
+                        {isFieldRequired(uni.required_fields, 'student.gender') ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-500" />
+                        )}
+                      </div>
+                    </td>
 
-                      <td className="px-6 py-4">
-                        <div className="flex items-start gap-2">
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center">
+                        {isFieldRequired(uni.required_fields, 'student.english_proficiencies') ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-500" />
+                        )}
+                      </div>
+                    </td>
 
-                          <a
-                            role="menuitem"
-                            aria-label="View University"
-                            href={`/admin/config-universities/${uni.id}`}
-                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                          >
-                            <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                          </a>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center">
+                        {isFieldRequired(uni.required_fields, 'student.photo') ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : (
+                          <XCircle className="h-5 w-5 text-red-500" />
+                        )}
+                      </div>
+                    </td>
 
-                          <div className="h-6 border-l border-slate-200" />
+                    <td className="px-6 py-4">
+                      <div className="flex items-start gap-2">
 
-                          <a
-                            role="menuitem"
-                            aria-label="Edit University"
-                            href={`/admin/config-universities/${uni.id}/edit`}
-                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                          >
-                            <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                          </a>
+                        <a
+                          role="menuitem"
+                          aria-label="View University"
+                          href={`/admin/config-universities/${uni.id}`}
+                          className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                        >
+                          <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
+                        </a>
 
-                          <div className="h-6 border-l border-slate-200" />
+                        <div className="h-6 border-l border-slate-200" />
 
-                          <button
-                            role="menuitem"
-                            aria-label="Delete University"
-                            onClick={() => {
-                              setSelectedUniversityId(uni.id);
-                              setSelectedUniversityName(uni.name);
-                              setIsDeleteOpen(true);
-                            }}
-                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                          >
-                            <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
-                          </button>
+                        <a
+                          role="menuitem"
+                          aria-label="Edit University"
+                          href={`/admin/config-universities/${uni.id}/edit`}
+                          className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                        >
+                          <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
+                        </a>
+
+                        <div className="h-6 border-l border-slate-200" />
+
+                        <button
+                          role="menuitem"
+                          aria-label="Delete University"
+                          onClick={() => {
+                            setSelectedUniversityId(uni.id);
+                            setSelectedUniversityName(uni.name);
+                            setIsDeleteOpen(true);
+                          }}
+                          className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                        >
+                          <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
+                        </button>
 
 
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
 
-          <div className="grid grid-cols-1 items-center gap-4 border-t bg-slate-50 p-4 sm:p-6 md:flex  md:justify-between">
+          <div
+            className="grid grid-cols-1 items-center gap-4 border-t bg-slate-50 p-4 sm:p-6 md:flex  md:justify-between">
             {universities.length > 0 && (
               <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                 Showing
@@ -432,7 +436,7 @@ const UniversityManagementTable = () => {
                 <span className="font-medium">
                   {Math.min(
                     currentPage * itemsPerPage,
-                    universities.length
+                    universities.length,
                   )}
                 </span>
                 of
@@ -450,7 +454,7 @@ const UniversityManagementTable = () => {
               />
 
               <span className="px-3 py-1 font-medium text-slate-500">
-                Page {currentPage} of{" "}
+                Page {currentPage} of{' '}
                 {Math.ceil(universities.length / itemsPerPage)}
               </span>
 
@@ -459,8 +463,8 @@ const UniversityManagementTable = () => {
                   setCurrentPage((prev) =>
                     Math.min(
                       prev + 1,
-                      Math.ceil(universities.length / itemsPerPage)
-                    )
+                      Math.ceil(universities.length / itemsPerPage),
+                    ),
                   )
                 }
                 disabled={

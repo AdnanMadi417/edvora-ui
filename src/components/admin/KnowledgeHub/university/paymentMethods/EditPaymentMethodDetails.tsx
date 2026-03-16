@@ -93,12 +93,14 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
 
       await updatePaymentMethods(paymentMethod.id, payload);
 
-      showToast("Payment method updated successfully");
+      showToast("Payment method updated successfully", "success");
       router.push("/admin/universities/payment-methods");
 
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to update payment method");
+    }
+    catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to update payment method. ${backendMessage}`, "error");
     }
   };
 
@@ -108,14 +110,17 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
     try {
       await deletePayment(selectedPaymentId);
 
-      showToast("Payment method deleted successfully");
+      showToast("Payment method deleted successfully", "success");
 
       setIsDeleteOpen(false);
       router.push("/admin/universities/payment-methods");
 
-    } catch (err) {
-      showToast("Failed to delete payment method");
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
+      showToast(`Deleted failed. ${backendMessage}`, "error");
     }
+
   };
 
   const handleBack = () => {

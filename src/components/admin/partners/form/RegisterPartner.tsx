@@ -1,5 +1,6 @@
 "use client";
 
+import { AxiosError } from "axios";
 import React, { useState } from "react";
 import { ChevronLeft, Handshake } from "lucide-react";
 import InputField from "components/form/InputField";
@@ -79,8 +80,7 @@ export default function RegisterPartner() {
         "Password must be at least 8 characters with 1 letter and 1 number";
     }
 
-    if (!formData.type)
-      newErrors.type = "Please select type";
+    if (!formData.type) newErrors.type = "Please select type";
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -96,7 +96,9 @@ export default function RegisterPartner() {
     try {
       await createPartner(payload);
 
-      showToast("Partner created successfully");
+      showToast("Partner created successfully", "success");
+
+      router.push("/admin/partners");
 
       setFormData({
         name: "",
@@ -108,13 +110,14 @@ export default function RegisterPartner() {
       });
 
       setErrors({});
+    } catch (err: any) {
 
-      // router.push("/admin/partners");
-    } catch (error) {
-      showToast(
-        createPartnerError ||
-        "Failed to create partner. Please try again."
-      );
+      const axiosError = err as AxiosError<{ message: string }>;
+      const backendMessage =
+        axiosError.response?.data?.message ||
+        "Failed to create partner. Please try again.";
+
+      showToast(backendMessage, "error");
     }
   };
 
@@ -209,7 +212,6 @@ export default function RegisterPartner() {
         <div className="flex justify-end gap-2 rounded-b-xl border-t px-6 py-5">
           <Button
             onClick={handleBack}
-            disabled={isCreatingPartner}
             icon={<ChevronLeft className="h-5 w-5" />}
             text="Back"
             bgColor="bg-slate-50"

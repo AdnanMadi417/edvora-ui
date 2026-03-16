@@ -9,51 +9,25 @@ import {
   Pause,
   CheckCircle,
 } from "lucide-react";
-import api from "../../../../lib/useApi";
 import { useToast } from "../../../context/ToastContext";
+
+import { useOfferLetterUpload } from "hooks/applications/files/useOfferLetterUpload";
+import { useVisaDocumentUpload } from "hooks/applications/files/useVisaDocumentUpload";
+import { useVisaSetup } from "hooks/applications/useVisaSetup";
+import { useStatusUpdate } from "hooks/applications/useStatusUpdate";
+import { useCommissionPaymentUpload } from "hooks/applications/files/useCommissionPaymentUpload";
+import { useApplicationActions } from 'hooks/applications/stages/useApplicationActions';
+
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
-import {
-  getPresignedUploads,
-  uploadFilesToSpaces,
-} from "services/uploadService";
+
 import { InputField } from "components/form";
-
-interface DocumentRequest {
-  id: string;
-  type: string[];
-  reason: string;
-}
-
-interface StatusOption {
-  id: string;
-  label: string;
-  description: string;
-  nextAction: string;
-  icon: any;
-  color: string;
-  bgColor: string;
-  borderColor: string;
-  requiresReason: boolean;
-  requiresDocumentSelection: boolean;
-}
-
-interface DocumentRequestListProps {
-  documents: DocumentRequest[];
-  setDocuments: React.Dispatch<React.SetStateAction<DocumentRequest[]>>;
-  documentTypes: { id: string; label: string }[];
-}
+import { DocumentRequest, StatusOption, DocumentRequestListProps } from "components/applications/popups/utility-functions/types";
 
 const DocumentRequestList = ({
   documents,
   setDocuments,
   documentTypes,
 }: DocumentRequestListProps) => {
-  const addDocument = () => {
-    setDocuments([
-      ...documents,
-      { id: Date.now().toString(), type: [], reason: "" },
-    ]);
-  };
 
   const removeDocument = (id: string) => {
     if (documents.length > 1) {
@@ -221,47 +195,36 @@ export default function UpdateStatusPopup({
     };
   };
 
+  const { actions, loading } = useApplicationActions(application?.id);
+
   useEffect(() => {
-    if (!isOpen || !application?.id) return;
+    if (!actions) return;
 
-    const fetchApplicationDetails = async () => {
-      try {
-        const response = await api.get(`/applications/${application.id}`);
-        const appData = response.data;
+    setDocumentTypes(
+      (actions.document_types || []).map((d) => ({
+        id: d.id,
+        label: d.description || d.type,
+      }))
+    );
 
-        setDocumentTypes(
-          (appData.document_types || []).map((d: any) => ({
-            id: d.id,
-            label: d.description || d.type,
-          }))
-        );
+    const options: StatusOption[] = (actions.stage_statuses || []).map((s) => {
+      const matchingAction = actions.available_actions?.find(
+        (a) => a.status === s.name
+      );
 
-        const options: StatusOption[] = (appData.stage_statuses || []).map(
-          (s: any) => {
-            const matchingAction = (appData.available_actions || []).find(
-              (a) => a.status === s.name
-            );
-            return {
-              id: s.id,
-              label: s.name,
-              description: s.description ?? "",
-              nextAction: matchingAction?.next_action ?? "",
-              ...getStatusStyle(s.name),
-              requiresReason: !!s.is_requires_reason,
-              requiresDocumentSelection: !!s.is_requires_document_selection,
-            };
-          }
-        );
+      return {
+        id: s.id,
+        label: s.name,
+        description: "",
+        nextAction: matchingAction?.next_action ?? "",
+        ...getStatusStyle(s.name),
+        requiresReason: !!s.is_requires_reason,
+        requiresDocumentSelection: !!s.is_requires_document_selection,
+      };
+    });
 
-        setStatusOptions(options);
-      } catch (err) {
-        console.error(err);
-        setStatusOptions([]);
-      }
-    };
-
-    fetchApplicationDetails();
-  }, [isOpen, application?.id]);
+    setStatusOptions(options);
+  }, [actions]);
 
   const requiresReason = selectedOption?.requiresReason || false;
   const requiresDocuments = selectedOption?.requiresDocumentSelection || false;
@@ -287,112 +250,56 @@ export default function UpdateStatusPopup({
 
   const isCommissionPaid = selectedOption?.label === "Commission Paid";
 
+  const { uploadOfferLetter, isUploading } = useOfferLetterUpload();
+
   const handleOfferLetterUpload = async () => {
-    if (!isUniversityApproved || !offerLetterFile) return;
+    if (!offerLetterFile || !isUniversityApproved) return;
 
-    showToast("Uploading offer letter...", "info");
-
-    const presigned = await getPresignedUploads([offerLetterFile], "documents");
-    const results = await uploadFilesToSpaces([offerLetterFile], presigned);
-    const uploaded = results?.[0];
-
-    if (!uploaded?.file_key || !uploaded?.public_url) {
-      throw new Error("Offer letter upload failed");
-    }
-
-    await api.post(`/applications/${application.id}/offer-letter`, {
-      file_key: uploaded.file_key,
-      file_url: uploaded.public_url,
-    });
-
-    showToast("Offer letter uploaded successfully.", "success");
+    await uploadOfferLetter(offerLetterFile, application.id);
   };
+
+  const { submitVisaFee, isSubmitting: isVisaSubmitting } = useVisaSetup();
 
   const handleVisaSetup = async () => {
     if (!isVisaSetupSelected) return;
 
     const amount = Number(formData.visa_fee_amount);
-    if (!amount || amount <= 0) {
-      throw new Error("Visa fee amount is required");
-    }
-
-    await api.patch(`/applications/${application.id}/visa-case`, {
-      visa_fee_amount: amount,
-      visa_reference_number: "UB" + Date.now(),
-      notes: "Visa fee amount updated by manager.",
-    });
-
-    showToast("Visa fee saved successfully", "success");
+    await submitVisaFee(application.id, amount);
   };
+
+  const { uploadVisaDocument, isUploading: isVisaUploading } = useVisaDocumentUpload();
 
   const handleVisaIssuedUpload = async () => {
-    if (selectedOption?.label !== "Visa Issued" || !visaDocumentFile) return;
+    if (!visaDocumentFile || selectedOption?.label !== "Visa Issued") return;
 
-    showToast("Uploading visa document...", "info");
-
-    const presigned = await getPresignedUploads(
-      [visaDocumentFile],
-      "documents"
-    );
-    const results = await uploadFilesToSpaces([visaDocumentFile], presigned);
-    const uploaded = results?.[0];
-
-    if (!uploaded?.file_key || !uploaded?.public_url) {
-      throw new Error("Visa document upload failed");
-    }
-
-    await api.post(`/applications/${application.id}/visa-document`, {
-      file_key: uploaded.file_key,
-      file_url: uploaded.public_url,
-    });
-
-    showToast("Visa document uploaded successfully", "success");
+    await uploadVisaDocument(visaDocumentFile, application.id);
   };
 
+  const { updateStatus, isUpdating: isStatusUpdating } = useStatusUpdate();
+
   const handleStatusUpdate = async () => {
-    await api.post(`/applications/${application.id}/status`, {
-      status_id: selectedStatus,
-      reason_text: reason.trim(),
-      notes: notes.trim(),
-      required_document_type_ids:
+    await updateStatus({
+      applicationId: application.id,
+      statusId: selectedStatus,
+      reason,
+      notes,
+      requiredDocumentTypeIds:
         requiresDocuments && !isUniversityApproved && !isCommissionPaid
           ? documents.flatMap((doc) => doc.type)
           : [],
     });
-
-    showToast("Status updated successfully.", "success");
   };
 
+  const { uploadCommissionPayment, } =
+    useCommissionPaymentUpload();
+
   const handleCommissionPaymentUpload = async () => {
-    if (!isCommissionPaid || !commissionPaymentFile) return;
+    if (!commissionPaymentFile || !application?.id) return;
 
-    showToast("Uploading commission payment proof...", "info");
-
-    const presigned = await getPresignedUploads(
-      [commissionPaymentFile],
-      "documents"
+    await uploadCommissionPayment(
+      commissionPaymentFile,
+      application.id
     );
-
-    const results = await uploadFilesToSpaces(
-      [commissionPaymentFile],
-      presigned
-    );
-
-    const uploaded = results?.[0];
-
-    if (!uploaded?.file_key || !uploaded?.public_url) {
-      throw new Error("Commission payment proof upload failed");
-    }
-
-    await api.post(
-      `/applications/${application.id}/commission-payment-document`,
-      {
-        file_key: uploaded.file_key,
-        file_url: uploaded.public_url,
-      }
-    );
-
-    showToast("Commission payment proof uploaded successfully.", "success");
   };
 
   const updateFormData = (field: string, value: any) => {

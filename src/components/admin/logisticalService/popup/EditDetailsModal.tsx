@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Plus, Trash2, Edit2, XCircle } from 'lucide-react';
-import ModalHeader from "../../../ui/modal/ModalHeader";
 
 import { useLogisticServices } from "../../../../hooks/serviceProviders/useLogisticServicesList";
 import { useLogisticServiceLocations } from "../../../../hooks/serviceProviders/uselogisticServiceLocationsList";
@@ -10,6 +9,7 @@ import { useLogisticLanguages } from "../../../../hooks/serviceProviders/useLogi
 import { useLogisticUniversities } from "../../../../hooks/serviceProviders/useLogisticUniversitiesList";
 import { useEditLogisticsProvider } from "../../../../hooks/serviceProviders/useEditLogisticsProvider";
 
+import ModalHeader from "../../../ui/modal/ModalHeader";
 import CheckSimpleBoxGroup from "../../../form/CheckSimpleBoxGroup";
 import InputField from "../../../form/InputField";
 import Button from "../../../ui/buttons/Button";
@@ -87,11 +87,8 @@ export default function EditDetailsModal({
   });
 
   const { logisticServices } = useLogisticServices();
-
   const { logisticServiceLocations } = useLogisticServiceLocations();
-
   const { logisticLanguages } = useLogisticLanguages();
-
   const { logisticUniversities } = useLogisticUniversities();
 
   const {
@@ -177,6 +174,68 @@ export default function EditDetailsModal({
     logisticServiceLocations,
   ]);
 
+  const isFormChanged = () => {
+    if (!provider) return false;
+
+    const basicChanged =
+      formData.name !== provider.name ||
+      formData.nationality !== provider.nationality ||
+      formData.main_location !== provider.main_location ||
+      formData.phone_number !== provider.phone_number ||
+      formData.whatsapp !== provider.whatsapp ||
+      formData.is_active !== (provider.is_active ?? true);
+
+    const servicesChanged =
+      formData.selectedServices.length !== (provider.services_offered || []).length ||
+      formData.selectedServices.some(
+        (id) => !logisticServices.find((s) => s.id === id)?.name ||
+          !provider.services_offered.includes(logisticServices.find((s) => s.id === id)?.name!)
+      );
+
+    const languagesChanged =
+      formData.selectedLanguages.length !== (provider.languages || []).length ||
+      formData.selectedLanguages.some(
+        (id) => !logisticLanguages.find((l) => l.id === id)?.name ||
+          !provider.languages.includes(logisticLanguages.find((l) => l.id === id)?.name!)
+      );
+
+    const universitiesChanged =
+      formData.selectedUniversities.length !== (provider.universities_served || []).length ||
+      formData.selectedUniversities.some(
+        (id) => !logisticUniversities.find((u) => u.id === id)?.name ||
+          !provider.universities_served.includes(logisticUniversities.find((u) => u.id === id)?.name!)
+      );
+
+    const locationsChanged =
+      formData.selectedLocations.length !== (provider.service_locations || []).length ||
+      formData.selectedLocations.some(
+        (id) => !logisticServiceLocations.find((l) => l.id === id)?.name ||
+          !provider.service_locations.includes(logisticServiceLocations.find((l) => l.id === id)?.name!)
+      );
+
+    const packagesChanged =
+      formData.packages_offered.length !== (provider.packages_offered || []).length ||
+      formData.packages_offered.some((pkg, i) => {
+        const original = provider.packages_offered[i];
+        if (!original) return true;
+        return (
+          pkg.name !== original.name ||
+          pkg.description !== original.description ||
+          pkg.price !== original.price ||
+          pkg.includes.join(",") !== (original.includes || []).join(",")
+        );
+      });
+
+    return (
+      basicChanged ||
+      servicesChanged ||
+      languagesChanged ||
+      universitiesChanged ||
+      locationsChanged ||
+      packagesChanged
+    );
+  };
+
   const handleSubmit = async () => {
     const newErrors: FormErrors = {};
 
@@ -232,13 +291,14 @@ export default function EditDetailsModal({
 
       setErrors({});
 
-      showToast("success: Logistics provider updated successfully");
+      showToast("Logistics provider updated successfully", "success");
 
       setTimeout(() => {
         location.reload();
       }, 1500);
-    } catch (error) {
-      showToast("error" + "Failed to update logistics provider");
+    } catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
 
@@ -585,7 +645,7 @@ export default function EditDetailsModal({
               hoverTextColor="hover:text-amber-800"
               hoverBorderColor="hover:border-amber-700"
               onClick={handleSubmit}
-              disabled={loadingEditLogisticsProvider}
+              disabled={loadingEditLogisticsProvider || !isFormChanged()}
             />
           </div>
         </div>

@@ -13,19 +13,21 @@ import {
   Users,
   AlertCircle, Trash2,
 } from 'lucide-react';
+import { MdAdminPanelSettings } from "react-icons/md";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+
+import { useAccountManagerList } from "hooks/account-managers/useAccountManagerList";
+import { useDeleteAccountManager } from 'hooks/account-managers/useDeleteAccountManager';
+
+import NoMessagesFound from 'components/emptyData/NoMessagesFound';
+import DeleteAccountManager from 'components/admin/accountManager/popups/DeleteAccountManager';
+import { useToast } from 'components/context/ToastContext';
 
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
-import ClearButton from "components/ui/buttons/DangerButton";
 
-import { useAccountManagerList } from "hooks/account-managers/useAccountManagerList";
+import ClearButton from "components/ui/buttons/DangerButton";
 import Link from "next/link";
-import { MdPersonAdd } from "react-icons/md";
-import NoMessagesFound from '../../../emptyData/NoMessagesFound';
-import DeleteAccountManager from 'components/admin/accountManager/popups/DeleteAccountManager';
-import { useDeleteAccountManager } from 'hooks/account-managers/useDeleteAccountManager';
-import { useToast } from '../../../context/ToastContext';
 
 const ModernAccountManagersTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,7 +91,7 @@ const ModernAccountManagersTable = () => {
     try {
       await deleteAccountManager(selectedUniversityId);
 
-      showToast("Account Manager deleted successfully.");
+      showToast("Account Manager deleted successfully.", "success");
 
       setIsDeleteOpen(false);
       setSelectedUniversityId(null);
@@ -98,10 +100,9 @@ const ModernAccountManagersTable = () => {
       setTimeout(() => location.reload(), 2000);
 
     } catch (error: any) {
-      showToast("Failed to delete Account Manager . Please try again.");
+      showToast("Failed to delete Account Manager. Please try again.", "error");
     }
   };
-
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
@@ -144,8 +145,8 @@ const ModernAccountManagersTable = () => {
               className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
               href="/admin/account-managers/create"
             >
-              <MdPersonAdd className="h-4 w-4" />
-              Create Account Manager
+              <MdAdminPanelSettings className="h-4 w-4" />
+              Create Manager
             </Link>
           </div>
         </div>

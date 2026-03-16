@@ -1,15 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { PlusCircle, XCircle, BadgePercent } from 'lucide-react';
-
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "../../../../ui/buttons/Button";
-import InputField from "../../../../form/InputField";
-import ToggleInput from '../../../../form/toggle/ToggleInput';
+import { XCircle, BadgePercent } from 'lucide-react';
 
 import { useCreateCommissionType } from "hooks/knowledge-hub/commission/useCreateCommissionType";
+
 import { useToast } from "components/context/ToastContext";
+import { useRouter } from 'next/navigation';
+
+import ModalHeader from "components/ui/modal/ModalHeader";
+import Button from "components/ui/buttons/Button";
+import InputField from "components/form/InputField";
 
 interface CreateCommissionTypeProps {
   isOpen: boolean;
@@ -23,6 +24,7 @@ export default function CreateCommissionType({
 
   const { createCommissionType, loading } = useCreateCommissionType();
   const { showToast } = useToast();
+  const router = useRouter();
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -63,26 +65,16 @@ export default function CreateCommissionType({
 
       showToast("Commission type created successfully.", "success");
 
+      router.push("admin/knowledge-hub/programs/create");
+
       onClose();
 
       return newCommissionType;
 
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
-      }
-
-      showToast("Failed to create commission type.", "error");
+    }
+    catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to create commission type. ${backendMessage}`, "error");
     }
   };
 
@@ -176,7 +168,7 @@ export default function CreateCommissionType({
 
             <Button
               onClick={handleCreate}
-              disabled={loading}
+              disabled={loading || !formData.name.trim() || !formData.description.trim()}
               icon={<BadgePercent className="h-5 w-5" />}
               text={loading ? "Creating..." : "Create Commission Type"}
               bgColor="bg-blue-50"

@@ -18,27 +18,23 @@ import {
   Trash2,
 } from 'lucide-react';
 import { MdSchool, MdLibraryAdd } from "react-icons/md";
-import { AiOutlineBank } from "react-icons/ai";
+import { useToast } from "components/context/ToastContext";
 
+import { AiOutlineBank } from "react-icons/ai";
 import { useAllPrograms } from "hooks/knowledge-hub/programs/useProgramsList";
 import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
 import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
 import { useDeleteKnowledgeHubPrograms } from "hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms";
+import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
 
 import FilterSelectField from "components/form/filter/FilterSelectField";
-
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
-
 import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
 import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/BatchUpdatePrograms";
-
 import Loading from "components/loading/Loading";
 import NoMessagesFound from 'components/emptyData/NoMessagesFound';
-
 import Link from "next/link";
-import { useToast } from "components/context/ToastContext";
-import { useAllUniversities } from '../../../../../hooks/knowledge-hub/universities/useUniversitiesList';
 
 const ProgramsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -155,7 +151,7 @@ const ProgramsTable = () => {
 
       await deletePrograms(ids);
 
-      showToast("Deleted successfully");
+      showToast("Deleted successfully", "success");
 
       setIsDeleteOpen(false);
       setDeleteMode(null);
@@ -163,9 +159,9 @@ const ProgramsTable = () => {
       setSelectedPrograms({});
 
       window.location.reload();
-    } catch (error) {
-      console.error(error);
-      showToast("Delete failed");
+    } catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Delete failed. ${backendMessage}`, "error");
     }
   };
 
@@ -566,11 +562,11 @@ const ProgramsTable = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2 text-sm">
                       {Program.has_scholarship ? (
-                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs text-green-600">
+                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
                               <CheckCircle className="h-4 w-4" /> Available
                             </span>
                       ) : (
-                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs text-red-600">
+                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
                               <XCircle className="h-4 w-4" /> Not Available
                             </span>
                       )}

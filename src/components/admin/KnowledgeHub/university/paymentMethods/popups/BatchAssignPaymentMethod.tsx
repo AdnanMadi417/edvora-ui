@@ -1,18 +1,28 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard } from "lucide-react";
+import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
+import { useBatchAssignPaymentMethod } from "hooks/knowledge-hub/payment-methods/useBatchAssignPaymentMethod";
+
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import InputField from "components/form/InputField";
-import SearchableDropdown from "components/form/search/SearchableDropdown";
-import { useBatchAssignPaymentMethod } from "hooks/knowledge-hub/payment-methods/useBatchAssignPaymentMethod";
+import MultiSelect from "components/form/search/MultiSelect";
 import { useToast } from "components/context/ToastContext";
-import { useRouter } from "next/navigation";
-import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
 
 interface BatchUniversitiesProps {
   isOpen: boolean;
   onClose: () => void;
   selectedUniversityIds: string[];
+}
+
+interface FormData {
+  payment_method_ids: string[];
+  university_ids: string[];
+  instructions: string;
+  currency: string;
+  is_active: boolean;
 }
 
 export default function BatchUniversities({
@@ -23,11 +33,10 @@ export default function BatchUniversities({
   const { paymentMethods } = useAllPaymentMethods();
   const { batchAssignPaymentMethod, loading } = useBatchAssignPaymentMethod();
   const { showToast } = useToast();
-  const router = useRouter();
 
-  const [formData, setFormData] = useState({
-    payment_method_id: "",
-    university_ids: [] as string[],
+  const [formData, setFormData] = useState<FormData>({
+    payment_method_ids: [],
+    university_ids: [],
     instructions: "",
     currency: "",
     is_active: true,
@@ -38,7 +47,7 @@ export default function BatchUniversities({
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        payment_method_id: "",
+        payment_method_ids: [],
         university_ids: selectedUniversityIds || [],
         instructions: "",
         currency: "",
@@ -48,17 +57,18 @@ export default function BatchUniversities({
     }
   }, [isOpen, selectedUniversityIds]);
 
-  const updateFormData = (field: string, value: any) => {
+  const updateFormData = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const handleAssign = async () => {
-    if (!formData.payment_method_id || !formData.university_ids.length) return;
+    if (!formData.payment_method_ids.length || !formData.university_ids.length)
+      return;
 
     try {
       await batchAssignPaymentMethod({
-        payment_method_id: formData.payment_method_id,
+        payment_method_ids: formData.payment_method_ids,
         university_ids: formData.university_ids,
         instructions: formData.instructions?.trim() || undefined,
         currency: formData.currency?.trim() || undefined,
@@ -66,18 +76,11 @@ export default function BatchUniversities({
       });
 
       showToast("Payment method assigned successfully.", "success");
+      setTimeout(() => location.reload(), 1500);
       onClose();
-      setTimeout(() => router.refresh(), 1500);
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
-        });
-        setErrors(newErrors);
-      }
-      showToast("Failed to assign payment method.", "error");
+    } catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to assign payment method. ${backendMessage}`, "error");
     }
   };
 
@@ -107,9 +110,9 @@ export default function BatchUniversities({
           />
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
-            <SearchableDropdown
+            <MultiSelect
               label="Payment Method"
-              field="payment_method_id"
+              field="payment_method_ids"
               required
               options={paymentMethods.map((p) => ({
                 value: String(p.id),
@@ -127,6 +130,7 @@ export default function BatchUniversities({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              required={false}
             />
 
             <InputField
@@ -136,6 +140,7 @@ export default function BatchUniversities({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              required={false}
             />
           </div>
 
@@ -150,7 +155,7 @@ export default function BatchUniversities({
             />
             <Button
               onClick={handleAssign}
-              disabled={!formData.payment_method_id || loading}
+              disabled={!formData.payment_method_ids.length || loading}
               icon={<CreditCard className="h-5 w-5" />}
               text={loading ? "Assigning..." : "Assign Payment Method"}
               bgColor="bg-blue-50"

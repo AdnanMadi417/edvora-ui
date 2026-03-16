@@ -18,18 +18,16 @@ import {
 import { MdAddBusiness } from "react-icons/md";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
-import Loading from "../../../loading/Loading";
-import NoMessagesFound from "../../../emptyData/NoMessagesFound";
+import Loading from "components/loading/Loading";
+import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import EmptyData from "components/emptyData/EmptyTableData";
+import NextButton from "components/ui/buttons/NextButton";
+import PrevButton from "components/ui/buttons/PrevButton";
 
-import EmptyData from "../../../emptyData/EmptyTableData";
-import NextButton from "../../../ui/buttons/NextButton";
+import { useServiceProviders } from "hooks/serviceProviders/useServiceProviders";
 
-import PrevButton from "../../../ui/buttons/PrevButton";
-
-import { useServiceProviders } from "../../../../hooks/serviceProviders/useServiceProviders";
-
-import ViewDetailsModal from "../../../admin/logisticalService/popup/ViewDetailsModal";
-import EditDetailsModal from "../../../admin/logisticalService/popup/EditDetailsModal";
+import ViewDetailsModal from "components/admin/logisticalService/popup/ViewDetailsModal";
+import EditDetailsModal from "components/admin/logisticalService/popup/EditDetailsModal";
 
 import Link from "next/link";
 
@@ -42,9 +40,6 @@ const LogisticalServiceProviderTable = () => {
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [selectedManager, setSelectedManager] = useState<any>(null);
-
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -64,22 +59,6 @@ const LogisticalServiceProviderTable = () => {
   const [showViewModal, setViewModal] = useState(false);
   const [showEditModal, setEditModal] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<any>(null);
-
-  const handleSelectProvider = (id: string) => {
-    setSelectedProviders((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
-  const handleSelectAll = () => {
-    const allSelected = Object.values(selectedProviders).every(Boolean);
-    const newSelection: Record<string, boolean> = {};
-    Object.keys(selectedProviders).forEach((id) => {
-      newSelection[id] = !allSelected;
-    });
-    setSelectedProviders(newSelection);
-  };
 
   useEffect(() => {
     if (serviceProviders.length) {

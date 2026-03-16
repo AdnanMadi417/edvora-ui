@@ -2,74 +2,74 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Trash2, PlusCircle, MoreVertical, ChevronLeft, CalendarPlus } from 'lucide-react';
+import {
+  GraduationCap,
+  Trash2,
+  MoreVertical,
+  ChevronLeft,
+  CalendarPlus,
+  Pencil,
+} from "lucide-react";
 
-import { DURATION,  SCHOLARSHIP_TYPE } from 'constants/lists';
-import Loading from "components/loading/Loading";
-
-import Button from 'components/ui/buttons/Button';
-import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
+import { DURATION, SCHOLARSHIP_TYPE } from "constants/lists";
 
 import { useToast } from "components/context/ToastContext";
+import Loading from "components/loading/Loading";
+import Button from "components/ui/buttons/Button";
+import DeleteProgramsConfirmation from "../popups/DeleteProgramsConfirmation";
 
 import { useProgram } from "hooks/knowledge-hub/programs/useProgram";
 import { useDeleteKnowledgeHubPrograms } from "hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms";
-import { useUpdateProgram,UpdateProgramPayload } from "hooks/knowledge-hub/programs/useUpdateProgram";
-import { useCommissionTypes } from 'hooks/knowledge-hub/commission/useCommissionTypes';
-import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
-import { useAllBranches } from 'hooks/knowledge-hub/universities/useBranchesList';
-import { useAllFields } from 'hooks/knowledge-hub/programs/useFieldsList';
-import { useAllQualifications } from 'hooks/knowledge-hub/qualifications/useQualificationsList';
+import {
+  useUpdateProgram,
+  UpdateProgramPayload,
+} from "hooks/knowledge-hub/programs/useUpdateProgram";
+import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
+import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
+import { useAllBranches } from "hooks/knowledge-hub/universities/useBranchesList";
+import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
+import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
 
 import InputField from "components/form/InputField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import MultipleDateInput from "components/form/MultipleDateInput";
-import SearchableSelect from 'components/form/SearchableSelect';
-import ArrayObjectField from 'components/form/ArrayObjectField';
-import SelectField from 'components/form/SelectField';
-import CreateUniversity from '../../../university/popups/CreateUniversity';
-import CreateCommissionType from '../../popups/CreateCommissionType';
-import CreateFieldOfStudy from '../../popups/CreateFieldOfStudy';
-import CreateBranch from '../../popups/CreateBranch';
+import SearchableDropdown from "components/form/search/SearchableDropdown";
+import ArrayObjectField from "components/form/ArrayObjectField";
+import SelectField from "components/form/SelectField";
 
-import IconButton from 'components/ui/buttons/IconButton';
-import NoMessagesFound from 'components/emptyData/NoMessagesFound';
-
+import IconButton from "components/ui/buttons/IconButton";
+import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 interface Props {
   id: string;
 }
 
 const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
-
-
-  const [showUniversityPopup, setShowUniversityPopup] = useState(false);
-  const [showCommissionTypePopup, setShowCommissionTypePopup] = useState(false);
-  const [showFieldOfStudyPopup, setShowFieldOfStudyPopup] = useState(false);
-  const [showBranchPopup, setShowBranchPopup] = useState(false);
-
-
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const { deletePrograms } =
-    useDeleteKnowledgeHubPrograms();
+  const { deletePrograms } = useDeleteKnowledgeHubPrograms();
 
-  const { commissionTypes } =
-    useCommissionTypes();
+  const { commissionTypes } = useCommissionTypes();
   const { qualifications } = useAllQualifications();
 
+  const { showToast } = useToast();
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [deleteMode, setDeleteMode] = useState<'single' | 'batch' | null>(null);
-  const { showToast } = useToast();
+  const [deleteMode, setDeleteMode] = useState<"single" | "batch" | null>(null);
+  const [isFormChanged, setIsFormChanged] = useState(false);
+  const [initialFormData, setInitialFormData] = useState<any>({});
 
   const router = useRouter();
-  const handleBack = () => {
-    router.push('/admin/knowledge-hub/programs');
-  };
-
   const { program, commission } = useProgram(id);
   const { updateProgram, updateProgrLoading } = useUpdateProgram();
   const [formData, setFormData] = useState<any>({});
+
+  const { fields } = useAllFields();
+  const { universities } = useAllUniversities();
+  const { branches } = useAllBranches(formData.uni_id);
+
+  const getNestedValue = (obj: any, path: string[]) => {
+    return path.reduce((acc, key) => (acc ? acc[key] : undefined), obj);
+  };
 
   const removeScholarship = (index: number) => {
     setFormData((prev) => ({
@@ -94,127 +94,56 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
     }));
   };
 
-  const isFormValid = React.useMemo(() => {
-    if (!formData) return false;
-
-    const basicValid =
-      formData.name?.trim() !== "" &&
-      formData.uni_id !== "" &&
-      formData.branch_id !== "" &&
-      formData.field_of_study_id !== "" &&
-      formData.qualification_id !== "" &&
-      formData.overview?.trim() !== "" &&
-      formData.curriculum?.trim() !== "" &&
-      formData.intake_dates?.length > 0 &&
-      Number(formData.tuition_fee) > 0 &&
-      Number(formData.duration) > 0 &&
-      Number(formData.english_required_score) > 0 &&
-      Number(formData.commission_amount) >= 0;
-
-    // At least one delivery mode
-    const deliveryValid =
-      formData.is_on_campus === true ||
-      formData.is_online === true;
-
-    // Commission type required only if commission amount > 0
-    const commissionValid =
-      Number(formData.commission_amount) === 0 ||
-      formData.commission_type_id !== "";
-
-    const yearlyFeesValid =
-      !formData.yearly_fees?.length ||
-      formData.yearly_fees.every(
-        (y: any) =>
-          Number(y.year) > 0 &&
-          Number(y.fee) > 0
-      );
-
-    const oneTimeFeesValid =
-      !formData.one_time_fees?.length ||
-      formData.one_time_fees.every(
-        (f: any) =>
-          f.description?.trim() !== "" &&
-          Number(f.fee) > 0
-      );
-
-    // Scholarship validation only if enabled
-    const scholarshipValid =
-      !formData.has_scholarship ||
-      (formData.scholarships?.length > 0 &&
-        formData.scholarships.every(
-          (s: any) =>
-            s.name?.trim() !== "" &&
-            Number(s.coverage_percent) >= 0 &&
-            Number(s.max_amount) >= 0
-        ));
-
-    return (
-      basicValid &&
-      deliveryValid &&
-      commissionValid &&
-      yearlyFeesValid &&
-      oneTimeFeesValid &&
-      scholarshipValid
-    );
-  }, [formData]);
-
-  useEffect(() => {
-    if (!program) return;
-
-    setFormData({
-      uni_id: program.university?.id ?? "",
-      branch_id: program.branch?.id ?? "",
-      field_of_study_id: program.field_of_study?.id ?? "",
-
-      name: program.name ?? "",
-      tuition_fee: program.tuition_fee ?? 0,
-      intake_dates: program.intake_dates ?? [],
-      duration: program.duration ?? 0,
-
-      english_required_score: program.english_required_score ?? "",
-      overview: program.overview ?? "",
-      curriculum: program.curriculum ?? "",
-
-      is_on_campus: program.is_on_campus ?? false,
-      is_online: program.is_online ?? false,
-      has_scholarship: program.has_scholarship ?? false,
-
-      commission_amount: Number(program.commission_amount) || 0,
-      commission_type_id: commission?.type_id ?? "",
-      commission_notes: commission?.notes ?? "Commission paid 30 days after student completes first semester of each academic year.",
-
-      qualification_id: String((program as any).qualification_id || ""),
-
-      yearly_fees: program.yearly_fees ?? [],
-      one_time_fees: program.one_time_fees ?? [],
-      scholarships: program.scholarships ?? [],
-    });
-  }, [program, commission]);
-
-  const { fields } = useAllFields();
-  const { universities } = useAllUniversities();
-  const { branches } = useAllBranches(formData.uni_id);
-
   const updateFormData = (field: string, value: any) => {
     setFormData((prev: any) => {
       const clone = structuredClone(prev);
-
-      const path = field
-        .replace(/\[(\w+)\]/g, '.$1')
-        .split('.');
-
+      const path = field.replace(/\[(\w+)\]/g, ".$1").split(".");
       let current = clone;
 
       for (let i = 0; i < path.length - 1; i++) {
         if (!current[path[i]]) current[path[i]] = {};
         current = current[path[i]];
       }
-
       current[path[path.length - 1]] = value;
+
+      const changed = JSON.stringify(clone) !== JSON.stringify(initialFormData);
+      setIsFormChanged(changed);
 
       return clone;
     });
   };
+
+  useEffect(() => {
+    if (!program) return;
+
+    const initialData = {
+      uni_id: program.university?.id ?? "",
+      branch_id: program.branch?.id ?? "",
+      field_of_study_id: program.field_of_study?.id ?? "",
+      name: program.name ?? "",
+      tuition_fee: program.tuition_fee ?? 0,
+      intake_dates: program.intake_dates ?? [],
+      duration: program.duration ?? 0,
+      english_required_score: program.english_required_score ?? "",
+      overview: program.overview ?? "",
+      curriculum: program.curriculum ?? "",
+      is_on_campus: program.is_on_campus ?? false,
+      is_online: program.is_online ?? false,
+      has_scholarship: program.has_scholarship ?? false,
+      commission_amount: Number(program.commission_amount) || 0,
+      commission_type_id: commission?.type_id ?? "",
+      commission_notes:
+        commission?.notes ??
+        "Commission paid 30 days after student completes first semester of each academic year.",
+      qualification_id: String((program as any).qualification_id || ""),
+      yearly_fees: program.yearly_fees ?? [],
+      one_time_fees: program.one_time_fees ?? [],
+      scholarships: program.scholarships ?? [],
+    };
+
+    setFormData(initialData);
+    setInitialFormData(initialData);
+  }, [program, commission]);
 
   const handleUpdate = async () => {
     try {
@@ -229,9 +158,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
         tuition_fee: Number(formData.tuition_fee) || 0,
         duration: Number(formData.duration) || 0,
-        english_required_score: String(
-          formData.english_required_score || ""
-        ),
+        english_required_score: String(formData.english_required_score || ""),
 
         is_on_campus: Boolean(formData.is_on_campus),
         is_online: Boolean(formData.is_online),
@@ -249,59 +176,66 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
         yearly_fees: Array.isArray(formData.yearly_fees)
           ? formData.yearly_fees.map((f: any) => ({
-            year: Number(f.year) || 0,
-            fee: Number(f.fee) || 0,
-          }))
+              year: Number(f.year) || 0,
+              fee: Number(f.fee) || 0,
+            }))
           : [],
 
         one_time_fees: Array.isArray(formData.one_time_fees)
           ? formData.one_time_fees.map((f: any) => ({
-            description: String(f.description || ""),
-            fee: Number(f.fee) || 0,
-          }))
+              description: String(f.description || ""),
+              fee: Number(f.fee) || 0,
+            }))
           : [],
 
         scholarships: formData.has_scholarship
           ? Array.isArray(formData.scholarships)
             ? formData.scholarships.map((s: any) => ({
-              type: Number(s.type) || 0,
-              coverage_percent: Number(s.coverage_percent) || 0,
-              max_amount: Number(s.max_amount) || 0,
-              name: String(s.name || ""),
-              description: String(s.description || ""),
-            }))
+                type: Number(s.type) || 0,
+                coverage_percent: Number(s.coverage_percent) || 0,
+                max_amount: Number(s.max_amount) || 0,
+                name: String(s.name || ""),
+                description: String(s.description || ""),
+              }))
             : []
           : [],
       };
 
       await updateProgram(id, payload);
 
-      showToast("Program updated successfully");
+      showToast("Program updated successfully", "success");
+
+      setInitialFormData(structuredClone(formData));
+      setIsFormChanged(false);
 
       router.push("/admin/knowledge-hub/programs");
-    } catch (err) {
-      console.error(err);
-      showToast("Update failed");
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
+      showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
 
   const handleDelete = async () => {
     try {
       if (!id) return;
-
+      setIsDeleting(true);
       await deletePrograms([id]);
-
-      showToast('Deleted successfully');
-
+      showToast("Deleted successfully", "success");
       setIsDeleteOpen(false);
       setDeleteMode(null);
-
-      router.push('/admin/knowledge-hub/programs');
-
-    } catch (error) {
-      console.error(error);
-      showToast('Delete failed');
+      router.push("/admin/knowledge-hub/programs");
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
+      showToast(`Delete failed. ${backendMessage}`, "error");
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const handleBack = () => {
+    router.push("/admin/knowledge-hub/programs");
   };
 
   if (!program) return <Loading text="Loading program..." />;
@@ -387,7 +321,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
             </h3>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <SearchableSelect
+              <SearchableDropdown
                 label="University"
                 field="uni_id"
                 options={(universities ?? [])
@@ -399,16 +333,9 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 formData={formData}
                 errors={{}}
                 updateFormData={updateFormData}
-                actions={[
-                  {
-                    label: "Create University",
-                    icon: <PlusCircle className="h-4 w-4" />,
-                    onClick: () => setShowUniversityPopup(true),
-                  },
-                ]}
               />
 
-              <SearchableSelect
+              <SearchableDropdown
                 label="Branch"
                 field="branch_id"
                 options={branches.map((s) => ({
@@ -418,13 +345,6 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 formData={formData}
                 errors={{}}
                 updateFormData={updateFormData}
-                actions={[
-                  {
-                    label: "Create Branch",
-                    icon: <PlusCircle className="h-4 w-4" />,
-                    onClick: () => setShowBranchPopup(true),
-                  },
-                ]}
               />
 
               <InputField
@@ -437,7 +357,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 updateFormData={updateFormData}
               />
 
-              <SearchableSelect
+              <SearchableDropdown
                 label="Field of Study"
                 field="field_of_study_id"
                 options={fields.map((f) => ({
@@ -447,13 +367,6 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 formData={formData}
                 errors={{}}
                 updateFormData={updateFormData}
-                actions={[
-                  {
-                    label: "Create Field of Study",
-                    icon: <PlusCircle className="h-4 w-4" />,
-                    onClick: () => setShowFieldOfStudyPopup(true),
-                  },
-                ]}
               />
 
               <InputField
@@ -615,7 +528,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
               subLabel="Year"
               field="yearly_fees"
               formData={formData}
-              errors={{ }}
+              errors={{}}
               updateFormData={updateFormData}
               fields={[
                 {
@@ -784,15 +697,15 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
           />
 
           <Button
-            icon={<PlusCircle className="h-5 w-5" />}
-            text={updateProgrLoading ? "Updating..." : "Update Program"}
+            icon={<Pencil className="h-5 w-5" />}
+            text={updateProgrLoading ? "Updating..." : "Save Change"}
             bgColor="bg-blue-50"
             textColor="text-blue-700"
             borderColor="border-blue-600"
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
             onClick={handleUpdate}
-            disabled={updateProgrLoading || !isFormValid}
+            disabled={updateProgrLoading || !isFormChanged}
           />
         </div>
       </div>
@@ -806,27 +719,6 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
         onConfirm={handleDelete}
         isDeleting={isDeleting}
         programNames={program?.name ? [program.name] : []}
-      />
-
-      <CreateUniversity
-        isOpen={showUniversityPopup}
-        onClose={() => setShowUniversityPopup(false)}
-      />
-
-      <CreateCommissionType
-        isOpen={showCommissionTypePopup}
-        onClose={() => setShowCommissionTypePopup(false)}
-      />
-
-      <CreateFieldOfStudy
-        isOpen={showFieldOfStudyPopup}
-        onClose={() => setShowFieldOfStudyPopup(false)}
-      />
-
-      <CreateBranch
-        isOpen={showBranchPopup}
-        onClose={() => setShowBranchPopup(false)}
-        universityId={formData.uni_id}
       />
     </>
   );

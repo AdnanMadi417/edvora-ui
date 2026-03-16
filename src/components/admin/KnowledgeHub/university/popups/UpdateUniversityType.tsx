@@ -1,16 +1,15 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { GraduationCap, XCircle } from "lucide-react";
+import { Layers, GraduationCap, XCircle } from "lucide-react";
+
+import { useAssignUniversityType } from "hooks/knowledge-hub/config-universities/useAssignUniversityType";
+import { useUniversityTypes } from "hooks/knowledge-hub/config-universities/useUniversityTypesQuery";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
-
 import SelectField from "components/form/SelectField";
-
-import { useAssignUniversityType } from "hooks/knowledge-hub/config-universities/useAssignUniversityType";
-import { useUniversityTypes } from "hooks/knowledge-hub/config-universities/useUniversityTypesQuery";
 
 interface Props {
   isOpen: boolean;
@@ -22,11 +21,11 @@ interface Props {
 }
 
 export default function AssignUniversityTypeModal({
-                                                    isOpen,
-                                                    onClose,
-                                                    universityId,
-                                                    initialData,
-                                                  }: Props) {
+  isOpen,
+  onClose,
+  universityId,
+  initialData,
+}: Props) {
   const { assignUniversityType, loading } =
     useAssignUniversityType(universityId);
 
@@ -38,6 +37,13 @@ export default function AssignUniversityTypeModal({
 
   const [formData, setFormData] = useState({
     university_type_id: "" as string | "",
+  });
+  const [initialFormData, setInitialFormData] = useState({
+    university_type_id: "" as string | "",
+  });
+
+  const normalizePayload = (data: typeof formData) => ({
+    university_type_id: data.university_type_id || "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -54,21 +60,30 @@ export default function AssignUniversityTypeModal({
 
   useEffect(() => {
     if (initialData) {
-      setFormData({
-        university_type_id:
-          initialData.university_type_id || "",
-      });
+      const initial = {
+        university_type_id: initialData.university_type_id || "",
+      };
+
+      setFormData(initial);
+      setInitialFormData(initial);
     }
   }, [initialData]);
 
+  const isFormChanged = React.useMemo(() => {
+    const current = normalizePayload(formData);
+    const initial = normalizePayload(initialFormData);
+
+    return JSON.stringify(current) !== JSON.stringify(initial);
+  }, [formData, initialFormData]);
+
   const updateFormData = (field: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
 
     if (errors[field]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [field]: "",
       }));
@@ -86,29 +101,18 @@ export default function AssignUniversityTypeModal({
 
     try {
       await assignUniversityType({
-        university_type_id:
-          formData.university_type_id || null,
+        university_type_id: formData.university_type_id || null,
       });
 
       showToast("University type assigned successfully", "success");
 
+      location.reload();
+
       onClose();
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
-      }
-
-      showToast("Failed to assign university type", "error");
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
+      showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
 
@@ -121,12 +125,16 @@ export default function AssignUniversityTypeModal({
     >
       <div
         className="w-full max-w-lg rounded-2xl bg-white shadow-2xl"
-        onClick={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <ModalHeader
+          icon={Layers}
           title="Assign University Type"
-          description="Select university type for this university"
-          icon={GraduationCap}
+          description="Select the university type for this institution"
+          iconBg="bg-blue-50"
+          iconColor="text-blue-600"
+          iconBorder="border-blue-200"
+          titleColor="text-gray-900"
           onClose={onClose}
         />
 
@@ -135,7 +143,7 @@ export default function AssignUniversityTypeModal({
             label="University Type"
             field="university_type_id"
             required
-            options={universityTypes.map(type => ({
+            options={universityTypes.map((type) => ({
               value: String(type.id),
               label: type.name,
             }))}
@@ -148,7 +156,6 @@ export default function AssignUniversityTypeModal({
         <div className="flex justify-end gap-3 border-t px-6 py-4">
           <Button
             onClick={onClose}
-            disabled={loading}
             icon={<XCircle className="h-5 w-5" />}
             text="Cancel"
             bgColor="bg-slate-50"
@@ -160,7 +167,7 @@ export default function AssignUniversityTypeModal({
 
           <Button
             onClick={handleSubmit}
-            disabled={loading || !isFormValid}
+            disabled={loading || !isFormValid || !isFormChanged}
             icon={<GraduationCap className="h-5 w-5" />}
             text={loading ? "Saving..." : "Save Type"}
             bgColor="bg-blue-50"

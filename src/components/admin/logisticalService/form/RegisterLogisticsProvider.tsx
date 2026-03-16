@@ -1,21 +1,21 @@
 "use client";
 
-import { Trash2, Truck, Plus, PlusCircle } from 'lucide-react';
+import { Trash2, Truck, Plus } from 'lucide-react';
 import React, { useState } from "react";
 
-import { useLogisticServices } from "../../../../hooks/serviceProviders/useLogisticServicesList";
-import { useLogisticServiceLocations } from "../../../../hooks/serviceProviders/uselogisticServiceLocationsList";
-import { useLogisticLanguages } from "../../../../hooks/serviceProviders/useLogisticLanguages";
-import { useLogisticUniversities } from "../../../../hooks/serviceProviders/useLogisticUniversitiesList";
-import { useCreateLogisticsProvider } from "../../../../hooks/serviceProviders/useCreateLogisticsProvider";
+import { useLogisticServices } from "hooks/serviceProviders/useLogisticServicesList";
+import { useLogisticServiceLocations } from "hooks/serviceProviders/uselogisticServiceLocationsList";
+import { useLogisticLanguages } from "hooks/serviceProviders/useLogisticLanguages";
+import { useLogisticUniversities } from "hooks/serviceProviders/useLogisticUniversitiesList";
+import { useCreateLogisticsProvider } from "hooks/serviceProviders/useCreateLogisticsProvider";
 
-import Loading from "../../../loading/Loading";
-import CheckBoxGroup from "../../../form/CheckBoxGroup";
-import CheckSimpleBoxGroup from "../../../form/CheckSimpleBoxGroup";
-import InputField from "../../../form/InputField";
-import SelectField from "../../../form/SelectField";
-import { COUNTRIES } from "../../../../constants/lists"
-import AddInclude from "../../../ui/buttons/Button";
+import { COUNTRIES } from "constants/lists"
+import SearchableDropdown from "components/form/search/SearchableDropdown";
+import Loading from "components/loading/Loading";
+import CheckBoxGroup from "components/form/CheckBoxGroup";
+import CheckSimpleBoxGroup from "components/form/CheckSimpleBoxGroup";
+import InputField from "components/form/InputField";
+import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation"
 
@@ -126,6 +126,19 @@ export default function RegisterLogisticsProvider() {
     }));
   };
 
+  const isFormValid = () => {
+    return (
+      formData.name.trim() !== "" &&
+      formData.nationality.trim() !== "" &&
+      formData.main_location.trim() !== "" &&
+      formData.phone_number.trim() !== "" &&
+      formData.selectedServices.length > 0 &&
+      formData.selectedLanguages.length > 0 &&
+      formData.selectedUniversities.length > 0 &&
+      formData.selectedLocations.length > 0
+    );
+  };
+
   const handleSubmit = async () => {
     const newErrors: FormErrors = {}
 
@@ -164,7 +177,7 @@ export default function RegisterLogisticsProvider() {
     try {
       await createLogisticsProvider(payload)
 
-      showToast("success" + "Logistics provider created successfully")
+      showToast("Logistics provider created successfully", "success")
 
       setFormData({
         name: "",
@@ -182,12 +195,14 @@ export default function RegisterLogisticsProvider() {
 
       setErrors({})
 
-      setTimeout(() => {
-        router.push("/admin/logistical-service")
-      }, 1500)
+      // setTimeout(() => {
+      //   router.push("/admin/logistical-service")
+      // }, 1500)
 
-    } catch (error) {
-      showToast("error" + "Failed to create logistics provider")
+    }
+    catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to create logistics provider. ${backendMessage}`, "error");
     }
   }
 
@@ -208,7 +223,7 @@ export default function RegisterLogisticsProvider() {
 
   return (
     <section className="mx-auto mt-5">
-      <div className="rounded-md border bg-slate-50 shadow-sm">
+      <div className="mt-6 rounded-md border bg-white">
 
         <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
@@ -236,7 +251,7 @@ export default function RegisterLogisticsProvider() {
             updateFormData={updateFormData}
           />
 
-          <SelectField
+          <SearchableDropdown
             label="Country"
             field="nationality"
             options={COUNTRIES.map(c => ({ label: c.name, value: c.code }))}
@@ -245,7 +260,7 @@ export default function RegisterLogisticsProvider() {
             updateFormData={updateFormData}
           />
 
-          <SelectField
+          <SearchableDropdown
             label="Current Address"
             field="main_location"
             options={logisticServiceLocations.map((u) => ({
@@ -284,7 +299,7 @@ export default function RegisterLogisticsProvider() {
               Packages Offered
             </h4>
 
-            <AddInclude
+            <Button
               icon={<Plus className="h-5 w-5" />}
               text="Add Package"
               bgColor="bg-blue-50"
@@ -400,7 +415,7 @@ export default function RegisterLogisticsProvider() {
                 </div>
 
                 <div className="flex justify-end mt-3">
-                  <AddInclude
+                  <Button
                     icon={<Plus className="h-4 w-4" />}
                     text="Add Item"
                     bgColor="bg-green-50"
@@ -470,8 +485,8 @@ export default function RegisterLogisticsProvider() {
 
         <div className="flex justify-end border-t rounded-b-xl px-6 py-5">
 
-          <AddInclude
-            icon={<PlusCircle className="h-5 w-5" />}
+          <Button
+            icon={<Truck className="h-5 w-5" />}
             text={loadingCreateLogisticsProvider ? "Creating..." : "Create Service"}
             bgColor="bg-blue-50"
             textColor="text-blue-700"
@@ -479,9 +494,7 @@ export default function RegisterLogisticsProvider() {
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
             onClick={handleSubmit}
-            disabled={
-              loadingCreateLogisticsProvider
-          }
+            disabled={loadingCreateLogisticsProvider || !isFormValid()}
           />
 
         </div>

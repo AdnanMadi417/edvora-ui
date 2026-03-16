@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 import api from "lib/useApi";
 
 interface BatchAssignPayload {
-  payment_method_id: string;
+  payment_method_ids: string[];
   university_ids: string[];
   instructions?: string;
   currency?: string;

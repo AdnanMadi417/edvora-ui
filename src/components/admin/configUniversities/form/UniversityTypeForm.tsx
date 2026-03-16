@@ -1,22 +1,16 @@
-
 import React, { useState } from "react";
 
-import { Building2, GraduationCap, XCircle } from "lucide-react";
+import { ArrowLeft, Layers, } from 'lucide-react';
+
+import { useApplicationSubmissionFields } from "hooks/knowledge-hub/config-universities/useApplicationSubmissionFields";
+import { useCreateUniversityType } from "hooks/knowledge-hub/config-universities/useCreateUniversityType";
+
 import { useToast } from "components/context/ToastContext";
-
+import InputField from "components/form/InputField";
 import Loading from "components/loading/Loading";
-
-import Button from "../../../ui/buttons/Button";
-
-import SettingToggleInput from "../../../form/toggle/SettingToggleInput";
-import InputField from "../../../form/InputField";
-
+import Button from "components/ui/buttons/Button";
+import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import { useRouter } from "next/navigation";
-
-import { useCreateUniversityType } from "../../../../hooks/knowledge-hub/config-universities/useCreateUniversityType";
-import {
-  useApplicationSubmissionFields,
-} from "../../../../hooks/knowledge-hub/config-universities/useApplicationSubmissionFields";
 
 export default function UniversityTypeForm() {
   const { createUniversityType, loading } = useCreateUniversityType();
@@ -66,12 +60,12 @@ export default function UniversityTypeForm() {
 
   const handleCreate = async () => {
     try {
-      const required_fields = Object.entries(
-        formData.required_fields_map
-      ).map(([id, is_required]) => ({
-        application_submission_field_id: id,
-        is_required: Boolean(is_required),
-      }));
+      const required_fields = Object.entries(formData.required_fields_map).map(
+        ([id, is_required]) => ({
+          application_submission_field_id: id,
+          is_required: Boolean(is_required),
+        })
+      );
 
       await createUniversityType({
         name: formData.name,
@@ -79,24 +73,13 @@ export default function UniversityTypeForm() {
         required_fields,
       });
 
-      showToast("University type created successfully.");
+      showToast("University type created successfully.", "success");
+
       router.push("/admin/config-universities");
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
-      }
-
-      showToast("Failed to create university type.");
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to create university type. ${backendMessage}`, "error");
     }
   };
 
@@ -117,9 +100,9 @@ export default function UniversityTypeForm() {
   return (
     <section className="mx-auto mt-5">
       <div className="rounded-md border bg-white">
-        <div className="flex items-start gap-x-4 bg-gray-50 rounded-t-md border-b px-6 py-5">
+        <div className="flex items-start gap-x-4 rounded-t-md border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <Building2 className="text-blue-700" size={24} />
+            <Layers className="text-blue-700" size={24} />
           </div>
           <div>
             <h3 className="text-xl font-semibold text-slate-900">
@@ -131,7 +114,7 @@ export default function UniversityTypeForm() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3 px-6 py-5">
+        <div className="grid grid-cols-1 gap-x-3 px-6 py-5 md:grid-cols-2">
           <InputField
             label="Category Type"
             field="name"
@@ -173,12 +156,11 @@ export default function UniversityTypeForm() {
           )}
         </div>
 
-        <div className="flex justify-end gap-2 bg-gray-50 border-t rounded-b-md px-6 py-5">
-
+        <div className="flex justify-end gap-2 rounded-b-md border-t px-6 py-5">
           <Button
             onClick={handleBack}
-            icon={<XCircle  className="h-5 w-5" />}
-            text={"Back"}
+            icon={<ArrowLeft className="h-5 w-5" />}
+            text={loading ? "Cancelling..." : "Cancel"}
             bgColor="bg-slate-50"
             textColor="text-slate-700"
             borderColor="border-slate-600"
@@ -189,15 +171,14 @@ export default function UniversityTypeForm() {
           <Button
             onClick={handleCreate}
             disabled={loading || !isFormValid}
-            icon={<GraduationCap  className="h-5 w-5" />}
-            text={loading ? "Creating..." : "Create University"}
+            icon={<Layers className="h-5 w-5" />}
+            text={loading ? "Creating..." : "Create University Type"}
             bgColor="bg-blue-50"
             textColor="text-blue-700"
             borderColor="border-blue-600"
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
           />
-
         </div>
       </div>
     </section>

@@ -3,14 +3,16 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, GitBranch } from "lucide-react";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "../../../../ui/buttons/Button";
-import InputField from "../../../../form/InputField";
-import SelectField from "../../../../form/SelectField";
+import { useRouter } from 'next/navigation';
+import { useToast } from "components/context/ToastContext";
 
 import { useCreateBranch } from "hooks/knowledge-hub/universities/useCreateBranch";
 import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
-import { useToast } from "components/context/ToastContext";
+
+import ModalHeader from "components/ui/modal/ModalHeader";
+import Button from "components/ui/buttons/Button";
+import InputField from "components/form/InputField";
+import SelectField from "components/form/SelectField";
 
 interface CreateBranchProps {
   isOpen: boolean;
@@ -34,6 +36,7 @@ export default function CreateBranch({
     })) || [];
 
   const { showToast } = useToast();
+  const router = useRouter();
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -77,30 +80,18 @@ export default function CreateBranch({
     try {
       const newBranch = await createBranch(universityId, formData);
 
-      showToast("Branch created successfully.");
+      showToast("Branch created successfully.", "success");
 
       onClose();
 
-      setTimeout(() => location.reload(), 1500);
+      setTimeout(() => router.refresh(), 1500);
       return newBranch;
 
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
-      }
-
-      showToast("Failed to create branch.", "error");
+    } catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to create branch. ${backendMessage}`, "error");
     }
+
   };
 
   useEffect(() => {
