@@ -26,14 +26,21 @@ pipelines:
             - export IMAGE_FULL="${IMAGE_NAME}:${IMAGE_TAG}"
 
             # backend env
-            - echo "APP_NAME=Unibexs UI" > .env.local
-            - echo "NODE_ENV=$NODE_ENV" >> .env.local
-            - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env.local
+            - echo "APP_NAME=Unibexs UI" > .env.staging
+            - echo "NODE_ENV=$NODE_ENV" >> .env.staging
+            - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env.staging
+
+            # instrumentation env
+            - echo "SIGNOZ_ENDPOINT=$SIGNOZ_ENDPOINT" >> .env.staging
+            - echo "SIGNOZ_INGESTION_KEY=$SIGNOZ_INGESTION_KEY" >> .env.staging
+            - echo "SIGNOZ_SERVICE_NAME=${SIGNOZ_SERVICE_NAME:-unibexs-ui}" >> .env.staging
+
             # Build and push the Docker image
             - docker build
               --progress=plain
               --shm-size=2gb
               --build-arg BUILDKIT_INLINE_CACHE=1
+              --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
               --cache-from ${IMAGE_NAME}:staging-latest
               -t ${IMAGE_FULL}
               -t ${IMAGE_NAME}:staging-latest
