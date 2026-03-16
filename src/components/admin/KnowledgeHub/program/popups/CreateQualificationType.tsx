@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { PlusCircle, XCircle,Award   } from "lucide-react";
+import { XCircle, Award } from "lucide-react";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "../../../../ui/buttons/Button";
-
-import InputField from "../../../../form/InputField";
-
-import { useCreateQualificationsType } from "hooks/knowledge-hub/qualifications/useCreateQualificationType";
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
+
+import { useCreateQualificationsType } from "hooks/knowledge-hub/qualifications/useCreateQualificationType";
+
+import ModalHeader from "components/ui/modal/ModalHeader";
+import Button from "components/ui/buttons/Button";
+import InputField from "components/form/InputField";
 
 interface CreateQualificationTypeProps {
   isOpen: boolean;
@@ -18,14 +18,10 @@ interface CreateQualificationTypeProps {
 }
 
 export default function CreateQualificationType({
-                                             isOpen,
-                                             onClose,
-                                           }: CreateQualificationTypeProps) {
-
-  const {
-    createQualificationType,
-    loading
-  } = useCreateQualificationsType();
+  isOpen,
+  onClose,
+}: CreateQualificationTypeProps) {
+  const { createQualificationType, loading } = useCreateQualificationsType();
 
   const { showToast } = useToast();
 
@@ -67,28 +63,17 @@ export default function CreateQualificationType({
         name: formData.name,
       });
 
-      showToast("Qualification Type created successfully.");
+      showToast("Qualification Type created successfully.", "success");
 
+      setTimeout(() => router.refresh(), 1500);
       onClose();
-
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
-      }
-
-      router.push("/admin/knowledge-hub/programs/create");
-
-      showToast("Failed to create Qualification Type.");
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
+      showToast(
+        `Failed to create Qualification Type. ${backendMessage}`,
+        "error"
+      );
     }
   };
 
@@ -120,7 +105,6 @@ export default function CreateQualificationType({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-
           <ModalHeader
             title="Create New Qualification Type"
             description="Add a new Qualification into the knowledge hub."
@@ -142,15 +126,13 @@ export default function CreateQualificationType({
               errors={errors}
               updateFormData={updateFormData}
             />
-
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-
             <Button
               onClick={onClose}
               disabled={loading}
-              icon={<XCircle  className="h-5 w-5" />}
+              icon={<XCircle className="h-5 w-5" />}
               text={loading ? "Cancelling..." : "Cancel"}
               bgColor="bg-slate-50"
               textColor="text-slate-700"
@@ -161,8 +143,8 @@ export default function CreateQualificationType({
 
             <Button
               onClick={handleCreate}
-              disabled={loading}
-              icon={<Award  className="h-5 w-5" />}
+              disabled={loading || !formData.name.trim()}
+              icon={<Award className="h-5 w-5" />}
               text={loading ? "Creating..." : "Create Qualification Type"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"

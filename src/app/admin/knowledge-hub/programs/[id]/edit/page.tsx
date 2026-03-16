@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import KnowledgeHubEditDetails from "components/admin/KnowledgeHub/program/details/edit/KnowledgeHubEditDetails";
+import KnowledgeHubEditDetails from "../../../../../../components/admin/KnowledgeHub/program/Form/ProgramEditForm";
 
 export default function KnowledgeHubEditDetailsPage() {
   const params = useParams();

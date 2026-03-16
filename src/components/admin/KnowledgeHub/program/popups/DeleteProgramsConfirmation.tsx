@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { PlusCircle, Trash2, XCircle } from 'lucide-react';
+import { Trash2, XCircle } from 'lucide-react';
 import ModalHeader from "components/ui/modal/ModalHeader";
-import DeleteBtn from '../../../../ui/buttons/Button';
+import DeleteBtn from 'components/ui/buttons/Button';
 
 interface DeleteProgramsConfirmationProps {
   isOpen: boolean;
@@ -63,19 +63,13 @@ export default function DeleteProgramsConfirmation({
           <div className="px-7 py-6 text-sm">
             <div className="space-y-5">
 
-              <div className="flex items-start gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-red-50">
-                  <Trash2 className="h-4 w-4 text-red-600" />
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold text-slate-900">
-                    Delete Programs
-                  </h3>
-                  <p className="text-sm text-slate-500">
-                    Are you sure you want to delete the following programs?
-                  </p>
-                </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Confirm Deletion
+                </h3>
+                <p className="text-sm text-slate-500">
+                  Are you sure you want to remove this account manager from the system?
+                </p>
               </div>
 
               {programNames && programNames.length > 0 && (
@@ -83,17 +77,13 @@ export default function DeleteProgramsConfirmation({
                   {programNames.map((name, index) => (
                     <li
                       key={index}
-                      className="inline-flex max-w-md items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700"
+                      className="inline-flex max-w-md items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700"
                     >
                       <span className="truncate">{name}</span>
                     </li>
                   ))}
                 </ul>
               )}
-
-              <div className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-600">
-                NOTE : This action will permanently delete all related data and cannot be undone.
-              </div>
 
             </div>
           </div>
@@ -115,7 +105,7 @@ export default function DeleteProgramsConfirmation({
             />
 
             <DeleteBtn
-              icon={<PlusCircle className="h-5 w-5" />}
+              icon={<Trash2 className="h-5 w-5" />}
               text={
                 isDeleting ? "Deleting..." : "Delete Program"
               }

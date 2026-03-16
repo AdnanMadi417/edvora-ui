@@ -12,6 +12,7 @@ import InputField from "../../../../form/InputField";
 
 import { useCreateUniversity } from "hooks/knowledge-hub/universities/useCreateKnowledgeHubUniversity";
 import { useToast } from "components/context/ToastContext";
+import { router } from 'next/client';
 
 interface CreateUniversityProps {
   isOpen: boolean;
@@ -69,27 +70,17 @@ export default function CreateUniversity({
     try {
       await createUniversity(formData);
 
-      showToast("University created successfully.");
-
+      showToast("University created successfully.", "success");
       onClose();
-      setTimeout(() => location.reload(), 1500);
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
 
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
+      setTimeout(() => router.push("admin/knowledge-hub/programs/create"), 1500);
 
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
-      }
-      showToast("Failed to create university.");
+    } catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to create university. ${backendMessage}`, "error");
     }
   };
+
   if (!isVisible) return null;
 
   return (

@@ -2,25 +2,10 @@
 
 import { BookOpen, CalendarPlus, ChevronLeft, PlusCircle, Trash2 } from 'lucide-react';
 import React, { useState } from "react";
-
-import ToggleInput from "../../../../form/toggle/ToggleInput";
-import InputField from "../../../../form/InputField";
-import ArrayObjectField from "../../../../form/ArrayObjectField";
-import SelectField from "../../../../form/SelectField";
-import MultipleDateInput from "../../../../form/MultipleDateInput";
-import SearchableSelect from "../../../../form/SearchableSelect";
-
-import { DURATION,  SCHOLARSHIP_TYPE } from 'constants/lists';
-
-import Button from '../../../../ui/buttons/Button';
-import CreateUniversity from "components/admin/KnowledgeHub/program/popups/CreateUniversity";
-import CreateFieldOfStudy from "components/admin/KnowledgeHub/program/popups/CreateFieldOfStudy";
-import CreateQualificationType from "components/admin/KnowledgeHub/program/popups/CreateQualificationType";
-import CreateBranch from "components/admin/KnowledgeHub/program/popups/CreateBranch";
-import CreateCommissionType from "components/admin/KnowledgeHub/program/popups/CreateCommissionType";
-
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
+
+import { DURATION,  SCHOLARSHIP_TYPE } from 'constants/lists';
 
 import { useCreateProgram } from "hooks/knowledge-hub/programs/useCreateKnowledgeHubProgram";
 import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
@@ -28,7 +13,21 @@ import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
 import { useAllBranches } from "hooks/knowledge-hub/universities/useBranchesList";
 import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
 import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
-import IconButton from '../../../../ui/buttons/IconButton';
+
+import ToggleInput from "components/form/toggle/ToggleInput";
+import InputField from "components/form/InputField";
+import ArrayObjectField from "components/form/ArrayObjectField";
+import SelectField from "components/form/SelectField";
+import MultipleDateInput from "components/form/MultipleDateInput";
+import SearchableSelect from "components/form/SearchableSelect";
+
+import Button from 'components/ui/buttons/Button';
+import CreateUniversity from "components/admin/KnowledgeHub/program/popups/CreateUniversity";
+import CreateBranch from "components/admin/KnowledgeHub/program/popups/CreateBranch";
+import CreateFieldOfStudy from "components/admin/KnowledgeHub/program/popups/CreateFieldOfStudy";
+import CreateQualificationType from "components/admin/KnowledgeHub/program/popups/CreateQualificationType";
+import CreateCommissionType from "components/admin/KnowledgeHub/program/popups/CreateCommissionType";
+import IconButton from 'components/ui/buttons/IconButton';
 
 export interface FormData {
   name: string;
@@ -281,24 +280,14 @@ export default function RegisterProgram() {
 
       showToast("Program created successfully", "success");
 
-      router.push("/admin/knowledge-hub/programs");
+      setTimeout (() => {
+        router.push("/admin/knowledge-hub/programs");
+      },1500)
 
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
-      }
-
-      showToast("Failed to create program", "error");
+    }
+    catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to create program. ${backendMessage}`, "error");
     }
   };
 
@@ -308,7 +297,7 @@ export default function RegisterProgram() {
 
   return (
     <section className="mx-auto mt-5">
-      <div className="rounded-md border bg-slate-50 shadow-sm">
+      <div className="mt-6 rounded-md border bg-white">
         <div className="flex items-start gap-x-4 border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <BookOpen  className="text-blue-700" size={24} />
@@ -498,7 +487,7 @@ export default function RegisterProgram() {
             </div>
           </div>
 
-          <div className="space-y-6 px-6 pb-5 ">
+          <div className="space-y-6 px-6 border-b border-slate-200 pb-5 ">
 
             <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
               Intake Schedule
@@ -741,7 +730,6 @@ export default function RegisterProgram() {
 
           <Button
             onClick={handleBack}
-            disabled={loading}
             icon={<ChevronLeft  className="h-5 w-5" />}
             text={"Back"}
             bgColor="bg-slate-50"

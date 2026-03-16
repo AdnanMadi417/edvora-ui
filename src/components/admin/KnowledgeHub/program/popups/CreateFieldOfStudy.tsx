@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, Tag } from "lucide-react";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "../../../../ui/buttons/Button";
-
-import InputField from "../../../../form/InputField";
-
 import { useCreateFieldOfStudy } from "hooks/knowledge-hub/useCreateFieldOfStudy";
+
+import ModalHeader from "components/ui/modal/ModalHeader";
+import Button from "components/ui/buttons/Button";
+import InputField from "components/form/InputField";
 import { useToast } from "components/context/ToastContext";
+import { useRouter } from 'next/navigation';
 
 interface CreateFieldOfStudyProps {
   isOpen: boolean;
@@ -23,6 +23,7 @@ export default function CreateFieldOfStudy({
   const { CreateFieldOfStudy, fieldLoading } = useCreateFieldOfStudy();
 
   const { showToast } = useToast();
+  const router = useRouter();
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -63,26 +64,14 @@ export default function CreateFieldOfStudy({
         is_active: formData.is_active,
       });
 
-      showToast("Field Of Study created successfully.");
+      showToast("Field Of Study created successfully." , "success");
 
       onClose();
-      setTimeout(() => location.reload(), 1500);
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
+      setTimeout(() => router.refresh(), 1500);
 
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
-      }
-
-      showToast("Failed to create Field Of Study.");
+    } catch (error: any) {
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to create Field Of Study. ${backendMessage}`, "error");
     }
   };
 
