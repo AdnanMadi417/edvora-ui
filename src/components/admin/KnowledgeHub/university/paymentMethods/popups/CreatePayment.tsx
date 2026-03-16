@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { CreditCard, XCircle } from 'lucide-react';
 
+import { useCreatePayment } from "hooks/knowledge-hub/payment-methods/useCreatePayment";
+
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-
 import InputField from "components/form/InputField";
-
-import { useCreatePayment } from "hooks/knowledge-hub/payment-methods/useCreatePayment";
 import { useToast } from "components/context/ToastContext";
+import { useRouter } from 'next/navigation';
 
 interface CreatePaymentMethodProps {
   isOpen: boolean;
@@ -31,6 +31,8 @@ export default function CreatePayment({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
+  const [apiError, setApiError] = useState<string | null>(null);
 
   const isFormValid =
     formData.name.trim() &&
@@ -61,29 +63,27 @@ export default function CreatePayment({
 
   const handleCreate = async () => {
     try {
+      setApiError(null);
+
       await createPayment(formData);
 
-      showToast("Payment Method created successfully.");
+      showToast("Payment Method created successfully.", "success");
 
       onClose();
-      setTimeout(() => location.reload(), 1500);
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
+      setTimeout(() => router.refresh(), 1500);
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
 
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
+      setApiError(backendMessage);
 
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
-        });
-
-        setErrors(newErrors);
-      }
-      showToast("Failed to create Payment Method.");
+      showToast(
+        `Failed to create Payment Method. ${backendMessage}`,
+        "error"
+      );
     }
   };
+
   if (!isVisible) return null;
 
   return (
@@ -132,6 +132,19 @@ export default function CreatePayment({
               errors={errors}
               updateFormData={updateFormData}
             />
+
+            {apiError && (
+              <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4">
+                <XCircle className="mt-0.5 h-5 w-5 text-red-600" />
+                <div>
+                  <p className="text-sm font-semibold text-red-800">
+                    Failed to create payment method
+                  </p>
+                  <p className="text-sm text-red-700">{apiError}</p>
+                </div>
+              </div>
+            )}
+
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">

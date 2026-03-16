@@ -71,7 +71,6 @@ export default function DeleteUniversityConfirmation({
               </p>
             </div>
 
-
             {universityName && (
               <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
                 <p className="text-sm font-medium text-slate-800">
