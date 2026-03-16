@@ -40,6 +40,7 @@ pipelines:
               --progress=plain
               --shm-size=2gb
               --build-arg BUILDKIT_INLINE_CACHE=1
+              --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
               --cache-from ${IMAGE_NAME}:staging-latest
               -t ${IMAGE_FULL}
               -t ${IMAGE_NAME}:staging-latest

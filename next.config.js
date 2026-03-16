@@ -10,6 +10,23 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Keep OTel packages as external so the standalone build includes them.
+  // Without this, dynamic `await import()` calls in instrumentation.ts are not
+  // traced by @vercel/nft and the packages are missing from the container.
+  serverExternalPackages: [
+    '@opentelemetry/api',
+    '@opentelemetry/api-logs',
+    '@opentelemetry/exporter-logs-otlp-http',
+    '@opentelemetry/exporter-metrics-otlp-http',
+    '@opentelemetry/exporter-trace-otlp-http',
+    '@opentelemetry/instrumentation-http',
+    '@opentelemetry/instrumentation-undici',
+    '@opentelemetry/resources',
+    '@opentelemetry/sdk-logs',
+    '@opentelemetry/sdk-metrics',
+    '@opentelemetry/sdk-node',
+    '@opentelemetry/semantic-conventions',
+  ],
   // Reduce memory usage
   experimental: {
     workerThreads: false,

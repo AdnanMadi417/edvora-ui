@@ -26,6 +26,11 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV SKIP_TYPE_CHECK=true
 ENV PNPM_VERSION=10.28.1
 
+# NEXT_PUBLIC_* vars must be present at build time so Next.js can bake them
+# into the client bundle. Pass them via --build-arg in the pipeline.
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
 # Copy EVERYTHING from deps stage including optional SWC binaries
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/package.json ./package.json
