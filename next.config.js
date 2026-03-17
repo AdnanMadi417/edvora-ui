@@ -31,8 +31,6 @@ const nextConfig = {
   experimental: {
     workerThreads: false,
     cpus: 1,
-    // Enable the instrumentation hook (instrumentation.ts) for OpenTelemetry.
-    instrumentationHook: true,
   },
   // Disable source maps in production to save memory
   productionBrowserSourceMaps: false,
