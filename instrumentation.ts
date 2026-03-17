@@ -19,6 +19,7 @@ export async function register() {
   if (process.env.NEXT_RUNTIME === 'edge') return;
 
   const endpoint = process.env.SIGNOZ_ENDPOINT;
+  console.log('[OTel] register() called, NEXT_RUNTIME=%s, SIGNOZ_ENDPOINT=%s', process.env.NEXT_RUNTIME, endpoint ? '(set)' : '(missing)');
   if (!endpoint) return;
 
   const ingestionKey = process.env.SIGNOZ_INGESTION_KEY ?? '';
@@ -74,6 +75,7 @@ export async function register() {
   });
 
   sdk.start();
+  console.log('[OTel] SDK started. Exporting to %s, service=%s', endpoint, serviceName);
 
   // ── Global error capture ──────────────────────────────────────────────────
   // Unhandled rejections and uncaught exceptions are emitted as ERROR log
