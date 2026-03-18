@@ -29,7 +29,6 @@ import {
 
 import { useProgram } from 'hooks/knowledge-hub/programs/useProgram';
 import { useDeleteKnowledgeHubPrograms, } from 'hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms';
-import { useCommissionTypes } from 'hooks/knowledge-hub/commission/useCommissionTypes';
 
 import { useToast } from 'components/context/ToastContext';
 import DeleteProgramsConfirmation from 'components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation';
@@ -45,9 +44,6 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const { deletePrograms } =
     useDeleteKnowledgeHubPrograms();
-
-  const { commissionTypes } =
-    useCommissionTypes();
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -551,16 +547,6 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
               <span className="absolute right-3 top-3 h-2 w-2 animate-pulse rounded-full bg-indigo-600" />
             </div>
 
-            <div
-              className="relative flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-md transition-transform">
-              <span className="text-2xl font-bold text-green-700">
-                {commission?.type}
-              </span>
-              <p className="text-sm font-semibold text-green-900">
-                Commission Type
-              </p>
-              <span className="absolute right-3 top-3 h-2 w-2 animate-pulse rounded-full bg-green-600" />
-            </div>
           </div>
 
           <div

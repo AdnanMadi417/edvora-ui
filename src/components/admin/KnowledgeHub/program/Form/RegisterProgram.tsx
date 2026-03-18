@@ -1,32 +1,27 @@
-"use client";
+'use client';
 
-import { BookOpen, CalendarPlus, ChevronLeft, PlusCircle, Trash2 } from 'lucide-react';
-import React, { useState } from "react";
-import { useToast } from "components/context/ToastContext";
-import { useRouter } from "next/navigation";
+import { BookOpen, CalendarPlus, ChevronLeft, Trash2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useToast } from 'components/context/ToastContext';
+import { useRouter } from 'next/navigation';
 
-import { DURATION,  SCHOLARSHIP_TYPE } from 'constants/lists';
+import { DURATION, IELTS_BANDS } from 'constants/lists';
 
-import { useCreateProgram } from "hooks/knowledge-hub/programs/useCreateKnowledgeHubProgram";
-import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
-import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
-import { useAllBranches } from "hooks/knowledge-hub/universities/useBranchesList";
-import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
-import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
+import { useCreateProgram } from 'hooks/knowledge-hub/programs/useCreateKnowledgeHubProgram';
+import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
+import { useAllFields } from 'hooks/knowledge-hub/programs/useFieldsList';
+import { useAllBranches } from 'hooks/knowledge-hub/universities/useBranchesList';
+import { useCommissionTypes } from 'hooks/knowledge-hub/commission/useCommissionTypes';
+import { useAllQualifications } from 'hooks/knowledge-hub/qualifications/useQualificationsList';
 
-import ToggleInput from "components/form/toggle/ToggleInput";
-import InputField from "components/form/InputField";
-import ArrayObjectField from "components/form/ArrayObjectField";
-import SelectField from "components/form/SelectField";
-import MultipleDateInput from "components/form/MultipleDateInput";
-import SearchableSelect from "components/form/SearchableSelect";
+import ToggleInput from 'components/form/toggle/ToggleInput';
+import InputField from 'components/form/InputField';
+import ArrayObjectField from 'components/form/ArrayObjectField';
+import SelectField from 'components/form/SelectField';
+import MultipleDateInput from 'components/form/MultipleDateInput';
+import SearchableDropdown from 'components/form/search/SearchableDropdown';
 
 import Button from 'components/ui/buttons/Button';
-import CreateUniversity from "components/admin/KnowledgeHub/program/popups/CreateUniversity";
-import CreateBranch from "components/admin/KnowledgeHub/program/popups/CreateBranch";
-import CreateFieldOfStudy from "components/admin/KnowledgeHub/program/popups/CreateFieldOfStudy";
-import CreateQualificationType from "components/admin/KnowledgeHub/program/popups/CreateQualificationType";
-import CreateCommissionType from "components/admin/KnowledgeHub/program/popups/CreateCommissionType";
 import IconButton from 'components/ui/buttons/IconButton';
 
 export interface FormData {
@@ -72,12 +67,6 @@ type FormErrors = Partial<Record<keyof FormData, string>>;
 
 export default function RegisterProgram() {
 
-  const [showUniversityPopup, setShowUniversityPopup] = useState(false);
-  const [showCommissionTypePopup, setShowCommissionTypePopup] = useState(false);
-  const [showFieldOfStudyPopup, setShowFieldOfStudyPopup] = useState(false);
-  const [showBranchPopup, setShowBranchPopup] = useState(false);
-  const [showQualificationPopup, setShowQualificationPopup] = useState(false);
-
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -87,23 +76,23 @@ export default function RegisterProgram() {
   const [errors, setErrors] = useState<FormErrors>({});
 
   const [formData, setFormData] = useState<FormData>({
-    name: "",
-    uni_id: "",
-    branch_id: "",
-    field_of_study_id: "",
+    name: '',
+    uni_id: '',
+    branch_id: '',
+    field_of_study_id: '',
     tuition_fee: 0,
     intake_dates: [],
     duration: 0,
-    english_required_score: "",
-    overview: "",
-    curriculum: "",
-    is_on_campus: false,
+    english_required_score: '',
+    overview: '',
+    curriculum: '',
+    is_on_campus: true,
     is_online: false,
     has_scholarship: false,
-    commission_type_id: "",
+    commission_type_id: '',
     commission_notes:
-      "Commission paid 30 days after student completes first semester of each academic year.",
-    qualification_id: "",
+      'Commission paid 30 days after student completes first semester of each academic year.',
+    qualification_id: '',
 
     commission_amount: 0,
 
@@ -114,8 +103,8 @@ export default function RegisterProgram() {
         type: 0,
         coverage_percent: 0,
         max_amount: 0,
-        name: "",
-        description: "",
+        name: '',
+        description: '',
       },
     ],
   });
@@ -142,8 +131,8 @@ export default function RegisterProgram() {
           type: 0,
           coverage_percent: 0,
           max_amount: 0,
-          name: "",
-          description: "",
+          name: '',
+          description: '',
         },
       ],
     }));
@@ -151,15 +140,15 @@ export default function RegisterProgram() {
 
   const isFormValid = React.useMemo(() => {
     const basicValid =
-      formData.name.trim() !== "" &&
-      formData.uni_id !== "" &&
-      formData.branch_id !== "" &&
-      formData.field_of_study_id !== "" &&
-      formData.commission_type_id !== "" &&
-      formData.qualification_id !== "" &&
-      formData.english_required_score.trim() !== "" &&
-      formData.overview.trim() !== "" &&
-      formData.curriculum.trim() !== "" &&
+      formData.name.trim() !== '' &&
+      formData.uni_id !== '' &&
+      formData.branch_id !== '' &&
+      formData.field_of_study_id !== '' &&
+      formData.commission_type_id !== '' &&
+      formData.qualification_id !== '' &&
+      formData.english_required_score.trim() !== '' &&
+      formData.overview.trim() !== '' &&
+      formData.curriculum.trim() !== '' &&
       formData.intake_dates.length > 0 &&
       formData.tuition_fee > 0 &&
       formData.duration > 0 &&
@@ -168,13 +157,13 @@ export default function RegisterProgram() {
     const yearlyFeesValid =
       formData.yearly_fees.length === 0 ||
       formData.yearly_fees.every(
-        (y) => y.year > 0 && y.fee > 0
+        (y) => y.year > 0 && y.fee > 0,
       );
 
     const oneTimeFeesValid =
       formData.one_time_fees.length === 0 ||
       formData.one_time_fees.every(
-        (f) => f.description.trim() !== "" && f.fee > 0
+        (f) => f.description.trim() !== '' && f.fee > 0,
       );
 
     return (
@@ -185,11 +174,10 @@ export default function RegisterProgram() {
   }, [formData]);
 
   const updateFormData = (field: string, value: any) => {
-
     setFormData((prev) => {
       const updated = structuredClone(prev);
 
-      const keys = field.replace(/\[(\d+)\]/g, ".$1").split(".");
+      const keys = field.replace(/\[(\d+)\]/g, '.$1').split('.');
       let current: any = updated;
 
       for (let i = 0; i < keys.length - 1; i++) {
@@ -204,7 +192,23 @@ export default function RegisterProgram() {
 
       current[keys[keys.length - 1]] = value;
 
-      if (field === "has_scholarship" && value === false) {
+      if (field === 'is_on_campus' && value === true) {
+        updated.is_online = false;
+      }
+
+      if (field === 'is_online' && value === true) {
+        updated.is_on_campus = false;
+      }
+
+      if (field === 'is_on_campus' && value === false) {
+        updated.is_online = true;
+      }
+
+      if (field === 'is_online' && value === false) {
+        updated.is_on_campus = true;
+      }
+
+      if (field === 'has_scholarship' && value === false) {
         updated.scholarships = [];
       }
 
@@ -216,32 +220,32 @@ export default function RegisterProgram() {
     try {
 
       if (!formData.uni_id) {
-        showToast("University is required", "error");
+        showToast('University is required', 'error');
         return;
       }
 
       if (!formData.branch_id) {
-        showToast("Branch is required", "error");
+        showToast('Branch is required', 'error');
         return;
       }
 
       if (!formData.field_of_study_id) {
-        showToast("Field of study is required", "error");
+        showToast('Field of study is required', 'error');
         return;
       }
 
       if (!formData.commission_type_id) {
-        showToast("Commission type is required", "error");
+        showToast('Commission type is required', 'error');
         return;
       }
 
       if (!formData.qualification_id) {
-        showToast("Qualification level is required", "error");
+        showToast('Qualification level is required', 'error');
         return;
       }
 
       if (!formData.intake_dates.length) {
-        showToast("At least one intake date is required", "error");
+        showToast('At least one intake date is required', 'error');
         return;
       }
 
@@ -250,7 +254,7 @@ export default function RegisterProgram() {
 
         tuition_fee: Number(formData.tuition_fee || 0),
         duration: Number(formData.duration || 0),
-        qualification_id: formData.qualification_id ,
+        qualification_id: formData.qualification_id,
         commission_amount: Number(formData.commission_amount || 0),
 
         yearly_fees: (formData.yearly_fees || []).map((y) => ({
@@ -259,7 +263,7 @@ export default function RegisterProgram() {
         })),
 
         one_time_fees: (formData.one_time_fees || []).map((f: any) => ({
-          description: f.description || "",
+          description: f.description || '',
           fee: Number(f.fee || 0),
         })),
 
@@ -267,7 +271,7 @@ export default function RegisterProgram() {
           ? (formData.scholarships || [])
             .filter((s) => s.name && s.description)
             .map((s) => ({
-              type: Number(s.type || 0),
+              type: Number(s.type ?? 2),
               coverage_percent: Number(s.coverage_percent || 0),
               max_amount: Number(s.max_amount || 0),
               name: s.name,
@@ -278,21 +282,20 @@ export default function RegisterProgram() {
 
       await createProgram(payload);
 
-      showToast("Program created successfully", "success");
+      showToast('Program created successfully', 'success');
 
-      setTimeout (() => {
-        router.push("/admin/knowledge-hub/programs");
-      },1500)
+      setTimeout(() => {
+        router.push('/admin/knowledge-hub/programs');
+      }, 1500);
 
-    }
-    catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
-      showToast(`Failed to create program. ${backendMessage}`, "error");
+    } catch (error: any) {
+      const backendMessage = error?.response?.data?.message || 'Please try again.';
+      showToast(`Failed to create program. ${backendMessage}`, 'error');
     }
   };
 
   const handleBack = () => {
-    router.push("/admin/knowledge-hub/programs");
+    router.push('/admin/knowledge-hub/programs');
   };
 
   return (
@@ -300,7 +303,7 @@ export default function RegisterProgram() {
       <div className="mt-6 rounded-md border bg-white">
         <div className="flex items-start gap-x-4 border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <BookOpen  className="text-blue-700" size={24} />
+            <BookOpen className="text-blue-700" size={24} />
           </div>
 
           <div>
@@ -323,7 +326,7 @@ export default function RegisterProgram() {
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 
-              <SearchableSelect
+              <SearchableDropdown
                 label="University"
                 field="uni_id"
                 options={(universities ?? [])
@@ -335,16 +338,9 @@ export default function RegisterProgram() {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
-                actions={[
-                  {
-                    label: "Create University",
-                    icon: <PlusCircle className="h-4 w-4" />,
-                    onClick: () => setShowUniversityPopup(true)
-                  }
-                ]}
               />
 
-              <SearchableSelect
+              <SearchableDropdown
                 label="Branch"
                 field="branch_id"
                 options={branches.map((s) => ({
@@ -354,13 +350,6 @@ export default function RegisterProgram() {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
-                actions={[
-                  {
-                    label: "Create Branch",
-                    icon: <PlusCircle className="h-4 w-4" />,
-                    onClick: () => setShowBranchPopup(true),
-                  },
-                ]}
               />
 
               <InputField
@@ -373,7 +362,7 @@ export default function RegisterProgram() {
                 updateFormData={updateFormData}
               />
 
-              <SearchableSelect
+              <SearchableDropdown
                 label="Field of Study"
                 field="field_of_study_id"
                 options={fields.map((f) => ({
@@ -383,13 +372,6 @@ export default function RegisterProgram() {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
-                actions={[
-                  {
-                    label: "Create Field of Study",
-                    icon: <PlusCircle className="h-4 w-4" />,
-                    onClick: () => setShowFieldOfStudyPopup(true)
-                  }
-                ]}
               />
 
               <InputField
@@ -424,10 +406,25 @@ export default function RegisterProgram() {
                 updateFormData={updateFormData}
               />
 
-              <InputField
-                label="English Required Score"
+              <SearchableDropdown
+                label="Qualification Level"
+                field="qualification_id"
+                options={qualifications.map((f) => ({
+                  value: String(f.id),
+                  label: f.name.charAt(0).toUpperCase() + f.name.slice(1),
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+
+              <SelectField
+                label="IELTS Required Score"
                 field="english_required_score"
-                placeholder="e.g. IELTS 6.0"
+                options={IELTS_BANDS.map((s) => ({
+                  label: s.label,
+                  value: s.score,
+                }))}
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
@@ -455,36 +452,19 @@ export default function RegisterProgram() {
             </div>
           </div>
 
-          <div className="space-y-6 px-6 border-b border-slate-200">
+          <div className="space-y-6 px-6 pb-5 border-b border-slate-200">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
               Delivery Mode
             </h3>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <ToggleInput
-                label="On Campus"
-                field="is_on_campus"
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
+            <ToggleInput
+              label="On Campus"
+              field="is_on_campus"
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+            />
 
-              <ToggleInput
-                label="Online Available"
-                field="is_online"
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
-
-              <ToggleInput
-                label="Has Scholarship"
-                field="has_scholarship"
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
-            </div>
           </div>
 
           <div className="space-y-6 px-6 border-b border-slate-200 pb-5 ">
@@ -520,7 +500,7 @@ export default function RegisterProgram() {
                 updateFormData={updateFormData}
               />
 
-              <SearchableSelect
+              <SearchableDropdown
                 label="Commission Type"
                 field="commission_type_id"
                 options={commissionTypes.map((f) => ({
@@ -530,34 +510,7 @@ export default function RegisterProgram() {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
-                actions={[
-                  {
-                    label: "Create Commission Type",
-                    icon: <PlusCircle className="h-4 w-4" />,
-                    onClick: () => setShowCommissionTypePopup(true)
-                  }
-                ]}
               />
-
-              <SearchableSelect
-                label="Qualification Level"
-                field="qualification_id"
-                options={qualifications.map((f) => ({
-                  value: String(f.id),
-                  label: f.name.charAt(0).toUpperCase() + f.name.slice(1),
-                }))}
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-                actions={[
-                  {
-                    label: "Create Qualification Level",
-                    icon: <PlusCircle className="h-4 w-4" />,
-                    onClick: () => setShowQualificationPopup(true)
-                  }
-                ]}
-              />
-
             </div>
           </div>
 
@@ -571,16 +524,16 @@ export default function RegisterProgram() {
               updateFormData={updateFormData}
               fields={[
                 {
-                  key: "year",
-                  label: "Year",
-                  type: "text",
-                  placeholder: "Year",
+                  key: 'year',
+                  label: 'Year',
+                  type: 'text',
+                  placeholder: 'Year',
                 },
                 {
-                  key: "fee",
-                  label: "Fee",
-                  type: "number",
-                  placeholder: "Fee",
+                  key: 'fee',
+                  label: 'Fee',
+                  type: 'number',
+                  placeholder: 'Fee',
                 },
               ]}
             />
@@ -594,135 +547,145 @@ export default function RegisterProgram() {
               updateFormData={updateFormData}
               fields={[
                 {
-                  key: "description",
-                  label: "Description",
-                  type: "text",
-                  placeholder: "One Time Fees",
+                  key: 'description',
+                  label: 'Description',
+                  type: 'text',
+                  placeholder: 'One Time Fees',
                 },
                 {
-                  key: "fee",
-                  label: "Fee",
-                  type: "number",
-                  placeholder: "Fee",
+                  key: 'fee',
+                  label: 'Fee',
+                  type: 'number',
+                  placeholder: 'Fee',
                 },
               ]}
             />
           </div>
 
-          {formData.has_scholarship && (
-            <div className="space-y-6 px-6 border-t border-slate-200 py-6">
-              <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-                  Scholarships
-                </h3>
+          <div className="space-y-6 px-6 pb-5">
 
-                <IconButton
-                  icon={<CalendarPlus className="h-4 w-4" />}
-                  bgColor="bg-blue-50"
-                  textColor="text-blue-700"
-                  borderColor="border-blue-600"
-                  hoverTextColor="hover:text-blue-800"
-                  hoverBorderColor="hover:border-blue-700"
-                  onClick={addScholarship}
-                />
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                Scholarship
+              </h3>
 
-              </div>
+              {formData.has_scholarship && (
 
-              {formData.scholarships.map((_, index) => (
-                <div
-                  key={index}
-                  className="rounded-xl border border-slate-200 bg-white p-6 transition "
-                >
-                  {/* Header */}
-                  <div className="mb-5 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
-                        {index + 1}
+                    <IconButton
+                      icon={<CalendarPlus className="h-4 w-4" />}
+                      bgColor="bg-blue-50"
+                      textColor="text-blue-700"
+                      borderColor="border-blue-600"
+                      hoverTextColor="hover:text-blue-800"
+                      hoverBorderColor="hover:border-blue-700"
+                      onClick={addScholarship}
+                    />
+              )}
+
+            </div>
+
+            <ToggleInput
+              label="Has Scholarship"
+              field="has_scholarship"
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+            />
+
+            {formData.has_scholarship && (
+              <div className="space-y-6 ">
+                {formData.scholarships.map((_, index) => (
+                  <div
+                    key={index}
+                    className="rounded-xl border border-slate-200 bg-white p-6 transition "
+                  >
+                    <div className="mb-5 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
+                          {index + 1}
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-slate-800">
+                            Scholarship
+                          </p>
+                          <p className="text-xs text-slate-500">
+                            Configure scholarship details
+                          </p>
+                        </div>
                       </div>
 
-                      <div>
-                        <p className="text-sm font-semibold text-slate-800">
-                          Scholarship
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          Configure scholarship details
-                        </p>
-                      </div>
+                      {formData.scholarships.length > 1 && (
+                        <IconButton
+                          icon={<Trash2 className="h-4 w-4" />}
+                          onClick={() => removeScholarship(index)}
+                          bgColor="bg-red-50"
+                          textColor="text-red-600"
+                          borderColor="border-red-200"
+                          hoverTextColor="hover:text-red-700"
+                          hoverBorderColor="hover:border-red-300"
+                        />
+                      )}
                     </div>
 
-                    {formData.scholarships.length > 1 && (
-                      <IconButton
-                        icon={<Trash2 className="h-4 w-4" />}
-                        onClick={() => removeScholarship(index)}
-                        bgColor="bg-red-50"
-                        textColor="text-red-600"
-                        borderColor="border-red-200"
-                        hoverTextColor="hover:text-red-700"
-                        hoverBorderColor="hover:border-red-300"
-                      />
-                    )}
-                  </div>
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                    <SelectField
-                      label="Scholarship Type"
-                      field={`scholarships[${index}].type`}
-                      options={SCHOLARSHIP_TYPE.map((d) => ({
-                        value: d.value,
-                        label: d.label,
-                      }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
+                      <div className="md:col-span-2">
 
-                    <InputField
-                      label="Coverage Percentage"
-                      field={`scholarships[${index}].coverage_percent`}
-                      type="number"
-                      placeholder="e.g. 50"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
+                        <InputField
+                          label="Scholarship Name"
+                          field={`scholarships[${index}].name`}
+                          placeholder="e.g. Excellence Award"
+                          type="text"
+                          formData={formData}
+                          errors={errors}
+                          updateFormData={updateFormData}
+                        />
 
-                    <InputField
-                      label="Maximum Amount"
-                      field={`scholarships[${index}].max_amount`}
-                      type="number"
-                      placeholder="e.g. 10000"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
+                      </div>
 
-                    <InputField
-                      label="Scholarship Name"
-                      field={`scholarships[${index}].name`}
-                      placeholder="e.g. Excellence Award"
-                      type="text"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <div className="md:col-span-2">
                       <InputField
-                        label="Description"
-                        field={`scholarships[${index}].description`}
-                        placeholder="Short description..."
-                        type="text"
+                        label="Coverage Percentage"
+                        field={`scholarships[${index}].coverage_percent`}
+                        type="number"
+                        placeholder="e.g. 50"
                         formData={formData}
                         errors={errors}
                         updateFormData={updateFormData}
+                        required={false}
                       />
+
+                      <InputField
+                        label="Maximum Amount"
+                        field={`scholarships[${index}].max_amount`}
+                        type="number"
+                        placeholder="e.g. 10000"
+                        formData={formData}
+                        errors={errors}
+                        updateFormData={updateFormData}
+                        required={false}
+                      />
+
+                      <div className="md:col-span-2">
+                        <InputField
+                          label="Description"
+                          field={`scholarships[${index}].description`}
+                          placeholder="Short description..."
+                          type="text"
+                          formData={formData}
+                          errors={errors}
+                          updateFormData={updateFormData}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
 
-            </div>
-          )}
+              </div>
+            )}
+
+          </div>
 
         </div>
 
@@ -730,8 +693,8 @@ export default function RegisterProgram() {
 
           <Button
             onClick={handleBack}
-            icon={<ChevronLeft  className="h-5 w-5" />}
-            text={"Back"}
+            icon={<ChevronLeft className="h-5 w-5" />}
+            text={'Back'}
             bgColor="bg-slate-50"
             textColor="text-slate-700"
             borderColor="border-slate-600"
@@ -741,7 +704,7 @@ export default function RegisterProgram() {
 
           <Button
             icon={<BookOpen className="h-5 w-5" />}
-            text={loading ? "Creating..." : "Create Program"}
+            text={loading ? 'Creating...' : 'Create Program'}
             bgColor="bg-blue-50"
             textColor="text-blue-700"
             borderColor="border-blue-600"
@@ -752,32 +715,6 @@ export default function RegisterProgram() {
           />
         </div>
       </div>
-
-      <CreateUniversity
-        isOpen={showUniversityPopup}
-        onClose={() => setShowUniversityPopup(false)}
-      />
-
-      <CreateCommissionType
-        isOpen={showCommissionTypePopup}
-        onClose={() => setShowCommissionTypePopup(false)}
-      />
-
-      <CreateQualificationType
-        isOpen={showQualificationPopup}
-        onClose={() => setShowQualificationPopup(false)}
-      />
-
-      <CreateFieldOfStudy
-        isOpen={showFieldOfStudyPopup}
-        onClose={() => setShowFieldOfStudyPopup(false)}
-      />
-
-      <CreateBranch
-        isOpen={showBranchPopup}
-        onClose={() => setShowBranchPopup(false)}
-        universityId={formData.uni_id}
-      />
 
     </section>
   );

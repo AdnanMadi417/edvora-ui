@@ -44,7 +44,7 @@ const KnowledgeHubCards = () => {
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
+  const itemsPerPage = 6;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const filteredPrograms = programs.filter((program) => {
@@ -181,9 +181,10 @@ const KnowledgeHubCards = () => {
             <div className="block">
               <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
                 {currentPrograms.map((program) => (
-                  <div
+                  <a
+                    href={`/partner/knowledgeHub/${program.id}`}
                     key={program.id}
-                    className="relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md"
+                    className="relative cursor-pointer flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md"
                   >
 
                     <div className="flex items-start gap-4 border-b border-gray-200 px-4 py-5">
@@ -327,7 +328,7 @@ const KnowledgeHubCards = () => {
 
                       </div>
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
 

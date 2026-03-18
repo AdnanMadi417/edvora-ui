@@ -26,10 +26,11 @@ import {
   Percent,
   ChevronLeft,
 } from "lucide-react";
-import CardHeader from "../../../ui/card/CardHeader";
+import { useProgram } from "hooks/knowledge-hub/programs/useProgram";
+
 import Link from "next/link";
-import { useProgram } from "../../../../hooks/knowledge-hub/programs/useProgram";
-import Loading from "../../../loading/Loading";
+import CardHeader from "components/ui/card/CardHeader";
+import Loading from "components/loading/Loading";
 
 interface UniversityDetailsProps {
   id: string;
@@ -431,15 +432,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               <span className="absolute right-3 top-3 h-2 w-2 animate-pulse rounded-full bg-indigo-600" />
             </div>
 
-            <div className="relative flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-md transition-transform">
-              <span className="text-2xl font-bold text-green-700">
-                {commission?.type?? "One Time"}
-              </span>
-              <p className="text-sm font-semibold text-green-900">
-                Commission Type
-              </p>
-              <span className="absolute right-3 top-3 h-2 w-2 animate-pulse rounded-full bg-green-600" />
-            </div>
           </div>
 
           <div className="mx-6 mb-6 flex items-start gap-3 rounded-xl border border-yellow-200 bg-yellow-50 p-4 shadow-inner">

@@ -210,6 +210,15 @@ const MarketplaceCard = () => {
                   </div>
 
                   <div className="mt-auto flex gap-3 border-t bg-slate-50 p-4">
+
+                    <a
+                      href={`/partner/marketplace/${m.id}`}
+                      className="flex flex-1 items-center justify-center gap-2 rounded-full border border-blue-600 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
+                    >
+                      <MdVisibility className="h-5 w-5" />
+                      Details
+                    </a>
+
                     <button
                       aria-label="Contact via WhatsApp"
                       onClick={(e) => {
@@ -224,13 +233,6 @@ const MarketplaceCard = () => {
                       Contact
                     </button>
 
-                    <a
-                      href={`/partner/marketplace/${m.id}`}
-                      className="flex flex-1 items-center justify-center gap-2 rounded-full border border-blue-600 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
-                    >
-                      <MdVisibility className="h-5 w-5" />
-                      Details
-                    </a>
                   </div>
                 </a>
               ))}
