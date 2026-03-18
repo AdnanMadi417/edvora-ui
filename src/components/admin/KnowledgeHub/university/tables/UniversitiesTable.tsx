@@ -14,7 +14,7 @@ import {
   Trash2,
   ChevronUp,
   ChevronDown,
-  GraduationCap, CreditCard, Wallet,
+  GraduationCap, Wallet,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
@@ -289,17 +289,6 @@ const UniversitiesTable = () => {
               <RefreshCw className="h-4 w-4" />
               Clear
             </button>
-
-            <Link
-              href={`/admin/universities/payment-methods`}
-              icon={<CreditCard  className="h-5 w-5" />}
-              label={"Payment Methods"}
-              bgColor="bg-teal-50"
-              textColor="text-teal-700"
-              borderColor="border-teal-600"
-              hoverTextColor="hover:text-teal-800"
-              hoverBorderColor="hover:border-teal-700"
-            />
 
             <Link
               href={`/admin/universities/create`}

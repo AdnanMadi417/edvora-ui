@@ -1,11 +1,11 @@
 "use client";
 
-import LogisticalServiceProviderTable from "../../../components/admin/logisticalService/table/LogisticalServiceProviderTable";
+import LogisticalServiceTable from "../../../components/admin/logisticalService/table/LogisticalServiceTable";
 
 const LogisticalServiceProviders = () => {
   return (
     <div>
-      <LogisticalServiceProviderTable/>
+      <LogisticalServiceTable/>
     </div>
   );
 };

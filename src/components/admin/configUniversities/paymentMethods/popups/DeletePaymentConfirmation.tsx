@@ -2,9 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Trash2, XCircle } from 'lucide-react';
-import ModalHeader from "../../../../../ui/modal/ModalHeader";
-import DeleteBtn from '../../../../../ui/buttons/Button';
-import Button from '../../../../../ui/buttons/Button';
+import ModalHeader from "components/ui/modal/ModalHeader";
+import Button from 'components/ui/buttons/Button';
 
 interface DeletePaymentMethodConfirmationProps {
   isOpen: boolean;
@@ -96,7 +95,7 @@ export default function DeletePaymentMethodConfirmation({
               hoverBorderColor="hover:border-slate-700"
             />
 
-            <DeleteBtn
+            <Button
               icon={<Trash2 className="h-5 w-5" />}
               text={
                 isDeleting ? "Deleting..." : "Delete Payment Method"

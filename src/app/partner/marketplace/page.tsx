@@ -1,6 +1,6 @@
 'use client';
 
-import MarketplaceCard from "../../../components/partner/marketplace/MarketplaceCard";
+import MarketplaceCard from "../../../components/marketplace/partner/MarketplaceCard";
 
 const Dashboard = () => {
   return (
