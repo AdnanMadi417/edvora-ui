@@ -18,18 +18,17 @@ import {
   MdLocationOn,
 } from 'react-icons/md';
 
+import { useServiceProviders } from "hooks/service-providers/useServiceProviders";
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
-import { useServiceProviders } from "hooks/serviceProviders/useServiceProviders";
-import ViewDetailsModal from "components/partner/marketplace/popup/ViewDetailsModal";
 
 const MarketplaceCard = () => {
   const { serviceProviders, loading, error } = useServiceProviders();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
+  const itemsPerPage = 6;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
@@ -43,9 +42,6 @@ const MarketplaceCard = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
-
-  const [showViewModal, setViewModal] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState<any>(null);
 
   useEffect(() => {
     if (serviceProviders.length) {
@@ -104,33 +100,33 @@ const MarketplaceCard = () => {
 
           {!error && filteredProviders.length > 0 && (
             <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
-              {currentServiceProviders.map((program) => (
-                <div
-                  key={program.id}
-                  className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+              {currentServiceProviders.map((m) => (
+                <a
+                  href={`/partner/marketplace/${m.id}`}
+                  key={m.id}
+                  className="flex flex-col overflow-hidden contract-trigger rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
                 >
                   <div className="flex items-center justify-between border-b bg-slate-50 px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative">
                         <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100">
                           <span className="text-sm font-semibold uppercase text-blue-700">
-                            {program.name?.slice(0, 2)}
+                            {m.name?.slice(0, 2)}
                           </span>
                         </div>
 
                         <span
                           className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${
-                            program.is_active ? "bg-emerald-500" : "bg-red-500"
+                            m.is_active ? "bg-emerald-500" : "bg-red-500"
                           }`}
                         />
                       </div>
 
-                      {/* Name + Location */}
                       <div>
                         <h3 className="flex items-center gap-1 text-sm font-semibold text-slate-900">
-                          {program.name}
+                          {m.name}
 
-                          {program.is_active ? (
+                          {m.is_active ? (
                             <CheckCircle className="h-4 w-4 text-emerald-500" />
                           ) : (
                             <XCircle className="h-4 w-4 text-red-500" />
@@ -139,7 +135,7 @@ const MarketplaceCard = () => {
 
                         <p className="flex items-center gap-1 text-xs text-slate-500">
                           <MdPublic className="h-3.5 w-3.5" />
-                          {program.main_location || "Not Provided"}
+                          {m.main_location || "Not Provided"}
                         </p>
                       </div>
                     </div>
@@ -152,7 +148,10 @@ const MarketplaceCard = () => {
                           Single Service
                         </span>
                         <p className="text-sm font-bold text-slate-900">
-                          From RM {program.price_range.min_price}
+                          From RM
+                          {m.price_range
+                            ? `RM ${m.price_range.min_price}`
+                            : "-"}
                         </p>
                       </div>
 
@@ -163,7 +162,10 @@ const MarketplaceCard = () => {
                           Package
                         </span>
                         <p className="text-sm font-bold text-slate-900">
-                          From RM {program.price_range.max_price}
+                          From RM
+                          {m.price_range
+                            ? `RM ${m.price_range.max_price}`
+                            : " - "}
                         </p>
                       </div>
                     </div>
@@ -171,19 +173,19 @@ const MarketplaceCard = () => {
                     <div className="mt-4 space-y-2 text-xs text-slate-600">
                       <p className="flex items-center gap-1">
                         <MdOutlineTranslate className="h-4 w-4 text-slate-500" />
-                        {program.languages?.slice(0, 3).join(" • ") ||
+                        {m.languages?.slice(0, 3).join(" • ") ||
                           "Language not provided"}
                       </p>
 
                       <p className="flex items-center gap-1">
                         <MdLocationOn className="h-4 w-4 text-slate-500" />
-                        {program.service_locations?.slice(0, 2).join(" • ") ||
+                        {m.service_locations?.slice(0, 2).join(" • ") ||
                           "Location not provided"}
                       </p>
 
                       <p className="flex items-center gap-1">
                         <MdOutlineSchool className="h-4 w-4 text-slate-500" />
-                        {program.universities_served?.slice(0, 2).join(" • ") ||
+                        {m.universities_served?.slice(0, 2).join(" • ") ||
                           "universities not provided"}
                       </p>
                     </div>
@@ -195,7 +197,7 @@ const MarketplaceCard = () => {
                       </p>
 
                       <div className="mt-4 flex flex-wrap gap-2">
-                        {program.services_offered?.slice(0, 3).map((service) => (
+                        {m.services_offered?.slice(0, 3).map((service) => (
                           <span
                             key={service}
                             className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
@@ -212,8 +214,8 @@ const MarketplaceCard = () => {
                       aria-label="Contact via WhatsApp"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (!program?.whatsapp) return;
-                        const number = program.whatsapp.replace("+", "");
+                        if (!m?.whatsapp) return;
+                        const number = m.whatsapp.replace("+", "");
                         window.open(`https://wa.me/${number}`, "_blank");
                       }}
                       className="flex flex-1 items-center justify-center gap-2 rounded-full border border-green-600 bg-green-100 px-4 py-2 text-sm font-medium text-green-700 transition-all hover:scale-105 hover:border-green-700 hover:bg-green-200 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400"
@@ -222,19 +224,15 @@ const MarketplaceCard = () => {
                       Contact
                     </button>
 
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedProvider(program);
-                        setViewModal(true);
-                      }}
+                    <a
+                      href={`/partner/marketplace/${m.id}`}
                       className="flex flex-1 items-center justify-center gap-2 rounded-full border border-blue-600 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
                     >
                       <MdVisibility className="h-5 w-5" />
                       Details
-                    </button>
+                    </a>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           )}
@@ -293,11 +291,6 @@ const MarketplaceCard = () => {
         </div>
       </div>
 
-      <ViewDetailsModal
-        isOpen={showViewModal}
-        onClose={() => setViewModal(false)}
-        provider={selectedProvider}
-      />
     </div>
   );
 };

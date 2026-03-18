@@ -22,13 +22,13 @@ import PrevButton from "components/ui/buttons/PrevButton";
 
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
-import DeletePaymentConfirmation from "./popups/DeletePaymentConfirmation";
-import CreatePayment from "./popups/CreatePayment";
+import DeletePaymentConfirmation from "components/admin/configUniversities/paymentMethods/popups/DeletePaymentConfirmation";
+import CreatePayment from "components/admin/configUniversities/paymentMethods/popups/CreatePayment";
 
 import Loading from "components/loading/Loading";
 
 import { useToast } from "components/context/ToastContext";
-import Button from "../../../../ui/buttons/Button";
+import Button from "components/ui/buttons/Button";
 
 const PaymentMethodsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -290,7 +290,7 @@ const PaymentMethodsTable = () => {
                           <a
                             role="menuitem"
                             aria-label="View Payment Method"
-                            href={`/admin/universities/payment-methods/${payment.id}`}
+                            href={`/admin/config-universities/payment-methods/${payment.id}`}
                             className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
                             <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
@@ -301,7 +301,7 @@ const PaymentMethodsTable = () => {
                           <a
                             role="menuitem"
                             aria-label="Edit Payment Method"
-                            href={`/admin/universities/payment-methods/${payment.id}/edit`}
+                            href={`/admin/config-universities/payment-methods/${payment.id}/edit`}
                             className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
                             <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />

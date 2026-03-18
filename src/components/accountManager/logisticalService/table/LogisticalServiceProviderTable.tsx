@@ -26,7 +26,7 @@ import NextButton from "../../../ui/buttons/NextButton";
 
 import PrevButton from "../../../ui/buttons/PrevButton";
 
-import { useServiceProviders } from "../../../../hooks/serviceProviders/useServiceProviders";
+import { useServiceProviders } from "hooks/service-providers/useServiceProviders";
 
 import ViewDetailsModal from "../../../accountManager/logisticalService/popup/ViewDetailsModal";
 import EditDetailsModal from "../../../accountManager/logisticalService/popup/EditDetailsModal";

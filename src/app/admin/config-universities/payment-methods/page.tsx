@@ -1,6 +1,6 @@
 "use client";
 
-import PaymentMethodsTable from "components/admin/KnowledgeHub/university/paymentMethods/PaymentMethodsTable";
+import PaymentMethodsTable from "components/admin/configUniversities/paymentMethods/PaymentMethodsTable";
 
 const PaymentMethodsTableOverview = () => {
   return (

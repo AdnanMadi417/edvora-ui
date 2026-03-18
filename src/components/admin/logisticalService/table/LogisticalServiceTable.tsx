@@ -13,8 +13,8 @@ import {
   Eye,
   Pencil,
   DollarSign,
-  BookOpen,
-} from "lucide-react";
+  BookOpen, Trash2,
+} from 'lucide-react';
 import { MdAddBusiness } from "react-icons/md";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
@@ -23,23 +23,28 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import EmptyData from "components/emptyData/EmptyTableData";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
-
-import { useServiceProviders } from "hooks/serviceProviders/useServiceProviders";
-
-import ViewDetailsModal from "components/admin/logisticalService/popup/ViewDetailsModal";
-import EditDetailsModal from "components/admin/logisticalService/popup/EditDetailsModal";
-
+import { useToast } from 'components/context/ToastContext';
 import Link from "next/link";
 
-const LogisticalServiceProviderTable = () => {
+import { useServiceProviders } from "hooks/service-providers/useServiceProviders";
+import { useDeleteLogisticProvider } from "hooks/service-providers/useDeleteLogisticProvider";
+import DeleteUniversityConfirmation from 'components/admin/logisticalService/DeleteServiceConfirmation';
+
+const LogisticalServiceTable = () => {
   const { serviceProviders, loading, error } = useServiceProviders();
+  const { showToast } = useToast();
 
   const [selectedProviders, setSelectedProviders] = useState<
     Record<string, boolean>
   >({});
 
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const [selectedManager, setSelectedManager] = useState<any>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedServiceName, setSelectedServiceName] =
+    useState<string>("");
+  const [selectedServiceId, setSelectedServiceId] = useState<
+    string | null
+  >(null);
+  const { deletePartner, isDeleting } = useDeleteLogisticProvider();
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -56,16 +61,13 @@ const LogisticalServiceProviderTable = () => {
     indexOfLastItem
   );
 
-  const [showViewModal, setViewModal] = useState(false);
-  const [showEditModal, setEditModal] = useState(false);
-  const [selectedProvider, setSelectedProvider] = useState<any>(null);
-
   useEffect(() => {
     if (serviceProviders.length) {
-      const defaults = {};
+      const defaults: Record<string, boolean> = {};
       serviceProviders.forEach((p) => {
-        defaults[p.id] = 1;
+        defaults[p.id] = false;
       });
+      setSelectedProviders(defaults);
     }
   }, [serviceProviders]);
 
@@ -76,6 +78,26 @@ const LogisticalServiceProviderTable = () => {
     });
     setSelectedProviders(initialSelection);
   }, [serviceProviders]);
+
+  const handleDelete = async () => {
+    if (!selectedServiceId) return;
+
+    try {
+      await deletePartner(selectedServiceId);
+
+      showToast("Service deleted successfully.", "success");
+
+      setIsDeleteOpen(false);
+      setSelectedServiceId(null);
+      setSelectedServiceName("");
+
+      setTimeout(() => location.reload(), 2000);
+    } catch (error: any) {
+      const backendMessage =
+        error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to delete service. ${backendMessage}`, "error");
+    }
+  };
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
@@ -240,8 +262,9 @@ const LogisticalServiceProviderTable = () => {
 
                         <td className="min-w-[200px] max-w-[250px] px-6 py-4">
                           <div className="truncate text-slate-500">
-                            {provider.price_range.min_price} –{" "}
-                            {provider.price_range.max_price} RM
+                            {provider.price_range
+                              ? `RM ${provider.price_range.min_price ?? "NA"} – ${provider.price_range.max_price ?? "NA"}`
+                              : "Not provided"}
                           </div>
                         </td>
 
@@ -258,7 +281,7 @@ const LogisticalServiceProviderTable = () => {
                           <div className="flex flex-wrap gap-2">
                             {provider.universities_served?.length ? (
                               provider.universities_served
-                                .slice(0, 2)
+                                .slice(0, 1)
                                 .map((uni) => (
                                   <span
                                     key={uni}
@@ -272,9 +295,9 @@ const LogisticalServiceProviderTable = () => {
                                 Not provided
                               </span>
                             )}
-                            {provider.universities_served?.length > 2 && (
+                            {provider.universities_served?.length > 1 && (
                               <button className="text-xs font-medium text-blue-600 hover:underline">
-                                +{provider.universities_served.length - 2} more
+                                +{provider.universities_served.length - 1} more
                               </button>
                             )}
                           </div>
@@ -283,7 +306,7 @@ const LogisticalServiceProviderTable = () => {
                         <td className="min-w-[150px] max-w-[200px] px-6 py-4">
                           <div className="flex flex-wrap gap-2">
                             {provider.languages?.length ? (
-                              provider.languages.slice(0, 3).map((lang) => (
+                              provider.languages.slice(0, 2).map((lang) => (
                                 <span
                                   key={lang}
                                   className="rounded-full text-xs font-medium text-slate-700"
@@ -296,9 +319,9 @@ const LogisticalServiceProviderTable = () => {
                                 Not provided
                               </span>
                             )}
-                            {provider.languages?.length > 3 && (
+                            {provider.languages?.length > 2 && (
                               <button className="text-xs font-medium text-blue-600 hover:underline">
-                                +{provider.languages.length - 3} more
+                                +{provider.languages.length - 2} more
                               </button>
                             )}
                           </div>
@@ -323,34 +346,41 @@ const LogisticalServiceProviderTable = () => {
 
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-2">
-                            <button
+                            <a
                               role="menuitem"
                               aria-label="View Provider"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedProvider(provider);
-                                setViewModal(true);
-                              }}
+                              href={`/admin/logistical-service/${provider.id}`}
                               className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                             >
                               <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                            </button>
+                            </a>
+
+                            <div className="h-6 border-l border-slate-200" />
+
+                            <a
+                              role="menuitem"
+                              aria-label="Edit Provider"
+                              href={`/admin/logistical-service/${provider.id}/edit`}
+                              className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                            >
+                              <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
+                            </a>
 
                             <div className="h-6 border-l border-slate-200" />
 
                             <button
                               role="menuitem"
-                              aria-label="Edit Provider"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedManager(provider);
-                                setEditModal(true);
-                                setOpenDropdownId(null);
+                              aria-label="Delete Provider"
+                              onClick={() => {
+                                setSelectedServiceId(provider.id);
+                                setSelectedServiceName(provider.name);
+                                setIsDeleteOpen(true);
                               }}
                               className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                             >
-                              <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
+                              <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                             </button>
+
                           </div>
                         </td>
                       </tr>
@@ -415,20 +445,16 @@ const LogisticalServiceProviderTable = () => {
         </div>
       </div>
 
-      <ViewDetailsModal
-        isOpen={showViewModal}
-        onClose={() => setViewModal(false)}
-        provider={selectedProvider}
-      />
-
-      <EditDetailsModal
-        isOpen={showEditModal}
-        onClose={() => setEditModal(false)}
-        provider={selectedProvider}
+      <DeleteUniversityConfirmation
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        serviceName={selectedServiceName}
       />
 
     </div>
   );
 };
 
-export default LogisticalServiceProviderTable;
+export default LogisticalServiceTable;
