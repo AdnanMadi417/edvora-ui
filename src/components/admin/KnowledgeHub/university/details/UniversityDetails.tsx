@@ -1,22 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
-  CreditCard,
   GraduationCap,
-  MoreVertical,
-  Settings,
 } from "lucide-react";
+import { FaTimesCircle } from "react-icons/fa";
+import { MdEvent, MdLocationCity, MdPublic } from "react-icons/md";
+import { HiOutlineCheckCircle } from "react-icons/hi";
+
 import { useUniversityDetails } from "hooks/knowledge-hub/universities/useUniversitiesDetails";
 import { useUniversityPaymentMethods } from "hooks/knowledge-hub/universities/payment-methods/useUniversityPaymentMethods";
-import Loading from "../../../../loading/Loading";
-import { MdEvent, MdLocationCity, MdPublic } from "react-icons/md";
-import EmptyData from "../../../../emptyData/EmptyTableData";
-import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
-import AssignPaymentMethods from "components/admin/KnowledgeHub/university/popups/AssignPaymentMethods";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+
+import Loading from "components/loading/Loading";
+import EmptyData from "components/emptyData/EmptyTableData";
 
 interface UniversityDetailsProps {
   id: string;
@@ -24,13 +22,6 @@ interface UniversityDetailsProps {
 
 const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const router = useRouter();
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-
-  const [isUniversityTypeModalOpen, setIsUniversityTypeModalOpen] =
-    useState(false);
-  const [isPaymentMethodsModalOpen, setIsPaymentMethodsModalOpen] =
-    useState(false);
-  const [activeUniversity, setActiveUniversity] = useState<any>(null);
 
   const { universityPaymentMethods, loading } = useUniversityPaymentMethods(id);
 
@@ -44,7 +35,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     return <Loading text="Loading university details..." />;
   }
 
-  if (!university) {
+  if (!university ) {
     return <EmptyData />;
   }
 
@@ -65,74 +56,15 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-6">
-              <div className="relative">
-                <button
-                  onClick={() =>
-                    setOpenDropdownId(
-                      openDropdownId === university.id ? null : university.id
-                    )
-                  }
-                  className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  Actions
-                  <MoreVertical className="h-4 w-4" />
-                </button>
-
-                {openDropdownId === university.id && (
-                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
-                    <div className="space-y-2 p-2">
-                      <button
-                        aria-label="Update Program Details"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:shadow-sm"
-                        onClick={() => {
-                          setActiveUniversity(university);
-                          setIsUniversityTypeModalOpen(true);
-                        }}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
-                          <Settings className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-slate-900">
-                          Assign University Type
-                        </span>
-                      </button>
-
-                      <button
-                        aria-label="Assign Payment Methods"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent  px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-100 hover:shadow-sm"
-                        onClick={() => {
-                          setActiveUniversity(university);
-                          setIsPaymentMethodsModalOpen(true);
-                        }}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-700 transition-colors group-hover:bg-blue-200">
-                          <CreditCard className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-slate-900">
-                          Assign Payment Methods
-                        </span>
-                      </button>
-
-                      <button
-                        aria-label="Back to Programs"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
-                        onClick={handleBack}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
-                          <ChevronLeft className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-slate-900">
-                          Back to Universities
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <button
+                onClick={handleBack}
+                className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
+              >
+                <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                <span className="hidden sm:inline">Back to universities</span>
+              </button>
             </div>
+
           </div>
 
           <div className="px-6 py-6">
@@ -186,16 +118,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
           </div>
 
           <div className="border-t border-gray-200 px-6 py-6">
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Description
-            </h3>
-
-            <p className="text-sm leading-relaxed text-slate-700">
-              {university.description || "No description provided."}
-            </p>
-          </div>
-
-          <div className="border-t border-gray-200 px-6 py-6">
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
               Branches
             </h3>
@@ -241,57 +163,44 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 {universityPaymentMethods.map((payment) => (
                   <div
                     key={payment.id}
-                    className="group relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:border-blue-200 hover:shadow-md"
+                    className="group relative cursor-pointer rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
                   >
-
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50">
-                          <CreditCard className="h-5 w-5 text-blue-600" />
-                        </div>
-
                         <div>
                           <p className="text-sm font-semibold text-slate-900">
                             {payment.payment_method_name}
                           </p>
-
-                          {payment.currency && (
-                            <span className="mt-1 inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">
-                              {payment.currency}
-                            </span>
-                          )}
                         </div>
                       </div>
 
                       <span
-                        className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium
-          ${
-            payment.is_active
-              ? "bg-green-50 text-green-700"
-              : "bg-gray-100 text-gray-500"
-          }`}
+                        className={`flex items-center gap-1 p-1 text-xs font-medium
+                          ${
+                            payment.is_active
+                              ? "text-green-700"
+                              : "text-red-700"
+                          }`}
                       >
                         {payment.is_active ? (
                           <>
-                            <FaCheckCircle className="text-[12px]" />
-                            Active
+                            <HiOutlineCheckCircle className=" w-5 h-5" />
                           </>
                         ) : (
                           <>
-                            <FaTimesCircle className="text-[12px]" />
-                            Inactive
+                            <FaTimesCircle className="w-5 h-5" />
                           </>
                         )}
                       </span>
                     </div>
 
                     {payment.instructions && (
-                      <div className="mt-4 border-t pt-3">
-                        <p className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                      <div className="mt-4 border-t pt-4">
+                        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
                           Instructions
                         </p>
 
-                        <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                        <p className="mt-1 text-xs leading-relaxed text-slate-600">
                           {payment.instructions}
                         </p>
                       </div>
@@ -304,18 +213,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
         </div>
       </div>
 
-      <UpdateUniversityType
-        isOpen={isUniversityTypeModalOpen}
-        onClose={() => setIsUniversityTypeModalOpen(false)}
-        universityId={activeUniversity?.id || null}
-        initialData={activeUniversity}
-      />
-
-      <AssignPaymentMethods
-        isOpen={isPaymentMethodsModalOpen}
-        onClose={() => setIsPaymentMethodsModalOpen(false)}
-        universityId={activeUniversity?.id || null}
-      />
     </>
   );
 };

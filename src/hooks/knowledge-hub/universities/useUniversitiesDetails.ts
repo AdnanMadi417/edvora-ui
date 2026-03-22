@@ -14,6 +14,7 @@ interface UniversityDetails {
   country: string;
   is_active: boolean;
   description?: string;
+  university_type_id: string;
   intake_months?: string[];
 }
 

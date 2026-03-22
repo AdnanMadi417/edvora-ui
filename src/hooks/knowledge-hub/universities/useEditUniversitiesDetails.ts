@@ -14,6 +14,7 @@ interface UpdateUniversityPayload {
   is_active: boolean;
   description?: string;
   intake_months?: string[];
+  university_type_id: string;
   branches: UpdateBranchPayload[];
 }
 

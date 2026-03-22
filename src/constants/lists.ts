@@ -406,3 +406,8 @@ export const PARTNER_TYPE = [
   { value: "individual", label: "Individual" },
   { value: "Business", label: "Business" },
 ];
+
+export const CURRENCY = [
+  { value: "usd", label: "USD" },
+  { value: "rm", label: "RM" },
+];
