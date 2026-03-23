@@ -1,21 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   CreditCard,
-  MoreVertical,
-  Trash2,
 } from 'lucide-react';
 
 import { usePaymentMethod } from "hooks/knowledge-hub/payment-methods/usePaymentMethodId";
-import { useDeleteUniversity } from 'hooks/knowledge-hub/payment-methods/useDeletePaymentMethod';
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
-import DeletePaymentConfirmation from './popups/DeletePaymentConfirmation';
-import { useToast } from 'components/context/ToastContext';
 
 interface PaymentMethodDetailsProps {
   id: string;
@@ -23,47 +18,18 @@ interface PaymentMethodDetailsProps {
 
 const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
   const router = useRouter();
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-  const { showToast } = useToast();
-
-  const { deletePayment, isDeleting } =useDeleteUniversity();
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [selectedPaymentId, setSelectedPaymentId] = useState<
-    string | null
-  >(null);
-  const [selectedPaymentMethodName, setSelectedPaymentMethodName] =
-    useState<string>("");
 
   const { paymentMethod,error, loading } = usePaymentMethod(id);
 
   const handleBack = () => {
-    router.push("/admin/universities/payment-methods");
-  };
-
-  const handleDelete = async () => {
-    if (!selectedPaymentId) return;
-
-    try {
-      await deletePayment(selectedPaymentId);
-
-      showToast(" Payment Method deleted successfully.");
-
-      setIsDeleteOpen(false);
-      setSelectedPaymentId(null);
-      setSelectedPaymentMethodName("");
-
-      setTimeout(() => router.push("/admin/universities/payment-methods"), 2000);
-
-    } catch (error: any) {
-      showToast("Failed to delete university. Please try again.");
-    }
+    router.push("/admin/config-universities/payment-methods");
   };
 
   if (loading) {
     return <Loading text="Loading payment methods details..." />;
   }
 
-  if (!paymentMethod) {
+  if (!paymentMethod ) {
     return <EmptyData />;
   }
 
@@ -83,60 +49,15 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
             </div>
 
             <div className="flex items-center gap-2 sm:gap-6">
-              <div className="relative">
-                <button
-                  onClick={() =>
-                    setOpenDropdownId(
-                      openDropdownId === paymentMethod.id ? null : paymentMethod.id
-                    )
-                  }
-                  className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  Actions
-                  <MoreVertical className="h-4 w-4" />
-                </button>
-
-                {openDropdownId === paymentMethod.id && (
-                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
-                    <div className="space-y-2 p-2">
-
-                      <button
-                        aria-label="Back to Programs"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-red-200 hover:bg-red-50 hover:shadow-sm"
-                        onClick={() => {
-                          setSelectedPaymentId(paymentMethod.id);
-                          setSelectedPaymentMethodName(paymentMethod.name);
-                          setIsDeleteOpen(true);
-                        }}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
-                          <Trash2 className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-red-900">
-                          Delete Payment
-                        </span>
-                      </button>
-
-                      <button
-                        aria-label="Back to Programs"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
-                        onClick={handleBack}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
-                          <ChevronLeft className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-slate-900">
-                          Back to Payments
-                        </span>
-                      </button>
-
-                    </div>
-                  </div>
-                )}
-              </div>
+              <button
+                onClick={handleBack}
+                className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
+              >
+                <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                <span className="hidden sm:inline">Back to Payments</span>
+              </button>
             </div>
+
           </div>
 
           <div className="border-t border-gray-200 px-6 py-6">
@@ -151,14 +72,6 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
 
         </div>
       </div>
-
-      <DeletePaymentConfirmation
-        isOpen={isDeleteOpen}
-        onClose={() => setIsDeleteOpen(false)}
-        onConfirm={handleDelete}
-        isDeleting={isDeleting}
-        paymentMethodName={selectedPaymentMethodName}
-      />
 
     </>
   );

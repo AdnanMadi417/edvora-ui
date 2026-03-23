@@ -188,11 +188,11 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           )}
         </div>
 
-        <div className="max-h-30 block overflow-y-auto [&::-webkit-scrollbar-thumb]:bg-blue-700 [&::-webkit-scrollbar-thumb]:[border-radius:3px] [&::-webkit-scrollbar-thumb]:[margin-left:3px] [&::-webkit-scrollbar]:[width:6px]" />
+        <div className="max-h-30 block overflow-y-auto [&::-webkit-scrollbar-thumb]:bg-slate-100 [&::-webkit-scrollbar-thumb]:[border-radius:3px] [&::-webkit-scrollbar-thumb]:[margin-left:3px] [&::-webkit-scrollbar]:[width:6px]" />
 
         <div
           className="flex-1 overflow-y-auto py-4
-        [&::-webkit-scrollbar-thumb]:bg-blue-700
+        [&::-webkit-scrollbar-thumb]:bg-slate-200
         [&::-webkit-scrollbar-thumb]:[border-radius:3px]
         [&::-webkit-scrollbar-thumb]:[margin-left:3px]
         [&::-webkit-scrollbar]:[width:6px]

@@ -72,6 +72,7 @@ export default function CreateFieldOfStudy({
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
       showToast(`Failed to create Field Of Study. ${backendMessage}`, "error");
+      setErrors({ name: backendMessage });
     }
   };
 
@@ -125,6 +126,7 @@ export default function CreateFieldOfStudy({
               errors={errors}
               updateFormData={updateFormData}
             />
+
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">

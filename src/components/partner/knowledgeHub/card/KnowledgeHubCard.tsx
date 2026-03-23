@@ -18,7 +18,7 @@ import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import { useAllPrograms } from "hooks/knowledge-hub/programs/useProgramsList";
-import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
+import { useAllFields } from "../../../../hooks/knowledge-hub/field-of-study/useFieldsList";
 import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
 import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
 

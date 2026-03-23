@@ -94,7 +94,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
       await updatePaymentMethods(paymentMethod.id, payload);
 
       showToast("Payment method updated successfully", "success");
-      router.push("/admin/universities/payment-methods");
+      router.push("/admin/config-universities/payment-methods");
 
     }
     catch (error: any) {
@@ -113,7 +113,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
       showToast("Payment method deleted successfully", "success");
 
       setIsDeleteOpen(false);
-      router.push("/admin/universities/payment-methods");
+      router.push("/admin/config-universities/payment-methods");
 
     } catch (error: any) {
       const backendMessage =
@@ -124,7 +124,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
   };
 
   const handleBack = () => {
-    router.push("/admin/universities/payment-methods");
+    router.push("/admin/config-universities/payment-methods");
   };
 
   if (loadingPayment) {
