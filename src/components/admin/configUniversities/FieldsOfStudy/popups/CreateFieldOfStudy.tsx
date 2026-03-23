@@ -1,42 +1,38 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CreditCard, XCircle } from 'lucide-react';
+import { XCircle, Tag } from "lucide-react";
 
-import { useCreatePayment } from "hooks/knowledge-hub/payment-methods/useCreatePayment";
+import { useCreateFieldOfStudy } from "../../../../../hooks/knowledge-hub/useCreateFieldOfStudy";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import InputField from "components/form/InputField";
-import { useToast } from "components/context/ToastContext";
+import ModalHeader from "../../../../ui/modal/ModalHeader";
+import Button from "../../../../ui/buttons/Button";
+import InputField from "../../../../form/InputField";
+import { useToast } from "../../../../context/ToastContext";
 import { useRouter } from 'next/navigation';
 
-interface CreatePaymentMethodProps {
+interface CreateFieldOfStudyProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export default function CreatePayment({
-                                           isOpen,
-                                           onClose,
-                                         }: CreatePaymentMethodProps) {
-  const { createPayment, paymentLoading } = useCreatePayment();
+export default function CreateFieldOfStudy({
+  isOpen,
+  onClose,
+}: CreateFieldOfStudyProps) {
+  const { CreateFieldOfStudy, fieldLoading } = useCreateFieldOfStudy();
+
   const { showToast } = useToast();
+  const router = useRouter();
 
   const [isVisible, setIsVisible] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
-    description: "",
+    is_active: true,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const router = useRouter();
-  const [apiError, setApiError] = useState<string | null>(null);
-
-  const isFormValid =
-    formData.name.trim() &&
-    formData.description.trim()
 
   useEffect(() => {
     if (isOpen) {
@@ -63,26 +59,33 @@ export default function CreatePayment({
 
   const handleCreate = async () => {
     try {
-      setApiError(null);
+      await CreateFieldOfStudy({
+        name: formData.name,
+        is_active: formData.is_active,
+      });
 
-      await createPayment(formData);
-
-      showToast("Payment Method created successfully.", "success");
+      showToast("Field Of Study created successfully." , "success");
 
       onClose();
       setTimeout(() => router.refresh(), 1500);
+
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
-
-      setApiError(backendMessage);
-
-      showToast(
-        `Failed to create Payment Method. ${backendMessage}`,
-        "error"
-      );
+      const backendMessage = error?.response?.data?.message || "Please try again.";
+      showToast(`Failed to create Field Of Study. ${backendMessage}`, "error");
+      setErrors({ name: backendMessage });
     }
   };
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        name: "",
+        is_active: true,
+      });
+
+      setErrors({});
+    }
+  }, [isOpen]);
 
   if (!isVisible) return null;
 
@@ -103,56 +106,35 @@ export default function CreatePayment({
       >
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
-            title="Create Payment Method"
-            description="Add a new payment method to the Knowledge Hub system."
-            icon={CreditCard}
+            title="Create New Field of Study"
+            description="Add a new field of study into the knowledge hub."
+            icon={Tag}
             iconBg="bg-blue-50"
-            iconColor="text-blue-700"
+            iconColor="text-blue-600"
             iconBorder="border-blue-200"
-            titleColor="text-blue-900"
+            titleColor="text-gray-900"
             onClose={onClose}
           />
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
             <InputField
-              label="Payment Method Name"
+              label="Field Of Study Name"
               field="name"
-              placeholder="e.g. Credit Card, PayPal, GrabPay"
+              placeholder="e.g. Computer Science"
               required
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
             />
 
-            <InputField
-              label="Description"
-              field="description"
-              placeholder="Brief description of the payment method (optional)"
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-            />
-
-            {apiError && (
-              <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4">
-                <XCircle className="mt-0.5 h-5 w-5 text-red-600" />
-                <div>
-                  <p className="text-sm font-semibold text-red-800">
-                    Failed to create payment method
-                  </p>
-                  <p className="text-sm text-red-700">{apiError}</p>
-                </div>
-              </div>
-            )}
-
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
             <Button
               onClick={onClose}
-              disabled={paymentLoading}
-              icon={<XCircle  className="h-5 w-5" />}
-              text={paymentLoading ? "Cancelling..." : "Cancel"}
+              disabled={fieldLoading}
+              icon={<XCircle className="h-5 w-5" />}
+              text={fieldLoading ? "Cancelling..." : "Cancel"}
               bgColor="bg-slate-50"
               textColor="text-slate-700"
               borderColor="border-slate-600"
@@ -162,9 +144,9 @@ export default function CreatePayment({
 
             <Button
               onClick={handleCreate}
-              disabled={paymentLoading || !isFormValid}
-              icon={<CreditCard  className="h-5 w-5" />}
-              text={paymentLoading ? "Creating..." : "Create Payment Method"}
+              disabled={fieldLoading || !formData.name.trim()}
+              icon={<Tag className="h-5 w-5" />}
+              text={fieldLoading ? "Creating..." : "Create Field of Study"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"
               borderColor="border-blue-600"

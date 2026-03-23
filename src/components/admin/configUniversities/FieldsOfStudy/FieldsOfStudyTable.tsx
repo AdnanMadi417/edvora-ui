@@ -22,7 +22,7 @@ import PrevButton from "components/ui/buttons/PrevButton";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import DeleteFieldConfirmation from "components/admin/configUniversities/FieldsOfStudy/popups/DeleteFieldConfirmation";
-import CreateFieldOfStudy from "components/admin/KnowledgeHub/program/popups/CreateFieldOfStudy";
+import CreateFieldOfStudy from "./popups/CreateFieldOfStudy";
 
 import Loading from "components/loading/Loading";
 
