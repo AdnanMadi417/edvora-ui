@@ -22,7 +22,8 @@ import PrevButton from "components/ui/buttons/PrevButton";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import DeleteFieldConfirmation from "components/admin/configUniversities/FieldsOfStudy/popups/DeleteFieldConfirmation";
-import CreateFieldOfStudy from "./popups/CreateFieldOfStudy";
+import CreateFieldOfStudy from "components/admin/configUniversities/FieldsOfStudy/popups/CreateFieldOfStudy";
+import UpdateField from "components/admin/configUniversities/FieldsOfStudy/popups/UpdateField";
 
 import Loading from "components/loading/Loading";
 
@@ -39,16 +40,14 @@ const FieldsOfStudyTable = () => {
 
   const { deleteField, isDeleting } = useDeleteField();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(
     null
   );
-
   const [selectedFieldName, setSelectedFieldName] =
     useState<string>("");
-
+  const [selectedField, setSelectedField] = useState<any | null>(null);
   const [selectedState, setSelectedState] = useState<string>("all");
-  const [selectedField, setSelectedField] = useState<string>("all");
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -57,17 +56,13 @@ const FieldsOfStudyTable = () => {
   const filteredFieldOfStudy = React.useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
 
-    return fields.filter((university) => {
+    return fields.filter((field) => {
       const matchSearch =
-        !term || university.name?.toLowerCase().includes(term);
+        !term || field.name?.toLowerCase().includes(term);
 
-      const matchField =
-        selectedField === "all" ||
-        (university as any).field_id === selectedField;
-
-      return matchSearch && matchField;
+      return matchSearch;
     });
-  }, [fields, searchTerm, selectedState, selectedField]);
+  }, [fields, searchTerm]);
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -111,6 +106,7 @@ const FieldsOfStudyTable = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
@@ -291,9 +287,8 @@ const FieldsOfStudyTable = () => {
                             role="menuitem"
                             aria-label="Update Field of study"
                             onClick={() => {
-                              setSelectedFieldId(field.id);
-                              setSelectedFieldName(field.name);
-                              setIsDeleteOpen(true);
+                              setSelectedField(field);
+                              setIsUpdateOpen(true);
                             }}
                             className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
@@ -379,6 +374,12 @@ const FieldsOfStudyTable = () => {
         onConfirm={handleDelete}
         isDeleting={isDeleting}
         FieldName={selectedFieldName}
+      />
+
+      <UpdateField
+        isOpen={isUpdateOpen}
+        onClose={() => setIsUpdateOpen(false)}
+        selectedField={selectedField}
       />
 
       <CreateFieldOfStudy

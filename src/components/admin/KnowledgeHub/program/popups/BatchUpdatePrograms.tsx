@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, GitBranch } from "lucide-react";
+import { XCircle, Percent } from "lucide-react";
 
 import { useBatchUpdatePrograms } from "hooks/knowledge-hub/programs/useBatchUpdatePrograms";
 import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
@@ -146,9 +146,9 @@ export default function CreateBranch({
       >
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
-            title="Create New Branch"
-            description="Add a new branch to this university."
-            icon={GitBranch}
+            title="Bulk Commission Update"
+            description="Update commission values for multiple programs at once."
+            icon={Percent}
             iconBg="bg-blue-50"
             iconColor="text-blue-600"
             iconBorder="border-blue-200"
@@ -206,8 +206,8 @@ export default function CreateBranch({
             <Button
               onClick={handleCreate}
               disabled={!isFormValid || loading}
-              icon={<GitBranch className="h-5 w-5" />}
-              text={loading ? "Updating..." : "Update Programs"}
+              icon={<Percent className="h-5 w-5" />}
+              text={loading ? "Updating..." : "Update Commission"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"
               borderColor="border-blue-600"

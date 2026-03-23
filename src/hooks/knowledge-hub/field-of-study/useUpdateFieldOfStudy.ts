@@ -1,18 +1,19 @@
+
 import { useState } from "react";
-import api from "../../lib/useApi";
+import api from "../../../lib/useApi";
 import Cookies from "js-cookie";
 
-export type CreateFieldOfStudyPayload = {
+export type UpdateFieldOfStudyPayload = {
   name: string;
   is_active: boolean;
 };
 
-export function useCreateFieldOfStudy() {
+export function useUpdateFieldOfStudy(fieldId:string) {
   const [fieldLoading, setLoading] = useState<boolean>(false);
   const [fieldError, setError] = useState<string>("");
   const [success, setSuccess] = useState<boolean>(false);
 
-  const CreateFieldOfStudy = async (data: CreateFieldOfStudyPayload) => {
+  const updateFieldOfStudy = async (data: UpdateFieldOfStudyPayload) => {
     setLoading(true);
     setError("");
     setSuccess(false);
@@ -20,8 +21,8 @@ export function useCreateFieldOfStudy() {
     try {
       const token = Cookies.get("token");
 
-      const res = await api.post(
-        "/knowledge-hub/fields-of-study",
+      const res = await api.put(
+        `/knowledge-hub/fields-of-study/${fieldId}`,
         data,
         {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -35,7 +36,7 @@ export function useCreateFieldOfStudy() {
 
       setError(
         err?.response?.data?.detail?.[0]?.msg ||
-        "Failed to create university"
+        "Failed to Update university"
       );
 
       throw err;
@@ -45,7 +46,7 @@ export function useCreateFieldOfStudy() {
   };
 
   return {
-    CreateFieldOfStudy,
+    updateFieldOfStudy,
     fieldLoading,
     fieldError,
     success,

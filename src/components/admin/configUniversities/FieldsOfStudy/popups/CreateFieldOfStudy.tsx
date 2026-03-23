@@ -3,12 +3,12 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, Tag } from "lucide-react";
 
-import { useCreateFieldOfStudy } from "../../../../../hooks/knowledge-hub/useCreateFieldOfStudy";
+import { useCreateFieldOfStudy } from "hooks/knowledge-hub/field-of-study/useCreateFieldOfStudy";
 
-import ModalHeader from "../../../../ui/modal/ModalHeader";
-import Button from "../../../../ui/buttons/Button";
-import InputField from "../../../../form/InputField";
-import { useToast } from "../../../../context/ToastContext";
+import ModalHeader from "components/ui/modal/ModalHeader";
+import Button from "components/ui/buttons/Button";
+import InputField from "components/form/InputField";
+import { useToast } from "components/context/ToastContext";
 import { useRouter } from 'next/navigation';
 
 interface CreateFieldOfStudyProps {
