@@ -88,10 +88,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
     setIsLoggingOut(true);
 
     try {
-
-      await api.post("/auth/logout").catch(() => {
-
-      });
+      await api.post("/auth/logout").catch(() => {});
     } catch (err) {
       console.error("Logout API error:", err);
     }
@@ -109,7 +106,6 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
 
   return (
     <>
-
       {open && (
         <div
           className="fixed inset-0 z-40 bg-overlay bg-opacity-40 backdrop-blur-sm"
@@ -118,19 +114,18 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
         />
       )}
 
-
       <div
-        className={`fixed z-50 flex h-screen w-[280px] flex-col 
-          border-r border-gray-200 bg-white shadow-md
-          transition-transform duration-300 ease-in-out xl:z-0 xl:translate-x-0 
-          ${open ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed left-0 top-0 z-50 flex h-screen w-[280px] flex-col 
+    border-r border-gray-200 bg-white shadow-md
+    transition-transform duration-300 ease-in-out xl:z-0 xl:translate-x-0 
+    ${open ? "translate-x-0" : "-translate-x-full"}`}
         role="navigation"
         aria-label="Main navigation"
       >
         <button
           className="absolute right-4 top-4 rounded-md bg-primary p-1
-            text-slate-900 transition-colors duration-200 hover:bg-card-hover
-            hover:text-slate-500 xl:hidden"
+      text-slate-900 transition-colors duration-200 hover:bg-card-hover
+      hover:text-slate-500 xl:hidden"
           onClick={handleOverlayClick}
           aria-label="Close navigation menu"
           type="button"
@@ -138,7 +133,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           <HiX className="text-icon-b" />
         </button>
 
-        <header className="flex items-center justify-center px-6 py-6 mt-3 mb-3">
+        <header className="mb-3 mt-3 flex items-center justify-center px-6 py-6">
           <Image
             src={logoImg}
             alt="Your Business Logo"
@@ -149,7 +144,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           />
         </header>
 
-        <div className="border-gray-200 border-y-thin px-6 py-4">
+        <div className="border-y-thin border-gray-200 px-6 py-4">
           {userError ? (
             <div className="text-center">
               <p className="text-p2 text-failed">Failed to load user</p>
@@ -164,7 +159,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             <div className="flex items-center gap-3">
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-full bg-accent-light text-h5 font-medium text-blue-700"
+          rounded-full bg-accent-light text-h5 font-medium text-blue-700"
               >
                 {user ? (
                   user.name[0].toUpperCase()
@@ -193,20 +188,29 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           )}
         </div>
 
-        <nav className="flex-1 py-4">
-          <Links routes={routes} />
-        </nav>
+        <div className="max-h-30 block overflow-y-auto [&::-webkit-scrollbar-thumb]:bg-blue-700 [&::-webkit-scrollbar-thumb]:[border-radius:3px] [&::-webkit-scrollbar-thumb]:[margin-left:3px] [&::-webkit-scrollbar]:[width:6px]" />
 
-        <footer className="border-t border-gray-200 p-4">
+        <div
+          className="flex-1 overflow-y-auto py-4
+        [&::-webkit-scrollbar-thumb]:bg-blue-700
+        [&::-webkit-scrollbar-thumb]:[border-radius:3px]
+        [&::-webkit-scrollbar-thumb]:[margin-left:3px]
+        [&::-webkit-scrollbar]:[width:6px]
+      "
+        >
+          <Links routes={routes} />
+        </div>
+
+        <footer className="border-t border-gray-200 px-6 py-4">
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}
             className="flex w-full items-center gap-3 rounded-full
-              border border-transparent px-4 py-3 text-left
-              font-medium text-red-600 transition-all duration-200
-              hover:bg-red-50 hover:border-red-100
-              focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
-              disabled:cursor-not-allowed disabled:opacity-50"
+        border border-transparent px-4 py-3 text-left
+        font-medium text-red-600 transition-all duration-200
+        hover:border-red-100 hover:bg-red-50
+        focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
+        disabled:cursor-not-allowed disabled:opacity-50"
             aria-label="Sign out of your account"
             type="button"
           >
@@ -218,7 +222,6 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             </span>
           </button>
         </footer>
-
       </div>
 
     </>
