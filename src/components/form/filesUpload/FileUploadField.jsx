@@ -10,7 +10,7 @@ const FileUploadField = ({
                            errors,
                            required = false,
                            multiple = false,
-                           accept = "*",
+                           accept=".pdf,.png",
                            uploadHandler,
                            removeHandler,
                          }) => {
@@ -65,38 +65,52 @@ const FileUploadField = ({
       </div>
 
       {file && (
-        <div className="mt-4 rounded-md border border-slate-200 bg-white p-4 transition">
+        <div
+          className={`mt-4 rounded-md border p-4 transition ${
+            file.file_key ? "border-slate-200 bg-white" : "border-red-400 bg-red-50"
+          }`}
+        >
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 truncate">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50 text-green-600">
+              <div
+                className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                  file.file_key ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+                }`}
+              >
                 <FileCheck className="h-5 w-5" />
               </div>
 
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-slate-900">
+                <p
+                  className={`truncate text-sm font-semibold ${
+                    file.file_key ? "text-slate-900" : "text-red-700"
+                  }`}
+                >
                   {file.name}
                 </p>
 
-                <p className="text-xs text-slate-400">
+                <p className={`text-xs ${file.file_key ? "text-slate-400" : "text-red-500"}`}>
                   {file.size}
                 </p>
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={handleRemove}
-              className="flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-4 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100"
-            >
-              <Trash2 className="h-3 w-3" />
-              Remove
-            </button>
+            {file.file_key && !file.uploading && (
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="flex items-center justify-center gap-2 rounded-full border border-red-600 bg-red-100 px-4 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-200"
+              >
+                <Trash2 className="h-3 w-3" />
+                Remove
+              </button>
+            )}
           </div>
 
           {file.uploading && (
-            <div className="mt-4 h-1.5 w-full rounded-full bg-slate-100">
+            <div className={`mt-4 h-1.5 w-full rounded-full ${file.file_key ? "bg-green-200" : "bg-red-200"}`}>
               <div
-                className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                className={`h-full rounded-full ${file.file_key ? "bg-green-600" : "bg-red-600"} transition-all duration-300`}
                 style={{ width: `${file.progress || 0}%` }}
               />
             </div>

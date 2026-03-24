@@ -298,7 +298,7 @@ const KnowledgeHubCards = () => {
                       <div className="flex justify-between gap-3 border-t p-4">
 
                         <Link
-                          href={`/partner/knowledgeHub/${program.id}`}
+                          href={`/partner/knowledge-hub/${program.id}`}
                           title="View details"
                           className="flex flex-1 items-center justify-center gap-2 rounded-full border border-blue-600 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
                         >
