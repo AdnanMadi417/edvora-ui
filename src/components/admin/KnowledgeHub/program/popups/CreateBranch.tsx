@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useToast } from "components/context/ToastContext";
 
 import { useCreateBranch } from "hooks/knowledge-hub/universities/useCreateBranch";
-import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
+import { useAllStates } from "../../../../../hooks/knowledge-hub/programs/useStates";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
@@ -27,7 +27,7 @@ export default function CreateBranch({
                                      }: CreateBranchProps) {
 
   const { createBranch, branchLoading } = useCreateBranch();
-  const { states, stateError } = useKnowledgeHubStates();
+  const { states, stateError } = useAllStates();
 
   const stateOptions =
     states?.map((c) => ({

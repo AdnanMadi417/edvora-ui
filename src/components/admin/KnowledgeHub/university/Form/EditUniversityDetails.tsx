@@ -26,9 +26,8 @@ import { useUpdateUniversityPaymentMethod } from "hooks/knowledge-hub/universiti
 import { useAssignPaymentMethod } from "hooks/knowledge-hub/universities/payment-methods/useAssignUniversityPayment";
 import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
 import { useDeleteUniversityPaymentMethod } from "hooks/knowledge-hub/universities/payment-methods/useDeleteUniversityPaymentMethod";
-
 import { useUniversityTypes } from "hooks/knowledge-hub/config-universities/useUniversityTypesQuery";
-import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
+import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
 
 import InputField from "components/form/InputField";
 import SelectField from "components/form/SelectField";
@@ -80,7 +79,7 @@ const UniversityEdit = ({ id }: Props) => {
   const { assignPaymentMethod } = useAssignPaymentMethod();
   const { deleteUniPayment } = useDeleteUniversityPaymentMethod();
   const { deleteBranch } = useDeleteBranch();
-  const { states } = useKnowledgeHubStates();
+  const { states } = useAllStates();
   const { updateUniversity, updateLoading } = useUpdateUniversity(id);
   const [showAddPayment, setShowAddPayment] = useState(false);
 
@@ -119,7 +118,6 @@ const UniversityEdit = ({ id }: Props) => {
     intake_months: [],
     branches: [],
     is_active: true,
-
     university_type_id: "",
   });
 
@@ -208,6 +206,11 @@ const UniversityEdit = ({ id }: Props) => {
         ...prev,
         branches: prev.branches.filter((_: any, i: number) => i !== index),
       }));
+
+      setTimeout(() => {
+        router.push("/admin/universities")
+      })
+
     } catch (error: any) {
       const backendMessage =
         error?.response?.data?.message || "Please try again.";

@@ -7,7 +7,7 @@ export type StateOption = {
   name: string;
 };
 
-export function useKnowledgeHubStates() {
+export function useAllStates() {
   const [states, setStates] = useState<StateOption[]>([]);
   const [stateLoading, setLoading] = useState(false);
   const [stateError, setError] = useState<string | null>(null);

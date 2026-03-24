@@ -2,12 +2,20 @@ import { useState } from "react";
 import api from "../../../lib/useApi";
 import Cookies from "js-cookie";
 
+type Branche = {
+  name: string;
+  location: string;
+  state_id: string;
+}
+
 export type CreateUniversityPayload = {
   name: string;
   country: string;
   is_active: boolean;
+  university_type_id: string;
   description: string;
   intake_months: string[];
+  branches: Branche[];
 };
 
 export function useCreateUniversity() {

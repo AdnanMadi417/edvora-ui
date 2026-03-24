@@ -19,7 +19,7 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import { useAllPrograms } from "hooks/knowledge-hub/programs/useProgramsList";
 import { useAllFields } from "../../../../hooks/knowledge-hub/field-of-study/useFieldsList";
-import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
+import { useAllStates } from "../../../../hooks/knowledge-hub/programs/useStates";
 import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
 
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -35,7 +35,7 @@ const KnowledgeHubCards = () => {
     loading: programsLoading,
     error: programsError,
   } = useAllPrograms({});
-  const { states, stateLoading, stateError } = useKnowledgeHubStates();
+  const { states, stateLoading, stateError } = useAllStates();
   const { fields, fieldsLoading, fieldsError } = useAllFields();
   const { universities } = useAllUniversities();
 
