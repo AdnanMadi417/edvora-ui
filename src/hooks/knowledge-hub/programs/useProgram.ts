@@ -91,6 +91,8 @@ export type Program = {
     type: string;
     code: string;
     description: string;
+    is_init_app_doc:string;
+    is_required_init_app_doc: boolean;
   }[];
 };
 

@@ -17,13 +17,15 @@ import {
   Globe,
   Trash2,
 } from 'lucide-react';
-import { MdSchool, MdLibraryAdd } from "react-icons/md";
+import { MdSchool, MdLibraryAdd, MdVerified } from 'react-icons/md';
+import { AiOutlineBank } from "react-icons/ai";
+
 import { useToast } from "components/context/ToastContext";
 
-import { AiOutlineBank } from "react-icons/ai";
 import { useAllPrograms } from "hooks/knowledge-hub/programs/useProgramsList";
-import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
-import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
+import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
+import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
+import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
 import { useDeleteKnowledgeHubPrograms } from "hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms";
 import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
 
@@ -45,13 +47,15 @@ const ProgramsTable = () => {
     error,
   } = useAllPrograms({});
 
-  const { states } = useKnowledgeHubStates();
+  const { states } = useAllStates();
   const { fields} = useAllFields();
   const { universities } = useAllUniversities();
+  const { qualifications } = useAllQualifications();
 
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
+  const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(
     null
   );
@@ -77,6 +81,7 @@ const ProgramsTable = () => {
     const hasStateFilter = selectedState !== "all";
     const hasFieldFilter = selectedField !== "all";
     const hasUniversityFilter = selectedUniversity !== "all";
+    const hasLevelFilter = selectedLevel !== "all";
 
     return programs.filter((program) => {
 
@@ -100,9 +105,13 @@ const ProgramsTable = () => {
       const matchesUniversity =
         !hasUniversityFilter || program.university?.name === selectedUniversity;
 
-      return matchesSearch && matchesState && matchesField && matchesUniversity;
+      const matchesLevel =
+        !hasLevelFilter || program.qualification_level === selectedLevel;
+
+
+      return matchesSearch && matchesState && matchesField && matchesUniversity && matchesLevel;
     });
-  }, [programs, searchTerm, selectedState, selectedField , selectedUniversity]);
+  }, [programs, searchTerm, selectedState, selectedField , selectedUniversity, selectedLevel]);
 
   const currentPrograms = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -188,7 +197,7 @@ const ProgramsTable = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedState, selectedField]);
+  }, [searchTerm, selectedState, selectedField, selectedUniversity, selectedLevel]);
 
   const selectedProgramIds = useMemo(() => {
     return Object.keys(selectedPrograms).filter(
@@ -197,11 +206,16 @@ const ProgramsTable = () => {
   }, [selectedPrograms]);
 
   const handleSelectAll = () => {
-    const allSelected = Object.values(selectedPrograms).every(Boolean);
-    const newSelection: Record<string, boolean> = {};
-    Object.keys(selectedPrograms).forEach((id) => {
+    const filteredIds = filteredPrograms.map((p) => p.id);
+
+    const allSelected = filteredIds.every((id) => selectedPrograms[id]);
+
+    const newSelection = { ...selectedPrograms };
+
+    filteredIds.forEach((id) => {
       newSelection[id] = !allSelected;
     });
+
     setSelectedPrograms(newSelection);
   };
 
@@ -268,6 +282,16 @@ const ProgramsTable = () => {
               />
             </div>
 
+            <div className="w-full sm:w-48 flex-shrink-0">
+              <FilterSelectField
+                value={selectedLevel}
+                onChange={(val) => { setSelectedLevel(val); setCurrentPage(1); }}
+                options={qualifications}
+                icon={MdVerified}
+                defaultOption="All Qualifications"
+              />
+            </div>
+
             <div className="w-full sm:w-auto flex-shrink-0">
               <button
                 onClick={() => {
@@ -275,6 +299,7 @@ const ProgramsTable = () => {
                   setSelectedState("all");
                   setSelectedField("all");
                   setSelectedUniversity("all");
+                  setSelectedLevel("all");
                   setCurrentPage(1);
                 }}
                 className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
@@ -311,7 +336,7 @@ const ProgramsTable = () => {
                     onClick={() => setIsBatchUpdateOpen(true)}
                     className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
                     <Pencil className="h-4 w-4" />
-                    Update Programs
+                    Update Commission
                   </button>
 
                   <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -340,8 +365,8 @@ const ProgramsTable = () => {
                     type="checkbox"
                     className="h-4 w-4 rounded border-slate-300 text-blue-600"
                     checked={
-                      Object.values(selectedPrograms).length > 0 &&
-                      Object.values(selectedPrograms).every(Boolean)
+                      filteredPrograms.length > 0 &&
+                      filteredPrograms.every((p) => selectedPrograms[p.id])
                     }
                     onChange={handleSelectAll}
                   />
@@ -548,7 +573,7 @@ const ProgramsTable = () => {
                             <span className="font-semibold text-slate-700">
                               First Year Tuition:
                             </span>
-                        <span>{Program.first_year_tuition ?? "—"} RM</span>
+                        <span>{Program.yearly_fees?.[0]?.fee ?? "—"} RM</span>
                       </div>
                       <div className="flex items-center gap-1">
                             <span className="font-semibold text-slate-700">

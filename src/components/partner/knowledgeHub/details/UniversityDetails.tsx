@@ -25,7 +25,7 @@ import {
   CheckCircle,
   Percent,
   ChevronLeft,
-} from "lucide-react";
+ Copy, Check } from "lucide-react";
 import { useProgram } from "hooks/knowledge-hub/programs/useProgram";
 
 import Link from "next/link";
@@ -43,6 +43,33 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   };
 
   const { program, requiredDocuments, commission } = useProgram(id);
+
+  const [copied, setCopied] = React.useState<string | null>(null);
+  
+  const handleCopyAll = async () => {
+    const text = `
+    Program: ${program?.name ?? "-"}
+    University: ${program?.university?.name ?? "-"}
+    Country: ${program?.university?.country ?? "-"}
+    State: ${program?.branch?.state ?? "-"}
+    Level: ${program?.qualification_level ?? "-"}
+    Field: ${program?.field_of_study?.name ?? "-"}
+    Duration: ${program?.duration ?? "-"} years
+    Study Mode: ${program?.is_on_campus ? "On-campus" : "Online"}
+
+    Intake Dates: ${program?.intake_dates?.join(", ") ?? "-"}
+
+    English Requirement: ${
+        program?.english_required_score
+          ? `Min score ${program.english_required_score}`
+          : "-"
+      }
+
+    Commission: RM ${commission?.amount ?? 0}
+    `;
+
+      await navigator.clipboard.writeText(text);
+    };
 
   if (!program) return <Loading text="Loading program details..." />;
 
@@ -76,7 +103,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-6">
+            <div className="flex items-center gap-1 sm:gap-6">
               <button
                 onClick={handleBack}
                 className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
@@ -84,6 +111,13 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
                 <span className="hidden sm:inline">Back to Programs</span>
               </button>
+
+                  <button
+                  onClick={handleCopyAll}
+                  className="flex items-center gap-2 p-2 text-sm text-slate-600 bg-salte-50 transitions hover:text-slate-700 hover:bg-slate-100 rounded-full"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </button>
             </div>
           </div>
 
@@ -185,7 +219,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <MdLocationCity className="h-4 w-4" />
               </div>
               <div className="min-w-0">
-                <p className="text-xs text-slate-500">Campus</p>
+                <p className="text-xs text-slate-500">Campus / Online</p>
                 <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
                   {program?.is_on_campus ? "On-campus" : "Online"}
                 </p>
@@ -348,7 +382,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                         </h5>
 
                         <p className="mt-1 text-xl font-bold text-blue-600">
-                          RM {item.max_amount.toLocaleString()}
+                          {item.max_amount > 0 && `Up to RM ${item.max_amount.toLocaleString()}`}
+                          {item.max_amount > 0 && item.coverage_percent > 0 && " • "}
+                          {item.coverage_percent > 0 && `${item.coverage_percent}% coverage`}
                         </p>
 
                         <p className="mt-2 text-sm text-slate-500">
@@ -370,10 +406,10 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
               <div className="min-w-0">
                 <h4 className="text-base font-semibold tracking-tight text-slate-900">
-                  Entry Requirements
+                  Required Entry Documents
                 </h4>
                 <p className="felx mt-1 gap-2 text-sm leading-relaxed text-slate-500">
-                  Review all academic and admission requirements.
+                   Review the documents needed for admission.
                 </p>
               </div>
             </div>
@@ -395,11 +431,19 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                       </p>
 
                       <div className="mt-2">
-                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
+                        <span
+                          className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm
+                          ${
+                            item.is_required_init_app_doc
+                              ? "border-green-200 bg-green-50 text-green-700"
+                              : "border-gray-200 bg-gray-50 text-gray-600"
+                          }`}
+                        >
                           <CheckCircle className="h-3 w-3" />
-                          Required
+                          {item.is_required_init_app_doc ? "Required" : "Optional"}
                         </span>
                       </div>
+
                     </div>
                   </div>
                 ))}

@@ -1,9 +1,4 @@
 import React, { useState } from "react";
-import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopBar";
-import RequiredAction from "components/applications/popups/partner/RequiredAction";
-import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
-
-import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 
 import {
   FaTasks,
@@ -23,12 +18,24 @@ import {
   FaClock,
   FaCheckCircle,
 } from "react-icons/fa";
-
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { Clock } from "lucide-react";
-import OfferLetterDecision from "./OfferLetterDecision";
+import { CheckCircle, Clock } from 'lucide-react';
+import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
+
+import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopBar";
+import RequiredAction from "components/applications/popups/partner/RequiredAction";
+import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
+import OfferLetterDecision, { OfferLetterDecisionType } from './OfferLetterDecision';
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import ApplicationCommission from './ApplicationCommission';
+import { submitOfferLetterDecision } from '../../../../services/offerLetterService';
+import { useToast } from '../../../context/ToastContext';
+
+interface OfferLetterDecisionPayload {
+  decision: OfferLetterDecisionType;
+  reason?: string;
+  notes?: string;
+}
 
 interface ApplicationDetailsProps {
   application: any;
@@ -68,6 +75,11 @@ export default function ApplicationDetails({
   const [showRequiredActionPopup, setShowRequiredActionPopup] = useState(false);
   const openRequiredActionPopup = () => setShowRequiredActionPopup(true);
   const closeRequiredActionPopup = () => setShowRequiredActionPopup(false);
+
+  const { showToast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+  const isUniversityApproved =
+    currentStatus === "University Approved";
 
   const [showProgramDecisionPopup, setShowProgramDecisionPopup] =
     useState(false);
@@ -113,6 +125,48 @@ export default function ApplicationDetails({
       previousEducation.start_date ||
       previousEducation.end_date ||
       previousEducation.grade);
+
+  const handleDecision = async (decision: OfferLetterDecisionType) => {
+    if (!application?.id || submitting) return;
+
+    let reason: string | undefined;
+
+    if (decision === "reject") {
+      reason = prompt("Please provide a reason for rejection") || undefined;
+      if (!reason) return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const payload: OfferLetterDecisionPayload = {
+        decision,
+        reason,
+        notes: "",
+      };
+
+      await submitOfferLetterDecision(application.id, payload);
+
+      showToast(
+        decision === "accept"
+          ? "Offer accepted successfully."
+          : "Offer rejected successfully.",
+        "success"
+      );
+
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
+    } catch (err: any) {
+      console.error(err);
+      showToast(
+        err?.response?.data?.message || "Failed to submit decision",
+        "error"
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <section>
@@ -191,6 +245,38 @@ export default function ApplicationDetails({
               )}
             </>
           )}
+
+          {isUniversityApproved && (
+            <>
+              <p className="text-sm text-slate-500">
+                Please review the offer letter carefully before accepting or rejecting.
+              </p>
+
+              <div className="flex flex-col justify-end gap-3 sm:flex-row">
+                <button
+                  onClick={() => handleDecision("accept")}
+                  disabled={submitting}
+                  className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Accept Offer
+                </button>
+
+                {/* Reject button if needed later */}
+                {/*
+      <button
+        onClick={() => handleDecision("reject")}
+        disabled={submitting}
+        className="rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 transition hover:border-text-error hover:text-text-error disabled:opacity-50"
+      >
+        Reject Offer
+      </button>
+      */}
+              </div>
+            </>
+          )}
+
+
         </div>
 
         <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between">

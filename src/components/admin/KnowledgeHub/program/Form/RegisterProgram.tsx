@@ -1,15 +1,15 @@
 'use client';
 
 import { BookOpen, CalendarPlus, ChevronLeft, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useToast } from 'components/context/ToastContext';
 import { useRouter } from 'next/navigation';
 
-import { DURATION, IELTS_BANDS } from 'constants/lists';
+import { IELTS_BANDS } from 'constants/lists';
 
 import { useCreateProgram } from 'hooks/knowledge-hub/programs/useCreateKnowledgeHubProgram';
 import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
-import { useAllFields } from 'hooks/knowledge-hub/programs/useFieldsList';
+import { useAllFields } from 'hooks/knowledge-hub/field-of-study/useFieldsList';
 import { useAllBranches } from 'hooks/knowledge-hub/universities/useBranchesList';
 import { useCommissionTypes } from 'hooks/knowledge-hub/commission/useCommissionTypes';
 import { useAllQualifications } from 'hooks/knowledge-hub/qualifications/useQualificationsList';
@@ -90,8 +90,7 @@ export default function RegisterProgram() {
     is_online: false,
     has_scholarship: false,
     commission_type_id: '',
-    commission_notes:
-      'Commission paid 30 days after student completes first semester of each academic year.',
+    commission_notes:'' ,
     qualification_id: '',
 
     commission_amount: 0,
@@ -100,7 +99,7 @@ export default function RegisterProgram() {
     one_time_fees: [],
     scholarships: [
       {
-        type: 0,
+        type: 1,
         coverage_percent: 0,
         max_amount: 0,
         name: '',
@@ -112,7 +111,6 @@ export default function RegisterProgram() {
   const { fields } = useAllFields();
   const { qualifications } = useAllQualifications();
   const { branches } = useAllBranches(formData.uni_id);
-
   const { universities } = useAllUniversities();
 
   const removeScholarship = (index: number) => {
@@ -138,6 +136,18 @@ export default function RegisterProgram() {
     }));
   };
 
+  useEffect(() => {
+    if (!branches || branches.length === 0) {
+      updateFormData("branch_id", "");
+      return;
+    }
+
+    if (branches.length === 1) {
+      updateFormData("branch_id", String(branches[0].id));
+    }
+  }, [branches]);
+
+
   const isFormValid = React.useMemo(() => {
     const basicValid =
       formData.name.trim() !== '' &&
@@ -147,10 +157,7 @@ export default function RegisterProgram() {
       formData.commission_type_id !== '' &&
       formData.qualification_id !== '' &&
       formData.english_required_score.trim() !== '' &&
-      formData.overview.trim() !== '' &&
-      formData.curriculum.trim() !== '' &&
       formData.intake_dates.length > 0 &&
-      formData.tuition_fee > 0 &&
       formData.duration > 0 &&
       formData.commission_amount >= 0;
 
@@ -340,17 +347,19 @@ export default function RegisterProgram() {
                 updateFormData={updateFormData}
               />
 
-              <SearchableDropdown
-                label="Branch"
-                field="branch_id"
-                options={branches.map((s) => ({
-                  value: String(s.id),
-                  label: s.name,
-                }))}
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
+              {branches.length > 1 && (
+                <SearchableDropdown
+                  label="Branch"
+                  field="branch_id"
+                  options={branches.map((s) => ({
+                    value: String(s.id),
+                    label: s.name,
+                  }))}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+              )}
 
               <InputField
                 label="Program Name"
@@ -374,16 +383,6 @@ export default function RegisterProgram() {
                 updateFormData={updateFormData}
               />
 
-              <InputField
-                label="Tuition Fee"
-                field="tuition_fee"
-                type="number"
-                placeholder="e.g. 20000"
-                required
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
             </div>
           </div>
 
@@ -393,13 +392,10 @@ export default function RegisterProgram() {
             </h3>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <SelectField
+              <InputField
                 label="Duration (Years)"
                 field="duration"
-                options={DURATION.map((d) => ({
-                  value: d.year,
-                  label: d.label,
-                }))}
+                placeholder="e.g. 2 Years"
                 required
                 formData={formData}
                 errors={errors}
@@ -434,7 +430,7 @@ export default function RegisterProgram() {
                 label="Overview"
                 field="overview"
                 placeholder="Program overview..."
-                required
+                required={false}
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
@@ -444,7 +440,7 @@ export default function RegisterProgram() {
                 label="Curriculum"
                 field="curriculum"
                 placeholder="Program curriculum..."
-                required
+                required={false}
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
@@ -497,6 +493,17 @@ export default function RegisterProgram() {
                 placeholder="e.g. 10"
                 formData={formData}
                 errors={errors}
+                updateFormData={updateFormData}
+              />
+
+              <InputField
+                label="Commission Notes"
+                field="commission_notes"
+                type="text"
+                placeholder="e.g. Commission paid ..."
+                formData={formData}
+                errors={errors}
+                required={false}
                 updateFormData={updateFormData}
               />
 
@@ -571,15 +578,15 @@ export default function RegisterProgram() {
 
               {formData.has_scholarship && (
 
-                    <IconButton
-                      icon={<CalendarPlus className="h-4 w-4" />}
-                      bgColor="bg-blue-50"
-                      textColor="text-blue-700"
-                      borderColor="border-blue-600"
-                      hoverTextColor="hover:text-blue-800"
-                      hoverBorderColor="hover:border-blue-700"
-                      onClick={addScholarship}
-                    />
+                <IconButton
+                  icon={<CalendarPlus className="h-4 w-4" />}
+                  bgColor="bg-blue-50"
+                  textColor="text-blue-700"
+                  borderColor="border-blue-600"
+                  hoverTextColor="hover:text-blue-800"
+                  hoverBorderColor="hover:border-blue-700"
+                  onClick={addScholarship}
+                />
               )}
 
             </div>

@@ -459,7 +459,9 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
                         </h5>
 
                         <p className="mt-1 text-xl font-bold text-blue-600">
-                          RM {item.max_amount.toLocaleString()}
+                          {item.max_amount > 0 && `Up to RM ${item.max_amount.toLocaleString()}`}
+                          {item.max_amount > 0 && item.coverage_percent > 0 && " • "}
+                          {item.coverage_percent > 0 && `${item.coverage_percent}% coverage`}
                         </p>
 
                         <p className="mt-2 text-sm text-slate-500">
@@ -481,10 +483,10 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
 
               <div className="min-w-0">
                 <h4 className="text-base font-semibold tracking-tight text-slate-900">
-                  Entry Requirements
+                  Required Entry Documents
                 </h4>
                 <p className="felx mt-1 gap-2 text-sm leading-relaxed text-slate-500">
-                  Review all academic and admission requirements.
+                   Review the documents needed for admission.
                 </p>
               </div>
             </div>
@@ -507,11 +509,19 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
                       </p>
 
                       <div className="mt-2">
-                        <span
-                          className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
-                          <CheckCircle className="h-3 w-3" />
-                          Required
-                        </span>
+                        <div className="mt-2">
+                          <span
+                            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm
+                            ${
+                              item.is_required_init_app_doc
+                                ? "border-green-200 bg-green-50 text-green-700"
+                                : "border-gray-200 bg-gray-50 text-gray-600"
+                            }`}
+                          >
+                            <CheckCircle className="h-3 w-3" />
+                            {item.is_required_init_app_doc ? "Required" : "Optional"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
