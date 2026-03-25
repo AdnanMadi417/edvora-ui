@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, Percent, GraduationCap } from "lucide-react";
+import { XCircle, GraduationCap } from "lucide-react";
 
 import { useBatchUpdatePrograms } from "hooks/knowledge-hub/programs/useBatchUpdatePrograms";
 
@@ -13,7 +13,7 @@ import { IELTS_BANDS } from 'constants/lists';
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
 
-interface CreateBranchProps {
+interface BatchBranchProps {
   isOpen: boolean;
   onClose: () => void;
   selectedProgramIds: string[];
@@ -25,12 +25,12 @@ export interface ProgramScorePayload {
   english_required_score?: string;
 }
 
-export default function CreateBranch({
+export default function BatchPrograms({
   isOpen,
   onClose,
   selectedProgramIds,
   onSuccess,
-}: CreateBranchProps) {
+}: BatchBranchProps) {
   const { batchUpdatePrograms, loading } = useBatchUpdatePrograms();
   const { showToast } = useToast();
   const router = useRouter();
@@ -81,7 +81,7 @@ export default function CreateBranch({
     }
   };
 
-  const handleCreate = async () => {
+  const handleUpdate = async () => {
     try {
       const amount =
         formData.english_required_score !== ""
@@ -168,7 +168,7 @@ export default function CreateBranch({
             />
 
             <Button
-              onClick={handleCreate}
+              onClick={handleUpdate}
               disabled={!isFormValid || loading}
               icon={<GraduationCap className="h-5 w-5" />}
               text={loading ? "Updating..." : "Update IELTS"}

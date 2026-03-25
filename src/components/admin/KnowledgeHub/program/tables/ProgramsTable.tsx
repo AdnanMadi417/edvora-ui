@@ -17,6 +17,7 @@ import {
   Globe,
   Trash2,
   ClipboardCheck,
+  CalendarDays,
 } from 'lucide-react';
 import { MdSchool, MdLibraryAdd, MdVerified } from 'react-icons/md';
 import { AiOutlineBank } from "react-icons/ai";
@@ -40,6 +41,7 @@ import Link from "next/link";
 import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
 import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/BatchCommissionPrograms";
 import BatchIELTSPrograms from "components/admin/KnowledgeHub/program/popups/BatchIELTSPrograms";
+import BatchProgramIntakes from "components/admin/KnowledgeHub/program/popups/BatchProgramIntakes";
 
 const ProgramsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -70,6 +72,7 @@ const ProgramsTable = () => {
 
   const [isBatchUpdateOpen, setIsBatchUpdateOpen] = useState(false);
   const [isBatchIeletsUpdateOpen, setIsBatchIeltsUpdateOpen] = useState(false);
+  const [isBatchIntakesUpdateOpen, setIsBatchIntakesUpdateOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -348,6 +351,13 @@ const ProgramsTable = () => {
                     className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
                     <ClipboardCheck className="h-4 w-4" />
                     Update IELTS Scores
+                  </button>
+
+                   <button
+                    onClick={() => setIsBatchIntakesUpdateOpen(true)}
+                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
+                    <CalendarDays className="h-4 w-4" />
+                    Update Intakes 
                   </button>
 
                   <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -740,9 +750,15 @@ const ProgramsTable = () => {
         selectedProgramIds={selectedProgramIds}
       />
 
-        <BatchIELTSPrograms
+      <BatchIELTSPrograms
         isOpen={isBatchIeletsUpdateOpen}
         onClose={() => setIsBatchIeltsUpdateOpen(false)}
+        selectedProgramIds={selectedProgramIds}
+      />
+
+       <BatchProgramIntakes
+        isOpen={isBatchIntakesUpdateOpen}
+        onClose={() => setIsBatchIntakesUpdateOpen(false)}
         selectedProgramIds={selectedProgramIds}
       />
 

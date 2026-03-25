@@ -5,8 +5,8 @@ import api from "../../../lib/useApi";
 interface BatchUpdateProgramPayload {
   program_ids: string[];
 
-  english_required_score: string;
-
+  english_required_score?: string;
+  intake_dates: string[];
   commission_amount?: number;
   commission_type_id?: string;
   commission_notes?: string;
