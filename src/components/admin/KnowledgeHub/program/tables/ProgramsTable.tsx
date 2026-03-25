@@ -16,6 +16,7 @@ import {
   XCircle,
   Globe,
   Trash2,
+  ClipboardCheck,
 } from 'lucide-react';
 import { MdSchool, MdLibraryAdd, MdVerified } from 'react-icons/md';
 import { AiOutlineBank } from "react-icons/ai";
@@ -32,11 +33,13 @@ import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversi
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
-import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
-import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/BatchUpdatePrograms";
 import Loading from "components/loading/Loading";
 import NoMessagesFound from 'components/emptyData/NoMessagesFound';
 import Link from "next/link";
+
+import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
+import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/BatchCommissionPrograms";
+import BatchIELTSPrograms from "components/admin/KnowledgeHub/program/popups/BatchIELTSPrograms";
 
 const ProgramsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -66,6 +69,7 @@ const ProgramsTable = () => {
   const { deletePrograms } = useDeleteKnowledgeHubPrograms();
 
   const [isBatchUpdateOpen, setIsBatchUpdateOpen] = useState(false);
+  const [isBatchIeletsUpdateOpen, setIsBatchIeltsUpdateOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -337,6 +341,13 @@ const ProgramsTable = () => {
                     className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
                     <Pencil className="h-4 w-4" />
                     Update Commission
+                  </button>
+
+                   <button
+                    onClick={() => setIsBatchIeltsUpdateOpen(true)}
+                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
+                    <ClipboardCheck className="h-4 w-4" />
+                    Update IELTS Scores
                   </button>
 
                   <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -726,6 +737,12 @@ const ProgramsTable = () => {
       <BatchUpdatePrograms
         isOpen={isBatchUpdateOpen}
         onClose={() => setIsBatchUpdateOpen(false)}
+        selectedProgramIds={selectedProgramIds}
+      />
+
+        <BatchIELTSPrograms
+        isOpen={isBatchIeletsUpdateOpen}
+        onClose={() => setIsBatchIeltsUpdateOpen(false)}
         selectedProgramIds={selectedProgramIds}
       />
 
