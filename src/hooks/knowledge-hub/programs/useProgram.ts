@@ -49,6 +49,9 @@ export type Commission = {
   amount: number | null;
   type: string | null;
   notes: string | null;
+  expected_commission_from:string;
+  expected_commission_to:string;
+
 };
 
 export type Program = {

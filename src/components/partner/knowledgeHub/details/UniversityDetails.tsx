@@ -25,7 +25,7 @@ import {
   CheckCircle,
   Percent,
   ChevronLeft,
- Copy, Check } from "lucide-react";
+ Copy } from "lucide-react";
 import { useProgram } from "hooks/knowledge-hub/programs/useProgram";
 
 import Link from "next/link";
@@ -44,8 +44,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
   const { program, requiredDocuments, commission } = useProgram(id);
 
-  const [copied, setCopied] = React.useState<string | null>(null);
-  
   const handleCopyAll = async () => {
     const text = `
     Program: ${program?.name ?? "-"}
@@ -489,6 +487,30 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               <p className="mt-1 text-sm text-yellow-700">
                 {commission?.notes ??
                   "Commission is generally paid within around 3 months, once the university completes its confirmation and payment process."}
+              </p>
+            </div>
+          </div>
+
+          <div
+            className="mx-6 mb-6 flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-4 shadow-inner">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+              <MdStar className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <h5 className="text-sm font-semibold text-green-800">
+                Expected Commission Timeline
+              </h5>
+
+              <p className="mt-1 text-sm text-green-700">
+                {commission.expected_commission_from || commission.expected_commission_to ? (
+                  <>
+                    Commission is expected between{" "}
+                    {commission.expected_commission_from ?? "—"} and{" "}
+                    {commission.expected_commission_to ?? "—"} months.
+                  </>
+                ) : (
+                  "Expected commission timeline not provided."
+                )}
               </p>
             </div>
           </div>

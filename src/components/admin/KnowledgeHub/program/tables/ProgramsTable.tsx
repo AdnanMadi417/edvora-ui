@@ -28,7 +28,7 @@ import { useAllPrograms } from "hooks/knowledge-hub/programs/useProgramsList";
 import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
 import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
 import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
-import { useDeleteKnowledgeHubPrograms } from "hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms";
+import { useDeletePrograms } from "hooks/knowledge-hub/programs/useDeletePrograms";
 import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
 
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -68,7 +68,7 @@ const ProgramsTable = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteMode, setDeleteMode] = useState<"single" | "batch" | null>(null);
-  const { deletePrograms } = useDeleteKnowledgeHubPrograms();
+  const { deletePrograms } = useDeletePrograms();
 
   const [isBatchUpdateOpen, setIsBatchUpdateOpen] = useState(false);
   const [isBatchIeletsUpdateOpen, setIsBatchIeltsUpdateOpen] = useState(false);

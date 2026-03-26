@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, Percent } from "lucide-react";
 
+import {MONTHS} from "constants/lists"
+
 import { useBatchUpdatePrograms } from "hooks/knowledge-hub/programs/useBatchUpdatePrograms";
 import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
 
@@ -21,14 +23,6 @@ interface CreateBranchProps {
   onSuccess?: () => void;
 }
 
-export interface ProgramCommissionPayload {
-  program_ids: string[];
-
-  commission_amount?: number;
-  commission_type_id?: string;
-  commission_notes?: string;
-}
-
 export default function CreateBranch({
   isOpen,
   onClose,
@@ -45,10 +39,10 @@ export default function CreateBranch({
   const [formData, setFormData] = useState({
     program_ids: [] as string[],
     commission_amount: "",
-    commission_type_id:
-      "" ||
-      "Commission paid 30 days after student completes first semester of each academic year.",
+    commission_type_id: "",
     commission_notes: "",
+    expected_commission_from: "",
+    expected_commission_to:"",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -56,6 +50,8 @@ export default function CreateBranch({
   const isFormValid =
     formData.commission_amount !== "" &&
     formData.commission_type_id !== "" &&
+    formData.expected_commission_from != "" &&
+    formData.expected_commission_to != "" &&
     !loading;
 
   useEffect(() => {
@@ -72,13 +68,15 @@ export default function CreateBranch({
       setFormData({
         program_ids: selectedProgramIds || [],
         commission_amount: "",
-        commission_type_id: "",
+        commission_type_id: commissionTypes[0] ? String(commissionTypes[0].id) : "",
         commission_notes: "",
+        expected_commission_from:"",
+        expected_commission_to:"",
       });
 
       setErrors({});
     }
-  }, [isOpen, selectedProgramIds]);
+  }, [isOpen, selectedProgramIds, commissionTypes]);
 
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({
@@ -105,6 +103,8 @@ export default function CreateBranch({
         program_ids: selectedProgramIds,
         commission_type_id: formData.commission_type_id || undefined,
         commission_notes: formData.commission_notes?.trim() || undefined,
+        expected_commission_from: formData.expected_commission_from || undefined,
+        expected_commission_to: formData.expected_commission_to || undefined,
         ...(amount !== undefined && !isNaN(amount)
           ? { commission_amount: amount }
           : {}),
@@ -167,18 +167,30 @@ export default function CreateBranch({
               updateFormData={updateFormData}
             />
 
+
             <SelectField
-              label="Commission Type"
-              field="commission_type_id"
-              required
-              options={commissionTypes.map((f) => ({
-                value: String(f.id),
-                label: f.name,
-              }))}
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-            />
+                label="Expected from"
+                field="expected_commission_from"
+                options={MONTHS.map((m) => ({
+                  value: m.value,
+                  label: m.label,
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+
+              <SelectField
+                label="Expected To"
+                field="expected_commission_to"
+                options={MONTHS.map((m) => ({
+                  value: m.value,
+                  label: m.label,
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
 
             <InputField
               label="Commission Notes"

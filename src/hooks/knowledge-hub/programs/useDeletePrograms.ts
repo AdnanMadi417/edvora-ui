@@ -2,7 +2,7 @@ import { useState } from "react";
 import api from "../../../lib/useApi";
 import Cookies from "js-cookie";
 
-export function useDeleteKnowledgeHubPrograms() {
+export function useDeletePrograms() {
   const [deleteProgramsLoading, setLoading] = useState<boolean>(false);
   const [deleteProgramsError, setError] = useState<string>("");
   const [success, setSuccess] = useState<boolean>(false);

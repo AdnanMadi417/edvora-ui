@@ -20,6 +20,8 @@ export type CreateProgramPayload = {
   commission_amount: number;
   commission_type_id: string;
   commission_notes: string;
+  expected_commission_from: string;
+  expected_commission_to: string;
 
   qualification_id: string;
 
@@ -39,6 +41,7 @@ export type CreateProgramPayload = {
     max_amount: number;
     name: string;
     description: string;
+    conditions: string[];
   }>;
 };
 
