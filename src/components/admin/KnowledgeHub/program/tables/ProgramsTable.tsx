@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState,useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Search,
   RefreshCw,
@@ -77,6 +77,7 @@ const ProgramsTable = () => {
   const [isBatchIeletsUpdateOpen, setIsBatchIeltsUpdateOpen] = useState(false);
   const [isBatchIntakesUpdateOpen, setIsBatchIntakesUpdateOpen] = useState(false);
   const [isBatchScholarshipsUpdateOpen, setIsBatchScholarshipsUpdateOpen] = useState(false);
+  const [isBulkMenuOpen, setIsBulkMenuOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -232,7 +233,7 @@ const ProgramsTable = () => {
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -331,49 +332,57 @@ const ProgramsTable = () => {
               </Link>
 
               {selectedCount > 0 && (
-                <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
-                  <button
-                    onClick={() => {
-                      setDeleteMode("batch");
-                      setIsDeleteOpen(true);
-                    }}
-                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-red-500 px-4 py-2.5 text-sm text-red-500 outline-0 transition hover:border-red-700 hover:text-red-700 sm:w-auto"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete Programs
-                  </button>
-
-                  <button
-                    onClick={() => setIsBatchUpdateOpen(true)}
-                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
-                    <Pencil className="h-4 w-4" />
-                    Update Commission
-                  </button>
-
-                   <button
-                    onClick={() => setIsBatchIeltsUpdateOpen(true)}
-                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
-                    <ClipboardCheck className="h-4 w-4" />
-                    Update IELTS Scores
-                  </button>
-
-                   <button
-                    onClick={() => setIsBatchIntakesUpdateOpen(true)}
-                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
-                    <CalendarDays className="h-4 w-4" />
-                    Update Intakes 
-                  </button>
-
-                  <button
-                    onClick={() => setIsBatchScholarshipsUpdateOpen(true)}
-                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
-                    <Sliders className="h-4 w-4" />
-                    Update Scholarship
-                  </button>
-
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                <div className="flex items-center gap-2 rounded-full border border-slate-100 bg-slate-50/60 px-3 py-1.5">
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
+                    <CheckCircle className="h-4 w-4" />
                     {selectedCount} selected
+                  </span>
+
+                  <div className="mx-1 h-4 w-px bg-slate-200" />
+
+                  <div className="relative">
+                    <button
+                      onClick={() => setIsBulkMenuOpen((prev) => !prev)}
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${isBulkMenuOpen ? "bg-white text-blue-700 shadow-sm" : "text-slate-600 hover:bg-white hover:text-blue-700 hover:shadow-sm"}`}
+                    >
+                      <Settings className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Bulk Update</span>
+                      <svg className={`h-3 w-3 transition-transform ${isBulkMenuOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+
+                    {isBulkMenuOpen && (
+                      <>
+                        <div className="fixed inset-0 z-[90]" onClick={() => setIsBulkMenuOpen(false)} />
+                        <div className="absolute left-0 top-full z-[100] mt-2 w-52 rounded-2xl border border-slate-100 bg-white p-1.5 shadow-xl shadow-slate-200/60">
+                          {[
+                            { label: "Commission", icon: <Pencil className="h-3.5 w-3.5 text-blue-600" />, bg: "bg-blue-50", onClick: () => setIsBatchUpdateOpen(true) },
+                            { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setIsBatchIeltsUpdateOpen(true) },
+                            { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setIsBatchIntakesUpdateOpen(true) },
+                            { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setIsBatchScholarshipsUpdateOpen(true) },
+                          ].map(({ label, icon, bg, onClick }) => (
+                            <button
+                              key={label}
+                              onClick={() => { onClick(); setIsBulkMenuOpen(false); }}
+                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50"
+                            >
+                              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${bg}`}>{icon}</span>
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
+
+                  <div className="mx-1 h-4 w-px bg-slate-200" />
+
+                  <button
+                    onClick={() => { setDeleteMode("batch"); setIsDeleteOpen(true); }}
+                    className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-white hover:shadow-sm"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Delete</span>
+                  </button>
                 </div>
               )}
             </div>
