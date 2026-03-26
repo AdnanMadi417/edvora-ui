@@ -33,6 +33,7 @@ export type Scholarship = {
   max_amount: number;
   name: string ;
   description: string;
+  conditions : string[];
 };
 
 type YearlyFee = {
