@@ -18,6 +18,7 @@ import {
   Trash2,
   ClipboardCheck,
   CalendarDays,
+  Sliders,
 } from 'lucide-react';
 import { MdSchool, MdLibraryAdd, MdVerified } from 'react-icons/md';
 import { AiOutlineBank } from "react-icons/ai";
@@ -42,6 +43,8 @@ import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/po
 import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/BatchCommissionPrograms";
 import BatchIELTSPrograms from "components/admin/KnowledgeHub/program/popups/BatchIELTSPrograms";
 import BatchProgramIntakes from "components/admin/KnowledgeHub/program/popups/BatchProgramIntakes";
+import BatchProgramScholarship from "components/admin/KnowledgeHub/program/popups/BatchProgramScholarship";
+
 
 const ProgramsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -73,6 +76,7 @@ const ProgramsTable = () => {
   const [isBatchUpdateOpen, setIsBatchUpdateOpen] = useState(false);
   const [isBatchIeletsUpdateOpen, setIsBatchIeltsUpdateOpen] = useState(false);
   const [isBatchIntakesUpdateOpen, setIsBatchIntakesUpdateOpen] = useState(false);
+  const [isBatchScholarshipsUpdateOpen, setIsBatchScholarshipsUpdateOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -358,6 +362,13 @@ const ProgramsTable = () => {
                     className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
                     <CalendarDays className="h-4 w-4" />
                     Update Intakes 
+                  </button>
+
+                  <button
+                    onClick={() => setIsBatchScholarshipsUpdateOpen(true)}
+                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
+                    <Sliders className="h-4 w-4" />
+                    Update Scholarship
                   </button>
 
                   <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -759,6 +770,12 @@ const ProgramsTable = () => {
        <BatchProgramIntakes
         isOpen={isBatchIntakesUpdateOpen}
         onClose={() => setIsBatchIntakesUpdateOpen(false)}
+        selectedProgramIds={selectedProgramIds}
+      />
+
+      <BatchProgramScholarship
+        isOpen={isBatchScholarshipsUpdateOpen}
+        onClose={() => setIsBatchScholarshipsUpdateOpen(false)}
         selectedProgramIds={selectedProgramIds}
       />
 
