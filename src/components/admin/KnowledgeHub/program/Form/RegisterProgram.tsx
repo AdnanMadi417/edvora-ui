@@ -1,13 +1,13 @@
 'use client';
 
-import { BookOpen, CalendarPlus, ChevronLeft, Trash2 } from 'lucide-react';
+import { BookOpen, CalendarPlus, ChevronLeft, Plus, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useToast } from 'components/context/ToastContext';
 import { useRouter } from 'next/navigation';
 
-import { IELTS_BANDS } from 'constants/lists';
+import { IELTS_BANDS, MONTHS } from 'constants/lists';
 
-import { useCreateProgram } from 'hooks/knowledge-hub/programs/useCreateKnowledgeHubProgram';
+import { useCreateProgram } from 'hooks/knowledge-hub/programs/useCreateProgram';
 import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
 import { useAllFields } from 'hooks/knowledge-hub/field-of-study/useFieldsList';
 import { useAllBranches } from 'hooks/knowledge-hub/universities/useBranchesList';
@@ -38,11 +38,13 @@ export interface FormData {
   is_on_campus: boolean;
   is_online: boolean;
   has_scholarship: boolean;
+
+  commission_amount:number;
   commission_type_id: string;
   commission_notes: string;
+  expected_commission_from: string;
+  expected_commission_to: string;
   qualification_id: string;
-
-  commission_amount: number;
 
   yearly_fees: Array<{
     year: number;
@@ -60,6 +62,7 @@ export interface FormData {
     max_amount: number;
     name: string;
     description: string;
+    conditions: string[];
   }>;
 }
 
@@ -89,11 +92,14 @@ export default function RegisterProgram() {
     is_on_campus: true,
     is_online: false,
     has_scholarship: false,
+
     commission_type_id: '',
     commission_notes:'' ,
-    qualification_id: '',
-
     commission_amount: 0,
+    expected_commission_from:'',
+    expected_commission_to:'',
+
+    qualification_id: '',
 
     yearly_fees: [],
     one_time_fees: [],
@@ -104,6 +110,7 @@ export default function RegisterProgram() {
         max_amount: 0,
         name: '',
         description: '',
+        conditions: [],
       },
     ],
   });
@@ -126,15 +133,22 @@ export default function RegisterProgram() {
       scholarships: [
         ...prev.scholarships,
         {
-          type: 0,
+          type: 1,
           coverage_percent: 0,
           max_amount: 0,
           name: '',
           description: '',
+          conditions: [],
         },
       ],
     }));
   };
+
+  useEffect(() => {
+    if (commissionTypes.length > 0) {
+      updateFormData("commission_type_id", String(commissionTypes[0].id));
+    }
+  }, [commissionTypes]);
 
   useEffect(() => {
     if (!branches || branches.length === 0) {
@@ -154,7 +168,6 @@ export default function RegisterProgram() {
       formData.uni_id !== '' &&
       formData.branch_id !== '' &&
       formData.field_of_study_id !== '' &&
-      formData.commission_type_id !== '' &&
       formData.qualification_id !== '' &&
       formData.english_required_score.trim() !== '' &&
       formData.intake_dates.length > 0 &&
@@ -262,7 +275,11 @@ export default function RegisterProgram() {
         tuition_fee: Number(formData.tuition_fee || 0),
         duration: Number(formData.duration || 0),
         qualification_id: formData.qualification_id,
+
         commission_amount: Number(formData.commission_amount || 0),
+        expected_commission_from: String( formData.expected_commission_from),
+        expected_commission_to: String( formData.expected_commission_to),
+
 
         yearly_fees: (formData.yearly_fees || []).map((y) => ({
           year: Number(y.year),
@@ -283,6 +300,7 @@ export default function RegisterProgram() {
               max_amount: Number(s.max_amount || 0),
               name: s.name,
               description: s.description,
+              conditions: [],
             }))
           : [],
       };
@@ -296,7 +314,10 @@ export default function RegisterProgram() {
       }, 1500);
 
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || 'Please try again.';
+      const backendMessage =
+        error?.response?.data?.detail?.[0]?.msg ||
+        error?.response?.data?.message ||
+        'Please try again.';
       showToast(`Failed to create program. ${backendMessage}`, 'error');
     }
   };
@@ -496,6 +517,30 @@ export default function RegisterProgram() {
                 updateFormData={updateFormData}
               />
 
+              <SelectField
+                label="Expected from"
+                field="expected_commission_from"
+                options={MONTHS.map((m) => ({
+                  value: m.value,
+                  label: m.label,
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+
+              <SelectField
+                label="Expected To"
+                field="expected_commission_to"
+                options={MONTHS.map((m) => ({
+                  value: m.value,
+                  label: m.label,
+                }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+              
               <InputField
                 label="Commission Notes"
                 field="commission_notes"
@@ -507,17 +552,6 @@ export default function RegisterProgram() {
                 updateFormData={updateFormData}
               />
 
-              <SearchableDropdown
-                label="Commission Type"
-                field="commission_type_id"
-                options={commissionTypes.map((f) => ({
-                  value: String(f.id),
-                  label: f.name,
-                }))}
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
             </div>
           </div>
 
@@ -684,6 +718,58 @@ export default function RegisterProgram() {
                           errors={errors}
                           updateFormData={updateFormData}
                         />
+                      </div>
+
+                      <div className="md:col-span-2 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-semibold tracking-wide text-slate-500">
+                            Conditions
+                          </h3>
+                          <IconButton
+                            icon={<Plus className="h-4 w-4" />}
+                            bgColor="bg-blue-50"
+                            textColor="text-blue-700"
+                            borderColor="border-blue-600"
+                            hoverTextColor="hover:text-blue-800"
+                            hoverBorderColor="hover:border-blue-700"
+                            onClick={() => {
+                              const updated = [...formData.scholarships[index].conditions, ''];
+                              updateFormData(`scholarships[${index}].conditions`, updated);
+                            }}
+                          />
+                        </div>
+
+                        {formData.scholarships[index].conditions.length === 0 ? (
+                          <p className="text-sm text-slate-400">No conditions added yet.</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {formData.scholarships[index].conditions.map((condition, cIndex) => (
+                              <div key={cIndex} className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                <input
+                                  value={condition}
+                                  onChange={(e) =>
+                                    updateFormData(
+                                      `scholarships[${index}].conditions[${cIndex}]`,
+                                      e.target.value,
+                                    )
+                                  }
+                                  placeholder={`Condition ${cIndex + 1}`}
+                                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = formData.scholarships[index].conditions.filter((_, i) => i !== cIndex);
+                                    updateFormData(`scholarships[${index}].conditions`, updated);
+                                  }}
+                                  className="text-red-400 transition hover:text-red-600"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
