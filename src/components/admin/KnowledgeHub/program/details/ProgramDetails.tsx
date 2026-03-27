@@ -414,12 +414,14 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
                         key={index}
                         className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
                       >
+
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
                           {item.description ?? 'Fee'}
                         </div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
                           RM {item.fee.toLocaleString()}
                         </div>
+
                       </div>
                     ))
                   ) : (
