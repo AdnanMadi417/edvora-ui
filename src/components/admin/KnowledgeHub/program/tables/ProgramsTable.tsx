@@ -44,6 +44,7 @@ import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/Ba
 import BatchIELTSPrograms from "components/admin/KnowledgeHub/program/popups/BatchIELTSPrograms";
 import BatchProgramIntakes from "components/admin/KnowledgeHub/program/popups/BatchProgramIntakes";
 import BatchProgramScholarship from "components/admin/KnowledgeHub/program/popups/BatchProgramScholarship";
+import DefaultVisaFee from "components/admin/KnowledgeHub/program/popups/DefaultVisaFee";
 
 
 const ProgramsTable = () => {
@@ -78,6 +79,7 @@ const ProgramsTable = () => {
   const [isBatchIntakesUpdateOpen, setIsBatchIntakesUpdateOpen] = useState(false);
   const [isBatchScholarshipsUpdateOpen, setIsBatchScholarshipsUpdateOpen] = useState(false);
   const [isBulkMenuOpen, setIsBulkMenuOpen] = useState(false);
+  const [isVisaFeeOpen, setIsVisaFeeOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -359,6 +361,7 @@ const ProgramsTable = () => {
                             { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setIsBatchIeltsUpdateOpen(true) },
                             { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setIsBatchIntakesUpdateOpen(true) },
                             { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setIsBatchScholarshipsUpdateOpen(true) },
+                            { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setIsVisaFeeOpen(true) },
                           ].map(({ label, icon, bg, onClick }) => (
                             <button
                               key={label}
@@ -786,6 +789,11 @@ const ProgramsTable = () => {
         isOpen={isBatchScholarshipsUpdateOpen}
         onClose={() => setIsBatchScholarshipsUpdateOpen(false)}
         selectedProgramIds={selectedProgramIds}
+      />
+
+      <DefaultVisaFee
+        isOpen={isVisaFeeOpen}
+        onClose={() => setIsVisaFeeOpen(false)}
       />
 
     </div>
