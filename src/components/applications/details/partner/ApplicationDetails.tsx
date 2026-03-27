@@ -19,14 +19,16 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { CheckCircle, Clock } from 'lucide-react';
+import { Clock, Wallet, Plane } from 'lucide-react';
 import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 
 import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopBar";
 import RequiredAction from "components/applications/popups/partner/RequiredAction";
 import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
-import OfferLetterDecision, { OfferLetterDecisionType } from './OfferLetterDecision';
+import OfferLetterDecision, { OfferLetterDecisionType } from './OfferLetter';
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
+import VisaPaymentConfirmation from "components/applications/popups/partner/VisaPaymentConfirmation";
+import ArrivalDate from "components/applications/popups/partner/ArrivalDate";
 import ApplicationCommission from './ApplicationCommission';
 import { submitOfferLetterDecision } from '../../../../services/offerLetterService';
 import { useToast } from '../../../context/ToastContext';
@@ -85,6 +87,20 @@ export default function ApplicationDetails({
     useState(false);
   const openProgramDecisionPopup = () => setShowProgramDecisionPopup(true);
   const closeProgramDecisionPopup = () => setShowProgramDecisionPopup(false);
+
+  const [showVisaPaymentPopup, setShowVisaPaymentPopup] = useState(false);
+
+  const stageName = stage?.name;
+  const stageStatuses = stage?.statuses || [];
+  const showVisaPayment =
+    stageName === "Visa Processing" &&
+    stageStatuses.some((s: any) => s.name === "Waiting for Payment");
+
+  const [showArrivalPopup, setShowArrivalPopup] = useState(false);
+
+  const showArrivalConfirmation =
+    stageName === "Student Arrival & Enrollment" &&
+    stageStatuses.some((s: any) => s.name === "Waiting Partner to confirm arrival date");
 
   const formatGender = (value: boolean | null) => {
     if (value === null) return "Not provided";
@@ -246,33 +262,34 @@ export default function ApplicationDetails({
             </>
           )}
 
+          {showVisaPayment && (
+            <button
+              type="button"
+              onClick={() => setShowVisaPaymentPopup(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+            >
+              <Wallet className="h-4 w-4" />
+              Proceed to Payment
+            </button>
+          )}
+
+          {showArrivalConfirmation && (
+            <button
+              type="button"
+              onClick={() => setShowArrivalPopup(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+            >
+              <Plane className="h-4 w-4" />
+              Confirm Arrival
+            </button>
+          )}
+
           {isUniversityApproved && (
             <>
               <p className="text-sm text-slate-500">
                 Please review the offer letter carefully before accepting or rejecting.
               </p>
 
-              <div className="flex flex-col justify-end gap-3 sm:flex-row">
-                <button
-                  onClick={() => handleDecision("accept")}
-                  disabled={submitting}
-                  className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200"
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  Accept Offer
-                </button>
-
-                {/* Reject button if needed later */}
-                {/*
-      <button
-        onClick={() => handleDecision("reject")}
-        disabled={submitting}
-        className="rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 transition hover:border-text-error hover:text-text-error disabled:opacity-50"
-      >
-        Reject Offer
-      </button>
-      */}
-              </div>
             </>
           )}
 
@@ -668,6 +685,22 @@ export default function ApplicationDetails({
         <RequiredAction
           isOpen={showRequiredActionPopup}
           onClose={closeRequiredActionPopup}
+          applicationId={application.id}
+        />
+      )}
+
+      {showArrivalPopup && (
+        <ArrivalDate
+          isOpen={showArrivalPopup}
+          onClose={() => setShowArrivalPopup(false)}
+          applicationId={application.id}
+        />
+      )}
+
+      {showVisaPaymentPopup && (
+        <VisaPaymentConfirmation
+          isOpen={showVisaPaymentPopup}
+          onClose={() => setShowVisaPaymentPopup(false)}
           applicationId={application.id}
         />
       )}

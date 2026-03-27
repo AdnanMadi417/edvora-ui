@@ -146,7 +146,7 @@ export default function RegisterProgram() {
 
   useEffect(() => {
     if (commissionTypes.length > 0) {
-      updateFormData("commission_type_id", String(commissionTypes[0].id));
+      setFormData((prev) => ({ ...prev, commission_type_id: String(commissionTypes[0].id) }));
     }
   }, [commissionTypes]);
 
@@ -300,7 +300,7 @@ export default function RegisterProgram() {
               max_amount: Number(s.max_amount || 0),
               name: s.name,
               description: s.description,
-              conditions: [],
+              conditions: Array.isArray(s.conditions) ? s.conditions : [],
             }))
           : [],
       };

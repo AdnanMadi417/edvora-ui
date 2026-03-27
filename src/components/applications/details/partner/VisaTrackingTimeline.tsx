@@ -10,10 +10,12 @@ import {
   Plane,
   XCircle,
   Receipt,
-  CheckCircle,
 } from "lucide-react";
+
 import { useVisaCase } from "hooks/useVisaCase";
 import { useVisaPayments } from "hooks/useVisaPayments";
+import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
+
 import VisaPaymentConfirmation from "../../../applications/popups/partner/VisaPaymentConfirmation";
 import ArrivalDate from "../../../applications/popups/partner/ArrivalDate";
 import { getDocumentDownloadUrl } from "../../../../services/documentService";
@@ -27,6 +29,8 @@ export default function VisaTrackingTimeline({
 }: VisaTrackingTimelineProps) {
   const [isVisaPopupOpen, setIsVisaPopupOpen] = useState(false);
   const [isArrivalPopupOpen, setIsArrivalPopupOpen] = useState(false);
+
+  const { methods, loading: paymentLoading } = useVisaPaymentMethods(application?.id);
 
   const stageName = application?.stage?.name;
   const stageStatuses = application?.stage?.statuses || [];
@@ -126,8 +130,49 @@ export default function VisaTrackingTimeline({
           </div>
         </div>
 
+
         {showVisaPayment && (
-          <div className="p-6 pb-0">
+          <div className="p-6 pb-0 block space-y-4">
+
+          {paymentLoading ? (
+          <div className="border-gray-200">
+            <p className="text-sm text-slate-500">Loading payment methods...</p>
+          </div>
+        ) : methods.length > 0 && (
+          <div className="">
+            <div className="mb-4 flex items-center gap-2">
+              <Wallet className="h-4 w-4 text-blue-600" />
+              <h4 className="text-sm font-semibold text-gray-900">Payment Methods</h4>
+            </div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {methods.map((method: any) => (
+                <div
+                  key={method.id}
+                  className="rounded-lg border border-gray-200 bg-gray-50 p-4"
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-blue-600" />
+                      <span className="font-semibold text-gray-900">{method.name}</span>
+                    </div>
+                    {method.currency && (
+                      <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-medium uppercase text-blue-700">
+                        {method.currency}
+                      </span>
+                    )}
+                  </div>
+                  {method.instructions && (
+                    <pre className="whitespace-pre-wrap text-xs leading-relaxed text-slate-600">
+                      {method.instructions}
+                    </pre>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+
             <div className="relative rounded-lg border border-gray-200 p-6">
               <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
 
@@ -143,14 +188,14 @@ export default function VisaTrackingTimeline({
                   </p>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end w-full">
                   <button
                     type="button"
                     onClick={() => setIsVisaPopupOpen(true)}
                     className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200"
                   >
                     <Wallet className="h-4 w-4" />
-                    Continue Payment
+                    Proceed to Payment
                   </button>
                 </div>
               </div>

@@ -1,23 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { CheckCircle, Pause, XCircle } from 'lucide-react';
+import { CheckCircle, Pause, XCircle, AlertCircle } from 'lucide-react';
 import { FaRegFileLines } from "react-icons/fa6";
-import api from "../../../../lib/useApi";
 import { FaFileAlt } from "react-icons/fa";
-import { useToast } from "components/context/ToastContext";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
-import {
-  getPresignedUploads,
-  uploadFilesToSpaces,
-} from "services/uploadService";
+import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
 import { useApplicationActions } from 'hooks/applications/stages/useApplicationActions';
+import { useRequiredDocumentsUpload } from 'hooks/applications/files/useRequiredDocumentsUpload';
 
 interface RequiredActionProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm?: (applicationId: string | number, selectedDocs?: string[]) => void;
-  applicationId: string ;
+  applicationId: string;
 }
 
 export default function RequiredAction({
@@ -26,58 +22,37 @@ export default function RequiredAction({
   onConfirm,
   applicationId,
 }: RequiredActionProps) {
+  const [selectedFiles, setSelectedFiles] = useState<{ [docId: string]: File | null }>({});
+  const [fileErrors, setFileErrors] = useState<{ [docId: string]: string }>({});
 
-  const { showToast } = useToast();
-  const [selectedFiles, setSelectedFiles] = useState<{
-    [docId: string]: File | null;
-  }>({});
+  const { actions, loading } = useApplicationActions(applicationId);
+  const { submitDocuments, isSubmitting } = useRequiredDocumentsUpload();
 
-  const { actions, loading } =
-    useApplicationActions(applicationId);
-
-  const handleFileChange = (docId: string, file: File | null) => {
-    if (!file) return;
-
+  const handleFileChange = (docId: string, file: File) => {
     setSelectedFiles((prev) => ({ ...prev, [docId]: file }));
+  };
 
-    showToast(`File uploaded successfully.`, "success");
+  const handleFileRemove = (docId: string) => {
+    setSelectedFiles((prev) => ({ ...prev, [docId]: null }));
+  };
+
+  const handleFileError = (docId: string, msg: string) => {
+    setFileErrors((prev) => ({ ...prev, [docId]: msg }));
   };
 
   const handleConfirm = async () => {
     try {
-      for (const [docId, file] of Object.entries(selectedFiles)) {
-        if (!file) continue;
-
-        const presigned = await getPresignedUploads([file], "documents");
-
-        const results = await uploadFilesToSpaces([file], presigned);
-        const uploadedFile = results[0];
-
-        await api.post(
-          `/applications/${applicationId}/requested-documents/bulk`,
-          [
-            {
-              document_type_id: docId,
-              file_url: uploadedFile.public_url,
-              file_key: uploadedFile.file_key,
-            },
-          ]
-        );
-      }
-
-      showToast("All documents processed successfully.", "success");
-
+      await submitDocuments(applicationId, selectedFiles);
       onConfirm?.(applicationId, Object.keys(selectedFiles));
-
-      setTimeout(() => window.location.reload(), 2000);
-    } catch (err: any) {
-      console.error("Some uploads failed:", err);
-      const msg = err.response?.data?.message || "Failed to upload documents.";
-      showToast(msg, "error");
-    } finally {
       onClose();
+      setTimeout(() => window.location.reload(), 2000);
+    } catch {
+      // error handled inside hook
     }
   };
+
+  const hasAnyFile = Object.values(selectedFiles).some(Boolean);
+  const hasAnyError = Object.values(fileErrors).some(Boolean);
 
   if (!isOpen) return null;
 
@@ -90,7 +65,7 @@ export default function RequiredAction({
         className="w-full max-w-lg transform transition-all"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-card shadow-lg ">
+        <div className="relative overflow-hidden rounded-2xl bg-card shadow-lg">
 
           <div className="relative border-b border-default px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
@@ -102,12 +77,11 @@ export default function RequiredAction({
                   <h5 className="text-lg font-bold text-gray-900">
                     Required Application Actions
                   </h5>
-
                   <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <span className="font-normal">
-                    <span className="font-medium">Next Action: {" "}</span>
+                      <span className="font-medium">Next Action: </span>
                       {actions ? `${actions.next_action}` : "Loading..."}
-                  </span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -145,25 +119,18 @@ export default function RequiredAction({
                         Documents to Upload
                       </h4>
 
-                      <ul className="space-y-2">
+                      <ul className="space-y-4">
                         {actions.document_types.map((doc: any) => (
                           <li
                             key={doc.id}
-                            className="block gap-4 rounded-md border border-gray-200 p-4 transition"
+                            className="block space-y-4"
                           >
-
                             <div className="block mb-4 sm:flex-1">
-                              <div className="flex items-center gap-2">
-                                <FaRegFileLines className="text-blue-500" />
-                                <span className="text-sm font-semibold text-gray-800 uppercase">
-                                  {doc.description}
-                                </span>
-                              </div>
 
                               {actions.correction_reason && (
                                 <div className="mt-1 flex items-center gap-2">
                                   <span className="text-xs font-medium text-orange-400">
-                                    Reason: {" "}
+                                    Reason:{" "}
                                     <span className="text-slate-500">
                                       {actions.correction_reason}
                                     </span>
@@ -172,41 +139,23 @@ export default function RequiredAction({
                               )}
                             </div>
 
-                            <div className="w-full ">
-                              <label
-                                htmlFor={`file-${doc.id}`}
-                                className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-4 text-center text-sm font-medium text-gray-600 transition hover:border-blue-500 hover:bg-blue-50"
-                              >
-                                <svg
-                                  className="h-6 w-6 text-gray-400"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M7 16v4h10v-4m-5-12v12m0 0l-3-3m3 3l3-3"
-                                  />
-                                </svg>
-                                <span className="truncate">
-                                  {selectedFiles[doc.id]?.name ||
-                                    "Upload document"}
-                                </span>
-                                <input
-                                  id={`file-${doc.id}`}
-                                  type="file"
-                                  className="hidden"
-                                  onChange={(e) =>
-                                    handleFileChange(
-                                      doc.id,
-                                      e.target.files?.[0] || null
-                                    )
-                                  }
-                                />
-                              </label>
-                            </div>
+                            <StatusFileUpload
+                              label={doc.description}
+                              id={`file-${doc.id}`}
+                              file={selectedFiles[doc.id] ?? null}
+                              onFileChange={(file) => handleFileChange(doc.id, file)}
+                              onRemove={() => handleFileRemove(doc.id)}
+                              onError={(msg) => handleFileError(doc.id, msg)}
+                              disabled={isSubmitting}
+                            />
+
+                            {fileErrors[doc.id] && (
+                              <div className="mb-3 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
+                                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+                                <p className="text-xs text-red-700">{fileErrors[doc.id]}</p>
+                              </div>
+                            )}
+
                           </li>
                         ))}
                       </ul>
@@ -227,18 +176,18 @@ export default function RequiredAction({
           <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
             <button
               onClick={onClose}
-              className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
             >
               <XCircle className="h-4 w-4" />
               Cancel
             </button>
             <button
               onClick={handleConfirm}
-              disabled={Object.values(selectedFiles).every((file) => !file)}
+              disabled={!hasAnyFile || hasAnyError || isSubmitting}
               className="flex items-center justify-center gap-2 rounded-full border border-amber-600 bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700 transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
             >
               <CheckCircle className="h-4 w-4" />
-              Confirm
+              {isSubmitting ? "Uploading..." : "Confirm"}
             </button>
           </div>
         </div>

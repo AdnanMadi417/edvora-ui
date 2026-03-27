@@ -13,14 +13,17 @@ export interface PresignedUpload {
 /**
  * Check if a file is allowed (PDF or PNG)
  */
-function isAllowedFile(file: File): boolean {
-  const allowedMimeTypes = ["application/pdf", "image/png"];
-  const allowedExtensions = [".pdf", ".png"];
-  const fileName = file.name.toLowerCase();
+export const ALLOWED_FILE_TYPES = {
+  mimeTypes: ["application/pdf", "image/png", "image/jpeg"],
+  extensions: [".pdf", ".png", ".jpg", ".jpeg"],
+  label: "PDF, PNG, or JPG",
+};
 
+function isAllowedFile(file: File): boolean {
+  const fileName = file.name.toLowerCase();
   return (
-    allowedMimeTypes.includes(file.type) ||
-    allowedExtensions.some((ext) => fileName.endsWith(ext))
+    ALLOWED_FILE_TYPES.mimeTypes.includes(file.type) ||
+    ALLOWED_FILE_TYPES.extensions.some((ext) => fileName.endsWith(ext))
   );
 }
 

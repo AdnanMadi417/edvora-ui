@@ -95,7 +95,7 @@ const FileUploadField = ({
               </div>
             </div>
 
-            {file.file_key && !file.uploading && (
+            {file.file_key && (
               <button
                 type="button"
                 onClick={handleRemove}

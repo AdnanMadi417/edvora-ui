@@ -208,7 +208,7 @@ const UniversityEdit = ({ id }: Props) => {
       }));
 
       setTimeout(() => {
-        router.push("/admin/universities")
+        router.refresh()
       })
 
     } catch (error: any) {
@@ -261,7 +261,7 @@ const UniversityEdit = ({ id }: Props) => {
       showToast("Payment method deleted successfully", "success");
 
       setTimeout(() => {
-        router.push("/admin/universities")
+        router.refresh()
       })
 
     } catch (error: any) {
@@ -288,7 +288,7 @@ const UniversityEdit = ({ id }: Props) => {
       showToast("Payment method assigned successfully.", "success");
 
       setTimeout(() => {
-        router.push("/admin/universities")
+        router.refresh()
       })
 
     } catch (err: any) {
@@ -339,7 +339,7 @@ const UniversityEdit = ({ id }: Props) => {
       showToast("University updated successfully.", "success");
 
       setTimeout(() => {
-        router.push("/admin/universities")
+        router.refresh()
       })
 
     } catch (error: any) {
@@ -350,7 +350,7 @@ const UniversityEdit = ({ id }: Props) => {
   };
 
   const handleBack = () => {
-    router.push("/admin/universities");
+    router.refresh();
   };
 
   if (universityLoading) {
