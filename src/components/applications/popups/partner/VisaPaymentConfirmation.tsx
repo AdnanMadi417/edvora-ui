@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, Wallet, CreditCard, CheckCircle } from 'lucide-react';
+import { XCircle, Wallet, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee } from "hooks/applications/useApplicationVisaFee";
 import { useVisaPaymentUpload } from "hooks/applications/files/useVisaPaymentUpload";
@@ -163,6 +163,13 @@ export default function VisaPaymentConfirmation({
               disabled={isUploading}
               required
             />
+
+            {fileError && (
+              <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+                <p className="text-xs text-red-700">{fileError}</p>
+              </div>
+            )}
 
           </div>
 

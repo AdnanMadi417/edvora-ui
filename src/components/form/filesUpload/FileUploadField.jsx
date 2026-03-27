@@ -1,5 +1,6 @@
-import { Upload, Trash2, FileCheck } from "lucide-react";
-import React from 'react';
+import { Upload, Trash2, FileCheck, AlertCircle } from "lucide-react";
+import React, { useState } from 'react';
+import { ALLOWED_FILE_TYPES } from "services/uploadService";
 
 const FileUploadField = ({
                            label,
@@ -10,10 +11,11 @@ const FileUploadField = ({
                            errors,
                            required = false,
                            multiple = false,
-                           accept=".pdf,.png",
+                           accept = ALLOWED_FILE_TYPES.extensions.join(","),
                            uploadHandler,
                            removeHandler,
                          }) => {
+  const [fileError, setFileError] = useState("");
   const documents = formData[field] || [];
 
   const file = documents.find(
@@ -23,6 +25,14 @@ const FileUploadField = ({
   const handleUpload = async (e) => {
     if (!uploadHandler) return;
 
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile && !ALLOWED_FILE_TYPES.mimeTypes.includes(selectedFile.type)) {
+      setFileError(`Invalid file type. Only ${ALLOWED_FILE_TYPES.label} files are allowed.`);
+      e.target.value = "";
+      return;
+    }
+
+    setFileError("");
     await uploadHandler(e, documentTypeId);
   };
 
@@ -115,6 +125,13 @@ const FileUploadField = ({
               />
             </div>
           )}
+        </div>
+      )}
+
+      {fileError && (
+        <div className="mt-2 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-2">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+          <p className="text-xs font-medium text-red-700">{fileError}</p>
         </div>
       )}
 
