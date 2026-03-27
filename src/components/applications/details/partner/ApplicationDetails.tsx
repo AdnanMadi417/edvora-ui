@@ -19,7 +19,8 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { Clock, Wallet, Plane } from 'lucide-react';
+import { Clock, Wallet, Plane, CheckCircle, XCircle } from 'lucide-react';
+import Button from 'components/ui/buttons/Button';
 import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 
 import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopBar";
@@ -32,6 +33,8 @@ import ArrivalDate from "components/applications/popups/partner/ArrivalDate";
 import ApplicationCommission from './ApplicationCommission';
 import { submitOfferLetterDecision } from '../../../../services/offerLetterService';
 import { useToast } from '../../../context/ToastContext';
+import Dispute from 'components/applications/popups/partner/UpdatedDispute';
+import api from 'lib/useApi';
 
 interface OfferLetterDecisionPayload {
   decision: OfferLetterDecisionType;
@@ -80,8 +83,36 @@ export default function ApplicationDetails({
 
   const { showToast } = useToast();
   const [submitting, setSubmitting] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [showDispute, setShowDispute] = useState(false);
   const isUniversityApproved =
     currentStatus === "University Approved";
+
+  const { partner_actions } = actions || {};
+  const confirmAction = partner_actions?.find(
+    (a: any) => a.target_status_code === "APPLICATION_COMPLETE"
+  );
+  const disputeAction = partner_actions?.find(
+    (a: any) => a.target_status_code === "COMMISSION_DISPUTED"
+  );
+
+  const handleCommissionConfirm = async () => {
+    if (!confirmAction) return;
+    try {
+      setConfirmLoading(true);
+      await api.post(`/applications/${application.id}/status`, {
+        status_id: confirmAction.target_status_id,
+        reason_text: null,
+        notes: "Partner commission confirmed successfully",
+      });
+      showToast("Commission confirmed successfully", "success");
+      setTimeout(() => window.location.reload(), 2000);
+    } catch {
+      showToast("Failed to confirm commission", "error");
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
 
   const [showProgramDecisionPopup, setShowProgramDecisionPopup] =
     useState(false);
@@ -289,8 +320,39 @@ export default function ApplicationDetails({
               <p className="text-sm text-slate-500">
                 Please review the offer letter carefully before accepting or rejecting.
               </p>
-
             </>
+          )}
+
+          {!actionsLoading && (confirmAction || disputeAction) && (
+            <div className="flex flex-row gap-2">
+              {confirmAction && (
+                <Button
+                  icon={<CheckCircle className="h-4 w-4" />}
+                  text={confirmLoading ? "Processing..." : "Confirm"}
+                  bgColor="bg-green-50"
+                  textColor="text-green-700"
+                  borderColor="border-green-600"
+                  hoverTextColor="hover:text-green-800"
+                  hoverBorderColor="hover:border-green-700"
+                  className="w-full"
+                  onClick={handleCommissionConfirm}
+                  disabled={confirmLoading}
+                />
+              )}
+              {disputeAction && (
+                <Button
+                  icon={<XCircle className="h-4 w-4" />}
+                  text="Dispute"
+                  bgColor="bg-red-50"
+                  textColor="text-red-700"
+                  borderColor="border-red-600"
+                  hoverTextColor="hover:text-red-800"
+                  hoverBorderColor="hover:border-red-700"
+                  className="w-full"
+                  onClick={() => setShowDispute(true)}
+                />
+              )}
+            </div>
           )}
 
 
@@ -711,6 +773,15 @@ export default function ApplicationDetails({
           onClose={closeProgramDecisionPopup}
           applicationId={application.id}
           universityId={application.program?.university?.id || ""}
+        />
+      )}
+
+      {showDispute && disputeAction && (
+        <Dispute
+          isOpen={showDispute}
+          onClose={() => setShowDispute(false)}
+          applicationId={application.id}
+          statusId={disputeAction.target_status_id}
         />
       )}
     </section>
