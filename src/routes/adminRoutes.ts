@@ -30,6 +30,12 @@ const AdminRoutes: IRoute[] = [
     icon: MdHandshake,
   },
   {
+    name: "Programs",
+    layout: "/admin",
+    path: "/knowledge-hub/programs",
+    icon: MdMenuBook,
+  },
+  {
     name: "Universities",
     layout: "/admin",
     path: "/universities",
@@ -54,12 +60,6 @@ const AdminRoutes: IRoute[] = [
         icon: BookOpen,
       }
     ],
-  },
-  {
-    name: "Programs",
-    layout: "/admin",
-    path: "/knowledge-hub/programs",
-    icon: MdMenuBook,
   },
   {
     name: "Logistical Service",

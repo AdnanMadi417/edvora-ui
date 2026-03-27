@@ -434,54 +434,52 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
 
           {program?.has_scholarship && program?.scholarships?.length > 0 && (
             <div className="border-b border-gray-200 p-6">
-              <div className="flex items-start gap-3">
+              <div className="flex items-center gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
                   <Award className="h-5 w-5 text-blue-600" />
                 </span>
-
-                <div className="min-w-0">
-                  <h4 className="text-base font-semibold tracking-tight text-slate-900">
-                    Scholarships & Discounts
-                  </h4>
-                </div>
+                <h4 className="text-base font-semibold tracking-tight text-slate-900">
+                  Scholarships & Discounts
+                </h4>
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-2">
-                {program.scholarships.map((item) => (
+                {program.scholarships.map((item, index) => (
                   <div
-                    key={item.id}
-                    className="rounded-md border border-slate-200 bg-white p-5"
+                    key={item.id ?? index}
+                    className="rounded-xl border border-slate-200 bg-white p-5 flex flex-col gap-3"
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="min-w-0">
-                        <h5 className="text-sm font-semibold text-slate-900">
-                          {item.name}
-                        </h5>
-
-                        <p className="mt-1 text-xl font-bold text-blue-600">
-                          {item.max_amount > 0 && `Up to RM ${item.max_amount.toLocaleString()}`}
-                          {item.max_amount > 0 && item.coverage_percent > 0 && " • "}
-                          {item.coverage_percent > 0 && `${item.coverage_percent}% coverage`}
-                        </p>
-
-                        <p className="mt-2 text-sm text-slate-500">
-                          {item.description}
-                        </p>
-                        
-                        {item.conditions && item.conditions.length > 0 && (
-                          <ul className="mt-2 space-y-1 pt-2 border-t border-slate-200">
-                            {item.conditions.map((condition, i) => (
-                              <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
-                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
-                                {condition}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-
-
-                      </div>
+                    <div className="flex items-start justify-between gap-2">
+                      <h5 className="text-sm font-semibold text-slate-900">
+                        {item.name}
+                      </h5>
+                      {item.coverage_percent > 0 && (
+                        <span className="shrink-0 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 border border-blue-100">
+                          {item.coverage_percent}% off
+                        </span>
+                      )}
                     </div>
+
+                    {item.max_amount > 0 && (
+                      <p className="text-lg font-bold text-blue-600">
+                        Up to RM {item.max_amount.toLocaleString()}
+                      </p>
+                    )}
+
+                    {item.description && (
+                      <p className="text-sm text-slate-500">{item.description}</p>
+                    )}
+
+                    {item.conditions && item.conditions.length > 0 && (
+                      <ul className="space-y-1 border-t border-slate-100 pt-3">
+                        {item.conditions.map((condition, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+                            {condition}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 ))}
               </div>

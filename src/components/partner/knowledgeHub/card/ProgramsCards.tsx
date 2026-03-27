@@ -27,7 +27,7 @@ import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "next/link";
 
-const KnowledgeHubCards = () => {
+const ProgramsCards = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const {
@@ -389,4 +389,4 @@ const KnowledgeHubCards = () => {
   );
 };
 
-export default KnowledgeHubCards;
+export default ProgramsCards;
