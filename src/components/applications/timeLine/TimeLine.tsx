@@ -49,7 +49,7 @@ export default function TimeLine({
         onClick={() => setShowTimeline(!showTimeline)}
       >
         <div className="flex flex-col gap-2">
-          <h3 className="text-p3 flex items-center gap-2 font-semibold text-text-primary">
+          <h3 className="text-p3 flex items-center gap-2 font-semibold text-slate-900">
             <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <History className="text-xl text-blue-700" />
             </span>
@@ -97,7 +97,7 @@ export default function TimeLine({
 
                   <div className="min-w-0 flex-1">
                     <div className="mb-2 flex items-center gap-2">
-                      <h3 className="truncate text-base font-semibold text-text-primary">
+                      <h3 className="truncate text-base font-semibold text-slate-900">
                         {event.description}
                       </h3>
                     </div>

@@ -43,7 +43,7 @@ export default function NewApplicationSuccess({ onClose }) {
                 <h5 className="text-h5 font-bold text-gray-900">
                   Application Submitted!
                 </h5>
-                <p className="mt-0.5 text-caption text-text-muted">
+                <p className="mt-0.5 text-caption text-slate-600">
                   Your applicants’ information has been received successfully.
                 </p>
               </div>
@@ -62,7 +62,7 @@ export default function NewApplicationSuccess({ onClose }) {
         <div className="space-y-5 px-6 py-4">
           <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
             <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
-            <p className="text-p2 leading-relaxed text-text-primary">
+            <p className="text-p2 leading-relaxed text-slate-900">
               Your application details have been successfully submitted. Our
               team will review the information and get back to you with any
               updates soon.

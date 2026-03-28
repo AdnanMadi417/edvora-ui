@@ -2,16 +2,10 @@
 
 import Notification from "../../../components/notifications/accountManager/Notifications";
 
-interface Notification {
-  params: {
-    id: string;
-  };
-}
-
-const Dashboard = ({ params }: Notification) => {
+const Dashboard = () => {
   return (
     <div>
-      <Notification params={params} />
+      <Notification />
     </div>
   );
 };

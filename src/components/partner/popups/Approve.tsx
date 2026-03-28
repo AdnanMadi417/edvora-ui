@@ -21,7 +21,7 @@ const InputField = ({
                       onChange,
                     }: InputFieldProps) => (
   <div className="space-y-2">
-    <label htmlFor={id} className="block text-p2 font-medium text-text-primary">
+    <label htmlFor={id} className="block text-p2 font-medium text-slate-900">
       {label}
     </label>
     <input
@@ -30,7 +30,7 @@ const InputField = ({
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className="w-full rounded-md border border-default px-4 py-3 text-p2 transition-all duration-200 placeholder:text-text-muted outline-none"
+      className="w-full rounded-md border border-default px-4 py-3 text-p2 transition-all duration-200 placeholder:text-slate-600 outline-none"
     />
   </div>
 );
@@ -99,7 +99,7 @@ export default function ApprovePartnerPopup({
                   <h5 className="text-h4 font-bold text-gray-900">
                     Approve Partner
                   </h5>
-                  <p className="mt-0.5 text-caption text-text-muted">
+                  <p className="mt-0.5 text-caption text-slate-600">
                     Confirm this partner’s registration approval
                   </p>
                 </div>
@@ -119,7 +119,7 @@ export default function ApprovePartnerPopup({
           <div className="space-y-5 px-6 py-4">
             <div className="flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-4">
               <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600" />
-              <p className="text-p2 leading-relaxed text-text-primary">
+              <p className="text-p2 leading-relaxed text-slate-900">
                 You are about to approve this partner. Please include a short note
                 or comment for record purposes.
               </p>

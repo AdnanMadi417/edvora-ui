@@ -4,52 +4,31 @@ import React, { useState, useEffect } from "react";
 import {
   XCircle,
   Clock,
-  Plus,
   Trash2,
   AlertCircle,
   Pause,
   CheckCircle,
 } from "lucide-react";
-import api from "../../../../lib/useApi";
 import { useToast } from "../../../context/ToastContext";
+
+import { useOfferLetterUpload } from "hooks/applications/files/useOfferLetterUpload";
+import { useVisaDocumentUpload } from "hooks/applications/files/useVisaDocumentUpload";
+import { useVisaSetup } from "hooks/applications/useVisaSetup";
+import { useStatusUpdate } from "hooks/applications/useStatusUpdate";
+import { useCommissionPaymentUpload } from "hooks/applications/files/useCommissionPaymentUpload";
+import { useApplicationActions } from 'hooks/applications/stages/useApplicationActions';
+import { useVisaCase } from 'hooks/useDefaultVisaCase';
+
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
-
-interface DocumentRequest {
-  id: string;
-  type: string[];
-  reason: string;
-}
-
-interface StatusOption {
-  id: string;
-  label: string;
-  description: string;
-  nextAction: string;
-  icon: any;
-  color: string;
-  bgColor: string;
-  borderColor: string;
-  requiresReason: boolean;
-  requiresDocumentSelection: boolean;
-}
-
-interface DocumentRequestListProps {
-  documents: DocumentRequest[];
-  setDocuments: React.Dispatch<React.SetStateAction<DocumentRequest[]>>;
-  documentTypes: { id: string; label: string }[];
-}
+import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import { InputField } from "components/form";
+import { DocumentRequest, StatusOption, DocumentRequestListProps } from "components/applications/popups/utility-functions/types";
 
 const DocumentRequestList = ({
   documents,
   setDocuments,
   documentTypes,
 }: DocumentRequestListProps) => {
-  const addDocument = () => {
-    setDocuments([
-      ...documents,
-      { id: Date.now().toString(), type: [], reason: "" },
-    ]);
-  };
 
   const removeDocument = (id: string) => {
     if (documents.length > 1) {
@@ -121,7 +100,7 @@ const DocumentRequestList = ({
               })}
             </div>
 
-            <div className="grid max-h-48 grid-cols-2 gap-2 overflow-y-auto rounded-md border border-gray-200 p-2">
+            <div className="grid grid-cols-1 gap-2 p-2">
               {documentTypes.map((d) => (
                 <label
                   key={d.id}
@@ -140,14 +119,6 @@ const DocumentRequestList = ({
           </div>
         </div>
       ))}
-
-      <button
-        onClick={addDocument}
-        className="flex w-full items-center justify-center gap-2 rounded-md border border-dashed border-blue-300 bg-blue-50/50 px-4 py-3 text-p2 font-medium text-blue-700 hover:border-blue-400 hover:bg-blue-100"
-      >
-        <Plus className="h-4 w-4" />
-        Add Another Document
-      </button>
     </div>
   );
 };
@@ -178,6 +149,7 @@ export default function UpdateStatusPopup({
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
+  const selectedOption = statusOptions.find((opt) => opt.id === selectedStatus);
 
   const getStatusStyle = (name: string) => {
     const lower = name.toLowerCase();
@@ -224,89 +196,245 @@ export default function UpdateStatusPopup({
     };
   };
 
+  const { actions, loading } = useApplicationActions(application?.id);
+  const { amount: defaultVisaFee } = useVisaCase();
+
   useEffect(() => {
-    if (!isOpen || !application?.id) return;
+    if (!actions) return;
 
-    const fetchApplicationDetails = async () => {
-      try {
-        const response = await api.get(`/applications/${application.id}`);
-        const appData = response.data;
+    setDocumentTypes(
+      (actions.document_types || []).map((d) => ({
+        id: d.id,
+        label: d.description || d.type,
+      }))
+    );
 
-        setDocumentTypes(
-          (appData.document_types || []).map((d: any) => ({
-            id: d.id,
-            label: d.description || d.type,
-          }))
-        );
+    const options: StatusOption[] = (actions.stage_statuses || []).map((s) => {
+      const matchingAction = actions.available_actions?.find(
+        (a) => a.status === s.name
+      );
 
-        const options: StatusOption[] = (appData.stage_statuses || []).map(
-          (s: any) => {
-            const matchingAction = (appData.available_actions || []).find(
-              (a) => a.status === s.name
-            );
-            return {
-              id: s.id,
-              label: s.name,
-              description: s.description ?? "",
-              nextAction: matchingAction?.next_action ?? "",
-              ...getStatusStyle(s.name),
-              requiresReason: !!s.is_requires_reason,
-              requiresDocumentSelection: !!s.is_requires_document_selection,
-            };
-          }
-        );
+      return {
+        id: s.id,
+        label: s.name,
+        description: "",
+        nextAction: matchingAction?.next_action ?? "",
+        ...getStatusStyle(s.name),
+        requiresReason: !!s.is_requires_reason,
+        requiresDocumentSelection: !!s.is_requires_document_selection,
+      };
+    });
 
-        setStatusOptions(options);
-      } catch (err) {
-        console.error(err);
-        setStatusOptions([]);
-      }
-    };
+    setStatusOptions(options);
+  }, [actions]);
 
-    fetchApplicationDetails();
-  }, [isOpen, application?.id]);
-
-  const selectedOption = statusOptions.find((opt) => opt.id === selectedStatus);
   const requiresReason = selectedOption?.requiresReason || false;
   const requiresDocuments = selectedOption?.requiresDocumentSelection || false;
 
+  const isUniversityApproved = selectedOption?.label === "University Approved";
+  const [offerLetterFile, setOfferLetterFile] = useState<File | null>(null);
+
+  const isVisaSetupSelected = selectedOption?.label === "Visa Setup";
+
+  const [visaDocumentFile, setVisaDocumentFile] = useState<File | null>(null);
+  const isVisaIssued = selectedOption?.label === "Visa Issued";
+
+  const [formData, setFormData] = useState({
+    visa_fee_amount: "",
+  });
+
+  const [formErrors, setFormErrors] = useState<any>({});
+
+  const [commissionPaymentFile, setCommissionPaymentFile] =
+    useState<File | null>(null);
+
+  const isCommissionPaid = selectedOption?.label === "Commission Paid";
+
+  const { uploadOfferLetter, isUploading } = useOfferLetterUpload();
+
+  const handleOfferLetterUpload = async () => {
+    if (!offerLetterFile || !isUniversityApproved) return;
+
+    await uploadOfferLetter(offerLetterFile, application.id);
+  };
+
+  const { submitVisaFee, isSubmitting: isVisaSubmitting } = useVisaSetup();
+
+  const handleVisaSetup = async () => {
+    if (!isVisaSetupSelected) return;
+
+    const enteredAmount = Number(formData.visa_fee_amount);
+    const finalAmount = enteredAmount > 0 ? enteredAmount : Number(defaultVisaFee?.amount ?? 0);
+    await submitVisaFee(application.id, finalAmount);
+  };
+
+  const { uploadVisaDocument, isUploading: isVisaUploading } = useVisaDocumentUpload();
+
+  const handleVisaIssuedUpload = async () => {
+    if (!visaDocumentFile || selectedOption?.label !== "Visa Issued") return;
+
+    await uploadVisaDocument(visaDocumentFile, application.id);
+  };
+
+  const { updateStatus, isUpdating: isStatusUpdating } = useStatusUpdate();
+
+  const handleStatusUpdate = async () => {
+    await updateStatus({
+      applicationId: application.id,
+      statusId: selectedStatus,
+      reason,
+      notes,
+      requiredDocumentTypeIds:
+        requiresDocuments && !isUniversityApproved && !isCommissionPaid
+          ? documents.flatMap((doc) => doc.type)
+          : [],
+    });
+  };
+
+  const { uploadCommissionPayment, } =
+    useCommissionPaymentUpload();
+
+  const handleCommissionPaymentUpload = async () => {
+    if (!commissionPaymentFile || !application?.id) return;
+
+    await uploadCommissionPayment(
+      commissionPaymentFile,
+      application.id
+    );
+  };
+
+  const updateFormData = (field: string, value: any) => {
+    setFormData((prev) => {
+      const keys = field.split(".");
+      const updated = { ...prev };
+      let current: any = updated;
+
+      keys.forEach((key, index) => {
+        if (index === keys.length - 1) {
+          current[key] = value;
+        } else {
+          current[key] = current[key] || {};
+          current = current[key];
+        }
+      });
+
+      return updated;
+    });
+
+    setFormErrors((prev: any) => ({
+      ...prev,
+      [field]: undefined,
+    }));
+  };
+
   const validateForm = () => {
-    if (!selectedStatus) return setError("Please select a status"), false;
-    if (requiresReason && !reason.trim())
-      return setError("Reason is required for this status"), false;
-    if (requiresDocuments && documents.some((doc) => !doc.type))
-      return setError("Please select a document type for all documents"), false;
+    if (!selectedStatus) {
+      setError("Please select a status");
+      return false;
+    }
+
+    if (requiresReason && !reason.trim()) {
+      setError("Reason is required for this status");
+      return false;
+    }
+
+    if (
+      requiresDocuments &&
+      !isUniversityApproved &&
+      selectedOption?.label !== "Visa Issued"
+    ) {
+      if (documents.some((doc) => doc.type.length === 0)) {
+        setError("Please select at least one document type");
+        return false;
+      }
+    }
+
+    if (isUniversityApproved && !offerLetterFile) {
+      setError("Please upload the offer letter");
+      return false;
+    }
+
+
+    if (selectedOption?.label === "Visa Issued" && !visaDocumentFile) {
+      setError("Please upload the visa document");
+      return false;
+    }
+
+    if (isCommissionPaid && !commissionPaymentFile) {
+      setError("Please upload commission payment proof");
+      return false;
+    }
+
     setError("");
     return true;
   };
 
   const handleConfirm = async () => {
     if (!validateForm() || !application?.id) return;
+
     setIsSubmitting(true);
 
     try {
-      const selectedDocumentTypeIds: string[] = requiresDocuments
-        ? documents.flatMap((doc) => doc.type).filter(Boolean)
-        : [];
+      if (isVisaIssued) {
+        if (!visaDocumentFile) {
+          setError(
+            "You must upload the visa document before setting status to Visa Issued."
+          );
+          showToast(
+            "You must upload the visa document before setting status to Visa Issued.",
+            "error"
+          );
+          setIsSubmitting(false);
+          return;
+        }
 
-      const payload = {
-        status_id: selectedStatus,
-        reason_text: reason.trim(),
-        notes: notes.trim(),
-        required_document_type_ids: selectedDocumentTypeIds,
-      };
+        await handleVisaIssuedUpload();
+        await handleStatusUpdate();
+      } else if (isUniversityApproved) {
+        if (!offerLetterFile) {
+          setError(
+            "You must upload the offer letter before setting status to University Approved."
+          );
+          showToast(
+            "You must upload the offer letter before setting status to University Approved.",
+            "error"
+          );
+          setIsSubmitting(false);
+          return;
+        }
 
-      await api.post(`/applications/${application.id}/status`, payload);
+        await handleOfferLetterUpload();
+        await handleStatusUpdate();
+      } else if (isVisaSetupSelected) {
+        await handleStatusUpdate();
+        await handleVisaSetup();
+        if (offerLetterFile) await handleOfferLetterUpload();
+        if (visaDocumentFile) await handleVisaIssuedUpload();
+      } else if (isCommissionPaid) {
+        if (!commissionPaymentFile) {
+          setError("Please upload commission payment proof");
+          showToast("Commission payment proof is required.", "error");
+          setIsSubmitting(false);
+          return;
+        }
 
-      showToast("Status updated successfully.", "success");
+        await handleCommissionPaymentUpload();
+        await handleStatusUpdate();
+      } else {
+        await handleStatusUpdate();
 
-      setTimeout(() => window.location.reload(), 2000);
+        if (offerLetterFile) await handleOfferLetterUpload();
+        if (visaDocumentFile) await handleVisaIssuedUpload();
+      }
 
       onConfirm(selectedStatus, reason, notes);
-
       handleClose();
+      setTimeout(() => window.location.reload(), 2000);
     } catch (err: any) {
-      const msg = err.response?.data?.message || "Failed to update status.";
+      const msg =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to update application";
       showToast(msg, "error");
       setError(msg);
     } finally {
@@ -345,16 +473,16 @@ export default function UpdateStatusPopup({
                   Update Application Status
                 </h5>
 
-                <div className="mt-1 flex items-center gap-2 text-sm text-gray-700">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
+                <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+                  <CheckCircle className="h-4 w-4" />
                   <span className="font-medium">Stage:</span>
                   <span className="font-normal">
                     {application?.stage?.name || "No Stage"}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-caption text-gray-600">
-                  <AlertCircle className="h-4 w-4 text-amber-600" />
+                <div className="flex items-center gap-2 text-caption text-slate-500">
+                  <AlertCircle className="h-4 w-4 " />
                   <span className="font-medium">Status:</span>
                   <span className="font-normal">
                     {application?.stage?.statuses?.[0]?.name || "No Status"}
@@ -418,17 +546,15 @@ export default function UpdateStatusPopup({
                   <div
                     key={option.id}
                     title={isDisabled ? "You cannot select this option." : ""}
-                    onClick={() =>
-                      !isDisabled && setSelectedStatus(option.id)
-                    }
+                    onClick={() => !isDisabled && setSelectedStatus(option.id)}
                     className={`rounded-md border p-4 transition-all 
     ${
-                      isDisabled
-                        ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60"
-                        : isSelected
-                          ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
-                          : "cursor-pointer border-default bg-card hover:border-gray-300 hover:shadow"
-                    }
+      isDisabled
+        ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60"
+        : isSelected
+        ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
+        : "cursor-pointer border-default bg-card hover:border-gray-300 hover:shadow"
+    }
   `}
                   >
                     <div className="flex items-center gap-3">
@@ -437,8 +563,8 @@ export default function UpdateStatusPopup({
                           isSelected
                             ? option.color
                             : isDisabled
-                              ? "text-gray-400"
-                              : "text-gray-400"
+                            ? "text-gray-400"
+                            : "text-gray-400"
                         }`}
                       />
                       <div>
@@ -446,13 +572,13 @@ export default function UpdateStatusPopup({
                           {option.label}
                         </p>
                         {option.nextAction && (
-                          <p className="mt-1 text-xs text-text-muted">
+                          <p className="mt-1 text-xs text-slate-500">
                             <span className="font-medium">Next :</span>{" "}
                             {option.nextAction}
                           </p>
                         )}
                         {option.description && (
-                          <p className="mt-0.5 text-xs text-text-muted">
+                          <p className="mt-0.5 text-xs text-slate-500">
                             {option.description}
                           </p>
                         )}
@@ -464,17 +590,33 @@ export default function UpdateStatusPopup({
             )}
           </div>
 
-          {requiresDocuments && (
-            <DocumentRequestList
-              documents={documents}
-              setDocuments={setDocuments}
-              documentTypes={documentTypes}
+          {requiresDocuments &&
+            !isUniversityApproved &&
+            !isVisaIssued &&
+            !isCommissionPaid && (
+              <DocumentRequestList
+                documents={documents}
+                setDocuments={setDocuments}
+                documentTypes={documentTypes}
+              />
+            )}
+
+          {isUniversityApproved && (
+            <StatusFileUpload
+              label="Upload Offer Letter"
+              id="offer-letter"
+              file={offerLetterFile}
+              onFileChange={setOfferLetterFile}
+              onRemove={() => setOfferLetterFile(null)}
+              onError={setError}
+              disabled={isSubmitting}
+              required
             />
           )}
 
           {requiresReason && (
             <div className="space-y-2">
-              <label className="block text-p2 font-medium text-text-muted">
+              <label className="block text-p2 font-medium text-slate-500">
                 Reason <span className="ml-1 text-red-500">*</span>
               </label>
               <textarea
@@ -482,9 +624,58 @@ export default function UpdateStatusPopup({
                 onChange={(e) => setReason(e.target.value)}
                 placeholder="Please provide a detailed reason..."
                 rows={4}
-                className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-text-muted focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
             </div>
+          )}
+
+          {isVisaSetupSelected && (
+            <div className="space-y-2">
+              <InputField
+                label="Visa Fee Amount"
+                field="visa_fee_amount"
+                type="number"
+                placeholder="Enter visa fee amount"
+                required={false}
+                formData={formData}
+                errors={formErrors}
+                updateFormData={updateFormData}
+              />
+              {defaultVisaFee?.amount && (
+                <div className="flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>
+                    Default visa fee is <strong>{defaultVisaFee.amount}</strong>. You can enter a different amount if needed.
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {isVisaIssued && (
+            <StatusFileUpload
+              label="Upload Visa Document"
+              id="visa-document"
+              file={visaDocumentFile}
+              onFileChange={setVisaDocumentFile}
+              onRemove={() => setVisaDocumentFile(null)}
+              onError={setError}
+              disabled={isSubmitting}
+              required
+            />
+          )}
+
+          {isCommissionPaid && (
+            <StatusFileUpload
+              label="Upload Commission Payment Proof"
+              id="commission-payment"
+              file={commissionPaymentFile}
+              onFileChange={setCommissionPaymentFile}
+              onRemove={() => setCommissionPaymentFile(null)}
+              onError={setError}
+              disabled={isSubmitting}
+              required
+            />
           )}
         </div>
 
@@ -492,8 +683,9 @@ export default function UpdateStatusPopup({
           <button
             onClick={handleClose}
             disabled={isSubmitting}
-            className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
           >
+            <XCircle className="h-4 w-4" />
             Cancel
           </button>
           <button
@@ -501,10 +693,12 @@ export default function UpdateStatusPopup({
             disabled={
               !selectedStatus ||
               isSubmitting ||
+              !!error ||
               (requiresReason && !reason.trim())
             }
-            className="rounded-full bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
           >
+            <CheckCircle className="h-4 w-4" />
             {isSubmitting ? "Updating..." : "Update Status"}
           </button>
         </div>
