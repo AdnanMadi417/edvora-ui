@@ -1,6 +1,6 @@
 'use client';
 
-import Notification from "../../../components/notifications/partner/Notifications";
+import Notification from "components/notifications/partner/Notifications";
 
 const Dashboard = () => {
   return (

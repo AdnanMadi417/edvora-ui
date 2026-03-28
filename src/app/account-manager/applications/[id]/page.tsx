@@ -1,66 +1,57 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "next/navigation";
-import api from "lib/useApi";
-import Cookies from "js-cookie";
 import EmptyData from "components/emptyData/EmptyData";
-import ApplicationDetails from "../../../../components/applications/details/account-manager/ApplicationDetails";
-import ApplicationDocuments from "../../../../components/applications/details/account-manager/ApplicationDocuments";
-import OfferLetterCard from "../../../../components/applications/details/account-manager/OfferLetterCard";
-import VisaTrackingTimeline from "../../../../components/applications/details/account-manager/VisaTrackingTimeline";
+import ApplicationDetails from "components/applications/details/account-manager/ApplicationDetails";
+import ApplicationDocuments from "components/applications/details/account-manager/ApplicationDocuments";
 import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import AgentPartnerChat from "components/chat/ApplicationChat";
+import { useUnreadCount } from 'hooks/chat/useUnreadCount';
+import { useAccountManagerApplication } from 'hooks/applications/useAccountManagerApplication';
+import { useMe } from 'hooks/useMe';
 
 export default function ApplicationPage() {
-
   const { id: applicationId } = useParams<{ id: string }>();
-  const { id } = useParams();
-  const [application, setApplication] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { user } = useMe();
   const [chatOpen, setChatOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchApplication = async () => {
-      try {
-        const token = Cookies.get("token");
-        const managerId = localStorage.getItem("managerId");
-        if (!managerId || !id) return;
+  const managerId = user?.id;
 
-        const res = await api.get(
-          `/account-managers/${managerId}/applications/${id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+  const { data: application, loading, error, refetch } = useAccountManagerApplication({
+    managerId: managerId || "",
+    applicationId: applicationId || "",
+  });
 
-        setApplication(res.data);
-      } catch (error) {
-        console.error("Error fetching application:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchApplication();
-  }, [id]);
+  const { unreadCount } = useUnreadCount({
+    applicationId,
+  });
 
   if (loading) return <Loading text="Fetching application data..." />;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
   if (!application) return <EmptyData />;
 
   return (
     <>
       <ApplicationDetails application={application} />
-      <OfferLetterCard application={application} />
       <ApplicationDocuments application={application} />
-      <VisaTrackingTimeline application={application} />
 
       <button
         onClick={() => setChatOpen((v) => !v)}
         aria-label={chatOpen ? "Close chat" : "Open chat"}
         className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg transition hover:scale-105 hover:bg-blue-700"
       >
-        {chatOpen ? <X size={26} /> : <MessageCircle size={28} />}
+        <div className="relative">
+          {chatOpen ? <X size={26} /> : <MessageCircle size={28} />}
+
+          {unreadCount > 0 && !chatOpen && (
+            <span className="absolute -right-6 -top-6 flex h-5 w-5 border-3 border-slate-200  items-center justify-center rounded-full bg-red-500 text-xs font-medium">
+        {unreadCount}
+      </span>
+          )}
+        </div>
       </button>
 
       <AnimatePresence>
@@ -71,7 +62,7 @@ export default function ApplicationPage() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed bottom-24 right-6 z-50 w-96 overflow-hidden rounded-md border bg-card shadow-md dark:border-navy-700 dark:bg-navy-800"
+            className="fixed bottom-24 right-6 z-50 w-96 max-w-full overflow-hidden rounded-md border bg-card shadow-md dark:border-navy-700 dark:bg-navy-800"
           >
             <AgentPartnerChat
               applicationId={applicationId}

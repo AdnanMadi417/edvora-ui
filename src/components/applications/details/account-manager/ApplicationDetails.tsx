@@ -1,5 +1,4 @@
 import React from "react";
-import ApplicationAccountManagerTopBar from "../../topBar/ApplicationAccountManagerTopBar";
 
 import {
   FaTasks,
@@ -22,6 +21,10 @@ import {
 } from 'react-icons/fa';
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
+import OfferLetterCard from '../admin/OfferLetterCard';
+import VisaTrackingTimeline from '../admin/VisaTrackingTimeline';
+import AccountManagerTopBar from "../../topBar/AccountManagerTopBar";
+
 
 interface ApplicationDetailsProps {
   application: any;
@@ -55,7 +58,9 @@ export default function ApplicationDetails({
   const englishProficiency = student.english_proficiencies?.[0] || {};
   const previousEducation = student.previous_educations?.[0] || {};
   const currentStatus = stage.statuses?.[0] || {};
-  const formatGender = (value: boolean) => {
+
+  const formatGender = (value: boolean | null) => {
+    if (value === null) return "Not provided";
     return value ? "Male" : "Female";
   };
 
@@ -71,88 +76,109 @@ export default function ApplicationDetails({
     3: "border-red-200 bg-red-50 text-red-700",
   }[application.lifecycle_status] ?? "border-gray-200 bg-gray-50 text-gray-600";
 
+  const hasEmergencyContact =
+    emergencyContact &&
+    (emergencyContact.name ||
+      emergencyContact.relation ||
+      emergencyContact.phone ||
+      emergencyContact.email)
+
+  const hasEnglishProficiency =
+    englishProficiency &&
+    (englishProficiency.test_type ||
+      englishProficiency.score ||
+      englishProficiency.test_date);
+
+  const hasPreviousEducation =
+    previousEducation &&
+    (previousEducation.institution_name ||
+      previousEducation.start_date ||
+      previousEducation.end_date ||
+      previousEducation.grade);
 
 
   return (
     <section>
+
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
-        <ApplicationAccountManagerTopBar application={application} />
 
-        <div className="flex flex-col items-start gap-4 sm:flex-row">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
-            <FaTasks className="text-lg text-blue-700" />
-          </span>
+        <AccountManagerTopBar application={application} />
 
-          <div className="min-w-0 flex-1 space-y-3">
-            <h3 className="break-words text-base font-semibold text-gray-800">
-              Review {application.program?.name}
-            </h3>
-
-            <div className="flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
-                <FaStream className="text-[10px] text-amber-700" />
-                Stage: {stage.name || "Not provided"}
-              </span>
-
-              <span className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm ${statusClass}`}>
-                <FaCheckCircle className="text-[10px]" />
-                Status: {statusText}
-              </span>
-
-              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
-                <FaClock className="text-[10px] text-purple-700" />
-                {daysSince(application.updated_at)} Days
-              </span>
-            </div>
+        <div className="flex items-start gap-4 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100/40 p-5">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
+            <FaCogs className="text-xl text-blue-600" />
           </div>
 
-          <div className="w-full self-start sm:w-auto sm:text-end">
-            <span className="block truncate text-sm text-text-muted">
-              {student.name || "Not provided"}
-            </span>
-            <span className="block truncate text-xs text-text-muted">
-              {/*{application.id}*/}
-            </span>
-          </div>
-        </div>
+          <div className="flex flex-col gap-1">
+              <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                Current Status
+              </span>
 
-        <div className="block rounded-md border border-gray-200 p-4">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-50">
-              <FaCogs className="text-2xl text-blue-600" />
-            </div>
-
-            <div className="flex flex-col">
-              <span className="text-sm sm:text-base">
-                <span className="font-semibold text-text-primary">
-                  Current Status:{" "}
-                </span>
+            <span className="text-lg font-semibold text-slate-900">
                 {application.stage?.statuses?.[0]?.name ||
                   application.stage?.name ||
                   "Not provided"}
               </span>
 
-              <span className="mt-1 text-xs text-text-muted sm:text-sm">
-                <span className="font-medium">Next Action: </span>
-                {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ??
-                  "Not provided"}
+            <span className="text-sm text-slate-600">
+                <span className="font-medium text-slate-700">Next action → </span>{" "}
+              {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ??
+                "Not provided"}
               </span>
-            </div>
           </div>
         </div>
 
-        <div className="space-y-1">
-          <p className="text-xs text-text-muted sm:text-p2">
-            Application created:{" "}
+        <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
+              <FaTasks className="text-lg text-slate-700" />
+            </div>
+
+            <div className="flex flex-col">
+              <h3 className="text-lg font-semibold text-slate-900">
+                Review {application.program?.name}
+              </h3>
+
+              <span className="text-sm text-slate-500">
+                  Applicant • {student.name || "Not provided"}
+                </span>
+            </div>
+          </div>
+
+          <div className="text-sm text-slate-500">
+            Updated{" "}
             {application?.updated_at
               ? formatDate(application.updated_at)
               : "N/A"}
-          </p>
+          </div>
         </div>
+
+        <div className="flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
+                <FaStream className="text-[10px] text-amber-700" />
+                Stage: {stage.name || "Not provided"}
+              </span>
+
+          <span
+            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm ${statusClass}`}
+          >
+                <FaCheckCircle className="text-[10px]" />
+                Status: {statusText}
+              </span>
+
+          <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
+                <FaClock className="text-[10px] text-purple-700" />
+            {daysSince(application.updated_at)} Days
+              </span>
+        </div>
+
       </div>
 
+      <OfferLetterCard application={application} />
+      <VisaTrackingTimeline application={application} />
+
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
-        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
+        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <MdAssignmentTurnedIn className="text-xl text-blue-700" />
           </span>
@@ -161,70 +187,70 @@ export default function ApplicationDetails({
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           <div>
-            <span className="block text-p1 font-medium text-text-primary">
+            <span className="block text-p1 font-medium text-slate-900">
               Program
             </span>
-            <span className="text-p2 text-text-muted">
+            <span className="text-p2 text-slate-500">
               {program.name || "Not provided"}
             </span>
           </div>
 
           <div>
-            <span className="block text-p1 font-medium text-text-primary">
+            <span className="block text-p1 font-medium text-slate-900">
               University
             </span>
-            <span className="text-p2 text-text-muted">
+            <span className="text-p2 text-slate-500">
               {university.name || "Not provided"}
             </span>
           </div>
 
           <div>
-            <span className="block text-p1 font-medium text-text-primary">
+            <span className="block text-p1 font-medium text-slate-900">
               Country of University
             </span>
-            <span className="text-p2 text-text-muted">
+            <span className="text-p2 text-slate-500">
               {university.country || "Not provided"}
             </span>
           </div>
 
           <div>
-            <span className="block text-p1 font-medium text-text-primary">
+            <span className="block text-p1 font-medium text-slate-900">
               Partner
             </span>
-            <span className="text-p2 text-text-muted">
+            <span className="text-p2 text-slate-500">
               {partner.name || "Not provided"}
             </span>
           </div>
 
           <div>
-            <span className="block text-p1 font-medium text-text-primary">
+            <span className="block text-p1 font-medium text-slate-900">
               Stage
             </span>
-            <span className="text-p2 text-text-muted">
+            <span className="text-p2 text-slate-500">
               {stage.name || "Not provided"}
             </span>
           </div>
 
           <div>
-            <span className="block text-p1 font-medium text-text-primary">
+            <span className="block text-p1 font-medium text-slate-900">
               Status
             </span>
-            <span className="text-p2 text-text-muted">
+            <span className="text-p2 text-slate-500">
               {currentStatus.name || "Not provided"}
             </span>
           </div>
 
           <div>
-            <span className="block text-p1 font-medium text-text-primary">
+            <span className="block text-p1 font-medium text-slate-900">
               Intake Date
             </span>
-            <span className="text-p2 text-text-muted">
+            <span className="text-p2 text-slate-500">
               {formatDate(application.intake_date)}
             </span>
           </div>
 
           <div>
-            <span className="block text-p1 font-medium text-text-primary">
+            <span className="block text-p1 font-medium text-slate-900">
               Tuition Fee
             </span>
             <span className="text-p1 text-text-success">
@@ -235,7 +261,7 @@ export default function ApplicationDetails({
       </div>
 
       <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
-        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
+        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <FaUser className="text-xl text-blue-700" />
           </span>
@@ -243,224 +269,199 @@ export default function ApplicationDetails({
         </h3>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
           <div>
-            <h4 className="mb-3 flex items-center gap-2 text-h6 font-semibold text-text-primary">
+            <h4 className="mb-3 flex items-center gap-2 text-h6 font-semibold text-slate-900">
               <FaUser /> Personal Details
             </h4>
-
             <dl className="space-y-3">
-              <div>
-                <dt className="text-sm font-medium text-text-primary">
-                  Full Name
-                </dt>
-                <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
-                  <FaUser className="text-text-muted" />
-                  {student.name || "Not provided"}
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-sm font-medium text-text-primary">
-                  Gender
-                </dt>
-                <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
-                  <FaUser className="text-text-muted" />
-                  {formatGender(student.gender)}
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-sm font-medium text-text-primary">
-                  Date of Birth
-                </dt>
-                <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
-                  <FaBirthdayCake className="text-text-muted" />
-                  {formatDate(student.birthday)}
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-sm font-medium text-text-primary">
-                  Nationality
-                </dt>
-                <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
-                  <FaFlag className="text-text-muted" />
-                  {student.nationality || "Not provided"}
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-sm font-medium text-text-primary">
-                  Passport Number
-                </dt>
-                <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
-                  <FaIdCard className="text-text-muted" />
-                  {student.passport_number || "Not provided"}
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-sm font-medium text-text-primary">
-                  Email Address
-                </dt>
-                <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
-                  <FaEnvelope className="text-text-muted" />
-                  {student.email || "Not provided"}
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-sm font-medium text-text-primary">
-                  Phone Number
-                </dt>
-                <dd className="mt-1 flex items-center gap-2 text-sm text-text-muted">
-                  <FaPhone className="text-text-muted" />
-                  {student.phone || "Not provided"}
-                </dd>
-              </div>
-
-              <div>
-                <dt className="text-sm font-medium text-text-primary">
-                  Current Address
-                </dt>
-                <dd className="mt-1 flex items-center gap-2 break-words text-sm text-text-muted">
-                  <FaHome className="text-text-muted" />
-                  {student.current_address || "Not provided"}
-                </dd>
-              </div>
+              {student.name && (
+                <div>
+                  <dt className="text-sm font-medium text-slate-900">Full Name</dt>
+                  <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+                    <FaUser className="text-slate-500" />
+                    {student.name}
+                  </dd>
+                </div>
+              )}
+              {student.gender !== null && (
+                <div>
+                  <dt className="text-sm font-medium text-slate-900">Gender</dt>
+                  <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+                    <FaUser className="text-slate-500" />
+                    {formatGender(student.gender)}
+                  </dd>
+                </div>
+              )}
+              {student.birthday && (
+                <div>
+                  <dt className="text-sm font-medium text-slate-900">Date of Birth</dt>
+                  <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+                    <FaBirthdayCake className="text-slate-500" />
+                    {formatDate(student.birthday)}
+                  </dd>
+                </div>
+              )}
+              {student.nationality && (
+                <div>
+                  <dt className="text-sm font-medium text-slate-900">Nationality</dt>
+                  <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+                    <FaFlag className="text-slate-500" />
+                    {student.nationality}
+                  </dd>
+                </div>
+              )}
+              {student.passport_number && (
+                <div>
+                  <dt className="text-sm font-medium text-slate-900">Passport Number</dt>
+                  <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+                    <FaIdCard className="text-slate-500" />
+                    {student.passport_number}
+                  </dd>
+                </div>
+              )}
+              {student.email && (
+                <div>
+                  <dt className="text-sm font-medium text-slate-900">Email Address</dt>
+                  <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+                    <FaEnvelope className="text-slate-500" />
+                    {student.email}
+                  </dd>
+                </div>
+              )}
+              {student.phone && (
+                <div>
+                  <dt className="text-sm font-medium text-slate-900">Phone Number</dt>
+                  <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
+                    <FaPhone className="text-slate-500" />
+                    {student.phone}
+                  </dd>
+                </div>
+              )}
+              {student.current_address && (
+                <div>
+                  <dt className="text-sm font-medium text-slate-900">Current Address</dt>
+                  <dd className="mt-1 flex items-center gap-2 break-words text-sm text-slate-500">
+                    <FaHome className="text-slate-500" />
+                    {student.current_address}
+                  </dd>
+                </div>
+              )}
             </dl>
           </div>
 
-          <div>
-            <div className="mb-6">
-              <h4 className="mb-3 flex items-center gap-2 text-h6 font-semibold text-text-primary">
+          {hasEnglishProficiency && (
+            <div>
+              <h4 className="mb-3 flex items-center gap-2 text-h6 font-semibold text-slate-900">
                 <FaBook /> English Proficiency
               </h4>
-
               <dl className="space-y-3">
-                <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">
-                    Test Name
-                  </dt>
-                  <dd className="text-sm text-text-muted">
-                    {englishProficiency.test_type || "Not provided"}
-                  </dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">
-                    Score
-                  </dt>
-                  <dd className="text-sm font-semibold text-text-muted">
-                    {englishProficiency.score || "Not provided"}
-                  </dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">
-                    Test Date
-                  </dt>
-                  <dd className="text-sm text-text-muted">
-                    {formatDate(englishProficiency.test_date)}
-                  </dd>
-                </div>
+                {englishProficiency.test_type && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-slate-900">Test Name</dt>
+                    <dd className="text-sm text-slate-500">{englishProficiency.test_type}</dd>
+                  </div>
+                )}
+                {englishProficiency.score && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-slate-900">Score</dt>
+                    <dd className="text-sm font-semibold text-slate-500">{englishProficiency.score}</dd>
+                  </div>
+                )}
+                {englishProficiency.test_date && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-slate-900">Test Date</dt>
+                    <dd className="text-sm text-slate-500">{formatDate(englishProficiency.test_date)}</dd>
+                  </div>
+                )}
               </dl>
             </div>
+          )}
 
+          {hasPreviousEducation && (
             <div>
-              <h4 className="mb-3 flex items-center gap-2 text-h6 font-semibold text-text-primary">
+              <h4 className="mb-3 flex items-center gap-2 text-h6 font-semibold text-slate-900">
                 <FaGraduationCap /> Previous Education
               </h4>
-
               <dl className="space-y-3">
-                <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">
-                    Degree
-                  </dt>
-                  <dd className="text-sm text-text-muted">
-                    {previousEducation.qualification || "Not provided"}
-                  </dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">
-                    Institution
-                  </dt>
-                  <dd className="max-w-[60%] break-words text-right text-sm text-text-muted">
-                    {previousEducation.institution_name || "Not provided"}
-                  </dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">
-                    Study Period
-                  </dt>
-                  <dd className="text-sm text-text-muted">
-                    {previousEducation.start_date && previousEducation.end_date
-                      ? `${formatDate(
-                        previousEducation.start_date
-                      )} - ${formatDate(previousEducation.end_date)}`
-                      : "Not provided"}
-                  </dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm font-medium text-text-primary">
-                    GPA / Grade
-                  </dt>
-                  <dd className="text-sm font-bold text-text-muted">
-                    {previousEducation.grade || "Not provided"}
-                  </dd>
-                </div>
+                {application.qualification_level && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-slate-900">Degree</dt>
+                    <dd className="text-sm text-slate-500">{application.qualification_level}</dd>
+                  </div>
+                )}
+                {previousEducation.institution_name && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-slate-900">Institution</dt>
+                    <dd className="max-w-[60%] break-words text-right text-sm text-slate-500">
+                      {previousEducation.institution_name}
+                    </dd>
+                  </div>
+                )}
+                {previousEducation.start_date && previousEducation.end_date && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-slate-900">Study Period</dt>
+                    <dd className="text-sm text-slate-500">
+                      {`${formatDate(previousEducation.start_date)} - ${formatDate(previousEducation.end_date)}`}
+                    </dd>
+                  </div>
+                )}
+                {previousEducation.grade && (
+                  <div className="flex justify-between">
+                    <dt className="text-sm font-medium text-slate-900">GPA / Grade</dt>
+                    <dd className="text-sm font-bold text-slate-500">{previousEducation.grade}</dd>
+                  </div>
+                )}
               </dl>
             </div>
-          </div>
+          )}
 
-          <div>
-            <div className="rounded-lg border border-red-200 bg-red-50 p-4 shadow-sm">
-              <div className="mb-3 flex items-center gap-2">
-                <FaPhoneAlt className="text-xs text-red-600" />
-                <h4 className="text-p2 font-semibold tracking-wide text-red-700">
-                  Emergency Contact
-                </h4>
+          {hasEmergencyContact && (
+            <div>
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4 shadow-sm">
+                <div className="mb-3 flex items-center gap-2">
+                  <FaPhoneAlt className="text-xs text-red-600" />
+                  <h4 className="text-p2 font-semibold tracking-wide text-red-700">Emergency Contact</h4>
+                </div>
+                <dl className="space-y-4">
+                  {emergencyContact.name && (
+                    <div className="grid grid-cols-[auto,1fr] items-start gap-2">
+                      <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                        <FaUser /> Name
+                      </dt>
+                      <dd className="min-w-0 break-words text-sm text-slate-900">{emergencyContact.name}</dd>
+                    </div>
+                  )}
+                  {emergencyContact.relation && (
+                    <div className="grid grid-cols-[auto,1fr] items-start gap-2">
+                      <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                        <FaUsers /> Relation
+                      </dt>
+                      <dd className="min-w-0 text-sm text-slate-900">{emergencyContact.relation}</dd>
+                    </div>
+                  )}
+                  {emergencyContact.phone && (
+                    <div className="grid grid-cols-[auto,1fr] items-start gap-2">
+                      <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                        <FaPhoneAlt /> Phone
+                      </dt>
+                      <dd className="min-w-0 text-sm text-slate-900">{emergencyContact.phone}</dd>
+                    </div>
+                  )}
+                  {emergencyContact.email && (
+                    <div className="grid grid-cols-[auto,1fr] items-start gap-2">
+                      <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                        <FaEnvelope /> Email
+                      </dt>
+                      <dd className="min-w-0 break-all text-sm text-slate-900">{emergencyContact.email}</dd>
+                    </div>
+                  )}
+                </dl>
               </div>
-
-              <dl className="space-y-4">
-                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
-                  <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaUser /> Name
-                  </dt>
-                  <dd className="min-w-0 break-words text-sm text-text-primary">
-                    {emergencyContact.name || "Not provided"}
-                  </dd>
-                </div>
-
-                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
-                  <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaUsers /> Relation
-                  </dt>
-                  <dd className="min-w-0 text-sm text-text-primary">
-                    {emergencyContact.relation || "Not provided"}
-                  </dd>
-                </div>
-
-                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
-                  <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaPhoneAlt /> Phone
-                  </dt>
-                  <dd className="min-w-0 text-sm text-text-primary">
-                    {emergencyContact.phone || "Not provided"}
-                  </dd>
-                </div>
-
-                <div className="grid grid-cols-[auto,1fr] items-start gap-2">
-                  <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
-                    <FaEnvelope /> Email
-                  </dt>
-                  <dd className="min-w-0 break-all text-sm text-text-primary">
-                    {emergencyContact.email || "Not provided"}
-                  </dd>
-                </div>
-              </dl>
-
             </div>
-          </div>
+          )}
         </div>
+
       </div>
     </section>
   );

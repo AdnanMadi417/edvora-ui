@@ -23,7 +23,7 @@ const InputField = ({
                       onChange,
                     }: InputFieldProps) => (
   <div className="space-y-2">
-    <label htmlFor={id} className="block text-p2 font-medium text-text-primary">
+    <label htmlFor={id} className="block text-p2 font-medium text-slate-900">
       {label}
     </label>
     <input
@@ -32,7 +32,7 @@ const InputField = ({
       value={value}
       onChange={onChange}
       placeholder={placeholder}
-      className="w-full rounded-md border border-default px-4 py-3 text-p2 transition-all duration-200 placeholder:text-text-muted outline-none focus:none"
+      className="w-full rounded-md border border-default px-4 py-3 text-p2 transition-all duration-200 placeholder:text-slate-600 outline-none focus:none"
     />
   </div>
 );
@@ -97,7 +97,7 @@ export default function HoldPopup({
                   <h5 className="text-h4 font-bold text-gray-900">
                     Request Resubmission Docs
                   </h5>
-                  <p className="mt-0.5 text-caption text-text-muted">
+                  <p className="mt-0.5 text-caption text-slate-600">
                     Ask the applicant to resubmit or correct specific documents.
                   </p>
                 </div>
@@ -116,7 +116,7 @@ export default function HoldPopup({
           <div className="space-y-5 px-6 py-4">
             <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4">
               <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600" />
-              <p className="text-p2 leading-relaxed text-text-primary">
+              <p className="text-p2 leading-relaxed text-slate-900">
                 This action will request the applicant to re-upload or fix documents.
                 Please include clear instructions or reasons to ensure proper resubmission.
               </p>

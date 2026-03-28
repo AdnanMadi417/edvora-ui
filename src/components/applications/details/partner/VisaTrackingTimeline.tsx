@@ -10,10 +10,12 @@ import {
   Plane,
   XCircle,
   Receipt,
-  CheckCircle,
 } from "lucide-react";
+
 import { useVisaCase } from "hooks/useVisaCase";
 import { useVisaPayments } from "hooks/useVisaPayments";
+import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
+
 import VisaPaymentConfirmation from "../../../applications/popups/partner/VisaPaymentConfirmation";
 import ArrivalDate from "../../../applications/popups/partner/ArrivalDate";
 import { getDocumentDownloadUrl } from "../../../../services/documentService";
@@ -27,6 +29,8 @@ export default function VisaTrackingTimeline({
 }: VisaTrackingTimelineProps) {
   const [isVisaPopupOpen, setIsVisaPopupOpen] = useState(false);
   const [isArrivalPopupOpen, setIsArrivalPopupOpen] = useState(false);
+
+  const { methods, loading: paymentLoading } = useVisaPaymentMethods(application?.id);
 
   const stageName = application?.stage?.name;
   const stageStatuses = application?.stage?.statuses || [];
@@ -86,10 +90,10 @@ export default function VisaTrackingTimeline({
                 <CreditCard className="text-xl text-blue-700" />
               </span>
               <div>
-                <h3 className="text-p3 font-semibold text-text-primary">
+                <h3 className="text-p3 font-semibold text-slate-900">
                   Visa Payment
                 </h3>
-                <span className="text-sm text-text-muted">
+                <span className="text-sm text-slate-500">
                   Visa processing fee details
                 </span>
               </div>
@@ -99,7 +103,7 @@ export default function VisaTrackingTimeline({
 
         <div className="mt-4 grid grid-cols-1 gap-4 border-b border-gray-200 p-6 sm:grid-cols-2">
           <div>
-            <p className="mb-2 text-sm tracking-wide text-text-muted">
+            <p className="mb-2 text-sm tracking-wide text-slate-500">
               Visa Fee Amount
             </p>
             <p className="text-lg font-bold ">
@@ -110,7 +114,7 @@ export default function VisaTrackingTimeline({
           </div>
 
           <div>
-            <p className="mb-2 text-sm tracking-wide text-text-muted">
+            <p className="mb-2 text-sm tracking-wide text-slate-500">
               Created At
             </p>
             <p className="text-sm">
@@ -121,13 +125,54 @@ export default function VisaTrackingTimeline({
           </div>
 
           <div>
-            <p className="mb-2 text-sm tracking-wide text-text-muted">Notes</p>
+            <p className="mb-2 text-sm tracking-wide text-slate-500">Notes</p>
             <p className="text-sm">{visaCase.notes || "No notes"}</p>
           </div>
         </div>
 
+
         {showVisaPayment && (
-          <div className="p-6 pb-0">
+          <div className="p-6 pb-0 block space-y-4">
+
+          {paymentLoading ? (
+          <div className="border-gray-200">
+            <p className="text-sm text-slate-500">Loading payment methods...</p>
+          </div>
+        ) : methods.length > 0 && (
+          <div className="">
+            <div className="mb-4 flex items-center gap-2">
+              <Wallet className="h-4 w-4 text-blue-600" />
+              <h4 className="text-sm font-semibold text-gray-900">Payment Methods</h4>
+            </div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {methods.map((method: any) => (
+                <div
+                  key={method.id}
+                  className="rounded-lg border border-gray-200 bg-gray-50 p-4"
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-blue-600" />
+                      <span className="font-semibold text-gray-900">{method.name}</span>
+                    </div>
+                    {method.currency && (
+                      <span className="rounded-full border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-medium uppercase text-blue-700">
+                        {method.currency}
+                      </span>
+                    )}
+                  </div>
+                  {method.instructions && (
+                    <pre className="whitespace-pre-wrap text-xs leading-relaxed text-slate-600">
+                      {method.instructions}
+                    </pre>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+
             <div className="relative rounded-lg border border-gray-200 p-6">
               <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
 
@@ -143,14 +188,14 @@ export default function VisaTrackingTimeline({
                   </p>
                 </div>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end w-full">
                   <button
                     type="button"
                     onClick={() => setIsVisaPopupOpen(true)}
                     className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200"
                   >
                     <Wallet className="h-4 w-4" />
-                    Continue Payment
+                    Proceed to Payment
                   </button>
                 </div>
               </div>
@@ -167,7 +212,7 @@ export default function VisaTrackingTimeline({
               <p className="text-base font-medium text-gray-900">
                 No payments yet
               </p>
-              <p className="mt-1 text-sm text-text-muted">
+              <p className="mt-1 text-sm text-slate-500">
                 Your payment history will appear here
               </p>
             </div>
@@ -178,7 +223,7 @@ export default function VisaTrackingTimeline({
                   <h3 className="text-lg font-semibold text-gray-900">
                     Payment History
                   </h3>
-                  <p className="text-sm text-text-muted">
+                  <p className="text-sm text-slate-500">
                     {visaPayments.length} payment
                     {visaPayments.length !== 1 ? "s" : ""} recorded
                   </p>
@@ -199,14 +244,14 @@ export default function VisaTrackingTimeline({
                         </p>
 
                         <p className="mt-1 break-all font-mono text-sm font-semibold text-gray-900">
-                          <span className="font-medium text-text-muted">
+                          <span className="font-medium text-slate-500">
                             Payment Reference:
                           </span>{" "}
                           {payment.payment_reference || "N/A"}
                         </p>
 
                         <div className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
-                          <div className="flex items-center gap-2 text-sm text-text-muted">
+                          <div className="flex items-center gap-2 text-sm text-slate-500">
                             <Calendar className="h-4 w-4" />
                             <span>
                               {payment.submitted_at
@@ -221,7 +266,7 @@ export default function VisaTrackingTimeline({
                     </div>
 
                     <div className="flex flex-col items-end gap-2 sm:items-end">
-                      <p className="text-sm font-medium text-text-muted">
+                      <p className="text-sm font-medium text-slate-500">
                         Documents
                       </p>
 
@@ -291,7 +336,7 @@ export default function VisaTrackingTimeline({
             <h3 className="text-lg font-semibold text-gray-900">
               Arrival Documents
             </h3>
-            <p className="text-sm text-text-muted">
+            <p className="text-sm text-slate-500">
               Travel and arrival-related files
             </p>
           </div>
@@ -301,7 +346,7 @@ export default function VisaTrackingTimeline({
             application.arrival_documents.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-10">
                 <FileText className="h-8 w-8 text-gray-400" />
-                <p className="mt-2 text-sm text-text-muted">
+                <p className="mt-2 text-sm text-slate-500">
                   No arrival documents uploaded
                 </p>
               </div>
@@ -321,7 +366,7 @@ export default function VisaTrackingTimeline({
                         <p className="font-medium text-gray-900">
                           {doc.document_type}
                         </p>
-                        <p className="text-xs text-text-muted">
+                        <p className="text-xs text-slate-500">
                           Uploaded on{" "}
                           {new Date(doc.created_at).toLocaleDateString()}
                         </p>

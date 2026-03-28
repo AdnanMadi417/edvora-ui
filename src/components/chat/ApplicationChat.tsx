@@ -8,15 +8,15 @@ import { useChatPolling } from "hooks/chat/useChatPolling";
 import { useMe } from "hooks/useMe";
 import { Send, User } from "lucide-react";
 import Loading from "../loading/Loading";
-import NoMessagesFound from '../emptyData/NoMessagesFound';
+import NoMessagesFound from "../emptyData/NoMessagesFound";
 
 interface AgentPartnerChatProps {
   applicationId: string;
 }
 
 export default function AgentPartnerChat({
-                                           applicationId,
-                                         }: AgentPartnerChatProps) {
+  applicationId,
+}: AgentPartnerChatProps) {
   const { user } = useMe();
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -64,8 +64,7 @@ export default function AgentPartnerChat({
   }
 
   return (
-    <div className="flex h-[70vh] min-h-[320px] max-h-[600px] flex-col bg-card">
-
+    <div className="flex h-[70vh] max-h-[600px] min-h-[320px] flex-col bg-card">
       <header className="bg-blue-600 px-3 py-3 text-white">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
@@ -106,9 +105,15 @@ export default function AgentPartnerChat({
                       : "mr-auto rounded-bl-none border border-default bg-card"
                   }`}
                 >
-                  {msg.message_text}
+                  {!isMine && (
+                    <span className="mb-1 block text-xs font-medium text-slate-500">
+                      {msg.sender_name || "Unknown"}{" "}
+                    </span>
+                  )}
 
-                  <span className="mt-1 block text-right text-xs text-text-muted">
+                  <span>{msg.message_text}</span>
+
+                  <span className="mt-1 block text-right text-xs text-slate-600">
                     {formatTime(msg.created_at)}
                   </span>
                 </div>
@@ -125,32 +130,31 @@ export default function AgentPartnerChat({
       </footer>
 
       <style jsx>{`
-          @keyframes fadeIn {
-              from {
-                  opacity: 0;
-                  transform: translateY(10px);
-              }
-              to {
-                  opacity: 1;
-                  transform: translateY(0);
-              }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
           }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
 
-          @media (prefers-reduced-motion: reduce) {
-              * {
-                  animation: none !important;
-              }
+        @media (prefers-reduced-motion: reduce) {
+          * {
+            animation: none !important;
           }
+        }
       `}</style>
     </div>
   );
 }
 
-
 function ChatInput({
-                     onSend,
-                     sending,
-                   }: {
+  onSend,
+  sending,
+}: {
   onSend: (text: string) => Promise<any>;
   sending: boolean;
 }) {

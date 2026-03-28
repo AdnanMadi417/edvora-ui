@@ -43,10 +43,16 @@ export default function SignInPage() {
           router.replace("/partner/applications");
         }, 100);
 
-      } else if (role === "account_manager" || role === "admin") {
+      } else if (role === "account_manager") {
         localStorage.setItem("managerId", user.manager_id || user.id);
         setTimeout(() => {
           router.replace("/account-manager/applications");
+        }, 100);
+
+      } else if ( role === "admin") {
+        localStorage.setItem("adminId", user.admin_id || user.id);
+        setTimeout(() => {
+          router.replace("/admin/applications");
         }, 100);
 
       } else {

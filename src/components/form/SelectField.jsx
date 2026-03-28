@@ -13,7 +13,7 @@ const SelectField = ({ label, field, options, required = true, formData, errors,
 
   return (
     <div className="mb-4">
-      <label className="block text-p2 font-medium text-text-primary">
+      <label className="block text-p2 font-medium text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}
       </label>
 

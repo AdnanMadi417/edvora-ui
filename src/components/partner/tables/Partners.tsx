@@ -103,7 +103,7 @@ const ModernPartnersTable = () => {
   const SortIndicator = ({ field }) => {
     if (sortConfig.key !== field)
       return (
-        <ChevronUp className="h-4 w-4 text-text-muted opacity-0 transition-opacity group-hover:opacity-100" />
+        <ChevronUp className="h-4 w-4 text-slate-600 opacity-0 transition-opacity group-hover:opacity-100" />
       );
     return sortConfig.direction === "asc" ? (
       <ChevronUp className="h-4 w-4 text-accent" />
@@ -120,10 +120,10 @@ const ModernPartnersTable = () => {
 
           <div className="mb-5 block ">
 
-              <h3 className="text-xl font-semibold text-text-primary">
+              <h3 className="text-xl font-semibold text-slate-900">
                 Partners Dashboard
               </h3>
-              <p className="mt-1 text-sm text-text-muted">
+              <p className="mt-1 text-sm text-slate-600">
                 Monitor partnerships and manage collaboration efficiently.
               </p>
 
@@ -177,7 +177,7 @@ const ModernPartnersTable = () => {
                   setFilterType("all");
                   setFilterCountry("all");
                 }}
-                className="bg-background flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-text-muted outline-0 transition hover:border-text-error hover:text-text-error sm:w-auto"
+                className="bg-background flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-slate-600 outline-0 transition hover:border-text-error hover:text-text-error sm:w-auto"
               >
                 Clear
               </button>
@@ -192,7 +192,7 @@ const ModernPartnersTable = () => {
 
           <thead>
           <tr className="border-b border-default bg-card">
-            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
               <div className="flex items-center gap-2">
                 <Building className="h-4 w-4" />
                 Partner
@@ -200,7 +200,7 @@ const ModernPartnersTable = () => {
               </div>
             </th>
 
-            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
               <div className="flex items-center gap-2">
                 <Tag className="h-4 w-4" />
                 Partner Type
@@ -208,34 +208,34 @@ const ModernPartnersTable = () => {
               </div>
             </th>
 
-            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4" />
                 Contact
               </div>
             </th>
 
-            <th className="min-w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
               <div className="flex items-center gap-2">
                 Country
               </div>
             </th>
 
-            <th className="min-w-[120px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[120px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4" />
                 Status
               </div>
             </th>
 
-            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
               <div className="flex items-center gap-2">
                 <CalendarDays className="h-4 w-4" />
                 Registered Date
               </div>
             </th>
 
-            <th className="min-w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-text-primary">
+            <th className="min-w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 Actions
@@ -249,7 +249,7 @@ const ModernPartnersTable = () => {
               <tr>
                 <td
                   colSpan={7}
-                  className="px-6 py-4 text-center text-text-muted"
+                  className="px-6 py-4 text-center text-slate-600"
                 >
                   Loading partners...
                 </td>
@@ -258,7 +258,7 @@ const ModernPartnersTable = () => {
                <tr>
                   <td
                     colSpan={9}
-                    className="px-6 py-8 text-center text-text-muted"
+                    className="px-6 py-8 text-center text-slate-600"
                   >
                     <EmptyData />
                   </td>
@@ -271,7 +271,7 @@ const ModernPartnersTable = () => {
                   className="group transition-colors hover:bg-primary"
                 >
 
-                  <td className="min-w-[250px] px-6 py-4 flex  items-center gap-2 text-text-primary">
+                  <td className="min-w-[250px] px-6 py-4 flex  items-center gap-2 text-slate-900">
                     <div className="">
                       <Image
                         width="40"
@@ -285,20 +285,20 @@ const ModernPartnersTable = () => {
                     {app.businessName}
                   </td>
 
-                  <td className="min-w-[200px] px-6 py-4 text-text-muted">
+                  <td className="min-w-[200px] px-6 py-4 text-slate-600">
                     {app.type}
                   </td>
 
-                  <td className="min-w-[200px] px-6 py-4 text-text-muted">
+                  <td className="min-w-[200px] px-6 py-4 text-slate-600">
                     <span className="block font-semibold">
                       {app.emailContact}
                     </span>
-                    <span className="block font-normal text-text-primary">
+                    <span className="block font-normal text-slate-900">
                       {app.phoneContact}
                     </span>
                   </td>
 
-                  <td className="min-w-[150px] px-6 py-4 text-text-muted">
+                  <td className="min-w-[150px] px-6 py-4 text-slate-600">
                     {app.country}
                   </td>
 
@@ -306,7 +306,7 @@ const ModernPartnersTable = () => {
                     <StatusBadge status={app.status} />
                   </td>
 
-                  <td className="min-w-[150px] px-6 py-4 text-text-muted">
+                  <td className="min-w-[150px] px-6 py-4 text-slate-600">
                     {new Date(app.registeredAt).toLocaleDateString()}
                   </td>
 
@@ -314,7 +314,7 @@ const ModernPartnersTable = () => {
                     <Link
                       href={`/account-manager/partners/${app.id}`}
                       aria-label="View Partner"
-                      className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-full border border-default p-2 text-sm text-text-muted transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+                      className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-full border border-default p-2 text-sm text-slate-600 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
                     >
                       <Eye className="h-4 w-4" />
                       <span className="text-caption">View </span>
@@ -330,7 +330,7 @@ const ModernPartnersTable = () => {
       </div>
 
       <div className="sticky bottom-0 rounded-b-lg border border-default bg-card px-6 py-4">
-        <div className="flex flex-col items-center justify-between gap-3 text-sm text-text-muted md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-3 text-sm text-slate-600 md:flex-row">
           <div>
             Showing{" "}
             <span className="font-medium">
@@ -358,7 +358,7 @@ const ModernPartnersTable = () => {
             >
               Previous
             </button>
-            <span className="px-2 text-text-muted">
+            <span className="px-2 text-slate-600">
               Page {currentPage} of {totalPages}
             </span>
             <button

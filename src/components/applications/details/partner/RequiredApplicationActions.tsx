@@ -70,14 +70,14 @@ export default function RequiredApplicationActions({
   return (
     <section>
       <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
-        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-text-primary">
+        <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
           <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
             <FaArrowCircleRight className="text-xl text-blue-700" />
           </span>
 
           <span className="flex flex-col">
             <span>Required Application Actions</span>
-            <span className="mt-1 text-p2 font-normal text-text-muted">
+            <span className="mt-1 text-p2 font-normal text-slate-500">
               {appDetails.next_action || "Not provided"}
             </span>
           </span>
@@ -106,7 +106,7 @@ export default function RequiredApplicationActions({
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
                       <FaFileAlt className="h-4 w-4 text-blue-700" />
                     </div>
-                    <h3 className="truncate text-base font-semibold text-text-primary">
+                    <h3 className="truncate text-base font-semibold text-slate-900">
                       {status.name}
                     </h3>
                   </div>

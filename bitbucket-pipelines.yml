@@ -26,14 +26,16 @@ pipelines:
             - export IMAGE_FULL="${IMAGE_NAME}:${IMAGE_TAG}"
 
             # backend env
-            - echo "APP_NAME=Unibexs UI" > .env.local
-            - echo "NODE_ENV=$NODE_ENV" >> .env.local
-            - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env.local
+            - echo "APP_NAME=Unibexs UI" > .env.staging
+            - echo "NODE_ENV=$NODE_ENV" >> .env.staging
+            - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env.staging
+
             # Build and push the Docker image
             - docker build
               --progress=plain
               --shm-size=2gb
               --build-arg BUILDKIT_INLINE_CACHE=1
+              --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
               --cache-from ${IMAGE_NAME}:staging-latest
               -t ${IMAGE_FULL}
               -t ${IMAGE_NAME}:staging-latest
@@ -48,14 +50,19 @@ pipelines:
             - echo "Image pushed successfully:"
             - echo "  ${IMAGE_FULL}"
             - echo "  ${IMAGE_NAME}:staging-latest"
-
-      - step:
-          name: Send alert to Slack
-          script:
+          after-script:
+            - export STATUS="SUCCESS"
+            - if [ "$BITBUCKET_EXIT_CODE" -ne 0 ]; then export STATUS="FAILURE"; fi
+            - export SHORT_COMMIT="${BITBUCKET_COMMIT:0:7}"
             - pipe: atlassian/slack-notify:2.3.1
               variables:
                 WEBHOOK_URL: $WEBHOOK_URL
-                MESSAGE: '"[$NODE_ENV] Unibexs UI build has exited with status $build_status"'
+                MESSAGE: >-
+                  "[${STATUS}] ${NODE_ENV} Unibexs UI pipeline
+                  repo=${BITBUCKET_REPO_FULL_NAME}
+                  branch=${BITBUCKET_BRANCH}
+                  commit=${SHORT_COMMIT}
+                  image=registry.digitalocean.com/unibexs-internal/unibexs-frontend:staging-${SHORT_COMMIT}"
 definitions:
   services:
     docker:
