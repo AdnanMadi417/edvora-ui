@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, Plane, Upload, Trash2, CheckCircle } from 'lucide-react';
-import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import api from "../../../../lib/useApi";
-import { useToast } from "../../../context/ToastContext";
+import { XCircle, Plane, CheckCircle, AlertCircle } from 'lucide-react';
 import { InputField } from "components/form";
+import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import { useArrivalDateUpload } from "hooks/applications/files/useArrivalDateUpload";
 
 
 interface ArrivalDateConfirmationProps {
@@ -22,8 +21,8 @@ export default function ArrivalDateConfirmation({
   const [isVisible, setIsVisible] = useState(false);
   const [arrivalDate, setArrivalDate] = useState<string>("");
   const [ticketFile, setTicketFile] = useState<File | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { showToast } = useToast();
+  const [fileError, setFileError] = useState("");
+  const { submitArrivalDate, isSubmitting } = useArrivalDateUpload();
 
   const [formData, setFormData] = useState({
     arrival_date: "",
@@ -43,51 +42,19 @@ export default function ArrivalDateConfirmation({
   }, [isOpen]);
 
   const handleConfirm = async () => {
-    if (!formData.arrival_date) {
-      showToast("Please select an arrival date", "error");
-      return;
-    }
-
     try {
-      setIsSubmitting(true);
-
-      let ticketData = null;
-      if (ticketFile) {
-        showToast("Uploading travel ticket...", "info");
-
-        const presigned = await getPresignedUploads([ticketFile], "travel_ticket");
-        const results = await uploadFilesToSpaces([ticketFile], presigned);
-        const uploaded = results?.[0];
-
-        if (!uploaded?.file_key || !uploaded?.public_url) {
-          throw new Error("Travel ticket upload failed");
-        }
-
-        ticketData = {
-          ticket_file_key: uploaded.file_key,
-          ticket_file_url: uploaded.public_url,
-        };
-      }
-
-      await api.patch(`/applications/${applicationId}/arrival-date`, {
-        arrival_date: formData.arrival_date,
-        ...ticketData,
-      });
-
-      showToast("Arrival date submitted successfully", "success");
-      setTimeout(() => window.location.reload(), 2000);
+      await submitArrivalDate(applicationId, formData.arrival_date, ticketFile);
       handleClose();
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to submit arrival date", "error");
-    } finally {
-      setIsSubmitting(false);
+      setTimeout(() => window.location.reload(), 2000);
+    } catch {
+      // error handled inside hook
     }
   };
 
   const handleClose = () => {
     setFormData({ arrival_date: "" });
     setTicketFile(null);
+    setFileError("");
     onClose();
   };
 
@@ -135,6 +102,13 @@ export default function ArrivalDateConfirmation({
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
 
+            {fileError && (
+              <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+                <p className="text-sm text-red-700">{fileError}</p>
+              </div>
+            )}
+
             <div className="space-y-2">
               <InputField
                 label="Arrival Date"
@@ -147,41 +121,15 @@ export default function ArrivalDateConfirmation({
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="block font-medium text-gray-900">Travel Ticket</label>
-              <label
-                htmlFor="ticket_file"
-                className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-gray-50 px-6 py-8 text-center transition hover:border-blue-500 hover:bg-blue-50/30"
-              >
-                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                  <Upload className="h-6 w-6" />
-                </div>
-                <p className="font-medium text-gray-900">Upload Travel Ticket</p>
-                <p className="mt-1 text-xs text-gray-500">PDF, JPG, PNG — Max 5MB</p>
-                <input
-                  id="ticket_file"
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  className="hidden"
-                  disabled={isSubmitting}
-                  onChange={(e) => setTicketFile(e.target.files?.[0] || null)}
-                />
-              </label>
-
-              {ticketFile && (
-                <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
-                  <span className="truncate text-sm text-slate-500">{ticketFile.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => setTicketFile(null)}
-                    className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Remove
-                  </button>
-                </div>
-              )}
-            </div>
+            <StatusFileUpload
+              label="Travel Ticket"
+              id="ticket_file"
+              file={ticketFile}
+              onFileChange={setTicketFile}
+              onRemove={() => setTicketFile(null)}
+              onError={setFileError}
+              disabled={isSubmitting}
+            />
           </div>
 
           <div className="border-t border-gray-200 px-6 py-4">
@@ -194,7 +142,7 @@ export default function ArrivalDateConfirmation({
                 Cancel
               </button>
               <button
-                disabled={!formData.arrival_date || !ticketFile || isSubmitting}
+                disabled={!formData.arrival_date || !ticketFile || !!fileError || isSubmitting}
                 onClick={handleConfirm}
                 className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
               >

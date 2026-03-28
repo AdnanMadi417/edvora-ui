@@ -29,7 +29,7 @@ const partnerRoutes: IRoute[] = [
   {
     name: "Knowledge Hub",
     layout: "/partner",
-    path: "/knowledgeHub",
+    path: "/knowledge-hub",
     icon: MdMenuBook,
   },
 

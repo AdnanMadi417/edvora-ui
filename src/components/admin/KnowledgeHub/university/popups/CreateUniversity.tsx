@@ -10,7 +10,7 @@ import MultipleDatePickerModal from "../../../../form/MultipleDatePickerModal";
 
 import InputField from "../../../../form/InputField";
 
-import { useCreateUniversity } from "hooks/knowledge-hub/universities/useCreateKnowledgeHubUniversity";
+import { useCreateUniversity } from "../../../../../hooks/knowledge-hub/universities/useCreateUniversity";
 import { useToast } from "components/context/ToastContext";
 
 interface CreateUniversityProps {

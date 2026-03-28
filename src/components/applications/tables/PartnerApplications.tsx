@@ -16,20 +16,23 @@ import {
   ArrowRight,
   ArrowLeft, UserSearch, GitBranch, UserPlus, RotateCcw,
 } from 'lucide-react';
+import { MdSchool } from 'react-icons/md';
+
 import Link from 'next/link';
-import EmptyData from 'components/emptyData/EmptyTableData';
+import { useRouter } from 'next/navigation';
 import api from 'lib/useApi';
 import Cookies from 'js-cookie';
-import NextButton from '../../ui/buttons/NextButton';
-import PrevButton from '../../ui/buttons/PrevButton';
-import ClearButton from '../../ui/buttons/DangerButton';
-import Button from '../../ui/buttons/Button';
-import { useRouter } from 'next/navigation';
-import FilterSelectField from '../../form/filter/FilterSelectField';
-import { MdSchool } from 'react-icons/md';
+
+import EmptyData from 'components/emptyData/EmptyTableData';
+import NextButton from 'components/ui/buttons/NextButton';
+import PrevButton from 'components/ui/buttons/PrevButton';
+import ClearButton from 'components/ui/buttons/DangerButton';
+import Button from 'components/ui/buttons/Button';
+import FilterSelectField from 'components/form/filter/FilterSelectField';
+
 import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
-import { useAllStages } from '../../../hooks/applications/stages/useStages';
-import { useAllStageStatuses } from '../../../hooks/applications/stages/useStageStatuses';
+import { useAllStages } from 'hooks/applications/stages/useStages';
+import { useAllStageStatuses } from 'hooks/applications/stages/useStageStatuses';
 
 const PartnerApplications = () => {
 
@@ -111,8 +114,7 @@ const PartnerApplications = () => {
     if (selectedStageStatus !== "all" && !stageStatusesLoading) {
       filtered = filtered.filter(
         (app) =>
-          app.status?.toLowerCase().replace(/\s+/g, "_") ===
-          selectedStageStatus.toLowerCase()
+          app.status?.toLowerCase().replace(/\s+/g, "_") === selectedStageStatus
       );
     }
 
@@ -276,21 +278,24 @@ const PartnerApplications = () => {
 
             <div className="w-full sm:w-48 flex-shrink-0">
               <FilterSelectField
-                value={selectedStageStatus}
-                onChange={(val) => setSelectedStageStatus(val)}
-                options={stageStatuses.map((s) => s.name)}
-                icon={BadgeCheck}
-                defaultOption={stageStatusesLoading ? "Loading statuses..." : "All Statuses"}
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
                 value={selectedUniversity}
                 onChange={(val) => setSelectedUniversity(val)}
                 options={universities}
                 icon={MdSchool}
                 defaultOption="All Universities"
+              />
+            </div>
+
+            <div className="w-full sm:w-48 flex-shrink-0">
+              <FilterSelectField
+                value={selectedStageStatus}
+                onChange={(val) => setSelectedStageStatus(val)}
+                options={stageStatuses.map(s => ({
+                  label: s.name,
+                  value: s.name.toLowerCase().replace(/\s+/g, "_")
+                }))}
+                icon={BadgeCheck}
+                defaultOption={stageStatusesLoading ? "Loading statuses..." : "All Statuses"}
               />
             </div>
 

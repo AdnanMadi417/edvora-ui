@@ -55,7 +55,7 @@ export default function StageAdditionalInfo({
 
   return (
     <div className="space-y-5">
-      {/* Student Information */}
+
       {hasStudentInfoFields && (
         <div className="mb-8">
           <h3 className="mb-4 font-semibold uppercase text-slate-900">
@@ -151,7 +151,6 @@ export default function StageAdditionalInfo({
         </div>
       )}
 
-      {/* Emergency Contacts */}
       {hasEmergencyFields && (
         <div className="mb-8">
           <h3 className="mb-4 font-semibold uppercase text-slate-900">
@@ -196,7 +195,6 @@ export default function StageAdditionalInfo({
         </div>
       )}
 
-      {/* Educational Background */}
       {hasEducationalFields && (
         <div className="mb-8">
           <div className="flex items-center justify-between">

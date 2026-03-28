@@ -14,17 +14,19 @@ import {
   ArrowLeft,
   ArrowRight, UserSearch, GitBranch, RotateCcw,
 } from 'lucide-react';
-import Link from "next/link";
-import EmptyData from "components/emptyData/EmptyTableData";
-import PrevButton from "../../ui/buttons/PrevButton";
-import NextButton from "../../ui/buttons/NextButton";
-import ClearButton from "../../ui/buttons/DangerButton";
-import { useAdminApplications } from "hooks/applications/useAdminApplications";
-import { useAllUniversities } from '../../../hooks/knowledge-hub/universities/useUniversitiesList';
-import FilterSelectField from '../../form/filter/FilterSelectField';
 import { MdSchool } from 'react-icons/md';
-import { useAllStages } from '../../../hooks/applications/stages/useStages';
-import { useAllStageStatuses } from '../../../hooks/applications/stages/useStageStatuses';
+import Link from "next/link";
+
+import { useAdminApplications } from "hooks/applications/useAdminApplications";
+import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
+import { useAllStages } from 'hooks/applications/stages/useStages';
+import { useAllStageStatuses } from 'hooks/applications/stages/useStageStatuses';
+
+import EmptyData from "components/emptyData/EmptyTableData";
+import PrevButton from "components/ui/buttons/PrevButton";
+import NextButton from "components/ui/buttons/NextButton";
+import ClearButton from "components/ui/buttons/DangerButton";
+import FilterSelectField from 'components/form/filter/FilterSelectField';
 
 const ModernApplicationsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -81,8 +83,7 @@ const ModernApplicationsTable = () => {
     if (selectedStageStatus !== "all" && !stageStatusesLoading) {
       filtered = filtered.filter(
         (app) =>
-          app.status?.toLowerCase().replace(/\s+/g, "_") ===
-          selectedStageStatus.toLowerCase()
+          app.status?.toLowerCase().replace(/\s+/g, "_") === selectedStageStatus
       );
     }
 
@@ -187,7 +188,10 @@ const ModernApplicationsTable = () => {
               <FilterSelectField
                 value={selectedStageStatus}
                 onChange={(val) => setSelectedStageStatus(val)}
-                options={stageStatuses.map((s) => s.name)}
+                options={stageStatuses.map(s => ({
+                  label: s.name,
+                  value: s.name.toLowerCase().replace(/\s+/g, "_")
+                }))}
                 icon={BadgeCheck}
                 defaultOption={stageStatusesLoading ? "Loading statuses..." : "All Statuses"}
               />

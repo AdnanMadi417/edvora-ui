@@ -22,6 +22,8 @@ export type UpdateProgramPayload = {
   commission_amount?: number | null;
   commission_type_id?: string | null;
   commission_notes?: string | null;
+  expected_commission_from?: string | null;
+  expected_commission_to?: string | null;
 
   yearly_fees?: Array<{ year: number; fee: number }>;
   one_time_fees?: Array<{ description: string; fee: number }>;
@@ -32,6 +34,7 @@ export type UpdateProgramPayload = {
     max_amount: number;
     name: string;
     description: string;
+    conditions: string[];
   }>;
 };
 
@@ -79,6 +82,8 @@ export function useUpdateProgram() {
       commission_amount: payload.commission_amount ?? null,
       commission_type_id: payload.commission_type_id ?? null,
       commission_notes: payload.commission_notes?.trim() ?? null,
+      expected_commission_from: payload.expected_commission_from ?? null,
+      expected_commission_to: payload.expected_commission_to ?? null,
     };
   };
 

@@ -37,7 +37,11 @@ export type Program = {
 
   duration: number | null;
 
-  yearly_fees: number[];
+  yearly_fees: {
+    year: string;
+    fee: string;
+  }[];
+
   one_time_fees: number[];
 
   english_required_score: number | null;

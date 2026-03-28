@@ -4,11 +4,11 @@ import React, { useState, useEffect } from "react";
 import { Plus, PlusCircle, Trash2, Edit2 } from "lucide-react";
 import ModalHeader from "../../../ui/modal/ModalHeader";
 
-import { useLogisticServices } from "../../../../hooks/serviceProviders/useLogisticServicesList";
-import { useLogisticServiceLocations } from "../../../../hooks/serviceProviders/uselogisticServiceLocationsList";
-import { useLogisticLanguages } from "../../../../hooks/serviceProviders/useLogisticLanguages";
-import { useLogisticUniversities } from "../../../../hooks/serviceProviders/useLogisticUniversitiesList";
-import { useEditLogisticsProvider } from "../../../../hooks/serviceProviders/useEditLogisticsProvider";
+import { useLogisticServices } from "hooks/service-providers/useLogisticServicesList";
+import { useLogisticServiceLocations } from "hooks/service-providers/uselogisticServiceLocationsList";
+import { useLogisticLanguages } from "hooks/service-providers/useLogisticLanguages";
+import { useLogisticUniversities } from "hooks/service-providers/useLogisticUniversitiesList";
+import { useEditLogisticsProvider } from "hooks/service-providers/useEditLogisticsProvider";
 
 import CheckSimpleBoxGroup from "../../../form/CheckSimpleBoxGroup";
 import InputField from "../../../form/InputField";

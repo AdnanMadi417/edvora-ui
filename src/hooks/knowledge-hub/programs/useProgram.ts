@@ -33,6 +33,7 @@ export type Scholarship = {
   max_amount: number;
   name: string ;
   description: string;
+  conditions : string[];
 };
 
 type YearlyFee = {
@@ -49,6 +50,9 @@ export type Commission = {
   amount: number | null;
   type: string | null;
   notes: string | null;
+  expected_commission_from:string;
+  expected_commission_to:string;
+
 };
 
 export type Program = {
@@ -91,6 +95,8 @@ export type Program = {
     type: string;
     code: string;
     description: string;
+    is_init_app_doc:string;
+    is_required_init_app_doc: boolean;
   }[];
 };
 

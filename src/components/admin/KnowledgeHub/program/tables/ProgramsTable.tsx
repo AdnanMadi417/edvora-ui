@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState,useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Search,
   RefreshCw,
@@ -16,25 +16,36 @@ import {
   XCircle,
   Globe,
   Trash2,
+  ClipboardCheck,
+  CalendarDays,
+  Sliders,
 } from 'lucide-react';
-import { MdSchool, MdLibraryAdd } from "react-icons/md";
+import { MdSchool, MdLibraryAdd, MdVerified } from 'react-icons/md';
+import { AiOutlineBank } from "react-icons/ai";
+
 import { useToast } from "components/context/ToastContext";
 
-import { AiOutlineBank } from "react-icons/ai";
 import { useAllPrograms } from "hooks/knowledge-hub/programs/useProgramsList";
-import { useAllFields } from "hooks/knowledge-hub/programs/useFieldsList";
-import { useKnowledgeHubStates } from "hooks/knowledge-hub/programs/useProgramStates";
-import { useDeleteKnowledgeHubPrograms } from "hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms";
+import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
+import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
+import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
+import { useDeletePrograms } from "hooks/knowledge-hub/programs/useDeletePrograms";
 import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
 
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
-import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
-import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/BatchUpdatePrograms";
 import Loading from "components/loading/Loading";
 import NoMessagesFound from 'components/emptyData/NoMessagesFound';
 import Link from "next/link";
+
+import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
+import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/BatchCommissionPrograms";
+import BatchIELTSPrograms from "components/admin/KnowledgeHub/program/popups/BatchIELTSPrograms";
+import BatchProgramIntakes from "components/admin/KnowledgeHub/program/popups/BatchProgramIntakes";
+import BatchProgramScholarship from "components/admin/KnowledgeHub/program/popups/BatchProgramScholarship";
+import DefaultVisaFee from "components/admin/KnowledgeHub/program/popups/DefaultVisaFee";
+
 
 const ProgramsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -45,13 +56,15 @@ const ProgramsTable = () => {
     error,
   } = useAllPrograms({});
 
-  const { states } = useKnowledgeHubStates();
+  const { states } = useAllStates();
   const { fields} = useAllFields();
   const { universities } = useAllUniversities();
+  const { qualifications } = useAllQualifications();
 
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
+  const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(
     null
   );
@@ -59,9 +72,14 @@ const ProgramsTable = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteMode, setDeleteMode] = useState<"single" | "batch" | null>(null);
-  const { deletePrograms } = useDeleteKnowledgeHubPrograms();
+  const { deletePrograms } = useDeletePrograms();
 
   const [isBatchUpdateOpen, setIsBatchUpdateOpen] = useState(false);
+  const [isBatchIeletsUpdateOpen, setIsBatchIeltsUpdateOpen] = useState(false);
+  const [isBatchIntakesUpdateOpen, setIsBatchIntakesUpdateOpen] = useState(false);
+  const [isBatchScholarshipsUpdateOpen, setIsBatchScholarshipsUpdateOpen] = useState(false);
+  const [isBulkMenuOpen, setIsBulkMenuOpen] = useState(false);
+  const [isVisaFeeOpen, setIsVisaFeeOpen] = useState(false);
 
   const { showToast } = useToast();
 
@@ -77,6 +95,7 @@ const ProgramsTable = () => {
     const hasStateFilter = selectedState !== "all";
     const hasFieldFilter = selectedField !== "all";
     const hasUniversityFilter = selectedUniversity !== "all";
+    const hasLevelFilter = selectedLevel !== "all";
 
     return programs.filter((program) => {
 
@@ -100,9 +119,13 @@ const ProgramsTable = () => {
       const matchesUniversity =
         !hasUniversityFilter || program.university?.name === selectedUniversity;
 
-      return matchesSearch && matchesState && matchesField && matchesUniversity;
+      const matchesLevel =
+        !hasLevelFilter || program.qualification_level === selectedLevel;
+
+
+      return matchesSearch && matchesState && matchesField && matchesUniversity && matchesLevel;
     });
-  }, [programs, searchTerm, selectedState, selectedField , selectedUniversity]);
+  }, [programs, searchTerm, selectedState, selectedField , selectedUniversity, selectedLevel]);
 
   const currentPrograms = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -188,7 +211,7 @@ const ProgramsTable = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedState, selectedField]);
+  }, [searchTerm, selectedState, selectedField, selectedUniversity, selectedLevel]);
 
   const selectedProgramIds = useMemo(() => {
     return Object.keys(selectedPrograms).filter(
@@ -197,17 +220,22 @@ const ProgramsTable = () => {
   }, [selectedPrograms]);
 
   const handleSelectAll = () => {
-    const allSelected = Object.values(selectedPrograms).every(Boolean);
-    const newSelection: Record<string, boolean> = {};
-    Object.keys(selectedPrograms).forEach((id) => {
+    const filteredIds = filteredPrograms.map((p) => p.id);
+
+    const allSelected = filteredIds.every((id) => selectedPrograms[id]);
+
+    const newSelection = { ...selectedPrograms };
+
+    filteredIds.forEach((id) => {
       newSelection[id] = !allSelected;
     });
+
     setSelectedPrograms(newSelection);
   };
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -268,6 +296,16 @@ const ProgramsTable = () => {
               />
             </div>
 
+            <div className="w-full sm:w-48 flex-shrink-0">
+              <FilterSelectField
+                value={selectedLevel}
+                onChange={(val) => { setSelectedLevel(val); setCurrentPage(1); }}
+                options={qualifications}
+                icon={MdVerified}
+                defaultOption="All Qualifications"
+              />
+            </div>
+
             <div className="w-full sm:w-auto flex-shrink-0">
               <button
                 onClick={() => {
@@ -275,6 +313,7 @@ const ProgramsTable = () => {
                   setSelectedState("all");
                   setSelectedField("all");
                   setSelectedUniversity("all");
+                  setSelectedLevel("all");
                   setCurrentPage(1);
                 }}
                 className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
@@ -295,28 +334,58 @@ const ProgramsTable = () => {
               </Link>
 
               {selectedCount > 0 && (
-                <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
-                  <button
-                    onClick={() => {
-                      setDeleteMode("batch");
-                      setIsDeleteOpen(true);
-                    }}
-                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-red-500 px-4 py-2.5 text-sm text-red-500 outline-0 transition hover:border-red-700 hover:text-red-700 sm:w-auto"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                    Delete Programs
-                  </button>
-
-                  <button
-                    onClick={() => setIsBatchUpdateOpen(true)}
-                    className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
-                    <Pencil className="h-4 w-4" />
-                    Update Programs
-                  </button>
-
-                  <div className="flex items-center gap-2 text-sm text-slate-500">
+                <div className="flex items-center gap-2 rounded-full border border-slate-100 bg-slate-50/60 px-3 py-1.5">
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
+                    <CheckCircle className="h-4 w-4" />
                     {selectedCount} selected
+                  </span>
+
+                  <div className="mx-1 h-4 w-px bg-slate-200" />
+
+                  <div className="relative">
+                    <button
+                      onClick={() => setIsBulkMenuOpen((prev) => !prev)}
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${isBulkMenuOpen ? "bg-white text-blue-700 shadow-sm" : "text-slate-600 hover:bg-white hover:text-blue-700 hover:shadow-sm"}`}
+                    >
+                      <Settings className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Bulk Update</span>
+                      <svg className={`h-3 w-3 transition-transform ${isBulkMenuOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                    </button>
+
+                    {isBulkMenuOpen && (
+                      <>
+                        <div className="fixed inset-0 z-[90]" onClick={() => setIsBulkMenuOpen(false)} />
+                        <div className="absolute left-0 top-full z-[100] mt-2 w-52 rounded-2xl border border-slate-100 bg-white p-1.5 shadow-xl shadow-slate-200/60">
+                          {[
+                            { label: "Commission", icon: <Pencil className="h-3.5 w-3.5 text-blue-600" />, bg: "bg-blue-50", onClick: () => setIsBatchUpdateOpen(true) },
+                            { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setIsBatchIeltsUpdateOpen(true) },
+                            { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setIsBatchIntakesUpdateOpen(true) },
+                            { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setIsBatchScholarshipsUpdateOpen(true) },
+                            { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setIsVisaFeeOpen(true) },
+                          ].map(({ label, icon, bg, onClick }) => (
+                            <button
+                              key={label}
+                              onClick={() => { onClick(); setIsBulkMenuOpen(false); }}
+                              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50"
+                            >
+                              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${bg}`}>{icon}</span>
+                              {label}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
+
+                  <div className="mx-1 h-4 w-px bg-slate-200" />
+
+                  <button
+                    onClick={() => { setDeleteMode("batch"); setIsDeleteOpen(true); }}
+                    className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-white hover:shadow-sm"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span className="hidden sm:inline">Delete</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -340,8 +409,8 @@ const ProgramsTable = () => {
                     type="checkbox"
                     className="h-4 w-4 rounded border-slate-300 text-blue-600"
                     checked={
-                      Object.values(selectedPrograms).length > 0 &&
-                      Object.values(selectedPrograms).every(Boolean)
+                      filteredPrograms.length > 0 &&
+                      filteredPrograms.every((p) => selectedPrograms[p.id])
                     }
                     onChange={handleSelectAll}
                   />
@@ -548,7 +617,7 @@ const ProgramsTable = () => {
                             <span className="font-semibold text-slate-700">
                               First Year Tuition:
                             </span>
-                        <span>{Program.first_year_tuition ?? "—"} RM</span>
+                        <span>{Program.yearly_fees?.[0]?.fee ?? "—"} RM</span>
                       </div>
                       <div className="flex items-center gap-1">
                             <span className="font-semibold text-slate-700">
@@ -702,6 +771,29 @@ const ProgramsTable = () => {
         isOpen={isBatchUpdateOpen}
         onClose={() => setIsBatchUpdateOpen(false)}
         selectedProgramIds={selectedProgramIds}
+      />
+
+      <BatchIELTSPrograms
+        isOpen={isBatchIeletsUpdateOpen}
+        onClose={() => setIsBatchIeltsUpdateOpen(false)}
+        selectedProgramIds={selectedProgramIds}
+      />
+
+       <BatchProgramIntakes
+        isOpen={isBatchIntakesUpdateOpen}
+        onClose={() => setIsBatchIntakesUpdateOpen(false)}
+        selectedProgramIds={selectedProgramIds}
+      />
+
+      <BatchProgramScholarship
+        isOpen={isBatchScholarshipsUpdateOpen}
+        onClose={() => setIsBatchScholarshipsUpdateOpen(false)}
+        selectedProgramIds={selectedProgramIds}
+      />
+
+      <DefaultVisaFee
+        isOpen={isVisaFeeOpen}
+        onClose={() => setIsVisaFeeOpen(false)}
       />
 
     </div>

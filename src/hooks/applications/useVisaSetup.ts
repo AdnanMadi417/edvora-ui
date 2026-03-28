@@ -14,10 +14,6 @@ export const useVisaSetup = (): UseVisaSetupReturn => {
   const { showToast } = useToast();
 
   const submitVisaFee = async (applicationId: string, amount: number) => {
-    if (!amount || amount <= 0) {
-      throw new Error("Visa fee amount is required");
-    }
-
     try {
       setIsSubmitting(true);
 

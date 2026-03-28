@@ -384,6 +384,18 @@ export const DURATION = [
   { year: 5, label: "PhD (5 Years)" }
 ];
 
+export const IELTS_BANDS = [
+  { score: 5.0, label: "Band 5" },
+  { score: 5.5, label: "Band 5.5" },
+  { score: 6.0, label: "Band 6" },
+  { score: 6.5, label: "Band 6.5" },
+  { score: 7.0, label: "Band 7" },
+  { score: 7.5, label: "Band 7.5" },
+  { score: 8.0, label: "Band 8" },
+  { score: 8.5, label: "Band 8.5" },
+  { score: 9.0, label: "Band 9" }
+];
+
 export const SCHOLARSHIP_TYPE = [
   { value: "1", label: "Full Scholarship" },
   { value: "2", label: "Partial Scholarship" },
@@ -393,4 +405,24 @@ export const SCHOLARSHIP_TYPE = [
 export const PARTNER_TYPE = [
   { value: "individual", label: "Individual" },
   { value: "Business", label: "Business" },
+];
+
+export const CURRENCY = [
+  { value: "usd", label: "USD" },
+  { value: "rm", label: "RM" },
+];
+
+export const MONTHS = [
+  { value: "1", label: "1 Month" },
+  { value: "2", label: "2 Months" },
+  { value: "3", label: "3 Months" },
+  { value: "4", label: "4 Months" },
+  { value: "5", label: "5 Months" },
+  { value: "6", label: "6 Months" },
+  { value: "7", label: "7 Months" },
+  { value: "8", label: "8 Months" },
+  { value: "9", label: "9 Months" },
+  { value: "10", label: "10 Months" },
+  { value: "11", label: "11 Months" },
+  { value: "12", label: "12 Months" },
 ];

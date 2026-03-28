@@ -3,11 +3,11 @@
 import { Trash2, Truck, Plus, PlusCircle } from 'lucide-react';
 import React, { useState } from "react";
 
-import { useLogisticServices } from "../../../../hooks/serviceProviders/useLogisticServicesList";
-import { useLogisticServiceLocations } from "../../../../hooks/serviceProviders/uselogisticServiceLocationsList";
-import { useLogisticLanguages } from "../../../../hooks/serviceProviders/useLogisticLanguages";
-import { useLogisticUniversities } from "../../../../hooks/serviceProviders/useLogisticUniversitiesList";
-import { useCreateLogisticsProvider } from "../../../../hooks/serviceProviders/useCreateLogisticsProvider";
+import { useLogisticServices } from "hooks/service-providers/useLogisticServicesList";
+import { useLogisticServiceLocations } from "hooks/service-providers/uselogisticServiceLocationsList";
+import { useLogisticLanguages } from "hooks/service-providers/useLogisticLanguages";
+import { useLogisticUniversities } from "hooks/service-providers/useLogisticUniversitiesList";
+import { useCreateLogisticsProvider } from "hooks/service-providers/useCreateLogisticsProvider";
 
 import Loading from "../../../loading/Loading";
 import CheckBoxGroup from "../../../form/CheckBoxGroup";

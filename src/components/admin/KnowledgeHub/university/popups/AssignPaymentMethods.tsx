@@ -2,15 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard } from "lucide-react";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import InputField from "components/form/InputField";
-import SearchableDropdown from "components/form/search/SearchableDropdown";
-import { useToast } from "components/context/ToastContext";
+
 import { useRouter } from "next/navigation";
+
 import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
 import { useUniversityPaymentMethods } from "hooks/knowledge-hub/universities/payment-methods/useUniversityPaymentMethods";
 import { useAssignPaymentMethod } from "hooks/knowledge-hub/universities/payment-methods/useAssignUniversityPayment";
+
+import { useToast } from "components/context/ToastContext";
+import { CURRENCY } from 'constants/lists';
+
+import ModalHeader from "components/ui/modal/ModalHeader";
+import Button from "components/ui/buttons/Button";
+import InputField from "components/form/InputField";
+import SelectField from "components/form/SelectField";
+import SearchableDropdown from "components/form/search/SearchableDropdown";
 
 interface AssignPaymentUniversityProps {
   isOpen: boolean;
@@ -155,10 +161,13 @@ export default function AssignPaymentUniversity({
               updateFormData={updateFormData}
             />
 
-            <InputField
+            <SelectField
               label="Currency"
               field="currency"
-              placeholder="e.g. USD"
+              options={(CURRENCY.map((c) => ({
+                value: c.value,
+                label: c.label,
+              })))}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}

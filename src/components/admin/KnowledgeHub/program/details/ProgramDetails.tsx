@@ -28,8 +28,7 @@ import {
 } from 'lucide-react';
 
 import { useProgram } from 'hooks/knowledge-hub/programs/useProgram';
-import { useDeleteKnowledgeHubPrograms, } from 'hooks/knowledge-hub/programs/useDeleteKnowledgeHubPrograms';
-import { useCommissionTypes } from 'hooks/knowledge-hub/commission/useCommissionTypes';
+import { useDeletePrograms, } from 'hooks/knowledge-hub/programs/useDeletePrograms';
 
 import { useToast } from 'components/context/ToastContext';
 import DeleteProgramsConfirmation from 'components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation';
@@ -44,10 +43,7 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const { deletePrograms } =
-    useDeleteKnowledgeHubPrograms();
-
-  const { commissionTypes } =
-    useCommissionTypes();
+    useDeletePrograms();
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -418,12 +414,14 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
                         key={index}
                         className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50"
                       >
+
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">
                           {item.description ?? 'Fee'}
                         </div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
                           RM {item.fee.toLocaleString()}
                         </div>
+
                       </div>
                     ))
                   ) : (
@@ -438,39 +436,52 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
 
           {program?.has_scholarship && program?.scholarships?.length > 0 && (
             <div className="border-b border-gray-200 p-6">
-              <div className="flex items-start gap-3">
+              <div className="flex items-center gap-3">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
                   <Award className="h-5 w-5 text-blue-600" />
                 </span>
-
-                <div className="min-w-0">
-                  <h4 className="text-base font-semibold tracking-tight text-slate-900">
-                    Scholarships & Discounts
-                  </h4>
-                </div>
+                <h4 className="text-base font-semibold tracking-tight text-slate-900">
+                  Scholarships & Discounts
+                </h4>
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-2">
-                {program.scholarships.map((item) => (
+                {program.scholarships.map((item, index) => (
                   <div
-                    key={item.id}
-                    className="rounded-md border border-slate-200 bg-white p-5"
+                    key={item.id ?? index}
+                    className="rounded-xl border border-slate-200 bg-white p-5 flex flex-col gap-3"
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="min-w-0">
-                        <h5 className="text-sm font-semibold text-slate-900">
-                          {item.name}
-                        </h5>
-
-                        <p className="mt-1 text-xl font-bold text-blue-600">
-                          RM {item.max_amount.toLocaleString()}
-                        </p>
-
-                        <p className="mt-2 text-sm text-slate-500">
-                          {item.description}
-                        </p>
-                      </div>
+                    <div className="flex items-start justify-between gap-2">
+                      <h5 className="text-sm font-semibold text-slate-900">
+                        {item.name}
+                      </h5>
+                      {item.coverage_percent > 0 && (
+                        <span className="shrink-0 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 border border-blue-100">
+                          {item.coverage_percent}% off
+                        </span>
+                      )}
                     </div>
+
+                    {item.max_amount > 0 && (
+                      <p className="text-lg font-bold text-blue-600">
+                        Up to RM {item.max_amount.toLocaleString()}
+                      </p>
+                    )}
+
+                    {item.description && (
+                      <p className="text-sm text-slate-500">{item.description}</p>
+                    )}
+
+                    {item.conditions && item.conditions.length > 0 && (
+                      <ul className="space-y-1 border-t border-slate-100 pt-3">
+                        {item.conditions.map((condition, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+                            {condition}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 ))}
               </div>
@@ -485,10 +496,10 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
 
               <div className="min-w-0">
                 <h4 className="text-base font-semibold tracking-tight text-slate-900">
-                  Entry Requirements
+                  Required Entry Documents
                 </h4>
                 <p className="felx mt-1 gap-2 text-sm leading-relaxed text-slate-500">
-                  Review all academic and admission requirements.
+                   Review the documents needed for admission.
                 </p>
               </div>
             </div>
@@ -511,11 +522,19 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
                       </p>
 
                       <div className="mt-2">
-                        <span
-                          className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-700 sm:text-sm">
-                          <CheckCircle className="h-3 w-3" />
-                          Required
-                        </span>
+                        <div className="mt-2">
+                          <span
+                            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm
+                            ${
+                              item.is_required_init_app_doc
+                                ? "border-green-200 bg-green-50 text-green-700"
+                                : "border-gray-200 bg-gray-50 text-gray-600"
+                            }`}
+                          >
+                            <CheckCircle className="h-3 w-3" />
+                            {item.is_required_init_app_doc ? "Required" : "Optional"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -551,16 +570,6 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
               <span className="absolute right-3 top-3 h-2 w-2 animate-pulse rounded-full bg-indigo-600" />
             </div>
 
-            <div
-              className="relative flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-6 shadow-md transition-transform">
-              <span className="text-2xl font-bold text-green-700">
-                {commission?.type}
-              </span>
-              <p className="text-sm font-semibold text-green-900">
-                Commission Type
-              </p>
-              <span className="absolute right-3 top-3 h-2 w-2 animate-pulse rounded-full bg-green-600" />
-            </div>
           </div>
 
           <div
@@ -575,6 +584,31 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
               <p className="mt-1 text-sm text-yellow-700">
                 {commission?.notes ??
                   'Commission is generally paid within around 3 months, once the university completes its confirmation and payment process.'}
+              </p>
+            </div>
+          </div>
+
+
+          <div
+            className="mx-6 mb-6 flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 p-4 shadow-inner">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+              <MdStar className="h-5 w-5 text-green-600" />
+            </div>
+            <div>
+              <h5 className="text-sm font-semibold text-green-800">
+                Expected Commission Timeline
+              </h5>
+
+              <p className="mt-1 text-sm text-green-700">
+                {commission.expected_commission_from || commission.expected_commission_to ? (
+                  <>
+                    Commission is expected between{" "}
+                    {commission.expected_commission_from ?? "—"} and{" "}
+                    {commission.expected_commission_to ?? "—"} months.
+                  </>
+                ) : (
+                  "Expected commission timeline not provided."
+                )}
               </p>
             </div>
           </div>

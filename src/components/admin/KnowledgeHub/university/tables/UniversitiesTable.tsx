@@ -14,14 +14,13 @@ import {
   Trash2,
   ChevronUp,
   ChevronDown,
-  GraduationCap, CreditCard, Wallet,
+  GraduationCap, Wallet,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 import { useDeleteUniversity } from "hooks/knowledge-hub/universities/useDeleteKnowledgeHubUniversity";
 import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
-import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
@@ -32,7 +31,6 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import DeleteUniversityConfirmation from "components/admin/KnowledgeHub/university/popups/DeleteUniversityConfirmation";
 import BatchAssignPaymentMethod  from "components/admin/KnowledgeHub/university/paymentMethods/popups/BatchAssignPaymentMethod";
 import CreateUniversity from "components/admin/KnowledgeHub/university/popups/CreateUniversity";
-import UpdateUniversityType from "components/admin/KnowledgeHub/university/popups/UpdateUniversityType";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
 
@@ -43,12 +41,9 @@ const UniversitiesTable = () => {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { universities, loading, error } = useAllUniversities();
-  const { paymentMethods } = useAllPaymentMethods();
 
   const { deleteUniversity, isDeleting } = useDeleteUniversity();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
-  const [selectedUniversity, setSelectedUniversity] = useState<any>(null);
 
   const [isBatchAssignOpen, setIsBatchAssignOpen] = useState(false);
 
@@ -289,17 +284,6 @@ const UniversitiesTable = () => {
               <RefreshCw className="h-4 w-4" />
               Clear
             </button>
-
-            <Link
-              href={`/admin/universities/payment-methods`}
-              icon={<CreditCard  className="h-5 w-5" />}
-              label={"Payment Methods"}
-              bgColor="bg-teal-50"
-              textColor="text-teal-700"
-              borderColor="border-teal-600"
-              hoverTextColor="hover:text-teal-800"
-              hoverBorderColor="hover:border-teal-700"
-            />
 
             <Link
               href={`/admin/universities/create`}
@@ -588,20 +572,6 @@ const UniversitiesTable = () => {
                         <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                       </button>
 
-                      <div className="h-6 border-l border-slate-200" />
-
-                      <button
-                        role="menuitem"
-                        aria-label="Delete University"
-                        onClick={() => {
-                          setSelectedUniversity(uni);
-                          setIsUpdateOpen(true);
-                        }}
-                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                      >
-                        <Settings className="h-4 w-4 text-slate-500 hover:text-red-600" />
-                      </button>
-
                     </div>
                   </td>
                 </tr>
@@ -672,13 +642,6 @@ const UniversitiesTable = () => {
         onConfirm={handleDelete}
         isDeleting={isDeleting}
         universityName={selectedUniversityName}
-      />
-
-      <UpdateUniversityType
-        isOpen={isUpdateOpen}
-        onClose={() => setIsUpdateOpen(false)}
-        universityId={selectedUniversity?.id || null}
-        initialData={selectedUniversity}
       />
 
       <BatchAssignPaymentMethod

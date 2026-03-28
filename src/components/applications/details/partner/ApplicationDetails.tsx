@@ -1,9 +1,4 @@
 import React, { useState } from "react";
-import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopBar";
-import RequiredAction from "components/applications/popups/partner/RequiredAction";
-import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
-
-import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 
 import {
   FaTasks,
@@ -23,12 +18,29 @@ import {
   FaClock,
   FaCheckCircle,
 } from "react-icons/fa";
-
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { Clock } from "lucide-react";
-import OfferLetterDecision from "./OfferLetterDecision";
+import { Clock, Wallet, Plane, CheckCircle, XCircle } from 'lucide-react';
+import Button from 'components/ui/buttons/Button';
+import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
+
+import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopBar";
+import RequiredAction from "components/applications/popups/partner/RequiredAction";
+import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
+import OfferLetterDecision, { OfferLetterDecisionType } from './OfferLetter';
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
+import VisaPaymentConfirmation from "components/applications/popups/partner/VisaPaymentConfirmation";
+import ArrivalDate from "components/applications/popups/partner/ArrivalDate";
 import ApplicationCommission from './ApplicationCommission';
+import { submitOfferLetterDecision } from '../../../../services/offerLetterService';
+import { useToast } from '../../../context/ToastContext';
+import Dispute from 'components/applications/popups/partner/UpdatedDispute';
+import api from 'lib/useApi';
+
+interface OfferLetterDecisionPayload {
+  decision: OfferLetterDecisionType;
+  reason?: string;
+  notes?: string;
+}
 
 interface ApplicationDetailsProps {
   application: any;
@@ -69,10 +81,57 @@ export default function ApplicationDetails({
   const openRequiredActionPopup = () => setShowRequiredActionPopup(true);
   const closeRequiredActionPopup = () => setShowRequiredActionPopup(false);
 
+  const { showToast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [showDispute, setShowDispute] = useState(false);
+  const isUniversityApproved =
+    currentStatus === "University Approved";
+
+  const { partner_actions } = actions || {};
+  const confirmAction = partner_actions?.find(
+    (a: any) => a.target_status_code === "APPLICATION_COMPLETE"
+  );
+  const disputeAction = partner_actions?.find(
+    (a: any) => a.target_status_code === "COMMISSION_DISPUTED"
+  );
+
+  const handleCommissionConfirm = async () => {
+    if (!confirmAction) return;
+    try {
+      setConfirmLoading(true);
+      await api.post(`/applications/${application.id}/status`, {
+        status_id: confirmAction.target_status_id,
+        reason_text: null,
+        notes: "Partner commission confirmed successfully",
+      });
+      showToast("Commission confirmed successfully", "success");
+      setTimeout(() => window.location.reload(), 2000);
+    } catch {
+      showToast("Failed to confirm commission", "error");
+    } finally {
+      setConfirmLoading(false);
+    }
+  };
+
   const [showProgramDecisionPopup, setShowProgramDecisionPopup] =
     useState(false);
   const openProgramDecisionPopup = () => setShowProgramDecisionPopup(true);
   const closeProgramDecisionPopup = () => setShowProgramDecisionPopup(false);
+
+  const [showVisaPaymentPopup, setShowVisaPaymentPopup] = useState(false);
+
+  const stageName = stage?.name;
+  const stageStatuses = stage?.statuses || [];
+  const showVisaPayment =
+    stageName === "Visa Processing" &&
+    stageStatuses.some((s: any) => s.name === "Waiting for Payment");
+
+  const [showArrivalPopup, setShowArrivalPopup] = useState(false);
+
+  const showArrivalConfirmation =
+    stageName === "Student Arrival & Enrollment" &&
+    stageStatuses.some((s: any) => s.name === "Waiting Partner to confirm arrival date");
 
   const formatGender = (value: boolean | null) => {
     if (value === null) return "Not provided";
@@ -113,6 +172,48 @@ export default function ApplicationDetails({
       previousEducation.start_date ||
       previousEducation.end_date ||
       previousEducation.grade);
+
+  const handleDecision = async (decision: OfferLetterDecisionType) => {
+    if (!application?.id || submitting) return;
+
+    let reason: string | undefined;
+
+    if (decision === "reject") {
+      reason = prompt("Please provide a reason for rejection") || undefined;
+      if (!reason) return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const payload: OfferLetterDecisionPayload = {
+        decision,
+        reason,
+        notes: "",
+      };
+
+      await submitOfferLetterDecision(application.id, payload);
+
+      showToast(
+        decision === "accept"
+          ? "Offer accepted successfully."
+          : "Offer rejected successfully.",
+        "success"
+      );
+
+      setTimeout(() => {
+        location.reload();
+      }, 1500);
+    } catch (err: any) {
+      console.error(err);
+      showToast(
+        err?.response?.data?.message || "Failed to submit decision",
+        "error"
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <section>
@@ -191,6 +292,70 @@ export default function ApplicationDetails({
               )}
             </>
           )}
+
+          {showVisaPayment && (
+            <button
+              type="button"
+              onClick={() => setShowVisaPaymentPopup(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+            >
+              <Wallet className="h-4 w-4" />
+              Proceed to Payment
+            </button>
+          )}
+
+          {showArrivalConfirmation && (
+            <button
+              type="button"
+              onClick={() => setShowArrivalPopup(true)}
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+            >
+              <Plane className="h-4 w-4" />
+              Confirm Arrival
+            </button>
+          )}
+
+          {isUniversityApproved && (
+            <>
+              <p className="text-sm text-slate-500">
+                Please review the offer letter carefully before accepting or rejecting.
+              </p>
+            </>
+          )}
+
+          {!actionsLoading && (confirmAction || disputeAction) && (
+            <div className="flex flex-row gap-2">
+              {confirmAction && (
+                <Button
+                  icon={<CheckCircle className="h-4 w-4" />}
+                  text={confirmLoading ? "Processing..." : "Confirm"}
+                  bgColor="bg-green-50"
+                  textColor="text-green-700"
+                  borderColor="border-green-600"
+                  hoverTextColor="hover:text-green-800"
+                  hoverBorderColor="hover:border-green-700"
+                  className="w-full"
+                  onClick={handleCommissionConfirm}
+                  disabled={confirmLoading}
+                />
+              )}
+              {disputeAction && (
+                <Button
+                  icon={<XCircle className="h-4 w-4" />}
+                  text="Dispute"
+                  bgColor="bg-red-50"
+                  textColor="text-red-700"
+                  borderColor="border-red-600"
+                  hoverTextColor="hover:text-red-800"
+                  hoverBorderColor="hover:border-red-700"
+                  className="w-full"
+                  onClick={() => setShowDispute(true)}
+                />
+              )}
+            </div>
+          )}
+
+
         </div>
 
         <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
@@ -586,12 +751,37 @@ export default function ApplicationDetails({
         />
       )}
 
+      {showArrivalPopup && (
+        <ArrivalDate
+          isOpen={showArrivalPopup}
+          onClose={() => setShowArrivalPopup(false)}
+          applicationId={application.id}
+        />
+      )}
+
+      {showVisaPaymentPopup && (
+        <VisaPaymentConfirmation
+          isOpen={showVisaPaymentPopup}
+          onClose={() => setShowVisaPaymentPopup(false)}
+          applicationId={application.id}
+        />
+      )}
+
       {application && showProgramDecisionPopup && (
         <ProgramDecision
           isOpen={showProgramDecisionPopup}
           onClose={closeProgramDecisionPopup}
           applicationId={application.id}
           universityId={application.program?.university?.id || ""}
+        />
+      )}
+
+      {showDispute && disputeAction && (
+        <Dispute
+          isOpen={showDispute}
+          onClose={() => setShowDispute(false)}
+          applicationId={application.id}
+          statusId={disputeAction.target_status_id}
         />
       )}
     </section>

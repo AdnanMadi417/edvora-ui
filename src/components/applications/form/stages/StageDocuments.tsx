@@ -53,7 +53,6 @@ export default function StageDocuments({
             uploadHandler={handleFileUpload}
             removeHandler={removeDocument}
             multiple={false}
-            accept="application/pdf,image/*"
           />
         ))}
       </div>
