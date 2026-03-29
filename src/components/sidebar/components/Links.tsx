@@ -49,6 +49,7 @@ export default function Links({ routes }: { routes: IRoute[] }) {
             <div
               onMouseEnter={() => setHoveredIndex(index)}
               onMouseLeave={() => setHoveredIndex(null)}
+              onClick={hasChildren ? () => setExpandedIndex(isExpanded ? null : index) : undefined}
               className={`ml-3 flex cursor-pointer items-center justify-between rounded-md px-3 py-3 text-sm font-medium transition-colors duration-200 ease-in-out
               ${isActive || isHovered ? "text-slate-900" : "text-slate-500"}`}
             >
@@ -61,22 +62,16 @@ export default function Links({ routes }: { routes: IRoute[] }) {
                   />
                 )}
                 <span>
-                  <Link href={fullPath}>{route.name}</Link>
+                  {hasChildren ? route.name : <Link href={fullPath}>{route.name}</Link>}
                 </span>
               </div>
 
               {hasChildren && (
-                <button
-                  type="button"
-                  onClick={() => setExpandedIndex(isExpanded ? null : index)}
-                  className="ml-2 flex items-center"
-                >
-                  <ChevronDown
-                    className={`h-4 w-4 transition-transform duration-200 ${
-                      isExpanded ? "rotate-180" : "rotate-0"
-                    } ${isActive || isHovered ? "text-slate-900" : "text-slate-500"}`}
-                  />
-                </button>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-200 ${
+                    isExpanded ? "rotate-180" : "rotate-0"
+                  } ${isActive || isHovered ? "text-slate-900" : "text-slate-500"}`}
+                />
               )}
             </div>
 
