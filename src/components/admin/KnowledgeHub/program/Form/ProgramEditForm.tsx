@@ -557,6 +557,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                     placeholder: "Fee",
                   },
                 ]}
+                getDefaultRow={(currentArray: unknown[]) => ({ year: currentArray.length + 1, fee: "" })}
               />
 
               <ArrayObjectField

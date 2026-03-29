@@ -14,6 +14,9 @@ interface BatchUpdateProgramPayload {
   expected_commission_from?: string;
   expected_commission_to?: string;
 
+  yearly_fees?: Array<{ year: number; fee: string }>;
+  one_time_fees?: Array<{ description: string; fee: string }>;
+
   scholarships?: Array<{
     type: number;
     coverage_percent: number;

@@ -1,12 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, Wallet, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
+import { XCircle, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee } from "hooks/applications/useApplicationVisaFee";
 import { useVisaPaymentUpload } from "hooks/applications/files/useVisaPaymentUpload";
-import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
-import SearchableDropdown from "components/form/search/SearchableDropdown";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
 
 interface VisaPaymentConfirmationProps {
@@ -126,32 +124,6 @@ export default function VisaPaymentConfirmation({
           </div>
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
-
-            <div className="flex items-center gap-2">
-              <Wallet className="h-4 w-4 text-blue-600" />
-              <h4 className="text-sm font-semibold text-gray-900">Payment Methods</h4>
-            </div>
-
-            {methods.length === 0 ? (
-              <NoDocumentsRequired
-                title="No payment methods available"
-                subtitle="Please check again later."
-              />
-            ) : (
-              <SearchableDropdown
-                label="Payment Method"
-                field="payment_method_id"
-                options={methods.map((m) => ({
-                  value: m.id,
-                  label: m.name,
-                }))}
-                required={false}
-                formData={{ payment_method_id: selectedMethod }}
-                errors={{ payment_method_id: "" }}
-                updateFormData={(field, value) => setSelectedMethod(value as string)}
-                placeholder="Select a payment method..."
-              />
-            )}
 
             <StatusFileUpload
               label="Upload Payment Receipt"

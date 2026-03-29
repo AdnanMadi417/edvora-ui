@@ -577,6 +577,7 @@ export default function RegisterProgram() {
                   placeholder: 'Fee',
                 },
               ]}
+              getDefaultRow={(currentArray: unknown[]) => ({ year: currentArray.length + 1, fee: "" })}
             />
 
             <ArrayObjectField
