@@ -18,8 +18,8 @@ import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import { useAllPrograms } from "hooks/knowledge-hub/programs/useProgramsList";
-import { useAllFields } from "../../../../hooks/knowledge-hub/field-of-study/useFieldsList";
-import { useAllStates } from "../../../../hooks/knowledge-hub/programs/useStates";
+import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
+import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
 import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
 
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -44,7 +44,7 @@ const ProgramsCards = () => {
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
+  const itemsPerPage = 9;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const filteredPrograms = programs.filter((program) => {
@@ -182,7 +182,7 @@ const ProgramsCards = () => {
               <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
                 {currentPrograms.map((program) => (
                   <a
-                    href={`/partner/knowledgeHub/${program.id}`}
+                    href={`/partner/knowledge-hub/${program.id}`}
                     key={program.id}
                     className="relative cursor-pointer flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md"
                   >

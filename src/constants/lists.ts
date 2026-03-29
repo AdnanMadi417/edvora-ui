@@ -385,6 +385,7 @@ export const DURATION = [
 ];
 
 export const IELTS_BANDS = [
+  { score: 4.5, label: "Band 4.5" },
   { score: 5.0, label: "Band 5" },
   { score: 5.5, label: "Band 5.5" },
   { score: 6.0, label: "Band 6" },

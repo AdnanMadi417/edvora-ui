@@ -16,6 +16,7 @@ import {
   ArrowRight, UserSearch, GitBranch, RotateCcw,
 } from 'lucide-react';
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MdSchool } from 'react-icons/md';
 
 import Cookies from "js-cookie";
@@ -32,6 +33,7 @@ import ClearButton from "components/ui/buttons/DangerButton";
 import FilterSelectField from 'components/form/filter/FilterSelectField';
 
 const ModernApplicationsTable = () => {
+  const router = useRouter();
   const [applications, setApplications] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
@@ -408,7 +410,8 @@ const ModernApplicationsTable = () => {
               paginatedApplications.map((app) => (
                 <tr
                   key={app.id}
-                  className="hover:bg-primary/10 group transition-colors"
+                  className="hover:bg-primary/10 group cursor-pointer transition-colors"
+                  onClick={() => router.push(`/admin/applications/${app.id}`)}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
 
