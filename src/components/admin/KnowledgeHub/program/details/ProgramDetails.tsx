@@ -64,7 +64,7 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
 
       await deletePrograms([id]);
 
-      showToast('Deleted successfully');
+      showToast('Deleted successfully', 'success');
 
       setIsDeleteOpen(false);
       setDeleteMode(null);
@@ -73,7 +73,7 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
 
     } catch (error) {
       console.error(error);
-      showToast('Delete failed');
+      showToast('Delete failed', 'error');
     }
   };
 
