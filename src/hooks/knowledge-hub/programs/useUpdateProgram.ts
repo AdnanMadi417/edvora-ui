@@ -22,8 +22,8 @@ export type UpdateProgramPayload = {
   commission_amount?: number | null;
   commission_type_id?: string | null;
   commission_notes?: string | null;
-  expected_commission_from?: string | null;
-  expected_commission_to?: string | null;
+  expected_commission_from?: number | null;
+  expected_commission_to?: number | null;
 
   yearly_fees?: Array<{ year: number; fee: number }>;
   one_time_fees?: Array<{ description: string; fee: number }>;
