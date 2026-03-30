@@ -177,13 +177,13 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
         commission_amount: Number(formData.commission_amount) || 0,
         commission_type_id: String(formData.commission_type_id || commissionTypes[0]?.id || ""),
         commission_notes: String(formData.commission_notes || ""),
-        expected_commission_from: String(formData.expected_commission_from || ""),
-        expected_commission_to: String(formData.expected_commission_to || ""),
+        expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
+        expected_commission_to: formData.expected_commission_to ? Number(formData.expected_commission_to) : null,
 
         qualification_id: String(formData.qualification_id),
 
         intake_dates: Array.isArray(formData.intake_dates)
-          ? formData.intake_dates
+          ? formData.intake_dates.filter((d: string) => !!d)
           : [],
 
         yearly_fees: Array.isArray(formData.yearly_fees)
