@@ -68,7 +68,7 @@ const PartnersTable = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  const filteredPartners = partners
+  const filteredPartners = React.useMemo(() => partners
     .filter((partner) => {
       const term = searchTerm.toLowerCase();
       return (
@@ -85,10 +85,8 @@ const PartnersTable = () => {
     })
     .filter((partner) => {
       if (selectedType === "all") return true;
-      return (
-        partner.type === selectedType
-      );
-    });
+      return partner.type === selectedType;
+    }), [partners, searchTerm, selectedManager, selectedType]);
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
