@@ -9,7 +9,7 @@ import Link from "next/link";
 import api from "../../lib/useApi";
 import { useRouter } from "next/navigation";
 import { useMe } from "hooks/useMe";
-import { profileRouteMap } from "components/navbar/config/navigation";
+import { profileRouteMap, notificationsRouteMap } from "components/navbar/config/navigation";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
 
 const Navbar = ({
@@ -34,6 +34,11 @@ const Navbar = ({
   const getProfileRoute = (role?: string) => {
     if (!role) return "/auth/sign-in";
     return profileRouteMap[role] || "/profile";
+  };
+
+  const getNotificationsRoute = (role?: string) => {
+    if (!role) return "/auth/sign-in";
+    return notificationsRouteMap[role] || "/notifications";
   };
 
   useEffect(() => {
@@ -112,7 +117,7 @@ const Navbar = ({
           <FiAlignJustify className="h-5 w-5 text-slate-600" />
         </span>
 
-        <Link href="notifications" className="relative flex items-center justify-center">
+        <Link href={getNotificationsRoute(user?.role)} className="relative flex items-center justify-center">
           <Bell className="h-5 w-5 text-slate-600" />
           {unreadCount > 0 && (
             <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">

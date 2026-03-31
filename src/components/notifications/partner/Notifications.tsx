@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Bell } from "lucide-react";
+import { Bell, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 import { useAllNotifications } from "hooks/notifications/useNotifications";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
@@ -124,9 +125,8 @@ export default function Notifications() {
               const sender = getSenderName(notification);
 
               return (
-                <a
+                <div
                   key={notification.id}
-                  href={`/partner/applications/${notification.application_id}`}
                   onClick={() => isUnread && markAsRead(notification.id)}
                   className={`flex cursor-pointer items-start gap-4 px-4 py-3 transition-colors ${
                     index !== displayed.length - 1 ? "border-b border-slate-50" : ""
@@ -150,14 +150,29 @@ export default function Notifications() {
                         <span className="ml-1 font-normal text-slate-700">{notification.title}</span>
                       )}
                     </p>
+                    {notification.body && (
+                      <p className="mt-0.5 truncate text-sm text-slate-500">{notification.body}</p>
+                    )}
                     <p className={`mt-1 text-xs font-semibold ${isUnread ? "text-blue-600" : "text-slate-400"}`}>
                       {timeAgo(notification.created_at)}
                     </p>
                   </div>
 
-                  {/* Unread dot */}
-                  {isUnread && <div className="flex-shrink-0 self-center"><div className="h-3 w-3 rounded-full bg-blue-500" /></div>}
-                </a>
+                  {/* Actions */}
+                  <div className="flex flex-shrink-0 items-center gap-2 self-center">
+                    {isUnread && <div className="h-3 w-3 rounded-full bg-blue-500" />}
+                    {notification.application_id && (
+                      <Link
+                        href={`/partner/applications/${notification.application_id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        title="View application"
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-blue-100 hover:text-blue-600"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
               );
             })}
           </div>
