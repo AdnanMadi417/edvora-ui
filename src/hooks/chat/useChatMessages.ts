@@ -68,7 +68,11 @@ export function useChatMessages({
       );
 
       if (response.data.length > 0) {
-        setMessages((prev) => [...prev, ...response.data]);
+        setMessages((prev) => {
+          const existingIds = new Set(prev.map((m) => m.id));
+          const newOnly = response.data.filter((m) => !existingIds.has(m.id));
+          return newOnly.length > 0 ? [...prev, ...newOnly] : prev;
+        });
       }
     } catch (err) {
       // polling errors should NOT break UI

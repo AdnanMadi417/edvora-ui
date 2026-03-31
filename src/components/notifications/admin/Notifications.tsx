@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Bell, ExternalLink } from "lucide-react";
-import Link from "next/link";
+import { Bell } from "lucide-react";
 
 import { useAllNotifications } from "hooks/notifications/useNotifications";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
@@ -18,16 +17,16 @@ function timeAgo(dateStr: string): string {
 }
 
 export default function Notifications() {
-  const [filter, setFilter] = useState<"all" | "unread">("all");
+  const [filter, setFilter] = useState<"all" | "unread">("unread");
 
-  const { notifications, loading, error } = useAllNotifications();
+  const { notifications, loading, error, refetch: refetchNotifications } = useAllNotifications();
   const { unreadCount, refetch: refetchCount } = useUnreadCount({});
   const { markAsRead: markRead } = useMarkAsRead();
 
   const markAsRead = async (id: string) => {
     try {
       await markRead(id);
-      refetchCount();
+      await Promise.all([refetchNotifications(), refetchCount()]);
     } catch (err) {
       console.error("Failed to mark notification as read", err);
     }
@@ -36,7 +35,7 @@ export default function Notifications() {
   const markAllAsRead = async () => {
     const unread = notifications.filter((n) => n.read_at === null);
     await Promise.allSettled(unread.map((n) => markRead(n.id)));
-    refetchCount();
+    await Promise.all([refetchNotifications(), refetchCount()]);
   };
 
   const displayed = [...(filter === "unread"
@@ -125,7 +124,8 @@ export default function Notifications() {
               const sender = getSenderName(notification);
 
               return (
-                <div
+                <a
+                  href={`/admin/applications/${notification.application_id}`}
                   key={notification.id}
                   onClick={() => isUnread && markAsRead(notification.id)}
                   className={`flex cursor-pointer items-start gap-4 px-4 py-3 transition-colors ${
@@ -150,31 +150,14 @@ export default function Notifications() {
                         <span className="ml-1 font-normal text-slate-700">{notification.title}</span>
                       )}
                     </p>
-                    {notification.data?.snippet && (
-                      <p className="mt-0.5 line-clamp-2 text-sm text-slate-500">
-                        {notification.data.snippet}
-                      </p>
-                    )}
                     <p className={`mt-1 text-xs font-semibold ${isUnread ? "text-blue-600" : "text-slate-400"}`}>
                       {timeAgo(notification.created_at)}
                     </p>
                   </div>
 
-                  {/* Actions */}
-                  <div className="flex flex-shrink-0 flex-col items-center gap-2 self-center pl-2">
-                    {isUnread && <div className="h-3 w-3 rounded-full bg-blue-500" />}
-                    {notification.application_id && (
-                      <Link
-                        href={`/admin/applications/${notification.application_id}`}
-                        onClick={(e) => e.stopPropagation()}
-                        title="View application"
-                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-blue-100 hover:text-blue-600"
-                      >
-                        <ExternalLink className="h-3.5 w-3.5" />
-                      </Link>
-                    )}
-                  </div>
-                </div>
+                  {/* Unread dot */}
+                  {isUnread && <div className="flex-shrink-0 self-center"><div className="h-3 w-3 rounded-full bg-blue-500" /></div>}
+                </a>
               );
             })}
           </div>

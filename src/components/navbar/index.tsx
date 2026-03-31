@@ -15,7 +15,6 @@ import { useUnreadCount } from "hooks/notifications/useUnreadCount";
 const Navbar = ({
                   onOpenSidenav,
                   brandText,
-                  routes,
                   open,
                   setOpen,
                 }: {
@@ -29,8 +28,8 @@ const Navbar = ({
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { user, loading, error } = useMe();
-  const { unreadCount } = useUnreadCount({});
+  const { user, loading } = useMe();
+  const { unreadCount } = useUnreadCount({ pollIntervalMs: 30000 });
 
   const getProfileRoute = (role?: string) => {
     if (!role) return "/auth/sign-in";
@@ -54,7 +53,7 @@ const Navbar = ({
   const deleteAllCookies = () => {
     document.cookie.split(";").forEach((cookie) => {
       const eqPos = cookie.indexOf("=");
-      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      const name = eqPos > -1 ? cookie.slice(0, eqPos).trim() : cookie.trim();
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
     });
   };
