@@ -64,7 +64,7 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
 
       await deletePrograms([id]);
 
-      showToast('Deleted successfully');
+      showToast('Deleted successfully', 'success');
 
       setIsDeleteOpen(false);
       setDeleteMode(null);
@@ -73,7 +73,7 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
 
     } catch (error) {
       console.error(error);
-      showToast('Delete failed');
+      showToast('Delete failed', 'error');
     }
   };
 
@@ -600,11 +600,11 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
               </h5>
 
               <p className="mt-1 text-sm text-green-700">
-                {commission.expected_commission_from || commission.expected_commission_to ? (
+                {commission?.expected_commission_from || commission?.expected_commission_to ? (
                   <>
                     Commission is expected between{" "}
-                    {commission.expected_commission_from ?? "—"} and{" "}
-                    {commission.expected_commission_to ?? "—"} months.
+                    {commission?.expected_commission_from ?? "—"} and{" "}
+                    {commission?.expected_commission_to ?? "—"} months.
                   </>
                 ) : (
                   "Expected commission timeline not provided."

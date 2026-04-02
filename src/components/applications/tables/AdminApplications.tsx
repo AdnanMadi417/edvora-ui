@@ -27,8 +27,11 @@ import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
 import ClearButton from "components/ui/buttons/DangerButton";
 import FilterSelectField from 'components/form/filter/FilterSelectField';
+import { useRouter } from "next/navigation";
 
 const ModernApplicationsTable = () => {
+
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
 
   const {
@@ -311,7 +314,8 @@ const ModernApplicationsTable = () => {
               paginatedApplications.map((app) => (
                 <tr
                   key={app.id}
-                  className="hover:bg-primary/10 group transition-colors"
+                  className="hover:bg-primary/10 group cursor-pointer transition-colors"
+                  onClick={() => router.push(`/admin/applications/${app.id}`)}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Cookies from "js-cookie";
 import api from "../../../lib/useApi";
 
 interface UpdateDefaultVisaFeePayload {
@@ -10,6 +11,12 @@ export function useUpdateDefaultVisaFee() {
   const [error, setError] = useState<string | null>(null);
 
   const updateDefaultVisaFee = async (payload: UpdateDefaultVisaFeePayload) => {
+    const role = Cookies.get("userRole");
+
+    if (role !== "admin") {
+      throw new Error("Unauthorized: only admins can update the default visa fee.");
+    }
+
     setLoading(true);
     setError(null);
 

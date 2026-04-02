@@ -110,34 +110,36 @@ export default function VisaTrackingTimeline({
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-4 border-b border-gray-200 p-6 sm:grid-cols-2">
-          <div>
-            <p className="mb-2 text-sm tracking-wide text-slate-500">
-              Visa Fee Amount
-            </p>
-            <p className="text-lg font-bold ">
-              {visaCase.visa_fee_amount
-                ? `RM ${visaCase.visa_fee_amount.toLocaleString()}`
-                : "—"}
-            </p>
-          </div>
+        {visaCase && (
+          <div className="mt-4 grid grid-cols-1 gap-4 border-b border-gray-200 p-6 sm:grid-cols-2">
+            <div>
+              <p className="mb-2 text-sm tracking-wide text-slate-500">
+                Visa Fee Amount
+              </p>
+              <p className="text-lg font-bold ">
+                {visaCase.visa_fee_amount
+                  ? `RM ${visaCase.visa_fee_amount.toLocaleString()}`
+                  : "—"}
+              </p>
+            </div>
 
-          <div>
-            <p className="mb-2 text-sm tracking-wide text-slate-500">
-              Created At
-            </p>
-            <p className="text-sm">
-              {visaCase.created_at
-                ? new Date(visaCase.created_at).toLocaleString()
-                : "—"}
-            </p>
-          </div>
+            <div>
+              <p className="mb-2 text-sm tracking-wide text-slate-500">
+                Created At
+              </p>
+              <p className="text-sm">
+                {visaCase.created_at
+                  ? new Date(visaCase.created_at).toLocaleString()
+                  : "—"}
+              </p>
+            </div>
 
-          <div>
-            <p className="mb-2 text-sm tracking-wide text-slate-500">Notes</p>
-            <p className="text-sm">{visaCase.notes || "No notes"}</p>
+            <div>
+              <p className="mb-2 text-sm tracking-wide text-slate-500">Notes</p>
+              <p className="text-sm">{visaCase.notes || "No notes"}</p>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="border-b border-gray-200 p-6 ">
           {visaPayments.length === 0 ? (

@@ -44,6 +44,7 @@ import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/Ba
 import BatchIELTSPrograms from "components/admin/KnowledgeHub/program/popups/BatchIELTSPrograms";
 import BatchProgramIntakes from "components/admin/KnowledgeHub/program/popups/BatchProgramIntakes";
 import BatchProgramScholarship from "components/admin/KnowledgeHub/program/popups/BatchProgramScholarship";
+import BatchFeesPrograms from "components/admin/KnowledgeHub/program/popups/BatchFeesPrograms";
 import DefaultVisaFee from "components/admin/KnowledgeHub/program/popups/DefaultVisaFee";
 
 
@@ -78,6 +79,7 @@ const ProgramsTable = () => {
   const [isBatchIeletsUpdateOpen, setIsBatchIeltsUpdateOpen] = useState(false);
   const [isBatchIntakesUpdateOpen, setIsBatchIntakesUpdateOpen] = useState(false);
   const [isBatchScholarshipsUpdateOpen, setIsBatchScholarshipsUpdateOpen] = useState(false);
+  const [isBatchFeesUpdateOpen, setIsBatchFeesUpdateOpen] = useState(false);
   const [isBulkMenuOpen, setIsBulkMenuOpen] = useState(false);
   const [isVisaFeeOpen, setIsVisaFeeOpen] = useState(false);
 
@@ -361,6 +363,7 @@ const ProgramsTable = () => {
                             { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setIsBatchIeltsUpdateOpen(true) },
                             { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setIsBatchIntakesUpdateOpen(true) },
                             { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setIsBatchScholarshipsUpdateOpen(true) },
+                            { label: "Tution Fees", icon: <DollarSign className="h-3.5 w-3.5 text-green-600" />, bg: "bg-green-50", onClick: () => setIsBatchFeesUpdateOpen(true) },
                             { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setIsVisaFeeOpen(true) },
                           ].map(({ label, icon, bg, onClick }) => (
                             <button
@@ -788,6 +791,12 @@ const ProgramsTable = () => {
       <BatchProgramScholarship
         isOpen={isBatchScholarshipsUpdateOpen}
         onClose={() => setIsBatchScholarshipsUpdateOpen(false)}
+        selectedProgramIds={selectedProgramIds}
+      />
+
+      <BatchFeesPrograms
+        isOpen={isBatchFeesUpdateOpen}
+        onClose={() => setIsBatchFeesUpdateOpen(false)}
         selectedProgramIds={selectedProgramIds}
       />
 

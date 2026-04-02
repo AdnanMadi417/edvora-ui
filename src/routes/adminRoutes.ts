@@ -9,7 +9,7 @@ import {
   MdAssignment,
   MdNotifications,
 } from 'react-icons/md';
-import { BookOpen, CreditCard } from 'lucide-react';
+import { BookOpen, CreditCard, Settings } from 'lucide-react';
 
 const AdminRoutes: IRoute[] = [
   {
@@ -60,6 +60,12 @@ const AdminRoutes: IRoute[] = [
         layout: "/admin/config-universities",
         path: "/payment-methods",
         icon: CreditCard,
+      },
+      {
+        name: "Configuration type",
+        layout: "/admin/config-universities",
+        path: "",
+        icon: Settings,
       },
       {
         name: "Fields of Study",

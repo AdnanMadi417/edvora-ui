@@ -170,9 +170,7 @@ export default function RegisterProgram() {
       formData.field_of_study_id !== '' &&
       formData.qualification_id !== '' &&
       formData.english_required_score.trim() !== '' &&
-      formData.intake_dates.length > 0 &&
-      formData.duration > 0 &&
-      formData.commission_amount >= 0;
+      formData.duration > 0 ;
 
     const yearlyFeesValid =
       formData.yearly_fees.length === 0 ||
@@ -264,11 +262,6 @@ export default function RegisterProgram() {
         return;
       }
 
-      if (!formData.intake_dates.length) {
-        showToast('At least one intake date is required', 'error');
-        return;
-      }
-
       const payload = {
         ...formData,
 
@@ -277,8 +270,8 @@ export default function RegisterProgram() {
         qualification_id: formData.qualification_id,
 
         commission_amount: Number(formData.commission_amount || 0),
-        expected_commission_from: String( formData.expected_commission_from),
-        expected_commission_to: String( formData.expected_commission_to),
+        expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
+        expected_commission_to: formData.expected_commission_to ? Number(formData.expected_commission_to) : null,
 
 
         yearly_fees: (formData.yearly_fees || []).map((y) => ({
@@ -416,6 +409,7 @@ export default function RegisterProgram() {
               <InputField
                 label="Duration (Years)"
                 field="duration"
+                type="number"
                 placeholder="e.g. 2 Years"
                 required
                 formData={formData}
@@ -493,7 +487,7 @@ export default function RegisterProgram() {
             <MultipleDateInput
               label="Intake Dates"
               field="intake_dates"
-              required
+              required ={false}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
@@ -514,12 +508,14 @@ export default function RegisterProgram() {
                 placeholder="e.g. 10"
                 formData={formData}
                 errors={errors}
+                required={false}
                 updateFormData={updateFormData}
               />
 
               <SelectField
                 label="Expected from"
                 field="expected_commission_from"
+                required={false}
                 options={MONTHS.map((m) => ({
                   value: m.value,
                   label: m.label,
@@ -532,6 +528,7 @@ export default function RegisterProgram() {
               <SelectField
                 label="Expected To"
                 field="expected_commission_to"
+                required={false}
                 options={MONTHS.map((m) => ({
                   value: m.value,
                   label: m.label,
@@ -577,6 +574,7 @@ export default function RegisterProgram() {
                   placeholder: 'Fee',
                 },
               ]}
+              getDefaultRow={(currentArray: unknown[]) => ({ year: currentArray.length + 1, fee: "" })}
             />
 
             <ArrayObjectField

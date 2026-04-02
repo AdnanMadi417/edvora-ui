@@ -513,11 +513,11 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
               </h5>
 
               <p className="mt-1 text-sm text-green-700">
-                {commission.expected_commission_from || commission.expected_commission_to ? (
+                {commission?.expected_commission_from || commission?.expected_commission_to ? (
                   <>
                     Commission is expected between{" "}
-                    {commission.expected_commission_from ?? "—"} and{" "}
-                    {commission.expected_commission_to ?? "—"} months.
+                    {commission?.expected_commission_from ?? "—"} and{" "}
+                    {commission?.expected_commission_to ?? "—"} months.
                   </>
                 ) : (
                   "Expected commission timeline not provided."

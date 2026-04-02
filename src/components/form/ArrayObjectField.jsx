@@ -32,17 +32,21 @@ const ArrayObjectField = ({
   errors,
   updateFormData,
   fields = [],
+  getDefaultRow = undefined,
 }) => {
   const arrayValue = getNestedValue(formData, field) || [];
 
+  const buildDefaultRow = (currentArray) => {
+    if (getDefaultRow) return getDefaultRow(currentArray);
+    return fields.reduce((acc, f) => {
+      acc[f.key] = "";
+      return acc;
+    }, {});
+  };
+
   useEffect(() => {
     if (!arrayValue || arrayValue.length === 0) {
-      const emptyRow = fields.reduce((acc, f) => {
-        acc[f.key] = "";
-        return acc;
-      }, {});
-
-      updateFormData(field, [emptyRow]);
+      updateFormData(field, [buildDefaultRow([])]);
     }
   }, []);
 
@@ -51,12 +55,7 @@ const ArrayObjectField = ({
   };
 
   const addRow = () => {
-    const emptyRow = fields.reduce((acc, f) => {
-      acc[f.key] = "";
-      return acc;
-    }, {});
-
-    updateFormData(field, [...arrayValue, emptyRow]);
+    updateFormData(field, [...arrayValue, buildDefaultRow(arrayValue)]);
   };
 
   const removeRow = (index) => {

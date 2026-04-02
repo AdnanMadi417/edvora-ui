@@ -31,7 +31,7 @@
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "apexcharts": "^3.35.2",
-    "axios": "^1.12.2",
+    "axios": "1.12.2",
     "clsx": "^2.1.1",
     "framer-motion": "^7.10.2",
     "js-cookie": "^3.0.5",
