@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Bell, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useAllNotifications } from "hooks/notifications/useNotifications";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
@@ -19,6 +20,7 @@ function timeAgo(dateStr: string): string {
 
 export default function Notifications() {
   const [filter, setFilter] = useState<"all" | "unread">("unread");
+  const router = useRouter();
 
   const { notifications, loading, error, refetch: refetchNotifications } = useAllNotifications();
   const { unreadCount, refetch: refetchCount } = useUnreadCount({});
@@ -127,7 +129,10 @@ export default function Notifications() {
               return (
                 <div
                   key={notification.id}
-                  onClick={() => isUnread && markAsRead(notification.id)}
+                  onClick={() => {
+                    if (notification.application_id) router.push(`/account-manager/applications/${notification.application_id}`);
+                    if (isUnread) markAsRead(notification.id);
+                  }}
                   className={`flex cursor-pointer items-start gap-4 px-4 py-3 transition-colors ${
                     index !== displayed.length - 1 ? "border-b border-slate-50" : ""
                   } ${isUnread ? "bg-blue-50 hover:bg-blue-100/60" : "hover:bg-slate-50"}`}
