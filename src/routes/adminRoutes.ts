@@ -9,7 +9,7 @@ import {
   MdAssignment,
   MdNotifications,
 } from 'react-icons/md';
-import { BookOpen, CreditCard, Settings } from 'lucide-react';
+import { BookOpen, CreditCard, Settings, Wrench } from 'lucide-react';
 
 const AdminRoutes: IRoute[] = [
   {
@@ -80,6 +80,14 @@ const AdminRoutes: IRoute[] = [
     layout: "/admin",
     path: "/logistical-service",
     icon: MdBusinessCenter,
+    children: [
+      {
+        name: "Service Types",
+        layout: "/admin/logistical-service",
+        path: "/services",
+        icon: Wrench,
+      },
+    ],
   },
 ];
 

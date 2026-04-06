@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from 'react';
+import PresignedImage from "components/ui/PresignedImage";
 import {
   Search,
   RefreshCw,
@@ -422,7 +423,13 @@ const UniversitiesTable = () => {
 
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div
+                      <PresignedImage
+                        fileKey={uni?.logo_file_key}
+                        alt={uni.name}
+                        className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-blue-500 ring-offset-2 shadow-md"
+                        fallback={
+
+                            <div
                         className="flex h-10 w-10 shrink-0 items-center justify-center
                 rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
                       >
@@ -430,8 +437,11 @@ const UniversitiesTable = () => {
                           uni.name?.slice(0, 2).toUpperCase()
                         ) : (
                           <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
-                        )}
-                      </div>
+                        )}                          
+
+                          </div>
+                        }
+                      />
 
                       <div className="w-full min-w-0">
                         <h3 className="truncate text-sm font-semibold text-slate-900">

@@ -13,6 +13,10 @@ interface UpdateUniversityPayload {
   country: string;
   is_active: boolean;
   description?: string;
+
+  logo_file_key: string;
+  logo_file_url: string;
+
   intake_months?: string[];
   university_type_id: string;
   branches: UpdateBranchPayload[];
