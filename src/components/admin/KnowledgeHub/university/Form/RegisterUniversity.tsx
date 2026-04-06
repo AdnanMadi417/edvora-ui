@@ -143,7 +143,6 @@ export default function RegisterUniversity() {
     try {
       await createUniversity({
         ...formData,
-        intake_months: formData.intake_months.filter((m: string) => m.trim() !== ""),
         logo_file_key: logoFileKey,
         logo_file_url: logoFileUrl,
       });
