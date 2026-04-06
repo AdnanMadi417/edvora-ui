@@ -32,12 +32,7 @@ definitions:
           - docker
         script:
           - set +e
-          - apt-get update && apt-get install -y wget
-          - wget https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
-          - tar xf doctl-1.104.0-linux-amd64.tar.gz
-          - mv doctl /usr/local/bin
-          - doctl auth init --access-token $DIGITALOCEAN_ACCESS_TOKEN
-          - doctl registry login
+          - docker login registry.digitalocean.com --username $DIGITALOCEAN_ACCESS_TOKEN --password $DIGITALOCEAN_ACCESS_TOKEN
           - export IMAGE_NAME="registry.digitalocean.com/unibexs-internal/unibexs-frontend-staging"
           - export IMAGE_TAG="staging-${BITBUCKET_COMMIT:0:7}"
           - export IMAGE_FULL="${IMAGE_NAME}:${IMAGE_TAG}"
@@ -70,12 +65,7 @@ definitions:
           - docker
         script:
           - set +e
-          - apt-get update && apt-get install -y wget
-          - wget https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
-          - tar xf doctl-1.104.0-linux-amd64.tar.gz
-          - mv doctl /usr/local/bin
-          - doctl auth init --access-token $DIGITALOCEAN_ACCESS_TOKEN
-          - doctl registry login
+          - docker login registry.digitalocean.com --username $DIGITALOCEAN_ACCESS_TOKEN --password $DIGITALOCEAN_ACCESS_TOKEN
           - export IMAGE_NAME="registry.digitalocean.com/unibexs-internal/unibexs-frontend-prod"
           - export IMAGE_TAG="prod-${BITBUCKET_COMMIT:0:7}"
           - export IMAGE_FULL="${IMAGE_NAME}:${IMAGE_TAG}"

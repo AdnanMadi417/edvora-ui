@@ -16,6 +16,10 @@ envs:
     scope: RUN_TIME
     type: SECRET
 
+  - key: SIGNOZ_ENDPOINT
+    scope: RUN_TIME
+    type: SECRET
+
 services:
   - name: unibexs-frontend
     image:
@@ -39,10 +43,8 @@ services:
         value: "staging"
       - key: SIGNOZ_SERVICE_NAME
         scope: RUN_TIME
-        value: "unibexs-frontend"
+        value: "unibexs-ui"
       - key: NODE_ENV
         scope: RUN_TIME
         value: "production"
-      - key: SIGNOZ_ENDPOINT
-        scope: RUN_TIME
-        value: "https://ingest.us.signoz.cloud:443"
+      
