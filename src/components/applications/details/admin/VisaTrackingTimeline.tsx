@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import { useVisaCase } from "hooks/useVisaCase";
 import { useVisaPayments } from "hooks/useVisaPayments";
-import VisaPaymentConfirmation from "../../../applications/popups/partner/VisaPaymentConfirmation";
 import { getDocumentDownloadUrl } from "../../../../services/documentService";
 import api from "lib/useApi";
 import { useToast } from "../../../context/ToastContext";
@@ -24,7 +23,6 @@ interface VisaTrackingTimelineProps {
 export default function VisaTrackingTimeline({
   application,
 }: VisaTrackingTimelineProps) {
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const {
@@ -305,13 +303,6 @@ export default function VisaTrackingTimeline({
           </div>
         </div>
 
-        {isPopupOpen && (
-          <VisaPaymentConfirmation
-            isOpen={isPopupOpen}
-            onClose={() => setIsPopupOpen(false)}
-            applicationId={application.id}
-          />
-        )}
       </div>
     </section>
   );

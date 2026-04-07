@@ -20,18 +20,14 @@ export default function VisaPaymentConfirmation({
 }: VisaPaymentConfirmationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [paymentReference, setPaymentReference] = useState<File | null>(null);
-  const [selectedMethod, setSelectedMethod] = useState<string>("");
   const [fileError, setFileError] = useState("");
+  const [uploadError, setUploadError] = useState("");
 
   const { methods, loading: paymentLoading, error: paymentError } = useVisaPaymentMethods(applicationId);
   const { visaFeeAmount } = useApplicationVisaFee(applicationId);
   const { uploadVisaPayment, isUploading } = useVisaPaymentUpload();
 
-  useEffect(() => {
-    if (methods.length > 0 && !selectedMethod) {
-      setSelectedMethod(methods[0].id);
-    }
-  }, [methods, selectedMethod]);
+  const firstMethod = methods[0] ?? null;
 
   useEffect(() => {
     if (isOpen) setIsVisible(true);
@@ -42,44 +38,30 @@ export default function VisaPaymentConfirmation({
   }, [isOpen]);
 
   const handleConfirmUpload = async () => {
-    if (!paymentReference || !selectedMethod) return;
+    if (!paymentReference) return;
 
-    const method = methods.find((m) => m.id === selectedMethod);
-    if (!method) return;
-
+    setUploadError("");
     try {
       await uploadVisaPayment(paymentReference, applicationId, {
-        methodId: method.id,
+        methodId: firstMethod?.id ?? null,
         amount: visaFeeAmount,
-        currency: method.currency,
+        currency: firstMethod?.currency ?? null,
       });
 
       handleClose();
       setTimeout(() => window.location.reload(), 2000);
-    } catch {
-      // error handled inside hook
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || "Failed to submit visa payment";
+      setUploadError(message);
     }
   };
 
   const handleClose = () => {
     setPaymentReference(null);
     setFileError("");
+    setUploadError("");
     onClose();
   };
-
-  if (paymentLoading)
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-overlay p-4">
-        <p>Loading visa details...</p>
-      </div>
-    );
-
-  if (paymentError)
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-overlay p-4">
-        <p className="text-red-500">{paymentError}</p>
-      </div>
-    );
 
   if (!isVisible) return null;
 
@@ -124,15 +106,21 @@ export default function VisaPaymentConfirmation({
           </div>
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
+            {paymentError && (
+              <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+                <p className="text-xs text-red-700">{paymentError}</p>
+              </div>
+            )}
 
             <StatusFileUpload
               label="Upload Payment Receipt"
               id="payment_reference"
               file={paymentReference}
-              onFileChange={setPaymentReference}
-              onRemove={() => setPaymentReference(null)}
+              onFileChange={(file) => { setPaymentReference(file); setUploadError(""); }}
+              onRemove={() => { setPaymentReference(null); setUploadError(""); }}
               onError={setFileError}
-              disabled={isUploading}
+              disabled={isUploading || paymentLoading}
               required
             />
 
@@ -143,6 +131,12 @@ export default function VisaPaymentConfirmation({
               </div>
             )}
 
+            {uploadError && (
+              <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
+                <p className="text-xs text-red-700">{uploadError}</p>
+              </div>
+            )}
           </div>
 
           <div className="border-t border-gray-200 px-6 py-4">
@@ -155,12 +149,12 @@ export default function VisaPaymentConfirmation({
                 Cancel
               </button>
               <button
-                disabled={!paymentReference || !!fileError || isUploading}
+                disabled={!paymentReference || !!fileError || !!uploadError || isUploading || paymentLoading}
                 onClick={handleConfirmUpload}
                 className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
               >
                 <CheckCircle className="h-4 w-4" />
-                {isUploading ? "Submitting..." : "Proceed to Payment"}
+                {isUploading ? "Submitting..." : paymentLoading ? "Loading..." : "Proceed to Payment"}
               </button>
             </div>
           </div>
