@@ -1,4 +1,4 @@
-FROM node:lts-alpine AS base
+FROM node:20-alpine AS base
 
 # Stage 1: Install dependencies
 FROM base AS deps
@@ -50,17 +50,28 @@ RUN corepack enable pnpm && \
     corepack prepare pnpm@${PNPM_VERSION} --activate && \
     pnpm run build
 
-# Stage 3: staging server
+# Stage 3: Production server
 FROM base AS runner
 WORKDIR /app
-ENV NEXT_PUBLIC_ENVIRONMENT=staging
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser  --system --uid 1001 nextjs
 
 # Copy public folder
-COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 
 # Copy standalone build
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+    CMD wget -qO- http://localhost:3000/api/health || exit 1
+
 CMD ["node", "server.js"]

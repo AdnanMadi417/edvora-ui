@@ -1,0 +1,50 @@
+# IMPORTANT — READ BEFORE RUNNING doctl apps update --spec
+# Running this command against a live app WILL wipe any secret whose stored value
+# is not included here as a literal `value:` field. All secrets are managed via
+# the DO dashboard (App-Level Environment Variables). To safely update this spec:
+#   1. doctl apps spec get $FE_STAGING_APP_ID > /tmp/live.yaml  (backup live state)
+#   2. Make your changes to /tmp/live.yaml directly
+#   3. doctl apps update $FE_STAGING_APP_ID --spec /tmp/live.yaml
+#   4. Immediately verify secrets are still set in DO dashboard
+# Do NOT add literal secret values to this file — it is committed to version control.
+
+name: staging-frontend
+region: sgp1
+
+envs:
+  - key: SIGNOZ_INGESTION_KEY
+    scope: RUN_TIME
+    type: SECRET
+
+  - key: SIGNOZ_ENDPOINT
+    scope: RUN_TIME
+    type: SECRET
+
+services:
+  - name: unibexs-frontend
+    image:
+      deploy_on_push:
+        enabled: false
+      registry_type: DOCR
+      registry: unibexs-internal
+      repository: unibexs-frontend-staging
+      tag: staging-latest
+    instance_count: 1
+    instance_size_slug: apps-s-1vcpu-1gb-fixed
+    http_port: 3000
+    health_check:
+      http_path: /api/health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      failure_threshold: 3
+    envs:
+      - key: ENVIRONMENT
+        scope: RUN_TIME
+        value: "staging"
+      - key: SIGNOZ_SERVICE_NAME
+        scope: RUN_TIME
+        value: "unibexs-ui"
+      - key: NODE_ENV
+        scope: RUN_TIME
+        value: "production"
+      

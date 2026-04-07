@@ -1,13 +1,14 @@
-node_modules
-.next
-.env
-.env.local # comment out when you run in local machine
-.DS_Store
 .git
 .gitignore
+.env*
+node_modules
+.next
+*.md
+.do
+bitbucket-pipelines.yml
+.DS_Store
+.vscode
 npm-debug.log
 yarn-error.log
 .npm
 .cache
-.vscode
-unibexs-frontend/
