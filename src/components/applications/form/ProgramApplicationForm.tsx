@@ -85,9 +85,9 @@ export default function StudentRegistrationForm() {
   const safeDocumentTypes = documentTypes ?? [];
 
   const requiredFieldKeys =
-    requiredFields
-      ?.filter((f) => f.is_required)
-      ?.map((f) => f.field_key) || [];
+    (requiredFields as any)?.fields
+      ?.filter((f: any) => f.is_required)
+      ?.map((f: any) => f.field_key) || [];
 
   const shouldShowStage3 = requiredFieldKeys.length > 0;
   const visibleStages = shouldShowStage3
