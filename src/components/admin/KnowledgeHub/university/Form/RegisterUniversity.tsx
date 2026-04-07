@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { GraduationCap, School, ChevronLeft, CalendarPlus } from 'lucide-react';
+import { GraduationCap, ChevronLeft, CalendarPlus, Trash2 } from 'lucide-react';
 
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,9 @@ import SearchableDropdown from 'components/form/search/SearchableDropdown';
 import Button from "components/ui/buttons/Button";
 import IconButton from 'components/ui/buttons/IconButton';
 import SelectField from 'components/form/SelectField';
+import ImageUploadField from 'components/form/images/ImageUploadField';
+import { getPresignedUploads, uploadFilesToSpaces } from 'services/uploadService';
+
 
 export default function RegisterUniversity() {
   const { createUniversity, loading } = useCreateUniversity();
@@ -24,6 +27,12 @@ export default function RegisterUniversity() {
 
   const { showToast } = useToast();
   const router = useRouter();
+
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoProgress, setLogoProgress] = useState(0);
+  const [logoFileKey, setLogoFileKey] = useState("");
+  const [logoFileUrl, setLogoFileUrl] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -45,7 +54,6 @@ export default function RegisterUniversity() {
 
   const isFormValid =
     formData.name.trim() &&
-    formData.intake_months.length > 0 &&
     formData.branches.length > 0 &&
     formData.university_type_id.trim() &&
     formData.branches.every(
@@ -94,9 +102,51 @@ export default function RegisterUniversity() {
     });
   };
 
-  const handleCreate = async () => {
+  const handleLogoSelect = async (file: File) => {
+    setLogoFile(file);
+    setLogoUploading(true);
+    setLogoProgress(0);
+    setLogoFileKey("");
+    setLogoFileUrl("");
+
     try {
-      await createUniversity(formData);
+      const presigned = await getPresignedUploads([file], "university-logos");
+      const results = await uploadFilesToSpaces([file], presigned, (_, pct) => {
+        setLogoProgress(pct);
+      });
+      const uploaded = results?.[0];
+
+      if (!uploaded?.file_key || !uploaded?.public_url) {
+        showToast("Logo upload failed. Please try again.", "error");
+        setLogoFile(null);
+        return;
+      }
+
+      setLogoFileKey(uploaded.file_key);
+      setLogoFileUrl(uploaded.public_url);
+      setLogoProgress(100);
+      showToast("Logo uploaded successfully.", "success");
+    } catch (err: any) {
+      showToast(err?.message || "Logo upload failed.", "error");
+      setLogoFile(null);
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
+  const handleCreate = async () => {
+    if (logoUploading) {
+      showToast("Please wait for the logo to finish uploading.", "error");
+      return;
+    }
+
+    try {
+      await createUniversity({
+        ...formData,
+        logo_file_key: logoFileKey,
+        logo_file_url: logoFileUrl,
+      });
+
       showToast("University created successfully.", "success");
 
       setTimeout(() => {
@@ -108,14 +158,20 @@ export default function RegisterUniversity() {
       let message = "Please try again.";
 
       if (code === "university_name_exists") {
-        message =
-          "A university with this name already exists. Please use a different name.";
+        message = "A university with this name already exists. Please use a different name.";
       } else if (error?.response?.data?.message) {
         message = error.response.data.message;
       }
 
       showToast(`Failed to create university. ${message}`, "error");
     }
+  };
+
+  const handleRemoveBranch = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      branches: prev.branches.filter((_, i) => i !== index),
+    }));
   };
 
   const handleAddBranch = () => {
@@ -141,8 +197,18 @@ export default function RegisterUniversity() {
       <div className="mt-6 rounded-md border bg-white">
         <div className="flex justify-between border-b p-6">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
-              <School className="h-6 w-6 text-white" />
+            <div className="shrink-0">
+              <ImageUploadField
+                label=""
+                field="logo"
+                imageOnly
+                simpleFile={logoFile}
+                onSimpleFileChange={handleLogoSelect}
+                onSimpleRemove={() => { setLogoFile(null); setLogoFileKey(""); setLogoFileUrl(""); }}
+                simpleUploading={logoUploading}
+                simpleProgress={logoProgress}
+                errors={errors}
+              />
             </div>
 
             <div>
@@ -181,7 +247,7 @@ export default function RegisterUniversity() {
           <MultipleDatePickerModal
             label="Intake Dates"
             field="intake_months"
-            required
+            required = {false}
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
@@ -196,11 +262,10 @@ export default function RegisterUniversity() {
               label: type.name,
             }))}
             formData={formData}
-            errors={{}}
-            updateFormData={(field, value) => {
-              updateFormData(field, value);
-            }}
+            errors={errors}
+            updateFormData={updateFormData}
           />
+
 
         </div>
 
@@ -232,6 +297,16 @@ export default function RegisterUniversity() {
                     Branch {index + 1}
                   </h4>
 
+                  <IconButton
+                    icon={<Trash2 className="h-4 w-4" />}
+                    disabled={formData.branches.length === 1}
+                    bgColor="bg-red-50"
+                    textColor="text-red-700"
+                    borderColor="border-red-200"
+                    hoverTextColor="hover:text-red-800"
+                    hoverBorderColor="hover:border-red-300"
+                    onClick={() => handleRemoveBranch(index)}
+                  />
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -278,7 +353,7 @@ export default function RegisterUniversity() {
         <div className="flex justify-end gap-2 border-t p-6">
           <Button
             onClick={handleBack}
-            disabled={loading}
+            disabled={loading || logoUploading}
             icon={<ChevronLeft className="h-5 w-5" />}
             text={"Back"}
             bgColor="bg-slate-50"
@@ -290,7 +365,7 @@ export default function RegisterUniversity() {
 
           <Button
             onClick={handleCreate}
-            disabled={loading || !isFormValid}
+            disabled={loading || logoUploading || !isFormValid}
             icon={<GraduationCap className="h-5 w-5" />}
             text={loading ? "Creating..." : "Create University"}
             bgColor="bg-blue-50"

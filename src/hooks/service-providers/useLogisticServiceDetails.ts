@@ -14,15 +14,23 @@ export interface PriceRange {
   max_price: number
 }
 
+export interface ServicesOffered {
+  id: string
+  name: string
+  price: number
+}
+
 export interface LogisticService {
   id: string
   name: string
+  picture_file_key: string
+  picture_file_url: string
   nationality: string
   main_location: string
   universities_served: string[]
   service_locations: string[]
   languages: string[]
-  services_offered: string[]
+  services_offered: ServicesOffered[]
   packages_offered: Package[]
   price_range: PriceRange
   phone_number: string

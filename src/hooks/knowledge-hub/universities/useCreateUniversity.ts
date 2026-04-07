@@ -12,6 +12,10 @@ export type CreateUniversityPayload = {
   name: string;
   country: string;
   is_active: boolean;
+
+  logo_file_key: string;
+  logo_file_url: string;
+
   university_type_id: string;
   description: string;
   intake_months: string[];

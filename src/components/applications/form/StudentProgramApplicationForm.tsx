@@ -18,6 +18,7 @@ import {
   uploadFilesToSpaces,
 } from "../../../services/uploadService";
 import { useMe } from "../../../hooks/useMe";
+import { usePartnerProgramIntakeDates } from "../../../hooks/knowledge-hub/programs/usePartnerProgramIntakeDates";
 import Loading from "../../loading/Loading";
 
 import { useSearchParams } from "next/navigation";
@@ -202,6 +203,14 @@ export default function StudentManualApplication() {
     setFormData((prev) => setNestedValue(prev, fieldPath, value));
     setErrors((prev) => setNestedValue(prev || {}, fieldPath, ""));
   };
+
+  const { intakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
+
+  useEffect(() => {
+    if (intakeDates.length > 0) {
+      setFormData((prev) => ({ ...prev, intake_date: intakeDates[0] }));
+    }
+  }, [intakeDates]);
 
   const addCompletedStage = (s) => {
     setCompletedStages((prev) => {
@@ -749,6 +758,26 @@ export default function StudentManualApplication() {
                     updateFormData={updateFormData}
                   />
                 </div>
+
+                {intakeDates.length > 1 && (
+                  <div>
+                    <label className="block text-p2 font-medium text-slate-900">
+                      Intake Date <span className="text-red-600">*</span>
+                    </label>
+                    <select
+                      value={formData.intake_date ?? ""}
+                      onChange={(e) => updateFormData("intake_date", e.target.value)}
+                      className="mt-2 flex h-12 w-full items-center rounded-md border border-default p-3 text-sm outline-none focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    >
+                      {intakeDates.map((date) => (
+                        <option key={date} value={date}>{date}</option>
+                      ))}
+                    </select>
+                    {errors?.["intake_date"] && (
+                      <p className="mt-1 text-xs text-red-600">{errors["intake_date"]}</p>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}

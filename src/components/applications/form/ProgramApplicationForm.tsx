@@ -30,6 +30,7 @@ import {
   uploadFilesToSpaces,
 } from "services/uploadService";
 import { useMe } from "hooks/useMe";
+import { usePartnerProgramIntakeDates } from "hooks/knowledge-hub/programs/usePartnerProgramIntakeDates";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
 import PrevButton from "components/ui/buttons/PrevButton";
@@ -78,18 +79,15 @@ export default function StudentRegistrationForm() {
   const university_id = searchParams.get("university_id") ?? "";
   const intake_date = searchParams.get("intake_date") ?? "";
 
-  const [isProgramEditable, setIsProgramEditable] = useState(false);
-
-  const handleChangeProgram = () => setIsProgramEditable(true);
 
   const { documentTypes } = useDocumentType(true);
   const { qualifications } = useAllQualifications();
   const safeDocumentTypes = documentTypes ?? [];
 
   const requiredFieldKeys =
-    requiredFields?.fields
-      ?.filter((f) => f.is_required)
-      ?.map((f) => f.field_key) || [];
+    (requiredFields as any)?.fields
+      ?.filter((f: any) => f.is_required)
+      ?.map((f: any) => f.field_key) || [];
 
   const shouldShowStage3 = requiredFieldKeys.length > 0;
   const visibleStages = shouldShowStage3
@@ -125,6 +123,14 @@ export default function StudentRegistrationForm() {
     documents: [],
     is_draft: false,
   });
+
+  const { intakeDates, loading: loadingIntakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
+
+  useEffect(() => {
+    if (intakeDates.length > 0) {
+      setFormData((prev) => ({ ...prev, intake_date: intakeDates[0] }));
+    }
+  }, [intakeDates]);
 
   const contact = formData.student.emergency_contacts[0];
 
@@ -491,8 +497,6 @@ export default function StudentRegistrationForm() {
               errors={errors}
               updateFormData={updateFormData}
               universities={universities}
-              isProgramEditable={isProgramEditable}
-              onChangeProgram={handleChangeProgram}
             />
           )}
 
@@ -514,6 +518,8 @@ export default function StudentRegistrationForm() {
               updateFormData={updateFormData}
               requiredFieldKeys={requiredFieldKeys}
               qualifications={qualifications}
+              intakeDates={intakeDates}
+              loadingIntakeDates={loadingIntakeDates}
             />
           )}
 

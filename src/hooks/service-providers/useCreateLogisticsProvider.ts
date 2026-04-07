@@ -9,8 +9,15 @@ interface PackageOffered {
   includes: string[]
 }
 
+interface ServiceEntry {
+  service_id: string
+  price: number
+}
+
 export interface CreateLogisticsProviderPayload {
   name: string
+  picture_file_key: string
+  picture_file_url: string
   nationality: string
   main_location: string
   phone_number: string
@@ -18,8 +25,7 @@ export interface CreateLogisticsProviderPayload {
   is_active: boolean
   packages_offered: PackageOffered[]
   university_ids: string[]
-  service_location_ids: string[]
-  service_ids: string[]
+  services: ServiceEntry[]
   language_ids: string[]
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import PresignedImage from "components/ui/PresignedImage";
 import {
   ArrowRight,
   ArrowLeft,
@@ -109,12 +110,22 @@ const MarketplaceCard = () => {
                   <div className="flex items-center justify-between border-b bg-slate-50 px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100">
-                          <span className="text-sm font-semibold uppercase text-blue-700">
-                            {m.name?.slice(0, 2)}
-                          </span>
-                        </div>
-
+                        {m.picture_file_key ? (
+                          <PresignedImage
+                            fileKey={m.picture_file_key}
+                            alt={m.name}
+                            className="h-11 w-11 rounded-full object-cover"
+                            fallback={
+                              <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100">
+                                <span className="text-sm font-semibold uppercase text-blue-700">{m.name?.slice(0, 2)}</span>
+                              </div>
+                            }
+                          />
+                        ) : (
+                          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100">
+                            <span className="text-sm font-semibold uppercase text-blue-700">{m.name?.slice(0, 2)}</span>
+                          </div>
+                        )}
                         <span
                           className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${
                             m.is_active ? "bg-emerald-500" : "bg-red-500"
@@ -199,11 +210,11 @@ const MarketplaceCard = () => {
                       <div className="mt-4 flex flex-wrap gap-2">
                         {m.services_offered?.slice(0, 3).map((service) => (
                           <span
-                            key={service}
+                            key={service.id}
                             className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
                           >
-                        {service}
-                      </span>
+                            {service.name}
+                          </span>
                         ))}
                       </div>
                     </div>
