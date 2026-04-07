@@ -30,7 +30,7 @@ services:
       repository: unibexs-frontend-staging
       tag: staging-latest
     instance_count: 1
-    instance_size_slug: professional-xs
+    instance_size_slug: apps-s-1vcpu-1gb-fixed
     http_port: 3000
     health_check:
       http_path: /api/health
