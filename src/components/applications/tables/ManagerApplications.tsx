@@ -411,7 +411,7 @@ const ModernApplicationsTable = () => {
                 <tr
                   key={app.id}
                   className="hover:bg-primary/10 group cursor-pointer transition-colors"
-                  onClick={() => router.push(`/admin/applications/${app.id}`)}
+                  onClick={() => router.push(`/account-manager/applications/${app.id}`)}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
 
