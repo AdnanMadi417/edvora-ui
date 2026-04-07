@@ -203,28 +203,27 @@ definitions:
         name: Smoke Test (Staging)
         script:
           - set +e
-          - apt-get update && apt-get install -y wget curl
-          - wget https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
-          - tar xf doctl-1.104.0-linux-amd64.tar.gz
-          - mv doctl /usr/local/bin
-          - doctl auth init --access-token $DIGITALOCEAN_ACCESS_TOKEN
-          - export STAGING_URL=$(doctl apps get $FE_STAGING_APP_ID --format LiveURL --no-header)
-          - 'echo "Resolved staging URL: $STAGING_URL"'
-          - MAX_ATTEMPTS=30
+          - SMOKE_STATUS=success
+          - apt-get update && apt-get install -y curl
+          - 'echo "Smoke testing: $FE_STAGING_URL/api/health"'
           - ATTEMPTS=0
+          - MAX_ATTEMPTS=12
           - |
-            while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
-              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${STAGING_URL}/api/health")
-              echo "Health check attempt $((ATTEMPTS+1))/$MAX_ATTEMPTS: HTTP $HTTP_CODE"
+            while [ "$ATTEMPTS" -lt "$MAX_ATTEMPTS" ]; do
+              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${FE_STAGING_URL}/api/health")
+              echo "  Attempt $((ATTEMPTS+1))/$MAX_ATTEMPTS -- HTTP $HTTP_CODE"
               if [ "$HTTP_CODE" = "200" ]; then
-                export SMOKE_STATUS=success
+                echo "Smoke test passed."
                 break
               fi
-              ATTEMPTS=$((ATTEMPTS+1))
+              ATTEMPTS=$((ATTEMPTS + 1))
               sleep 10
             done
-          - if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then export SMOKE_STATUS=failure; fi
-          - curl -sf -o /dev/null -w "HTTP %{http_code}" "${STAGING_URL}/api/health"
+          - |
+            if [ "$ATTEMPTS" -ge "$MAX_ATTEMPTS" ]; then
+              echo "Smoke test timed out after $((MAX_ATTEMPTS * 10))s"
+              SMOKE_STATUS=failure
+            fi
           - echo "$SMOKE_STATUS" > smoke_status.txt
         artifacts:
           - smoke_status.txt
@@ -233,28 +232,27 @@ definitions:
         name: Smoke Test (Prod)
         script:
           - set +e
-          - apt-get update && apt-get install -y wget curl
-          - wget https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
-          - tar xf doctl-1.104.0-linux-amd64.tar.gz
-          - mv doctl /usr/local/bin
-          - doctl auth init --access-token $DIGITALOCEAN_ACCESS_TOKEN
-          - export PROD_URL=$(doctl apps get $FE_PROD_APP_ID --format LiveURL --no-header)
-          - 'echo "Resolved prod URL: $PROD_URL"'
-          - MAX_ATTEMPTS=30
+          - SMOKE_STATUS=success
+          - apt-get update && apt-get install -y curl
+          - 'echo "Smoke testing: $FE_PROD_URL/api/health"'
           - ATTEMPTS=0
+          - MAX_ATTEMPTS=12
           - |
-            while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
-              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${PROD_URL}/api/health")
-              echo "Health check attempt $((ATTEMPTS+1))/$MAX_ATTEMPTS: HTTP $HTTP_CODE"
+            while [ "$ATTEMPTS" -lt "$MAX_ATTEMPTS" ]; do
+              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${FE_PROD_URL}/api/health")
+              echo "  Attempt $((ATTEMPTS+1))/$MAX_ATTEMPTS -- HTTP $HTTP_CODE"
               if [ "$HTTP_CODE" = "200" ]; then
-                export SMOKE_STATUS=success
+                echo "Smoke test passed."
                 break
               fi
-              ATTEMPTS=$((ATTEMPTS+1))
+              ATTEMPTS=$((ATTEMPTS + 1))
               sleep 10
             done
-          - if [ $ATTEMPTS -ge $MAX_ATTEMPTS ]; then export SMOKE_STATUS=failure; fi
-          - curl -sf -o /dev/null -w "HTTP %{http_code}" "${PROD_URL}/api/health"
+          - |
+            if [ "$ATTEMPTS" -ge "$MAX_ATTEMPTS" ]; then
+              echo "Smoke test timed out after $((MAX_ATTEMPTS * 10))s"
+              SMOKE_STATUS=failure
+            fi
           - echo "$SMOKE_STATUS" > smoke_status.txt
         artifacts:
           - smoke_status.txt
@@ -288,17 +286,16 @@ definitions:
               SMOKE_STATUS="unknown"
             fi
           - |
-            TEST_ICON=""
-            BUILD_ICON=""
-            DEPLOY_ICON=""
-            SMOKE_ICON=""
-            OVERALL="FAILED"
-            if [ "$TEST_STATUS" = "success" ]; then TEST_ICON="✓"; else TEST_ICON="✗"; fi
-            if [ "$BUILD_STATUS" = "success" ]; then BUILD_ICON="✓"; else BUILD_ICON="✗"; fi
-            if [ "$DEPLOY_STATUS" = "success" ]; then DEPLOY_ICON="✓"; else DEPLOY_ICON="✗"; fi
-            if [ "$SMOKE_STATUS" = "success" ]; then SMOKE_ICON="✓"; else SMOKE_ICON="✗"; fi
-            if [ "$TEST_STATUS" = "success" ] && [ "$BUILD_STATUS" = "success" ] && [ "$DEPLOY_STATUS" = "success" ] && [ "$SMOKE_STATUS" = "success" ]; then OVERALL="SUCCESS"; fi
-            NOTIFY_MESSAGE=$(printf "[STAGING] Unibexs Frontend — %s\nTests: %s  |  Build: %s  |  Deploy: %s  |  Smoke: %s\nBranch: %s" "$OVERALL" "$TEST_ICON" "$BUILD_ICON" "$DEPLOY_ICON" "$SMOKE_ICON" "$BITBUCKET_BRANCH")
+            if [ "$TEST_STATUS" = "success" ]; then TEST_ICON="✅"; else TEST_ICON="❌"; fi
+            if [ "$BUILD_STATUS" = "success" ]; then BUILD_ICON="✅"; else BUILD_ICON="❌"; fi
+            if [ "$DEPLOY_STATUS" = "success" ]; then DEPLOY_ICON="✅"; else DEPLOY_ICON="❌"; fi
+            if [ "$SMOKE_STATUS" = "success" ]; then SMOKE_ICON="✅"; else SMOKE_ICON="❌"; fi
+            if [ "$TEST_STATUS" = "success" ] && [ "$BUILD_STATUS" = "success" ] && [ "$DEPLOY_STATUS" = "success" ] && [ "$SMOKE_STATUS" = "success" ]; then
+              OVERALL="✅ SUCCESS"
+            else
+              OVERALL="❌ FAILED"
+            fi
+            NOTIFY_MESSAGE=$(printf "🖥️ *Unibexs Frontend — Staging*\nStatus: %s\n\nTests %s  |  Build %s  |  Deploy %s  |  Smoke %s\n\nBranch: %s  |  Commit: %s" "$OVERALL" "$TEST_ICON" "$BUILD_ICON" "$DEPLOY_ICON" "$SMOKE_ICON" "$BITBUCKET_BRANCH" "${BITBUCKET_COMMIT:0:7}")
           - pipe: atlassian/slack-notify:2.3.1
             variables:
               WEBHOOK_URL: $WEBHOOK_URL
@@ -333,17 +330,16 @@ definitions:
               SMOKE_STATUS="unknown"
             fi
           - |
-            TEST_ICON=""
-            BUILD_ICON=""
-            DEPLOY_ICON=""
-            SMOKE_ICON=""
-            OVERALL="FAILED"
-            if [ "$TEST_STATUS" = "success" ]; then TEST_ICON="✓"; else TEST_ICON="✗"; fi
-            if [ "$BUILD_STATUS" = "success" ]; then BUILD_ICON="✓"; else BUILD_ICON="✗"; fi
-            if [ "$DEPLOY_STATUS" = "success" ]; then DEPLOY_ICON="✓"; else DEPLOY_ICON="✗"; fi
-            if [ "$SMOKE_STATUS" = "success" ]; then SMOKE_ICON="✓"; else SMOKE_ICON="✗"; fi
-            if [ "$TEST_STATUS" = "success" ] && [ "$BUILD_STATUS" = "success" ] && [ "$DEPLOY_STATUS" = "success" ] && [ "$SMOKE_STATUS" = "success" ]; then OVERALL="SUCCESS"; fi
-            NOTIFY_MESSAGE=$(printf "[PROD] Unibexs Frontend — %s\nTests: %s  |  Build: %s  |  Deploy: %s  |  Smoke: %s\nBranch: %s" "$OVERALL" "$TEST_ICON" "$BUILD_ICON" "$DEPLOY_ICON" "$SMOKE_ICON" "$BITBUCKET_BRANCH")
+            if [ "$TEST_STATUS" = "success" ]; then TEST_ICON="✅"; else TEST_ICON="❌"; fi
+            if [ "$BUILD_STATUS" = "success" ]; then BUILD_ICON="✅"; else BUILD_ICON="❌"; fi
+            if [ "$DEPLOY_STATUS" = "success" ]; then DEPLOY_ICON="✅"; else DEPLOY_ICON="❌"; fi
+            if [ "$SMOKE_STATUS" = "success" ]; then SMOKE_ICON="✅"; else SMOKE_ICON="❌"; fi
+            if [ "$TEST_STATUS" = "success" ] && [ "$BUILD_STATUS" = "success" ] && [ "$DEPLOY_STATUS" = "success" ] && [ "$SMOKE_STATUS" = "success" ]; then
+              OVERALL="✅ SUCCESS"
+            else
+              OVERALL="❌ FAILED"
+            fi
+            NOTIFY_MESSAGE=$(printf "🖥️ *Unibexs Frontend — Production*\nStatus: %s\n\nTests %s  |  Build %s  |  Deploy %s  |  Smoke %s\n\nBranch: %s  |  Commit: %s" "$OVERALL" "$TEST_ICON" "$BUILD_ICON" "$DEPLOY_ICON" "$SMOKE_ICON" "$BITBUCKET_BRANCH" "${BITBUCKET_COMMIT:0:7}")
           - pipe: atlassian/slack-notify:2.3.1
             variables:
               WEBHOOK_URL: $WEBHOOK_URL
@@ -392,10 +388,8 @@ pipelines:
                 TEST_STATUS="unknown"
               fi
             - |
-              TEST_ICON=""
-              OVERALL="FAILED"
-              if [ "$TEST_STATUS" = "success" ]; then TEST_ICON="✓"; OVERALL="SUCCESS"; else TEST_ICON="✗"; fi
-              NOTIFY_MESSAGE=$(printf "[main] Unibexs Frontend — %s\nTests: %s\nBranch: %s" "$OVERALL" "$TEST_ICON" "$BITBUCKET_BRANCH")
+              if [ "$TEST_STATUS" = "success" ]; then TEST_ICON="✅"; OVERALL="✅ SUCCESS"; else TEST_ICON="❌"; OVERALL="❌ FAILED"; fi
+              NOTIFY_MESSAGE=$(printf "🖥️ *Unibexs Frontend — main*\nStatus: %s\n\nTests %s\n\nBranch: %s  |  Commit: %s" "$OVERALL" "$TEST_ICON" "$BITBUCKET_BRANCH" "${BITBUCKET_COMMIT:0:7}")
             - pipe: atlassian/slack-notify:2.3.1
               variables:
                 WEBHOOK_URL: $WEBHOOK_URL
