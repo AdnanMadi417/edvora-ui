@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import InputField from "../form/InputField";
+import PasswordField from "../form/PasswordField";
 import Checkbox from "../checkbox";
 import { Lock } from "lucide-react";
 
@@ -71,10 +72,9 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
             updateFormData={updateFormData}
           />
 
-          <InputField
+          <PasswordField
             label="Password"
             field="password"
-            type="password"
             placeholder="Min. 8 characters"
             formData={formData}
             errors={errors}

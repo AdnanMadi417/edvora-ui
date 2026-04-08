@@ -12,6 +12,7 @@ import { useAssignPartnerManager } from 'hooks/partners/useAssignPartnerManager'
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import InputField from "components/form/InputField";
+import PasswordField from "components/form/PasswordField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import SelectField from "components/form/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
@@ -275,10 +276,9 @@ const EditPartnerDetails = ({ id }: PartnerDetailsProps) => {
               updateFormData={updateFormData}
             />
 
-            <InputField
+            <PasswordField
               label="Password"
               field="password"
-              type="password"
               placeholder="At least 8 characters, letters & numbers"
               required
               formData={formData}

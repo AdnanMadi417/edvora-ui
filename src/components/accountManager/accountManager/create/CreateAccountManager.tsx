@@ -4,6 +4,7 @@ import { PlusCircle, User } from "lucide-react";
 import React, { useState } from "react";
 
 import InputField from "../../../form/InputField";
+import PasswordField from "../../../form/PasswordField";
 import CreateAccount from "../../../ui/buttons/Button";
 import { useCreateAccountManager } from "hooks/account-managers/useCreateAccountManager";
 
@@ -130,10 +131,9 @@ export default function RegisterAccountManager() {
             updateFormData={updateFormData}
           />
 
-          <InputField
+          <PasswordField
             label="Password"
             field="password"
-            type="password"
             placeholder="At least 8 characters, letters & numbers"
             required
             formData={formData}
@@ -141,10 +141,9 @@ export default function RegisterAccountManager() {
             updateFormData={updateFormData}
           />
 
-          <InputField
+          <PasswordField
             label="Confirm Password"
             field="confirm_password"
-            type="password"
             placeholder="Repeat your password"
             required
             formData={formData}

@@ -5,6 +5,7 @@ import {
 import React, { useEffect, useState } from "react";
 
 import InputField from "components/form/InputField";
+import PasswordField from "components/form/PasswordField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
@@ -186,10 +187,9 @@ export default function EditProfileDetails({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3">
 
-            <InputField
+            <PasswordField
               label="Password"
               field="password"
-              type="password"
               placeholder="At least 8 characters, letters & numbers"
               required
               formData={formData}
@@ -197,10 +197,9 @@ export default function EditProfileDetails({
               updateFormData={updateField}
             />
 
-            <InputField
+            <PasswordField
               label="Confirm Password"
               field="confirm_password"
-              type="password"
               placeholder="Repeat your password"
               required
               formData={formData}
