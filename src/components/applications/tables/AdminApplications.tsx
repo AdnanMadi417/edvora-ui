@@ -2,46 +2,97 @@ import React, { useState, useMemo, useEffect } from "react";
 import {
   ChevronUp,
   ChevronDown,
-  Eye,
-  Calendar,
+  ChevronRight,
   Clock,
   User,
   Building,
   GraduationCap,
-  CalendarCheck,
   BadgeCheck,
-  Settings,
   ArrowLeft,
-  ArrowRight, UserSearch, GitBranch, RotateCcw,
-} from 'lucide-react';
-import { MdSchool } from 'react-icons/md';
-import Link from "next/link";
+  ArrowRight,
+  UserSearch,
+  GitBranch,
+  RotateCcw,
+  Flag,
+} from "lucide-react";
+import { MdSchool } from "react-icons/md";
 
 import { useAdminApplications } from "hooks/applications/useAdminApplications";
-import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
-import { useAllStages } from 'hooks/applications/stages/useStages';
-import { useAllStageStatuses } from 'hooks/applications/stages/useStageStatuses';
+import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
+import { useAllStages } from "hooks/applications/stages/useStages";
+import { useAllStageStatuses } from "hooks/applications/stages/useStageStatuses";
 
 import EmptyData from "components/emptyData/EmptyTableData";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
 import ClearButton from "components/ui/buttons/DangerButton";
-import FilterSelectField from 'components/form/filter/FilterSelectField';
+import FilterSelectField from "components/form/filter/FilterSelectField";
 import { useRouter } from "next/navigation";
+
+const getRelativeTime = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
+};
+
+const SkeletonRow = () => (
+  <tr className="border-b border-gray-100">
+    <td className="px-6 py-4">
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 shrink-0 animate-pulse rounded-full bg-gray-200" />
+        <div className="space-y-2">
+          <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
+          <div className="h-3 w-44 animate-pulse rounded bg-gray-200" />
+        </div>
+      </div>
+    </td>
+    <td className="px-6 py-4">
+      <div className="space-y-2">
+        <div className="h-4 w-40 animate-pulse rounded bg-gray-200" />
+        <div className="h-3 w-28 animate-pulse rounded bg-gray-200" />
+      </div>
+    </td>
+    <td className="px-6 py-4">
+      <div className="space-y-2">
+        <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
+        <div className="h-3 w-24 animate-pulse rounded bg-gray-200" />
+      </div>
+    </td>
+    <td className="px-6 py-4">
+      <div className="space-y-2">
+        <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
+        <div className="h-6 w-32 animate-pulse rounded-full bg-gray-200" />
+      </div>
+    </td>
+    <td className="px-6 py-4">
+      <div className="h-4 w-20 animate-pulse rounded bg-gray-200" />
+    </td>
+    <td className="px-4 py-4" />
+  </tr>
+);
 
 const ModernApplicationsTable = () => {
 
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   const {
     items: adminApplications,
     loading,
-    error,
     total,
   } = useAdminApplications({
-    limit: 20,
-    offset: (currentPage - 1) * 20,
+    limit: itemsPerPage,
+    offset: (currentPage - 1) * itemsPerPage,
     status: "active",
   });
 
@@ -52,7 +103,6 @@ const ModernApplicationsTable = () => {
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedStages, setSelectedStages] = useState<string>("all");
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
-
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -60,12 +110,19 @@ const ModernApplicationsTable = () => {
     setCurrentPage(1);
   }, [searchTerm, selectedUniversity, selectedStages, selectedStageStatus]);
 
-  const handleSort = (key) => {
+  const handleSort = (key: string) => {
     setSortConfig((prev) => ({
       key,
       direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
     }));
   };
+
+  const activeFiltersCount = [
+    selectedUniversity !== "all",
+    selectedStages !== "all",
+    selectedStageStatus !== "all",
+    searchTerm !== "",
+  ].filter(Boolean).length;
 
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = [...adminApplications];
@@ -79,26 +136,25 @@ const ModernApplicationsTable = () => {
           (app.partner_name?.toLowerCase() ?? "").includes(term) ||
           (app.account_manager_name?.toLowerCase() ?? "").includes(term) ||
           (app.program_name?.toLowerCase() ?? "").includes(term) ||
-          (app.university_name?.toLowerCase() ?? "").includes(term)
+          (app.university_name?.toLowerCase() ?? "").includes(term),
       );
     }
 
     if (selectedStageStatus !== "all" && !stageStatusesLoading) {
       filtered = filtered.filter(
-        (app) =>
-          app.status?.toLowerCase().replace(/\s+/g, "_") === selectedStageStatus
+        (app) => app.status?.toLowerCase().replace(/\s+/g, "_") === selectedStageStatus,
       );
     }
 
     if (selectedStages !== "all") {
       filtered = filtered.filter(
-        (app) => app.stage?.toLowerCase() === selectedStages.toLowerCase()
+        (app) => app.stage?.toLowerCase() === selectedStages.toLowerCase(),
       );
     }
 
     if (selectedUniversity !== "all") {
       filtered = filtered.filter(
-        (app) => app.university_name?.toLowerCase() === selectedUniversity.toLowerCase()
+        (app) => app.university_name?.toLowerCase() === selectedUniversity.toLowerCase(),
       );
     }
 
@@ -123,15 +179,66 @@ const ModernApplicationsTable = () => {
     stageStatusesLoading,
   ]);
 
-  const itemsPerPage = 20;
   const totalPages = Math.ceil(total / itemsPerPage);
-
   const paginatedApplications = filteredAndSortedApplications;
+
+  const StatusBadge = ({ status }: { status: string }) => {
+    const statusConfig: Record<string, any> = {
+      new_application: {
+        bg: "bg-blue-50 border-blue-200",
+        text: "text-blue-700",
+        dot: "bg-blue-500",
+        label: "New Application",
+      },
+      under_review_by_account_manager: {
+        bg: "bg-yellow-50 border-yellow-200",
+        text: "text-yellow-700",
+        dot: "bg-yellow-500",
+        label: "Under Review",
+      },
+      correction_requested_by_account_manager: {
+        bg: "bg-orange-50 border-orange-200",
+        text: "text-orange-700",
+        dot: "bg-orange-500",
+        label: "Correction Requested",
+      },
+      approved_from_stage_1: {
+        bg: "bg-green-50 border-green-200",
+        text: "text-green-700",
+        dot: "bg-green-500",
+        label: "Approved",
+      },
+      rejected: {
+        bg: "bg-red-50 border-red-200",
+        text: "text-red-700",
+        dot: "bg-red-500",
+        label: "Rejected",
+      },
+    };
+
+    const normalizedStatus = status?.toLowerCase().replace(/\s+/g, "_");
+    const config = statusConfig[normalizedStatus] || {
+      bg: "bg-gray-100 border-gray-200",
+      text: "text-gray-700",
+      dot: "bg-gray-400",
+      label: status || "Unknown",
+    };
+
+    return (
+      <span
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${config.bg} ${config.text}`}
+        title={config.label}
+      >
+        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${config.dot}`} />
+        <span className="truncate max-w-[160px]">{config.label}</span>
+      </span>
+    );
+  };
 
   const SortIndicator = ({ field }) => {
     if (sortConfig.key !== field) {
       return (
-        <ChevronUp className="h-4 w-4 text-slate-500 opacity-0 transition-opacity group-hover:opacity-100" />
+        <ChevronUp className="h-4 w-4 text-slate-400 opacity-0 transition-opacity group-hover:opacity-100" />
       );
     }
     return sortConfig.direction === "asc" ? (
@@ -151,36 +258,34 @@ const ModernApplicationsTable = () => {
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-4 overflow-hidden rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
-          <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
+
+          {/* Header */}
+          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-slate-900">
-                Applications Dashboard
-              </h3>
-              <p className="mt-1 text-sm text-slate-500">
-                Manage and track student applications
-              </p>
+              <h3 className="text-xl font-semibold text-slate-900">Applications Dashboard</h3>
+              <p className="mt-0.5 text-sm text-slate-500">Manage and track student applications</p>
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
-
+          {/* Filter bar */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-3">
             <div className="relative w-full sm:w-64 flex-shrink-0">
-              <UserSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
+              <UserSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search applications..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 text-sm text-slate-700 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
-            <div className="w-full sm:w-48 flex-shrink-0">
+            <div className="w-full sm:w-44 flex-shrink-0">
               <FilterSelectField
                 value={selectedStages}
-                onChange={(val) => setSelectedStages(val)}
+                onChange={(val: string) => setSelectedStages(val)}
                 options={stages}
                 icon={GitBranch}
                 defaultOption="All Stages"
@@ -189,32 +294,39 @@ const ModernApplicationsTable = () => {
 
             <div className="w-full sm:w-48 flex-shrink-0">
               <FilterSelectField
-                value={selectedStageStatus}
-                onChange={(val) => setSelectedStageStatus(val)}
-                options={stageStatuses.map(s => ({
-                  label: s.name,
-                  value: s.name.toLowerCase().replace(/\s+/g, "_")
-                }))}
-                icon={BadgeCheck}
-                defaultOption={stageStatusesLoading ? "Loading statuses..." : "All Statuses"}
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
                 value={selectedUniversity}
-                onChange={(val) => setSelectedUniversity(val)}
+                onChange={(val: string) => setSelectedUniversity(val)}
                 options={universities}
                 icon={MdSchool}
                 defaultOption="All Universities"
               />
             </div>
 
-            <ClearButton
-              onClick={handleClearFilters}
-              text="Clear"
-              icon={<RotateCcw className="h-4 w-4" />}
-            />
+            <div className="w-full sm:w-48 flex-shrink-0">
+              <FilterSelectField
+                value={selectedStageStatus}
+                onChange={(val: string) => setSelectedStageStatus(val)}
+                options={stageStatuses.map((s) => ({
+                  label: s.name,
+                  value: s.name.toLowerCase().replace(/\s+/g, "_"),
+                }))}
+                icon={BadgeCheck}
+                defaultOption={stageStatusesLoading ? "Loading..." : "All Statuses"}
+              />
+            </div>
+
+            {activeFiltersCount > 0 && (
+              <div className="relative flex-shrink-0">
+                <ClearButton
+                  onClick={handleClearFilters}
+                  text="Clear"
+                  icon={<RotateCcw className="h-4 w-4" />}
+                />
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {activeFiltersCount}
+                </span>
+              </div>
+            )}
           </div>
 
         </div>
@@ -226,87 +338,65 @@ const ModernApplicationsTable = () => {
             <tr className="border-b border-gray-200 bg-card">
               <th
                 onClick={() => handleSort("student_name")}
-                className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
               >
                 <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-slate-500" />
+                  <User className="h-4 w-4 text-slate-400" />
                   Student
                   <SortIndicator field="student_name" />
                 </div>
               </th>
 
               <th
-                onClick={() => handleSort("application-name")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
+                onClick={() => handleSort("program_name")}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
               >
                 <div className="flex min-w-[250px] items-center gap-2">
-                  <GraduationCap className="h-4 w-4 text-slate-500" />
+                  <GraduationCap className="h-4 w-4 text-slate-400" />
                   University / Program
-                  <SortIndicator field="application-name" />
+                  <SortIndicator field="program_name" />
                 </div>
               </th>
 
               <th
                 onClick={() => handleSort("partner_name")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
               >
                 <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4 text-slate-500" />
+                  <Building className="h-4 w-4 text-slate-400" />
                   Ownership
                   <SortIndicator field="partner_name" />
                 </div>
               </th>
 
               <th
-                onClick={() => handleSort("status")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
+                onClick={() => handleSort("stage")}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
               >
-                <div className="flex min-w-[250px] items-center gap-2">
-                  <BadgeCheck className="h-4 w-4 text-slate-500" />
+                <div className="flex min-w-[200px] items-center gap-2">
+                  <Flag className="h-4 w-4 text-slate-400" />
                   Stage / Status
-                  <SortIndicator field="status" />
-                </div>
-              </th>
-
-              <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                <div className="flex items-center gap-2 ">
-                  <CalendarCheck className="h-4 w-4 text-slate-500" />
-                  Next Action
-                </div>
-              </th>
-
-              <th className="group px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
-                <div className="flex min-w-[150px] items-center gap-2">
-                  <Clock className="h-4 w-4 text-slate-500" />
-                  Last Updated
+                  <SortIndicator field="stage" />
                 </div>
               </th>
 
               <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4 text-slate-500" />
-                  Actions
+                <div className="flex min-w-[100px] items-center gap-2">
+                  <Clock className="h-4 w-4 text-slate-400" />
+                  Updated
                 </div>
               </th>
+
+              <th className="w-10 px-4 py-4" />
             </tr>
           </thead>
 
-          <tbody className="divide-border-gray-200 divide-y bg-primary">
+          <tbody className="divide-y divide-gray-100 bg-card">
             {loading ? (
-              <tr>
-                <td
-                  colSpan={8}
-                  className="px-6 py-4 text-center text-p1 text-slate-500"
-                >
-                  Loading applications...
-                </td>
-              </tr>
+              Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
             ) : paginatedApplications.length === 0 ? (
               <tr>
-                <td
-                  colSpan={8}
-                  className="px-6 py-8 text-center text-slate-500"
-                >
+                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
                   <EmptyData />
                 </td>
               </tr>
@@ -314,82 +404,46 @@ const ModernApplicationsTable = () => {
               paginatedApplications.map((app) => (
                 <tr
                   key={app.id}
-                  className="hover:bg-primary/10 group cursor-pointer transition-colors"
+                  className="group cursor-pointer transition-colors hover:bg-slate-50"
                   onClick={() => router.push(`/admin/applications/${app.id}`)}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
-                      >
-                        {app ? (
-                          app.student_name[0].toUpperCase()
-                        ) : (
-                          <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
-                        )}
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                        {app.student_name?.[0]?.toUpperCase() ?? "?"}
                       </div>
-
-                      <div className="w-full overflow-hidden">
-                        <div className="truncate text-slate-900">
-                          {app.student_name}
-                        </div>
-                        <div className="truncate text-caption text-slate-500">
-                          {app.student_email}
-                        </div>
+                      <div className="min-w-0">
+                        <div className="truncate font-medium text-slate-900">{app.student_name}</div>
+                        <div className="truncate text-xs text-slate-500">{app.student_email}</div>
                       </div>
                     </div>
                   </td>
 
                   <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                    <div className="text-slate-900">{app.program_name}</div>
-                    <div className="truncate text-caption text-slate-500">
-                      {app.university_name}
-                    </div>
+                    <div className="font-medium text-slate-900">{app.program_name}</div>
+                    <div className="truncate text-xs text-slate-500">{app.university_name}</div>
                   </td>
 
                   <td className="min-w-[200px] max-w-[250px] px-6 py-4">
-                    <div className="truncate text-slate-900">
-                      {app.partner_name}
-                    </div>
-                    <div className="truncate text-caption text-slate-500">
-                      {app.account_manager_name}
-                    </div>
+                    <div className="truncate font-medium text-slate-900">{app.partner_name}</div>
+                    <div className="truncate text-xs text-slate-500">{app.account_manager_name}</div>
                   </td>
 
-                  <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                    <div className="text-slate-900">{app.stage}</div>
-                    <div className="truncate text-caption text-slate-500">
-                      {app.status}
-                    </div>
-                  </td>
-
-                  <td className="max-w-48 px-6 py-4">
-                    <div className="break-words text-slate-500">
-                      {app.next_action}
+                  <td className="px-6 py-4">
+                    <div className="space-y-1.5">
+                      <div className="text-xs text-slate-500">{app.stage}</div>
+                      <StatusBadge status={app.status} />
                     </div>
                   </td>
 
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-1 text-slate-500">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(app.updated_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "2-digit",
-                      })}
+                    <div className="text-sm text-slate-500">
+                      {getRelativeTime(app.updated_at)}
                     </div>
                   </td>
 
-                  <td className="min-w-[150px] px-6 py-4">
-                    <Link
-                      href={`/admin/applications/${app.id}`}
-                      aria-label="View Application"
-                      className="flex items-center justify-center gap-2 rounded-full border border-gray-200 p-2 text-caption text-slate-900 transition hover:border-blue-700 hover:text-blue-700"
-                    >
-                      <Eye className="h-4 w-4" />
-                      <span>View</span>
-                    </Link>
+                  <td className="px-4 py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
                 </tr>
               ))
@@ -399,24 +453,25 @@ const ModernApplicationsTable = () => {
       </div>
 
       <div className="sticky bottom-0 rounded-b-lg border border-gray-200 bg-card px-6 py-4">
-        <div className="flex flex-col items-center justify-between gap-3 text-sm text-slate-500 md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-2 text-sm text-slate-500 md:flex-row">
           <div>
-            Showing{" "}
-            <span className="font-medium">
-              {(currentPage - 1) * itemsPerPage + 1}
-            </span>{" "}
-            to{" "}
-            <span className="font-normal">
-              {Math.min(
-                currentPage * itemsPerPage,
-                filteredAndSortedApplications.length
-              )}
-            </span>{" "}
-            of{" "}
-            <span className="font-normal">
-              {filteredAndSortedApplications.length}
-            </span>{" "}
-            results
+            {total === 0 ? (
+              <span>No results found</span>
+            ) : (
+              <>
+                Showing{" "}
+                <span className="font-medium text-slate-700">
+                  {(currentPage - 1) * itemsPerPage + 1}
+                </span>{" "}
+                to{" "}
+                <span className="font-medium text-slate-700">
+                  {Math.min(currentPage * itemsPerPage, total)}
+                </span>{" "}
+                of{" "}
+                <span className="font-medium text-slate-700">{total}</span>{" "}
+                results
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -426,14 +481,12 @@ const ModernApplicationsTable = () => {
               text="Previous"
               icon={<ArrowLeft className="h-4 w-4" />}
             />
-
             <span className="px-2 text-slate-500">
-              Page {currentPage} of {totalPages}
+              Page {currentPage} of {Math.max(totalPages, 1)}
             </span>
-
             <NextButton
               onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages || totalPages === 0}
               text="Next"
               icon={<ArrowRight className="h-4 w-4" />}
             />
