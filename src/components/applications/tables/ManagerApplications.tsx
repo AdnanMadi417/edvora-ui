@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useMemo, useEffect } from "react";
 import {
   ChevronUp,
@@ -19,7 +21,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MdSchool } from 'react-icons/md';
 
-import Cookies from "js-cookie";
 import api from "lib/useApi";
 
 import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
@@ -54,22 +55,19 @@ const ModernApplicationsTable = () => {
     const fetchApplications = async () => {
       setLoading(true);
       try {
-        const token = Cookies.get("token");
-        const managerId = localStorage.getItem("managerId");
+        let managerId = localStorage.getItem("managerId");
 
-        if (!token || !managerId) return;
+        if (!managerId) {
+          const meRes = await api.get("/auth/me");
+          managerId = meRes.data.manager_id ?? meRes.data.id;
+          if (managerId) localStorage.setItem("managerId", managerId);
+        }
 
-        const res = await api.get(
-          `/account-managers/${managerId}/applications`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        if (!managerId) return;
 
+        const res = await api.get(`/account-managers/${managerId}/applications`);
         const appsArray = Array.isArray(res.data.items) ? res.data.items : [];
-
         setApplications(appsArray);
-
       } catch (err) {
         console.error("Error fetching applications:", err);
       } finally {
