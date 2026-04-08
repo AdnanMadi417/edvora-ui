@@ -34,6 +34,16 @@ import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversi
 import { useAllStages } from 'hooks/applications/stages/useStages';
 import { useAllStageStatuses } from 'hooks/applications/stages/useStageStatuses';
 
+// Statuses that require the partner to take action
+const PARTNER_ACTION_STATUSES = new Set([
+  'correction_requested_by_account_manager',
+  'waiting_for_payment',
+  'waiting_partner_to_confirm_arrival_date',
+]);
+
+const needsPartnerAction = (status: string) =>
+  PARTNER_ACTION_STATUSES.has(status?.toLowerCase().replace(/\s+/g, '_'));
+
 const getRelativeTime = (dateStr: string) => {
   const date = new Date(dateStr);
   const now = new Date();
@@ -429,13 +439,25 @@ const PartnerApplications = () => {
               paginatedApplications.map((app) => (
                 <tr
                   key={app.id}
-                  className="group cursor-pointer transition-colors hover:bg-slate-50"
+                  className={`group cursor-pointer transition-colors hover:bg-slate-50 ${
+                    needsPartnerAction(app.status) ? 'border-l-2 border-l-amber-400 bg-amber-50/30' : ''
+                  }`}
                   onClick={() => router.push(`/partner/applications/${app.id}`)}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                        {app.student_name?.[0]?.toUpperCase() ?? '?'}
+                      <div className="relative shrink-0">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                          {app.student_name?.[0]?.toUpperCase() ?? '?'}
+                        </div>
+                        {needsPartnerAction(app.status) && (
+                          <span
+                            className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-400 ring-2 ring-white"
+                            title="Action required"
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                          </span>
+                        )}
                       </div>
                       <div className="min-w-0">
                         <div className="truncate font-medium text-slate-900">{app.student_name}</div>
