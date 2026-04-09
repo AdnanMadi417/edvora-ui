@@ -248,7 +248,6 @@ const ModernApplicationsTable = () => {
         className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${config.bg} ${config.text}`}
         title={config.label}
       >
-        <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${config.dot}`} />
         <span className="truncate max-w-[160px]">{config.label}</span>
       </span>
     );
@@ -436,15 +435,15 @@ const ModernApplicationsTable = () => {
                         {app.student_name?.[0]?.toUpperCase() ?? "?"}
                       </div>
                       <div className="min-w-0">
-                        <div className="truncate font-medium text-slate-900">{app.student_name}</div>
-                        <div className="truncate text-xs text-slate-500">{app.student_email}</div>
+                        <div className="truncate font-medium text-slate-900 truncate">{app.student_name}</div>
+                        <div className="truncate text-xs text-slate-500 truncate">{app.student_email}</div>
                       </div>
                     </div>
                   </td>
 
                   <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                    <div className="font-medium text-slate-900">{app.program_name}</div>
-                    <div className="truncate text-xs text-slate-500">{app.university_name}</div>
+                    <div className="font-medium text-slate-900 truncate">{app.program_name}</div>
+                    <div className="truncate text-xs text-slate-500 truncate">{app.university_name}</div>
                   </td>
 
                   <td className="min-w-[180px] max-w-[250px] px-6 py-4">
@@ -453,7 +452,7 @@ const ModernApplicationsTable = () => {
 
                   <td className="px-6 py-4">
                     <div className="space-y-1.5">
-                      <div className="text-xs text-slate-500">{app.stage}</div>
+                      <div className="text-xs text-slate-500 truncate">{app.stage}</div>
                       <StatusBadge status={app.status} />
                     </div>
                   </td>
