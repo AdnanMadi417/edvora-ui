@@ -110,6 +110,11 @@ export function getNotificationIconConfig(notification: any): NotificationIconCo
     return { icon: MessageCircle, bg: "bg-blue-100", iconColor: "text-blue-600", badgeBg: "bg-blue-500" };
   }
 
+  // New application submitted by a partner
+  if (notification.type === "new_application") {
+    return { icon: FilePlus, bg: "bg-blue-100", iconColor: "text-blue-600", badgeBg: "bg-blue-500" };
+  }
+
   // Stage changes → look up the destination status UUID
   if (notification.type === "application_stage_changed") {
     const statusId = notification.data?.to_status_id;
@@ -120,5 +125,11 @@ export function getNotificationIconConfig(notification: any): NotificationIconCo
 }
 
 export function getSenderName(notification: any): string {
-  return notification.data?.sender_name || notification.data?.actor_name || "System";
+  return (
+    notification.data?.sender_name ||
+    notification.data?.actor_name ||
+    notification.data?.partner_name ||
+    notification.data?.student_name ||
+    "System"
+  );
 }
