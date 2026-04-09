@@ -103,7 +103,7 @@ export default function AdminTopBar({ application }: Props) {
                     <div className="p-2">
                       <button
                         onClick={handleHold}
-                        className="group flex w-full items-center gap-3 rounded-md px-4 pb-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-amber-50 hover:text-amber-900"
+                        className="group flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-amber-50 hover:text-amber-900"
                       >
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-600 group-hover:bg-amber-200">
                           <Clock className="h-4 w-4" />
