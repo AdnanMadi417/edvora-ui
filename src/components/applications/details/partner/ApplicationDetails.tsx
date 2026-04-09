@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { GraduationCap, Building2, Globe, Calendar, ArrowRight } from "lucide-react";
+import { GraduationCap, Building2,  Globe, Calendar, ArrowRight } from "lucide-react";
 import {
   FaUser,
   FaBirthdayCake,
@@ -198,173 +198,212 @@ export default function ApplicationDetails({
 
   return (
     <section>
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
-        <ApplicationPartnerTopBar application={{ id: application.id }} />
 
-        {/* Top row: avatar + info | intake date */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-700 text-xl font-bold text-white">
-              {student.name?.[0]?.toUpperCase() ?? "?"}
-            </div>
-            <div>
-              <h2 className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-slate-900">
-                {student.name}
-              </h2>
-              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
-                {program.name && (
-                  <span className="flex items-center gap-1">
-                    <GraduationCap className="h-3.5 w-3.5 text-blue-500" />
-                    {program.name}
-                  </span>
-                )}
-                {university.name && (
-                  <>
-                    <span className="text-slate-300">|</span>
-                    <span className="flex items-center gap-1">
-                      <Building2 className="h-3.5 w-3.5 text-blue-500" />
-                      {university.name}
-                    </span>
-                  </>
-                )}
-                {university.country && (
-                  <>
-                    <span className="text-slate-300">|</span>
-                    <span className="flex items-center gap-1">
-                      <Globe className="h-3.5 w-3.5 text-blue-500" />
-                      {university.country}
-                    </span>
-                  </>
-                )}
+      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-slate-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
+  
+          <ApplicationPartnerTopBar application={application} />
+  
+          {/* Top row: avatar + info | intake date */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-700 border-2 border-blue-200 text-xl font-bold text-white">
+                {student.name?.[0]?.toUpperCase() ?? "?"}
               </div>
-            </div>
-          </div>
-
-          <div className="shrink-0 rounded-xl border border-gray-200 bg-white px-5 py-4 text-right shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Intake Date</p>
-            <p className="mt-1 flex items-center justify-end gap-2 text-lg font-bold text-slate-900">
-              <Calendar className="h-4 w-4 text-blue-500" />
-              {formatDate(application.intake_date)}
-            </p>
-          </div>
-        </div>
-
-        {/* Bottom row: current status | next action */}
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="rounded-xl bg-slate-50 border border-gray-200 p-5 shadow-sm">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Current Status</p>
-            <div className="flex flex-wrap gap-2">
-              {currentStatus.name && (
-                <span className="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-medium text-amber-700">
-                  {currentStatus.name}
-                </span>
-              )}
-              {stage.name && (
-                <span className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm font-medium text-slate-800">
-                  {stage.name}
-                </span>
-              )}
-            </div>
-            <p className="mt-3 text-sm text-slate-500">{daysSince(application.updated_at)} days in stage</p>
-          </div>
-
-          <div className="rounded-xl border-[2px] border-blue-200 bg-blue-50 p-5 shadow-sm">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Next Action</p>
-            <div className="mb-3 flex items-start gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100">
-                <ArrowRight className="h-4 w-4 text-blue-600" />
+              <div>
+                <h2 className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-slate-900">
+                  {student.name}
+                </h2>
+                {application.intake_date && (
+                  <div className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 sm:hidden">
+                    <Clock className="h-3 w-3" />
+                    <span>Intake: {formatDate(application.intake_date)}</span>
+                  </div>
+                )}
+                <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+                  {program.name && (
+                    <span className="flex items-center gap-1 hidden md:flex">
+                      <GraduationCap className="h-3.5 w-3.5 text-blue-400" />
+                      {program.name}
+                    </span>
+                  )}
+                  {university.name && (
+                    <>
+                      <span className="text-slate-300 hidden md:block">|</span>
+                      <span className="flex items-center gap-1 hidden md:flex">
+                        <Building2 className="h-3.5 w-3.5 text-blue-400" />
+                        {university.name}
+                      </span>
+                    </>
+                  )}
+                  {university.country && (
+                    <>
+                      <span className="text-slate-300 hidden md:block">|</span>
+                      <span className="flex items-center gap-1 hidden md:flex">
+                        <Globe className="h-3.5 w-3.5 text-blue-400" />
+                        {university.country}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
-              <p className="text-sm font-medium text-slate-800">
-                {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ?? "Not provided"}
+  
+            </div>
+  
+            
+              <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+                  {program.name && (
+                    <span className="flex items-center gap-1 flex md:hidden">
+                      <GraduationCap className="h-3.5 w-3.5 text-blue-400" />
+                      {program.name}
+                    </span>
+                  )}
+                  {university.name && (
+                    <>
+                      <span className="flex items-center gap-1 flex md:hidden">
+                        <Building2 className="h-3.5 w-3.5 text-blue-400" />
+                        {university.name}
+                      </span>
+                    </>
+                  )}
+                  {university.country && (
+                    <>
+                      <span className="flex items-center gap-1 flex md:hidden">
+                        <Globe className="h-3.5 w-3.5 text-blue-400" />
+                        {university.country}
+                      </span>
+                    </>
+                  )}
+                </div>
+  
+  
+            <div className="hidden sm:block shrink-0 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-start shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Intake Date</p>
+              <p className="mt-1 flex items-center justify-start gap-2 text-lg font-bold text-slate-900">
+                <Calendar className="h-4 w-4 text-blue-400" />
+                {formatDate(application.intake_date)}
               </p>
             </div>
-            {/* Partner action buttons */}
-       
-        <div className="space-y-2">
-          {actions && (
-            <>
-              {actions.document_types?.length > 0 ? (
-                <button
-                  onClick={openRequiredActionPopup}
-                  className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
-                >
-                  <Clock className="h-4 w-4 text-orange-500" />
-                  Upload Required Documents
-                </button>
-              ) : actions.stage_statuses?.some((status) => status.is_requires_reason) ? (
-                <button
-                  onClick={openProgramDecisionPopup}
-                  className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  <Clock className="h-4 w-4 text-blue-500" />
-                  Submit Program Decision
-                </button>
-              ) : null}
-            </>
-          )}
-
-          {showVisaPayment && (
-            <button
-              type="button"
-              onClick={() => setShowVisaPaymentPopup(true)}
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
-            >
-              <Wallet className="h-4 w-4" />
-              Proceed to Payment
-            </button>
-          )}
-
-          {showArrivalConfirmation && (
-            <button
-              type="button"
-              onClick={() => setShowArrivalPopup(true)}
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
-            >
-              <Plane className="h-4 w-4" />
-              Confirm Arrival
-            </button>
-          )}
-
-          {!actionsLoading && (confirmAction || disputeAction) && (
-            <div className="flex flex-row gap-2">
-              {confirmAction && (
-                <Button
-                  icon={<CheckCircle className="h-4 w-4" />}
-                  text={confirmLoading ? "Processing..." : "Confirm"}
-                  bgColor="bg-green-50"
-                  textColor="text-green-700"
-                  borderColor="border-green-600"
-                  hoverTextColor="hover:text-green-800"
-                  hoverBorderColor="hover:border-green-700"
-                  className="w-full"
-                  onClick={handleCommissionConfirm}
-                  disabled={confirmLoading}
-                />
-              )}
-              {disputeAction && (
-                <Button
-                  icon={<XCircle className="h-4 w-4" />}
-                  text="Dispute"
-                  bgColor="bg-red-50"
-                  textColor="text-red-700"
-                  borderColor="border-red-600"
-                  hoverTextColor="hover:text-red-800"
-                  hoverBorderColor="hover:border-red-700"
-                  className="w-full"
-                  onClick={() => setShowDispute(true)}
-                />
-              )}
+          </div>
+  
+          {/* Bottom row: current status | next action */}
+  
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="rounded-xl bg-slate-50 border border-slate-200 p-5 shadow-sm">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Current Status</p>
+              <div className="flex flex-wrap gap-2">
+                {currentStatus.name && (
+                  <span className="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-normal text-amber-700">
+                    {currentStatus.name}
+                  </span>
+                )}
+                {stage.name && (
+                  <span className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm font-normal text-slate-800">
+                    {stage.name}
+                  </span>
+                )}
+                <p className="inline-flex items-center px-3 py-1 text-xs font-normal text-slate-600">{daysSince(application.updated_at)} days in stage</p>
+              </div>
             </div>
+  
+            <div className="grid grid-cols-1 gap-2 rounded-xl border-[2px] border-blue-200 bg-blue-50 p-5 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                  <ArrowRight className="h-4 w-4 text-blue-700" />
+                </div>
+  
+                <div className="block space-y-1">
+  
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-blue-500">Next Action</p>
+                <p className="text-sm font-medium text-slate-800">
+                  {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ?? "Not provided"}
+                </p>
+              </div>
+              
+              </div>
+
+                <div className="space-y-2">
+      {actions && (
+        <>
+          {actions.document_types?.length > 0 ? (
+            <button
+              onClick={openRequiredActionPopup}
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
+            >
+              <Clock className="h-4 w-4 text-orange-500" />
+              Upload Required Documents
+            </button>
+          ) : actions.stage_statuses?.some((status) => status.is_requires_reason) ? (
+            <button
+              onClick={openProgramDecisionPopup}
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+            >
+              <Clock className="h-4 w-4 text-blue-500" />
+              Submit Program Decision
+            </button>
+          ) : null}
+        </>
+      )}
+
+      {showVisaPayment && (
+        <button
+          type="button"
+          onClick={() => setShowVisaPaymentPopup(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+        >
+          <Wallet className="h-4 w-4" />
+          Proceed to Payment
+        </button>
+      )}
+
+      {showArrivalConfirmation && (
+        <button
+          type="button"
+          onClick={() => setShowArrivalPopup(true)}
+          className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+        >
+          <Plane className="h-4 w-4" />
+          Confirm Arrival
+        </button>
+      )}
+
+      {!actionsLoading && (confirmAction || disputeAction) && (
+        <div className="flex flex-row gap-2">
+          {confirmAction && (
+            <Button
+              icon={<CheckCircle className="h-4 w-4" />}
+              text={confirmLoading ? "Processing..." : "Confirm"}
+              bgColor="bg-green-50"
+              textColor="text-green-700"
+              borderColor="border-green-600"
+              hoverTextColor="hover:text-green-800"
+              hoverBorderColor="hover:border-green-700"
+              className="w-full"
+              onClick={handleCommissionConfirm}
+              disabled={confirmLoading}
+            />
+          )}
+          {disputeAction && (
+            <Button
+              icon={<XCircle className="h-4 w-4" />}
+              text="Dispute"
+              bgColor="bg-red-50"
+              textColor="text-red-700"
+              borderColor="border-red-600"
+              hoverTextColor="hover:text-red-800"
+              hoverBorderColor="hover:border-red-700"
+              className="w-full"
+              onClick={() => setShowDispute(true)}
+            />
           )}
         </div>
+      )}
+    </div>
 
-
+            </div>
           </div>
+          
         </div>
         
-      </div>
-
       <OfferLetterDecision application={application} />
       <VisaTrackingTimeline application={application} />
       <ApplicationCommission application={application} />
