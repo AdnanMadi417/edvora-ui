@@ -32,6 +32,7 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import DeleteUniversityConfirmation from "components/admin/KnowledgeHub/university/popups/DeleteUniversityConfirmation";
 import BatchAssignPaymentMethod  from "components/admin/KnowledgeHub/university/paymentMethods/popups/BatchAssignPaymentMethod";
 import CreateUniversity from "components/admin/KnowledgeHub/university/popups/CreateUniversity";
+import AssignPaymentUniversity from "components/admin/KnowledgeHub/university/popups/AssignPaymentMethods";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
 
@@ -47,6 +48,8 @@ const UniversitiesTable = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const [isBatchAssignOpen, setIsBatchAssignOpen] = useState(false);
+  const [isAssignPaymentOpen, setIsAssignPaymentOpen] = useState(false);
+  const [assignPaymentUniversityId, setAssignPaymentUniversityId] = useState<string>("");
 
   const [selectedUniversityId, setSelectedUniversityId] = useState<
     string | null
@@ -331,18 +334,6 @@ const UniversitiesTable = () => {
 
               <tr className="border-b border-slate-200 bg-card">
 
-                <td className="pl-6">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 rounded border-slate-300 text-blue-600"
-                    checked={
-                      Object.values(selectedUniversities).length > 0 &&
-                      Object.values(selectedUniversities).every(Boolean)
-                    }
-                    onChange={handleSelectAll}
-                  />
-                </td>
-
                 <th
                   onClick={() => handleSort("name")}
                   className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
@@ -410,16 +401,6 @@ const UniversitiesTable = () => {
                   key={uni.id}
                   className="hover:bg-primary/10 group transition-colors"
                 >
-
-                  <td className="pl-6">
-                    <input
-                      type="checkbox"
-                      aria-label={`Select ${uni.name}`}
-                      checked={selectedUniversities[uni.id] || false}
-                      onChange={() => handleSelectUniversity(uni.id)}
-                      className="h-4 w-4 rounded border-slate-300 text-blue-600"
-                    />
-                  </td>
 
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -555,6 +536,19 @@ const UniversitiesTable = () => {
                         <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                       </a>
 
+                      <div className="h-6 border-l border-slate-200" />
+
+                      <button
+                        role="menuitem"
+                        aria-label="Assign Payment Method"
+                        onClick={() => {
+                          setAssignPaymentUniversityId(uni.id);
+                          setIsAssignPaymentOpen(true);
+                        }}
+                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                      >
+                        <Wallet className="h-4 w-4 text-slate-500 hover:text-blue-600" />
+                      </button>
 
                       <div className="h-6 border-l border-slate-200" />
 
@@ -663,6 +657,12 @@ const UniversitiesTable = () => {
       <CreateUniversity
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
+      />
+
+      <AssignPaymentUniversity
+        isOpen={isAssignPaymentOpen}
+        onClose={() => setIsAssignPaymentOpen(false)}
+        universityId={assignPaymentUniversityId}
       />
 
     </div>
