@@ -20,6 +20,7 @@ import ImageUploadField from "components/form/images/ImageUploadField";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation"
+import CreateLogisticServicePopup from "components/admin/logisticalService/CreateLogisticServicePopup";
 
 export interface PackageOffered {
   name: string;
@@ -74,8 +75,9 @@ export default function RegisterLogisticsProvider() {
     selectedLocations: [],
   });
 
-  const { logisticServices, loadingLogisticServices } = useLogisticServices();
-  const { states, stateLoading } = useAllStates();
+  const [isCreateServiceOpen, setIsCreateServiceOpen] = useState(false);
+  const { logisticServices, loadingLogisticServices, refetchLogisticServices } = useLogisticServices();
+  const { states } = useAllStates();
   const { logisticLanguages, loadingLogisticLanguage } = useLogisticLanguages();
   const { logisticUniversities, loadingLogisticUniversity } = useLogisticUniversities();
   const { createLogisticsProvider, loadingCreateLogisticsProvider, errorCreateLogisticsProvider } = useCreateLogisticsProvider();
@@ -424,9 +426,21 @@ export default function RegisterLogisticsProvider() {
         </div>
 
         <div className="border-t px-6 py-5">
-          <label className="mb-3 block text-sm font-semibold text-slate-900">
-            Logistic Services <span className="text-red-600">*</span>
-          </label>
+          <div className="mb-3 flex items-center justify-between">
+            <label className="text-sm font-semibold text-slate-900">
+              Logistic Services <span className="text-red-600">*</span>
+            </label>
+            <Button
+              icon={<Plus className="h-4 w-4" />}
+              text="New Service"
+              bgColor="bg-blue-50"
+              textColor="text-blue-700"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-blue-800"
+              hoverBorderColor="hover:border-blue-700"
+              onClick={() => setIsCreateServiceOpen(true)}
+            />
+          </div>
 
           {errors.selectedServices && (
             <p className="mb-2 text-xs font-medium text-red-600">{errors.selectedServices}</p>
@@ -514,6 +528,13 @@ export default function RegisterLogisticsProvider() {
         </div>
 
       </div>
+
+      <CreateLogisticServicePopup
+        isOpen={isCreateServiceOpen}
+        onClose={() => setIsCreateServiceOpen(false)}
+        onCreated={refetchLogisticServices}
+      />
+
     </section>
   );
 }
