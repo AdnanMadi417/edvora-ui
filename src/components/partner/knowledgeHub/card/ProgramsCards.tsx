@@ -4,15 +4,15 @@ import React, { useState } from "react";
 import {
   Search,
   RefreshCw,
-  CheckCircle,
   ArrowRight,
   ArrowLeft,
   GraduationCap,
   MapPin,
-  MinusCircle,
+  Award,
   Send,
 } from 'lucide-react';
-import { MdMenuBook, MdAttachMoney, MdSchool } from 'react-icons/md';
+import { MdSchool } from 'react-icons/md';
+import PresignedImage from "components/ui/PresignedImage";
 
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
@@ -88,7 +88,7 @@ const ProgramsCards = () => {
     [...dates].sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
   return (
-    <div className="mt-6 overflow-hidden text-p2">
+    <div className="mt-6 overflow-hidden text-p2 max-w-5xl mx-auto">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
         <div className="relative border-b border-gray-200 p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
@@ -184,149 +184,117 @@ const ProgramsCards = () => {
                   <a
                     href={`/partner/knowledge-hub/${program.id}`}
                     key={program.id}
-                    className="relative cursor-pointer flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md"
+                    className="relative cursor-pointer flex flex-col overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm transition-all duration-200 hover:shadow-md"
                   >
-
-                    <div className="flex items-start gap-4 border-b border-gray-200 px-4 py-5">
-                      <div className="relative flex-shrink-0">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm">
-                          <GraduationCap className="h-6 w-6 text-white" />
-                        </div>
-
-                        <span
-                          className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-white ${
-                            program.field_of_study?.is_active
-                              ? "bg-emerald-500"
-                              : "bg-red-500"
-                          }`}
-                          title={
-                            program.field_of_study?.is_active
-                              ? "Active"
-                              : "Inactive"
-                          }
-                        />
+                    {/* Header */}
+                    <div className="flex items-start gap-3 px-4 pt-5 pb-4">
+                      
+                      <div className="flex-shrink-0 h-14 w-14 rounded-xl overflow-hidden">
+                        {program.university?.logo_file_key ? (
+                          <PresignedImage
+                            fileKey={program.university.logo_file_key}
+                            alt={program.university.name}
+                            className="h-full w-full object-cover"
+                            fallback={
+                              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
+                                <GraduationCap className="h-7 w-7 text-white" />
+                              </div>
+                            }
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
+                            <GraduationCap className="h-7 w-7 text-white" />
+                          </div>
+                        )}
                       </div>
-
                       <div className="min-w-0 flex-1">
-                        <h3 className="line-clamp-3 text-sm font-semibold text-slate-900 truncate">
+                        <h3 className="text-sm font-bold text-slate-900 leading-snug line-clamp-2">
                           {program.name}
                         </h3>
-
-                        <p className="mt-1 flex items-center gap-2 text-xs text-slate-500">
-                          <span className="line-clamp-1">
-                            {program.university?.name}
-                          </span>
+                        <p className="mt-0.5 text-xs text-slate-500 truncate">
+                          {program.university?.name}
                         </p>
                       </div>
                     </div>
 
-                    <div className="space-y-3 px-5 py-4 text-sm">
+                    {/* Divider */}
+                    <div className="mx-4 border-t border-slate-100" />
 
-                      <div className="flex items-center justify-between">
-                        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                          <MdAttachMoney className="h-4 w-4" />
-                          First-Year Cost
-                        </span>
-
-                        <span className="text-sm font-semibold text-slate-900">
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 px-4 py-4">
+                      <div>
+                        <p className="text-xs text-slate-400">First Year</p>
+                        <p className="text-sm font-bold text-slate-900">
                           {program.first_year_tuition
-                            ? `RM${program.first_year_tuition.toLocaleString()}`
-                            : "Not provided"}
-                        </span>
+                            ? `RM ${program.first_year_tuition.toLocaleString()}`
+                            : "N/A"}
+                        </p>
                       </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                          <GraduationCap className="h-4 w-4" />
-                          Level
-                        </span>
-
-                        <span className="text-sm font-semibold text-slate-900">
+                      <div>
+                        <p className="text-xs text-slate-400">Level</p>
+                        <p className="text-sm font-bold text-slate-900">
                           {program.qualification_level ?? "N/A"}
-                        </span>
+                        </p>
                       </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                          <MapPin className="h-4 w-4" />
-                          Location
-                        </span>
-
-                        <span className="text-sm font-semibold text-slate-900">
-                          {program.branch?.state ?? "Location not provided"}
-                        </span>
+                      <div>
+                        <p className="text-xs text-slate-400">Location</p>
+                        <p className="text-sm font-bold text-slate-900">
+                          {program.branch?.state ?? "N/A"}
+                        </p>
                       </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-                          {program.has_scholarship ? (
-                            <CheckCircle className="h-4 w-4" />
-                          ) : (
-                            <MinusCircle className="h-4 w-4" />
-                          )}
-                          Scholarship
-                        </span>
-
-                        <span
-                          className={`rounded-full px-3 py-1 text-xs font-medium ${
-                            program.has_scholarship
-                              ? "bg-green-100 text-green-700"
-                              : "bg-slate-100 text-slate-500"
-                          }`}
-                        >
-                          {program.has_scholarship
-                            ? "Available"
-                            : "Not Available"}
-                        </span>
+                      <div>
+                        <p className="text-xs text-slate-400">Duration</p>
+                        <p className="text-sm font-bold text-slate-900">
+                          {program.duration ?? "N/A"}
+                        </p>
                       </div>
                     </div>
 
-                    <div className="mt-auto grid grid-cols-1">
+                    {/* Scholarship badge */}
+                    <div className="px-4 pb-3">
+                      {program.has_scholarship ? (
+                        <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
+                          <Award className="h-4 w-4" />
+                          Scholarship Available
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                          <Award className="h-4 w-4" />
+                          No Scholarship
+                        </span>
+                      )}
+                    </div>
 
-                      <div className="flex items-center justify-between bg-gradient-to-r from-slate-50 to-slate-100 px-5 py-4">
-                        <div className="text-xs text-slate-500">
-                          Your Commission
-                        </div>
+                    {/* Commission */}
+                    <div className="mx-4 mb-4 flex items-center justify-between rounded-xl bg-emerald-50 px-4 py-3">
+                      <span className="text-sm font-medium text-emerald-700">Your Commission</span>
+                      <span className="text-lg font-bold text-emerald-600">
+                        {program.commission_amount
+                          ? `RM ${program.commission_amount.toLocaleString()}`
+                          : "N/A"}
+                      </span>
+                    </div>
 
-                        <div className="text-lg font-semibold text-slate-900">
-                          {program.commission_amount
-                            ? `RM${program.commission_amount.toLocaleString()}`
-                            : "Not provided"}
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between gap-3 border-t p-4">
-
-                        <Link
-                          href={`/partner/knowledge-hub/${program.id}`}
-                          title="View details"
-                          className="flex flex-1 items-center justify-center gap-2 rounded-full border border-blue-600 px-4 py-2 text-sm font-medium text-blue-700 transition hover:bg-blue-50"
-                        >
-                          <MdMenuBook className="h-5 w-5" />
-                          Details
-                        </Link>
-
-                        <Link
-                          href={{
-                            pathname: "/partner/applications/apply-for-program",
-                            query: {
-                              program_id: program.id,
-                              university_id: program.university.id,
-                              intake_date:
-                                program.intake_dates?.[0] ??
-                                program.university.intake_months?.[0] ??
-                                new Date().toISOString().split("T")[0],
-                            },
-                          }}
-                          title="Apply Now"
-
-                          className="flex flex-1 items-center justify-center gap-2 rounded-full border border-green-600 px-4 py-2 text-sm font-medium text-green-700 transition hover:bg-green-50"
-                        >
-                          <Send className="h-5 w-5" />
-                          Apply
-                        </Link>
-
-                      </div>
+                    {/* Apply Now */}
+                    <div className="px-4 pb-4">
+                      <Link
+                        href={{
+                          pathname: "/partner/applications/apply-for-program",
+                          query: {
+                            program_id: program.id,
+                            university_id: program.university.id,
+                            intake_date:
+                              program.intake_dates?.[0] ??
+                              program.university.intake_months?.[0] ??
+                              new Date().toISOString().split("T")[0],
+                          },
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
+                      >
+                        <Send className="h-4 w-4" />
+                        Apply Now
+                      </Link>
                     </div>
                   </a>
                 ))}

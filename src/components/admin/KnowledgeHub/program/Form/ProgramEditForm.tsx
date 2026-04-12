@@ -645,6 +645,20 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                   </div>
 
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    
+                    <div className="md:col-span-2">
+                    
+                    <InputField
+                      label="Scholarship Name"
+                      field={`scholarships[${index}].name`}
+                      placeholder="e.g. Excellence Award"
+                      type="text"
+                      formData={formData}
+                      errors={{}}
+                      updateFormData={updateFormData}
+                    />
+
+                    </div>
 
                     <InputField
                       label="Coverage Percentage"
@@ -663,16 +677,6 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                       formData={formData}
                       errors={{}}
                       required={false}
-                      updateFormData={updateFormData}
-                    />
-
-                    <InputField
-                      label="Scholarship Name"
-                      field={`scholarships[${index}].name`}
-                      placeholder="e.g. Excellence Award"
-                      type="text"
-                      formData={formData}
-                      errors={{}}
                       updateFormData={updateFormData}
                     />
 
