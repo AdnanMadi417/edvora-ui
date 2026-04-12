@@ -119,17 +119,38 @@ export async function uploadFilesToSpaces(
       Object.entries(presigned.fields).forEach(([key, value]) => formData.append(key, value));
       formData.append("file", file);
 
-      try {
-        const response = await fetch(presigned.upload_url, { method: "POST", body: formData });
-        if (!response.ok) throw new Error(`Upload failed for ${file.name}`);
+      await new Promise<void>((resolve) => {
+        const xhr = new XMLHttpRequest();
 
-        results.push({ public_url: presigned.public_url, file_key: presigned.file_key });
-        if (onProgress) onProgress(i, 100);
-      } catch (err) {
-        console.error(`Upload error for ${file.name}:`, err);
+        if (onProgress) {
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percent = Math.round((event.loaded / event.total) * 100);
+              onProgress(i, percent);
+            }
+          };
+        }
 
-        setTimeout(() => removeFileFromStorage(presigned.file_key), 6000);
-      }
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            results.push({ public_url: presigned.public_url, file_key: presigned.file_key });
+            onProgress?.(i, 100);
+          } else {
+            console.error(`Upload failed for ${file.name}: ${xhr.status}`);
+            setTimeout(() => removeFileFromStorage(presigned.file_key), 6000);
+          }
+          resolve();
+        };
+
+        xhr.onerror = () => {
+          console.error(`Upload error for ${file.name}`);
+          setTimeout(() => removeFileFromStorage(presigned.file_key), 6000);
+          resolve();
+        };
+
+        xhr.open("POST", presigned.upload_url);
+        xhr.send(formData);
+      });
     })
   );
 

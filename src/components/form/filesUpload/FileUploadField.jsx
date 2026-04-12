@@ -34,6 +34,7 @@ const FileUploadField = ({
 
     setFileError("");
     await uploadHandler(e, documentTypeId);
+    e.target.value = "";
   };
 
   const handleRemove = async () => {
