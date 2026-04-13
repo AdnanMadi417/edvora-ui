@@ -193,7 +193,7 @@ export default function RegisterUniversity() {
   };
 
   return (
-    <section className="mx-auto mt-5">
+    <section className="mx-auto mt-5 max-w-5xl">
       <div className="mt-6 rounded-md border bg-white">
         <div className="flex justify-between border-b p-6">
           <div className="flex items-center gap-4">

@@ -248,7 +248,7 @@ const UniversitiesTable = () => {
   };
 
   return (
-    <div className="mt-6 overflow-hidden text-p2">
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
