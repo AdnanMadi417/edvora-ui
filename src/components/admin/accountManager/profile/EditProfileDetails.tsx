@@ -125,7 +125,7 @@ export default function EditProfileDetails({
   return (
     <section>
 
-      <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-card shadow-sm transition-all duration-300">
+      <div className="group relative max-w-5xl mx-auto overflow-hidden rounded-2xl border border-slate-200 bg-card shadow-sm transition-all duration-300">
 
         <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-5">

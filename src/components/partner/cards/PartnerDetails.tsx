@@ -35,7 +35,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
   return (
     <section className="min-h-screen">
 
-      <div className="mb-6 mt-6 rounded-xl border border-default bg-card shadow-sm">
+      <div className="mb-6 mt-6 max-w-5xl mx-auto rounded-xl border border-default bg-card shadow-sm">
 
           <TopBars  params={params} />
 
