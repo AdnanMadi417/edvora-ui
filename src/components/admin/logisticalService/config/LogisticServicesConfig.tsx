@@ -47,7 +47,7 @@ const LogisticServicesConfig = () => {
 
   return (
     <>
-    <div className="mt-6 overflow-hidden text-p2">
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-card">
         <div className="border-b border-slate-200 p-6">
           <div className="flex items-center justify-between">

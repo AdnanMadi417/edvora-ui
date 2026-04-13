@@ -255,7 +255,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
   return (
     <>
-      <div className="mt-6 rounded-md border bg-card shadow-sm">
+      <div className="mt-6 max-w-5xl mx-auto rounded-md border bg-card shadow-sm">
           <div className="flex justify-between border-b p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">

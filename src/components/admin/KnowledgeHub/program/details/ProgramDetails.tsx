@@ -54,6 +54,7 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
     try {
       if (!id) return;
 
+      setIsDeleting(true);
       await deletePrograms([id]);
 
       showToast('Deleted successfully', 'success');
@@ -65,6 +66,8 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
     } catch (error) {
       console.error(error);
       showToast('Delete failed', 'error');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -271,6 +274,28 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
                 </div>
               </div>
 
+              {program?.intake_dates?.length > 0 && (
+                <div className="col-span-1 flex items-start gap-3 md:col-span-2">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+                    <Calendar className="h-5 w-5 text-slate-500" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500">Intake Dates</p>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      {program.intake_dates.map((date, i) => (
+                        <span
+                          key={`${date}-${i}`}
+                          className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                        >
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          {date}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
         </div>
@@ -434,25 +459,29 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
               <h4 className="text-base font-bold text-slate-900">Required Documents</h4>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
-              {requiredDocuments.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3"
-                >
-                  <p className="text-sm font-medium text-slate-800">
-                    {item.description ?? item.type ?? 'Document'}
-                  </p>
-                  <span className={`shrink-0 rounded-full border px-3 py-1 text-xs ${
-                    item.is_required_init_app_doc
-                      ? 'border-blue-200 bg-blue-50 text-blue-600'
-                      : 'border-slate-200 bg-white text-slate-400'
-                  }`}>
-                    {item.is_required_init_app_doc ? 'Required' : 'Optional'}
-                  </span>
-                </div>
-              ))}
-            </div>
+            {requiredDocuments.length > 0 ? (
+              <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
+                {requiredDocuments.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3"
+                  >
+                    <p className="text-sm font-medium text-slate-800">
+                      {item.description ?? item.type ?? 'Document'}
+                    </p>
+                    <span className={`shrink-0 rounded-full border px-3 py-1 text-xs ${
+                      item.is_required_init_app_doc
+                        ? 'border-blue-200 bg-blue-50 text-blue-600'
+                        : 'border-slate-200 bg-white text-slate-400'
+                    }`}>
+                      {item.is_required_init_app_doc ? 'Required' : 'Optional'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-6 text-sm text-slate-400">No documents configured for this program.</p>
+            )}
           </div>
         </div>
       </div>

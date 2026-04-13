@@ -236,7 +236,7 @@ export default function RegisterLogisticsProvider() {
   }
 
   return (
-    <section className="mx-auto mt-5">
+    <section className="mx-auto mt-5 max-w-5xl">
       <div className="mt-6 rounded-md border bg-white">
 
         <div className="flex items-center gap-4 rounded-t-xl border-b px-6 py-5">
