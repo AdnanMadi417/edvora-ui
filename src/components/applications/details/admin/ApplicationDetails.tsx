@@ -19,6 +19,7 @@ import {
 import { MdAssignmentTurnedIn } from "react-icons/md";
 import OfferLetterCard from './OfferLetterCard';
 import VisaTrackingTimeline from './VisaTrackingTimeline';
+import ApplicationTimeline from '../ApplicationTimeline';
 
 interface ApplicationDetailsProps {
   application: any;
@@ -78,7 +79,7 @@ export default function ApplicationDetails({
       previousEducation.grade);
 
   return (
-    <section>
+    <section className="max-w-5xl mx-auto">
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-slate-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
 
@@ -205,9 +206,10 @@ export default function ApplicationDetails({
         </div>
         
       </div>
-  
-      <OfferLetterCard application={application} />
+
+      <ApplicationTimeline application={application} />
       <VisaTrackingTimeline application={application} />
+      <OfferLetterCard application={application} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">

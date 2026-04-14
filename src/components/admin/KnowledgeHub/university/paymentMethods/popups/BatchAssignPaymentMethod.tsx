@@ -7,9 +7,11 @@ import { useBatchAssignPaymentMethod } from "hooks/knowledge-hub/payment-methods
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
+import SelectField from "components/form/SelectField";
 import InputField from "components/form/InputField";
 import MultiSelect from "components/form/search/MultiSelect";
 import { useToast } from "components/context/ToastContext";
+import { CURRENCY } from 'constants/lists';
 
 interface BatchUniversitiesProps {
   isOpen: boolean;
@@ -123,14 +125,16 @@ export default function BatchUniversities({
               updateFormData={updateFormData}
             />
 
-            <InputField
+            <SelectField
               label="Currency"
               field="currency"
-              placeholder="e.g. USD"
+              options={(CURRENCY.map((c) => ({
+                value: c.value,
+                label: c.label,
+              })))}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
-              required={false}
             />
 
             <InputField

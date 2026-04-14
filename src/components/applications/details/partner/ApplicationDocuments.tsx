@@ -1,56 +1,57 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  FolderOpen,
-  ChevronDown,
-  Clock,
-  CheckCircle,
-  XCircle,
-  Download,
-} from 'lucide-react';
-import ViewPopup from '../../popups/ViewDoc';
+import { FolderOpen, ChevronDown, Clock, CheckCircle, XCircle, Download } from 'lucide-react';
 import EmptyData from 'components/emptyData/EmptyData';
-
 import { getDocumentDownloadUrl } from 'services/documentService';
+import { useToast } from '../../../context/ToastContext';
 
 interface ApplicationDocumentsProps {
   application: any;
 }
 
-export default function ApplicationDocuments({
-                                               application,
-                                             }: ApplicationDocumentsProps) {
+const STATUS_ICON: Record<string, React.ReactNode> = {
+  '1': <Clock className="h-5 w-5 text-yellow-500" />,
+  '2': <CheckCircle className="h-5 w-5 text-green-600" />,
+  '3': <XCircle className="h-5 w-5 text-red-600" />,
+};
+
+const STATUS_BADGE: Record<string, string> = {
+  '1': 'border-yellow-200 bg-yellow-50 text-yellow-700',
+  '2': 'border-green-200 bg-green-50 text-green-700',
+  '3': 'border-red-200 bg-red-50 text-red-700',
+};
+
+const STATUS_LABEL: Record<string, string> = {
+  '1': 'Pending',
+  '2': 'Approved',
+  '3': 'Rejected',
+};
+
+export default function ApplicationDocuments({ application }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
-  const [showViewPopup, setShowViewPopup] = useState(false);
-  const [selectedDoc, setSelectedDoc] = useState<any>(null);
+  const [downloading, setDownloading] = useState<string | null>(null);
+  const { showToast } = useToast();
 
-  const documents = application?.documents || [];
-  const paymentDocuments = application?.payment_documents || [];
-  const arrivalDocuments = application?.arrival_documents || [];
+  const documents: any[] = application?.documents || [];
+  const paymentDocuments: any[] = application?.payment_documents || [];
+  const arrivalDocuments: any[] = application?.arrival_documents || [];
+  const emgsEvaluationDoc: any = application?.emgs_evaluation_document || null;
+  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvaluationDoc ? 1 : 0);
+  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvaluationDoc ? [emgsEvaluationDoc] : [])].filter(
+    (d) => d.status === '1',
+  ).length;
 
-  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length;
-
-  const handleDownload = async (fileKey: string) => {
+  const handleDownload = async (fileKey: string, docId: string) => {
+    if (!fileKey || downloading) return;
     try {
-      const downloadUrl = await getDocumentDownloadUrl(fileKey);
-      window.open(downloadUrl, '_blank'); // opens PDF or file in browser
+      setDownloading(docId);
+      const url = await getDocumentDownloadUrl(fileKey);
+      window.open(url, '_blank');
     } catch (err: any) {
-      console.error('Download failed:', err);
-      alert(err?.message || 'Failed to download document');
-    }
-  };
-
-  const getFileStatus = (status: string) => {
-    switch (status) {
-      case '1':
-        return <Clock className="h-5 w-5 text-yellow-500" />;
-      case '2':
-        return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case '3':
-        return <XCircle className="h-5 w-5 text-red-600" />;
-      default:
-        return <Clock className="h-5 w-5 text-yellow-500" />;
+      showToast(err?.message || 'Failed to download document', 'error');
+    } finally {
+      setDownloading(null);
     }
   };
 
@@ -59,310 +60,113 @@ export default function ApplicationDocuments({
     return new Date(dateString).toLocaleDateString();
   };
 
-  if (documents.length === 0) {
-    return <EmptyData />;
-  }
+  if (totalDocuments === 0) return <EmptyData />;
+
+  const DocRow = ({ doc }: { doc: any }) => {
+    const icon = STATUS_ICON[doc.status] ?? STATUS_ICON['1'];
+    const badge = STATUS_BADGE[doc.status] ?? STATUS_BADGE['1'];
+    const label = STATUS_LABEL[doc.status] ?? 'Pending';
+    const isDownloading = downloading === doc.id;
+
+    return (
+      <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4 transition-colors hover:bg-slate-50">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary">
+            {icon}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="truncate text-sm font-semibold text-slate-800">
+                {doc.document_type
+                  ? doc.document_type.charAt(0).toUpperCase() + doc.document_type.slice(1)
+                  : 'Document'}
+              </p>
+              <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${badge}`}>
+                {label}
+              </span>
+            </div>
+            <p className="mt-0.5 text-xs text-slate-400">{formatDate(doc.created_at)}</p>
+            {doc.approve_notes && (
+              <p className="mt-1 text-xs text-slate-500">
+                Note: <span className="font-medium text-slate-700">{doc.approve_notes}</span>
+              </p>
+            )}
+          </div>
+        </div>
+        <button
+          onClick={() => doc.file_key && handleDownload(doc.file_key, doc.id)}
+          disabled={!doc.file_key || !!downloading}
+          className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-40"
+          title="Download"
+        >
+          <Download className={`h-4 w-4 ${isDownloading ? 'animate-pulse' : ''}`} />
+        </button>
+      </div>
+    );
+  };
+
+  const DocGroup = ({ label, docs }: { label: string; docs: any[] }) => {
+    if (docs.length === 0) return null;
+    return (
+      <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</p>
+        <div className="space-y-2">
+          {docs.map((doc: any) => (
+            <DocRow key={doc.id} doc={doc} />
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <section className="mb-6 mt-6 rounded-lg bg-card transition-all duration-300">
+    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
       <div
-        className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-6 transition-all duration-300 ${
+        className={`flex cursor-pointer items-center justify-between border border-gray-200 p-5 transition-colors hover:bg-slate-50 ${
           showDocs ? 'rounded-t-lg' : 'rounded-lg'
         }`}
         onClick={() => setShowDocs(!showDocs)}
       >
-        <div className="flex flex-col gap-2">
-          <h3 className="text-p3 flex items-center gap-2 font-semibold text-slate-900">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-              <FolderOpen className="text-xl text-blue-700" />
+        <div className="flex items-center gap-3">
+          <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+            <FolderOpen className="h-5 w-5 text-blue-700" />
+            {pendingDocuments > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-white">
+                {pendingDocuments}
+              </span>
+            )}
+          </span>
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-slate-900">Documents</h3>
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+              {totalDocuments}
             </span>
-            Documents
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
-              {totalDocuments} Total
-            </span>
-          </h3>
+            {pendingDocuments > 0 && (
+              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+                {pendingDocuments} pending
+              </span>
+            )}
+          </div>
         </div>
-
         <button
-          className="flex items-center justify-center rounded-full bg-blue-100 p-2.5 text-blue-600 transition-all duration-200 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
-          aria-label="Show documents"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
+          aria-label="Toggle documents"
           aria-expanded={showDocs}
         >
           <ChevronDown
-            className={`text-lg transition-transform duration-300 ${
-              showDocs ? 'rotate-180' : ''
-            }`}
+            className={`h-4 w-4 transition-transform duration-200 ${showDocs ? 'rotate-180' : ''}`}
           />
         </button>
       </div>
 
-      <div
-        className={`transition-all duration-300 ease-in-out ${
-          showDocs
-            ? 'max-h-[2000px] opacity-100'
-            : 'max-h-0 overflow-hidden opacity-0'
-        }`}
-      >
-        <div className="space-y-4 rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
-          <div className="space-y-4">
-            {documents.map((doc: any, index: number) => (
-              <div
-                key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
-                style={{
-                  animation: showDocs
-                    ? `slideIn 0.3s ease-out ${index * 0.08}s both`
-                    : 'none',
-                }}
-              >
-                <div className="flex min-w-0 flex-1 items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
-                      {getFileStatus(doc.status)}
-                    </div>
-                  </div>
-
-                  <div className="min-w-0 max-w-[350px] flex-1">
-                    <div className="mb-2 flex items-center gap-2">
-                      <h3 className="truncate text-sm font-semibold text-slate-800">
-                        {doc.document_type.charAt(0).toUpperCase() + doc.document_type.slice(1)}
-                      </h3>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
-                      <div className="flex items-center gap-1.5">
-                        <svg
-                          className="h-3.5 w-3.5 text-slate-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                          />
-                        </svg>
-                        <span className="font-medium">PDF</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{formatDate(doc.created_at)}</span>
-                      </div>
-                    </div>
-
-                    {doc.approve_notes && (
-                      <div className="mt-2.5 text-xs text-slate-500">
-                        Notes:{' '}
-                        <span className="font-medium text-slate-700">
-                          {doc.approve_notes}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="ml-4 flex flex-wrap gap-2">
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!doc.file_key) return;
-                      handleDownload(doc.file_key);
-                    }}
-                    className="group rounded-full cursor-pointer border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!doc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="space-y-4">
-            {paymentDocuments.map((doc: any, index: number) => (
-              <div
-                key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
-                style={{
-                  animation: showDocs
-                    ? `slideIn 0.3s ease-out ${index * 0.08}s both`
-                    : 'none',
-                }}
-              >
-                <div className="flex min-w-0 flex-1 items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
-                      {getFileStatus(doc.status)}
-                    </div>
-                  </div>
-
-                  <div className="min-w-0 max-w-[350px] flex-1">
-                    <div className="mb-2 flex items-center gap-2">
-                      <h3 className="truncate text-sm font-semibold text-slate-800">
-                        {doc.document_type
-                          ? doc.document_type.charAt(0).toUpperCase() + doc.document_type.slice(1)
-                          : "Not provided"}
-                      </h3>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
-                      <div className="flex items-center gap-1.5">
-                        <svg
-                          className="h-3.5 w-3.5 text-slate-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                          />
-                        </svg>
-                        <span className="font-medium">PDF</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{formatDate(doc.created_at)}</span>
-                      </div>
-                    </div>
-
-                    {doc.approve_notes && (
-                      <div className="mt-2.5 text-xs text-slate-500">
-                        Notes:{' '}
-                        <span className="font-medium text-slate-700">
-                          {doc.approve_notes}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="ml-4 flex flex-wrap gap-2">
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!doc.file_key) return;
-                      handleDownload(doc.file_key);
-                    }}
-                    className="group rounded-full cursor-pointer border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!doc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="space-y-4">
-            {arrivalDocuments.map((doc: any, index: number) => (
-              <div
-                key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
-                style={{
-                  animation: showDocs
-                    ? `slideIn 0.3s ease-out ${index * 0.08}s both`
-                    : 'none',
-                }}
-              >
-                <div className="flex min-w-0 flex-1 items-start gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
-                      {getFileStatus(doc.status)}
-                    </div>
-                  </div>
-
-                  <div className="min-w-0 max-w-[350px] flex-1">
-                    <div className="mb-2 flex items-center gap-2">
-                      <h3 className="truncate text-sm font-semibold text-slate-800">
-                        {doc.document_type.charAt(0).toUpperCase() + doc.document_type.slice(1)}
-                      </h3>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
-                      <div className="flex items-center gap-1.5">
-                        <svg
-                          className="h-3.5 w-3.5 text-slate-400"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                          />
-                        </svg>
-                        <span className="font-medium">PDF</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{formatDate(doc.created_at)}</span>
-                      </div>
-                    </div>
-
-                    {doc.approve_notes && (
-                      <div className="mt-2.5 text-xs text-slate-500">
-                        Notes:{' '}
-                        <span className="font-medium text-slate-700">
-                          {doc.approve_notes}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="ml-4 flex flex-wrap gap-2">
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!doc.file_key) return;
-                      handleDownload(doc.file_key);
-                    }}
-                    className="group rounded-full cursor-pointer border border-transparent bg-green-50 p-2 text-green-600 transition-all duration-200 hover:border-green-200 hover:bg-green-100 hover:text-green-700 focus-visible:ring-2 focus-visible:ring-green-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!doc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+      {showDocs && (
+        <div className="space-y-6 rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
+          <DocGroup label="Application Documents" docs={documents} />
+          <DocGroup label="Payment Documents" docs={paymentDocuments} />
+          <DocGroup label="Arrival Documents" docs={arrivalDocuments} />
+          <DocGroup label="EMGS Evaluation Document" docs={emgsEvaluationDoc ? [emgsEvaluationDoc] : []} />
         </div>
-
-        <ViewPopup
-          isOpen={showViewPopup}
-          onClose={() => setShowViewPopup(false)}
-          doc={selectedDoc}
-        />
-      </div>
-
-      <style jsx>{`
-          @keyframes slideIn {
-              from {
-                  opacity: 0;
-                  transform: translateY(-10px);
-              }
-              to {
-                  opacity: 1;
-                  transform: translateY(0);
-              }
-          }
-      `}</style>
+      )}
     </section>
   );
 }

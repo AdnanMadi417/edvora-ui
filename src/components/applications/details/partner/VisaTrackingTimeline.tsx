@@ -18,6 +18,7 @@ import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 
 import VisaPaymentConfirmation from "../../../applications/popups/partner/VisaPaymentConfirmation";
 import ArrivalDate from "../../../applications/popups/partner/ArrivalDate";
+import EmgsEvaluationUpload from "../../../applications/popups/partner/EmgsEvaluationUpload";
 import { getDocumentDownloadUrl } from "../../../../services/documentService";
 
 interface VisaTrackingTimelineProps {
@@ -29,6 +30,7 @@ export default function VisaTrackingTimeline({
 }: VisaTrackingTimelineProps) {
   const [isVisaPopupOpen, setIsVisaPopupOpen] = useState(false);
   const [isArrivalPopupOpen, setIsArrivalPopupOpen] = useState(false);
+  const [isEmgsUploadOpen, setIsEmgsUploadOpen] = useState(false);
 
   const { methods, loading: paymentLoading } = useVisaPaymentMethods(application?.id);
 
@@ -38,6 +40,10 @@ export default function VisaTrackingTimeline({
   const showVisaPayment =
     stageName === "Visa Processing" &&
     stageStatuses.some((s: any) => s.name === "Waiting for Payment");
+
+  const showEmgsUpload =
+    stageName === "Visa Processing" &&
+    stageStatuses.some((s: any) => s.name === "Upload EMGS evaluation");
 
   const showArrivalConfirmation =
     stageName === "Student Arrival & Enrollment" &&
@@ -81,7 +87,7 @@ export default function VisaTrackingTimeline({
   if (!visaCase) return null;
 
   return (
-    <section className="mb-6 mt-6 rounded-lg bg-card">
+    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
       <div className="mb-6 rounded-lg border bg-white">
         <div className="flex items-start gap-3 border-b border-gray-200 p-6">
           <div className="flex-1">
@@ -112,7 +118,6 @@ export default function VisaTrackingTimeline({
                 : "—"}
             </p>
           </div>
-
           <div>
             <p className="mb-2 text-sm tracking-wide text-slate-500">
               Created At
@@ -128,8 +133,136 @@ export default function VisaTrackingTimeline({
             <p className="mb-2 text-sm tracking-wide text-slate-500">Notes</p>
             <p className="text-sm">{visaCase.notes || "No notes"}</p>
           </div>
+
         </div>
 
+        <div className="block space-y-4 border-b border-gray-200 p-6">
+
+              <div className="">
+            <h3 className="text-lg font-semibold text-gray-900">
+              EMGS Evaluation Document
+            </h3>
+            <p className="text-sm text-slate-500">
+              EMGS evaluation file
+            </p>
+          </div>
+
+
+         <div className="block space-y-4">
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+
+            <div className="flex gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                <svg className="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="mb-1 text-sm font-semibold text-slate-800">Download Your Evaluation</p>
+                <p className="mb-2 text-xs text-slate-500">Your evaluation is ready. Download it directly from the EMGS app.</p>
+                <a
+                  href="https://www.youtube.com/shorts/fT4Wmm4eWwI"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+                >
+                  View EMGS app instructions
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <div className="flex gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                <svg className="h-4 w-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div className="min-w-0">
+                <p className="mb-1 text-sm font-semibold text-slate-800">Check Entry Requirements</p>
+                <p className="mb-2 text-xs text-slate-500">Verify whether you need an eVISA or Visa on Arrival before travelling to Malaysia.</p>
+                <a
+                  href="https://educationmalaysia.gov.my/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 hover:underline"
+                >
+                  Visit Education Malaysia
+                  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+        
+        </div>
+
+        {showEmgsUpload && (
+                  <div className="relative rounded-lg border border-gray-200 p-6">
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="max-w-xl">
+                        <h3 className="text-sm font-semibold text-slate-900">Upload EMGS Evaluation Document</h3>
+                        <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                          Upload your EMGS evaluation document to continue with the visa application process.
+                        </p>
+                      </div>
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setIsEmgsUploadOpen(true)}
+                          className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200"
+                        >
+                          <FileText className="h-4 w-4" />
+                          Upload Evaluation
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+          <div className="">
+            {!application?.emgs_evaluation_document ? (
+              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-10">
+                <FileText className="h-8 w-8 text-gray-400" />
+                <p className="mt-2 text-sm text-slate-500">
+                  No EMGS evaluation document uploaded
+                </p>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+                    <FileText className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {application.emgs_evaluation_document.document_type}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      Uploaded on{" "}
+                      {new Date(application.emgs_evaluation_document.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleDownload(application.emgs_evaluation_document.file_key)}
+                  disabled={downloading}
+                  className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                  title="Download document"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+      </div>
+      
 
         {showVisaPayment && (
           <div className="p-6 pb-0 block space-y-4">
@@ -400,6 +533,14 @@ export default function VisaTrackingTimeline({
           <ArrivalDate
             isOpen={isArrivalPopupOpen}
             onClose={() => setIsArrivalPopupOpen(false)}
+            applicationId={application.id}
+          />
+        )}
+
+        {isEmgsUploadOpen && (
+          <EmgsEvaluationUpload
+            isOpen={isEmgsUploadOpen}
+            onClose={() => setIsEmgsUploadOpen(false)}
             applicationId={application.id}
           />
         )}

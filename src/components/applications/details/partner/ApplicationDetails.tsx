@@ -15,28 +15,23 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { Clock, Wallet, Plane, CheckCircle, XCircle } from 'lucide-react';
+import { Clock, Wallet, Plane, CheckCircle, XCircle, FileText } from 'lucide-react';
 import Button from 'components/ui/buttons/Button';
 import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 
 import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopBar";
 import RequiredAction from "components/applications/popups/partner/RequiredAction";
 import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
-import OfferLetterDecision, { OfferLetterDecisionType } from './OfferLetter';
+import OfferLetterDecision from './OfferLetter';
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import VisaPaymentConfirmation from "components/applications/popups/partner/VisaPaymentConfirmation";
 import ArrivalDate from "components/applications/popups/partner/ArrivalDate";
+import EmgsEvaluationUpload from "components/applications/popups/partner/EmgsEvaluationUpload";
 import ApplicationCommission from './ApplicationCommission';
-import { submitOfferLetterDecision } from '../../../../services/offerLetterService';
 import { useToast } from '../../../context/ToastContext';
 import Dispute from 'components/applications/popups/partner/UpdatedDispute';
 import api from 'lib/useApi';
-
-interface OfferLetterDecisionPayload {
-  decision: OfferLetterDecisionType;
-  reason?: string;
-  notes?: string;
-}
+import ApplicationTimeline from '../ApplicationTimeline';
 
 interface ApplicationDetailsProps {
   application: any;
@@ -78,12 +73,8 @@ export default function ApplicationDetails({
   const closeRequiredActionPopup = () => setShowRequiredActionPopup(false);
 
   const { showToast } = useToast();
-  const [submitting, setSubmitting] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [showDispute, setShowDispute] = useState(false);
-  const isUniversityApproved =
-    currentStatus === "University Approved";
-
   const { partner_actions } = actions || {};
   const confirmAction = partner_actions?.find(
     (a: any) => a.target_status_code === "APPLICATION_COMPLETE"
@@ -124,10 +115,15 @@ export default function ApplicationDetails({
     stageStatuses.some((s: any) => s.name === "Waiting for Payment");
 
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
+  const [showEmgsUploadPopup, setShowEmgsUploadPopup] = useState(false);
 
   const showArrivalConfirmation =
     stageName === "Student Arrival & Enrollment" &&
     stageStatuses.some((s: any) => s.name === "Waiting Partner to confirm arrival date");
+
+  const showEmgsUpload =
+    stageName === "Visa Processing" &&
+    actions?.status_code === "EVAL_PARTNER_UPLOAD";
 
   const formatGender = (value: boolean | null) => {
     if (value === null) return "Not provided";
@@ -154,50 +150,8 @@ export default function ApplicationDetails({
       previousEducation.end_date ||
       previousEducation.grade);
 
-  const handleDecision = async (decision: OfferLetterDecisionType) => {
-    if (!application?.id || submitting) return;
-
-    let reason: string | undefined;
-
-    if (decision === "reject") {
-      reason = prompt("Please provide a reason for rejection") || undefined;
-      if (!reason) return;
-    }
-
-    try {
-      setSubmitting(true);
-
-      const payload: OfferLetterDecisionPayload = {
-        decision,
-        reason,
-        notes: "",
-      };
-
-      await submitOfferLetterDecision(application.id, payload);
-
-      showToast(
-        decision === "accept"
-          ? "Offer accepted successfully."
-          : "Offer rejected successfully.",
-        "success"
-      );
-
-      setTimeout(() => {
-        location.reload();
-      }, 1500);
-    } catch (err: any) {
-      console.error(err);
-      showToast(
-        err?.response?.data?.message || "Failed to submit decision",
-        "error"
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
-    <section>
+    <section className="max-w-5xl mx-auto">
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-slate-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
   
@@ -321,93 +275,161 @@ export default function ApplicationDetails({
               
               </div>
 
-                <div className="space-y-2">
-      {actions && (
-        <>
-          {actions.document_types?.length > 0 ? (
-            <button
-              onClick={openRequiredActionPopup}
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
-            >
-              <Clock className="h-4 w-4 text-orange-500" />
-              Upload Required Documents
-            </button>
-          ) : actions.stage_statuses?.some((status) => status.is_requires_reason) ? (
-            <button
-              onClick={openProgramDecisionPopup}
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
-            >
-              <Clock className="h-4 w-4 text-blue-500" />
-              Submit Program Decision
-            </button>
-          ) : null}
-        </>
-      )}
+              </div>
 
-      {showVisaPayment && (
-        <button
-          type="button"
-          onClick={() => setShowVisaPaymentPopup(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
-        >
-          <Wallet className="h-4 w-4" />
-          Proceed to Payment
-        </button>
-      )}
-
-      {showArrivalConfirmation && (
-        <button
-          type="button"
-          onClick={() => setShowArrivalPopup(true)}
-          className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
-        >
-          <Plane className="h-4 w-4" />
-          Confirm Arrival
-        </button>
-      )}
-
-      {!actionsLoading && (confirmAction || disputeAction) && (
-        <div className="flex flex-row gap-2">
-          {confirmAction && (
-            <Button
-              icon={<CheckCircle className="h-4 w-4" />}
-              text={confirmLoading ? "Processing..." : "Confirm"}
-              bgColor="bg-green-50"
-              textColor="text-green-700"
-              borderColor="border-green-600"
-              hoverTextColor="hover:text-green-800"
-              hoverBorderColor="hover:border-green-700"
-              className="w-full"
-              onClick={handleCommissionConfirm}
-              disabled={confirmLoading}
-            />
-          )}
-          {disputeAction && (
-            <Button
-              icon={<XCircle className="h-4 w-4" />}
-              text="Dispute"
-              bgColor="bg-red-50"
-              textColor="text-red-700"
-              borderColor="border-red-600"
-              hoverTextColor="hover:text-red-800"
-              hoverBorderColor="hover:border-red-700"
-              className="w-full"
-              onClick={() => setShowDispute(true)}
-            />
-          )}
-        </div>
-      )}
-    </div>
-
-            </div>
           </div>
           
-        </div>
-        
-      <OfferLetterDecision application={application} />
-      <VisaTrackingTimeline application={application} />
-      <ApplicationCommission application={application} />
+          <div className="space-y-2">
+                  {actions && (
+                    <>
+                      {actions.document_types?.length > 0 ? (
+                        <button
+                          onClick={openRequiredActionPopup}
+                          className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
+                        >
+                          <Clock className="h-4 w-4 text-orange-500" />
+                          Upload Required Documents
+                        </button>
+                      ) : actions.stage_statuses?.some((status) => status.is_requires_reason) ? (
+                        <button
+                          onClick={openProgramDecisionPopup}
+                          className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                        >
+                          <Clock className="h-4 w-4 text-blue-500" />
+                          Submit Program Decision
+                        </button>
+                      ) : null}
+                    </>
+                  )}
 
+                  {showVisaPayment && (
+                    <button
+                      type="button"
+                      onClick={() => setShowVisaPaymentPopup(true)}
+                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    >
+                      <Wallet className="h-4 w-4" />
+                      Proceed to Payment
+                    </button>
+                  )}
+
+                  {showArrivalConfirmation && (
+                    <button
+                      type="button"
+                      onClick={() => setShowArrivalPopup(true)}
+                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    >
+                      <Plane className="h-4 w-4" />
+                      Confirm Arrival
+                    </button>
+                  )}
+
+                  {showEmgsUpload && (
+
+                    <div className="block space-y-2">
+
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                
+                      <div className="flex gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                          <svg className="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="mb-1 text-sm font-semibold text-slate-800">Download Your Evaluation</p>
+                          <p className="mb-2 text-xs text-slate-500">Your evaluation is ready. Download it directly from the EMGS app.</p>
+                          <a
+                            href="https://www.youtube.com/shorts/fT4Wmm4eWwI"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+                          >
+                            View EMGS app instructions
+                            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                
+                      <div className="flex gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100">
+                          <svg className="h-4 w-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                          </svg>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="mb-1 text-sm font-semibold text-slate-800">Check Entry Requirements</p>
+                          <p className="mb-2 text-xs text-slate-500">Verify whether you need an eVISA or Visa on Arrival before travelling to Malaysia.</p>
+                          <a
+                            href="https://educationmalaysia.gov.my/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 hover:underline"
+                          >
+                            Visit Education Malaysia
+                            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                          </a>
+                        </div>
+                      </div>
+                        
+                        </div>
+                           
+                      <button
+                      type="button"
+                      onClick={() => setShowEmgsUploadPopup(true)}
+                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    >
+                      <FileText className="h-4 w-4" />
+                      Upload EMGS Evaluation
+                    </button>
+
+                    </div>
+                    
+                  )}
+
+                  {!actionsLoading && (confirmAction || disputeAction) && (
+                    <div className="flex flex-row gap-2">
+                      {confirmAction && (
+                        <Button
+                          icon={<CheckCircle className="h-4 w-4" />}
+                          text={confirmLoading ? "Processing..." : "Confirm"}
+                          bgColor="bg-green-50"
+                          textColor="text-green-700"
+                          borderColor="border-green-600"
+                          hoverTextColor="hover:text-green-800"
+                          hoverBorderColor="hover:border-green-700"
+                          className="w-full"
+                          onClick={handleCommissionConfirm}
+                          disabled={confirmLoading}
+                        />
+                      )}
+                      {disputeAction && (
+                        <Button
+                          icon={<XCircle className="h-4 w-4" />}
+                          text="Dispute"
+                          bgColor="bg-red-50"
+                          textColor="text-red-700"
+                          borderColor="border-red-600"
+                          hoverTextColor="hover:text-red-800"
+                          hoverBorderColor="hover:border-red-700"
+                          className="w-full"
+                          onClick={() => setShowDispute(true)}
+                        />
+                      )}
+                    </div>
+                  )}
+            </div>
+
+        </div>
+
+      <ApplicationTimeline application={application} />
+      <ApplicationCommission application={application} />
+      <VisaTrackingTimeline application={application} />
+      <OfferLetterDecision application={application} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
@@ -756,6 +778,14 @@ export default function ApplicationDetails({
         <ArrivalDate
           isOpen={showArrivalPopup}
           onClose={() => setShowArrivalPopup(false)}
+          applicationId={application.id}
+        />
+      )}
+
+      {showEmgsUploadPopup && (
+        <EmgsEvaluationUpload
+          isOpen={showEmgsUploadPopup}
+          onClose={() => setShowEmgsUploadPopup(false)}
           applicationId={application.id}
         />
       )}

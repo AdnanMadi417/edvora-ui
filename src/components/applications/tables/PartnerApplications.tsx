@@ -287,7 +287,7 @@ const PartnerApplications = () => {
   };
 
   return (
-    <div className="mt-6 overflow-hidden text-p2">
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
       <div className="relative mb-4 overflow-hidden rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
 
