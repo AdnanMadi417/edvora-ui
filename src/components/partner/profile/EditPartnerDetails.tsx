@@ -90,7 +90,7 @@ const EditPartnerProfile: React.FC<EditPartnerProfileProps> = () => {
   if (partnerError || !partner) return <EmptyData />;
 
   return (
-    <div className="mx-auto mt-6 max-w-4xl">
+    <div className="mx-auto mt-6 max-w-5xl">
       <div className="rounded-md border bg-card shadow-sm">
         <div className="flex justify-between border-b px-6 py-5">
           <div className="flex items-center gap-4">

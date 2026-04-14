@@ -320,7 +320,7 @@ export default function RegisterProgram() {
   };
 
   return (
-    <section className="mx-auto mt-5">
+    <section className="mx-auto mt-5 max-w-5xl">
       <div className="mt-6 rounded-md border bg-white">
         <div className="flex items-start gap-x-4 border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">

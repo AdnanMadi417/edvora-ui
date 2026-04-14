@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import type { IRoute } from "../../../types/navigation";
 import { ChevronDown } from "lucide-react";
 
-export default function Links({ routes }: { routes: IRoute[] }) {
+export default function Links({ routes, onLinkClick }: { routes: IRoute[]; onLinkClick?: () => void }) {
   const pathname = usePathname();
 
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -75,6 +75,7 @@ export default function Links({ routes }: { routes: IRoute[] }) {
                 href={fullPath}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
+                onClick={onLinkClick}
                 className={`ml-3 flex cursor-pointer items-center justify-between rounded-md px-3 py-3 text-sm font-medium transition-colors duration-200 ease-in-out
                 ${isActive || isHovered ? "text-slate-900" : "text-slate-500"}`}
               >
@@ -120,6 +121,7 @@ export default function Links({ routes }: { routes: IRoute[] }) {
                       <Link
                         key={childIndex}
                         href={childPath}
+                        onClick={onLinkClick}
                         className={`relative flex items-center gap-2 rounded-s p-2 text-sm transition-all
                         ${
                           isChildActive

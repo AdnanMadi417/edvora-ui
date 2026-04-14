@@ -21,6 +21,7 @@ import {
   Sliders,
 } from 'lucide-react';
 import { MdSchool, MdLibraryAdd, MdVerified } from 'react-icons/md';
+import PresignedImage from "components/ui/PresignedImage";
 import { AiOutlineBank } from "react-icons/ai";
 
 import { useToast } from "components/context/ToastContext";
@@ -236,7 +237,7 @@ const ProgramsTable = () => {
   };
 
   return (
-    <div className="mt-6 overflow-hidden text-p2">
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
       <div className="relative mb-8 rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
@@ -505,14 +506,22 @@ const ProgramsTable = () => {
 
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div
-                        className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
-                      >
-                        {Program ? (
-                          Program.name?.slice(0, 2).toUpperCase()
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                        {Program.university?.logo_file_key ? (
+                          <PresignedImage
+                            fileKey={Program.university.logo_file_key}
+                            alt={Program.university.name}
+                            className="h-full w-full object-cover"
+                            fallback={
+                              <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
+                                {Program.name?.slice(0, 2).toUpperCase()}
+                              </div>
+                            }
+                          />
                         ) : (
-                          <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
+                          <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
+                            {Program.name?.slice(0, 2).toUpperCase()}
+                          </div>
                         )}
                       </div>
 

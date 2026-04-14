@@ -113,7 +113,7 @@ const ModernPartnersTable = () => {
   };
 
   return (
-    <div className="mt-6 overflow-hidden text-p2">
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
 
       <div className="relative mb-8 overflow-hidden rounded-lg border border-default bg-card">
         <div className="relative p-6">

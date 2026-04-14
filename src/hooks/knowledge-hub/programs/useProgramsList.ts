@@ -65,6 +65,8 @@ export type Program = {
     name: string;
     country: string;
     is_active: boolean;
+    logo_file_key: string,
+    logo_file_url: string,
     description: string | null;
     state: string | null;
     intake_months: string[] | null;

@@ -290,7 +290,7 @@ const EditMarketplaceDetails = ({ id }: Props) => {
   if (errorService) return <EmptyData />;
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 max-w-5xl mx-auto">
       <div className="rounded-md border border-default bg-card shadow-sm">
 
 

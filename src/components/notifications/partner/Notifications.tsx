@@ -48,7 +48,7 @@ export default function Notifications() {
   );
 
   return (
-    <section className="mb-6 mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
+    <section className="mb-6 mt-6 max-w-5xl mx-auto overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
         <div>

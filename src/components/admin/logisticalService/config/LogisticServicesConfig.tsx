@@ -1,17 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { Pencil, Check, X, Settings } from "lucide-react";
+import { Pencil, Check, X, Settings, Plus } from "lucide-react";
 
 import { useLogisticServices } from "hooks/service-providers/useLogisticServicesList";
 import { useEditLogisticService } from "hooks/service-providers/useEditLogisticService";
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { useToast } from "components/context/ToastContext";
+import Button from "components/ui/buttons/Button";
+import CreateLogisticServicePopup from "components/admin/logisticalService/CreateLogisticServicePopup";
 
 const LogisticServicesConfig = () => {
-  const { logisticServices, loadingLogisticServices, errorLogisticServices } =
+  const { logisticServices, loadingLogisticServices, errorLogisticServices, refetchLogisticServices } =
     useLogisticServices();
+  const [isCreateServiceOpen, setIsCreateServiceOpen] = useState(false);
   const { editLogisticService, loadingEditLogisticService } =
     useEditLogisticService();
   const { showToast } = useToast();
@@ -43,21 +46,34 @@ const LogisticServicesConfig = () => {
   };
 
   return (
-    <div className="mt-6 overflow-hidden text-p2">
+    <>
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-card">
         <div className="border-b border-slate-200 p-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-200 bg-blue-50">
-              <Settings className="h-5 w-5 text-blue-700" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-200 bg-blue-50">
+                <Settings className="h-5 w-5 text-blue-700" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-slate-900">
+                  Logistic Services
+                </h3>
+                <p className="mt-0.5 text-sm text-slate-500">
+                  Manage available logistic service types
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-xl font-semibold text-slate-900">
-                Logistic Services
-              </h3>
-              <p className="mt-0.5 text-sm text-slate-500">
-                Manage available logistic service types
-              </p>
-            </div>
+            <Button
+              icon={<Plus className="h-4 w-4" />}
+              text="New Service"
+              bgColor="bg-blue-50"
+              textColor="text-blue-700"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-blue-800"
+              hoverBorderColor="hover:border-blue-700"
+              onClick={() => setIsCreateServiceOpen(true)}
+            />
           </div>
         </div>
 
@@ -129,6 +145,13 @@ const LogisticServicesConfig = () => {
         </div>
       </div>
     </div>
+
+      <CreateLogisticServicePopup
+        isOpen={isCreateServiceOpen}
+        onClose={() => setIsCreateServiceOpen(false)}
+        onCreated={refetchLogisticServices}
+      />
+    </>
   );
 };
 

@@ -35,7 +35,7 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
 
   return (
     <>
-      <div className="mt-6">
+      <div className="mt-6 max-w-5xl mx-auto">
         <div className="rounded-md border bg-card shadow-sm">
           <div className="flex justify-between border-b p-6">
             <div className="flex items-center gap-4">

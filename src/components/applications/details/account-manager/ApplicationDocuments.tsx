@@ -62,8 +62,12 @@ export default function ApplicationDocuments({
   const documents = application?.documents || [];
   const paymentDocuments = application?.payment_documents || [];
   const arrivalDocuments = application?.arrival_documents || [];
+  const emgsEvaluationDoc = application?.emgs_evaluation_document || null;
 
-  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length;
+  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvaluationDoc ? 1 : 0);
+  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvaluationDoc ? [emgsEvaluationDoc] : [])].filter(
+    (d) => d.status === "1"
+  ).length;
 
   const getFileStatus = (status: string) => {
     switch (status) {
@@ -93,7 +97,7 @@ export default function ApplicationDocuments({
   }
 
   return (
-    <section className="mb-6 mt-6 rounded-lg bg-card transition-all duration-300">
+    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card transition-all duration-300">
       <div
         className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-6 transition-all duration-300 ${
           showDocs ? "rounded-t-lg" : "rounded-lg"
@@ -102,13 +106,23 @@ export default function ApplicationDocuments({
       >
         <div className="flex flex-col gap-2">
           <h3 className="text-p3 flex items-center gap-2 font-semibold text-slate-900">
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+            <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <FolderOpen className="text-xl text-blue-700" />
+              {pendingDocuments > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+                  {pendingDocuments}
+                </span>
+              )}
             </span>
             Documents {documents.document_type}
             <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
               {totalDocuments} Total
             </span>
+            {pendingDocuments > 0 && (
+              <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+                {pendingDocuments} Pending
+              </span>
+            )}
           </h3>
         </div>
 
@@ -416,6 +430,60 @@ export default function ApplicationDocuments({
               </div>
             ))}
           </div>
+
+          {emgsEvaluationDoc && (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">EMGS Evaluation Document</p>
+              <div className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
+                <div className="flex min-w-0 flex-1 items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
+                      {getFileStatus(emgsEvaluationDoc.status)}
+                    </div>
+                  </div>
+                  <div className="min-w-0 max-w-[350px] flex-1">
+                    <div className="mb-2 flex items-center gap-2">
+                      <h3 className="truncate text-sm font-semibold text-slate-800">
+                        {emgsEvaluationDoc.document_type}
+                      </h3>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
+                      <div className="flex items-center gap-1.5">
+                        <svg className="h-3.5 w-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span className="font-medium">PDF</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-slate-400" />
+                        <span>{formatDate(emgsEvaluationDoc.created_at)}</span>
+                      </div>
+                    </div>
+                    {emgsEvaluationDoc.approve_notes && (
+                      <div className="mt-2.5 text-xs text-slate-500">
+                        Notes: <span className="font-medium text-slate-700">{emgsEvaluationDoc.approve_notes}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="ml-4 flex flex-wrap gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!emgsEvaluationDoc.file_key) return;
+                      handleDownload(emgsEvaluationDoc.file_key);
+                    }}
+                    className="group rounded-full cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    title="Download Document"
+                    aria-label="Download Document"
+                    disabled={!emgsEvaluationDoc.file_key}
+                  >
+                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <ViewPopup

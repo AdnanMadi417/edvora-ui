@@ -255,7 +255,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
   return (
     <>
-      <div className="mt-6 rounded-md border bg-card shadow-sm">
+      <div className="mt-6 max-w-5xl mx-auto rounded-md border bg-card shadow-sm">
           <div className="flex justify-between border-b p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
@@ -645,6 +645,20 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                   </div>
 
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    
+                    <div className="md:col-span-2">
+                    
+                    <InputField
+                      label="Scholarship Name"
+                      field={`scholarships[${index}].name`}
+                      placeholder="e.g. Excellence Award"
+                      type="text"
+                      formData={formData}
+                      errors={{}}
+                      updateFormData={updateFormData}
+                    />
+
+                    </div>
 
                     <InputField
                       label="Coverage Percentage"
@@ -663,16 +677,6 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                       formData={formData}
                       errors={{}}
                       required={false}
-                      updateFormData={updateFormData}
-                    />
-
-                    <InputField
-                      label="Scholarship Name"
-                      field={`scholarships[${index}].name`}
-                      placeholder="e.g. Excellence Award"
-                      type="text"
-                      formData={formData}
-                      errors={{}}
                       updateFormData={updateFormData}
                     />
 

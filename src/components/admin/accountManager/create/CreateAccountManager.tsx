@@ -5,6 +5,7 @@ import { ChevronLeft} from 'lucide-react';
 import { MdAdminPanelSettings } from 'react-icons/md';
 
 import InputField from "components/form/InputField";
+import PasswordField from "components/form/PasswordField";
 import Button from 'components/ui/buttons/Button';
 
 import { useCreateAccountManager } from "hooks/account-managers/useCreateAccountManager";
@@ -110,7 +111,7 @@ export default function RegisterAccountManager() {
   };
 
   return (
-    <section className="mx-auto mt-5">
+    <section className="mx-auto mt-5 max-w-5xl">
       <div className="rounded-md border bg-slate-50 shadow-sm">
         <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
@@ -148,10 +149,9 @@ export default function RegisterAccountManager() {
             updateFormData={updateFormData}
           />
 
-          <InputField
+          <PasswordField
             label="Password"
             field="password"
-            type="password"
             placeholder="At least 8 characters, letters & numbers"
             required
             formData={formData}
@@ -159,10 +159,9 @@ export default function RegisterAccountManager() {
             updateFormData={updateFormData}
           />
 
-          <InputField
+          <PasswordField
             label="Confirm Password"
             field="confirm_password"
-            type="password"
             placeholder="Repeat your password"
             required
             formData={formData}
