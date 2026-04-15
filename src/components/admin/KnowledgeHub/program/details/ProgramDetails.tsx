@@ -320,7 +320,7 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
               <div className="mt-4 overflow-hidden rounded-md border border-slate-200">
                 <div className="grid grid-cols-2 bg-slate-50">
                   <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">
-                    Year / Semester
+                    Year
                   </div>
                   <div className="flex items-center gap-3 px-5 py-4 font-semibold text-slate-800 md:justify-end md:text-sm">
                     Tuition Fee
