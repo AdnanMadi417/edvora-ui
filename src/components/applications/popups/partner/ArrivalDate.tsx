@@ -21,7 +21,9 @@ export default function ArrivalDateConfirmation({
   const [isVisible, setIsVisible] = useState(false);
   const [arrivalDate, setArrivalDate] = useState<string>("");
   const [ticketFile, setTicketFile] = useState<File | null>(null);
+  const [eVisaFile, setEVisaFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
+  const [eVisaError, setEVisaError] = useState("");
   const { submitArrivalDate, isSubmitting } = useArrivalDateUpload();
 
   const [formData, setFormData] = useState({
@@ -43,7 +45,7 @@ export default function ArrivalDateConfirmation({
 
   const handleConfirm = async () => {
     try {
-      await submitArrivalDate(applicationId, formData.arrival_date, ticketFile);
+      await submitArrivalDate(applicationId, formData.arrival_date, ticketFile, eVisaFile);
       handleClose();
       setTimeout(() => window.location.reload(), 2000);
     } catch {
@@ -54,7 +56,9 @@ export default function ArrivalDateConfirmation({
   const handleClose = () => {
     setFormData({ arrival_date: "" });
     setTicketFile(null);
+    setEVisaFile(null);
     setFileError("");
+    setEVisaError("");
     onClose();
   };
 
@@ -102,10 +106,10 @@ export default function ArrivalDateConfirmation({
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
 
-            {fileError && (
+            {(fileError || eVisaError) && (
               <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4">
                 <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-                <p className="text-sm text-red-700">{fileError}</p>
+                <p className="text-sm text-red-700">{fileError || eVisaError}</p>
               </div>
             )}
 
@@ -125,9 +129,20 @@ export default function ArrivalDateConfirmation({
               label="Travel Ticket"
               id="ticket_file"
               file={ticketFile}
+              required
               onFileChange={setTicketFile}
               onRemove={() => setTicketFile(null)}
               onError={setFileError}
+              disabled={isSubmitting}
+            />
+
+            <StatusFileUpload
+              label="E-Visa Document (if required)"
+              id="e_visa_file"
+              file={eVisaFile}
+              onFileChange={setEVisaFile}
+              onRemove={() => setEVisaFile(null)}
+              onError={setEVisaError}
               disabled={isSubmitting}
             />
           </div>
@@ -142,7 +157,7 @@ export default function ArrivalDateConfirmation({
                 Cancel
               </button>
               <button
-                disabled={!formData.arrival_date || !ticketFile || !!fileError || isSubmitting}
+                disabled={!formData.arrival_date || !ticketFile || !!fileError || !!eVisaError || isSubmitting}
                 onClick={handleConfirm}
                 className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
               >

@@ -37,8 +37,9 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
   const paymentDocuments: any[] = application?.payment_documents || [];
   const arrivalDocuments: any[] = application?.arrival_documents || [];
   const emgsEvalDoc: any = application?.emgs_evaluation_document || null;
-  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvalDoc ? 1 : 0);
-  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvalDoc ? [emgsEvalDoc] : [])].filter(
+  const commissionDocuments: any[] = Object.values(application?.commission_documents || {}).filter(Boolean) as any[];
+  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvalDoc ? 1 : 0) + commissionDocuments.length;
+  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvalDoc ? [emgsEvalDoc] : []), ...commissionDocuments].filter(
     (d) => d.status === '1',
   ).length;
 

@@ -10,12 +10,14 @@ export const useArrivalDateUpload = () => {
   const submitArrivalDate = async (
     applicationId: string,
     arrivalDate: string,
-    ticketFile: File | null
+    ticketFile: File | null,
+    eVisaFile: File | null = null
   ) => {
     try {
       setIsSubmitting(true);
 
       let ticketData = {};
+      let eVisaData = {};
 
       if (ticketFile) {
         showToast("Uploading travel ticket...", "info");
@@ -34,9 +36,27 @@ export const useArrivalDateUpload = () => {
         };
       }
 
+      if (eVisaFile) {
+        showToast("Uploading e-visa document...", "info");
+
+        const presigned = await getPresignedUploads([eVisaFile], "documents");
+        const results = await uploadFilesToSpaces([eVisaFile], presigned);
+        const uploaded = results?.[0];
+
+        if (!uploaded?.file_key || !uploaded?.public_url) {
+          throw new Error("E-visa document upload failed");
+        }
+
+        eVisaData = {
+          e_visa_file_key: uploaded.file_key,
+          e_visa_file_url: uploaded.public_url,
+        };
+      }
+
       await api.patch(`/applications/${applicationId}/arrival-date`, {
         arrival_date: arrivalDate,
         ...ticketData,
+        ...eVisaData,
       });
 
       showToast("Arrival date submitted successfully", "success");
