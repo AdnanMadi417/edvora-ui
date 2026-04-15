@@ -62,10 +62,10 @@ export default function ApplicationDocuments({
   const documents = application?.documents || [];
   const paymentDocuments = application?.payment_documents || [];
   const arrivalDocuments = application?.arrival_documents || [];
-  const emgsEvaluationDoc = application?.emgs_evaluation_document || null;
+  const emgsEvalDoc = application?.emgs_evaluation_document || null;
 
-  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvaluationDoc ? 1 : 0);
-  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvaluationDoc ? [emgsEvaluationDoc] : [])].filter(
+  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvalDoc ? 1 : 0);
+  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvalDoc ? [emgsEvalDoc] : [])].filter(
     (d) => d.status === "1"
   ).length;
 
@@ -99,44 +99,54 @@ export default function ApplicationDocuments({
   return (
     <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card transition-all duration-300">
       <div
-        className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-6 transition-all duration-300 ${
+        className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80 ${
           showDocs ? "rounded-t-lg" : "rounded-lg"
         }`}
         onClick={() => setShowDocs(!showDocs)}
       >
-        <div className="flex flex-col gap-2">
-          <h3 className="text-p3 flex items-center gap-2 font-semibold text-slate-900">
-            <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-              <FolderOpen className="text-xl text-blue-700" />
+        {/* Left: icon + info */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="relative shrink-0">
+            <div className="flex h-11 w-11 items-center justify-center rounded-md bg-blue-50">
+              <FolderOpen className="h-5 w-5 text-blue-600" />
+            </div>
+            {pendingDocuments > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+                {pendingDocuments}
+              </span>
+            )}
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Application Documents</h3>
+            <p className="mt-0.5 text-xs text-slate-500">
+              {totalDocuments} {totalDocuments === 1 ? "file" : "files"}
               {pendingDocuments > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
-                  {pendingDocuments}
-                </span>
+                <span className="font-medium text-amber-600"> · {pendingDocuments} pending review</span>
               )}
-            </span>
-            Documents {documents.document_type}
-            <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
+            </p>
+          </div>
+        </div>
+
+        {/* Right: badges + chevron */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
               {totalDocuments} Total
             </span>
             {pendingDocuments > 0 && (
-              <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+              <span className="rounded-md bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">
                 {pendingDocuments} Pending
               </span>
             )}
-          </h3>
+          </div>
+          <div
+            className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
+              showDocs ? "bg-blue-100 text-blue-600" : "bg-slate-100 text-slate-500"
+            } group-hover:bg-blue-50 group-hover:text-blue-600`}
+          >
+            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showDocs ? "rotate-180" : ""}`} />
+          </div>
         </div>
-
-        <button
-          className="flex items-center justify-center rounded-full bg-blue-100 p-2.5 text-blue-600 transition-all duration-200 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
-          aria-label="Show documents"
-          aria-expanded={showDocs}
-        >
-          <ChevronDown
-            className={`text-lg transition-transform duration-300 ${
-              showDocs ? "rotate-180" : ""
-            }`}
-          />
-        </button>
       </div>
 
       <div
@@ -431,20 +441,20 @@ export default function ApplicationDocuments({
             ))}
           </div>
 
-          {emgsEvaluationDoc && (
+          {emgsEvalDoc && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">EMGS Evaluation Document</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">EMGS Eval Document</p>
               <div className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
-                      {getFileStatus(emgsEvaluationDoc.status)}
+                      {getFileStatus(emgsEvalDoc.status)}
                     </div>
                   </div>
                   <div className="min-w-0 max-w-[350px] flex-1">
                     <div className="mb-2 flex items-center gap-2">
                       <h3 className="truncate text-sm font-semibold text-slate-800">
-                        {emgsEvaluationDoc.document_type}
+                        {emgsEvalDoc.document_type}
                       </h3>
                     </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
@@ -456,12 +466,12 @@ export default function ApplicationDocuments({
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{formatDate(emgsEvaluationDoc.created_at)}</span>
+                        <span>{formatDate(emgsEvalDoc.created_at)}</span>
                       </div>
                     </div>
-                    {emgsEvaluationDoc.approve_notes && (
+                    {emgsEvalDoc.approve_notes && (
                       <div className="mt-2.5 text-xs text-slate-500">
-                        Notes: <span className="font-medium text-slate-700">{emgsEvaluationDoc.approve_notes}</span>
+                        Notes: <span className="font-medium text-slate-700">{emgsEvalDoc.approve_notes}</span>
                       </div>
                     )}
                   </div>
@@ -470,13 +480,13 @@ export default function ApplicationDocuments({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (!emgsEvaluationDoc.file_key) return;
-                      handleDownload(emgsEvaluationDoc.file_key);
+                      if (!emgsEvalDoc.file_key) return;
+                      handleDownload(emgsEvalDoc.file_key);
                     }}
                     className="group rounded-full cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     aria-label="Download Document"
-                    disabled={!emgsEvaluationDoc.file_key}
+                    disabled={!emgsEvalDoc.file_key}
                   >
                     <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>

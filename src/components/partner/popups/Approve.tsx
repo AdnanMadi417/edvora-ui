@@ -89,7 +89,7 @@ export default function ApprovePartnerPopup({
           <div className="relative border-b border-default px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
                   <CheckCircle
                     className="h-6 w-6 text-green-600"
                     strokeWidth={2.5}
@@ -108,7 +108,7 @@ export default function ApprovePartnerPopup({
               <button
                 onClick={handleClose}
                 aria-label="Close dialog"
-                className="group flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600"
+                className="group flex h-9 w-9 items-center justify-center rounded-md text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600"
               >
                 <XCircle className="h-5 w-5" strokeWidth={2} />
               </button>
@@ -140,13 +140,13 @@ export default function ApprovePartnerPopup({
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleClose}
-                className="rounded-full border border-default bg-card px-5 py-2.5 text-p2 font-medium text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50"
+                className="rounded-md border border-default bg-card px-5 py-2.5 text-p2 font-medium text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirm}
-                className="rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-p2 font-medium text-white shadow-lg shadow-green-500/25 transition-all duration-200 hover:from-green-600 hover:to-emerald-600 hover:shadow-xl hover:shadow-green-500/30 focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                className="rounded-md bg-gradient-to-r from-green-500 to-emerald-500 px-5 py-2.5 text-p2 font-medium text-white shadow-lg shadow-green-500/25 transition-all duration-200 hover:from-green-600 hover:to-emerald-600 hover:shadow-xl hover:shadow-green-500/30 focus:outline-none focus:ring-2 focus:ring-green-500/50"
               >
                 Confirm Approval
               </button>

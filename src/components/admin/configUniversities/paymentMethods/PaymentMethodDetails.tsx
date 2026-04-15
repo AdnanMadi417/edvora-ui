@@ -39,7 +39,7 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
         <div className="rounded-md border bg-card shadow-sm">
           <div className="flex justify-between border-b p-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
+              <div className="flex h-12 w-12 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-700">
                 <CreditCard className="h-6 w-6 text-white" />
               </div>
 
@@ -51,7 +51,7 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
             <div className="flex items-center gap-2 sm:gap-6">
               <button
                 onClick={handleBack}
-                className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
+                className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
                 <span className="hidden sm:inline">Back to Payments</span>

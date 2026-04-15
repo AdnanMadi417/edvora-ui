@@ -81,12 +81,12 @@ export default function Notifications() {
           >
             {tab}
             {tab === "unread" && unreadCount > 0 && (
-              <span className="ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-blue-100 px-1.5 text-xs font-bold text-blue-700">
+              <span className="ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-md bg-blue-100 px-1.5 text-xs font-bold text-blue-700">
                 {unreadCount}
               </span>
             )}
             {filter === tab && (
-              <span className="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-blue-600" />
+              <span className="absolute bottom-0 left-0 h-0.5 w-full rounded-md bg-blue-600" />
             )}
           </button>
         ))}
@@ -98,7 +98,7 @@ export default function Notifications() {
           <div className="flex flex-col">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-start gap-4 px-4 py-4">
-                <div className="h-11 w-11 animate-pulse rounded-full bg-slate-100" />
+                <div className="h-11 w-11 animate-pulse rounded-md bg-slate-100" />
                 <div className="flex-1 space-y-2 pt-1">
                   <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100" />
                   <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100" />
@@ -111,7 +111,7 @@ export default function Notifications() {
           <div className="px-6 py-12 text-center text-sm text-red-500">{error}</div>
         ) : displayed.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-slate-400">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+            <div className="flex h-16 w-16 items-center justify-center rounded-md bg-slate-100">
               <Bell className="h-8 w-8 text-slate-300" />
             </div>
             <p className="text-sm font-medium">
@@ -139,10 +139,10 @@ export default function Notifications() {
                 >
                   {/* Icon with type badge */}
                   <div className="relative flex-shrink-0">
-                    <div className={`flex h-11 w-11 items-center justify-center rounded-full ${config.bg}`}>
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-md ${config.bg}`}>
                       <Icon className={`h-5 w-5 ${config.iconColor}`} />
                     </div>
-                    <span className={`absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-white ${config.badgeBg}`}>
+                    <span className={`absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-md ring-2 ring-white ${config.badgeBg}`}>
                       <Bell className="h-2 w-2 text-white" />
                     </span>
                   </div>
@@ -165,13 +165,13 @@ export default function Notifications() {
 
                   {/* Actions */}
                   <div className="flex flex-shrink-0 items-center gap-2 self-center">
-                    {isUnread && <div className="h-3 w-3 rounded-full bg-blue-500" />}
+                    {isUnread && <div className="h-3 w-3 rounded-md bg-blue-500" />}
                     {notification.application_id && (
                       <Link
                         href={`/admin/applications/${notification.application_id}`}
                         onClick={(e) => e.stopPropagation()}
                         title="View application"
-                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-blue-100 hover:text-blue-600"
+                        className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-500 transition hover:bg-blue-100 hover:text-blue-600"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Link>

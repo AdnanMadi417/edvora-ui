@@ -9,6 +9,7 @@ import {
   MdOutlineBusiness, MdAdminPanelSettings, MdSchool, MdManageAccounts, MdAssignment,
 } from 'react-icons/md';
 
+
 import type { IRoute } from "../types/navigation";
 
 const partnerRoutes: IRoute[] = [
@@ -16,7 +17,7 @@ const partnerRoutes: IRoute[] = [
     name: "Applications",
     layout: "/partner",
     path: "/applications",
-    icon: MdManageAccounts,
+    icon: MdAssignment,
   },
 
   // {

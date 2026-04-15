@@ -71,7 +71,7 @@ export default function RequiredApplicationActions({
     <section className="max-w-5xl mx-auto">
       <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FaArrowCircleRight className="text-xl text-blue-700" />
           </span>
 
@@ -103,7 +103,7 @@ export default function RequiredApplicationActions({
                   }}
                 >
                   <div className="mb-3 flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100">
                       <FaFileAlt className="h-4 w-4 text-blue-700" />
                     </div>
                     <h3 className="truncate text-base font-semibold text-slate-900">
@@ -123,7 +123,7 @@ export default function RequiredApplicationActions({
                               <strong>{doc.type}:</strong> {doc.description}
                             </span>
                             <button
-                              className="rounded-full border border-gray-200 px-2 py-1 text-xs text-blue-700 transition hover:bg-blue-50"
+                              className="rounded-md border border-gray-200 px-2 py-1 text-xs text-blue-700 transition hover:bg-blue-50"
                               onClick={() => handleResubmit(status, doc.id)}
                             >
                               Upload Document

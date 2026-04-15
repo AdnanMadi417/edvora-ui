@@ -28,7 +28,7 @@ export default function ApplicationCommissions({ application }: ApplicationCommi
   return (
     <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg border border-gray-200 bg-card p-6">
       <div className="flex items-center gap-3 mb-4">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+        <span className="flex h-12 w-12 items-center justify-center rounded-md bg-green-100">
           <DollarSign className="text-xl text-green-700" />
         </span>
         <div>
@@ -50,11 +50,11 @@ export default function ApplicationCommissions({ application }: ApplicationCommi
             return (
               <div key={c.id} className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">{status.icon}</div>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">{status.icon}</div>
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-semibold">Commission #{i + 1}</span>
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${status.badge}`}>{status.text}</span>
+                      <span className={`rounded-md px-2 py-0.5 text-xs font-medium ${status.badge}`}>{status.text}</span>
                     </div>
                     <div className="text-green-600 font-bold">{formatCurrency(c.amount)}</div>
                     <div className="text-xs text-slate-600">Created: {formatDate(c.created_at)}</div>

@@ -78,7 +78,7 @@ const MultipleDatePickerModal = ({
               onClick={() => removeDate(i)}
               disabled={dates.length <= 1}
               aria-label={`Remove intake date ${i + 1}`}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-red-600 text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+              className="flex h-8 w-8 items-center justify-center rounded-md border border-red-600 text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
               title="Remove this date"
             >
               <Trash2 className="h-4 w-4" />

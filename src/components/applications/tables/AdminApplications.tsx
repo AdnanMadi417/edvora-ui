@@ -48,7 +48,7 @@ const SkeletonRow = () => (
   <tr className="border-b border-gray-100">
     <td className="px-6 py-4">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 shrink-0 animate-pulse rounded-full bg-gray-200" />
+        <div className="h-10 w-10 shrink-0 animate-pulse rounded-md bg-gray-200" />
         <div className="space-y-2">
           <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
           <div className="h-3 w-44 animate-pulse rounded bg-gray-200" />
@@ -70,7 +70,7 @@ const SkeletonRow = () => (
     <td className="px-6 py-4">
       <div className="space-y-2">
         <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
-        <div className="h-6 w-32 animate-pulse rounded-full bg-gray-200" />
+        <div className="h-6 w-32 animate-pulse rounded-md bg-gray-200" />
       </div>
     </td>
     <td className="px-6 py-4">
@@ -226,7 +226,7 @@ const ModernApplicationsTable = () => {
 
     return (
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${config.bg} ${config.text}`}
+        className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium ${config.bg} ${config.text}`}
         title={config.label}
       >
         <span className="truncate max-w-[160px]">{config.label}</span>
@@ -277,7 +277,7 @@ const ModernApplicationsTable = () => {
                 placeholder="Search applications..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 text-sm text-slate-700 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 text-sm text-slate-700 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
@@ -321,7 +321,7 @@ const ModernApplicationsTable = () => {
                   text="Clear"
                   icon={<RotateCcw className="h-4 w-4" />}
                 />
-                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-md bg-red-500 text-[10px] font-bold text-white">
                   {activeFiltersCount}
                 </span>
               </div>
@@ -331,7 +331,50 @@ const ModernApplicationsTable = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-card">
+      {/* Mobile card list */}
+      <div className="md:hidden rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-card divide-y divide-gray-100">
+        {loading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3.5">
+              <div className="h-11 w-11 shrink-0 animate-pulse rounded-md bg-gray-200" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="flex justify-between gap-2">
+                  <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
+                  <div className="h-3 w-12 animate-pulse rounded bg-gray-200" />
+                </div>
+                <div className="h-3 w-24 animate-pulse rounded bg-gray-200" />
+                <div className="h-5 w-28 animate-pulse rounded-md bg-gray-200" />
+              </div>
+            </div>
+          ))
+        ) : paginatedApplications.length === 0 ? (
+          <div className="px-6 py-8 text-center"><EmptyData /></div>
+        ) : (
+          paginatedApplications.map((app) => (
+            <div
+              key={app.id}
+              className="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50"
+              onClick={() => router.push(`/admin/applications/${app.id}`)}
+            >
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700">
+                {app.student_name?.[0]?.toUpperCase() ?? "?"}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate text-sm font-semibold text-slate-900">{app.student_name}</span>
+                  <span className="shrink-0 text-xs text-slate-400">{getRelativeTime(app.updated_at)}</span>
+                </div>
+                <div className="mt-0.5 truncate text-xs text-slate-500">{app.program_name}</div>
+                <div className="mt-1.5"><StatusBadge status={app.status} /></div>
+              </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-card">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200 bg-card">
@@ -408,7 +451,7 @@ const ModernApplicationsTable = () => {
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700">
                         {app.student_name?.[0]?.toUpperCase() ?? "?"}
                       </div>
                       <div className="min-w-0">

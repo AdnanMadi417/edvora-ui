@@ -257,7 +257,7 @@ export default function RegisterLogisticsProvider() {
             <h3 className="text-xl font-semibold text-slate-900">Register Logistics Provider</h3>
             <p className="text-sm text-slate-500">Fill in the required details to register a new logistics service provider</p>
             {logoFile && !logoUploading && (
-              <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+              <span className="mt-1 inline-block rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
                 Picture ready — save to apply
               </span>
             )}
@@ -343,7 +343,7 @@ export default function RegisterLogisticsProvider() {
                 <button
                   type="button"
                   onClick={() => removePackage(index)}
-                  className="flex items-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700"
+                  className="flex items-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700"
                 >
                   <Trash2 className="h-4 w-4" />
                   Remove
@@ -401,7 +401,7 @@ export default function RegisterLogisticsProvider() {
                           const updated = pkg.includes.filter((_, idx) => idx !== i);
                           updatePackage(index, "includes", updated);
                         }}
-                        className="flex items-center justify-center rounded-full border border-red-600 p-1 text-red-600 transition hover:border-red-700 hover:text-red-700"
+                        className="flex items-center justify-center rounded-md border border-red-600 p-1 text-red-600 transition hover:border-red-700 hover:text-red-700"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

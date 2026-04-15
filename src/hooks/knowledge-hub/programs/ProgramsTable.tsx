@@ -257,7 +257,7 @@ const ProgramsTable = () => {
                 placeholder="Search by university, program, or level..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -315,7 +315,7 @@ const ProgramsTable = () => {
                   setSelectedLevel("all");
                   setCurrentPage(1);
                 }}
-                className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
               >
                 <RefreshCw className="h-4 w-4" />
                 Clear
@@ -325,7 +325,7 @@ const ProgramsTable = () => {
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
 
               <Link
-                className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+                className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
                 href="/admin/knowledge-hub/programs/create"
               >
                 <MdLibraryAdd className="h-4 w-4" />
@@ -333,7 +333,7 @@ const ProgramsTable = () => {
               </Link>
 
               {selectedCount > 0 && (
-                <div className="flex items-center gap-2 rounded-full border border-slate-100 bg-slate-50/60 px-3 py-1.5">
+                <div className="flex items-center gap-2 rounded-md border border-slate-100 bg-slate-50/60 px-3 py-1.5">
                   <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
                     <CheckCircle className="h-4 w-4" />
                     {selectedCount} selected
@@ -500,7 +500,7 @@ const ProgramsTable = () => {
 
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md">
                         {Program.university?.logo_file_key ? (
                           <PresignedImage
                             fileKey={Program.university.logo_file_key}
@@ -537,7 +537,7 @@ const ProgramsTable = () => {
 
                           <span className="text-slate-300">•</span>
 
-                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
                                 {Program.duration} Years
                               </span>
                         </div>
@@ -595,7 +595,7 @@ const ProgramsTable = () => {
                             <span
                               key={index}
                               title={tag.label}
-                              className={`truncate rounded-full px-2 py-0.5 font-medium transition ${
+                              className={`truncate rounded-md px-2 py-0.5 font-medium transition ${
                                 tag.color === "green"
                                   ? "bg-green-50 text-green-700"
                                   : tag.color === "blue"
@@ -608,7 +608,7 @@ const ProgramsTable = () => {
                           ))}
 
                           {hiddenCount > 0 && (
-                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
                                   +{hiddenCount} more
                                 </span>
                           )}
@@ -637,11 +637,11 @@ const ProgramsTable = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2 text-sm">
                       {Program.has_scholarship ? (
-                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
+                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
                               <CheckCircle className="h-4 w-4" /> Available
                             </span>
                       ) : (
-                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
+                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
                               <XCircle className="h-4 w-4" /> Not Available
                             </span>
                       )}
@@ -662,7 +662,7 @@ const ProgramsTable = () => {
                         role="menuitem"
                         aria-label="View Program"
                         href={`/admin/knowledge-hub/programs/${Program.id}`}
-                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                       >
                         <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                       </a>
@@ -673,7 +673,7 @@ const ProgramsTable = () => {
                         role="menuitem"
                         aria-label="Edit Program"
                         href={`/admin/knowledge-hub/programs/${Program.id}/edit`}
-                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                       >
                         <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                       </a>
@@ -688,7 +688,7 @@ const ProgramsTable = () => {
                           setDeleteMode("single");
                           setIsDeleteOpen(true);
                         }}
-                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                       >
                         <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                       </button>

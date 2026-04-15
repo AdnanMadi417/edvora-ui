@@ -601,7 +601,7 @@ export default function StudentManualApplication() {
     <section className="mx-auto mt-5">
       <div className="rounded-lg border border-slate-200 bg-card p-6">
         <div className="mb-6 flex items-start gap-x-3 border-b-2 border-slate-100 pb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FileText className="text-blue-700" size={24} />
           </div>
           <div>
@@ -637,7 +637,7 @@ export default function StudentManualApplication() {
                   <button
                     onClick={() => canAccess && setStage(s.id)}
                     disabled={!canAccess}
-                    className={`mb-2 flex h-12 w-12 items-center justify-center rounded-full transition ${
+                    className={`mb-2 flex h-12 w-12 items-center justify-center rounded-md transition ${
                       isCompleted
                         ? "bg-blue-500 text-white"
                         : isActive

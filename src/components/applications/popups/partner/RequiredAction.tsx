@@ -70,7 +70,7 @@ export default function RequiredAction({
           <div className="relative border-b border-default px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100">
                   <Pause className="h-6 w-6 text-amber-600" strokeWidth={2.5} />
                 </div>
                 <div>
@@ -89,7 +89,7 @@ export default function RequiredAction({
               <button
                 onClick={onClose}
                 aria-label="Close dialog"
-                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
               >
                 <XCircle className="h-5 w-5" strokeWidth={2} />
               </button>
@@ -176,7 +176,7 @@ export default function RequiredAction({
           <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
             <button
               onClick={onClose}
-              className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
             >
               <XCircle className="h-4 w-4" />
               Cancel
@@ -184,7 +184,7 @@ export default function RequiredAction({
             <button
               onClick={handleConfirm}
               disabled={!hasAnyFile || hasAnyError || isSubmitting}
-              className="flex items-center justify-center gap-2 rounded-full border border-amber-600 bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700 transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-md border border-amber-600 bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700 transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
             >
               <CheckCircle className="h-4 w-4" />
               {isSubmitting ? "Uploading..." : "Confirm"}

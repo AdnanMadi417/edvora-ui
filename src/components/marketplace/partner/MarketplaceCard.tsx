@@ -77,7 +77,7 @@ const MarketplaceCard = () => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="bg-background w-full rounded-full border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -110,20 +110,20 @@ const MarketplaceCard = () => {
                         <PresignedImage
                           fileKey={m.picture_file_key}
                           alt={m.name}
-                          className="h-14 w-14 rounded-full object-cover"
+                          className="h-14 w-14 rounded-md object-cover"
                           fallback={
-                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-md bg-blue-100">
                               <span className="text-base font-semibold uppercase text-blue-700">{m.name?.slice(0, 2)}</span>
                             </div>
                           }
                         />
                       ) : (
-                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-md bg-blue-100">
                           <span className="text-base font-semibold uppercase text-blue-700">{m.name?.slice(0, 2)}</span>
                         </div>
                       )}
                       <span
-                        className={`absolute bottom-0 left-0 h-3.5 w-3.5 rounded-full border-2 border-white ${
+                        className={`absolute bottom-0 left-0 h-3.5 w-3.5 rounded-md border-2 border-white ${
                           m.is_active ? "bg-emerald-500" : "bg-slate-400"
                         }`}
                       />
@@ -186,13 +186,13 @@ const MarketplaceCard = () => {
                       {m.services_offered?.slice(0, 1).map((service) => (
                         <span
                           key={service.id}
-                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                          className="rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                         >
                           {service.name}
                         </span>
                       ))}
                       {m.services_offered?.length > 1 && (
-                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500">
+                        <span className="rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500">
                           +{m.services_offered.length - 1} more
                         </span>
                       )}
@@ -209,7 +209,7 @@ const MarketplaceCard = () => {
                         const number = m.whatsapp.replace("+", "");
                         window.open(`https://wa.me/${number}`, "_blank");
                       }}
-                      className="flex w-full items-center justify-center gap-2 rounded-full bg-green-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-green-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                     >
                       <MdWhatsapp className="h-5 w-5" />
                       Contact on WhatsApp

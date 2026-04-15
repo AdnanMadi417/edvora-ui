@@ -96,7 +96,7 @@ export default function RegisterAccountManager() {
     <section className="mx-auto mt-5 max-w-5xl">
       <div className="rounded-md border bg-slate-50 shadow-sm">
         <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <User className="text-blue-700" size={24} />
           </div>
           <div>

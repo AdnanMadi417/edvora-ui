@@ -130,7 +130,7 @@ export default function EditProfileDetails({
         <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-5">
 
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-slate-700 transition-transform group-hover:scale-105">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-accent-light text-xl font-semibold text-slate-700 transition-transform group-hover:scale-105">
               {manager.name?.charAt(0).toUpperCase() ?? "?"}
             </div>
 
@@ -140,7 +140,7 @@ export default function EditProfileDetails({
                   Edit Account Manager
                 </h1>
 
-                <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700">
+                <span className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700">
                   <Pencil className="h-3 w-3" />
                   Editing
                 </span>

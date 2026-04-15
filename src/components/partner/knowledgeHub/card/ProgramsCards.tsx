@@ -112,7 +112,7 @@ const ProgramsCards = () => {
                 placeholder="Search by university, program, or level..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -155,7 +155,7 @@ const ProgramsCards = () => {
                   setSelectedUniversity("all");
                   setCurrentPage(1);
                 }}
-                className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
               >
                 <RefreshCw className="h-4 w-4" />
                 Clear
@@ -290,7 +290,7 @@ const ProgramsCards = () => {
                           },
                         }}
                         onClick={(e) => e.stopPropagation()}
-                        className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
+                        className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
                       >
                         <Send className="h-4 w-4" />
                         Apply Now

@@ -258,7 +258,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       <div className="mt-6 max-w-5xl mx-auto rounded-md border bg-card shadow-sm">
           <div className="flex justify-between border-b p-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
+              <div className="flex h-14 w-14 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-700">
                 <GraduationCap className="h-8 w-8 text-white" />
               </div>
 
@@ -280,7 +280,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                       openDropdownId === program.id ? null : program.id
                     )
                   }
-                  className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+                  className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
                   Actions
                   <MoreVertical className="h-4 w-4" />
@@ -298,7 +298,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                           setOpenDropdownId(null);
                         }}
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
                           <Trash2 className="h-4 w-4" />
                         </div>
 
@@ -312,7 +312,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                         className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
                         onClick={handleBack}
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
                           <ChevronLeft className="h-4 w-4" />
                         </div>
 
@@ -619,7 +619,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 <div className="rounded-xl border border-slate-200 bg-white p-6 transition">
                   <div className="mb-5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-600">
                         {index + 1}
                       </div>
 

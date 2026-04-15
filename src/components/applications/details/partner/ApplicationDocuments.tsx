@@ -36,9 +36,9 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
   const documents: any[] = application?.documents || [];
   const paymentDocuments: any[] = application?.payment_documents || [];
   const arrivalDocuments: any[] = application?.arrival_documents || [];
-  const emgsEvaluationDoc: any = application?.emgs_evaluation_document || null;
-  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvaluationDoc ? 1 : 0);
-  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvaluationDoc ? [emgsEvaluationDoc] : [])].filter(
+  const emgsEvalDoc: any = application?.emgs_evaluation_document || null;
+  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvalDoc ? 1 : 0);
+  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvalDoc ? [emgsEvalDoc] : [])].filter(
     (d) => d.status === '1',
   ).length;
 
@@ -122,41 +122,54 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
   return (
     <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
       <div
-        className={`flex cursor-pointer items-center justify-between border border-gray-200 p-5 transition-colors hover:bg-slate-50 ${
+        className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80 ${
           showDocs ? 'rounded-t-lg' : 'rounded-lg'
         }`}
         onClick={() => setShowDocs(!showDocs)}
       >
-        <div className="flex items-center gap-3">
-          <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-            <FolderOpen className="h-5 w-5 text-blue-700" />
+        {/* Left: icon + info */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="relative shrink-0">
+            <div className="flex h-11 w-11 items-center justify-center rounded-md bg-blue-50">
+              <FolderOpen className="h-5 w-5 text-blue-600" />
+            </div>
             {pendingDocuments > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-white">
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
                 {pendingDocuments}
               </span>
             )}
-          </span>
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-slate-900">Documents</h3>
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-              {totalDocuments}
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Application Documents</h3>
+            <p className="mt-0.5 text-xs text-slate-500">
+              {totalDocuments} {totalDocuments === 1 ? 'file' : 'files'}
+              {pendingDocuments > 0 && (
+                <span className="font-medium text-amber-600"> · {pendingDocuments} pending review</span>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Right: badges + chevron */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+              {totalDocuments} Total
             </span>
             {pendingDocuments > 0 && (
-              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
-                {pendingDocuments} pending
+              <span className="rounded-md bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">
+                {pendingDocuments} Pending
               </span>
             )}
           </div>
+          <div
+            className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
+              showDocs ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'
+            } group-hover:bg-blue-50 group-hover:text-blue-600`}
+          >
+            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showDocs ? 'rotate-180' : ''}`} />
+          </div>
         </div>
-        <button
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
-          aria-label="Toggle documents"
-          aria-expanded={showDocs}
-        >
-          <ChevronDown
-            className={`h-4 w-4 transition-transform duration-200 ${showDocs ? 'rotate-180' : ''}`}
-          />
-        </button>
       </div>
 
       {showDocs && (
@@ -164,7 +177,7 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
           <DocGroup label="Application Documents" docs={documents} />
           <DocGroup label="Payment Documents" docs={paymentDocuments} />
           <DocGroup label="Arrival Documents" docs={arrivalDocuments} />
-          <DocGroup label="EMGS Evaluation Document" docs={emgsEvaluationDoc ? [emgsEvaluationDoc] : []} />
+          <DocGroup label="EMGS Eval Document" docs={emgsEvalDoc ? [emgsEvalDoc] : []} />
         </div>
       )}
     </section>

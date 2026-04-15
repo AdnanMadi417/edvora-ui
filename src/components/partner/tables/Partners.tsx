@@ -93,7 +93,7 @@ const ModernPartnersTable = () => {
 
     return (
       <span
-        className={`inline-flex rounded-full border px-2 py-1 text-p2 ${config.bg} ${config.text}`}
+        className={`inline-flex rounded-md border px-2 py-1 text-p2 ${config.bg} ${config.text}`}
       >
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
@@ -136,11 +136,11 @@ const ModernPartnersTable = () => {
                 placeholder="Search partners by name or business..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-full border border-default bg-card px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-0 focus:ring-blue-500 sm:w-64"
+                className="w-full rounded-md border border-default bg-card px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-0 focus:ring-blue-500 sm:w-64"
               />
 
               <select
-                className="rounded-full border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="rounded-md border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
@@ -151,7 +151,7 @@ const ModernPartnersTable = () => {
               </select>
 
               {/*<select*/}
-              {/*  className="rounded-full border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"*/}
+              {/*  className="rounded-md border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"*/}
               {/*  value={filterCountry}*/}
               {/*  onChange={(e) => setFilterCountry(e.target.value)}*/}
               {/*>*/}
@@ -161,7 +161,7 @@ const ModernPartnersTable = () => {
               {/*</select>*/}
 
               <select
-                className="rounded-full border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="rounded-md border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
               >
@@ -177,7 +177,7 @@ const ModernPartnersTable = () => {
                   setFilterType("all");
                   setFilterCountry("all");
                 }}
-                className="bg-background flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-slate-600 outline-0 transition hover:border-text-error hover:text-text-error sm:w-auto"
+                className="bg-background flex items-center justify-center gap-2 rounded-md border border-default px-4 py-2.5 text-sm text-slate-600 outline-0 transition hover:border-text-error hover:text-text-error sm:w-auto"
               >
                 Clear
               </button>
@@ -276,7 +276,7 @@ const ModernPartnersTable = () => {
                       <Image
                         width="40"
                         height="40"
-                        className="h-10 w-10 rounded-full"
+                        className="h-10 w-10 rounded-md"
                         src={partner}
                         alt="Profile"
                       />
@@ -314,7 +314,7 @@ const ModernPartnersTable = () => {
                     <Link
                       href={`/account-manager/partners/${app.id}`}
                       aria-label="View Partner"
-                      className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-full border border-default p-2 text-sm text-slate-600 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+                      className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-md border border-default p-2 text-sm text-slate-600 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
                     >
                       <Eye className="h-4 w-4" />
                       <span className="text-caption">View </span>
@@ -354,7 +354,7 @@ const ModernPartnersTable = () => {
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="rounded-full border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
             >
               Previous
             </button>
@@ -364,7 +364,7 @@ const ModernPartnersTable = () => {
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="rounded-full border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next
             </button>

@@ -127,12 +127,12 @@ const LogisticalServiceTable = () => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
             <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+              className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
               href="/admin/logistical-service/create"
             >
               <MdAddBusiness className="h-4 w-4" />
@@ -242,15 +242,15 @@ const LogisticalServiceTable = () => {
                               <PresignedImage
                                 fileKey={provider.picture_file_key}
                                 alt={provider.name}
-                                className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-blue-500 ring-offset-2 shadow-md"
+                                className="h-10 w-10 shrink-0 rounded-md object-cover ring-2 ring-blue-500 ring-offset-2 shadow-md"
                                 fallback={
-                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-100 text-sm font-semibold text-blue-700">
                                     {provider.name[0].toUpperCase()}
                                   </div>
                                 }
                               />
                             ) : (
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-100 text-sm font-semibold text-blue-700">
                                 {provider.name[0].toUpperCase()}
                               </div>
                             )}
@@ -292,7 +292,7 @@ const LogisticalServiceTable = () => {
                                 .map((uni) => (
                                   <span
                                     key={uni}
-                                    className="truncate rounded-full border bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                                    className="truncate rounded-md border bg-white px-3 py-1 text-xs font-medium text-slate-700"
                                   >
                                     {uni}
                                   </span>
@@ -316,7 +316,7 @@ const LogisticalServiceTable = () => {
                               provider.languages.slice(0, 2).map((lang) => (
                                 <span
                                   key={lang}
-                                  className="rounded-full text-xs font-medium text-slate-700"
+                                  className="rounded-md text-xs font-medium text-slate-700"
                                 >
                                   {lang}
                                 </span>
@@ -336,7 +336,7 @@ const LogisticalServiceTable = () => {
 
                         <td className="px-6 py-4">
                           <div
-                            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold ${
+                            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-3 py-1 text-xs font-semibold ${
                               provider.is_active
                                 ? "border-green-600 bg-green-100 text-green-700"
                                 : "border-slate-300 bg-slate-100 text-slate-500"
@@ -357,7 +357,7 @@ const LogisticalServiceTable = () => {
                               role="menuitem"
                               aria-label="View Provider"
                               href={`/admin/logistical-service/${provider.id}`}
-                              className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                              className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                             >
                               <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                             </a>
@@ -368,7 +368,7 @@ const LogisticalServiceTable = () => {
                               role="menuitem"
                               aria-label="Edit Provider"
                               href={`/admin/logistical-service/${provider.id}/edit`}
-                              className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                              className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                             >
                               <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                             </a>
@@ -383,7 +383,7 @@ const LogisticalServiceTable = () => {
                                 setSelectedServiceName(provider.name);
                                 setIsDeleteOpen(true);
                               }}
-                              className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                              className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                             >
                               <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                             </button>
