@@ -14,7 +14,7 @@ import {
   ArrowLeft,
   UserSearch,
   GitBranch,
-  UserPlus,
+  FilePlus,
   RotateCcw,
 } from 'lucide-react';
 import { MdSchool } from 'react-icons/md';
@@ -299,7 +299,7 @@ const PartnerApplications = () => {
             </div>
             <Button
               onClick={() => router.push('/partner/applications/apply-now')}
-              icon={<UserPlus className="h-4 w-4" />}
+              icon={<FilePlus className="h-4 w-4" />}
               text="Create Application"
               bgColor="bg-blue-600"
               textColor="text-white"

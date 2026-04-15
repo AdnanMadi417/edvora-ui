@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ChevronLeft, Edit2, Pencil, Plus, Trash2, X } from "lucide-react";
-import { BiArrowBack } from "react-icons/bi";
 
 import { useLogisticServiceDetails } from "hooks/service-providers/useLogisticServiceDetails";
 import { useLogisticServices } from "hooks/service-providers/useLogisticServicesList";
@@ -623,7 +622,7 @@ const EditMarketplaceDetails = ({ id }: Props) => {
         <div className="flex justify-end gap-2 border-t border-gray-200 px-6 py-5">
           <Button
             onClick={() => router.push("/admin/logistical-service/")}
-            icon={<BiArrowBack className="h-5 w-5" />}
+            icon={<X className="h-5 w-5" />}
             text="Cancel"
             bgColor="bg-slate-50"
             textColor="text-slate-700"

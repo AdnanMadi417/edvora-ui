@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { FaArrowCircleRight, FaFileAlt } from "react-icons/fa";
+import { FaFileAlt } from "react-icons/fa";
+import { MdAssignment } from "react-icons/md";
 import api from "../../../../lib/useApi";
+import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import UploadDoc from "../../popups/partner/UploadDoc";
 import { AlertCircle, ArrowRightCircle } from "lucide-react";
 
@@ -40,19 +42,20 @@ export default function RequiredApplicationActions({
     if (!file) return;
 
     try {
-      const dummyUrl = "https://example.com/dummy-file.pdf";
+      const presigned = await getPresignedUploads([file], "applications-files");
+      const results = await uploadFilesToSpaces([file], presigned);
+      const uploaded = results?.[0];
+
+      if (!uploaded?.public_url) throw new Error("File upload failed");
 
       const payload = [
         {
           document_type_id: documentTypeId,
-          file_url: dummyUrl, // send ONLY STRING
+          file_url: uploaded.public_url,
         },
       ];
 
-      const res = await api.post(
-        `/applications/${id}/requested-documents/bulk`,
-        payload
-      );
+      await api.post(`/applications/${id}/requested-documents/bulk`, payload);
     } catch (err: any) {
       console.error("Upload failed:", err.response?.data || err.message);
     }
@@ -72,7 +75,7 @@ export default function RequiredApplicationActions({
       <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
           <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-            <FaArrowCircleRight className="text-xl text-blue-700" />
+            <MdAssignment className="text-xl text-blue-700" />
           </span>
 
           <span className="flex flex-col">

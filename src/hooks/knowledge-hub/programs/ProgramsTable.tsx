@@ -19,8 +19,9 @@ import {
   ClipboardCheck,
   CalendarDays,
   Sliders,
+  Plus,
 } from 'lucide-react';
-import { MdSchool, MdLibraryAdd, MdVerified } from 'react-icons/md';
+import { MdSchool, MdVerified } from 'react-icons/md';
 import PresignedImage from "components/ui/PresignedImage";
 import { AiOutlineBank } from "react-icons/ai";
 
@@ -328,7 +329,7 @@ const ProgramsTable = () => {
                 className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
                 href="/admin/knowledge-hub/programs/create"
               >
-                <MdLibraryAdd className="h-4 w-4" />
+                <Plus className="h-4 w-4" />
                 Create Program
               </Link>
 

@@ -15,7 +15,7 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { Clock, Wallet, Plane, CheckCircle, XCircle, FileText } from 'lucide-react';
+import { Clock, Upload, ClipboardCheck, CreditCard, Plane, CheckCircle, XCircle, FileUp } from 'lucide-react';
 import Button from 'components/ui/buttons/Button';
 import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 
@@ -290,17 +290,17 @@ export default function ApplicationDetails({
                       {actions.document_types?.length > 0 ? (
                         <button
                           onClick={openRequiredActionPopup}
-                          className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
+                          className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"
                         >
-                          <Clock className="h-4 w-4 text-orange-500" />
+                          <Upload className="h-4 w-4" />
                           Upload Required Documents
                         </button>
                       ) : actions.stage_statuses?.some((status) => status.is_requires_reason) ? (
                         <button
                           onClick={openProgramDecisionPopup}
-                          className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                          className="flex w-full items-center justify-center gap-2 rounded-md bg-violet-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-violet-600"
                         >
-                          <Clock className="h-4 w-4 text-blue-500" />
+                          <ClipboardCheck className="h-4 w-4" />
                           Submit Program Decision
                         </button>
                       ) : null}
@@ -311,9 +311,9 @@ export default function ApplicationDetails({
                     <button
                       type="button"
                       onClick={() => setShowVisaPaymentPopup(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-green-700"
                     >
-                      <Wallet className="h-4 w-4" />
+                      <CreditCard className="h-4 w-4" />
                       Proceed to Payment
                     </button>
                   )}
@@ -322,7 +322,7 @@ export default function ApplicationDetails({
                     <button
                       type="button"
                       onClick={() => setShowArrivalPopup(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-emerald-700"
                     >
                       <Plane className="h-4 w-4" />
                       Confirm Arrival
@@ -386,9 +386,9 @@ export default function ApplicationDetails({
                       <button
                       type="button"
                       onClick={() => setShowEmgsUploadPopup(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700"
                     >
-                      <FileText className="h-4 w-4" />
+                      <FileUp className="h-4 w-4" />
                       Upload EMGS Eval
                     </button>
 

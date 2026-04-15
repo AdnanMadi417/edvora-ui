@@ -115,7 +115,7 @@ export default function RegisterAccountManager() {
       <div className="rounded-md border bg-slate-50 shadow-sm">
         <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
           <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-            <MdAdminPanelSettings className="text-blue-700" size={24} />
+            <MdPersonAdd className="text-blue-700" size={24} />
           </div>
           <div>
             <h3 className="text-xl font-semibold text-slate-900">
@@ -190,7 +190,7 @@ export default function RegisterAccountManager() {
           />
 
           <Button
-            icon={<MdAdminPanelSettings className="h-5 w-5" />}
+            icon={<MdPersonAdd className="h-5 w-5" />}
             text={loadingCreateAccountManager ? "Creating Manager..." : "Create Manager"}
             bgColor="bg-blue-50"
             textColor="text-blue-700"
