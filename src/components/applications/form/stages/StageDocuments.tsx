@@ -34,7 +34,12 @@ export default function StageDocuments({
       </div>
 
       <div className="space-y-6">
-        {documentTypes.map((docType) => (
+        {[...documentTypes]
+          .sort((a, b) => {
+            const order: Record<string, number> = { passport: 1, transcript: 2, ielts: 3 };
+            return (order[a.code] ?? 99) - (order[b.code] ?? 99);
+          })
+          .map((docType) => (
           <FileUploadField
             key={docType.id}
             label={

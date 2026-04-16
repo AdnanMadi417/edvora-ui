@@ -457,7 +457,7 @@ export default function StudentRegistrationForm() {
                   <button
                     onClick={() => canAccess && setStage(s.id)}
                     disabled={!canAccess}
-                    className={`relative mb-3 flex h-12 w-12 items-center justify-center rounded-md border-2 transition-all duration-300
+                    className={`relative mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-300
       ${
                       isCompleted
                         ? "border-blue-500 bg-blue-500 text-white shadow-md"

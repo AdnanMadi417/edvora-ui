@@ -640,7 +640,7 @@ export default function StudentManualApplicationForm() {
                   <button
                     onClick={() => canAccess && setStage(s.id)}
                     disabled={!canAccess}
-                    className={`mb-2 flex h-12 w-12 items-center justify-center rounded-md transition ${
+                    className={`mb-2 flex h-12 w-12 items-center justify-center rounded-full transition ${
                       isCompleted
                         ? "bg-blue-500 text-white"
                         : isActive
