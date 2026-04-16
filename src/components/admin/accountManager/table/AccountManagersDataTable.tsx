@@ -344,7 +344,7 @@ const ModernAccountManagersTable = () => {
             <PrevButton
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              text="Previous"
+              text="Prev"
               icon={<ArrowLeft className="h-4 w-4" />}
             />
 

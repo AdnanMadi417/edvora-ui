@@ -429,7 +429,7 @@ export default function StudentRegistrationForm() {
                   {index < visibleStages.length - 1 && (
                     <div className="absolute left-1/2 top-6 -z-10 hidden h-1 w-full bg-slate-200 sm:block">
                       <div
-                        className={`h-full rounded-md transition-all duration-300 ${
+                        className={`h-full rounded-full transition-all duration-300 ${
                           isCompleted ? "w-full bg-blue-500" : "w-0"
                         }`}
                       />
@@ -439,7 +439,7 @@ export default function StudentRegistrationForm() {
                   <button
                     onClick={() => canAccess && setStage(s.id)}
                     disabled={!canAccess}
-                    className={`relative mb-3 flex h-12 w-12 items-center justify-center rounded-md border-2 transition-all duration-300
+                    className={`relative mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-300
       ${
         isCompleted
           ? "border-blue-500 bg-blue-500 text-white shadow-md"
@@ -479,7 +479,7 @@ export default function StudentRegistrationForm() {
               errors={errors}
               updateFormData={updateFormData}
               universities={universities}
-f            />
+            />
           )}
 
           {stage === 2 && (
@@ -525,7 +525,7 @@ f            />
             {stage > 1 && (
               <PrevButton
                 onClick={prevStage}
-                text="Previous"
+                text="Prev"
                 icon={<ArrowLeft className="h-4 w-4" />}
                 disabled={stage === 1 || loadingCreatePartnerApplication}
               />

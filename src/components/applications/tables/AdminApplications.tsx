@@ -14,6 +14,7 @@ import {
   GitBranch,
   RotateCcw,
   Flag,
+  SlidersHorizontal,
 } from "lucide-react";
 import { MdSchool } from "react-icons/md";
 
@@ -105,6 +106,7 @@ const ModernApplicationsTable = () => {
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [searchTerm, setSearchTerm] = useState("");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -270,62 +272,79 @@ const ModernApplicationsTable = () => {
 
           {/* Filter bar */}
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-3">
-            <div className="relative w-full sm:w-64 flex-shrink-0">
-              <UserSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search applications..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 text-sm text-slate-700 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-
-            <div className="w-full sm:w-44 flex-shrink-0">
-              <FilterSelectField
-                value={selectedStages}
-                onChange={(val: string) => setSelectedStages(val)}
-                options={stages}
-                icon={GitBranch}
-                defaultOption="All Stages"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedUniversity}
-                onChange={(val: string) => setSelectedUniversity(val)}
-                options={universities}
-                icon={MdSchool}
-                defaultOption="All Universities"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedStageStatus}
-                onChange={(val: string) => setSelectedStageStatus(val)}
-                options={stageStatuses.map((s) => ({
-                  label: s.name,
-                  value: s.name.toLowerCase().replace(/\s+/g, "_"),
-                }))}
-                icon={BadgeCheck}
-                defaultOption={stageStatusesLoading ? "Loading..." : "All Statuses"}
-              />
-            </div>
-
-            {activeFiltersCount > 0 && (
-              <div className="relative flex-shrink-0">
-                <ClearButton
-                  onClick={handleClearFilters}
-                  text="Clear"
-                  icon={<RotateCcw className="h-4 w-4" />}
+            {/* Search + mobile filter toggle */}
+            <div className="flex items-center gap-2 sm:contents">
+              <div className="relative flex-1 sm:w-64 sm:flex-none flex-shrink-0">
+                <UserSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search applications..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 text-sm text-slate-700 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
-                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-md bg-red-500 text-[10px] font-bold text-white">
-                  {activeFiltersCount}
-                </span>
               </div>
-            )}
+              <button
+                className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-background text-slate-500 hover:bg-slate-50"
+                onClick={() => setShowMobileFilters((v) => !v)}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                {activeFiltersCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Filter selects — collapsible on mobile, always visible on sm+ */}
+            <div className={`flex-col gap-3 sm:contents ${showMobileFilters ? "flex" : "hidden sm:contents"}`}>
+              <div className="w-full sm:w-44 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedStages}
+                  onChange={(val: string) => setSelectedStages(val)}
+                  options={stages}
+                  icon={GitBranch}
+                  defaultOption="All Stages"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedUniversity}
+                  onChange={(val: string) => setSelectedUniversity(val)}
+                  options={universities}
+                  icon={MdSchool}
+                  defaultOption="All Universities"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedStageStatus}
+                  onChange={(val: string) => setSelectedStageStatus(val)}
+                  options={stageStatuses.map((s) => ({
+                    label: s.name,
+                    value: s.name.toLowerCase().replace(/\s+/g, "_"),
+                  }))}
+                  icon={BadgeCheck}
+                  defaultOption={stageStatusesLoading ? "Loading..." : "All Statuses"}
+                />
+              </div>
+
+              {activeFiltersCount > 0 && (
+                <div className="relative flex-shrink-0">
+                  <ClearButton
+                    onClick={handleClearFilters}
+                    text="Clear"
+                    icon={<RotateCcw className="h-4 w-4" />}
+                  />
+                  <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-md bg-red-500 text-[10px] font-bold text-white">
+                    {activeFiltersCount}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
         </div>
@@ -356,7 +375,7 @@ const ModernApplicationsTable = () => {
               className="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50"
               onClick={() => router.push(`/admin/applications/${app.id}`)}
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                 {app.student_name?.[0]?.toUpperCase() ?? "?"}
               </div>
               <div className="min-w-0 flex-1">
@@ -451,7 +470,7 @@ const ModernApplicationsTable = () => {
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                         {app.student_name?.[0]?.toUpperCase() ?? "?"}
                       </div>
                       <div className="min-w-0">
@@ -520,7 +539,7 @@ const ModernApplicationsTable = () => {
             <PrevButton
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              text="Previous"
+              text="Prev"
               icon={<ArrowLeft className="h-4 w-4" />}
             />
             <span className="px-2 text-slate-500">

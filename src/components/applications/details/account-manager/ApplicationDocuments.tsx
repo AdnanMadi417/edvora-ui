@@ -59,14 +59,24 @@ export default function ApplicationDocuments({
     }
   };
 
-  const documents = application?.documents || [];
+  const allDocs = application?.documents || [];
+  const passportDocs = allDocs.filter((d: any) => d.document_type?.toLowerCase() === 'passport');
+  const transcriptDocs = allDocs.filter((d: any) => d.document_type?.toLowerCase() === 'transcript');
+  const ieltsDocs = allDocs.filter((d: any) => d.document_type?.toLowerCase() === 'ielts');
+  const otherDocs = allDocs.filter(
+    (d: any) => !['passport', 'transcript', 'ielts'].includes(d.document_type?.toLowerCase()),
+  );
+  const documents = allDocs;
   const paymentDocuments = application?.payment_documents || [];
   const arrivalDocuments = application?.arrival_documents || [];
   const emgsEvalDoc = application?.emgs_evaluation_document || null;
+  const offerLetterDoc = application?.offer_letter_document || null;
+  const visaDoc = application?.visa_document || null;
   const commissionDocuments: any[] = Object.values(application?.commission_documents || {}).filter(Boolean) as any[];
 
-  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvalDoc ? 1 : 0) + commissionDocuments.length;
-  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvalDoc ? [emgsEvalDoc] : []), ...commissionDocuments].filter(
+  const singleDocs = [emgsEvalDoc, offerLetterDoc, visaDoc].filter(Boolean);
+  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + singleDocs.length + commissionDocuments.length;
+  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...singleDocs, ...commissionDocuments].filter(
     (d) => d.status === "1"
   ).length;
 
@@ -159,8 +169,17 @@ export default function ApplicationDocuments({
       >
         <div className="space-y-4 rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
 
-          <div className="space-y-4">
-            {documents.map((doc: any, index: number) => (
+          {[
+            { label: 'Passport', docs: passportDocs },
+            { label: 'Transcript', docs: transcriptDocs },
+            { label: 'IELTS', docs: ieltsDocs },
+            { label: 'Other Documents', docs: otherDocs },
+          ].map(({ label, docs }) =>
+            docs.length === 0 ? null : (
+              <div key={label} className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</p>
+                <div className="space-y-4">
+                  {docs.map((doc: any, index: number) => (
               <div
                 key={doc.id}
                 className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
@@ -251,7 +270,10 @@ export default function ApplicationDocuments({
 
               </div>
             ))}
-          </div>
+                </div>
+              </div>
+            )
+          )}
 
           <div className="space-y-4">
             {paymentDocuments.map((doc: any, index: number) => (

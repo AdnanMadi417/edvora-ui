@@ -33,13 +33,23 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
   const [downloading, setDownloading] = useState<string | null>(null);
   const { showToast } = useToast();
 
-  const documents: any[] = application?.documents || [];
+  const allDocs: any[] = application?.documents || [];
+  const passportDocs = allDocs.filter((d) => d.document_type?.toLowerCase() === 'passport');
+  const transcriptDocs = allDocs.filter((d) => d.document_type?.toLowerCase() === 'transcript');
+  const ieltsDocs = allDocs.filter((d) => d.document_type?.toLowerCase() === 'ielts');
+  const otherDocs = allDocs.filter(
+    (d) => !['passport', 'transcript', 'ielts'].includes(d.document_type?.toLowerCase()),
+  );
+  const documents = allDocs; // kept for totalDocuments / pendingDocuments counts
   const paymentDocuments: any[] = application?.payment_documents || [];
   const arrivalDocuments: any[] = application?.arrival_documents || [];
   const emgsEvalDoc: any = application?.emgs_evaluation_document || null;
+  const offerLetterDoc: any = application?.offer_letter_document || null;
+  const visaDoc: any = application?.visa_document || null;
   const commissionDocuments: any[] = Object.values(application?.commission_documents || {}).filter(Boolean) as any[];
-  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvalDoc ? 1 : 0) + commissionDocuments.length;
-  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvalDoc ? [emgsEvalDoc] : []), ...commissionDocuments].filter(
+  const singleDocs = [emgsEvalDoc, offerLetterDoc, visaDoc].filter(Boolean);
+  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + singleDocs.length + commissionDocuments.length;
+  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...singleDocs, ...commissionDocuments].filter(
     (d) => d.status === '1',
   ).length;
 
@@ -175,7 +185,10 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
 
       {showDocs && (
         <div className="space-y-6 rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
-          <DocGroup label="Application Documents" docs={documents} />
+          <DocGroup label="Passport" docs={passportDocs} />
+          <DocGroup label="Transcript" docs={transcriptDocs} />
+          <DocGroup label="IELTS" docs={ieltsDocs} />
+          <DocGroup label="Other Documents" docs={otherDocs} />
           <DocGroup label="Payment Documents" docs={paymentDocuments} />
           <DocGroup label="Arrival Documents" docs={arrivalDocuments} />
           <DocGroup label="EMGS Eval Document" docs={emgsEvalDoc ? [emgsEvalDoc] : []} />

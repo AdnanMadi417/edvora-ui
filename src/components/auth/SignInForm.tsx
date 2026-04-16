@@ -55,9 +55,9 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
         onSubmit={handleSubmit}
       >
         <div className="mb-6 text-center">
-          <h1 className="text-3xl font-extrabold text-gray-900">Sign In</h1>
-          <p className="mt-2 text-slate-600">
-            Enter your email and password to access your account
+          <h1 className="text-xl font-medium text-slate-900">Welcome back</h1>
+          <p className="mt-2 text-sm text-slate-600">
+            Sign in to your account
           </p>
         </div>
 
