@@ -1,228 +1,188 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  ChevronDown,
-  Bell,
-  CheckCircle,
-  XCircle,
-  Info,
-  Clock,
-  Check,
-  MessageCircle,
-} from "lucide-react";
+import { Bell, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useAllNotifications } from "hooks/notifications/useNotifications";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
 import { useMarkAsRead } from "hooks/notifications/useMarkAsRead";
-
+import { getNotificationIconConfig, getSenderName } from "utils/notificationIcons";
 
 function timeAgo(dateStr: string): string {
   const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (diff < 60) return "just now";
+  if (diff < 60) return "Just now";
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
   return `${Math.floor(diff / 86400)}d ago`;
 }
 
-function getNotificationIcon(type: string) {
-  const t = type.toLowerCase();
-  if (t.includes("message"))
-    return (
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-        <MessageCircle className="h-5 w-5 text-blue-600" />
-      </span>
-    );
-  if (t.includes("approved"))
-    return (
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
-        <CheckCircle className="h-5 w-5 text-green-600" />
-      </span>
-    );
-  if (t.includes("rejected"))
-    return (
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
-        <XCircle className="h-5 w-5 text-red-600" />
-      </span>
-    );
-  if (t.includes("pending"))
-    return (
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100">
-        <Clock className="h-5 w-5 text-yellow-600" />
-      </span>
-    );
-  return (
-    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100">
-      <Info className="h-5 w-5 text-slate-500" />
-    </span>
-  );
-}
-
 export default function Notifications() {
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [removingIndex, setRemovingIndex] = useState<number | null>(null);
+  const [filter, setFilter] = useState<"all" | "unread">("unread");
+  const router = useRouter();
 
-  const { notifications, loading, error } = useAllNotifications();
+  const { notifications, loading, error, refetch: refetchNotifications } = useAllNotifications();
   const { unreadCount, refetch: refetchCount } = useUnreadCount({});
   const { markAsRead: markRead } = useMarkAsRead();
 
-  const markAsRead = async (id: string, index: number) => {
-    setRemovingIndex(index);
+  const markAsRead = async (id: string) => {
     try {
       await markRead(id);
-      refetchCount();
+      await Promise.all([refetchNotifications(), refetchCount()]);
     } catch (err) {
       console.error("Failed to mark notification as read", err);
-    } finally {
-      setTimeout(() => setRemovingIndex(null), 300);
     }
   };
 
+  const markAllAsRead = async () => {
+    const unread = notifications.filter((n) => n.read_at === null);
+    await Promise.allSettled(unread.map((n) => markRead(n.id)));
+    await Promise.all([refetchNotifications(), refetchCount()]);
+  };
+
+  const displayed = [...(filter === "unread"
+    ? notifications.filter((n) => n.read_at === null)
+    : notifications)].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
   return (
-    <section className="mb-6 mt-6 rounded-lg bg-card transition-all duration-300">
+    <section className="mb-6 mt-6 max-w-5xl mx-auto overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
       {/* Header */}
-      <div
-        className={`flex cursor-pointer items-center justify-between border border-default p-6 transition-all duration-300 ${
-          showNotifications ? "rounded-t-lg" : "rounded-lg"
-        }`}
-        onClick={() => setShowNotifications(!showNotifications)}
-      >
-        <div className="flex flex-col gap-1">
-          <h3 className="flex items-center gap-3 text-base font-semibold text-slate-900">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-              <Bell className="h-5 w-5 text-blue-700" />
-            </span>
-            <span className="flex flex-col">
-              <span>Notifications Center</span>
-              <span className="text-xs font-normal text-slate-500">
-                {unreadCount > 0
-                  ? `${unreadCount} unread ${unreadCount === 1 ? "notification" : "notifications"}`
-                  : "All caught up"}
-              </span>
-            </span>
-          </h3>
-          <p className="ml-[52px] text-sm text-slate-500">
-            See updates about student applications and actions required.
-          </p>
-        </div>
-
-        <button
-          className="flex items-center justify-center rounded-full bg-blue-100 p-2 text-blue-600 transition hover:bg-blue-200"
-          aria-label="Toggle notifications"
-          aria-expanded={showNotifications}
-        >
-          <ChevronDown
-            className={`h-4 w-4 transition-transform duration-300 ${
-              showNotifications ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-      </div>
-
-      {/* Body */}
-      <div
-        className={`transition-all duration-300 ease-in-out ${
-          showNotifications
-            ? "max-h-[1500px] opacity-100"
-            : "max-h-0 overflow-hidden opacity-0"
-        }`}
-      >
-        <div className="rounded-b-lg border border-t-0 border-default bg-card p-6">
-          {loading ? (
-            <div className="py-10 text-center text-slate-500">Loading...</div>
-          ) : error ? (
-            <div className="py-10 text-center text-red-500">{error}</div>
-          ) : notifications.length === 0 ? (
-            <div className="flex items-center justify-center gap-2 py-10 text-slate-500">
-              <Bell className="h-5 w-5" /> No notifications yet
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {notifications.map((notification, index) => (
-                <div
-                  key={notification.id}
-                  className={`relative flex items-center justify-between rounded-lg border border-default bg-white p-4 transition-all duration-300 hover:shadow-sm ${
-                    notification.read_at !== null ? "opacity-50" : ""
-                  } ${
-                    removingIndex === index ? "animate-fadeOut" : "animate-slideIn"
-                  }`}
-                >
-                  <div className="flex min-w-0 flex-1 items-start gap-3">
-                    {/* Icon */}
-                    <div className="flex-shrink-0 pt-0.5">
-                      {getNotificationIcon(notification.type)}
-                    </div>
-
-                    {/* Content */}
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-0.5 flex items-center gap-2">
-                        <span className="truncate text-sm font-semibold text-slate-900">
-                          {notification.data.sender_name}
-                        </span>
-                        {notification.read_at === null && (
-                          <span className="h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
-                        )}
-                        <span className="ml-auto flex-shrink-0 text-xs text-slate-400">
-                          {timeAgo(notification.created_at)}
-                        </span>
-                      </div>
-
-                      <p className="mb-0.5 text-xs font-medium text-slate-600">
-                        {notification.title}
-                      </p>
-
-                      <p className="truncate text-xs text-slate-400">
-                        {notification.data.snippet}
-                      </p>
-                    </div>
-                  </div>
-
-                  {notification.read_at === null && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        markAsRead(notification.id, index);
-                      }}
-                      className="ml-4 flex flex-shrink-0 items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-xs font-medium text-green-700 transition hover:bg-green-200 outline-0"
-                    >
-                      <Check className="h-3 w-3" /> Mark as Read
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
+      <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">Notifications</h2>
+          {unreadCount > 0 && (
+            <p className="mt-0.5 text-sm text-slate-500">
+              {unreadCount} new {unreadCount === 1 ? "notification" : "notifications"}
+            </p>
           )}
         </div>
+        {unreadCount > 0 && (
+          <button
+            onClick={markAllAsRead}
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
+          >
+            Mark all as read
+          </button>
+        )}
       </div>
 
-      <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes fadeOut {
-          from {
-            opacity: 1;
-            transform: translateY(0);
-          }
-          to {
-            opacity: 0;
-            transform: translateY(-8px);
-          }
-        }
-        .animate-slideIn {
-          animation: slideIn 0.25s ease-out;
-        }
-        .animate-fadeOut {
-          animation: fadeOut 0.25s ease-in forwards;
-        }
-      `}</style>
+      {/* Filter tabs */}
+      <div className="flex gap-1 border-b border-slate-100 px-4 pt-2">
+        {(["all", "unread"] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setFilter(tab)}
+            className={`relative px-4 py-2 text-sm font-semibold capitalize transition-colors ${
+              filter === tab ? "text-blue-600" : "text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            {tab}
+            {tab === "unread" && unreadCount > 0 && (
+              <span className="ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-blue-100 px-1.5 text-xs font-bold text-blue-700">
+                {unreadCount}
+              </span>
+            )}
+            {filter === tab && (
+              <span className="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-blue-600" />
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* List */}
+      <div>
+        {loading ? (
+          <div className="flex flex-col">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-start gap-4 px-4 py-4">
+                <div className="h-11 w-11 animate-pulse rounded-full bg-slate-100" />
+                <div className="flex-1 space-y-2 pt-1">
+                  <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100" />
+                  <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100" />
+                  <div className="h-3 w-1/4 animate-pulse rounded bg-slate-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="px-6 py-12 text-center text-sm text-red-500">{error}</div>
+        ) : displayed.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-slate-400">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+              <Bell className="h-8 w-8 text-slate-300" />
+            </div>
+            <p className="text-sm font-medium">
+              {filter === "unread" ? "No unread notifications" : "No notifications yet"}
+            </p>
+          </div>
+        ) : (
+          <div>
+            {displayed.map((notification, index) => {
+              const isUnread = notification.read_at === null;
+              const config = getNotificationIconConfig(notification);
+              const Icon = config.icon;
+              const sender = getSenderName(notification);
+
+              return (
+                <div
+                  key={notification.id}
+                  onClick={() => {
+                    if (notification.application_id) router.push(`/admin/applications/${notification.application_id}`);
+                    if (isUnread) markAsRead(notification.id);
+                  }}
+                  className={`flex cursor-pointer items-start gap-4 px-4 py-3 transition-colors ${
+                    index !== displayed.length - 1 ? "border-b border-slate-50" : ""
+                  } ${isUnread ? "bg-blue-50 hover:bg-blue-100/60" : "hover:bg-slate-50"}`}
+                >
+                  {/* Icon with type badge */}
+                  <div className="relative flex-shrink-0">
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-full ${config.bg}`}>
+                      <Icon className={`h-5 w-5 ${config.iconColor}`} />
+                    </div>
+                    <span className={`absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-white ${config.badgeBg}`}>
+                      <Bell className="h-2 w-2 text-white" />
+                    </span>
+                  </div>
+
+                  {/* Content */}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm leading-snug text-slate-900">
+                      <span className="font-bold">{sender}</span>
+                      {notification.title && (
+                        <span className="ml-1 font-normal text-slate-700">{notification.title}</span>
+                      )}
+                    </p>
+                    {notification.body && (
+                      <p className="mt-0.5 truncate text-sm text-slate-500">{notification.body}</p>
+                    )}
+                    <p className={`mt-1 text-xs font-semibold ${isUnread ? "text-blue-600" : "text-slate-400"}`}>
+                      {timeAgo(notification.created_at)}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-shrink-0 items-center gap-2 self-center">
+                    {isUnread && <div className="h-3 w-3 rounded-full bg-blue-500" />}
+                    {notification.application_id && (
+                      <Link
+                        href={`/admin/applications/${notification.application_id}`}
+                        onClick={(e) => e.stopPropagation()}
+                        title="View application"
+                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-blue-100 hover:text-blue-600"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

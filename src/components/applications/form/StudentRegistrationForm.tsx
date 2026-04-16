@@ -30,6 +30,7 @@ import {
   uploadFilesToSpaces,
 } from "services/uploadService";
 import { useMe } from "hooks/useMe";
+import { usePartnerProgramIntakeDates } from "hooks/knowledge-hub/programs/usePartnerProgramIntakeDates";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
 import PrevButton from "components/ui/buttons/PrevButton";
@@ -115,6 +116,14 @@ export default function StudentRegistrationForm() {
     documents: [],
     is_draft: false,
   });
+
+  const { intakeDates, loading: loadingIntakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
+
+  useEffect(() => {
+    if (intakeDates.length > 0) {
+      setFormData((prev) => ({ ...prev, intake_date: intakeDates[0] }));
+    }
+  }, [intakeDates]);
 
   const contact = formData.student.emergency_contacts[0];
 
@@ -491,6 +500,8 @@ f            />
               updateFormData={updateFormData}
               requiredFieldKeys={requiredFieldKeys}
               qualifications={qualifications}
+              intakeDates={intakeDates}
+              loadingIntakeDates={loadingIntakeDates}
             />
           )}
 

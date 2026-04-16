@@ -1,9 +1,8 @@
 import React from "react";
 import AdminTopBar from "../../topBar/AdminTopBar";
+import { GraduationCap, Building2, Clock, Globe, Calendar, ArrowRight } from "lucide-react";
 
 import {
-  FaTasks,
-  FaCogs,
   FaUser,
   FaBirthdayCake,
   FaFlag,
@@ -15,14 +14,12 @@ import {
   FaGraduationCap,
   FaPhoneAlt,
   FaUsers,
-  FaClock,
-  FaStream,
-  FaCheckCircle,
 } from "react-icons/fa";
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
 import OfferLetterCard from './OfferLetterCard';
 import VisaTrackingTimeline from './VisaTrackingTimeline';
+import ApplicationTimeline from '../ApplicationTimeline';
 
 interface ApplicationDetailsProps {
   application: any;
@@ -61,21 +58,6 @@ export default function ApplicationDetails({
     return value ? "Male" : "Female";
   };
 
-  const statusText =
-    {
-      1: "Active",
-      2: "On Hold",
-      3: "Cancelled",
-    }[application.lifecycle_status] ?? "Not provided";
-
-  const statusClass =
-    {
-      1: "border-green-200 bg-green-50 text-green-700",
-      2: "border-yellow-200 bg-yellow-50 text-yellow-700",
-      3: "border-red-200 bg-red-50 text-red-700",
-    }[application.lifecycle_status] ??
-    "border-gray-200 bg-gray-50 text-gray-600";
-
   const hasEmergencyContact =
     emergencyContact &&
     (emergencyContact.name ||
@@ -97,83 +79,137 @@ export default function ApplicationDetails({
       previousEducation.grade);
 
   return (
-    <section>
+    <section className="max-w-5xl mx-auto">
 
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
+      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-slate-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
+
         <AdminTopBar application={application} />
 
-        <div className="flex items-start gap-4 rounded-xl bg-gradient-to-r from-blue-50 to-blue-100/40 p-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm">
-            <FaCogs className="text-xl text-blue-600" />
+        {/* Top row: avatar + info | intake date */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-700 border-2 border-blue-200 text-xl font-bold text-white">
+              {student.name?.[0]?.toUpperCase() ?? "?"}
+            </div>
+            <div>
+              <h2 className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-slate-900">
+                {student.name}
+              </h2>
+              {application.intake_date && (
+                <div className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 sm:hidden">
+                  <Clock className="h-3 w-3" />
+                  <span>Intake: {formatDate(application.intake_date)}</span>
+                </div>
+              )}
+              <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+                {program.name && (
+                  <span className="flex items-center gap-1 hidden md:flex">
+                    <GraduationCap className="h-3.5 w-3.5 text-blue-400" />
+                    {program.name}
+                  </span>
+                )}
+                {university.name && (
+                  <>
+                    <span className="text-slate-300 hidden md:block">|</span>
+                    <span className="flex items-center gap-1 hidden md:flex">
+                      <Building2 className="h-3.5 w-3.5 text-blue-400" />
+                      {university.name}
+                    </span>
+                  </>
+                )}
+                {university.country && (
+                  <>
+                    <span className="text-slate-300 hidden md:block">|</span>
+                    <span className="flex items-center gap-1 hidden md:flex">
+                      <Globe className="h-3.5 w-3.5 text-blue-400" />
+                      {university.country}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
+
           </div>
 
-          <div className="flex flex-col gap-1">
-              <span className="text-xs font-medium uppercase tracking-wide text-slate-500">
-                Current Status
-              </span>
+          
+            <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
+                {program.name && (
+                  <span className="flex items-center gap-1 flex md:hidden">
+                    <GraduationCap className="h-3.5 w-3.5 text-blue-400" />
+                    {program.name}
+                  </span>
+                )}
+                {university.name && (
+                  <>
+                    <span className="flex items-center gap-1 flex md:hidden">
+                      <Building2 className="h-3.5 w-3.5 text-blue-400" />
+                      {university.name}
+                    </span>
+                  </>
+                )}
+                {university.country && (
+                  <>
+                    <span className="flex items-center gap-1 flex md:hidden">
+                      <Globe className="h-3.5 w-3.5 text-blue-400" />
+                      {university.country}
+                    </span>
+                  </>
+                )}
+              </div>
 
-            <span className="text-lg font-semibold text-slate-900">
-                {application.stage?.statuses?.[0]?.name ||
-                  application.stage?.name ||
-                  "Not provided"}
-              </span>
 
-            <span className="text-sm text-slate-600">
-                <span className="font-medium text-slate-700">Next action → </span>{" "}
-              {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ??
-                "Not provided"}
-              </span>
+          <div className="hidden sm:block shrink-0 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-start shadow-sm">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Intake Date</p>
+            <p className="mt-1 flex items-center justify-start gap-2 text-lg font-bold text-slate-900">
+              <Calendar className="h-4 w-4 text-blue-400" />
+              {formatDate(application.intake_date)}
+            </p>
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 border-b border-slate-100 pb-5 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-start gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100">
-              <FaTasks className="text-lg text-slate-700" />
-            </div>
+        {/* Bottom row: current status | next action */}
 
-            <div className="flex flex-col">
-              <h3 className="text-lg font-semibold text-slate-900">
-                Review {application.program?.name}
-              </h3>
-
-              <span className="text-sm text-slate-500">
-                  Applicant • {student.name || "Not provided"}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="rounded-xl bg-slate-50 border border-slate-200 p-5 shadow-sm">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Current Status</p>
+            <div className="flex flex-wrap gap-2">
+              {currentStatus.name && (
+                <span className="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-normal text-amber-700">
+                  {currentStatus.name}
                 </span>
+              )}
+              {stage.name && (
+                <span className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm font-normal text-slate-800">
+                  {stage.name}
+                </span>
+              )}
+              <p className="inline-flex items-center px-3 py-1 text-xs font-normal text-slate-600">{daysSince(application.updated_at)} days in stage</p>
             </div>
           </div>
 
-          <div className="text-sm text-slate-500">
-            Updated{" "}
-            {application?.updated_at
-              ? formatDate(application.updated_at)
-              : "N/A"}
+          <div className="rounded-xl border-[2px] border-blue-200 bg-blue-50 p-5 shadow-sm">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                <ArrowRight className="h-4 w-4 text-blue-700" />
+              </div>
+
+              <div className="block space-y-1 ">
+
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-blue-500">Next Action</p>
+              <p className="text-sm font-medium text-slate-800">
+                {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ?? "Not provided"}
+              </p>
+              </div>
+            
+            </div>
           </div>
         </div>
-
-        <div className="flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 sm:text-sm">
-                <FaStream className="text-[10px] text-amber-700" />
-                Stage: {stage.name || "Not provided"}
-              </span>
-
-          <span
-            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-medium sm:text-sm ${statusClass}`}
-          >
-                <FaCheckCircle className="text-[10px]" />
-                Status: {statusText}
-              </span>
-
-          <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-medium text-purple-700 sm:text-sm">
-                <FaClock className="text-[10px] text-purple-700" />
-            {daysSince(application.updated_at)} Days
-              </span>
-        </div>
-
+        
       </div>
 
-      <OfferLetterCard application={application} />
+      <ApplicationTimeline application={application} />
       <VisaTrackingTimeline application={application} />
+      <OfferLetterCard application={application} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">

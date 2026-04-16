@@ -214,10 +214,10 @@ export default function ViewDetailsModal({
                 {provider?.services_offered?.length ? (
                   provider.services_offered.map((service) => (
                     <span
-                      key={service}
+                      key={service.id}
                       className="rounded-lg bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
                     >
-                      {service}
+                      {service.name}
                     </span>
                   ))
                 ) : (

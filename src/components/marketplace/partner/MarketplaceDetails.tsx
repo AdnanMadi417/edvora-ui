@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import PresignedImage from "components/ui/PresignedImage";
 
 import {
   MdContentCopy,
@@ -41,25 +42,31 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
 
   return (
     <>
-      <div className="mt-6">
+      <div className="mt-6 max-w-5xl mx-auto">
         <div className="rounded-md border border-default bg-card shadow-sm">
           <div className="flex justify-between border-b border-gray-200 p-6">
             <div className="flex items-center gap-4">
               <div className="relative flex-shrink-0">
-                <div className="flex  h-10 w-10 items-center justify-center rounded-full bg-blue-100 md:h-14 md:w-14">
-                  <Truck className="h-5 w-5 text-blue-700 md:h-8 md:w-8" />
-                </div>
-
+                <PresignedImage
+                  fileKey={service.picture_file_key}
+                  alt={service.name}
+                  className="h-10 w-10 rounded-full object-cover md:h-14 md:w-14 ring-2 ring-blue-500 ring-offset-2 shadow-md"
+                  fallback={
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 md:h-14 md:w-14">
+                      <Truck className="h-5 w-5 text-blue-700 md:h-8 md:w-8" />
+                    </div>
+                  }
+                />
                 <span
                   className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-white ${
-                    service.id ? "bg-emerald-500" : "bg-red-500"
+                    service.is_active ? "bg-emerald-500" : "bg-red-500"
                   }`}
                 />
               </div>
 
               <div className="min-w-0">
                 <h3 className="line-clamp-2 text-lg font-semibold text-slate-900">
-                  Logistical Service Providers
+                  {service.name}
                 </h3>
                 <p className="mt-1 break-words text-sm text-slate-500">
                   Browse and view available service providers
@@ -83,7 +90,6 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
 
             <div className="flex flex-col md:flex-row md:justify-between md:items-start space-y-3 md:space-y-0">
               <div>
-                <h2 className="text-2xl font-bold text-slate-800">{service?.name}</h2>
                 <p className="text-sm text-slate-600 mt-1">
                   Nationality: <span className="font-medium">{service?.nationality || "Not provided"}</span>
                 </p>
@@ -188,23 +194,21 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
             </div>
 
             <div className="border-b border-slate-200 py-5">
-              <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-slate-700">
+              <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-slate-700">
                 <MdLocalAirport className="h-5 w-5 text-emerald-600" /> Services Offered
               </div>
-              <div className="flex flex-wrap gap-3">
-                {service?.services_offered?.length ? (
-                  service.services_offered.map(srv => (
-                    <span
-                      key={srv}
-                      className="rounded-lg bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
-                    >
-          {srv}
-        </span>
-                  ))
-                ) : (
-                  <span className="text-xs text-slate-400">Not provided</span>
-                )}
-              </div>
+              {service?.services_offered?.length ? (
+                <div className="flex flex-wrap gap-2">
+                  {service.services_offered.map(srv => (
+                    <div key={srv.id} className="flex items-center gap-0 overflow-hidden rounded-full border border-emerald-200">
+                      <span className="bg-white px-3 py-1 text-xs font-medium text-slate-700">{srv.name}</span>
+                      <span className="bg-emerald-500 px-3 py-1 text-xs font-semibold text-white">RM {srv.price ?? 0}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <span className="text-xs text-slate-400">Not provided</span>
+              )}
             </div>
 
           </div>

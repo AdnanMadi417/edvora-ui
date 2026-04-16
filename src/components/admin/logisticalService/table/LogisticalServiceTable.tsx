@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import PresignedImage from "components/ui/PresignedImage";
 import {
   ArrowRight,
   ArrowLeft,
@@ -100,7 +101,7 @@ const LogisticalServiceTable = () => {
   };
 
   return (
-    <div className="mt-6 overflow-hidden text-p2">
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
@@ -237,16 +238,22 @@ const LogisticalServiceTable = () => {
                       >
                         <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div
-                              className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
-                            >
-                              {provider ? (
-                                provider.name[0].toUpperCase()
-                              ) : (
-                                <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
-                              )}
-                            </div>
+                            {provider.picture_file_key ? (
+                              <PresignedImage
+                                fileKey={provider.picture_file_key}
+                                alt={provider.name}
+                                className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-blue-500 ring-offset-2 shadow-md"
+                                fallback={
+                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+                                    {provider.name[0].toUpperCase()}
+                                  </div>
+                                }
+                              />
+                            ) : (
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+                                {provider.name[0].toUpperCase()}
+                              </div>
+                            )}
 
                             <div className="w-full overflow-hidden">
                               <div className="truncate text-slate-900">

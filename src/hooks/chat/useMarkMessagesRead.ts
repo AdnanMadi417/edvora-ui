@@ -7,39 +7,36 @@ interface UseMarkMessagesReadOptions {
   applicationId: string;
 }
 
-export function useMarkMessagesRead({
-                                      applicationId,
-                                    }: UseMarkMessagesReadOptions) {
+export function useMarkMessagesRead({ applicationId }: UseMarkMessagesReadOptions) {
   const { user } = useMe();
 
   const markMessagesRead = useCallback(
-    async (messages: ChatMessage[]) => {
-      if (!user) return;
+    async (messages: ChatMessage[]): Promise<string[]> => {
+      if (!user) return [];
 
-      const unreadIncomingMessages = messages.filter(
-        (message) =>
-          message.sender_id !== user.id && message.read_at === null
+      const unread = messages.filter(
+        (m) => m.sender_id !== user.id && m.read_at === null
       );
 
-      if (unreadIncomingMessages.length === 0) return;
+      if (unread.length === 0) return [];
 
-      try {
-        await Promise.all(
-          unreadIncomingMessages.map((message) =>
-            api.put(
-              `/applications/${applicationId}/messages/${message.id}/read`
-            )
-          )
-        );
-      } catch (err) {
-        // Silent failure is OK here; unread-count will self-heal later
-        console.error("Failed to mark messages as read", err);
-      }
+      const markedIds: string[] = [];
+
+      await Promise.all(
+        unread.map(async (m) => {
+          try {
+            await api.put(`/applications/${applicationId}/messages/${m.id}/read`);
+            markedIds.push(m.id);
+          } catch (err) {
+            console.error("Failed to mark message as read", m.id, err);
+          }
+        })
+      );
+
+      return markedIds;
     },
     [applicationId, user]
   );
 
-  return {
-    markMessagesRead,
-  };
+  return { markMessagesRead };
 }

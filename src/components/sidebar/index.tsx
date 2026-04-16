@@ -198,7 +198,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
         [&::-webkit-scrollbar]:[width:6px]
       "
         >
-          <Links routes={routes} />
+          <Links routes={routes} onLinkClick={() => setOpen(false)} />
         </div>
 
         <footer className="border-t border-gray-200 px-6 py-4">

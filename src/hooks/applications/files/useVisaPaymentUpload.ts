@@ -4,9 +4,9 @@ import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 interface VisaPaymentPayload {
-  methodId: string;
+  methodId: string | null;
   amount: number | "";
-  currency: string;
+  currency: string | null;
 }
 
 export const useVisaPaymentUpload = () => {
@@ -30,14 +30,17 @@ export const useVisaPaymentUpload = () => {
         throw new Error("File upload failed");
       }
 
-      await api.post(`/applications/${applicationId}/visa-payments`, {
-        university_payment_method_id: payload.methodId,
-        amount: payload.amount,
-        currency: payload.currency,
+      const body: Record<string, any> = {
         payment_reference: `ref-${Date.now()}`,
         file_key: uploaded.file_key,
         file_url: uploaded.public_url,
-      });
+      };
+
+      if (payload.methodId) body.university_payment_method_id = payload.methodId;
+      if (payload.amount !== "") body.amount = payload.amount;
+      if (payload.currency) body.currency = payload.currency;
+
+      await api.post(`/applications/${applicationId}/visa-payments`, body);
 
       showToast("Visa payment submitted successfully!", "success");
       return uploaded;

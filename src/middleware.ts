@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicRoutes = ["/auth/sign-in", "/unauthorized", "/"];
+const publicRoutes = ["/auth/sign-in", "/unauthorized", "/", "/api/health"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("token")?.value;
+
+  if (pathname === "/auth/sign-in" && token) {
+    const role = req.cookies.get("userRole")?.value;
+    const destination =
+      role === "partner" ? "/partner/applications"
+      : role === "account_manager" ? "/account-manager/applications"
+      : "/admin/applications";
+    return NextResponse.redirect(new URL(destination, req.url));
+  }
 
   if (publicRoutes.includes(pathname)) {
     return NextResponse.next();

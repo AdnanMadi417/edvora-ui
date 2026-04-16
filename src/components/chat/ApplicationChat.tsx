@@ -6,6 +6,9 @@ import { useSendMessage } from "hooks/chat/useSendMessage";
 import { useMarkMessagesRead } from "hooks/chat/useMarkMessagesRead";
 import { useChatPolling } from "hooks/chat/useChatPolling";
 import { useMe } from "hooks/useMe";
+import { useUnreadCount } from "hooks/notifications/useUnreadCount";
+import { useAllNotifications } from "hooks/notifications/useNotifications";
+import api from "lib/useApi";
 import { Send, User } from "lucide-react";
 import Loading from "../loading/Loading";
 import NoMessagesFound from "../emptyData/NoMessagesFound";
@@ -20,11 +23,13 @@ export default function AgentPartnerChat({
   const { user } = useMe();
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  const { messages, error, fetchInitialMessages, fetchNewMessages } =
+  const { messages, error, fetchInitialMessages, fetchNewMessages, setMessages } =
     useChatMessages({ applicationId });
 
   const { sendMessage, sending } = useSendMessage({ applicationId });
   const { markMessagesRead } = useMarkMessagesRead({ applicationId });
+  const { refetch: refetchUnreadCount } = useUnreadCount({ enabled: false });
+  const { notifications, refetch: refetchNotifications } = useAllNotifications();
 
   const [loading, setLoading] = useState(true);
 
@@ -44,10 +49,29 @@ export default function AgentPartnerChat({
   });
 
   useEffect(() => {
-    if (messages.length > 0) {
-      markMessagesRead(messages);
-    }
-  }, [messages, markMessagesRead]);
+    if (messages.length === 0) return;
+
+    markMessagesRead(messages).then(async (markedIds) => {
+      if (markedIds.length === 0) return;
+      const now = new Date().toISOString();
+      setMessages((prev) =>
+        prev.map((m) => (markedIds.includes(m.id) ? { ...m, read_at: now } : m))
+      );
+
+      // Mark corresponding notifications as read
+      const relatedNotifications = notifications.filter(
+        (n) => n.read_at === null && n.data.message_id && markedIds.includes(n.data.message_id)
+      );
+      if (relatedNotifications.length > 0) {
+        await Promise.allSettled(
+          relatedNotifications.map((n) => api.put(`/me/notifications/${n.id}/read`))
+        );
+        await refetchNotifications();
+      }
+
+      refetchUnreadCount();
+    });
+  }, [messages, markMessagesRead, setMessages]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

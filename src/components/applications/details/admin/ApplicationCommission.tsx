@@ -26,7 +26,7 @@ export default function ApplicationCommissions({ application }: ApplicationCommi
   const total = commissions.reduce((sum: number, c: any) => sum + (c.amount || 0), 0);
 
   return (
-    <section className="mb-6 mt-6 rounded-lg border border-gray-200 bg-card p-6">
+    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg border border-gray-200 bg-card p-6">
       <div className="flex items-center gap-3 mb-4">
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
           <DollarSign className="text-xl text-green-700" />

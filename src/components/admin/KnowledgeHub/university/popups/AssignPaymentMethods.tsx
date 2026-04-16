@@ -14,8 +14,8 @@ import { CURRENCY } from 'constants/lists';
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import InputField from "components/form/InputField";
 import SelectField from "components/form/SelectField";
+import InputField from "components/form/InputField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 
 interface AssignPaymentUniversityProps {
@@ -71,6 +71,11 @@ export default function AssignPaymentUniversity({
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
+
+  const isFormValid = () =>
+    formData.payment_method_id.trim() !== "" &&
+    formData.currency.trim() !== "" &&
+    !assigning;
 
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -194,7 +199,7 @@ export default function AssignPaymentUniversity({
             />
             <Button
               onClick={handleAssign}
-              disabled={!formData.payment_method_id || assigning}
+              disabled={!isFormValid()}
               icon={<CreditCard className="h-5 w-5" />}
               text={loading ? "Assigning..." : "Assign Payment Method"}
               bgColor="bg-blue-50"

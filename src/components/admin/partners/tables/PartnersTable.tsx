@@ -68,7 +68,7 @@ const PartnersTable = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
-  const filteredPartners = partners
+  const filteredPartners = React.useMemo(() => partners
     .filter((partner) => {
       const term = searchTerm.toLowerCase();
       return (
@@ -85,10 +85,8 @@ const PartnersTable = () => {
     })
     .filter((partner) => {
       if (selectedType === "all") return true;
-      return (
-        partner.type === selectedType
-      );
-    });
+      return partner.type === selectedType;
+    }), [partners, searchTerm, selectedManager, selectedType]);
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -171,7 +169,7 @@ const PartnersTable = () => {
   };
 
   return (
-    <div className="mt-6 overflow-hidden text-p2">
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">

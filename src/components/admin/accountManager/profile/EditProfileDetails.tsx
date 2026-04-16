@@ -5,6 +5,7 @@ import {
 import React, { useEffect, useState } from "react";
 
 import InputField from "components/form/InputField";
+import PasswordField from "components/form/PasswordField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
@@ -124,7 +125,7 @@ export default function EditProfileDetails({
   return (
     <section>
 
-      <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-card shadow-sm transition-all duration-300">
+      <div className="group relative max-w-5xl mx-auto overflow-hidden rounded-2xl border border-slate-200 bg-card shadow-sm transition-all duration-300">
 
         <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-5">
@@ -186,10 +187,9 @@ export default function EditProfileDetails({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3">
 
-            <InputField
+            <PasswordField
               label="Password"
               field="password"
-              type="password"
               placeholder="At least 8 characters, letters & numbers"
               required
               formData={formData}
@@ -197,10 +197,9 @@ export default function EditProfileDetails({
               updateFormData={updateField}
             />
 
-            <InputField
+            <PasswordField
               label="Confirm Password"
               field="confirm_password"
-              type="password"
               placeholder="Repeat your password"
               required
               formData={formData}

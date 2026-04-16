@@ -6,6 +6,7 @@ import {
   ChevronLeft,
   GraduationCap,
 } from "lucide-react";
+import PresignedImage from "components/ui/PresignedImage";
 import { FaTimesCircle } from "react-icons/fa";
 import { MdEvent, MdLocationCity, MdPublic } from "react-icons/md";
 import { HiOutlineCheckCircle } from "react-icons/hi";
@@ -41,12 +42,21 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
   return (
     <>
-      <div className="mt-6">
+      <div className="mt-6 max-w-5xl mx-auto">
         <div className="rounded-md border bg-card shadow-sm">
           <div className="flex justify-between border-b p-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
-                <GraduationCap className="h-6 w-6 text-white" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full">
+                <PresignedImage
+                  fileKey={university.logo_file_key}
+                  alt={university.name}
+                  className="h-12 w-12 rounded-full object-cover ring-2 ring-blue-500 ring-offset-2 shadow-md"
+                  fallback={
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
+                      <GraduationCap className="h-6 w-6 text-white" />
+                    </div>
+                  }
+                />
               </div>
 
               <div>

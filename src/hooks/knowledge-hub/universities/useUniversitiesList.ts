@@ -8,6 +8,9 @@ export interface University {
   is_active: boolean;
   description?: string;
 
+  logo_file_key: string;
+  logo_file_url: string;
+
   university_type_id: string;
   university_type_name: string;
 

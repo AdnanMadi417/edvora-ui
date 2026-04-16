@@ -8,8 +8,11 @@ import {
   MdManageAccounts,
   MdAssignment,
   MdNotifications,
+  MdCategory,
+  MdAddCircle,
+  MdBuild,
 } from 'react-icons/md';
-import { BookOpen, CreditCard } from 'lucide-react';
+import { BookOpen, CreditCard, Settings } from 'lucide-react';
 
 const AdminRoutes: IRoute[] = [
   {
@@ -62,6 +65,12 @@ const AdminRoutes: IRoute[] = [
         icon: CreditCard,
       },
       {
+        name: "Configuration type",
+        layout: "/admin/config-universities",
+        path: "",
+        icon: Settings,
+      },
+      {
         name: "Fields of Study",
         layout: "/admin/config-universities",
         path: "/fields-of-study",
@@ -74,6 +83,26 @@ const AdminRoutes: IRoute[] = [
     layout: "/admin",
     path: "/logistical-service",
     icon: MdBusinessCenter,
+    children: [
+      {
+        name: "logistical service",
+        layout: "/admin/logistical-service",
+        path: "",
+        icon: MdBuild,
+      },
+      {
+        name: "Service Types",
+        layout: "/admin/logistical-service",
+        path: "/services",
+        icon: MdCategory, 
+      },
+      {
+        name: "Create Service",
+        layout: "/admin/logistical-service",
+        path: "/create",
+        icon: MdAddCircle,
+      },
+    ],
   },
 ];
 

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import type { IRoute } from "../../../types/navigation";
 import { ChevronDown } from "lucide-react";
 
-export default function Links({ routes }: { routes: IRoute[] }) {
+export default function Links({ routes, onLinkClick }: { routes: IRoute[]; onLinkClick?: () => void }) {
   const pathname = usePathname();
 
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -46,39 +46,51 @@ export default function Links({ routes }: { routes: IRoute[] }) {
         return (
           <div key={index} className="relative">
 
-            <div
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-              className={`ml-3 flex cursor-pointer items-center justify-between rounded-md px-3 py-3 text-sm font-medium transition-colors duration-200 ease-in-out
-              ${isActive || isHovered ? "text-slate-900" : "text-slate-500"}`}
-            >
-              <div className="flex items-center gap-3">
-                {Icon && (
-                  <Icon
-                    className={`text-lg transition-colors ${
-                      isActive || isHovered ? "text-slate-900" : "text-slate-600"
-                    }`}
-                  />
-                )}
-                <span>
-                  <Link href={fullPath}>{route.name}</Link>
-                </span>
+            {hasChildren ? (
+              <div
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                onClick={() => setExpandedIndex(isExpanded ? null : index)}
+                className={`ml-3 flex cursor-pointer items-center justify-between rounded-md px-3 py-3 text-sm font-medium transition-colors duration-200 ease-in-out
+                ${isActive || isHovered ? "text-slate-900" : "text-slate-500"}`}
+              >
+                <div className="flex items-center gap-3">
+                  {Icon && (
+                    <Icon
+                      className={`text-lg transition-colors ${
+                        isActive || isHovered ? "text-slate-900" : "text-slate-600"
+                      }`}
+                    />
+                  )}
+                  <span>{route.name}</span>
+                </div>
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform duration-200 ${
+                    isExpanded ? "rotate-180" : "rotate-0"
+                  } ${isActive || isHovered ? "text-slate-900" : "text-slate-500"}`}
+                />
               </div>
-
-              {hasChildren && (
-                <button
-                  type="button"
-                  onClick={() => setExpandedIndex(isExpanded ? null : index)}
-                  className="ml-2 flex items-center"
-                >
-                  <ChevronDown
-                    className={`h-4 w-4 transition-transform duration-200 ${
-                      isExpanded ? "rotate-180" : "rotate-0"
-                    } ${isActive || isHovered ? "text-slate-900" : "text-slate-500"}`}
-                  />
-                </button>
-              )}
-            </div>
+            ) : (
+              <Link
+                href={fullPath}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                onClick={onLinkClick}
+                className={`ml-3 flex cursor-pointer items-center justify-between rounded-md px-3 py-3 text-sm font-medium transition-colors duration-200 ease-in-out
+                ${isActive || isHovered ? "text-slate-900" : "text-slate-500"}`}
+              >
+                <div className="flex items-center gap-3">
+                  {Icon && (
+                    <Icon
+                      className={`text-lg transition-colors ${
+                        isActive || isHovered ? "text-slate-900" : "text-slate-600"
+                      }`}
+                    />
+                  )}
+                  <span>{route.name}</span>
+                </div>
+              </Link>
+            )}
 
             {hasChildren && (
               <div
@@ -109,6 +121,7 @@ export default function Links({ routes }: { routes: IRoute[] }) {
                       <Link
                         key={childIndex}
                         href={childPath}
+                        onClick={onLinkClick}
                         className={`relative flex items-center gap-2 rounded-s p-2 text-sm transition-all
                         ${
                           isChildActive
