@@ -96,7 +96,7 @@ export default function OfferLetterDecision({
     <section className="max-w-5xl mx-auto">
       <div className="mb-5 mt-5 space-y-4 rounded-lg border border-gray-200 bg-card p-4 shadow-sm sm:p-6">
         <div className="flex items-start gap-4">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
+          <span className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-200">
             <FaFilePdf className="text-lg text-blue-700" />
           </span>
 
@@ -131,7 +131,7 @@ export default function OfferLetterDecision({
           <button
             onClick={() => handleDownload(offerLetter.file_key)}
             disabled={downloading}
-            className="group rounded-full border border-transparent bg-green-50 p-2 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
+            className="group rounded-md border border-transparent bg-green-50 p-2 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
             title="Download Offer Letter"
           >
             <Download className="h-4 w-4 transition-transform group-hover:scale-110" />
@@ -148,7 +148,7 @@ export default function OfferLetterDecision({
               <button
                 onClick={() => handleDecision("accept")}
                 disabled={submitting}
-                className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200"
+                className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200"
               >
                 <CheckCircle className="h-4 w-4" />
                 Accept Offer
@@ -159,7 +159,7 @@ export default function OfferLetterDecision({
       <button
         onClick={() => handleDecision("reject")}
         disabled={submitting}
-        className="rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 transition hover:border-text-error hover:text-text-error disabled:opacity-50"
+        className="rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 transition hover:border-text-error hover:text-text-error disabled:opacity-50"
       >
         Reject Offer
       </button>

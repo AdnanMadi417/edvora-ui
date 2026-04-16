@@ -29,7 +29,7 @@ const IconLinkBtn = ({
       href={href}
       title={title}
       className={`
-        inline-flex items-center justify-center rounded-full p-2 transition
+        inline-flex items-center justify-center rounded-md p-2 transition
         ${bgColor} ${textColor} ${borderColor}
         ${hoverTextColor} ${hoverBorderColor}
         ${className || ""}

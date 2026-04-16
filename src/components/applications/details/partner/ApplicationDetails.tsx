@@ -15,7 +15,7 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { Clock, Wallet, Plane, CheckCircle, XCircle, FileText } from 'lucide-react';
+import { Clock, Upload, ClipboardCheck, CreditCard, Plane, CheckCircle, XCircle, FileUp } from 'lucide-react';
 import Button from 'components/ui/buttons/Button';
 import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 
@@ -26,7 +26,7 @@ import OfferLetterDecision from './OfferLetter';
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import VisaPaymentConfirmation from "components/applications/popups/partner/VisaPaymentConfirmation";
 import ArrivalDate from "components/applications/popups/partner/ArrivalDate";
-import EmgsEvaluationUpload from "components/applications/popups/partner/EmgsEvaluationUpload";
+import EmgsEvalUpload from "components/applications/popups/partner/EmgsEvaluationUpload";
 import ApplicationCommission from './ApplicationCommission';
 import { useToast } from '../../../context/ToastContext';
 import Dispute from 'components/applications/popups/partner/UpdatedDispute';
@@ -153,9 +153,11 @@ export default function ApplicationDetails({
   return (
     <section className="max-w-5xl mx-auto">
 
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-slate-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
-  
-          <ApplicationPartnerTopBar application={application} />
+      <div className="mb-5 mt-5 block space-y-2">
+
+        <ApplicationPartnerTopBar application={application} />
+
+          <div className=" block space-y-4 rounded-lg border border-slate-200 bg-card p-4 shadow-sm sm:p-6">
   
           {/* Top row: avatar + info | intake date */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -246,16 +248,19 @@ export default function ApplicationDetails({
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Current Status</p>
               <div className="flex flex-wrap gap-2">
                 {currentStatus.name && (
-                  <span className="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-normal text-amber-700">
+                  <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-normal text-amber-700">
                     {currentStatus.name}
                   </span>
                 )}
                 {stage.name && (
-                  <span className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm font-normal text-slate-800">
+                  <span className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-1 text-sm font-normal text-slate-800">
                     {stage.name}
                   </span>
                 )}
-                <p className="inline-flex items-center px-3 py-1 text-xs font-normal text-slate-600">{daysSince(application.updated_at)} days in stage</p>
+                <p className="inline-flex items-center text-xs font-normal text-slate-600">
+                  <span className="sm:hidden rounded-md border border-slate-200 bg-white px-3 py-1">{daysSince(application.updated_at)} d</span>
+                  <span className="hidden sm:inline">{daysSince(application.updated_at)} days in stage</span>
+                </p>
               </div>
             </div>
   
@@ -285,17 +290,17 @@ export default function ApplicationDetails({
                       {actions.document_types?.length > 0 ? (
                         <button
                           onClick={openRequiredActionPopup}
-                          className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
+                          className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"
                         >
-                          <Clock className="h-4 w-4 text-orange-500" />
+                          <Upload className="h-4 w-4" />
                           Upload Required Documents
                         </button>
                       ) : actions.stage_statuses?.some((status) => status.is_requires_reason) ? (
                         <button
                           onClick={openProgramDecisionPopup}
-                          className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                          className="flex w-full items-center justify-center gap-2 rounded-md bg-violet-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-violet-600"
                         >
-                          <Clock className="h-4 w-4 text-blue-500" />
+                          <ClipboardCheck className="h-4 w-4" />
                           Submit Program Decision
                         </button>
                       ) : null}
@@ -306,9 +311,9 @@ export default function ApplicationDetails({
                     <button
                       type="button"
                       onClick={() => setShowVisaPaymentPopup(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-green-700"
                     >
-                      <Wallet className="h-4 w-4" />
+                      <CreditCard className="h-4 w-4" />
                       Proceed to Payment
                     </button>
                   )}
@@ -317,7 +322,7 @@ export default function ApplicationDetails({
                     <button
                       type="button"
                       onClick={() => setShowArrivalPopup(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-emerald-700"
                     >
                       <Plane className="h-4 w-4" />
                       Confirm Arrival
@@ -326,7 +331,7 @@ export default function ApplicationDetails({
 
                   {showEmgsUpload && (
 
-                    <div className="block space-y-2">
+                    <div className="block space-y-4">
 
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 
@@ -337,7 +342,7 @@ export default function ApplicationDetails({
                           </svg>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="mb-1 text-sm font-semibold text-slate-800">Download Your Evaluation</p>
+                          <p className="mb-1 text-sm font-semibold text-slate-800">Download Your Eval</p>
                           <p className="mb-2 text-xs text-slate-500">Your evaluation is ready. Download it directly from the EMGS app.</p>
                           <a
                             href="https://www.youtube.com/shorts/fT4Wmm4eWwI"
@@ -381,10 +386,10 @@ export default function ApplicationDetails({
                       <button
                       type="button"
                       onClick={() => setShowEmgsUploadPopup(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700"
                     >
-                      <FileText className="h-4 w-4" />
-                      Upload EMGS Evaluation
+                      <FileUp className="h-4 w-4" />
+                      Upload EMGS Eval
                     </button>
 
                     </div>
@@ -426,6 +431,9 @@ export default function ApplicationDetails({
 
         </div>
 
+
+      </div>
+      
       <ApplicationTimeline application={application} />
       <ApplicationCommission application={application} />
       <VisaTrackingTimeline application={application} />
@@ -433,7 +441,7 @@ export default function ApplicationDetails({
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <MdAssignmentTurnedIn className="text-xl text-blue-700" />
           </span>
           Application Information
@@ -516,7 +524,7 @@ export default function ApplicationDetails({
 
       <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FaUser className="text-xl text-blue-700" />
           </span>
           Student Information
@@ -783,7 +791,7 @@ export default function ApplicationDetails({
       )}
 
       {showEmgsUploadPopup && (
-        <EmgsEvaluationUpload
+        <EmgsEvalUpload
           isOpen={showEmgsUploadPopup}
           onClose={() => setShowEmgsUploadPopup(false)}
           applicationId={application.id}

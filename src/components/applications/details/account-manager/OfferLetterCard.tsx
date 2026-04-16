@@ -35,7 +35,7 @@ export default function OfferLetterDecision({
     <section className="max-w-5xl mx-auto">
       <div className="mb-5 mt-5 space-y-4 rounded-lg border border-gray-200 bg-card p-4 shadow-sm sm:p-6">
         <div className="flex items-start gap-4">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
+          <span className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-200">
             <FaFilePdf className="text-lg text-blue-700" />
           </span>
 
@@ -70,7 +70,7 @@ export default function OfferLetterDecision({
           <button
             onClick={() => handleDownload(offerLetter.file_key)}
             disabled={downloading}
-            className="group rounded-full border border-transparent bg-green-50 p-2 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
+            className="group rounded-md border border-transparent bg-green-50 p-2 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
             title="Download Offer Letter"
           >
             <Download className="h-4 w-4 transition-transform group-hover:scale-110" />

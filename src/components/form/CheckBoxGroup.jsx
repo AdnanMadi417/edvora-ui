@@ -62,12 +62,12 @@ const CheckBoxGroup = ({
                   onChange={() => toggleSelection(option.id)}
                   className="peer sr-only"
                 />
-                <div className="h-6 w-11 rounded-full bg-slate-300 transition-colors peer-checked:bg-blue-600" />
-                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+                <div className="h-6 w-11 rounded-md bg-slate-300 transition-colors peer-checked:bg-blue-600" />
+                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-md bg-white shadow transition-transform peer-checked:translate-x-5" />
               </div>
 
               {selected && (
-                <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-blue-600" />
+                <span className="absolute right-3 top-3 h-2 w-2 rounded-md bg-blue-600" />
               )}
             </label>
           )

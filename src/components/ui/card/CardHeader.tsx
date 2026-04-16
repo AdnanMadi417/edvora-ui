@@ -25,7 +25,7 @@ const CardHeader: React.FC<CardHeaderProps> = ({
       }`}
     >
       <div
-        className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full border ${iconBg}`}
+        className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-md border ${iconBg}`}
       >
         <Icon className={`h-7 w-7 ${iconColor}`} />
       </div>

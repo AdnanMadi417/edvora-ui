@@ -5,16 +5,16 @@ import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
-interface UseEmgsEvaluationUploadReturn {
-  uploadEmgsEvaluation: (file: File, applicationId: string) => Promise<void>;
+interface UseEmgsEvalUploadReturn {
+  uploadEmgsEval: (file: File, applicationId: string) => Promise<void>;
   isUploading: boolean;
 }
 
-export const useEmgsEvaluationUpload = (): UseEmgsEvaluationUploadReturn => {
+export const useEmgsEvalUpload = (): UseEmgsEvalUploadReturn => {
   const [isUploading, setIsUploading] = useState(false);
   const { showToast } = useToast();
 
-  const uploadEmgsEvaluation = async (file: File, applicationId: string) => {
+  const uploadEmgsEval = async (file: File, applicationId: string) => {
     if (!file) return;
 
     try {
@@ -45,5 +45,5 @@ export const useEmgsEvaluationUpload = (): UseEmgsEvaluationUploadReturn => {
     }
   };
 
-  return { uploadEmgsEvaluation, isUploading };
+  return { uploadEmgsEval, isUploading };
 };

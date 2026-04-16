@@ -39,7 +39,7 @@ const ApplicationTimeline = ({ application }: ApplicationTimelineProps) => {
 
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-50">
+        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-blue-50">
           <Clock className="h-5 w-5 text-blue-600" />
         </div>
         <div>

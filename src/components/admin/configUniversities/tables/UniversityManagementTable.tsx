@@ -185,7 +185,7 @@ const UniversityManagementTable = () => {
                 placeholder="Search by university, University, or level..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -207,7 +207,7 @@ const UniversityManagementTable = () => {
                 setSelectedField('all');
                 setCurrentPage(1);
               }}
-              className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
             >
               <RefreshCw className="h-4 w-4" />
               Clear
@@ -307,12 +307,12 @@ const UniversityManagementTable = () => {
                       <div className="flex items-center gap-3">
                         <div
                           className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
+                rounded-md bg-accent-light text-h6 font-medium text-blue-700 "
                         >
                           {uni ? (
                             uni.name?.slice(0, 2).toUpperCase()
                           ) : (
-                            <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
+                            <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
                           )}
                         </div>
 
@@ -384,7 +384,7 @@ const UniversityManagementTable = () => {
                           role="menuitem"
                           aria-label="View University"
                           href={`/admin/config-universities/${uni.id}`}
-                          className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                          className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                         >
                           <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                         </a>
@@ -395,7 +395,7 @@ const UniversityManagementTable = () => {
                           role="menuitem"
                           aria-label="Edit University"
                           href={`/admin/config-universities/${uni.id}/edit`}
-                          className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                          className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                         >
                           <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                         </a>
@@ -410,7 +410,7 @@ const UniversityManagementTable = () => {
                             setSelectedUniversityName(uni.name);
                             setIsDeleteOpen(true);
                           }}
-                          className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                          className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                         >
                           <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                         </button>

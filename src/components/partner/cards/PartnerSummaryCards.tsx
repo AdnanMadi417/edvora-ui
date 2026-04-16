@@ -45,7 +45,7 @@ export default function PartnerSummaryCards() {
               className="flex items-center gap-4 rounded-xl border border-gray-200 bg-white p-5 "
             >
               <div className="flex-shrink-0">
-                <div className={`p-3 rounded-full ${item.iconBg}`}>
+                <div className={`p-3 rounded-md ${item.iconBg}`}>
                   <Icon className={`w-6 h-6 ${item.iconColor}`} />
                 </div>
               </div>

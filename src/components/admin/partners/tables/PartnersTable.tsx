@@ -190,7 +190,7 @@ const PartnersTable = () => {
                 placeholder="Search by university, Partner, or level..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -226,7 +226,7 @@ const PartnersTable = () => {
                 setSelectedManager("all");
                 setCurrentPage(1);
               }}
-              className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
             >
               <RefreshCw className="h-4 w-4" />
               Clear
@@ -326,7 +326,7 @@ const PartnersTable = () => {
                       <td className="min-w-[220px] max-w-[320px] px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="relative flex-shrink-0">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700">
                               {partner.name
                                 ? partner.name.slice(0, 2).toUpperCase()
                                 : "NA"}
@@ -370,11 +370,11 @@ const PartnersTable = () => {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2 text-sm">
                           {partner.is_active ? (
-                            <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
+                            <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
                               <CheckCircle className="h-3 w-3" /> Active
                             </span>
                           ) : (
-                            <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
+                            <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
                               <XCircle className="h-3 w-3" /> Not Active
                             </span>
                           )}
@@ -387,7 +387,7 @@ const PartnersTable = () => {
                             role="menuitem"
                             aria-label="View University"
                             href={`/admin/partners/${partner.id}`}
-                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                            className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
                             <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                           </a>
@@ -398,7 +398,7 @@ const PartnersTable = () => {
                             role="menuitem"
                             aria-label="View University"
                             href={`/admin/partners/${partner.id}/edit`}
-                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                            className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
                             <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                           </a>
@@ -412,7 +412,7 @@ const PartnersTable = () => {
                               setSelectedPartner(partner);
                               setIsAssignModalOpen(true);
                             }}
-                            className="flex items-center justify-center rounded-full p-2 hover:bg-slate-100"
+                            className="flex items-center justify-center rounded-md p-2 hover:bg-slate-100"
                           >
                             <UserCog className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                           </button>
@@ -426,7 +426,7 @@ const PartnersTable = () => {
                               setSelectedPartnerId(partner.id);
                               setIsDeleteOpen(true);
                             }}
-                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                            className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
                             <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                           </button>

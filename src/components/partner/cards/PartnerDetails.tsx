@@ -41,7 +41,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
 
         <div className="flex flex-col items-start justify-between gap-6 px-6 py-6 sm:flex-row sm:items-center">
           <div className="flex items-start gap-4">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+            <span className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-100">
               <FaHandshake className="text-xl text-blue-700" />
             </span>
 
@@ -55,7 +55,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
                 </span>{" "}
                 {partner.type}
                 <span
-                  className={`ml-2 inline-flex rounded-full px-3 py-1 text-xs font-medium ${
+                  className={`ml-2 inline-flex rounded-md px-3 py-1 text-xs font-medium ${
                     partner.status === "registered"
                       ? "bg-green-100 text-green-700"
                       : partner.status === "pending"
@@ -85,7 +85,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FaBuilding className="text-xl text-blue-700" />
           </span>
           Business Information
@@ -136,7 +136,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-default bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FaEnvelope className="text-xl text-blue-700" />
           </span>
           Contact Information

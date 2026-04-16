@@ -93,7 +93,7 @@ export default function VisaTrackingTimeline({
         <div className="flex items-start gap-3 border-b border-gray-200 p-6">
           <div className="flex-1">
             <div className="flex items-center gap-4">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+              <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
                 <CreditCard className="text-xl text-blue-700" />
               </span>
               <div>
@@ -142,7 +142,7 @@ export default function VisaTrackingTimeline({
         <div className="block space-y-4 border-b border-gray-200 p-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
-              EMGS Evaluation Document
+              EMGS Eval Document
             </h3>
             <p className="text-sm text-slate-500">
               EMGS evaluation file
@@ -160,7 +160,7 @@ export default function VisaTrackingTimeline({
             ) : (
               <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
                     <FileText className="h-5 w-5 text-green-600" />
                   </div>
                   <div>
@@ -176,7 +176,7 @@ export default function VisaTrackingTimeline({
                 <button
                   onClick={() => handleDownload(application.emgs_evaluation_document.file_key)}
                   disabled={downloading}
-                  className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                  className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
                   title="Download document"
                 >
                   <Download className="h-4 w-4" />
@@ -189,7 +189,7 @@ export default function VisaTrackingTimeline({
         <div className="border-b border-gray-200 p-6 ">
           {visaPayments.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-12">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-md bg-gray-100">
                 <Receipt className="h-8 w-8 text-gray-400" />
               </div>
               <p className="text-base font-medium text-gray-900">
@@ -254,7 +254,7 @@ export default function VisaTrackingTimeline({
                       </p>
 
                       {payment.documents.length === 0 ? (
-                        <div className="flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5">
+                        <div className="flex items-center gap-1.5 rounded-md bg-red-50 px-3 py-1.5">
                           <XCircle className="h-3.5 w-3.5 text-red-500" />
                           <span className="text-sm font-medium text-red-600">
                             No documents
@@ -267,7 +267,7 @@ export default function VisaTrackingTimeline({
                               <button
                                 onClick={() => handleDownload(doc.file_key)}
                                 disabled={downloading}
-                                className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                                className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 hover:bg-green-100 disabled:opacity-50"
                               >
                                 <Download className="h-4 w-4" />
                               </button>
@@ -276,7 +276,7 @@ export default function VisaTrackingTimeline({
                                 <button
                                   onClick={() => handleApprove(payment.id)}
                                   disabled={loading}
-                                  className="rounded-full border border-blue-600 bg-blue-50 p-2 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                                  className="rounded-md border border-blue-600 bg-blue-50 p-2 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
                                 >
                                   <CheckCircle className="h-4 w-4" />
                                 </button>
@@ -320,7 +320,7 @@ export default function VisaTrackingTimeline({
                     className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
                         <FileText className="h-5 w-5 text-green-600" />
                       </div>
 
@@ -338,7 +338,7 @@ export default function VisaTrackingTimeline({
                     <button
                       onClick={() => handleDownload(doc.file_key)}
                       disabled={downloading}
-                      className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                      className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
                       title="Download document"
                     >
                       <Download className="h-4 w-4" />

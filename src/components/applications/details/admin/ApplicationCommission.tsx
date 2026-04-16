@@ -1,69 +1,96 @@
 "use client";
 
-import React from "react";
-import { DollarSign, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import React, { useState } from "react";
+import { Receipt, Download } from "lucide-react";
+import { getDocumentDownloadUrl } from "../../../../services/documentService";
 
 interface ApplicationCommissionsProps {
   application: any;
 }
 
-export default function ApplicationCommissions({ application }: ApplicationCommissionsProps) {
+export default function ApplicationCommissions({
+  application,
+}: ApplicationCommissionsProps) {
   const commissions = application?.commissions || [];
+  const [downloading, setDownloading] = useState(false);
 
-  const statusMap: Record<string, any> = {
-    "1": { icon: <Clock className="h-5 w-5 text-yellow-500" />, text: "Pending", badge: "bg-yellow-100 text-yellow-700" },
-    "2": { icon: <CheckCircle className="h-5 w-5 text-green-600" />, text: "Approved", badge: "bg-green-100 text-green-700" },
-    "3": { icon: <XCircle className="h-5 w-5 text-red-600" />, text: "Rejected", badge: "bg-red-100 text-red-700" },
-    default: { icon: <AlertCircle className="h-5 w-5 text-gray-500" />, text: "Unknown", badge: "bg-gray-100 text-gray-700" },
+  const commissionDocs = Object.values(
+    application?.commission_documents || {}
+  ).filter(Boolean) as any[];
+
+  const hasCommissions = commissions.length > 0;
+
+  if (!hasCommissions && commissionDocs.length === 0) return null;
+
+  const handleDownload = async (fileKey?: string) => {
+    if (!fileKey || downloading) return;
+    try {
+      setDownloading(true);
+      const url = await getDocumentDownloadUrl(fileKey);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch {
+      alert("Download failed");
+    } finally {
+      setDownloading(false);
+    }
   };
 
-  const formatDate = (d: string | null) =>
-    d ? new Date(d).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Not provided";
-
-  const formatCurrency = (n: number) =>
-    new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n);
-
-  const total = commissions.reduce((sum: number, c: any) => sum + (c.amount || 0), 0);
-
   return (
-    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg border border-gray-200 bg-card p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
-          <DollarSign className="text-xl text-green-700" />
-        </span>
-        <div>
-          <h3 className="text-lg font-semibold text-slate-900">
-            Commission Details
-          </h3>
-          <p className="text-sm text-slate-500">
-            Total: {formatCurrency(total)} ({commissions.length} {commissions.length === 1 ? "record" : "records"})
-          </p>
+    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
+      <div className="mb-6 rounded-lg border bg-white">
+        <div className="flex items-start gap-3 border-b border-gray-200 p-6">
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
+            <Receipt className="text-xl text-blue-700" />
+          </span>
+          <div>
+            <h3 className="text-p3 font-semibold text-slate-900">
+              Commission Details
+            </h3>
+          </div>
         </div>
-      </div>
 
-      <div className="space-y-4">
-        {commissions.length === 0 ? (
-          <p className="text-center text-gray-500">No commission records found.</p>
-        ) : (
-          commissions.map((c: any, i: number) => {
-            const status = statusMap[c.status] || statusMap.default;
-            return (
-              <div key={c.id} className="flex items-center justify-between rounded-lg border border-gray-200 p-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">{status.icon}</div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold">Commission #{i + 1}</span>
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${status.badge}`}>{status.text}</span>
+        <div className="space-y-4 p-6">
+          {hasCommissions ? (
+            commissions.map((commission: any) => {
+              const commissionName =
+                commissionDocs[0]?.document_type || "Commission Payment";
+              return (
+                <div
+                  key={commission.id}
+                  className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
+                        <Receipt className="h-5 w-5 text-green-600" />
+                      </div>
+                      <p className="font-medium text-gray-900">
+                        {commissionName}
+                      </p>
                     </div>
-                    <div className="text-green-600 font-bold">{formatCurrency(c.amount)}</div>
-                    <div className="text-xs text-slate-600">Created: {formatDate(c.created_at)}</div>
+                    <div className="flex items-center gap-2">
+                      {commissionDocs.map((doc: any) => (
+                        <button
+                          key={doc.id}
+                          onClick={() => handleDownload(doc.file_key)}
+                          disabled={downloading}
+                          title={doc.document_type}
+                          className="flex h-9 w-9 items-center justify-center rounded-md border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                        >
+                          <Download className="h-4 w-4" />
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })
-        )}
+              );
+            })
+          ) : (
+            <p className="text-center text-gray-500">
+              No commission records found.
+            </p>
+          )}
+        </div>
       </div>
     </section>
   );

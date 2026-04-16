@@ -400,7 +400,7 @@ export default function StudentRegistrationForm() {
     <section className="mx-auto mt-5">
       <div className="rounded-lg border border-slate-200 bg-card p-6">
         <div className="mb-6 flex items-start gap-x-3 border-b-2 border-slate-100 pb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FileText className="text-blue-700" size={24} />
           </div>
           <div>
@@ -429,7 +429,7 @@ export default function StudentRegistrationForm() {
                   {index < visibleStages.length - 1 && (
                     <div className="absolute left-1/2 top-6 -z-10 hidden h-1 w-full bg-slate-200 sm:block">
                       <div
-                        className={`h-full rounded-full transition-all duration-300 ${
+                        className={`h-full rounded-md transition-all duration-300 ${
                           isCompleted ? "w-full bg-blue-500" : "w-0"
                         }`}
                       />
@@ -439,7 +439,7 @@ export default function StudentRegistrationForm() {
                   <button
                     onClick={() => canAccess && setStage(s.id)}
                     disabled={!canAccess}
-                    className={`relative mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-300
+                    className={`relative mb-3 flex h-12 w-12 items-center justify-center rounded-md border-2 transition-all duration-300
       ${
         isCompleted
           ? "border-blue-500 bg-blue-500 text-white shadow-md"
@@ -515,7 +515,7 @@ f            />
 
         </div>
 
-        <div className="flex-col content-center justify-content items-center gap-2 space-y-2 sm:flex-row md:flex md:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-sm text-slate-500">
             Step {stage} of {visibleStages.length} — {completedStages.length}{" "}
             completed

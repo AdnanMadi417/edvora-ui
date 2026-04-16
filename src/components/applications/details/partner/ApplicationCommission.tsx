@@ -91,7 +91,7 @@ export default function ApplicationCommission({
         <div className="mb-6 rounded-lg border bg-white">
           <div className="flex items-start gap-3 border-b border-gray-200 p-6">
             <div className="flex flex-1 items-center gap-4">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+              <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
                 <Receipt className="text-xl text-blue-700" />
               </span>
               <div>
@@ -113,37 +113,42 @@ export default function ApplicationCommission({
 
           <div className="space-y-4 p-6">
             {hasCommissions
-              ? application.commissions.map((commission: any) => (
+              ? application.commissions.map((commission: any) => {
+                const commissionDocs = Object.values(application.commission_documents || {}).filter((doc: any) => doc !== null) as any[];
+                const commissionName = commissionDocs[0]?.document_type || "Commission Payment";
+                return (
                 <div
                   key={commission.id}
                   className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
                         <Receipt className="h-5 w-5 text-green-600" />
                       </div>
                       <p className="font-medium text-gray-900">
-                        Commission Payment
+                        {commissionName}
                       </p>
                     </div>
-
                     <div className="flex items-center gap-2">
-                      {application.payment_documents?.map((doc: any) => (
-                        <button
-                          key={doc.id}
-                          onClick={() => handleDownload(doc.file_key)}
-                          disabled={downloading}
-                          title="Download payment proof"
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
-                        >
-                          <Download className="h-4 w-4" />
-                        </button>
-                      ))}
+                      {Object.values(application.commission_documents || {})
+                        .filter((doc: any) => doc !== null)
+                        .map((doc: any) => (
+                          <button
+                            key={doc.id}
+                            onClick={() => handleDownload(doc.file_key)}
+                            disabled={downloading}
+                            title={doc.document_type}
+                            className="flex h-9 w-9 items-center justify-center rounded-md border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                          >
+                            <Download className="h-4 w-4" />
+                          </button>
+                        ))}
                     </div>
                   </div>
                 </div>
-              ))
+              );
+              })
               : null}
           </div>
 

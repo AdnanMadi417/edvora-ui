@@ -101,7 +101,7 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="group relative flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-4 py-3 font-semibold text-sm text-white shadow-md transition-all duration-200 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
+          className="group relative flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-3 font-semibold text-sm text-white shadow-md transition-all duration-200 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
         >
           <Lock className="h-4 w-4 text-white transition-colors group-hover:text-blue-100" />
           {loading ? "Signing in..." : "Sign In"}

@@ -161,7 +161,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                       openDropdownId === university.id ? null : university.id
                     )
                   }
-                  className="flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+                  className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
                   Actions
                   <MoreVertical className="h-4 w-4" />
@@ -175,7 +175,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                         className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm"
                         onClick={handleUpdateLink}
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
                           <Clock className="h-4 w-4" />
                         </div>
 
@@ -189,7 +189,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                         className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
                         onClick={handleBack}
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
                           <ChevronLeft className="h-4 w-4" />
                         </div>
 

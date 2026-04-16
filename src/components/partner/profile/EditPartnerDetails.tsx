@@ -95,11 +95,11 @@ const EditPartnerProfile: React.FC<EditPartnerProfileProps> = () => {
         <div className="flex justify-between border-b px-6 py-5">
           <div className="flex items-center gap-4">
             <div className="relative flex-shrink-0">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700">
                 {partner.name?.slice(0, 2).toUpperCase() || "NA"}
               </div>
               <span
-                className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${
+                className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-md border-2 border-white ${
                   partner.is_active ? "bg-emerald-500" : "bg-slate-300"
                 }`}
               />

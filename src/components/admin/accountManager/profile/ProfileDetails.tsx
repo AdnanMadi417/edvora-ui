@@ -16,7 +16,7 @@ export default function ProfileDetails({ manager }: ProfileDetailsProps) {
     <section>
       <div className="mb-5 mt-5 max-w-5xl mx-auto block rounded-lg border border-slate-200 bg-card p-6 shadow-sm">
         <div className="flex items-center gap-5">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-slate-700">
+          <div className="flex h-14 w-14 items-center justify-center rounded-md bg-accent-light text-xl font-semibold text-slate-700">
             {manager.name?.charAt(0).toUpperCase() ?? "?"}
           </div>
 
@@ -27,7 +27,7 @@ export default function ProfileDetails({ manager }: ProfileDetailsProps) {
               </h1>
 
               <span
-                className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold ${
+                className={`inline-flex items-center gap-1 rounded-md px-3 py-1 text-xs font-semibold ${
                   manager.is_active
                     ? "border border-green-700 bg-green-100 text-green-700"
                     : "border border-slate-500 bg-slate-100 text-slate-500"
@@ -61,13 +61,13 @@ export default function ProfileDetails({ manager }: ProfileDetailsProps) {
             </span>
 
             {Number(manager.assigned_partners_count) > 0 ? (
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 w-fit">
+              <span className="inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 w-fit">
                 <Users className="h-3 w-3" />
                 {Number(manager.assigned_partners_count)} Partner
                 {Number(manager.assigned_partners_count) !== 1 && "s"}
               </span>
             ) : (
-              <span className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
+              <span className="inline-flex items-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
                 <AlertCircle className="h-3 w-3" />
                 Needs Partner
               </span>
@@ -86,7 +86,7 @@ export default function ProfileDetails({ manager }: ProfileDetailsProps) {
                 {manager.assigned_partners.map((partner) => (
                   <span
                     key={partner.id}
-                    className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700 transition hover:bg-slate-100"
+                    className="rounded-md border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700 transition hover:bg-slate-100"
                   >
                     {partner.name}
                   </span>

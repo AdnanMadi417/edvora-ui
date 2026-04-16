@@ -109,7 +109,7 @@ const Navbar = ({
         </p>
       </div>
 
-      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-full border border-default bg-card px-2 py-2">
+      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-md border border-default bg-card px-2 py-2">
         <span
           className="flex h-5 w-5 cursor-pointer items-center justify-center xl:hidden"
           onClick={onOpenSidenav}
@@ -120,7 +120,7 @@ const Navbar = ({
         <Link href={getNotificationsRoute(user?.role)} className="relative flex items-center justify-center">
           <Bell className="h-5 w-5 text-slate-600" />
           {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-md bg-red-500 text-[10px] font-bold text-white">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
@@ -133,12 +133,12 @@ const Navbar = ({
 
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-full text-h5 font-medium text-blue-700 "
+                rounded-md text-h5 font-medium text-blue-700 "
               >
                 {user ? (
                   user.name[0].toUpperCase()
                 ) : (
-                  <div className="h-5 w-5 animate-pulse rounded-full" />
+                  <div className="h-5 w-5 animate-pulse rounded-md" />
                 )}
               </div>
 

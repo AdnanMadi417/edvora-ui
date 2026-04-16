@@ -21,7 +21,9 @@ export default function ArrivalDateConfirmation({
   const [isVisible, setIsVisible] = useState(false);
   const [arrivalDate, setArrivalDate] = useState<string>("");
   const [ticketFile, setTicketFile] = useState<File | null>(null);
+  const [eVisaFile, setEVisaFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
+  const [eVisaError, setEVisaError] = useState("");
   const { submitArrivalDate, isSubmitting } = useArrivalDateUpload();
 
   const [formData, setFormData] = useState({
@@ -43,7 +45,7 @@ export default function ArrivalDateConfirmation({
 
   const handleConfirm = async () => {
     try {
-      await submitArrivalDate(applicationId, formData.arrival_date, ticketFile);
+      await submitArrivalDate(applicationId, formData.arrival_date, ticketFile, eVisaFile);
       handleClose();
       setTimeout(() => window.location.reload(), 2000);
     } catch {
@@ -54,7 +56,9 @@ export default function ArrivalDateConfirmation({
   const handleClose = () => {
     setFormData({ arrival_date: "" });
     setTicketFile(null);
+    setEVisaFile(null);
     setFileError("");
+    setEVisaError("");
     onClose();
   };
 
@@ -78,7 +82,7 @@ export default function ArrivalDateConfirmation({
           <div className="relative border-b border-gray-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50">
                   <Plane className="h-6 w-6 text-blue-600" strokeWidth={2.5} />
                 </div>
                 <div>
@@ -93,7 +97,7 @@ export default function ArrivalDateConfirmation({
               <button
                 onClick={handleClose}
                 aria-label="Close dialog"
-                className="group flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600"
+                className="group flex h-9 w-9 items-center justify-center rounded-md text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600"
               >
                 <XCircle className="h-5 w-5" strokeWidth={2} />
               </button>
@@ -102,10 +106,10 @@ export default function ArrivalDateConfirmation({
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
 
-            {fileError && (
+            {(fileError || eVisaError) && (
               <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4">
                 <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-                <p className="text-sm text-red-700">{fileError}</p>
+                <p className="text-sm text-red-700">{fileError || eVisaError}</p>
               </div>
             )}
 
@@ -125,9 +129,20 @@ export default function ArrivalDateConfirmation({
               label="Travel Ticket"
               id="ticket_file"
               file={ticketFile}
+              required
               onFileChange={setTicketFile}
               onRemove={() => setTicketFile(null)}
               onError={setFileError}
+              disabled={isSubmitting}
+            />
+
+            <StatusFileUpload
+              label="E-Visa Document (if required)"
+              id="e_visa_file"
+              file={eVisaFile}
+              onFileChange={setEVisaFile}
+              onRemove={() => setEVisaFile(null)}
+              onError={setEVisaError}
               disabled={isSubmitting}
             />
           </div>
@@ -136,15 +151,15 @@ export default function ArrivalDateConfirmation({
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleClose}
-                className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-md border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
               >
                 <XCircle className="h-4 w-4" />
                 Cancel
               </button>
               <button
-                disabled={!formData.arrival_date || !ticketFile || !!fileError || isSubmitting}
+                disabled={!formData.arrival_date || !ticketFile || !!fileError || !!eVisaError || isSubmitting}
                 onClick={handleConfirm}
-                className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
               >
                 <CheckCircle className="h-4 w-4" />
                 {isSubmitting ? "Submitting..." : "Confirm Arrival"}

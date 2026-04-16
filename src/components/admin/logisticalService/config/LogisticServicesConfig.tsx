@@ -52,7 +52,7 @@ const LogisticServicesConfig = () => {
         <div className="border-b border-slate-200 p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-200 bg-blue-50">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md border border-blue-200 bg-blue-50">
                 <Settings className="h-5 w-5 text-blue-700" />
               </div>
               <div>
@@ -114,14 +114,14 @@ const LogisticServicesConfig = () => {
                       onClick={() => handleSave(service.id)}
                       disabled={loadingEditLogisticService}
                       aria-label="Save"
-                      className="flex items-center justify-center rounded-full border border-green-600 p-1.5 text-green-600 transition hover:bg-green-50 disabled:opacity-50"
+                      className="flex items-center justify-center rounded-md border border-green-600 p-1.5 text-green-600 transition hover:bg-green-50 disabled:opacity-50"
                     >
                       <Check className="h-4 w-4" />
                     </button>
                     <button
                       onClick={cancelEdit}
                       aria-label="Cancel"
-                      className="flex items-center justify-center rounded-full border border-slate-300 p-1.5 text-slate-500 transition hover:bg-slate-50"
+                      className="flex items-center justify-center rounded-md border border-slate-300 p-1.5 text-slate-500 transition hover:bg-slate-50"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -134,7 +134,7 @@ const LogisticServicesConfig = () => {
                     <button
                       onClick={() => startEdit(service.id, service.name)}
                       aria-label="Edit service"
-                      className="flex items-center justify-center rounded-full p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
+                      className="flex items-center justify-center rounded-md p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
                     >
                       <Pencil className="h-4 w-4" />
                     </button>

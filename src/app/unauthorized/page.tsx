@@ -32,7 +32,7 @@ export default function UnauthorizedPage() {
 
         <div className="mb-2 flex justify-center">
           <div
-            className="rounded-full p-6 bg-blue-300/50"
+            className="rounded-md p-6 bg-blue-300/50"
           >
             <ShieldX
               size={72}

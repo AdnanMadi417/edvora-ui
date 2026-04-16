@@ -80,7 +80,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
             <div className="flex items-center gap-3 sm:gap-6">
               <Link
                 href="/account-manager/partners"
-                className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
+                className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
                 <span>Back to Partners</span>
@@ -91,7 +91,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2 rounded-full border border-default bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+                  className="flex items-center gap-2 rounded-md border border-default bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
                 >
                   Actions
                   <MoreVertical className="h-4 w-4" />
@@ -106,7 +106,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
                         onClick={handleApprove}
                         className="group flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-green-50 hover:text-green-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-200"
                       >
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-100 text-green-600 transition-colors group-hover:bg-green-200">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-green-100 text-green-600 transition-colors group-hover:bg-green-200">
                           <CheckCircle className="h-4 w-4" />
                         </div>
                         <div className="flex-1">
@@ -121,7 +121,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
                         onClick={handleHold}
                         className="group flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-amber-50 hover:text-amber-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
                       >
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
                           <Clock className="h-4 w-4" />
                         </div>
                         <div className="flex-1">
@@ -136,7 +136,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
                         onClick={handleBack}
                         className="group flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-green-50 hover:text-green-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-200"
                       >
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-100 text-green-600 transition-colors group-hover:bg-green-200">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-md bg-green-100 text-green-600 transition-colors group-hover:bg-green-200">
                           <Users className="h-4 w-4" />
                         </div>
                         <div className="flex-1">

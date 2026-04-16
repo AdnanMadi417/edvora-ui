@@ -159,12 +159,12 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             <div className="flex items-center gap-3">
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center
-          rounded-full bg-accent-light text-h5 font-medium text-blue-700"
+          rounded-md bg-accent-light text-h5 font-medium text-blue-700"
               >
                 {user ? (
                   user.name[0].toUpperCase()
                 ) : (
-                  <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
+                  <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
                 )}
               </div>
               <div className="min-w-0 flex-1">
@@ -205,7 +205,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="flex w-full items-center gap-3 rounded-full
+            className="flex w-full items-center gap-3 rounded-md
         border border-transparent px-4 py-3 text-left
         font-medium text-red-600 transition-all duration-200
         hover:border-red-100 hover:bg-red-50

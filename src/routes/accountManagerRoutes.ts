@@ -6,7 +6,7 @@ const accountManagerRoutes: IRoute[] = [
         name: "Applications",
         layout: "/account-manager",
         path: "/applications",
-        icon: MdManageAccounts,
+        icon: MdAssignment,
     },
     // {
     //     name: "Partners",
