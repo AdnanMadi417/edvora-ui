@@ -63,9 +63,10 @@ export default function ApplicationDocuments({
   const paymentDocuments = application?.payment_documents || [];
   const arrivalDocuments = application?.arrival_documents || [];
   const emgsEvalDoc = application?.emgs_evaluation_document || null;
+  const commissionDocuments: any[] = Object.values(application?.commission_documents || {}).filter(Boolean) as any[];
 
-  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvalDoc ? 1 : 0);
-  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvalDoc ? [emgsEvalDoc] : [])].filter(
+  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvalDoc ? 1 : 0) + commissionDocuments.length;
+  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvalDoc ? [emgsEvalDoc] : []), ...commissionDocuments].filter(
     (d) => d.status === "1"
   ).length;
 
@@ -492,6 +493,49 @@ export default function ApplicationDocuments({
                   </button>
                 </div>
               </div>
+            </div>
+          )}
+
+          {commissionDocuments.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Commission Documents</p>
+              {commissionDocuments.map((doc: any) => (
+                <div key={doc.id} className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
+                  <div className="flex min-w-0 flex-1 items-start gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
+                        {getFileStatus(doc.status)}
+                      </div>
+                    </div>
+                    <div className="min-w-0 max-w-[350px] flex-1">
+                      <div className="mb-2 flex items-center gap-2">
+                        <h3 className="truncate text-sm font-semibold text-slate-800">{doc.document_type}</h3>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
+                        <div className="flex items-center gap-1.5">
+                          <Clock className="h-3.5 w-3.5 text-slate-400" />
+                          <span>{formatDate(doc.created_at)}</span>
+                        </div>
+                      </div>
+                      {doc.approve_notes && (
+                        <div className="mt-2.5 text-xs text-slate-500">
+                          Notes: <span className="font-medium text-slate-700">{doc.approve_notes}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="ml-4 flex flex-wrap gap-2">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); if (!doc.file_key) return; handleDownload(doc.file_key); }}
+                      className="group rounded-full cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      title="Download Document"
+                      disabled={!doc.file_key}
+                    >
+                      <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>

@@ -331,7 +331,7 @@ export default function ApplicationDetails({
 
                   {showEmgsUpload && (
 
-                    <div className="block space-y-2">
+                    <div className="block space-y-4">
 
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 

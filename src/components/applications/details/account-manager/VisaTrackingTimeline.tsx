@@ -25,17 +25,9 @@ export default function VisaTrackingTimeline({
 }: VisaTrackingTimelineProps) {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
-  const {
-    visaCase,
-    loading: visaLoading,
-    error: visaError,
-  } = useVisaCase(application?.id || "");
+  const { visaCase } = useVisaCase(application?.id || "");
 
-  const {
-    payments: visaPayments,
-    loading: paymentsLoading,
-    error: paymentsError,
-  } = useVisaPayments(application?.id || "");
+  const { payments: visaPayments } = useVisaPayments(application?.id || "");
 
   const hasVisaPayments =
     Array.isArray(visaPayments) && visaPayments.length > 0;
@@ -64,7 +56,7 @@ export default function VisaTrackingTimeline({
 
     setLoading(true);
     try {
-      const res = await api.post(
+      await api.post(
         `/applications/${application.id}/visa-payments/${paymentId}/review`,
         {
           status: "approved",
@@ -115,7 +107,7 @@ export default function VisaTrackingTimeline({
               Visa Fee Amount
             </p>
             <p className="text-lg font-bold ">
-              {visaCase.visa_fee_amount
+              {visaCase?.visa_fee_amount
                 ? `RM ${visaCase.visa_fee_amount.toLocaleString()}`
                 : "—"}
             </p>
@@ -126,7 +118,7 @@ export default function VisaTrackingTimeline({
               Created At
             </p>
             <p className="text-sm">
-              {visaCase.created_at
+              {visaCase?.created_at
                 ? new Date(visaCase.created_at).toLocaleString()
                 : "—"}
             </p>
@@ -134,7 +126,7 @@ export default function VisaTrackingTimeline({
 
           <div>
             <p className="mb-2 text-sm tracking-wide text-slate-500">Notes</p>
-            <p className="text-sm">{visaCase.notes || "No notes"}</p>
+            <p className="text-sm">{visaCase?.notes || "No notes"}</p>
           </div>
         </div>
 

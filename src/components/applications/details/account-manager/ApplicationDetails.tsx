@@ -16,10 +16,12 @@ import {
 } from 'react-icons/fa';
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import OfferLetterCard from '../admin/OfferLetterCard';
-import VisaTrackingTimeline from '../admin/VisaTrackingTimeline';
+import OfferLetterCard from '../account-manager/OfferLetterCard';
+import VisaTrackingTimeline from '../account-manager/VisaTrackingTimeline';
 import AccountManagerTopBar from "../../topBar/AccountManagerTopBar";
 import ApplicationTimeline from '../ApplicationTimeline';
+import ApplicationCommission from '../account-manager/ApplicationCommission';
+
 
 
 interface ApplicationDetailsProps {
@@ -216,7 +218,8 @@ export default function ApplicationDetails({
         </div>
 
       </div>
-      
+
+      <ApplicationCommission application={application} />
       <ApplicationTimeline application={application} />
       <VisaTrackingTimeline application={application} />
       <OfferLetterCard application={application} />
