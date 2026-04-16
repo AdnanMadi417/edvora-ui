@@ -1057,7 +1057,7 @@ export default function StudentManualApplicationForm() {
             {stage > 1 && (
               <PrevButton
                 onClick={prevStage}
-                text="Previous"
+                text="Prev"
                 icon={<ArrowLeft className="h-4 w-4" />}
                 disabled={stage === 1}
               />
