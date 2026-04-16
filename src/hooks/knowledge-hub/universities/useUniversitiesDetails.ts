@@ -13,6 +13,10 @@ interface UniversityDetails {
   name: string;
   country: string;
   is_active: boolean;
+
+  logo_file_key: string;
+  logo_file_url: string;
+
   description?: string;
   university_type_id: string;
   intake_months?: string[];

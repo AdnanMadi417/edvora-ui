@@ -1,69 +1,396 @@
-pipelines:
-  branches:
-    release/staging:
-      - step:
-          name: Build and Push Docker Image
-          size: 8x  # 4GB RAM instead of default 1GB (or use 4x, 8x for more)
-          max-time: 30
-          services:
-            - docker
-          caches:
-            - docker
+image: node:20-slim
 
-          script:
-            - apt-get update && apt-get install -y wget
-            - wget https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
-            - tar xf doctl-1.104.0-linux-amd64.tar.gz
-            - mv doctl /usr/local/bin
-
-            # Authenticate with Digital Ocean Container Registry
-            - doctl auth init --access-token $DIGITALOCEAN_ACCESS_TOKEN
-            - doctl registry login
-
-            # Set image variables
-            - export IMAGE_NAME="registry.digitalocean.com/unibexs-internal/unibexs-frontend"
-            - export IMAGE_TAG="staging-${BITBUCKET_COMMIT:0:7}"
-            - export IMAGE_FULL="${IMAGE_NAME}:${IMAGE_TAG}"
-
-            # backend env
-            - echo "APP_NAME=Unibexs UI" > .env.staging
-            - echo "NODE_ENV=$NODE_ENV" >> .env.staging
-            - echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env.staging
-
-            # Build and push the Docker image
-            - docker build
-              --progress=plain
-              --shm-size=2gb
-              --build-arg BUILDKIT_INLINE_CACHE=1
-              --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
-              --cache-from ${IMAGE_NAME}:staging-latest
-              -t ${IMAGE_FULL}
-              -t ${IMAGE_NAME}:staging-latest
-              -f Dockerfile
-              .
-
-            # Push to Digital Ocean Container Registry
-            - docker push ${IMAGE_FULL}
-            - docker push ${IMAGE_NAME}:staging-latest
-
-            # Output image info
-            - echo "Image pushed successfully:"
-            - echo "  ${IMAGE_FULL}"
-            - echo "  ${IMAGE_NAME}:staging-latest"
-          after-script:
-            - export STATUS="SUCCESS"
-            - if [ "$BITBUCKET_EXIT_CODE" -ne 0 ]; then export STATUS="FAILURE"; fi
-            - export SHORT_COMMIT="${BITBUCKET_COMMIT:0:7}"
-            - pipe: atlassian/slack-notify:2.3.1
-              variables:
-                WEBHOOK_URL: $WEBHOOK_URL
-                MESSAGE: >-
-                  "[${STATUS}] ${NODE_ENV} Unibexs UI pipeline
-                  repo=${BITBUCKET_REPO_FULL_NAME}
-                  branch=${BITBUCKET_BRANCH}
-                  commit=${SHORT_COMMIT}
-                  image=registry.digitalocean.com/unibexs-internal/unibexs-frontend:staging-${SHORT_COMMIT}"
 definitions:
   services:
     docker:
-      memory: 3072  # Reduced to 3GB for Docker daemon
+      memory: 3072
+
+  steps:
+    - step: &test
+        name: Test
+        script:
+          - set +e
+          - TEST_STATUS=success
+          - pnpm install --frozen-lockfile
+          - INSTALL_EXIT_CODE=$?
+          - |
+            if [ "$INSTALL_EXIT_CODE" -ne 0 ]; then
+              TEST_STATUS=failure
+            fi
+          - echo "No tests configured yet — skipping test run"
+          - echo "$TEST_STATUS" > test_status.txt
+        artifacts:
+          - test_status.txt
+
+    - step: &build-and-push-staging
+        name: Build and Push Docker Image (Staging)
+        size: 8x
+        max-time: 30
+        services:
+          - docker
+        caches:
+          - docker
+        script:
+          - set +e
+          - docker login registry.digitalocean.com --username $DIGITALOCEAN_ACCESS_TOKEN --password $DIGITALOCEAN_ACCESS_TOKEN
+          - export IMAGE_NAME="registry.digitalocean.com/unibexs-internal/unibexs-frontend-staging"
+          - export IMAGE_TAG="staging-${BITBUCKET_COMMIT:0:7}"
+          - export IMAGE_FULL="${IMAGE_NAME}:${IMAGE_TAG}"
+          - rm -f .env .env.staging .env.dev .env.prod .env.local .env.production .env.development
+          - >
+            docker build
+            --platform linux/amd64
+            --no-cache
+            --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+            -t "${IMAGE_FULL}"
+            -t "${IMAGE_NAME}:staging-latest"
+            -f Dockerfile .
+          - export BUILD_STATUS=$?
+          - docker push "${IMAGE_FULL}"
+          - export PUSH_STATUS_1=$?
+          - docker push "${IMAGE_NAME}:staging-latest"
+          - export PUSH_STATUS_2=$?
+          - if [ $BUILD_STATUS -eq 0 ] && [ $PUSH_STATUS_1 -eq 0 ] && [ $PUSH_STATUS_2 -eq 0 ]; then BUILD_STATUS=success; else BUILD_STATUS=failure; fi
+          - echo "$BUILD_STATUS" > build_status.txt
+        artifacts:
+          - build_status.txt
+
+    - step: &build-and-push-prod
+        name: Build and Push Docker Image (Prod)
+        size: 8x
+        max-time: 30
+        services:
+          - docker
+        caches:
+          - docker
+        script:
+          - set +e
+          - docker login registry.digitalocean.com --username $DIGITALOCEAN_ACCESS_TOKEN --password $DIGITALOCEAN_ACCESS_TOKEN
+          - export IMAGE_NAME="registry.digitalocean.com/unibexs-internal/unibexs-frontend-prod"
+          - export IMAGE_TAG="prod-${BITBUCKET_COMMIT:0:7}"
+          - export IMAGE_FULL="${IMAGE_NAME}:${IMAGE_TAG}"
+          - rm -f .env .env.staging .env.dev .env.prod .env.local .env.production .env.development
+          - >
+            docker build
+            --platform linux/amd64
+            --no-cache
+            --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL_PROD
+            -t "${IMAGE_FULL}"
+            -t "${IMAGE_NAME}:prod-latest"
+            -f Dockerfile .
+          - export BUILD_STATUS=$?
+          - docker push "${IMAGE_FULL}"
+          - export PUSH_STATUS_1=$?
+          - docker push "${IMAGE_NAME}:prod-latest"
+          - export PUSH_STATUS_2=$?
+          - if [ $BUILD_STATUS -eq 0 ] && [ $PUSH_STATUS_1 -eq 0 ] && [ $PUSH_STATUS_2 -eq 0 ]; then BUILD_STATUS=success; else BUILD_STATUS=failure; fi
+          - echo "$BUILD_STATUS" > build_status.txt
+          - echo "${IMAGE_TAG}" > image_tag.txt
+        artifacts:
+          - build_status.txt
+          - image_tag.txt
+
+    - step: &deploy-staging
+        name: Deploy to Staging
+        deployment: staging
+        script:
+          - set +e
+          - DEPLOY_STATUS=success
+          - apt-get update && apt-get install -y wget
+          - wget -q https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
+          - tar xf doctl-1.104.0-linux-amd64.tar.gz
+          - mv doctl /usr/local/bin
+          - doctl auth init --access-token $DO_API_TOKEN
+          - export IMAGE_TAG="staging-${BITBUCKET_COMMIT:0:7}"
+          - doctl apps spec get $FE_STAGING_APP_ID > /tmp/live-fe-staging.yaml
+          - |
+            sed "s/tag: staging-[a-z0-9]*/tag: ${IMAGE_TAG}/g" /tmp/live-fe-staging.yaml > /tmp/live-fe-staging-pinned.yaml
+          - 'grep "tag: staging" /tmp/live-fe-staging-pinned.yaml'
+          - doctl apps update $FE_STAGING_APP_ID --spec /tmp/live-fe-staging-pinned.yaml
+          - UPDATE_EXIT_CODE=$?
+          - rm -f /tmp/live-fe-staging.yaml /tmp/live-fe-staging-pinned.yaml
+          - |
+            if [ "$UPDATE_EXIT_CODE" -ne 0 ]; then
+              DEPLOY_STATUS=failure
+            fi
+          - |
+            if [ "$DEPLOY_STATUS" = "success" ]; then
+              echo "Waiting for deployment to be created..."
+              sleep 15
+              DEPLOY_ID=$(doctl apps list-deployments $FE_STAGING_APP_ID --format ID --no-header 2>/dev/null | head -1)
+              echo "Polling deployment: $DEPLOY_ID"
+              ATTEMPTS=0
+              MAX_ATTEMPTS=40
+              while [ "$ATTEMPTS" -lt "$MAX_ATTEMPTS" ]; do
+                PHASE=$(doctl apps get-deployment $FE_STAGING_APP_ID $DEPLOY_ID --format Phase --no-header 2>/dev/null)
+                echo "  Attempt $ATTEMPTS/$MAX_ATTEMPTS -- phase: $PHASE"
+                if [ "$PHASE" = "ACTIVE" ]; then
+                  echo "Deployment succeeded."
+                  break
+                elif [ "$PHASE" = "ERROR" ] || [ "$PHASE" = "CANCELED" ]; then
+                  echo "Deployment failed with phase: $PHASE"
+                  DEPLOY_STATUS=failure
+                  break
+                fi
+                sleep 15
+                ATTEMPTS=$((ATTEMPTS + 1))
+              done
+              if [ "$ATTEMPTS" -ge "$MAX_ATTEMPTS" ]; then
+                echo "Deployment wait timed out after $((MAX_ATTEMPTS * 15))s"
+                DEPLOY_STATUS=failure
+              fi
+            fi
+          - echo "$DEPLOY_STATUS" > deploy_status.txt
+        artifacts:
+          - deploy_status.txt
+
+    - step: &deploy-prod
+        name: Deploy to Production
+        deployment: production
+        trigger: manual
+        script:
+          - set +e
+          - DEPLOY_STATUS=success
+          - apt-get update && apt-get install -y wget
+          - wget -q https://github.com/digitalocean/doctl/releases/download/v1.104.0/doctl-1.104.0-linux-amd64.tar.gz
+          - tar xf doctl-1.104.0-linux-amd64.tar.gz
+          - mv doctl /usr/local/bin
+          - doctl auth init --access-token $DO_API_TOKEN
+          - export IMAGE_TAG="prod-${BITBUCKET_COMMIT:0:7}"
+          - doctl apps spec get $FE_PROD_APP_ID > /tmp/live-fe-prod.yaml
+          - |
+            sed "s/tag: prod-[a-z0-9]*/tag: ${IMAGE_TAG}/g" /tmp/live-fe-prod.yaml > /tmp/live-fe-prod-pinned.yaml
+          - 'grep "tag: prod" /tmp/live-fe-prod-pinned.yaml'
+          - doctl apps update $FE_PROD_APP_ID --spec /tmp/live-fe-prod-pinned.yaml
+          - UPDATE_EXIT_CODE=$?
+          - rm -f /tmp/live-fe-prod.yaml /tmp/live-fe-prod-pinned.yaml
+          - |
+            if [ "$UPDATE_EXIT_CODE" -ne 0 ]; then
+              DEPLOY_STATUS=failure
+            fi
+          - |
+            if [ "$DEPLOY_STATUS" = "success" ]; then
+              echo "Waiting for deployment to be created..."
+              sleep 15
+              DEPLOY_ID=$(doctl apps list-deployments $FE_PROD_APP_ID --format ID --no-header 2>/dev/null | head -1)
+              echo "Polling deployment: $DEPLOY_ID"
+              ATTEMPTS=0
+              MAX_ATTEMPTS=40
+              while [ "$ATTEMPTS" -lt "$MAX_ATTEMPTS" ]; do
+                PHASE=$(doctl apps get-deployment $FE_PROD_APP_ID $DEPLOY_ID --format Phase --no-header 2>/dev/null)
+                echo "  Attempt $ATTEMPTS/$MAX_ATTEMPTS -- phase: $PHASE"
+                if [ "$PHASE" = "ACTIVE" ]; then
+                  echo "Deployment succeeded."
+                  break
+                elif [ "$PHASE" = "ERROR" ] || [ "$PHASE" = "CANCELED" ]; then
+                  echo "Deployment failed with phase: $PHASE"
+                  DEPLOY_STATUS=failure
+                  break
+                fi
+                sleep 15
+                ATTEMPTS=$((ATTEMPTS + 1))
+              done
+              if [ "$ATTEMPTS" -ge "$MAX_ATTEMPTS" ]; then
+                echo "Deployment wait timed out after $((MAX_ATTEMPTS * 15))s"
+                DEPLOY_STATUS=failure
+              fi
+            fi
+          - echo "$DEPLOY_STATUS" > deploy_status.txt
+        artifacts:
+          - deploy_status.txt
+
+    - step: &smoke-test-staging
+        name: Smoke Test (Staging)
+        script:
+          - set +e
+          - SMOKE_STATUS=success
+          - apt-get update && apt-get install -y curl
+          - 'echo "Smoke testing: $FE_STAGING_URL/api/health"'
+          - ATTEMPTS=0
+          - MAX_ATTEMPTS=12
+          - |
+            while [ "$ATTEMPTS" -lt "$MAX_ATTEMPTS" ]; do
+              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${FE_STAGING_URL}/api/health")
+              echo "  Attempt $((ATTEMPTS+1))/$MAX_ATTEMPTS -- HTTP $HTTP_CODE"
+              if [ "$HTTP_CODE" = "200" ]; then
+                echo "Smoke test passed."
+                break
+              fi
+              ATTEMPTS=$((ATTEMPTS + 1))
+              sleep 10
+            done
+          - |
+            if [ "$ATTEMPTS" -ge "$MAX_ATTEMPTS" ]; then
+              echo "Smoke test timed out after $((MAX_ATTEMPTS * 10))s"
+              SMOKE_STATUS=failure
+            fi
+          - echo "$SMOKE_STATUS" > smoke_status.txt
+        artifacts:
+          - smoke_status.txt
+
+    - step: &smoke-test-prod
+        name: Smoke Test (Prod)
+        script:
+          - set +e
+          - SMOKE_STATUS=success
+          - apt-get update && apt-get install -y curl
+          - 'echo "Smoke testing: $FE_PROD_URL/api/health"'
+          - ATTEMPTS=0
+          - MAX_ATTEMPTS=12
+          - |
+            while [ "$ATTEMPTS" -lt "$MAX_ATTEMPTS" ]; do
+              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${FE_PROD_URL}/api/health")
+              echo "  Attempt $((ATTEMPTS+1))/$MAX_ATTEMPTS -- HTTP $HTTP_CODE"
+              if [ "$HTTP_CODE" = "200" ]; then
+                echo "Smoke test passed."
+                break
+              fi
+              ATTEMPTS=$((ATTEMPTS + 1))
+              sleep 10
+            done
+          - |
+            if [ "$ATTEMPTS" -ge "$MAX_ATTEMPTS" ]; then
+              echo "Smoke test timed out after $((MAX_ATTEMPTS * 10))s"
+              SMOKE_STATUS=failure
+            fi
+          - echo "$SMOKE_STATUS" > smoke_status.txt
+        artifacts:
+          - smoke_status.txt
+
+    - step: &notify-slack-staging
+        name: Notify Slack (Staging)
+        script:
+          - set +e
+          - |
+            if [ -f test_status.txt ]; then
+              TEST_STATUS=$(cat test_status.txt)
+            else
+              TEST_STATUS="unknown"
+            fi
+          - |
+            if [ -f build_status.txt ]; then
+              BUILD_STATUS=$(cat build_status.txt)
+            else
+              BUILD_STATUS="unknown"
+            fi
+          - |
+            if [ -f deploy_status.txt ]; then
+              DEPLOY_STATUS=$(cat deploy_status.txt)
+            else
+              DEPLOY_STATUS="unknown"
+            fi
+          - |
+            if [ -f smoke_status.txt ]; then
+              SMOKE_STATUS=$(cat smoke_status.txt)
+            else
+              SMOKE_STATUS="unknown"
+            fi
+          - |
+            if [ "$TEST_STATUS" = "success" ]; then TEST_ICON="✅"; else TEST_ICON="❌"; fi
+            if [ "$BUILD_STATUS" = "success" ]; then BUILD_ICON="✅"; else BUILD_ICON="❌"; fi
+            if [ "$DEPLOY_STATUS" = "success" ]; then DEPLOY_ICON="✅"; else DEPLOY_ICON="❌"; fi
+            if [ "$SMOKE_STATUS" = "success" ]; then SMOKE_ICON="✅"; else SMOKE_ICON="❌"; fi
+            if [ "$TEST_STATUS" = "success" ] && [ "$BUILD_STATUS" = "success" ] && [ "$DEPLOY_STATUS" = "success" ] && [ "$SMOKE_STATUS" = "success" ]; then
+              OVERALL="✅ SUCCESS"
+            else
+              OVERALL="❌ FAILED"
+            fi
+            NOTIFY_MESSAGE=$(printf "🖥️ *Unibexs Frontend — Staging*\nStatus: %s\n\nTests %s  |  Build %s  |  Deploy %s  |  Smoke %s\n\nBranch: %s  |  Commit: %s" "$OVERALL" "$TEST_ICON" "$BUILD_ICON" "$DEPLOY_ICON" "$SMOKE_ICON" "$BITBUCKET_BRANCH" "${BITBUCKET_COMMIT:0:7}")
+          - pipe: atlassian/slack-notify:2.3.1
+            variables:
+              WEBHOOK_URL: $WEBHOOK_URL
+              MESSAGE: "$NOTIFY_MESSAGE"
+
+    - step: &notify-slack-prod
+        name: Notify Slack (Prod)
+        script:
+          - set +e
+          - |
+            if [ -f test_status.txt ]; then
+              TEST_STATUS=$(cat test_status.txt)
+            else
+              TEST_STATUS="unknown"
+            fi
+          - |
+            if [ -f build_status.txt ]; then
+              BUILD_STATUS=$(cat build_status.txt)
+            else
+              BUILD_STATUS="unknown"
+            fi
+          - |
+            if [ -f deploy_status.txt ]; then
+              DEPLOY_STATUS=$(cat deploy_status.txt)
+            else
+              DEPLOY_STATUS="unknown"
+            fi
+          - |
+            if [ -f smoke_status.txt ]; then
+              SMOKE_STATUS=$(cat smoke_status.txt)
+            else
+              SMOKE_STATUS="unknown"
+            fi
+          - |
+            if [ "$TEST_STATUS" = "success" ]; then TEST_ICON="✅"; else TEST_ICON="❌"; fi
+            if [ "$BUILD_STATUS" = "success" ]; then BUILD_ICON="✅"; else BUILD_ICON="❌"; fi
+            if [ "$DEPLOY_STATUS" = "success" ]; then DEPLOY_ICON="✅"; else DEPLOY_ICON="❌"; fi
+            if [ "$SMOKE_STATUS" = "success" ]; then SMOKE_ICON="✅"; else SMOKE_ICON="❌"; fi
+            if [ "$TEST_STATUS" = "success" ] && [ "$BUILD_STATUS" = "success" ] && [ "$DEPLOY_STATUS" = "success" ] && [ "$SMOKE_STATUS" = "success" ]; then
+              OVERALL="✅ SUCCESS"
+            else
+              OVERALL="❌ FAILED"
+            fi
+            NOTIFY_MESSAGE=$(printf "🖥️ *Unibexs Frontend — Production*\nStatus: %s\n\nTests %s  |  Build %s  |  Deploy %s  |  Smoke %s\n\nBranch: %s  |  Commit: %s" "$OVERALL" "$TEST_ICON" "$BUILD_ICON" "$DEPLOY_ICON" "$SMOKE_ICON" "$BITBUCKET_BRANCH" "${BITBUCKET_COMMIT:0:7}")
+          - pipe: atlassian/slack-notify:2.3.1
+            variables:
+              WEBHOOK_URL: $WEBHOOK_URL
+              MESSAGE: "$NOTIFY_MESSAGE"
+
+pipelines:
+  branches:
+    release/staging:
+      - step: *test
+      - step: *build-and-push-staging
+      - step: *deploy-staging
+      - step: *smoke-test-staging
+      - step: *notify-slack-staging
+
+    release/prod:
+      - step: *test
+      - step: *build-and-push-prod
+      - step: *deploy-prod
+      - step: *smoke-test-prod
+      - step: *notify-slack-prod
+
+    main:
+      - step:
+          name: Test
+          script:
+            - set +e
+            - TEST_STATUS=success
+            - pnpm install --frozen-lockfile
+            - INSTALL_EXIT_CODE=$?
+            - |
+              if [ "$INSTALL_EXIT_CODE" -ne 0 ]; then
+                TEST_STATUS=failure
+              fi
+            - echo "No tests configured yet — skipping test run"
+            - echo "$TEST_STATUS" > test_status.txt
+          artifacts:
+            - test_status.txt
+      - step:
+          name: Notify Slack
+          script:
+            - set +e
+            - |
+              if [ -f test_status.txt ]; then
+                TEST_STATUS=$(cat test_status.txt)
+              else
+                TEST_STATUS="unknown"
+              fi
+            - |
+              if [ "$TEST_STATUS" = "success" ]; then TEST_ICON="✅"; OVERALL="✅ SUCCESS"; else TEST_ICON="❌"; OVERALL="❌ FAILED"; fi
+              NOTIFY_MESSAGE=$(printf "🖥️ *Unibexs Frontend — main*\nStatus: %s\n\nTests %s\n\nBranch: %s  |  Commit: %s" "$OVERALL" "$TEST_ICON" "$BITBUCKET_BRANCH" "${BITBUCKET_COMMIT:0:7}")
+            - pipe: atlassian/slack-notify:2.3.1
+              variables:
+                WEBHOOK_URL: $WEBHOOK_URL
+                MESSAGE: "$NOTIFY_MESSAGE"

@@ -4,6 +4,7 @@ import { AxiosError } from "axios";
 import React, { useState } from "react";
 import { ChevronLeft, Handshake } from "lucide-react";
 import InputField from "components/form/InputField";
+import PasswordField from "components/form/PasswordField";
 import SelectField from "components/form/SelectField";
 import { useToast } from "components/context/ToastContext";
 import Button from "components/ui/buttons/Button";
@@ -126,7 +127,7 @@ export default function RegisterPartner() {
   };
 
   return (
-    <section className="mx-auto mt-5">
+    <section className="mx-auto mt-5 max-w-5xl">
       <div className="rounded-md border bg-white shadow-sm">
 
         <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
@@ -180,10 +181,9 @@ export default function RegisterPartner() {
             updateFormData={updateFormData}
           />
 
-          <InputField
+          <PasswordField
             label="Password"
             field="password"
-            type="password"
             placeholder="At least 8 characters, letters & numbers"
             required
             formData={formData}
@@ -191,10 +191,9 @@ export default function RegisterPartner() {
             updateFormData={updateFormData}
           />
 
-          <InputField
+          <PasswordField
             label="Confirm Password"
             field="confirm_password"
-            type="password"
             placeholder="Repeat your password"
             required
             formData={formData}

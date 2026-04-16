@@ -11,8 +11,11 @@ interface BatchUpdateProgramPayload {
   commission_amount?: number;
   commission_type_id?: string;
   commission_notes?: string;
-  expected_commission_from?: string;
-  expected_commission_to?: string;
+  expected_commission_from?: number | null;
+  expected_commission_to?: number | null;
+
+  yearly_fees?: Array<{ year: number; fee: string }>;
+  one_time_fees?: Array<{ description: string; fee: string }>;
 
   scholarships?: Array<{
     type: number;

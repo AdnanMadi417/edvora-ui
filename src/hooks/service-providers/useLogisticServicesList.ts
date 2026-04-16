@@ -14,6 +14,7 @@ export function useLogisticServices() {
     useState<LogisticServices>([])
   const [loadingLogisticServices, setLoading] = useState(true)
   const [errorLogisticServices, setError] = useState<string | null>(null)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     const fetchLogisticServices = async () => {
@@ -34,7 +35,9 @@ export function useLogisticServices() {
     }
 
     fetchLogisticServices()
-  }, [])
+  }, [refreshKey])
 
-  return { logisticServices, loadingLogisticServices, errorLogisticServices }
+  const refetchLogisticServices = () => setRefreshKey((k) => k + 1)
+
+  return { logisticServices, loadingLogisticServices, errorLogisticServices, refetchLogisticServices }
 }

@@ -4,21 +4,21 @@ import React, { useState, useMemo, useEffect } from 'react';
 import {
   ChevronUp,
   ChevronDown,
+  ChevronRight,
   Flag,
-  Eye,
-  Calendar,
   Clock,
   User,
   BadgeCheck,
-  Settings,
-  CalendarCheck,
   GraduationCap,
   ArrowRight,
-  ArrowLeft, UserSearch, GitBranch, UserPlus, RotateCcw,
+  ArrowLeft,
+  UserSearch,
+  GitBranch,
+  UserPlus,
+  RotateCcw,
 } from 'lucide-react';
 import { MdSchool } from 'react-icons/md';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import api from 'lib/useApi';
 import Cookies from 'js-cookie';
@@ -34,6 +34,61 @@ import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversi
 import { useAllStages } from 'hooks/applications/stages/useStages';
 import { useAllStageStatuses } from 'hooks/applications/stages/useStageStatuses';
 
+// Statuses that require the partner to take action
+const PARTNER_ACTION_STATUSES = new Set([
+  'correction_requested_by_account_manager',
+  'waiting_for_payment',
+  'waiting_partner_to_confirm_arrival_date',
+]);
+
+const needsPartnerAction = (status: string) =>
+  PARTNER_ACTION_STATUSES.has(status?.toLowerCase().replace(/\s+/g, '_'));
+
+const getRelativeTime = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays}d ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+};
+
+const SkeletonRow = () => (
+  <tr className="border-b border-gray-100">
+    <td className="px-6 py-4">
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 shrink-0 animate-pulse rounded-full bg-gray-200" />
+        <div className="space-y-2">
+          <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
+          <div className="h-3 w-44 animate-pulse rounded bg-gray-200" />
+        </div>
+      </div>
+    </td>
+    <td className="px-6 py-4">
+      <div className="space-y-2">
+        <div className="h-4 w-40 animate-pulse rounded bg-gray-200" />
+        <div className="h-3 w-28 animate-pulse rounded bg-gray-200" />
+      </div>
+    </td>
+    <td className="px-6 py-4">
+      <div className="space-y-2">
+        <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
+        <div className="h-6 w-32 animate-pulse rounded-full bg-gray-200" />
+      </div>
+    </td>
+    <td className="px-6 py-4">
+      <div className="h-4 w-20 animate-pulse rounded bg-gray-200" />
+    </td>
+    <td className="px-4 py-4" />
+  </tr>
+);
+
 const PartnerApplications = () => {
 
   const [applications, setApplications] = useState([]);
@@ -41,9 +96,9 @@ const PartnerApplications = () => {
   const { stages } = useAllStages();
   const { stageStatuses, stageStatusesLoading } = useAllStageStatuses();
 
-  const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
-  const [selectedStages, setSelectedStages] = useState<string>("all");
-  const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
+  const [selectedUniversity, setSelectedUniversity] = useState<string>('all');
+  const [selectedStages, setSelectedStages] = useState<string>('all');
+  const [selectedStageStatus, setSelectedStageStatus] = useState<string>('all');
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,7 +106,6 @@ const PartnerApplications = () => {
 
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -69,11 +123,7 @@ const PartnerApplications = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        const appsWithPriority = res.data.items.map((app: any) => ({
-          ...app,
-        }));
-
-        setApplications(appsWithPriority);
+        setApplications(res.data.items.map((app: any) => ({ ...app })));
       } catch (err: any) {
         console.error('Error fetching partner applications:', err);
       } finally {
@@ -88,12 +138,19 @@ const PartnerApplications = () => {
     setCurrentPage(1);
   }, [searchTerm, selectedUniversity, selectedStages, selectedStageStatus]);
 
-  const handleSort = (key) => {
+  const handleSort = (key: string) => {
     setSortConfig((prev) => ({
       key,
-      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
+
+  const activeFiltersCount = [
+    selectedUniversity !== 'all',
+    selectedStages !== 'all',
+    selectedStageStatus !== 'all',
+    searchTerm !== '',
+  ].filter(Boolean).length;
 
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = [...applications];
@@ -102,40 +159,39 @@ const PartnerApplications = () => {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (app) =>
-          (app.student_name?.toLowerCase() ?? "").includes(term) ||
-          (app.student_email?.toLowerCase() ?? "").includes(term) ||
-          (app.partner_name?.toLowerCase() ?? "").includes(term) ||
-          (app.account_manager_name?.toLowerCase() ?? "").includes(term) ||
-          (app.program_name?.toLowerCase() ?? "").includes(term) ||
-          (app.university_name?.toLowerCase() ?? "").includes(term)
+          (app.student_name?.toLowerCase() ?? '').includes(term) ||
+          (app.student_email?.toLowerCase() ?? '').includes(term) ||
+          (app.partner_name?.toLowerCase() ?? '').includes(term) ||
+          (app.account_manager_name?.toLowerCase() ?? '').includes(term) ||
+          (app.program_name?.toLowerCase() ?? '').includes(term) ||
+          (app.university_name?.toLowerCase() ?? '').includes(term),
       );
     }
 
-    if (selectedStageStatus !== "all" && !stageStatusesLoading) {
+    if (selectedStageStatus !== 'all' && !stageStatusesLoading) {
       filtered = filtered.filter(
-        (app) =>
-          app.status?.toLowerCase().replace(/\s+/g, "_") === selectedStageStatus
+        (app) => app.status?.toLowerCase().replace(/\s+/g, '_') === selectedStageStatus,
       );
     }
 
-    if (selectedStages !== "all") {
+    if (selectedStages !== 'all') {
       filtered = filtered.filter(
-        (app) => app.stage?.toLowerCase() === selectedStages.toLowerCase()
+        (app) => app.stage?.toLowerCase() === selectedStages.toLowerCase(),
       );
     }
 
-    if (selectedUniversity !== "all") {
+    if (selectedUniversity !== 'all') {
       filtered = filtered.filter(
-        (app) => app.university_name?.toLowerCase() === selectedUniversity.toLowerCase()
+        (app) => app.university_name?.toLowerCase() === selectedUniversity.toLowerCase(),
       );
     }
 
     if (sortConfig.key) {
       filtered.sort((a, b) => {
-        const aVal = a[sortConfig.key]?.toString().toLowerCase() ?? "";
-        const bVal = b[sortConfig.key]?.toString().toLowerCase() ?? "";
-        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
+        const aVal = a[sortConfig.key]?.toString().toLowerCase() ?? '';
+        const bVal = b[sortConfig.key]?.toString().toLowerCase() ?? '';
+        if (aVal < bVal) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'asc' ? 1 : -1;
         return 0;
       });
     }
@@ -151,9 +207,7 @@ const PartnerApplications = () => {
     stageStatusesLoading,
   ]);
 
-  const totalPages = Math.ceil(
-    filteredAndSortedApplications.length / itemsPerPage,
-  );
+  const totalPages = Math.ceil(filteredAndSortedApplications.length / itemsPerPage);
   const paginatedApplications = filteredAndSortedApplications.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
@@ -164,37 +218,36 @@ const PartnerApplications = () => {
       new_application: {
         bg: 'bg-blue-50 border-blue-200',
         text: 'text-blue-700',
-        dot: 'bg-blue-600',
+        dot: 'bg-blue-500',
         label: 'New Application',
       },
       under_review_by_account_manager: {
         bg: 'bg-yellow-50 border-yellow-200',
         text: 'text-yellow-700',
-        dot: 'bg-yellow-600',
-        label: 'Under Review by Account Manager',
+        dot: 'bg-yellow-500',
+        label: 'Under Review',
       },
       correction_requested_by_account_manager: {
         bg: 'bg-orange-50 border-orange-200',
         text: 'text-orange-700',
-        dot: 'bg-orange-600',
-        label: 'Correction Requested by Account Manager',
+        dot: 'bg-orange-500',
+        label: 'Correction Requested',
       },
       approved_from_stage_1: {
         bg: 'bg-green-50 border-green-200',
         text: 'text-green-700',
-        dot: 'bg-green-600',
+        dot: 'bg-green-500',
         label: 'Approved',
       },
       rejected: {
         bg: 'bg-red-50 border-red-200',
         text: 'text-red-700',
-        dot: 'bg-red-600',
+        dot: 'bg-red-500',
         label: 'Rejected',
       },
     };
 
     const normalizedStatus = status?.toLowerCase().replace(/\s+/g, '_');
-
     const config = statusConfig[normalizedStatus] || {
       bg: 'bg-gray-100 border-gray-200',
       text: 'text-gray-700',
@@ -204,11 +257,10 @@ const PartnerApplications = () => {
 
     return (
       <span
-        className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-normal ${config.bg} ${config.text}`}
+        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${config.bg} ${config.text}`}
         title={config.label}
       >
-        <span className={`h-2 w-2 rounded-full ${config.dot}`}></span>
-        <span className="truncate">{config.label}</span>
+        <span className="truncate max-w-[160px]">{config.label}</span>
       </span>
     );
   };
@@ -216,7 +268,7 @@ const PartnerApplications = () => {
   const SortIndicator = ({ field }) => {
     if (sortConfig.key !== field) {
       return (
-        <ChevronUp className="h-4 w-4 text-slate-500 opacity-0 transition-opacity group-hover:opacity-100" />
+        <ChevronUp className="h-4 w-4 text-slate-400 opacity-0 transition-opacity group-hover:opacity-100" />
       );
     }
     return sortConfig.direction === 'asc' ? (
@@ -226,50 +278,55 @@ const PartnerApplications = () => {
     );
   };
 
-  const handleApplicationRouter = () => {
-    router.push('/partner/applications/apply-now');
-  };
-
   const handleClearFilters = () => {
-    setSearchTerm("");
-    setSelectedUniversity("all");
-    setSelectedStages("all");
-    setSelectedStageStatus("all");
-    setSortConfig({ key: null, direction: "asc" });
+    setSearchTerm('');
+    setSelectedUniversity('all');
+    setSelectedStages('all');
+    setSelectedStageStatus('all');
+    setSortConfig({ key: null, direction: 'asc' });
   };
 
   return (
-    <div className="mt-6 overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
+      <div className="relative mb-4 overflow-hidden rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
-          <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
+
+          {/* Header row: title + primary action */}
+          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h3 className="text-xl font-semibold text-slate-900">
-                Applications Dashboard
-              </h3>
-              <p className="mt-1 text-sm text-slate-500">
-                Manage and track student applications
-              </p>
+              <h3 className="text-xl font-semibold text-slate-900">Applications Dashboard</h3>
+              <p className="mt-0.5 text-sm text-slate-500">Manage and track student applications</p>
             </div>
+            <Button
+              onClick={() => router.push('/partner/applications/apply-now')}
+              icon={<UserPlus className="h-4 w-4" />}
+              text="Create Application"
+              bgColor="bg-blue-600"
+              textColor="text-white"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
+              className="shrink-0 !bg-blue-600 hover:!bg-blue-700"
+            />
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
-
+          {/* Filter bar */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-3">
             <div className="relative w-full sm:w-64 flex-shrink-0">
-              <UserSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
+              <UserSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search applications..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 text-sm text-slate-700 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
-            <div className="w-full sm:w-48 flex-shrink-0">
+            <div className="w-full sm:w-44 flex-shrink-0">
               <FilterSelectField
                 value={selectedStages}
-                onChange={(val) => setSelectedStages(val)}
+                onChange={(val: string) => setSelectedStages(val)}
                 options={stages}
                 icon={GitBranch}
                 defaultOption="All Stages"
@@ -279,7 +336,7 @@ const PartnerApplications = () => {
             <div className="w-full sm:w-48 flex-shrink-0">
               <FilterSelectField
                 value={selectedUniversity}
-                onChange={(val) => setSelectedUniversity(val)}
+                onChange={(val: string) => setSelectedUniversity(val)}
                 options={universities}
                 icon={MdSchool}
                 defaultOption="All Universities"
@@ -289,32 +346,28 @@ const PartnerApplications = () => {
             <div className="w-full sm:w-48 flex-shrink-0">
               <FilterSelectField
                 value={selectedStageStatus}
-                onChange={(val) => setSelectedStageStatus(val)}
-                options={stageStatuses.map(s => ({
+                onChange={(val: string) => setSelectedStageStatus(val)}
+                options={stageStatuses.map((s) => ({
                   label: s.name,
-                  value: s.name.toLowerCase().replace(/\s+/g, "_")
+                  value: s.name.toLowerCase().replace(/\s+/g, '_'),
                 }))}
                 icon={BadgeCheck}
-                defaultOption={stageStatusesLoading ? "Loading statuses..." : "All Statuses"}
+                defaultOption={stageStatusesLoading ? 'Loading...' : 'All Statuses'}
               />
             </div>
 
-            <Button
-              onClick={handleApplicationRouter}
-              icon={<UserPlus className="h-5 w-5" />}
-              text={'Create Application'}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
-            />
-
-            <ClearButton
-              onClick={handleClearFilters}
-              text="Clear"
-              icon={<RotateCcw className="h-4 w-4" />}
-            />
+            {activeFiltersCount > 0 && (
+              <div className="relative flex-shrink-0">
+                <ClearButton
+                  onClick={handleClearFilters}
+                  text="Clear"
+                  icon={<RotateCcw className="h-4 w-4" />}
+                />
+                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                  {activeFiltersCount}
+                </span>
+              </div>
+            )}
           </div>
 
         </div>
@@ -323,173 +376,119 @@ const PartnerApplications = () => {
       <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-card">
         <table className="w-full">
           <thead>
-          <tr className="border-b border-gray-200 bg-card">
-            <th
-              onClick={() => handleSort('student_name')}
-              className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
-            >
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-slate-500" />
-                Student
-                <SortIndicator field="student_name" />
-              </div>
-            </th>
+            <tr className="border-b border-gray-200 bg-card">
+              <th
+                onClick={() => handleSort('student_name')}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
+              >
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4 text-slate-400" />
+                  Student
+                  <SortIndicator field="student_name" />
+                </div>
+              </th>
 
-            <th
-              onClick={() => handleSort('program_name')}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
-            >
-              <div className="flex min-w-[250px] items-center gap-2">
-                <GraduationCap className="h-4 w-4 text-slate-500" />
-                University / Program
-                <SortIndicator field="program_name" />
-              </div>
-            </th>
+              <th
+                onClick={() => handleSort('program_name')}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
+              >
+                <div className="flex min-w-[250px] items-center gap-2">
+                  <GraduationCap className="h-4 w-4 text-slate-400" />
+                  University / Program
+                  <SortIndicator field="program_name" />
+                </div>
+              </th>
 
-            <th
-              onClick={() => handleSort('stage')}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
-            >
-              <div className="flex items-center gap-2">
-                <Flag className="h-4 w-4 text-slate-500" />
-                Stage
-                <SortIndicator field="stage" />
-              </div>
-            </th>
+              <th
+                onClick={() => handleSort('stage')}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
+              >
+                <div className="flex items-center gap-2">
+                  <Flag className="h-4 w-4 text-slate-400" />
+                  Stage / Status
+                  <SortIndicator field="stage" />
+                </div>
+              </th>
 
-            <th
-              onClick={() => handleSort('status')}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
-            >
-              <div className="flex items-center gap-2">
-                <BadgeCheck className="h-4 w-4 text-slate-500" />
-                Status
-                <SortIndicator field="status" />
-              </div>
-            </th>
+              <th
+                onClick={() => handleSort('updated_at')}
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
+              >
+                <div className="flex min-w-[100px] items-center gap-2">
+                  <Clock className="h-4 w-4 text-slate-400" />
+                  Updated
+                  <SortIndicator field="updated_at" />
+                </div>
+              </th>
 
-            <th className="min-w-[200px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-              <div className="flex items-center gap-2">
-                <CalendarCheck className="h-4 w-4 text-slate-500" />
-                Next Action
-              </div>
-            </th>
-
-            <th
-              onClick={() => handleSort('update_at')}
-              className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
-            >
-              <div className="flex min-w-[150px] items-center gap-2">
-                <Clock className="h-4 w-4 text-slate-500" />
-                Last Updated
-                <SortIndicator field="update_at" />
-              </div>
-            </th>
-
-            <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-              <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4 text-slate-500" />
-                Actions
-              </div>
-            </th>
-          </tr>
+              <th className="w-10 px-4 py-4" />
+            </tr>
           </thead>
 
-          <tbody className="divide-border-gray-200 divide-y bg-primary">
-          {loading ? (
-            <tr>
-              <td
-                colSpan={9}
-                className="px-6 py-4 text-center text-p1 text-slate-500"
-              >
-                Loading applications...
-              </td>
-            </tr>
-          ) : paginatedApplications.length === 0 ? (
-            <tr>
-              <td
-                colSpan={9}
-                className="px-6 py-8 text-center text-slate-500"
-              >
-                <EmptyData />
-              </td>
-            </tr>
-          ) : (
-            paginatedApplications.map((app) => (
-              <tr
-                key={app.id}
-                className="hover:bg-primary/10 group transition-colors"
-              >
-                <td className="min-w-[200px] max-w-[300px] px-6 py-4">
-                  <div className="flex items-center gap-3">
-
-                    <div
-                      className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
-                    >
-                      {app ? (
-                        app.student_name[0].toUpperCase()
-                      ) : (
-                        <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
-                      )}
-                    </div>
-
-                    <div className="w-full overflow-hidden">
-                      <div className="truncate text-slate-900">
-                        {app.student_name}
-                      </div>
-                      <div className="truncate text-caption text-slate-500">
-                        {app.student_email}
-                      </div>
-                    </div>
-                  </div>
-                </td>
-
-                <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                  <div className="text-slate-900">{app.program_name}</div>
-                  <div className="truncate text-caption text-slate-500">
-                    {app.university_name}
-                  </div>
-                </td>
-
-                <td className="px-6 py-4">
-                  <div className="text-slate-500">{app.stage}</div>
-                </td>
-
-                <td className="min-w-[150px] px-6 py-4">
-                  <StatusBadge status={app.status} />
-                </td>
-
-                <td className="px-6 py-4">
-                  <div className="max-w-[200px] break-words text-slate-500">
-                    {app.next_action}
-                  </div>
-                </td>
-
-                <td className="px-6 py-4">
-                  <div className="flex items-center gap-1 text-slate-500">
-                    <Calendar className="h-3 w-3" />
-                    {new Date(app.updated_at).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: '2-digit',
-                    })}
-                  </div>
-                </td>
-
-                <td className="min-w-[150px] px-6 py-4">
-                  <Link
-                    href={`/partner/applications/${app.id}`}
-                    aria-label="View Application"
-                    className="flex items-center justify-center gap-2 rounded-full border border-gray-200 p-2 text-caption text-slate-900 transition hover:border-blue-700 hover:text-blue-700"
-                  >
-                    <Eye className="h-4 w-4" />
-                    <span>View</span>
-                  </Link>
+          <tbody className="divide-y divide-gray-100 bg-card">
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
+            ) : paginatedApplications.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                  <EmptyData />
                 </td>
               </tr>
-            ))
-          )}
+            ) : (
+              paginatedApplications.map((app) => (
+                <tr
+                  key={app.id}
+                  className={`group cursor-pointer transition-colors hover:bg-slate-50 ${
+                    needsPartnerAction(app.status) ? 'border-l-2 border-l-amber-400 bg-amber-50/30' : ''
+                  }`}
+                  onClick={() => router.push(`/partner/applications/${app.id}`)}
+                >
+                  <td className="min-w-[200px] max-w-[300px] px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="relative shrink-0">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                          {app.student_name?.[0]?.toUpperCase() ?? '?'}
+                        </div>
+                        {needsPartnerAction(app.status) && (
+                          <span
+                            className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-400 ring-2 ring-white"
+                            title="Action required"
+                          >
+                            <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                          </span>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="truncate font-medium text-slate-900 truncate">{app.student_name}</div>
+                        <div className="truncate text-xs text-slate-500 truncate">{app.student_email}</div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="min-w-[250px] max-w-[300px] px-6 py-4">
+                    <div className="font-medium text-slate-900 truncate">{app.program_name}</div>
+                    <div className="truncate text-xs text-slate-500 truncate">{app.university_name}</div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="space-y-1.5">
+                      <div className="text-xs text-slate-500 truncate">{app.stage}</div>
+                      <StatusBadge status={app.status} />
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-slate-500">
+                      {getRelativeTime(app.updated_at)}
+                    </div>
+                  </td>
+
+                  <td className="px-4 py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
@@ -497,22 +496,25 @@ const PartnerApplications = () => {
       <div className="sticky bottom-0 rounded-b-lg border border-gray-200 bg-card px-6 py-4">
         <div className="flex flex-col items-center justify-between gap-2 text-sm text-slate-500 md:flex-row">
           <div>
-            Showing{' '}
-            <span className="font-medium">
-              {(currentPage - 1) * itemsPerPage + 1}
-            </span>{' '}
-            to{' '}
-            <span className="font-normal">
-              {Math.min(
-                currentPage * itemsPerPage,
-                filteredAndSortedApplications.length,
-              )}
-            </span>{' '}
-            of{' '}
-            <span className="font-normal">
-              {filteredAndSortedApplications.length}
-            </span>{' '}
-            results
+            {filteredAndSortedApplications.length === 0 ? (
+              <span>No results found</span>
+            ) : (
+              <>
+                Showing{' '}
+                <span className="font-medium text-slate-700">
+                  {(currentPage - 1) * itemsPerPage + 1}
+                </span>{' '}
+                to{' '}
+                <span className="font-medium text-slate-700">
+                  {Math.min(currentPage * itemsPerPage, filteredAndSortedApplications.length)}
+                </span>{' '}
+                of{' '}
+                <span className="font-medium text-slate-700">
+                  {filteredAndSortedApplications.length}
+                </span>{' '}
+                results
+              </>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -522,14 +524,12 @@ const PartnerApplications = () => {
               text="Previous"
               icon={<ArrowLeft className="h-4 w-4" />}
             />
-
             <span className="px-2 text-slate-500">
-              Page {currentPage} of {totalPages}
+              Page {currentPage} of {Math.max(totalPages, 1)}
             </span>
-
             <NextButton
               onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages || totalPages === 0}
               text="Next"
               icon={<ArrowRight className="h-4 w-4" />}
             />

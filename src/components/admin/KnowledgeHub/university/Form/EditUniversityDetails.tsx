@@ -6,7 +6,6 @@ import {
   CalendarPlus,
   ChevronLeft,
   ArrowLeft,
-  GraduationCap,
   Pencil,
   Landmark,
   Trash2,
@@ -33,6 +32,9 @@ import InputField from "components/form/InputField";
 import SelectField from "components/form/SelectField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
+import ImageUploadField from "components/form/images/ImageUploadField";
+import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
+import { getDocumentDownloadUrl } from "services/documentService";
 
 import Button from "components/ui/buttons/Button";
 import Loading from "components/loading/Loading";
@@ -45,7 +47,7 @@ const normalizePayload = (formData: any) => {
     name: formData.name?.trim() || "",
     country: formData.country?.trim() || "",
     description: formData.description || "",
-    intake_months: [...(formData.intake_months || [])],
+    intake_months: (formData.intake_months || []).filter((m: string) => m.trim() !== ""),
     is_active: formData.is_active ?? true,
     university_type_id: formData.university_type_id || "",
     branches: (formData.branches || [])
@@ -82,6 +84,14 @@ const UniversityEdit = ({ id }: Props) => {
   const { states } = useAllStates();
   const { updateUniversity, updateLoading } = useUpdateUniversity(id);
   const [showAddPayment, setShowAddPayment] = useState(false);
+
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoProgress, setLogoProgress] = useState(0);
+  const [logoFileKey, setLogoFileKey] = useState("");
+  const [logoFileUrl, setLogoFileUrl] = useState("");
+  const [existingLogoUrl, setExistingLogoUrl] = useState("");
+  const [existingLogoKey, setExistingLogoKey] = useState("");
 
   const [paymentFormData, setPaymentFormData] = useState<any[]>([]);
 
@@ -144,6 +154,12 @@ const UniversityEdit = ({ id }: Props) => {
 
     setFormData(data);
     setInitialFormData(data);
+    setExistingLogoKey(university.logo_file_key || "");
+    if (university.logo_file_key) {
+      getDocumentDownloadUrl(university.logo_file_key)
+        .then(setExistingLogoUrl)
+        .catch(() => setExistingLogoUrl(""));
+    }
   }, [university, branches]);
 
   React.useEffect(() => {
@@ -175,6 +191,10 @@ const UniversityEdit = ({ id }: Props) => {
       JSON.stringify(normalizePayload(formData)) !==
       JSON.stringify(normalizePayload(initialFormData));
 
+    const logoChanged =
+      logoFile !== null ||
+      existingLogoUrl !== (university?.logo_file_url || "");
+
     const paymentChanged =
       paymentFormData.some((p, index) => {
         const initial = universityPaymentMethods?.[index];
@@ -187,8 +207,8 @@ const UniversityEdit = ({ id }: Props) => {
         );
       }) ?? false;
 
-    return universityChanged || paymentChanged;
-  }, [formData, initialFormData, paymentFormData, universityPaymentMethods]);
+    return universityChanged || logoChanged || paymentChanged;
+  }, [formData, initialFormData, logoFile, existingLogoUrl, university, paymentFormData, universityPaymentMethods]);
 
   const handleRemoveBranch = async (index: number) => {
     const branch = formData.branches[index];
@@ -229,6 +249,39 @@ const UniversityEdit = ({ id }: Props) => {
         branches: branchesCopy,
       };
     });
+  };
+
+  const handleLogoSelect = async (file: File) => {
+    setLogoFile(file);
+    setLogoUploading(true);
+    setLogoProgress(0);
+    setLogoFileKey("");
+    setLogoFileUrl("");
+
+    try {
+      const presigned = await getPresignedUploads([file], "university-logos");
+      const results = await uploadFilesToSpaces([file], presigned, (_, pct) => {
+        setLogoProgress(pct);
+      });
+      const uploaded = results?.[0];
+
+      if (!uploaded?.file_key || !uploaded?.public_url) {
+        showToast("Logo upload failed. Please try again.", "error");
+        setLogoFile(null);
+        setLogoUploading(false);
+        return;
+      }
+
+      setLogoFileKey(uploaded.file_key);
+      setLogoFileUrl(uploaded.public_url);
+      setLogoProgress(100);
+      showToast("Logo uploaded successfully.", "success");
+    } catch (err: any) {
+      showToast(err?.message || "Logo upload failed.", "error");
+      setLogoFile(null);
+    } finally {
+      setLogoUploading(false);
+    }
   };
 
   const handleSavePaymentMethod = async (method: any) => {
@@ -309,8 +362,16 @@ const UniversityEdit = ({ id }: Props) => {
   };
 
   const handleUpdate = async () => {
+    if (logoUploading) {
+      showToast("Please wait for the logo to finish uploading.", "error");
+      return;
+    }
+
     try {
-      const payload = normalizePayload(formData);
+      const logo_file_key = logoFile ? logoFileKey : existingLogoKey;
+      const logo_file_url = logoFile ? logoFileUrl : existingLogoUrl;
+
+      const payload = { ...normalizePayload(formData), logo_file_key, logo_file_url };
 
       await updateUniversity(payload);
 
@@ -362,16 +423,33 @@ const UniversityEdit = ({ id }: Props) => {
   }
 
   return (
-    <div className="mt-6 rounded-md border bg-white">
+    <div className="mt-6 max-w-5xl mx-auto rounded-md border bg-white">
       <div className="flex justify-between border-b p-6">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
-            <GraduationCap className="h-6 w-6 text-white" />
+          <div className="shrink-0">
+            <ImageUploadField
+              label=""
+              field="logo"
+              imageOnly
+              simpleFile={logoFile}
+              onSimpleFileChange={handleLogoSelect}
+              onSimpleRemove={() => { setLogoFile(null); setLogoFileKey(""); setLogoFileUrl(""); }}
+              simpleUploading={logoUploading}
+              simpleProgress={logoProgress}
+              existingUrl={existingLogoUrl}
+              onExistingRemove={() => { setExistingLogoUrl(""); setExistingLogoKey(""); }}
+              errors={errors}
+            />
           </div>
 
           <div>
             <h2 className="text-lg font-semibold">{university.name}</h2>
             <p className="text-sm text-slate-500">{university.country}</p>
+            {logoFile && !logoUploading && (
+              <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                Logo ready — click Save Changes
+              </span>
+            )}
           </div>
         </div>
 
@@ -718,7 +796,7 @@ const UniversityEdit = ({ id }: Props) => {
               await handleAssign();
             }
           }}
-          disabled={updateLoading || (!isFormChanged && !formData.payment_method_id)}
+          disabled={logoUploading || updateLoading || (!isFormChanged && !formData.payment_method_id)}
           icon={<Pencil className="h-5 w-5" />}
           text={updateLoading ? "Updating..." : "Save Changes"}
           bgColor="bg-blue-50"

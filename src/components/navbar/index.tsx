@@ -3,18 +3,18 @@
 import React, { useEffect, useState } from "react";
 import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
-import { LogOut, Settings } from "lucide-react";
+import { LogOut, Settings, Bell } from "lucide-react";
 import NavLink from "components/link/NavLink";
 import Link from "next/link";
 import api from "../../lib/useApi";
 import { useRouter } from "next/navigation";
 import { useMe } from "hooks/useMe";
-import { profileRouteMap } from "components/navbar/config/navigation";
+import { profileRouteMap, notificationsRouteMap } from "components/navbar/config/navigation";
+import { useUnreadCount } from "hooks/notifications/useUnreadCount";
 
 const Navbar = ({
                   onOpenSidenav,
                   brandText,
-                  routes,
                   open,
                   setOpen,
                 }: {
@@ -28,11 +28,17 @@ const Navbar = ({
   const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const { user, loading, error } = useMe();
+  const { user, loading } = useMe();
+  const { unreadCount } = useUnreadCount({ pollIntervalMs: 30000 });
 
   const getProfileRoute = (role?: string) => {
     if (!role) return "/auth/sign-in";
     return profileRouteMap[role] || "/profile";
+  };
+
+  const getNotificationsRoute = (role?: string) => {
+    if (!role) return "/auth/sign-in";
+    return notificationsRouteMap[role] || "/notifications";
   };
 
   useEffect(() => {
@@ -52,7 +58,7 @@ const Navbar = ({
   const deleteAllCookies = () => {
     document.cookie.split(";").forEach((cookie) => {
       const eqPos = cookie.indexOf("=");
-      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      const name = eqPos > -1 ? cookie.slice(0, eqPos).trim() : cookie.trim();
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
     });
   };
@@ -110,6 +116,15 @@ const Navbar = ({
         >
           <FiAlignJustify className="h-5 w-5 text-slate-600" />
         </span>
+
+        <Link href={getNotificationsRoute(user?.role)} className="relative flex items-center justify-center">
+          <Bell className="h-5 w-5 text-slate-600" />
+          {unreadCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </Link>
 
         <Dropdown
           button={

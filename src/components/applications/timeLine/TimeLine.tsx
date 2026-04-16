@@ -41,7 +41,7 @@ export default function TimeLine({
   };
 
   return (
-    <section className="mb-6 mt-6 rounded-lg bg-card transition-all duration-300">
+    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card transition-all duration-300">
       <div
         className={`group flex items-center justify-between border border-default p-6 transition-all duration-300 ${
           showTimeline ? "rounded-t-lg" : "rounded-lg"

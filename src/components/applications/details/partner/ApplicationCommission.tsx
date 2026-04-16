@@ -87,7 +87,7 @@ export default function ApplicationCommission({
 
   return (
     <>
-      <section className="mb-6 mt-6 rounded-lg bg-card">
+      <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
         <div className="mb-6 rounded-lg border bg-white">
           <div className="flex items-start gap-3 border-b border-gray-200 p-6">
             <div className="flex flex-1 items-center gap-4">

@@ -12,6 +12,8 @@ interface StatusFileUploadProps {
   onError?: (msg: string) => void;
   disabled?: boolean;
   required?: boolean;
+  uploading?: boolean;
+  progress?: number;
 }
 
 export default function StatusFileUpload({
@@ -23,6 +25,8 @@ export default function StatusFileUpload({
   onError,
   disabled = false,
   required = false,
+  uploading = false,
+  progress = 0,
 }: StatusFileUploadProps) {
   const { showToast } = useToast();
 
@@ -46,6 +50,7 @@ export default function StatusFileUpload({
 
     onError?.("");
     onFileChange(selected);
+    e.target.value = "";
   };
 
   return (
@@ -83,16 +88,32 @@ export default function StatusFileUpload({
       </label>
 
       {file && (
-        <div className="flex items-center justify-between rounded-md border border-gray-200 bg-white px-4 py-2">
-          <span className="truncate text-sm text-slate-500">{file.name}</span>
-          <button
-            type="button"
-            onClick={onRemove}
-            className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
-          >
-            <Trash2 className="h-4 w-4" />
-            Remove
-          </button>
+        <div className="rounded-md border border-gray-200 bg-white px-4 py-3">
+          <div className="flex items-center justify-between">
+            <span className="truncate text-sm text-slate-500">{file.name}</span>
+            {!uploading && (
+              <button
+                type="button"
+                onClick={onRemove}
+                className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+              >
+                <Trash2 className="h-4 w-4" />
+                Remove
+              </button>
+            )}
+            {uploading && (
+              <span className="text-xs font-medium text-blue-600">{progress}%</span>
+            )}
+          </div>
+
+          {uploading && (
+            <div className="mt-3 h-1.5 w-full rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

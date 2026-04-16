@@ -25,6 +25,7 @@ const FileUploadToggleField = ({
   const handleUpload = async (e) => {
     if (!uploadHandler) return;
     await uploadHandler(e, documentTypeId);
+    e.target.value = "";
   };
 
   const handleRemove = async () => {

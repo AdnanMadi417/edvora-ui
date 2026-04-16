@@ -49,8 +49,12 @@ export default function AssignManagerModal({
   const { assignManager, loading, error } = useAssignPartnerManager();
 
   useEffect(() => {
-    if (isOpen) setIsVisible(true);
-    else setTimeout(() => setIsVisible(false), 300);
+    if (isOpen) {
+      setIsVisible(true);
+    } else {
+      const timer = setTimeout(() => setIsVisible(false), 300);
+      return () => clearTimeout(timer);
+    }
   }, [isOpen]);
 
     useEffect(() => {

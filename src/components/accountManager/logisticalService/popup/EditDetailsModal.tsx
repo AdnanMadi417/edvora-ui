@@ -14,7 +14,6 @@ import CheckSimpleBoxGroup from "../../../form/CheckSimpleBoxGroup";
 import InputField from "../../../form/InputField";
 import AddInclude from "../../../ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
-import { useRouter } from "next/navigation";
 import SelectField from "../../../form/SelectField";
 import { COUNTRIES } from "../../../../constants/lists";
 
@@ -23,6 +22,11 @@ export interface PackageOffered {
   description: string;
   price: number;
   includes: string[];
+}
+
+interface ServiceEntry {
+  service_id: string;
+  price: number;
 }
 
 export interface FormData {
@@ -35,10 +39,9 @@ export interface FormData {
 
   packages_offered: PackageOffered[];
 
-  selectedServices: string[];
+  selectedServices: ServiceEntry[];
   selectedLanguages: string[];
   selectedUniversities: string[];
-  selectedLocations: string[];
 }
 
 interface EditDetailsModalProps {
@@ -47,7 +50,7 @@ interface EditDetailsModalProps {
   provider: any;
 }
 
-type FormErrors = Partial<Record<keyof FormData, string>>;
+type FormErrors = Partial<Record<keyof FormData | "selectedServices", string>>;
 
 export default function EditDetailsModal({
   isOpen,
@@ -70,9 +73,8 @@ export default function EditDetailsModal({
   };
 
   const { showToast } = useToast();
-  const router = useRouter();
   const [errors, setErrors] = useState<FormErrors>({});
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: provider?.name || "",
     nationality: provider?.nationality || "",
     main_location: provider?.main_location || "",
@@ -80,10 +82,9 @@ export default function EditDetailsModal({
     whatsapp: provider?.whatsapp || "",
     is_active: provider?.is_active ?? true,
     packages_offered: provider?.packages_offered || [],
-    selectedServices: provider?.services_offered || [],
+    selectedServices: [],
     selectedLanguages: provider?.languages || [],
     selectedUniversities: provider?.universities_served || [],
-    selectedLocations: provider?.service_locations || [],
   });
 
   const { logisticServices } = useLogisticServices();
@@ -135,13 +136,30 @@ export default function EditDetailsModal({
     }));
   };
 
+  const toggleService = (serviceId: string) => {
+    setFormData((prev) => {
+      const exists = prev.selectedServices.find((s) => s.service_id === serviceId);
+      if (exists) {
+        return { ...prev, selectedServices: prev.selectedServices.filter((s) => s.service_id !== serviceId) };
+      }
+      return { ...prev, selectedServices: [...prev.selectedServices, { service_id: serviceId, price: 0 }] };
+    });
+  };
+
+  const updateServicePrice = (serviceId: string, price: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      selectedServices: prev.selectedServices.map((s) =>
+        s.service_id === serviceId ? { ...s, price } : s
+      ),
+    }));
+  };
+
   useEffect(() => {
     if (
       provider &&
-      logisticServices.length &&
       logisticLanguages.length &&
-      logisticUniversities.length &&
-      logisticServiceLocations.length
+      logisticUniversities.length
     ) {
       setFormData({
         name: provider.name || "",
@@ -151,30 +169,24 @@ export default function EditDetailsModal({
         whatsapp: provider.whatsapp || "",
         is_active: provider.is_active ?? true,
         packages_offered: provider.packages_offered || [],
-        selectedServices: provider.services_offered
-          .map(
-            (service) => logisticServices.find((s) => s.name === service)?.id
-          )
-          .filter(Boolean) as string[],
+        selectedServices: (provider.services_offered || []).map(
+          (srv: { id: string; prize?: number }) => ({
+            service_id: srv.id,
+            price: srv.prize ?? 0,
+          })
+        ),
         selectedLanguages: provider.languages
-          .map((lang) => logisticLanguages.find((l) => l.name === lang)?.id)
+          .map((lang: string) => logisticLanguages.find((l) => l.name === lang)?.id)
           .filter(Boolean) as string[],
         selectedUniversities: provider.universities_served
-          .map((uni) => logisticUniversities.find((u) => u.name === uni)?.id)
-          .filter(Boolean) as string[],
-        selectedLocations: provider.service_locations
-          .map(
-            (loc) => logisticServiceLocations.find((l) => l.name === loc)?.id
-          )
+          .map((uni: string) => logisticUniversities.find((u) => u.name === uni)?.id)
           .filter(Boolean) as string[],
       });
     }
   }, [
     provider,
-    logisticServices,
     logisticLanguages,
     logisticUniversities,
-    logisticServiceLocations,
   ]);
 
   const handleSubmit = async () => {
@@ -193,8 +205,6 @@ export default function EditDetailsModal({
       newErrors.selectedLanguages = "Please select at least one language";
     if (!formData.selectedUniversities.length)
       newErrors.selectedUniversities = "Please select at least one university";
-    if (!formData.selectedLocations.length)
-      newErrors.selectedLocations = "Please select at least one location";
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -207,10 +217,9 @@ export default function EditDetailsModal({
       whatsapp: formData.whatsapp,
       is_active: formData.is_active,
       packages_offered: formData.packages_offered,
-      service_ids: formData.selectedServices,
+      services: formData.selectedServices,
       language_ids: formData.selectedLanguages,
       university_ids: formData.selectedUniversities,
-      service_location_ids: formData.selectedLocations,
     };
 
     try {
@@ -227,7 +236,6 @@ export default function EditDetailsModal({
         selectedServices: [],
         selectedLanguages: [],
         selectedUniversities: [],
-        selectedLocations: [],
       });
 
       setErrors({});
@@ -523,30 +531,49 @@ export default function EditDetailsModal({
                 required
               />
 
-              <CheckSimpleBoxGroup
-                label="Logistic Services"
-                field="selectedServices"
-                options={logisticServices}
-                formData={formData}
-                updateFormData={updateFormData}
-                errors={errors}
-                required
-              />
+              <div className="mb-4">
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Logistic Services <span className="text-red-500">*</span>
+                </label>
+                <div className="space-y-2">
+                  {logisticServices.map((svc) => {
+                    const selected = formData.selectedServices.find((s) => s.service_id === svc.id);
+                    return (
+                      <div key={svc.id} className="rounded-md border border-slate-200 px-3 py-2">
+                        <label className="flex cursor-pointer items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={!!selected}
+                            onChange={() => toggleService(svc.id)}
+                            className="h-4 w-4 rounded border-slate-300 accent-amber-600"
+                          />
+                          <span className="text-sm text-slate-700">{svc.name}</span>
+                        </label>
+                        {selected && (
+                          <div className="mt-2 flex items-center gap-2 pl-6">
+                            <span className="text-xs text-slate-500">Price (RM)</span>
+                            <input
+                              type="number"
+                              min={0}
+                              value={selected.price}
+                              onChange={(e) => updateServicePrice(svc.id, Number(e.target.value))}
+                              className="w-28 rounded border border-slate-200 px-2 py-1 text-sm focus:border-amber-400 focus:outline-none"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                {errors.selectedServices && (
+                  <p className="mt-1 text-xs text-red-500">{errors.selectedServices}</p>
+                )}
+              </div>
 
               <CheckSimpleBoxGroup
                 label="Universities"
                 field="selectedUniversities"
                 options={logisticUniversities}
-                formData={formData}
-                updateFormData={updateFormData}
-                errors={errors}
-                required
-              />
-
-              <CheckSimpleBoxGroup
-                label="Locations"
-                field="selectedLocations"
-                options={logisticServiceLocations}
                 formData={formData}
                 updateFormData={updateFormData}
                 errors={errors}

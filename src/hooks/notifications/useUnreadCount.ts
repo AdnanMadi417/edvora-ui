@@ -3,11 +3,13 @@ import api from "lib/useApi";
 
 interface UseUnreadCountOptions {
   enabled?: boolean;
+  pollIntervalMs?: number;
 }
 
 export function useUnreadCount({
-                                 enabled = true,
-                               }: UseUnreadCountOptions) {
+  enabled = true,
+  pollIntervalMs,
+}: UseUnreadCountOptions) {
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -34,6 +36,12 @@ export function useUnreadCount({
   useEffect(() => {
     fetchUnreadCount();
   }, [fetchUnreadCount]);
+
+  useEffect(() => {
+    if (!enabled || !pollIntervalMs) return;
+    const interval = setInterval(fetchUnreadCount, pollIntervalMs);
+    return () => clearInterval(interval);
+  }, [enabled, fetchUnreadCount, pollIntervalMs]);
 
   return {
     unreadCount,
