@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { CheckCircle, Pause, XCircle, AlertCircle } from 'lucide-react';
-import { FaRegFileLines } from "react-icons/fa6";
 import { FaFileAlt } from "react-icons/fa";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
@@ -51,7 +50,9 @@ export default function RequiredAction({
     }
   };
 
-  const hasAnyFile = Object.values(selectedFiles).some(Boolean);
+  const allDocsUploaded =
+    (actions?.document_types?.length ?? 0) > 0 &&
+    actions!.document_types.every((doc: any) => selectedFiles[doc.id]);
   const hasAnyError = Object.values(fileErrors).some(Boolean);
 
   if (!isOpen) return null;
@@ -75,7 +76,7 @@ export default function RequiredAction({
                 </div>
                 <div>
                   <h5 className="text-lg font-bold text-gray-900">
-                    Required Application Actions
+                    Required 6
                   </h5>
                   <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <span className="font-normal">
@@ -119,26 +120,19 @@ export default function RequiredAction({
                         Documents to Upload
                       </h4>
 
+                      {actions.correction_reason && (
+                        <div className="mb-4 flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 p-2.5 text-amber-800">
+                          <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-500" />
+                          <span className="text-xs">{actions.correction_reason}</span>
+                        </div>
+                      )}
+
                       <ul className="space-y-4">
                         {actions.document_types.map((doc: any) => (
                           <li
                             key={doc.id}
                             className="block space-y-4"
                           >
-                            <div className="block mb-4 sm:flex-1">
-
-                              {actions.correction_reason && (
-                                <div className="mt-1 flex items-center gap-2">
-                                  <span className="text-xs font-medium text-orange-400">
-                                    Reason:{" "}
-                                    <span className="text-slate-500">
-                                      {actions.correction_reason}
-                                    </span>
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-
                             <StatusFileUpload
                               label={doc.description}
                               id={`file-${doc.id}`}
@@ -183,7 +177,7 @@ export default function RequiredAction({
             </button>
             <button
               onClick={handleConfirm}
-              disabled={!hasAnyFile || hasAnyError || isSubmitting}
+              disabled={!allDocsUploaded || hasAnyError || isSubmitting}
               className="flex items-center justify-center gap-2 rounded-md border border-amber-600 bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700 transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
             >
               <CheckCircle className="h-4 w-4" />

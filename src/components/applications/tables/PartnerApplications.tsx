@@ -35,15 +35,6 @@ import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversi
 import { useAllStages } from 'hooks/applications/stages/useStages';
 import { useAllStageStatuses } from 'hooks/applications/stages/useStageStatuses';
 
-// Statuses that require the partner to take action
-const PARTNER_ACTION_STATUSES = new Set([
-  'correction_requested_by_account_manager',
-  'waiting_for_payment',
-  'waiting_partner_to_confirm_arrival_date',
-]);
-
-const needsPartnerAction = (status: string) =>
-  PARTNER_ACTION_STATUSES.has(status?.toLowerCase().replace(/\s+/g, '_'));
 
 const getRelativeTime = (dateStr: string) => {
   const date = new Date(dateStr);
@@ -146,6 +137,22 @@ const PartnerApplications = () => {
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
+
+  const actionRequiredStatuses = useMemo(() => {
+    const fromApi = stageStatuses
+      .filter((s) => s.is_requires_reason || s.is_requires_document_selection || s.is_triggers_stage_advance)
+      .map((s) => s.name.toLowerCase().replace(/\s+/g, '_'));
+    return new Set([
+      ...fromApi,
+      'correction_requested_by_account_manager',
+      'waiting_for_payment',
+      'waiting_partner_to_confirm_arrival_date',
+      'eval_partner_upload',
+    ]);
+  }, [stageStatuses]);
+
+  const needsPartnerAction = (status: string) =>
+    actionRequiredStatuses.has(status?.toLowerCase().replace(/\s+/g, '_'));
 
   const activeFiltersCount = [
     selectedUniversity !== 'all',

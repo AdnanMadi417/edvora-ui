@@ -129,18 +129,7 @@ export default function StageAdditionalInfo({
               />
             )}
 
-            {isFieldRequired("student.passport_number") && (
-              <InputField
-                label="Passport Number"
-                field="student.passport_number"
-                placeholder="A1234567"
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
-            )}
-
-            {isFieldRequired("student.email") && (
+{isFieldRequired("student.email") && (
               <InputField
                 label="Email Address"
                 field="student.email"

@@ -101,6 +101,9 @@ export const validateFormData = (
 
     if (isEmpty(formData.program_id))
       newErrors["program_id"] = "required";
+
+    if (isEmpty(student.passport_number))
+      newErrors["student.passport_number"] = "required";
   }
 
   if (stageNum === 2) {
