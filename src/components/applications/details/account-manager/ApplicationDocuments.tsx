@@ -122,7 +122,7 @@ export default function ApplicationDocuments({
               <FolderOpen className="h-5 w-5 text-blue-600" />
             </div>
             {pendingDocuments > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-md bg-amber-500 text-[10px] font-bold text-white">
                 {pendingDocuments}
               </span>
             )}
@@ -191,7 +191,7 @@ export default function ApplicationDocuments({
               >
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
                       {getFileStatus(doc.status)}
                     </div>
                   </div>
@@ -246,7 +246,7 @@ export default function ApplicationDocuments({
                       if (!doc.file_key) return;
                       handleDownload(doc.file_key);
                     }}
-                    className="group rounded-full cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     aria-label="Download Document"
                     disabled={!doc.file_key}
@@ -260,7 +260,7 @@ export default function ApplicationDocuments({
                       setSelectedDoc(doc);
                       setShowResubmitPopup(true);
                     }}
-                    className="group rounded-full border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
                     title="Resubmit Document"
                     aria-label="Resubmit Document"
                   >
@@ -288,7 +288,7 @@ export default function ApplicationDocuments({
               >
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
                       {getFileStatus(doc.status)}
                     </div>
                   </div>
@@ -344,7 +344,7 @@ export default function ApplicationDocuments({
                       if (!doc.file_key) return;
                       handleDownload(doc.file_key);
                     }}
-                    className="group rounded-full cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     aria-label="Download Document"
                     disabled={!doc.file_key}
@@ -358,7 +358,7 @@ export default function ApplicationDocuments({
                       setSelectedDoc(doc);
                       setShowResubmitPopup(true);
                     }}
-                    className="group rounded-full border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
                     title="Resubmit Document"
                     aria-label="Resubmit Document"
                   >
@@ -383,7 +383,7 @@ export default function ApplicationDocuments({
               >
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
                       {getFileStatus(doc.status)}
                     </div>
                   </div>
@@ -438,7 +438,7 @@ export default function ApplicationDocuments({
                       if (!doc.file_key) return;
                       handleDownload(doc.file_key);
                     }}
-                    className="group rounded-full cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     aria-label="Download Document"
                     disabled={!doc.file_key}
@@ -452,7 +452,7 @@ export default function ApplicationDocuments({
                       setSelectedDoc(doc);
                       setShowResubmitPopup(true);
                     }}
-                    className="group rounded-full border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
                     title="Resubmit Document"
                     aria-label="Resubmit Document"
                   >
@@ -470,7 +470,7 @@ export default function ApplicationDocuments({
               <div className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
                       {getFileStatus(emgsEvalDoc.status)}
                     </div>
                   </div>
@@ -506,7 +506,7 @@ export default function ApplicationDocuments({
                       if (!emgsEvalDoc.file_key) return;
                       handleDownload(emgsEvalDoc.file_key);
                     }}
-                    className="group rounded-full cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     aria-label="Download Document"
                     disabled={!emgsEvalDoc.file_key}
@@ -525,7 +525,7 @@ export default function ApplicationDocuments({
                 <div key={doc.id} className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
                   <div className="flex min-w-0 flex-1 items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
                         {getFileStatus(doc.status)}
                       </div>
                     </div>
@@ -549,7 +549,7 @@ export default function ApplicationDocuments({
                   <div className="ml-4 flex flex-wrap gap-2">
                     <button
                       onClick={(e) => { e.stopPropagation(); if (!doc.file_key) return; handleDownload(doc.file_key); }}
-                      className="group rounded-full cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                       title="Download Document"
                       disabled={!doc.file_key}
                     >

@@ -147,6 +147,7 @@ const PartnerApplications = () => {
       'correction_requested_by_account_manager',
       'waiting_for_payment',
       'waiting_partner_to_confirm_arrival_date',
+      'eval_ready',
       'eval_partner_upload',
     ]);
   }, [stageStatuses]);

@@ -15,6 +15,7 @@ import {
 import { useVisaCase } from "hooks/useVisaCase";
 import { useVisaPayments } from "hooks/useVisaPayments";
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
+import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 
 import VisaPaymentConfirmation from "../../../applications/popups/partner/VisaPaymentConfirmation";
 import ArrivalDate from "../../../applications/popups/partner/ArrivalDate";
@@ -33,23 +34,29 @@ export default function VisaTrackingTimeline({
   const [isEmgsUploadOpen, setIsEmgsUploadOpen] = useState(false);
 
   const { methods, loading: paymentLoading } = useVisaPaymentMethods(application?.id);
+  const { actions } = useApplicationActions(application?.id);
 
   const stageName = application?.stage?.name;
-  const stageStatuses = application?.stage?.statuses || [];
+  const currentStatusCode =
+    actions?.status_code ||
+    application?.stage?.statuses?.[0]?.code;
+  const currentStatusName = actions?.status || application?.stage?.statuses?.[0]?.name;
 
   const showVisaPayment =
     stageName === "Visa Processing" &&
-    stageStatuses.some((s: any) => s.name === "Waiting for Payment");
+    currentStatusCode === "WAITING_FOR_PAYMENT";
 
   const showEmgsUpload =
     stageName === "Visa Processing" &&
-    stageStatuses.some((s: any) => s.name === "Upload EMGS evaluation");
+    (
+      currentStatusCode === "EVAL_READY" ||
+      currentStatusCode === "EVAL_PARTNER_UPLOAD" ||
+      currentStatusCode === "EVAL_REUPLOAD_REQUIRED"
+    );
 
   const showArrivalConfirmation =
     stageName === "Student Arrival & Enrollment" &&
-    stageStatuses.some(
-      (s: any) => s.name === "Waiting Partner to confirm arrival date"
-    );
+    currentStatusName === "Waiting Partner to confirm arrival date";
 
   const {
     visaCase,
@@ -136,6 +143,7 @@ export default function VisaTrackingTimeline({
 
         </div>
 
+        {showEmgsUpload && (
         <div className="block space-y-4 border-b border-gray-200 p-6">
 
               <div className="">
@@ -260,9 +268,8 @@ export default function VisaTrackingTimeline({
             )}
           </div>
         </div>
-
-      </div>
-      
+        </div>
+        )}
 
         {showVisaPayment && (
           <div className="p-6 pb-0 block space-y-4">
