@@ -10,7 +10,7 @@ import {
   User,
   Globe,
   Settings,
-  Eye,
+  ChevronRight,
   Pencil,
   DollarSign,
   BookOpen,
@@ -232,13 +232,14 @@ const LogisticalServiceProviderTable = () => {
                     currentServiceProviders.map((provider) => (
                       <tr
                         key={provider.id}
-                        className="hover:bg-primary/10 group transition-colors"
+                        className="group cursor-pointer transition-colors hover:bg-primary/10"
+                        onClick={() => { setSelectedManager(provider); setViewModal(true); }}
                       >
                         <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div
                               className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-md bg-accent-light text-h6 font-medium text-blue-700 "
+                rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
                             >
                               {provider ? (
                                 provider.name[0].toUpperCase()
@@ -346,21 +347,6 @@ const LogisticalServiceProviderTable = () => {
                           <div className="flex items-center gap-2">
                             <button
                               role="menuitem"
-                              aria-label="View Provider"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedProvider(provider);
-                                setViewModal(true);
-                              }}
-                              className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                            >
-                              <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                            </button>
-
-                            <div className="h-6 border-l border-slate-200" />
-
-                            <button
-                              role="menuitem"
                               aria-label="Edit Provider"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -373,6 +359,9 @@ const LogisticalServiceProviderTable = () => {
                               <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                             </button>
                           </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                         </td>
                       </tr>
                     ))

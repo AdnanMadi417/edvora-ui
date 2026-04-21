@@ -10,7 +10,7 @@ import {
   BookOpen,
   DollarSign,
   Settings,
-  Eye,
+  ChevronRight,
   CheckCircle,
   Pencil,
   XCircle,
@@ -19,6 +19,7 @@ import {
   ClipboardCheck,
   CalendarDays,
   Sliders,
+  SlidersHorizontal,
   Plus,
 } from 'lucide-react';
 import { MdSchool, MdVerified } from 'react-icons/md';
@@ -41,6 +42,7 @@ import Loading from "components/loading/Loading";
 import NoMessagesFound from 'components/emptyData/NoMessagesFound';
 import Link from "next/link";
 
+import { useRouter } from "next/navigation";
 import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
 import BatchUpdatePrograms from "components/admin/KnowledgeHub/program/popups/BatchCommissionPrograms";
 import BatchIELTSPrograms from "components/admin/KnowledgeHub/program/popups/BatchIELTSPrograms";
@@ -51,6 +53,7 @@ import DefaultVisaFee from "components/admin/KnowledgeHub/program/popups/Default
 
 
 const ProgramsTable = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
 
   const {
@@ -84,6 +87,7 @@ const ProgramsTable = () => {
   const [isBatchFeesUpdateOpen, setIsBatchFeesUpdateOpen] = useState(false);
   const [isBulkMenuOpen, setIsBulkMenuOpen] = useState(false);
   const [isVisaFeeOpen, setIsVisaFeeOpen] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const { showToast } = useToast();
 
@@ -139,6 +143,14 @@ const ProgramsTable = () => {
 
   const totalItems = filteredPrograms.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const activeFiltersCount = [
+    selectedState !== "all",
+    selectedField !== "all",
+    selectedUniversity !== "all",
+    selectedLevel !== "all",
+    searchTerm !== "",
+  ].filter(Boolean).length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -255,76 +267,89 @@ const ProgramsTable = () => {
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
 
-            <div className="relative w-full sm:w-64 flex-shrink-0">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search by university, program, or level..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedState}
-                onChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
-                options={states}
-                icon={Globe}
-                defaultOption="All Locations"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedField}
-                onChange={(val) => {
-                  setSelectedField(val);
-                  setCurrentPage(1);
-                }}
-                options={fields}
-                icon={MdSchool}
-                defaultOption="All Fields"
-              />
-
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedUniversity}
-                onChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
-                options={universities}
-                icon={MdSchool}
-                defaultOption="All Universities"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedLevel}
-                onChange={(val) => { setSelectedLevel(val); setCurrentPage(1); }}
-                options={qualifications}
-                icon={MdVerified}
-                defaultOption="All Qualifications"
-              />
-            </div>
-
-            <div className="w-full sm:w-auto flex-shrink-0">
+            {/* Search + mobile filter toggle */}
+            <div className="flex items-center gap-2 sm:contents">
+              <div className="relative flex-1 sm:w-64 sm:flex-none flex-shrink-0">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search by university, program, or level..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                />
+              </div>
               <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedState("all");
-                  setSelectedField("all");
-                  setSelectedUniversity("all");
-                  setSelectedLevel("all");
-                  setCurrentPage(1);
-                }}
-                className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+                className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-background text-slate-500 hover:bg-slate-50"
+                onClick={() => setShowMobileFilters((v) => !v)}
               >
-                <RefreshCw className="h-4 w-4" />
-                Clear
+                <SlidersHorizontal className="h-4 w-4" />
+                {activeFiltersCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                    {activeFiltersCount}
+                  </span>
+                )}
               </button>
+            </div>
+
+            {/* Filter selects — collapsible on mobile, always visible on sm+ */}
+            <div className={`flex-col gap-3 sm:contents ${showMobileFilters ? 'flex' : 'hidden sm:contents'}`}>
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedState}
+                  onChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
+                  options={states}
+                  icon={Globe}
+                  defaultOption="All Locations"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedField}
+                  onChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
+                  options={fields}
+                  icon={MdSchool}
+                  defaultOption="All Fields"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedUniversity}
+                  onChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
+                  options={universities}
+                  icon={MdSchool}
+                  defaultOption="All Universities"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedLevel}
+                  onChange={(val) => { setSelectedLevel(val); setCurrentPage(1); }}
+                  options={qualifications}
+                  icon={MdVerified}
+                  defaultOption="All Qualifications"
+                />
+              </div>
+
+              <div className="w-full sm:w-auto flex-shrink-0">
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedState("all");
+                    setSelectedField("all");
+                    setSelectedUniversity("all");
+                    setSelectedLevel("all");
+                    setCurrentPage(1);
+                  }}
+                  className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Clear
+                </button>
+              </div>
             </div>
 
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
@@ -493,7 +518,8 @@ const ProgramsTable = () => {
               {!error && currentPrograms.map((Program) => (
                 <tr
                   key={Program.id}
-                  className="hover:bg-primary/10 group transition-colors"
+                  className="group cursor-pointer transition-colors hover:bg-primary/10"
+                  onClick={() => router.push(`/admin/knowledge-hub/programs/${Program.id}`)}
                 >
                   <td className="pl-6">
                     <input
@@ -507,7 +533,7 @@ const ProgramsTable = () => {
 
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md">
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
                         {Program.university?.logo_file_key ? (
                           <PresignedImage
                             fileKey={Program.university.logo_file_key}
@@ -667,19 +693,9 @@ const ProgramsTable = () => {
                     <div className="flex items-center gap-2">
                       <a
                         role="menuitem"
-                        aria-label="View Program"
-                        href={`/admin/knowledge-hub/programs/${Program.id}`}
-                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                      >
-                        <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                      </a>
-
-                      <div className="h-6 border-l border-slate-200" />
-
-                      <a
-                        role="menuitem"
                         aria-label="Edit Program"
                         href={`/admin/knowledge-hub/programs/${Program.id}/edit`}
+                        onClick={(e) => e.stopPropagation()}
                         className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                       >
                         <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
@@ -690,7 +706,8 @@ const ProgramsTable = () => {
                       <button
                         role="menuitem"
                         aria-label="Delete Program"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedProgramId(Program.id);
                           setDeleteMode("single");
                           setIsDeleteOpen(true);
@@ -700,6 +717,9 @@ const ProgramsTable = () => {
                         <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                       </button>
                     </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
                 </tr>
               ))}

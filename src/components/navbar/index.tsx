@@ -139,7 +139,7 @@ const Navbar = ({
 
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-md text-h5 font-medium text-blue-700 "
+                rounded-full text-h5 font-medium text-blue-700 "
               >
                 {user ? (
                   user.name[0].toUpperCase()

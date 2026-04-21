@@ -10,6 +10,7 @@ import {
   MapPin,
   Award,
   Send,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { MdSchool } from 'react-icons/md';
 import PresignedImage from "components/ui/PresignedImage";
@@ -42,6 +43,7 @@ const ProgramsCards = () => {
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
@@ -71,6 +73,13 @@ const ProgramsCards = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
+
+  const activeFiltersCount = [
+    selectedState !== "all",
+    selectedField !== "all",
+    selectedUniversity !== "all",
+    searchTerm !== "",
+  ].filter(Boolean).length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -105,61 +114,78 @@ const ProgramsCards = () => {
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
 
-            <div className="relative w-full sm:w-64 flex-shrink-0">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search by university, program, or level..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedState}
-                onChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
-                options={states}
-                icon={MapPin}
-                defaultOption="All Locations"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedField}
-                onChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
-                options={fields}
-                icon={GraduationCap}
-                defaultOption="All Fields"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedUniversity}
-                onChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
-                options={universities}
-                icon={MdSchool}
-                defaultOption="All Universities"
-              />
-            </div>
-
-            <div className="w-full sm:w-auto flex-shrink-0">
+            {/* Search + mobile filter toggle */}
+            <div className="flex items-center gap-2 sm:contents">
+              <div className="relative flex-1 sm:w-64 sm:flex-none flex-shrink-0">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search by university, program, or level..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                />
+              </div>
               <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedState("all");
-                  setSelectedField("all");
-                  setSelectedUniversity("all");
-                  setCurrentPage(1);
-                }}
-                className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+                className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-background text-slate-500 hover:bg-slate-50"
+                onClick={() => setShowMobileFilters((v) => !v)}
               >
-                <RefreshCw className="h-4 w-4" />
-                Clear
+                <SlidersHorizontal className="h-4 w-4" />
+                {activeFiltersCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                    {activeFiltersCount}
+                  </span>
+                )}
               </button>
+            </div>
+
+            {/* Filter selects — collapsible on mobile, always visible on sm+ */}
+            <div className={`flex-col gap-3 sm:contents ${showMobileFilters ? 'flex' : 'hidden sm:contents'}`}>
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedState}
+                  onChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
+                  options={states}
+                  icon={MapPin}
+                  defaultOption="All Locations"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedField}
+                  onChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
+                  options={fields}
+                  icon={GraduationCap}
+                  defaultOption="All Fields"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedUniversity}
+                  onChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
+                  options={universities}
+                  icon={MdSchool}
+                  defaultOption="All Universities"
+                />
+              </div>
+
+              <div className="w-full sm:w-auto flex-shrink-0">
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedState("all");
+                    setSelectedField("all");
+                    setSelectedUniversity("all");
+                    setCurrentPage(1);
+                  }}
+                  className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Clear
+                </button>
+              </div>
             </div>
           </div>
 
@@ -189,7 +215,7 @@ const ProgramsCards = () => {
                     {/* Header */}
                     <div className="flex items-start gap-3 px-4 pt-5 pb-4">
                       
-                      <div className="flex-shrink-0 h-14 w-14 rounded-xl overflow-hidden">
+                      <div className="flex-shrink-0 h-14 w-14 rounded-full overflow-hidden">
                         {program.university?.logo_file_key ? (
                           <PresignedImage
                             fileKey={program.university.logo_file_key}

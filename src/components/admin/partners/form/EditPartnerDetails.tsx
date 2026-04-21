@@ -162,7 +162,7 @@ const EditPartnerDetails = ({ id }: PartnerDetailsProps) => {
         <div className="flex justify-between border-b p-6">
           <div className="flex items-center gap-4">
             <div className="relative flex-shrink-0">
-              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                 {partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
               </div>
 

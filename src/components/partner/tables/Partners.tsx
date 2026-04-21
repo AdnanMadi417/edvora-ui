@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { ChevronUp,
   ChevronDown,
-  Eye,
+  ChevronRight,
   Building,
   Tag,
   Phone,
@@ -14,9 +14,11 @@ import Image from "next/image";
 import partner from "/public/img/dashboards/partner-icon.png";
 import { partners as initialPartners } from "components/data/applications";
 import EmptyData from '../../emptyData/EmptyTableData';
+import { useRouter } from "next/navigation";
 import Link from 'next/link';
 
 const ModernPartnersTable = () => {
+  const router = useRouter();
   const [partners] = useState(initialPartners);
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
@@ -235,12 +237,7 @@ const ModernPartnersTable = () => {
               </div>
             </th>
 
-            <th className="min-w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-              <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Actions
-              </div>
-            </th>
+            <th className="px-4 py-4" />
           </tr>
           </thead>
 
@@ -268,7 +265,8 @@ const ModernPartnersTable = () => {
               paginatedPartners.map((app) => (
                 <tr
                   key={app.id}
-                  className="group transition-colors hover:bg-primary"
+                  className="group cursor-pointer transition-colors hover:bg-primary"
+                  onClick={() => router.push(`/account-manager/partners/${app.id}`)}
                 >
 
                   <td className="min-w-[250px] px-6 py-4 flex  items-center gap-2 text-slate-900">
@@ -310,15 +308,8 @@ const ModernPartnersTable = () => {
                     {new Date(app.registeredAt).toLocaleDateString()}
                   </td>
 
-                  <td className="min-w-[150px] px-6 py-4">
-                    <Link
-                      href={`/account-manager/partners/${app.id}`}
-                      aria-label="View Partner"
-                      className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-md border border-default p-2 text-sm text-slate-600 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-                    >
-                      <Eye className="h-4 w-4" />
-                      <span className="text-caption">View </span>
-                    </Link>
+                  <td className="px-4 py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
 
 

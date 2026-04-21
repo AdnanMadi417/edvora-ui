@@ -110,15 +110,15 @@ const MarketplaceCard = () => {
                         <PresignedImage
                           fileKey={m.picture_file_key}
                           alt={m.name}
-                          className="h-14 w-14 rounded-md object-cover"
+                          className="h-14 w-14 rounded-full object-cover"
                           fallback={
-                            <div className="flex h-14 w-14 items-center justify-center rounded-md bg-blue-100">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
                               <span className="text-base font-semibold uppercase text-blue-700">{m.name?.slice(0, 2)}</span>
                             </div>
                           }
                         />
                       ) : (
-                        <div className="flex h-14 w-14 items-center justify-center rounded-md bg-blue-100">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
                           <span className="text-base font-semibold uppercase text-blue-700">{m.name?.slice(0, 2)}</span>
                         </div>
                       )}
