@@ -214,9 +214,9 @@ export default function ApplicationDetails({
       </div>
 
       </div>
-
-      <ApplicationCommission application={application}/> 
+      
       <ApplicationTimeline application={application} />
+      <ApplicationCommission application={application}/> 
       <VisaTrackingTimeline application={application} />
       <OfferLetterCard application={application} />
 

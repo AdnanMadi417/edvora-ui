@@ -9,7 +9,7 @@ import {
   ArrowLeft,
   Calendar,
   Settings,
-  Eye,
+  ChevronRight,
   CheckCircle,
   Pencil,
   Trash2,
@@ -23,6 +23,7 @@ import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import { useDeleteUniversity } from "hooks/knowledge-hub/universities/useDeleteKnowledgeHubUniversity";
 import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
 
+import { useRouter } from "next/navigation";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "components/ui/links/LinkBtn";
@@ -37,6 +38,7 @@ import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
 
 const UniversitiesTable = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const { showToast } = useToast();
 
@@ -399,7 +401,8 @@ const UniversitiesTable = () => {
               {!error && currentUniversities.map((uni) => (
                 <tr
                   key={uni.id}
-                  className="hover:bg-primary/10 group transition-colors"
+                  className="group cursor-pointer transition-colors hover:bg-primary/10"
+                  onClick={() => router.push(`/admin/universities/${uni.id}`)}
                 >
 
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
@@ -407,12 +410,12 @@ const UniversitiesTable = () => {
                       <PresignedImage
                         fileKey={uni?.logo_file_key}
                         alt={uni.name}
-                        className="h-10 w-10 shrink-0 rounded-md object-cover ring-1 ring-blue-500 ring-offset-2 shadow-md"
+                        className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-blue-500 ring-offset-2 shadow-md"
                         fallback={
 
                             <div
                         className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-md bg-accent-light text-h6 font-medium text-blue-700 "
+                rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
                       >
                         {uni ? (
                           uni.name?.slice(0, 2).toUpperCase()
@@ -527,21 +530,11 @@ const UniversitiesTable = () => {
 
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <a
-                        role="menuitem"
-                        aria-label="View University"
-                        href={`/admin/universities/${uni.id}`}
-                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                      >
-                        <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                      </a>
-
-                      <div className="h-6 border-l border-slate-200" />
-
                       <button
                         role="menuitem"
                         aria-label="Assign Payment Method"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setAssignPaymentUniversityId(uni.id);
                           setIsAssignPaymentOpen(true);
                         }}
@@ -556,6 +549,7 @@ const UniversitiesTable = () => {
                         role="menuitem"
                         aria-label="Edit University"
                         href={`/admin/universities/${uni.id}/edit`}
+                        onClick={(e) => e.stopPropagation()}
                         className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                       >
                         <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
@@ -566,7 +560,8 @@ const UniversitiesTable = () => {
                       <button
                         role="menuitem"
                         aria-label="Delete University"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedUniversityId(uni.id);
                           setSelectedUniversityName(uni.name);
                           setIsDeleteOpen(true);
@@ -575,8 +570,10 @@ const UniversitiesTable = () => {
                       >
                         <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                       </button>
-
                     </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
                 </tr>
               ))}

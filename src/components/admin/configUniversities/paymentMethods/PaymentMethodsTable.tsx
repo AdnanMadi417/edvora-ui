@@ -7,7 +7,7 @@ import {
   ArrowRight,
   ArrowLeft,
   Settings,
-  Eye,
+  ChevronRight,
   Pencil,
   Trash2,
   CreditCard,
@@ -27,10 +27,12 @@ import CreatePayment from "components/admin/configUniversities/paymentMethods/po
 
 import Loading from "components/loading/Loading";
 
+import { useRouter } from "next/navigation";
 import { useToast } from "components/context/ToastContext";
 import Button from "components/ui/buttons/Button";
 
 const PaymentMethodsTable = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const { showToast } = useToast();
 
@@ -256,7 +258,8 @@ const PaymentMethodsTable = () => {
                   currentPaymentMethods.map((payment) => (
                     <tr
                       key={payment.id}
-                      className="hover:bg-primary/10 group transition-colors"
+                      className="group cursor-pointer transition-colors hover:bg-primary/10"
+                      onClick={() => router.push(`/admin/config-universities/payment-methods/${payment.id}`)}
                     >
                       <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -289,19 +292,9 @@ const PaymentMethodsTable = () => {
                         <div className="flex items-center gap-2">
                           <a
                             role="menuitem"
-                            aria-label="View Payment Method"
-                            href={`/admin/config-universities/payment-methods/${payment.id}`}
-                            className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                          >
-                            <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                          </a>
-
-                          <div className="h-6 border-l border-slate-200" />
-
-                          <a
-                            role="menuitem"
                             aria-label="Edit Payment Method"
                             href={`/admin/config-universities/payment-methods/${payment.id}/edit`}
+                            onClick={(e) => e.stopPropagation()}
                             className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
                             <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
@@ -312,7 +305,8 @@ const PaymentMethodsTable = () => {
                           <button
                             role="menuitem"
                             aria-label="Delete Payment Method"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSelectedPaymentId(payment.id);
                               setSelectedPaymentMethodName(payment.name);
                               setIsDeleteOpen(true);
@@ -322,6 +316,9 @@ const PaymentMethodsTable = () => {
                             <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                           </button>
                         </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                       </td>
                     </tr>
                   ))}

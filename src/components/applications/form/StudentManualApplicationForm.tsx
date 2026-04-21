@@ -601,7 +601,7 @@ export default function StudentManualApplicationForm() {
   }
 
   return (
-    <section className="mx-auto mt-5">
+    <section className="mx-auto mt-5 max-w-5xl">
       <div className="rounded-lg border border-slate-200 bg-card p-6">
         <div className="mb-6 flex items-start gap-x-3 border-b-2 border-slate-100 pb-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">

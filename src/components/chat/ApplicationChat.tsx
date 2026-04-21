@@ -91,7 +91,7 @@ export default function AgentPartnerChat({
     <div className="flex h-[70vh] max-h-[600px] min-h-[320px] flex-col bg-card">
       <header className="bg-blue-600 px-3 py-3 text-white">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-white shadow-sm">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
             <User className="h-5 w-5 text-blue-600" />
           </div>
 
@@ -199,13 +199,13 @@ function ChatInput({
         onKeyDown={(e) => e.key === "Enter" && handleSend()}
         placeholder="Type your message..."
         disabled={sending}
-        className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+        className="w-full rounded-full border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
       />
 
       <button
         onClick={handleSend}
         disabled={sending || !text.trim()}
-        className="rounded-md bg-blue-600 p-2 text-white transition hover:bg-blue-700 disabled:opacity-50"
+        className="rounded-full bg-blue-600 p-2 text-white transition hover:bg-blue-700 disabled:opacity-50"
       >
         <Send className="h-5 w-5" />
       </button>

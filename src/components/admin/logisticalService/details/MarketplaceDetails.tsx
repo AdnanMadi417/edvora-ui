@@ -50,9 +50,9 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
                 <PresignedImage
                   fileKey={service.picture_file_key}
                   alt={service.name}
-                  className="h-10 w-10 rounded-md object-cover md:h-14 md:w-14 ring-2 ring-blue-500 ring-offset-2 shadow-md"
+                  className="h-10 w-10 rounded-full object-cover md:h-14 md:w-14 ring-2 ring-blue-500 ring-offset-2 shadow-md"
                   fallback={
-                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-100 md:h-14 md:w-14">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 md:h-14 md:w-14">
                       <Truck className="h-5 w-5 text-blue-700 md:h-8 md:w-8" />
                     </div>
                   }

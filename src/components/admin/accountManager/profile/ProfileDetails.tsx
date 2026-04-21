@@ -16,7 +16,7 @@ export default function ProfileDetails({ manager }: ProfileDetailsProps) {
     <section>
       <div className="mb-5 mt-5 max-w-5xl mx-auto block rounded-lg border border-slate-200 bg-card p-6 shadow-sm">
         <div className="flex items-center gap-5">
-          <div className="flex h-14 w-14 items-center justify-center rounded-md bg-accent-light text-xl font-semibold text-slate-700">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-slate-700">
             {manager.name?.charAt(0).toUpperCase() ?? "?"}
           </div>
 

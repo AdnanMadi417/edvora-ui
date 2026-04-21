@@ -107,7 +107,7 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
         <button
           onClick={() => doc.file_key && handleDownload(doc.file_key, doc.id)}
           disabled={!doc.file_key || !!downloading}
-          className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-40"
+          className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-40"
           title="Download"
         >
           <Download className={`h-4 w-4 ${isDownloading ? 'animate-pulse' : ''}`} />
@@ -145,7 +145,7 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
               <FolderOpen className="h-5 w-5 text-blue-600" />
             </div>
             {pendingDocuments > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-md bg-amber-500 text-[10px] font-bold text-white">
                 {pendingDocuments}
               </span>
             )}

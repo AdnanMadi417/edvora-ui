@@ -30,16 +30,12 @@ export default function Notifications() {
     try {
       await markRead(id);
       await Promise.all([refetchNotifications(), refetchCount()]);
+      window.dispatchEvent(new CustomEvent('notifications:refetch'));
     } catch (err) {
       console.error("Failed to mark notification as read", err);
     }
   };
 
-  const markAllAsRead = async () => {
-    const unread = notifications.filter((n) => n.read_at === null);
-    await Promise.allSettled(unread.map((n) => markRead(n.id)));
-    await Promise.all([refetchNotifications(), refetchCount()]);
-  };
 
   const displayed = [...(filter === "unread"
     ? notifications.filter((n) => n.read_at === null)
@@ -59,14 +55,6 @@ export default function Notifications() {
             </p>
           )}
         </div>
-        {unreadCount > 0 && (
-          <button
-            onClick={markAllAsRead}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
-          >
-            Mark all as read
-          </button>
-        )}
       </div>
 
       {/* Filter tabs */}
@@ -81,7 +69,7 @@ export default function Notifications() {
           >
             {tab}
             {tab === "unread" && unreadCount > 0 && (
-              <span className="ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-md bg-blue-100 px-1.5 text-xs font-bold text-blue-700">
+              <span className="ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-blue-100 px-1.5 text-xs font-bold text-blue-700">
                 {unreadCount}
               </span>
             )}
@@ -129,9 +117,9 @@ export default function Notifications() {
               return (
                 <div
                   key={notification.id}
-                  onClick={() => {
+                  onClick={async () => {
+                    if (isUnread) await markAsRead(notification.id);
                     if (notification.application_id) router.push(`/account-manager/applications/${notification.application_id}`);
-                    if (isUnread) markAsRead(notification.id);
                   }}
                   className={`flex cursor-pointer items-start gap-4 px-4 py-3 transition-colors ${
                     index !== displayed.length - 1 ? "border-b border-slate-50" : ""
@@ -142,7 +130,7 @@ export default function Notifications() {
                     <div className={`flex h-11 w-11 items-center justify-center rounded-md ${config.bg}`}>
                       <Icon className={`h-5 w-5 ${config.iconColor}`} />
                     </div>
-                    <span className={`absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-md ring-2 ring-white ${config.badgeBg}`}>
+                    <span className={`absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-white ${config.badgeBg}`}>
                       <Bell className="h-2 w-2 text-white" />
                     </span>
                   </div>
@@ -165,7 +153,7 @@ export default function Notifications() {
 
                   {/* Actions */}
                   <div className="flex flex-shrink-0 items-center gap-2 self-center">
-                    {isUnread && <div className="h-3 w-3 rounded-md bg-blue-500" />}
+                    {isUnread && <div className="h-3 w-3 rounded-full bg-blue-500" />}
                     {notification.application_id && (
                       <Link
                         href={`/account-manager/applications/${notification.application_id}`}

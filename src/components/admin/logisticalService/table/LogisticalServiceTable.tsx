@@ -11,7 +11,7 @@ import {
   User,
   Globe,
   Settings,
-  Eye,
+  ChevronRight,
   Pencil,
   DollarSign,
   BookOpen, Trash2,
@@ -25,6 +25,7 @@ import EmptyData from "components/emptyData/EmptyTableData";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import { useToast } from 'components/context/ToastContext';
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { useServiceProviders } from "hooks/service-providers/useServiceProviders";
@@ -32,6 +33,7 @@ import { useDeleteLogisticProvider } from "hooks/service-providers/useDeleteLogi
 import DeleteUniversityConfirmation from 'components/admin/logisticalService/DeleteServiceConfirmation';
 
 const LogisticalServiceTable = () => {
+  const router = useRouter();
   const { serviceProviders, loading, error } = useServiceProviders();
   const { showToast } = useToast();
 
@@ -234,7 +236,8 @@ const LogisticalServiceTable = () => {
                     currentServiceProviders.map((provider) => (
                       <tr
                         key={provider.id}
-                        className="hover:bg-primary/10 group transition-colors"
+                        className="group cursor-pointer transition-colors hover:bg-primary/10"
+                        onClick={() => router.push(`/admin/logistical-service/${provider.id}`)}
                       >
                         <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -242,15 +245,15 @@ const LogisticalServiceTable = () => {
                               <PresignedImage
                                 fileKey={provider.picture_file_key}
                                 alt={provider.name}
-                                className="h-10 w-10 shrink-0 rounded-md object-cover ring-2 ring-blue-500 ring-offset-2 shadow-md"
+                                className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-blue-500 ring-offset-2 shadow-md"
                                 fallback={
-                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-100 text-sm font-semibold text-blue-700">
+                                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
                                     {provider.name[0].toUpperCase()}
                                   </div>
                                 }
                               />
                             ) : (
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-100 text-sm font-semibold text-blue-700">
+                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
                                 {provider.name[0].toUpperCase()}
                               </div>
                             )}
@@ -355,19 +358,9 @@ const LogisticalServiceTable = () => {
                           <div className="flex items-center gap-2">
                             <a
                               role="menuitem"
-                              aria-label="View Provider"
-                              href={`/admin/logistical-service/${provider.id}`}
-                              className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                            >
-                              <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                            </a>
-
-                            <div className="h-6 border-l border-slate-200" />
-
-                            <a
-                              role="menuitem"
                               aria-label="Edit Provider"
                               href={`/admin/logistical-service/${provider.id}/edit`}
+                              onClick={(e) => e.stopPropagation()}
                               className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                             >
                               <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
@@ -378,7 +371,8 @@ const LogisticalServiceTable = () => {
                             <button
                               role="menuitem"
                               aria-label="Delete Provider"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setSelectedServiceId(provider.id);
                                 setSelectedServiceName(provider.name);
                                 setIsDeleteOpen(true);
@@ -387,8 +381,10 @@ const LogisticalServiceTable = () => {
                             >
                               <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                             </button>
-
                           </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                         </td>
                       </tr>
                     ))

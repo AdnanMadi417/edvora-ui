@@ -16,9 +16,10 @@ import {
   UserCog,
   Handshake,
   Trash2,
-  Eye,
+  ChevronRight,
   Pencil,
   Filter,
+  SlidersHorizontal,
 } from "lucide-react";
 
 import { useAllPartners } from "hooks/partners/usePartnersList";
@@ -52,6 +53,7 @@ const PartnersTable = () => {
   const { stages } = useAllStages();
   const [selectedManager, setSelectedManager] = useState<string>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -116,6 +118,12 @@ const PartnersTable = () => {
     indexOfFirstItem,
     indexOfLastItem
   );
+
+  const activeFiltersCount = [
+    selectedManager !== "all",
+    selectedType !== "all",
+    searchTerm !== "",
+  ].filter(Boolean).length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -183,54 +191,72 @@ const PartnersTable = () => {
           </div>
 
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search by university, Partner, or level..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
-              />
+            {/* Search + mobile filter toggle */}
+            <div className="flex items-center gap-2 sm:contents">
+              <div className="relative flex-1 sm:w-64 sm:flex-none flex-shrink-0">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search by university, Partner, or level..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                />
+              </div>
+              <button
+                className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-background text-slate-500 hover:bg-slate-50"
+                onClick={() => setShowMobileFilters((v) => !v)}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                {activeFiltersCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </button>
             </div>
 
-            <div className="w-full flex-shrink-0 sm:w-48">
-              <FilterSelectField
-                value={selectedManager}
-                onChange={(val: string) => setSelectedManager(val)}
-                options={accountManagers.map((m) => ({
-                  label: m.name,
-                  value: m.id,
-                }))}
-                icon={UserCog}
-                defaultOption="All Managers"
-              />
-            </div>
+            {/* Filter selects — collapsible on mobile, always visible on sm+ */}
+            <div className={`flex-col gap-3 sm:contents ${showMobileFilters ? 'flex' : 'hidden sm:contents'}`}>
+              <div className="w-full flex-shrink-0 sm:w-48">
+                <FilterSelectField
+                  value={selectedManager}
+                  onChange={(val: string) => setSelectedManager(val)}
+                  options={accountManagers.map((m) => ({
+                    label: m.name,
+                    value: m.id,
+                  }))}
+                  icon={UserCog}
+                  defaultOption="All Managers"
+                />
+              </div>
 
-            <div className="w-full flex-shrink-0 sm:w-48">
-              <FilterSelectField
-                value={selectedType}
-                onChange={(val: string) => setSelectedType(val)}
-                options={PARTNER_TYPE.map((type) => ({
-                  label: type.label,
-                  value: type.value,
-                }))}
-                icon={Filter}
-                defaultOption="All Types"
-              />
-            </div>
+              <div className="w-full flex-shrink-0 sm:w-48">
+                <FilterSelectField
+                  value={selectedType}
+                  onChange={(val: string) => setSelectedType(val)}
+                  options={PARTNER_TYPE.map((type) => ({
+                    label: type.label,
+                    value: type.value,
+                  }))}
+                  icon={Filter}
+                  defaultOption="All Types"
+                />
+              </div>
 
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setSelectedManager("all");
-                setCurrentPage(1);
-              }}
-              className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Clear
-            </button>
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setSelectedManager("all");
+                  setSelectedType("all");
+                  setCurrentPage(1);
+                }}
+                className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Clear
+              </button>
+            </div>
 
             <Link
               href={`/admin/partners/register-partner`}
@@ -321,12 +347,13 @@ const PartnersTable = () => {
                   currentPartners.map((partner) => (
                     <tr
                       key={partner.id}
-                      className="hover:bg-primary/10 group transition-colors"
+                      className="group cursor-pointer transition-colors hover:bg-primary/10"
+                      onClick={() => router.push(`/admin/partners/${partner.id}`)}
                     >
                       <td className="min-w-[220px] max-w-[320px] px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="relative flex-shrink-0">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-700">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                               {partner.name
                                 ? partner.name.slice(0, 2).toUpperCase()
                                 : "NA"}
@@ -385,19 +412,9 @@ const PartnersTable = () => {
                         <div className="flex items-center justify-center gap-2">
                           <a
                             role="menuitem"
-                            aria-label="View University"
-                            href={`/admin/partners/${partner.id}`}
-                            className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                          >
-                            <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                          </a>
-
-                          <div className="h-6 border-l border-slate-200" />
-
-                          <a
-                            role="menuitem"
-                            aria-label="View University"
+                            aria-label="Edit Partner"
                             href={`/admin/partners/${partner.id}/edit`}
+                            onClick={(e) => e.stopPropagation()}
                             className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
                             <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
@@ -408,7 +425,8 @@ const PartnersTable = () => {
                           <button
                             role="menuitem"
                             aria-label="Assign Manager"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSelectedPartner(partner);
                               setIsAssignModalOpen(true);
                             }}
@@ -422,7 +440,8 @@ const PartnersTable = () => {
                           <button
                             role="menuitem"
                             aria-label="Delete Partner"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSelectedPartnerId(partner.id);
                               setIsDeleteOpen(true);
                             }}
@@ -431,6 +450,9 @@ const PartnersTable = () => {
                             <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                           </button>
                         </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                       </td>
                     </tr>
                   ))}

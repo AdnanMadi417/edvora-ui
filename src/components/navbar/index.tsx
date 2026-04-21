@@ -29,7 +29,13 @@ const Navbar = ({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { user, loading } = useMe();
-  const { unreadCount } = useUnreadCount({ pollIntervalMs: 30000 });
+  const { unreadCount, refetch: refetchUnreadCount } = useUnreadCount({ pollIntervalMs: 30000 });
+
+  useEffect(() => {
+    const handler = () => refetchUnreadCount();
+    window.addEventListener('notifications:refetch', handler);
+    return () => window.removeEventListener('notifications:refetch', handler);
+  }, [refetchUnreadCount]);
 
   const getProfileRoute = (role?: string) => {
     if (!role) return "/auth/sign-in";
@@ -120,7 +126,7 @@ const Navbar = ({
         <Link href={getNotificationsRoute(user?.role)} className="relative flex items-center justify-center">
           <Bell className="h-5 w-5 text-slate-600" />
           {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-md bg-red-500 text-[10px] font-bold text-white">
+            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
@@ -133,7 +139,7 @@ const Navbar = ({
 
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-md text-h5 font-medium text-blue-700 "
+                rounded-full text-h5 font-medium text-blue-700 "
               >
                 {user ? (
                   user.name[0].toUpperCase()

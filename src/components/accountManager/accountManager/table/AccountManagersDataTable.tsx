@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
-  Eye,
+  ChevronRight,
   User,
   Mail,
   CheckCircle,
@@ -182,13 +182,14 @@ const ModernAccountManagersTable = () => {
             paginatedAccountManagers.map((app) => (
               <tr
                 key={app.id}
-                className="hover:bg-primary/10 group transition-colors"
+                className="group cursor-pointer transition-colors hover:bg-primary/10"
+                onClick={() => { setSelectedManager(app); setViewModal(true); setOpenDropdownId(null); }}
               >
                 <td className="min-w-[200px] max-w-[250px] px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div
                       className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-md bg-accent-light text-h6 font-medium text-slate-700 "
+                rounded-full bg-accent-light text-h6 font-medium text-slate-700 "
                     >
                       {app.name?.charAt(0).toUpperCase() ?? '?'}
                     </div>
@@ -227,22 +228,6 @@ const ModernAccountManagersTable = () => {
                   <div className="flex items-center gap-2">
                     <button
                       role="menuitem"
-                      aria-label="View Manager"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedManager(app);
-                        setViewModal(true);
-                        setOpenDropdownId(null);
-                      }}
-                      className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:outline-none"
-                    >
-                      <Eye className="h-4 w-4 text-slate-500 transition-colors hover:text-slate-700" />
-                    </button>
-
-                    <div className="h-6 border-l border-slate-200" />
-
-                    <button
-                      role="menuitem"
                       aria-label="Edit Manager"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -255,6 +240,9 @@ const ModernAccountManagersTable = () => {
                       <Pencil className="h-4 w-4 text-slate-500 transition-colors hover:text-slate-700" />
                     </button>
                   </div>
+                </td>
+                <td className="px-4 py-4">
+                  <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                 </td>
 
               </tr>

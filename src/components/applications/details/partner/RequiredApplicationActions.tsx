@@ -4,7 +4,7 @@ import { MdAssignment } from "react-icons/md";
 import api from "../../../../lib/useApi";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import UploadDoc from "../../popups/partner/UploadDoc";
-import { AlertCircle, ArrowRightCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 
 interface RequiredApplicationActionsProps {
   params: {
@@ -18,7 +18,6 @@ export default function RequiredApplicationActions({
   const [appDetails, setAppDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showResubmit, setShowResubmit] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<any>(null);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
 
   const id = params.id;
@@ -61,8 +60,7 @@ export default function RequiredApplicationActions({
     }
   };
 
-  const handleResubmit = (status: any, docId?: string) => {
-    setSelectedStatus(status);
+  const handleResubmit = (_status: any, docId?: string) => {
     setSelectedDocId(docId || null);
     setShowResubmit(true);
   };
@@ -137,18 +135,11 @@ export default function RequiredApplicationActions({
                     )}
 
                     {hasStageInfo && (
-                      <div className="mt-3 w-fit space-y-2 text-xs text-slate-500">
-                        {status.is_requires_reason && (
-                          <div className="flex items-center gap-2">
-                            <AlertCircle className="h-3.5 w-3.5" />
-                            <span>Requires Reason: Yes</span>
-                          </div>
-                        )}
-
-                        {status.is_triggers_stage_advance && (
-                          <div className="flex items-center gap-2">
-                            <ArrowRightCircle className="h-3.5 w-3.5" />
-                            <span>Triggers Stage Advance: Yes</span>
+                      <div className="mt-3 space-y-2 text-xs text-slate-500">
+                        {status.is_requires_reason && (status.reason || status.notes || status.reason_text) && (
+                          <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 p-2.5 text-amber-800">
+                            <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-500" />
+                            <span>{status.reason || status.notes || status.reason_text}</span>
                           </div>
                         )}
                       </div>

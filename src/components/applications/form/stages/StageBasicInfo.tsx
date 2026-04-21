@@ -65,6 +65,15 @@ export default function StageBasicInfo({
           errors={errors}
           updateFormData={updateFormData}
         />
+
+        <InputField
+          label="Passport Number"
+          field="student.passport_number"
+          placeholder="A1234567"
+          formData={formData}
+          errors={errors}
+          updateFormData={updateFormData}
+        />
       </div>
     </div>
   );

@@ -50,9 +50,9 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 <PresignedImage
                   fileKey={university.logo_file_key}
                   alt={university.name}
-                  className="h-12 w-12 rounded-md object-cover ring-2 ring-blue-500 ring-offset-2 shadow-md"
+                  className="h-12 w-12 rounded-full object-cover ring-2 ring-blue-500 ring-offset-2 shadow-md"
                   fallback={
-                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-700">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-indigo-700">
                       <GraduationCap className="h-6 w-6 text-white" />
                     </div>
                   }

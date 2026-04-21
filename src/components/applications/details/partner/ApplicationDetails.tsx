@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { GraduationCap, Building2,  Globe, Calendar, ArrowRight } from "lucide-react";
+import { GraduationCap, Building2,  Globe, Calendar, ArrowRight, Wallet } from "lucide-react";
 import {
   FaUser,
   FaBirthdayCake,
@@ -32,6 +32,7 @@ import { useToast } from '../../../context/ToastContext';
 import Dispute from 'components/applications/popups/partner/UpdatedDispute';
 import api from 'lib/useApi';
 import ApplicationTimeline from '../ApplicationTimeline';
+import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 
 interface ApplicationDetailsProps {
   application: any;
@@ -72,6 +73,8 @@ export default function ApplicationDetails({
   const openRequiredActionPopup = () => setShowRequiredActionPopup(true);
   const closeRequiredActionPopup = () => setShowRequiredActionPopup(false);
 
+  const { methods, loading: paymentLoading } = useVisaPaymentMethods(application?.id);
+  
   const { showToast } = useToast();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [showDispute, setShowDispute] = useState(false);
@@ -109,21 +112,29 @@ export default function ApplicationDetails({
   const [showVisaPaymentPopup, setShowVisaPaymentPopup] = useState(false);
 
   const stageName = stage?.name;
-  const stageStatuses = stage?.statuses || [];
+  const currentStatusCode =
+    application?.status_code ||
+    stage?.statuses?.[0]?.code;
+  const currentStatusName = application?.status || stage?.statuses?.[0]?.name;
+
   const showVisaPayment =
     stageName === "Visa Processing" &&
-    stageStatuses.some((s: any) => s.name === "Waiting for Payment");
+    currentStatusCode === "WAITING_FOR_PAYMENT";
 
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
   const [showEmgsUploadPopup, setShowEmgsUploadPopup] = useState(false);
 
   const showArrivalConfirmation =
     stageName === "Student Arrival & Enrollment" &&
-    stageStatuses.some((s: any) => s.name === "Waiting Partner to confirm arrival date");
+    currentStatusName === "Waiting Partner to confirm arrival date";
 
   const showEmgsUpload =
     stageName === "Visa Processing" &&
-    actions?.status_code === "EVAL_PARTNER_UPLOAD";
+    (
+      actions?.status_code === "EVAL_READY" ||
+      actions?.status_code === "EVAL_PARTNER_UPLOAD" ||
+      actions?.status_code === "EVAL_REUPLOAD_REQUIRED"
+    );
 
   const formatGender = (value: boolean | null) => {
     if (value === null) return "Not provided";
@@ -308,6 +319,55 @@ export default function ApplicationDetails({
                   )}
 
                   {showVisaPayment && (
+
+                    <div className="block space-y-4">
+
+                      {showVisaPayment && (
+                        <div className=" block space-y-4">
+
+              {paymentLoading ? (
+              <div className="border-gray-200">
+                <p className="text-sm text-slate-500">Loading payment methods...</p>
+              </div>
+            ) : methods.length > 0 && (
+              <div className="">
+                <div className="mb-4 flex items-center gap-2">
+                  <Wallet className="h-4 w-4 text-blue-600" />
+                  <h4 className="text-sm font-semibold text-gray-900">Payment Methods</h4>
+                </div>
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {methods.map((method: any) => (
+                    <div
+                      key={method.id}
+                      className="rounded-lg border border-gray-200 bg-gray-50 p-4"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="h-4 w-4 text-blue-600" />
+                          <span className="font-semibold text-gray-900">{method.name}</span>
+                        </div>
+                        {method.currency && (
+                          <span className="rounded-md border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-medium uppercase text-blue-700">
+                            {method.currency}
+                          </span>
+                        )}
+                      </div>
+                      {method.instructions && (
+                        <pre className="whitespace-pre-wrap text-xs leading-relaxed text-slate-600">
+                          {method.instructions}
+                        </pre>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="">
+              <div className="" /></div>
+            </div>
+            )}
+
                     <button
                       type="button"
                       onClick={() => setShowVisaPaymentPopup(true)}
@@ -316,6 +376,9 @@ export default function ApplicationDetails({
                       <CreditCard className="h-4 w-4" />
                       Proceed to Payment
                     </button>
+
+                  </div>
+
                   )}
 
                   {showArrivalConfirmation && (
