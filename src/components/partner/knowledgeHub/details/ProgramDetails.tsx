@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   CreditCard,
@@ -36,31 +36,53 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
   };
 
   const { program, requiredDocuments, commission } = useProgram(id);
+  const [copied, setCopied] = useState(false);
+
+  const getOrdinal = (n: number) => {
+    const s = ["th", "st", "nd", "rd"];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
 
   const handleCopyAll = async () => {
-    const text = `
-    Program: ${program?.name ?? "-"}
-    University: ${program?.university?.name ?? "-"}
-    Country: ${program?.university?.country ?? "-"}
-    State: ${program?.branch?.state ?? "-"}
-    Level: ${program?.qualification_level ?? "-"}
-    Field: ${program?.field_of_study?.name ?? "-"}
-    Duration: ${program?.duration ?? "-"} years
-    Study Mode: ${program?.is_on_campus ? "On-campus" : "Online"}
+    const lines: string[] = [];
 
-    Intake Dates: ${program?.intake_dates?.join(", ") ?? "-"}
+    lines.push(program?.university?.name ?? "");
+    lines.push(`  ${program?.name ?? ""}`);
+    lines.push("");
 
-    English Requirement: ${
-        program?.english_required_score
-          ? `Min score ${program.english_required_score}`
-          : "-"
-      }
+    if (program?.duration) lines.push(`Duration: ${program.duration} year(s)`);
+    if (program?.english_required_score) lines.push(`English requirement: IELTS ${program.english_required_score}`);
+    lines.push("");
 
-    Commission: RM ${commission?.amount ?? 0}
-    `;
+    if (program?.intake_dates?.length) lines.push(`Intake: ${program.intake_dates.join(",")}`);
+    lines.push("");
 
-      await navigator.clipboard.writeText(text);
-    };
+    lines.push("Course fee for international students");
+    lines.push("");
+    lines.push("Yearly Tuition fees");
+    lines.push("");
+
+    (program?.yearly_fees ?? []).forEach((item) => {
+      lines.push(`${getOrdinal(item.year)} year: MYR ${item.fee.toLocaleString()}`);
+    });
+
+    lines.push("");
+    lines.push("");
+    lines.push("Other fees");
+    lines.push("");
+
+    (program?.one_time_fees ?? []).forEach((item) => {
+      lines.push(` ${item.description ?? "Fee"}: MYR ${item.fee.toLocaleString()}`);
+    });
+
+    lines.push("");
+    lines.push("University fees for this course do not include 6% tax (SST)");
+
+    await navigator.clipboard.writeText(lines.join("\n"));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (!program) return <Loading text="Loading program details..." />;
 
@@ -106,9 +128,15 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
               )}
               <button
                 onClick={handleCopyAll}
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-slate-200 text-slate-600 transition hover:bg-slate-100"
+                title={copied ? "Copied!" : "Copy program info"}
+                className={`flex h-9 items-center justify-center gap-1.5 rounded-md border px-3 text-xs font-medium transition ${
+                  copied
+                    ? "border-green-300 bg-green-50 text-green-700"
+                    : "border-slate-200 text-slate-600 hover:bg-slate-100"
+                }`}
               >
-                <Copy className="h-4 w-4" />
+                <Copy className="h-3.5 w-3.5" />
+                {copied ? "Copied!" : "Copy"}
               </button>
             </div>
 

@@ -92,7 +92,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
 
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Country</p>
-                  <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
+                  <p className="mt-0.5 truncate text-sm font-medium capitalize text-slate-900">
                     {partner.country || "Not Provided"}
                   </p>
                 </div>
@@ -105,7 +105,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
 
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Phone Number</p>
-                  <p className="mt-0.5 text-sm font-medium text-slate-900">
+                  <p className="mt-0.5 truncate text-sm font-medium text-slate-900">
                     {partner.phone || "Not Provided"}
                   </p>
                 </div>
@@ -118,7 +118,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
 
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Partner Type</p>
-                  <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
+                  <p className="mt-0.5 truncate text-sm font-medium capitalize text-slate-900">
                     {partner.type}
                   </p>
                 </div>
@@ -131,7 +131,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
 
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Assigned Manager</p>
-                  <p className="mt-0.5 text-sm font-medium text-slate-900">
+                  <p className="mt-0.5 truncate text-sm font-medium text-slate-900">
                     {partner.assigned_manager_name || "Not Assigned"}
                   </p>
                 </div>

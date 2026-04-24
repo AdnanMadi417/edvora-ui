@@ -269,8 +269,8 @@ const ModernPartnersTable = () => {
                   onClick={() => router.push(`/account-manager/partners/${app.id}`)}
                 >
 
-                  <td className="min-w-[250px] px-6 py-4 flex  items-center gap-2 text-slate-900">
-                    <div className="">
+                  <td className="min-w-[250px] px-6 py-4 flex items-center gap-2 text-slate-900">
+                    <div className="shrink-0">
                       <Image
                         width="40"
                         height="40"
@@ -279,25 +279,24 @@ const ModernPartnersTable = () => {
                         alt="Profile"
                       />
                     </div>
-
-                    {app.businessName}
+                    <div className="min-w-0 truncate">{app.businessName}</div>
                   </td>
 
                   <td className="min-w-[200px] px-6 py-4 text-slate-600">
-                    {app.type}
+                    <div className="truncate">{app.type}</div>
                   </td>
 
                   <td className="min-w-[200px] px-6 py-4 text-slate-600">
-                    <span className="block font-semibold">
+                    <span className="block truncate font-semibold">
                       {app.emailContact}
                     </span>
-                    <span className="block font-normal text-slate-900">
+                    <span className="block truncate font-normal text-slate-900">
                       {app.phoneContact}
                     </span>
                   </td>
 
                   <td className="min-w-[150px] px-6 py-4 text-slate-600">
-                    {app.country}
+                    <div className="truncate">{app.country}</div>
                   </td>
 
                   <td className="min-w-[100px] px-6 py-4">
