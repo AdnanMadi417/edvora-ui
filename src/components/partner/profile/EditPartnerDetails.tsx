@@ -112,29 +112,6 @@ const EditPartnerProfile: React.FC<EditPartnerProfileProps> = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-4 px-6 py-5 md:grid-cols-2">
-          <SearchableDropdown
-            label="Country"
-            field="country"
-            options={COUNTRIES.map((c) => ({
-              value: c.code,
-              label: c.name,
-            }))}
-            formData={formData}
-            errors={{}}
-            updateFormData={updateFormData}
-          />
-
-          <SelectField
-            label="Country"
-            field="type"
-            options={PARTNER_TYPE.map((type) => ({
-              value: type.value,
-              label: type.label,
-            }))}
-            formData={formData}
-            errors={{}}
-            updateFormData={updateFormData}
-          />
 
           <InputField
             label="Phone Number"

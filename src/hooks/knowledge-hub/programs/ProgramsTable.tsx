@@ -515,7 +515,7 @@ const ProgramsTable = () => {
                   className="group cursor-pointer transition-colors hover:bg-primary/10"
                   onClick={() => router.push(`/admin/knowledge-hub/programs/${Program.id}`)}
                 >
-                  <td className="pl-6">
+                  <td className="pl-6" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
                       aria-label={`Select ${Program.name}`}

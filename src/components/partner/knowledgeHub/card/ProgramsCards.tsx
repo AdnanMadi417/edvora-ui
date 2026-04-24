@@ -11,6 +11,7 @@ import {
   Award,
   Send,
   SlidersHorizontal,
+  BookOpen,
 } from 'lucide-react';
 import { MdSchool } from 'react-icons/md';
 import PresignedImage from "components/ui/PresignedImage";
@@ -43,7 +44,12 @@ const ProgramsCards = () => {
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
+  const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  const levels = Array.from(
+    new Set(programs.map((p) => p.qualification_level).filter(Boolean))
+  ).map((level) => ({ value: level, label: level }));
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
@@ -66,7 +72,10 @@ const ProgramsCards = () => {
     const matchesUniversity =
       selectedUniversity === "all" || (program.university?.name?.toLowerCase() === selectedUniversity.toLowerCase());
 
-    return matchesSearch && matchesLocation && matchesField && matchesUniversity;
+    const matchesLevel =
+      selectedLevel === "all" || (program.qualification_level?.toLowerCase() === selectedLevel.toLowerCase());
+
+    return matchesSearch && matchesLocation && matchesField && matchesUniversity && matchesLevel;
   });
 
   const currentPrograms = filteredPrograms.slice(
@@ -78,6 +87,7 @@ const ProgramsCards = () => {
     selectedState !== "all",
     selectedField !== "all",
     selectedUniversity !== "all",
+    selectedLevel !== "all",
     searchTerm !== "",
   ].filter(Boolean).length;
 
@@ -171,6 +181,16 @@ const ProgramsCards = () => {
                 />
               </div>
 
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedLevel}
+                  onChange={(val) => { setSelectedLevel(val); setCurrentPage(1); }}
+                  options={levels}
+                  icon={BookOpen}
+                  defaultOption="All Levels"
+                />
+              </div>
+
               <div className="w-full sm:w-auto flex-shrink-0">
                 <button
                   onClick={() => {
@@ -178,6 +198,7 @@ const ProgramsCards = () => {
                     setSelectedState("all");
                     setSelectedField("all");
                     setSelectedUniversity("all");
+                    setSelectedLevel("all");
                     setCurrentPage(1);
                   }}
                   className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"

@@ -279,7 +279,7 @@ const LogisticalServiceTable = () => {
                         </td>
 
                         <td className="block min-w-[200px] max-w-[250px] space-y-1 px-4 py-3">
-                          <div className="flex items-center text-sm ">
+                          <div className="truncate text-sm">
                             {provider?.phone_number}
                           </div>
                         </td>

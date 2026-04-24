@@ -134,9 +134,9 @@ const MarketplaceCard = () => {
                         <span className="truncate">{m.name}</span>
                         <CheckCircle className="h-4 w-4 flex-shrink-0 fill-blue-500 text-white" />
                       </h3>
-                      <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
-                        <MdLocationOn className="h-3.5 w-3.5" />
-                        {m.main_location || "Not Provided"}
+                      <p className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-slate-500">
+                        <MdLocationOn className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{m.main_location || "Not Provided"}</span>
                       </p>
                     </div>
                   </div>
@@ -166,13 +166,13 @@ const MarketplaceCard = () => {
 
                   {/* Info */}
                   <div className="space-y-2 px-5 pb-4 text-xs text-slate-600">
-                    <p className="flex items-center gap-1.5">
-                      <MdOutlineTranslate className="h-4 w-4 text-slate-400" />
-                      {m.languages?.slice(0, 3).join(" • ") || "Language not provided"}
+                    <p className="flex min-w-0 items-center gap-1.5">
+                      <MdOutlineTranslate className="h-4 w-4 shrink-0 text-slate-400" />
+                      <span className="truncate">{m.languages?.slice(0, 3).join(" • ") || "Language not provided"}</span>
                     </p>
-                    <p className="flex items-center gap-1.5">
-                      <MdLocationOn className="h-4 w-4 text-slate-400" />
-                      {m.service_locations?.slice(0, 2).join(" • ") || "Location not provided"}
+                    <p className="flex min-w-0 items-center gap-1.5">
+                      <MdLocationOn className="h-4 w-4 shrink-0 text-slate-400" />
+                      <span className="truncate">{m.service_locations?.slice(0, 2).join(" • ") || "Location not provided"}</span>
                     </p>
                   </div>
 
@@ -186,7 +186,7 @@ const MarketplaceCard = () => {
                       {m.services_offered?.slice(0, 1).map((service) => (
                         <span
                           key={service.id}
-                          className="rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                          className="max-w-[160px] truncate rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                         >
                           {service.name}
                         </span>

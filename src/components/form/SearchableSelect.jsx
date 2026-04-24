@@ -79,7 +79,7 @@ const CreatableSelectField = ({
 
       >
         <span
-          className={`${
+          className={`truncate ${
             selectedLabel ? "text-slate-900" : "text-slate-400"
           }`}
         >
@@ -117,9 +117,9 @@ const CreatableSelectField = ({
               <li
                 key={opt.value}
                 onClick={() => handleSelect(opt)}
-                className="mt-2 flex h-10 w-full pointer items-center justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-2 flex h-10 w-full cursor-pointer items-center justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
-                {opt.label}
+                <span className="truncate">{opt.label}</span>
               </li>
             ))}
 

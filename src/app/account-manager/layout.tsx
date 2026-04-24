@@ -10,12 +10,14 @@ import Footer from "components/footer/Footer";
 import RoleGuard from "components/guard/RoleGuard";
 import { ToastProvider } from "components/context/ToastContext";
 
+const ACCOUNT_MANAGER_ROLES = ["admin", "account_manager"];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
   return (
-    <RoleGuard allowedRoles={["admin", "account_manager"]}>
+    <RoleGuard allowedRoles={ACCOUNT_MANAGER_ROLES}>
 
       <ToastProvider>
         <div className="relative flex min-h-screen w-full bg-background-100 dark:bg-background-900">

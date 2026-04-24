@@ -88,19 +88,6 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                         </span>
                       </button>
 
-                      <button
-                        aria-label="Back to Programs"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
-                        onClick={handleBack}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
-                          <ChevronLeft className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-slate-900">
-                          Back to applications
-                        </span>
-                      </button>
                     </div>
                   </div>
                 )}
