@@ -43,8 +43,8 @@ export default function VisaTrackingTimeline({
   const currentStatusName = actions?.status || application?.stage?.statuses?.[0]?.name;
 
   const showVisaPayment =
-    stageName === "Visa Processing" &&
-    currentStatusCode === "WAITING_FOR_PAYMENT";
+    currentStatusCode === "WAITING_FOR_PAYMENT" ||
+    currentStatusCode === "PAYMENT_REJECTED";
 
   const showEmgsUpload =
     stageName === "Visa Processing" &&
@@ -61,13 +61,11 @@ export default function VisaTrackingTimeline({
   const {
     visaCase,
     loading: visaLoading,
-    error: visaError,
   } = useVisaCase(application?.id || "");
 
   const {
     payments: visaPayments,
     loading: paymentsLoading,
-    error: paymentsError,
   } = useVisaPayments(application?.id || "");
 
   const [downloading, setDownloading] = useState(false);

@@ -113,13 +113,17 @@ export default function ApplicationDetails({
 
   const stageName = stage?.name;
   const currentStatusCode =
+    actions?.status_code ||
     application?.status_code ||
     stage?.statuses?.[0]?.code;
-  const currentStatusName = application?.status || stage?.statuses?.[0]?.name;
+  const currentStatusName =
+    actions?.status ||
+    application?.status ||
+    stage?.statuses?.[0]?.name;
 
   const showVisaPayment =
-    stageName === "Visa Processing" &&
-    currentStatusCode === "WAITING_FOR_PAYMENT";
+    currentStatusCode === "WAITING_FOR_PAYMENT" ||
+    currentStatusCode === "PAYMENT_REJECTED";
 
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
   const [showEmgsUploadPopup, setShowEmgsUploadPopup] = useState(false);
@@ -298,7 +302,7 @@ export default function ApplicationDetails({
           <div className="space-y-2">
                   {actions && (
                     <>
-                      {actions.document_types?.length > 0 ? (
+                      {actions.document_types?.length > 0 && (
                         <button
                           onClick={openRequiredActionPopup}
                           className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"
@@ -306,7 +310,8 @@ export default function ApplicationDetails({
                           <Upload className="h-4 w-4" />
                           Upload Required Documents
                         </button>
-                      ) : actions.stage_statuses?.some((status) => status.is_requires_reason) ? (
+                      )}
+                      {actions.partner_actions?.some((a) => a.is_requires_reason) && (
                         <button
                           onClick={openProgramDecisionPopup}
                           className="flex w-full items-center justify-center gap-2 rounded-md bg-violet-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-violet-600"
@@ -314,7 +319,7 @@ export default function ApplicationDetails({
                           <ClipboardCheck className="h-4 w-4" />
                           Submit Program Decision
                         </button>
-                      ) : null}
+                      )}
                     </>
                   )}
 

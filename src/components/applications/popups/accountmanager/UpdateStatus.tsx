@@ -610,6 +610,7 @@ export default function UpdateStatusPopup({
           {isUniversityApproved && (
             <StatusFileUpload
               label="Upload Offer Letter"
+              description="Upload the official offer letter issued by the university"
               id="offer-letter"
               file={offerLetterFile}
               onFileChange={setOfferLetterFile}
@@ -661,6 +662,7 @@ export default function UpdateStatusPopup({
           {isVisaIssued && (
             <StatusFileUpload
               label="Upload Visa Document"
+              description="Upload the visa document issued by the immigration authority"
               id="visa-document"
               file={visaDocumentFile}
               onFileChange={setVisaDocumentFile}
@@ -674,6 +676,7 @@ export default function UpdateStatusPopup({
           {isCommissionPaid && (
             <StatusFileUpload
               label="Upload Commission Payment Proof"
+              description="Upload proof of commission payment (receipt or transfer confirmation)"
               id="commission-payment"
               file={commissionPaymentFile}
               onFileChange={setCommissionPaymentFile}

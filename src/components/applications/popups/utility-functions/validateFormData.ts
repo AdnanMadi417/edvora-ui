@@ -1,29 +1,10 @@
 
-import { FormDataType, DocumentType,Student } from "components/applications/form/utility-functions/types";
+import { FormDataType, DocumentType, Student } from "components/applications/form/utility-functions/types";
 
 export type ValidationResult = {
   isValid: boolean;
   errors: Record<string, string>;
 };
-
-const validateContacts = (
-  contacts: Student["emergency_contacts"],
-  requiredFieldKeys: string[],
-  errors: Record<string, string>
-) => {
-  contacts.forEach((c, idx) => {
-    ["name", "relation", "phone", "email"].forEach((f) => {
-      const key = `student.emergency_contacts[${idx}].${f}`;
-      if (requiredFieldKeys.includes(key)) {
-        const value = c[f as keyof typeof c];
-        if (value === undefined || value === null || (typeof value === "string" && value.trim() === "")) {
-          errors[key] = "required";
-        }
-      }
-    });
-  });
-};
-
 
 const isEmpty = (value: any) =>
   value === undefined || value === null || (typeof value === "string" && value.trim() === "");
@@ -85,16 +66,21 @@ export const validateFormData = (
   formData: FormDataType,
   stageNum: number,
   requiredFieldKeys: string[],
-  documentTypes: DocumentType[]
+  documentTypes: DocumentType[],
+  documentTypesLoading?: boolean
 ): ValidationResult => {
   const newErrors: Record<string, string> = {};
   const student = formData.student;
 
   if (stageNum === 1) {
-    const firstEducation = student.previous_educations?.[0];
-
     if (isEmpty(student.name))
       newErrors["student.name"] = "required";
+
+    if (isEmpty(student.passport_number))
+      newErrors["student.passport_number"] = "required";
+
+    if (isEmpty(student.nationality))
+      newErrors["student.nationality"] = "required";
 
     if (isEmpty(formData.university_id))
       newErrors["university_id"] = "required";
@@ -104,28 +90,22 @@ export const validateFormData = (
   }
 
   if (stageNum === 2) {
-    documentTypes.forEach((docType) => {
-      if (!docType.is_required_init_app_doc) return;
+    if (documentTypesLoading) {
+      newErrors["documents"] = "Document types are still loading, please wait.";
+    } else {
+      documentTypes.forEach((docType) => {
+        if (!docType.is_required_init_app_doc) return;
 
-      const uploaded = formData.documents.find(
-        (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
-      );
+        const uploaded = formData.documents.find(
+          (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
+        );
 
-      if (!uploaded) {
-        newErrors[`documents.${docType.id}`] = "required";
-      }
-    });
+        if (!uploaded) {
+          newErrors[`documents.${docType.id}`] = "required";
+        }
+      });
+    }
   }
-
-  if (stageNum === 3) {
-
-    validateStudentFields(student, requiredFieldKeys, newErrors);
-
-    validateEmergencyContacts(student.emergency_contacts, requiredFieldKeys, newErrors);
-
-    validateEducations(student.previous_educations, requiredFieldKeys, newErrors);
-  }
-
 
   if (stageNum === 3) {
     validateStudentFields(student, requiredFieldKeys, newErrors);

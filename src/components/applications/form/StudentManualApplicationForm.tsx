@@ -152,8 +152,6 @@ export default function StudentManualApplicationForm() {
     { id: string; type: string; description: string }[]
   >([]);
 
-  const [initOnly, setInitOnly] = useState(true);
-
   const getCurrentDate = () => {
     const d = new Date();
     const year = d.getFullYear();
@@ -323,28 +321,14 @@ export default function StudentManualApplicationForm() {
 
   useEffect(() => {
     const fetchDocumentTypes = async () => {
-      const token = Cookies.get("token");
-
-      const res = await api.get("/document-types", {
-        params: { init_only: initOnly },
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-
-      setDocumentTypes(res.data || []);
-    };
-
-    fetchDocumentTypes();
-  }, [initOnly]);
-
-  useEffect(() => {
-    const fetchDocumentTypes = async () => {
       try {
         const token = Cookies.get("token");
+        const params: Record<string, any> = { init_only: true };
+        if (formData.program_id) params.program_id = formData.program_id;
+        if (formData.student.nationality) params.nationality = formData.student.nationality;
 
         const res = await api.get("/document-types", {
-          params: {
-            init_only: true, // or false
-          },
+          params,
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
@@ -355,7 +339,7 @@ export default function StudentManualApplicationForm() {
     };
 
     fetchDocumentTypes();
-  }, []);
+  }, [formData.program_id, formData.student.nationality]);
 
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,

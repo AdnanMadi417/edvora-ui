@@ -11,10 +11,26 @@ type DocumentType = {
   is_required_init_app_doc: boolean;
 };
 
-export function useDocumentType(initOnly?: boolean) {
+type DocumentTypeParams = {
+  initOnly?: boolean;
+  programId?: string;
+  qualificationId?: string;
+  applicationStageId?: string;
+  nationality?: string;
+};
+
+export function useDocumentType(params?: DocumentTypeParams) {
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const {
+    initOnly,
+    programId,
+    qualificationId,
+    applicationStageId,
+    nationality,
+  } = params ?? {};
 
   useEffect(() => {
     const fetchDocumentTypes = async () => {
@@ -22,8 +38,15 @@ export function useDocumentType(initOnly?: boolean) {
       try {
         const token = Cookies.get("token");
 
+        const queryParams: Record<string, any> = {};
+        if (initOnly !== undefined) queryParams.init_only = initOnly;
+        if (programId) queryParams.program_id = programId;
+        if (qualificationId) queryParams.qualification_id = qualificationId;
+        if (applicationStageId) queryParams.application_stage_id = applicationStageId;
+        if (nationality) queryParams.nationality = nationality;
+
         const res = await api.get("/document-types", {
-          params: initOnly !== undefined ? { init_only: initOnly } : {},
+          params: queryParams,
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
@@ -37,7 +60,7 @@ export function useDocumentType(initOnly?: boolean) {
     };
 
     fetchDocumentTypes();
-  }, [initOnly]);
+  }, [initOnly, programId, qualificationId, applicationStageId, nationality]);
 
   return { documentTypes, loading, error };
 }

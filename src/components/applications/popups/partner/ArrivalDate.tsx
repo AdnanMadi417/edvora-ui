@@ -127,6 +127,7 @@ export default function ArrivalDateConfirmation({
 
             <StatusFileUpload
               label="Travel Ticket"
+              description="Upload your flight ticket or booking confirmation"
               id="ticket_file"
               file={ticketFile}
               required
@@ -138,6 +139,7 @@ export default function ArrivalDateConfirmation({
 
             <StatusFileUpload
               label="E-Visa Document (if required)"
+              description="Upload your e-visa if entry requires one — check with immigration before travelling"
               id="e_visa_file"
               file={eVisaFile}
               onFileChange={setEVisaFile}

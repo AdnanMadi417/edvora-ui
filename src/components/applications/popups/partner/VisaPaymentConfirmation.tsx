@@ -115,6 +115,7 @@ export default function VisaPaymentConfirmation({
 
             <StatusFileUpload
               label="Upload Payment Receipt"
+              description="Upload your proof of visa fee payment (bank transfer slip, receipt, etc.)"
               id="payment_reference"
               file={paymentReference}
               onFileChange={(file) => { setPaymentReference(file); setUploadError(""); }}

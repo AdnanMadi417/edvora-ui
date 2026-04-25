@@ -105,6 +105,7 @@ export default function EmgsEvalUpload({
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
             <StatusFileUpload
               label="EMGS Eval Document"
+              description="Upload the EMGS evaluation document downloaded from the EMGS portal"
               id="emgs_evaluation"
               file={file}
               onFileChange={(f) => { setFile(f); setUploadError(""); }}
