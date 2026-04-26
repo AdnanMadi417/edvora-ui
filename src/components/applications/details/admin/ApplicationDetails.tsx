@@ -18,7 +18,6 @@ import {
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
 import OfferLetterCard from './OfferLetterCard';
-import VisaTrackingTimeline from './VisaTrackingTimeline';
 import ApplicationTimeline from '../ApplicationTimeline';
 import ApplicationCommission from './ApplicationCommission';
 
@@ -216,8 +215,7 @@ export default function ApplicationDetails({
       </div>
       
       <ApplicationTimeline application={application} />
-      <ApplicationCommission application={application}/> 
-      <VisaTrackingTimeline application={application} />
+      <ApplicationCommission application={application}/>
       <OfferLetterCard application={application} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">

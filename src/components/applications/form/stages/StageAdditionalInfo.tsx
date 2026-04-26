@@ -1,7 +1,6 @@
 import React from "react";
 import { InputField, RadioField } from "components/form";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
-import { NATIONALITIES } from "constants/lists";
 import { BookOpen } from "lucide-react";
 import IconButton from "components/ui/buttons/IconButton";
 
@@ -115,19 +114,6 @@ export default function StageAdditionalInfo({
               />
             )}
 
-            {isFieldRequired("student.nationality") && (
-              <SearchableDropdown
-                label="Nationality"
-                field="student.nationality"
-                options={NATIONALITIES.map((q) => ({
-                  value: String(q.label),
-                  label: q.name,
-                }))}
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
-            )}
 
 {isFieldRequired("student.email") && (
               <InputField

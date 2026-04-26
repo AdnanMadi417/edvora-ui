@@ -5,6 +5,7 @@ import { useToast } from "components/context/ToastContext";
 
 interface StatusFileUploadProps {
   label: string;
+  description?: string;
   id: string;
   file: File | null;
   onFileChange: (file: File) => void;
@@ -18,6 +19,7 @@ interface StatusFileUploadProps {
 
 export default function StatusFileUpload({
   label,
+  description,
   id,
   file,
   onFileChange,
@@ -55,9 +57,14 @@ export default function StatusFileUpload({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-900">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
+      <div>
+        <label className="block text-sm font-medium text-gray-900">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        {description && (
+          <p className="mt-0.5 text-xs text-slate-400">{description}</p>
+        )}
+      </div>
 
       <label
         htmlFor={id}

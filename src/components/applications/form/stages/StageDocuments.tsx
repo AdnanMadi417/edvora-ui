@@ -1,5 +1,5 @@
 import React from "react";
-import FileUploadField from "components/form/filesUpload/FileUploadField";
+import DocumentUploadList from "components/applications/form/stages/DocumentUploadList";
 
 interface Props {
   formData: any;
@@ -11,13 +11,12 @@ interface Props {
 }
 
 export default function StageDocuments({
-                                         formData,
-                                         errors,
-                                         updateFormData,
-                                         documentTypes,
-                                         handleFileUpload,
-                                         removeDocument,
-                                       }: Props) {
+  formData,
+  errors,
+  documentTypes,
+  handleFileUpload,
+  removeDocument,
+}: Props) {
   return (
     <div>
       <div className="mb-6">
@@ -27,44 +26,18 @@ export default function StageDocuments({
           </h4>
           <div className="ml-4 flex-1 border-t-2 border-slate-900 opacity-70"></div>
         </div>
-
         <p className="text-sm text-slate-800">
           Please upload all necessary documents to complete your application.
         </p>
       </div>
 
-      <div className="space-y-6">
-        {[...documentTypes]
-          .sort((a, b) => {
-            const order: Record<string, number> = { passport: 1, transcript: 2, ielts: 3 };
-            return (order[a.code] ?? 99) - (order[b.code] ?? 99);
-          })
-          .map((docType) => (
-          <FileUploadField
-            key={docType.id}
-            label={
-              docType.is_required_init_app_doc
-                ? `${docType.type} *`
-                : `${docType.type} (Optional)`
-            }
-            field="documents"
-            documentTypeId={docType.id}
-            formData={formData}
-            updateFormData={updateFormData}
-            errors={{
-              ...errors,
-              documents: errors[`documents.${docType.id}`],
-            }}
-            uploadHandler={handleFileUpload}
-            removeHandler={removeDocument}
-            multiple={false}
-          />
-        ))}
-      </div>
-
-      {errors.documents && (
-        <p className="mt-2 text-xs text-red-600">{errors.documents}</p>
-      )}
+      <DocumentUploadList
+        documentTypes={documentTypes}
+        formData={formData}
+        errors={errors}
+        handleFileUpload={handleFileUpload}
+        removeDocument={removeDocument}
+      />
     </div>
   );
 }

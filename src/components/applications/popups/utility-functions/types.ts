@@ -22,5 +22,5 @@ export interface StatusOption {
 export interface DocumentRequestListProps {
   documents: DocumentRequest[];
   setDocuments: React.Dispatch<React.SetStateAction<DocumentRequest[]>>;
-  documentTypes: { id: string; label: string }[];
+  documentTypes: { id: string; label: string; description?: string }[];
 }

@@ -80,24 +80,10 @@ export default function StudentRegistrationForm() {
   const intake_date = searchParams.get("intake_date") ?? "";
 
 
-  const { documentTypes } = useDocumentType(true);
-  const { qualifications } = useAllQualifications();
-  const safeDocumentTypes = documentTypes ?? [];
-
-  const requiredFieldKeys =
-    (requiredFields as any)?.fields
-      ?.filter((f: any) => f.is_required)
-      ?.map((f: any) => f.field_key) || [];
-
-  const shouldShowStage3 = requiredFieldKeys.length > 0;
-  const visibleStages = shouldShowStage3
-    ? stages
-    : stages.filter((s) => s.id !== 3);
-
   const [formData, setFormData] = useState<FormDataType>({
-    program_id: "",
-    university_id: "",
-    intake_date: getCurrentDate().toString(),
+    program_id: program_id,
+    university_id: university_id,
+    intake_date: intake_date || getCurrentDate().toString(),
     student_id: "",
     student: {
       name: "",
@@ -123,6 +109,24 @@ export default function StudentRegistrationForm() {
     documents: [],
     is_draft: false,
   });
+
+  const { documentTypes, loading: documentTypesLoading } = useDocumentType({
+    initOnly: true,
+    programId: formData.program_id || undefined,
+    nationality: formData.student.nationality || undefined,
+  });
+  const { qualifications } = useAllQualifications();
+  const safeDocumentTypes = documentTypes ?? [];
+
+  const requiredFieldKeys =
+    (requiredFields as any)?.fields
+      ?.filter((f: any) => f.is_required)
+      ?.map((f: any) => f.field_key) || [];
+
+  const shouldShowStage3 = requiredFieldKeys.length > 0;
+  const visibleStages = shouldShowStage3
+    ? stages
+    : stages.filter((s) => s.id !== 3);
 
   const { intakeDates, loading: loadingIntakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
 
@@ -151,12 +155,13 @@ export default function StudentRegistrationForm() {
         formData,
         stageNum,
         requiredFieldKeys,
-        safeDocumentTypes
+        safeDocumentTypes,
+        documentTypesLoading
       );
       setErrors(errors);
       return isValid;
     },
-    [formData, requiredFieldKeys, safeDocumentTypes]
+    [formData, requiredFieldKeys, safeDocumentTypes, documentTypesLoading]
   );
 
   const nextStage = async () => {
@@ -287,8 +292,8 @@ export default function StudentRegistrationForm() {
   );
 
   const isStageValid = React.useMemo(() => {
-    return validateFormData(formData, stage, requiredFieldKeys, documentTypes).isValid;
-  }, [stage, formData, requiredFieldKeys, documentTypes]);
+    return validateFormData(formData, stage, requiredFieldKeys, documentTypes, documentTypesLoading).isValid;
+  }, [stage, formData, requiredFieldKeys, documentTypes, documentTypesLoading]);
 
   const handleSubmit = async () => {
     for (const s of visibleStages) {

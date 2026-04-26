@@ -23,6 +23,7 @@ import { MdSchool } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import api from "lib/useApi";
 
+import { useAccountManagerApplications } from "hooks/applications/useAccountManagerApplications";
 import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
 import { useAllStages } from "hooks/applications/stages/useStages";
 import { useAllStageStatuses } from "hooks/applications/stages/useStageStatuses";
@@ -80,12 +81,11 @@ const SkeletonRow = () => (
 
 const ModernApplicationsTable = () => {
   const router = useRouter();
-  const [applications, setApplications] = useState([]);
+  const [managerId, setManagerId] = useState<string>("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   const { universities } = useAllUniversities();
   const { stages } = useAllStages();
@@ -98,31 +98,23 @@ const ModernApplicationsTable = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    const fetchApplications = async () => {
-      setLoading(true);
-      try {
-        let managerId = localStorage.getItem("managerId");
-
-        if (!managerId) {
-          const meRes = await api.get("/auth/me");
-          managerId = meRes.data.manager_id ?? meRes.data.id;
-          if (managerId) localStorage.setItem("managerId", managerId);
-        }
-
-        if (!managerId) return;
-
-        const res = await api.get(`/account-managers/${managerId}/applications`);
-        const appsArray = Array.isArray(res.data.items) ? res.data.items : [];
-        setApplications(appsArray);
-      } catch (err) {
-        console.error("Error fetching applications:", err);
-      } finally {
-        setLoading(false);
+    const resolveManager = async () => {
+      let id = localStorage.getItem("managerId");
+      if (!id) {
+        const meRes = await api.get("/auth/me");
+        id = meRes.data.manager_id ?? meRes.data.id;
+        if (id) localStorage.setItem("managerId", id);
       }
+      if (id) setManagerId(id);
     };
-
-    fetchApplications();
+    resolveManager();
   }, []);
+
+  const { items: applications, loading } = useAccountManagerApplications({
+    managerId,
+    limit: itemsPerPage,
+    offset: (currentPage - 1) * itemsPerPage,
+  });
 
   useEffect(() => {
     setCurrentPage(1);
@@ -150,7 +142,7 @@ const ModernApplicationsTable = () => {
       filtered = filtered.filter(
         (app) =>
           (app.student_name?.toLowerCase() ?? "").includes(term) ||
-          (app.student_email?.toLowerCase() ?? "").includes(term) ||
+          (app.passport_number?.toLowerCase() ?? "").includes(term) ||
           (app.partner_name?.toLowerCase() ?? "").includes(term) ||
           (app.account_manager_name?.toLowerCase() ?? "").includes(term) ||
           (app.program_name?.toLowerCase() ?? "").includes(term) ||
@@ -498,7 +490,7 @@ const ModernApplicationsTable = () => {
                       </div>
                       <div className="min-w-0">
                         <div className="truncate font-medium text-slate-900">{app.student_name}</div>
-                        <div className="truncate text-xs text-slate-500">{app.student_email}</div>
+                        <div className="truncate text-xs text-slate-500">{app.passport_number ?? "—"}</div>
                       </div>
                     </div>
                   </td>

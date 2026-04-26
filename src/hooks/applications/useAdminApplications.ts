@@ -12,6 +12,7 @@ export type AdminApplication = {
   university_name: string;
   student_name: string;
   student_email: string;
+  passport_number?: string;
   stage: string;
   status: string;
   next_action: string;

@@ -1,18 +1,21 @@
 import { useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
-import { Download } from "lucide-react";
+import { Download, CreditCard } from "lucide-react";
 import { getDocumentDownloadUrl } from "services/documentService";
+import { useVisaCase } from "hooks/useVisaCase";
+import VisaTrackingTimeline from "./VisaTrackingTimeline";
 
 interface OfferLetterDecisionProps {
   application: any;
 }
 
 export default function OfferLetterDecision({
-                                              application,
-                                            }: OfferLetterDecisionProps) {
+  application,
+}: OfferLetterDecisionProps) {
   const offerLetter = application?.offer_letter_document;
 
   const [downloading, setDownloading] = useState(false);
+  const { visaCase } = useVisaCase(application?.id || "");
 
   const handleDownload = async (fileKey?: string) => {
     if (!fileKey || downloading) return;
@@ -33,6 +36,47 @@ export default function OfferLetterDecision({
 
   return (
     <section className="max-w-5xl mx-auto">
+
+      {visaCase && (
+        <>
+          <div className="my-5 rounded-lg border border-gray-200 bg-card shadow-sm">
+            <div className="flex items-center gap-4 border-b border-gray-200 p-6">
+              <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
+                <CreditCard className="text-xl text-blue-700" />
+              </span>
+              <div>
+                <h3 className="text-p3 font-semibold text-slate-900">Visa Payment</h3>
+                <span className="text-sm text-slate-500">Visa processing fee details</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-3">
+              <div>
+                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">Visa Fee Amount</p>
+                <p className="text-lg font-bold text-slate-900">
+                  {visaCase.visa_fee_amount
+                    ? `RM ${Number(visaCase.visa_fee_amount).toLocaleString()}`
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">Created At</p>
+                <p className="text-sm text-slate-700">
+                  {visaCase.created_at
+                    ? new Date(visaCase.created_at).toLocaleString()
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">Notes</p>
+                <p className="text-sm text-slate-700">{visaCase.notes || "No notes"}</p>
+              </div>
+            </div>
+            <VisaTrackingTimeline application={application} />
+          </div>
+        </>
+      )}
+
       <div className="mb-5 mt-5 space-y-4 rounded-lg border border-gray-200 bg-card p-4 shadow-sm sm:p-6">
         <div className="flex items-start gap-4">
           <span className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-200">
@@ -78,6 +122,7 @@ export default function OfferLetterDecision({
         </div>
 
       </div>
+
     </section>
   );
 }
