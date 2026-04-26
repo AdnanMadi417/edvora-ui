@@ -17,7 +17,6 @@ import { useVisaSetup } from "hooks/applications/useVisaSetup";
 import { useStatusUpdate } from "hooks/applications/useStatusUpdate";
 import { useCommissionPaymentUpload } from "hooks/applications/files/useCommissionPaymentUpload";
 import { useApplicationActions } from 'hooks/applications/stages/useApplicationActions';
-import { useVisaCase } from 'hooks/useDefaultVisaCase';
 
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
@@ -59,7 +58,7 @@ const DocumentRequestList = ({
 
   return (
     <div className="space-y-4">
-      {documents.map((doc, index) => (
+      {documents.map((doc) => (
         <div
           key={doc.id}
           className="relative space-y-3 rounded-md border bg-card p-4"
@@ -106,7 +105,7 @@ const DocumentRequestList = ({
               {documentTypes.map((d) => (
                 <label
                   key={d.id}
-                  className={`flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 transition-colors ${
+                  className={`flex cursor-pointer items-start gap-2.5 rounded-md px-3 py-2 transition-colors ${
                     doc.type.includes(d.id)
                       ? "bg-blue-50 text-blue-700"
                       : "text-gray-700 hover:bg-gray-50"
@@ -116,9 +115,14 @@ const DocumentRequestList = ({
                     type="checkbox"
                     checked={doc.type.includes(d.id)}
                     onChange={() => toggleType(doc.id, d.id)}
-                    className="h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="truncate text-sm">{d.label}</span>
+                  <div className="min-w-0 ">
+                    <span className="block truncate text-sm font-medium text-slate-800">{d.label}</span>
+                    {d.description && (
+                      <span className="block text-xs text-slate-400">{d.description}</span>
+                    )}
+                  </div>
                 </label>
               ))}
             </div>
@@ -150,7 +154,7 @@ export default function UpdateStatusPopup({
   ]);
   const [statusOptions, setStatusOptions] = useState<StatusOption[]>([]);
   const [documentTypes, setDocumentTypes] = useState<
-    { id: string; label: string }[]
+    { id: string; label: string; description?: string }[]
   >([]);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -202,8 +206,7 @@ export default function UpdateStatusPopup({
     };
   };
 
-  const { actions, loading } = useApplicationActions(application?.id);
-  const { amount: defaultVisaFee } = useVisaCase();
+  const { actions } = useApplicationActions(application?.id);
 
   useEffect(() => {
     if (!actions) return;
@@ -211,7 +214,8 @@ export default function UpdateStatusPopup({
     setDocumentTypes(
       (actions.document_types || []).map((d) => ({
         id: d.id,
-        label: d.description || d.type,
+        label: d.type,
+        description: d.description,
       }))
     );
 
@@ -256,7 +260,7 @@ export default function UpdateStatusPopup({
 
   const isCommissionPaid = selectedOption?.label === "Commission Paid";
 
-  const { uploadOfferLetter, isUploading } = useOfferLetterUpload();
+  const { uploadOfferLetter } = useOfferLetterUpload();
 
   const handleOfferLetterUpload = async () => {
     if (!offerLetterFile || !isUniversityApproved) return;
@@ -264,17 +268,17 @@ export default function UpdateStatusPopup({
     await uploadOfferLetter(offerLetterFile, application.id);
   };
 
-  const { submitVisaFee, isSubmitting: isVisaSubmitting } = useVisaSetup();
+  const { submitVisaFee } = useVisaSetup();
 
   const handleVisaSetup = async () => {
     if (!isVisaSetupSelected) return;
 
     const enteredAmount = Number(formData.visa_fee_amount);
-    const finalAmount = enteredAmount > 0 ? enteredAmount : Number(defaultVisaFee?.amount ?? 0);
+    const finalAmount = enteredAmount > 0 ? enteredAmount : 0;
     await submitVisaFee(application.id, finalAmount);
   };
 
-  const { uploadVisaDocument, isUploading: isVisaUploading } = useVisaDocumentUpload();
+  const { uploadVisaDocument } = useVisaDocumentUpload();
 
   const handleVisaIssuedUpload = async () => {
     if (!visaDocumentFile || selectedOption?.label !== "Visa Issued") return;
@@ -282,7 +286,7 @@ export default function UpdateStatusPopup({
     await uploadVisaDocument(visaDocumentFile, application.id);
   };
 
-  const { updateStatus, isUpdating: isStatusUpdating } = useStatusUpdate();
+  const { updateStatus } = useStatusUpdate();
 
   const handleStatusUpdate = async () => {
     await updateStatus({
@@ -520,6 +524,16 @@ export default function UpdateStatusPopup({
             </div>
           )}
 
+          {actions?.correction_reason && (
+            <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+              <div>
+                <p className="text-xs font-semibold text-amber-700">Correction Reason</p>
+                <p className="mt-0.5 text-xs text-amber-800">{actions.correction_reason}</p>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-3">
             <label className="block text-p2 font-semibold text-gray-900">
               <span className="flex items-center gap-1">
@@ -538,7 +552,7 @@ export default function UpdateStatusPopup({
                 subtitle="There are no status options available at the moment."
               />
             ) : (
-              statusOptions.map((option, index) => {
+              statusOptions.map((option) => {
                 const Icon = option.icon;
                 const isSelected = selectedStatus === option.id;
 
@@ -648,14 +662,6 @@ export default function UpdateStatusPopup({
                 errors={formErrors}
                 updateFormData={updateFormData}
               />
-              {defaultVisaFee?.amount && (
-                <div className="flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
-                  <span>
-                    Default visa fee is <strong>{defaultVisaFee.amount}</strong>. You can enter a different amount if needed.
-                  </span>
-                </div>
-              )}
             </div>
           )}
 

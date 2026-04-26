@@ -6,7 +6,7 @@ import { XCircle, AlertCircle, RotateCcw } from "lucide-react";
 interface ResubmitDocProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (file: File | null, documentTypeId: string) => void;
+  onConfirm: (file: File | null, documentTypeId: string) => Promise<void>;
   applicationId?: string;
   documentTypeId?: string;
 }
@@ -38,9 +38,10 @@ export default function UploadDoc({
   };
 
   const handleConfirm = () => {
-    if (!documentTypeId) return;
+    if (!documentTypeId || !selectedFile) return;
     onConfirm(selectedFile, documentTypeId);
     setSelectedFile(null);
+    onClose();
   };
 
   const handleClose = () => {

@@ -12,6 +12,7 @@ interface ProgramDecisionModalProps {
   onClose: () => void;
   applicationId: string | number;
   universityId: string;
+  correctionReason?: string;
 }
 
 export default function ProgramDecisionModal({
@@ -19,6 +20,7 @@ export default function ProgramDecisionModal({
                                                onClose,
                                                applicationId,
                                                universityId,
+                                               correctionReason,
                                              }: ProgramDecisionModalProps) {
 
   const { universities } = useUniversities();
@@ -93,9 +95,7 @@ export default function ProgramDecisionModal({
             <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
               <RefreshCcw className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
               <p className="text-p2 leading-relaxed text-slate-900">
-                The university has requested that this applicant’s program be
-                updated. Please select the new program and provide a brief
-                reason.
+                {correctionReason ?? "The university has requested that this applicant’s program be updated. Please select the new program and provide a brief reason."}
               </p>
             </div>
 

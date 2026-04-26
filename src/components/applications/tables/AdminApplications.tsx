@@ -134,7 +134,7 @@ const ModernApplicationsTable = () => {
       filtered = filtered.filter(
         (app) =>
           (app.student_name?.toLowerCase() ?? "").includes(term) ||
-          (app.student_email?.toLowerCase() ?? "").includes(term) ||
+          (app.passport_number?.toLowerCase() ?? "").includes(term) ||
           (app.partner_name?.toLowerCase() ?? "").includes(term) ||
           (app.account_manager_name?.toLowerCase() ?? "").includes(term) ||
           (app.program_name?.toLowerCase() ?? "").includes(term) ||
@@ -475,7 +475,7 @@ const ModernApplicationsTable = () => {
                       </div>
                       <div className="min-w-0">
                         <div className="truncate font-medium text-slate-900">{app.student_name}</div>
-                        <div className="truncate text-xs text-slate-500">{app.student_email}</div>
+                        <div className="truncate text-xs text-slate-500">{app.passport_number ?? "—"}</div>
                       </div>
                     </div>
                   </td>

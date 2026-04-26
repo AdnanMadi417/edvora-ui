@@ -25,11 +25,13 @@ export default function VisaTrackingTimeline({
 }: VisaTrackingTimelineProps) {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
+  const isVisaStageOrLater = (application?.stage?.name || "").toLowerCase().includes("visa");
+
   const {
     visaCase,
     loading: visaLoading,
     error: visaError,
-  } = useVisaCase(application?.id || "");
+  } = useVisaCase(isVisaStageOrLater ? application?.id || "" : "");
 
   const {
     payments: visaPayments,
@@ -108,83 +110,41 @@ export default function VisaTrackingTimeline({
           </div>
         </div>
 
-        {visaCase && (
-          <div className="mt-4 grid grid-cols-1 gap-4 border-b border-gray-200 p-6 sm:grid-cols-2">
-            <div>
-              <p className="mb-2 text-sm tracking-wide text-slate-500">
-                Visa Fee Amount
-              </p>
-              <p className="text-lg font-bold ">
-                {visaCase.visa_fee_amount
-                  ? `RM ${visaCase.visa_fee_amount.toLocaleString()}`
-                  : "—"}
-              </p>
-            </div>
 
+        {application?.emgs_evaluation_document && (
+          <div className="block space-y-4 border-b border-gray-200 p-6">
             <div>
-              <p className="mb-2 text-sm tracking-wide text-slate-500">
-                Created At
-              </p>
-              <p className="text-sm">
-                {visaCase.created_at
-                  ? new Date(visaCase.created_at).toLocaleString()
-                  : "—"}
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900">
+                EMGS Eval Document
+              </h3>
+              <p className="text-sm text-slate-500">EMGS evaluation file</p>
             </div>
-
-            <div>
-              <p className="mb-2 text-sm tracking-wide text-slate-500">Notes</p>
-              <p className="text-sm">{visaCase.notes || "No notes"}</p>
+            <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
+                  <FileText className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {application.emgs_evaluation_document.document_type}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Uploaded on{" "}
+                    {new Date(application.emgs_evaluation_document.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => handleDownload(application.emgs_evaluation_document.file_key)}
+                disabled={downloading}
+                className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                title="Download document"
+              >
+                <Download className="h-4 w-4" />
+              </button>
             </div>
           </div>
         )}
-
-        <div className="block space-y-4 border-b border-gray-200 p-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              EMGS Eval Document
-            </h3>
-            <p className="text-sm text-slate-500">
-              EMGS evaluation file
-            </p>
-          </div>
-
-          <div>
-            {!application?.emgs_evaluation_document ? (
-              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-10">
-                <FileText className="h-8 w-8 text-gray-400" />
-                <p className="mt-2 text-sm text-slate-500">
-                  No EMGS evaluation document uploaded
-                </p>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
-                    <FileText className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      {application.emgs_evaluation_document.document_type}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Uploaded on{" "}
-                      {new Date(application.emgs_evaluation_document.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleDownload(application.emgs_evaluation_document.file_key)}
-                  disabled={downloading}
-                  className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
-                  title="Download document"
-                >
-                  <Download className="h-4 w-4" />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
 
         <div className="border-b border-gray-200 p-6 ">
           {visaPayments.length === 0 ? (
@@ -293,26 +253,15 @@ export default function VisaTrackingTimeline({
           )}
         </div>
 
-        <div>
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Arrival Documents
-            </h3>
-            <p className="text-sm text-slate-500">
-              Travel and arrival-related files
-            </p>
-          </div>
-
-          <div className="p-6 pt-0">
-            {!application?.arrival_documents ||
-            application.arrival_documents.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-10">
-                <FileText className="h-8 w-8 text-gray-400" />
-                <p className="mt-2 text-sm text-slate-500">
-                  No arrival documents uploaded
-                </p>
-              </div>
-            ) : (
+        {application?.arrival_documents?.length > 0 && (
+          <div>
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Arrival Documents
+              </h3>
+              <p className="text-sm text-slate-500">Travel and arrival-related files</p>
+            </div>
+            <div className="p-6 pt-0">
               <div className="space-y-4">
                 {application.arrival_documents.map((doc: any) => (
                   <div
@@ -323,18 +272,13 @@ export default function VisaTrackingTimeline({
                       <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
                         <FileText className="h-5 w-5 text-green-600" />
                       </div>
-
                       <div>
-                        <p className="font-medium text-gray-900">
-                          {doc.document_type}
-                        </p>
+                        <p className="font-medium text-gray-900">{doc.document_type}</p>
                         <p className="text-xs text-slate-500">
-                          Uploaded on{" "}
-                          {new Date(doc.created_at).toLocaleDateString()}
+                          Uploaded on {new Date(doc.created_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
-
                     <button
                       onClick={() => handleDownload(doc.file_key)}
                       disabled={downloading}
@@ -346,9 +290,9 @@ export default function VisaTrackingTimeline({
                   </div>
                 ))}
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
     </section>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, Landmark } from "lucide-react";
 
-import { useUpdateDefaultVisaFee } from "hooks/knowledge-hub/programs/useBatchUpdateVisaAmounts";
+import { useBatchUpdatePrograms } from "hooks/knowledge-hub/programs/useBatchUpdatePrograms";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
@@ -14,15 +14,17 @@ import { useToast } from "components/context/ToastContext";
 interface DefaultVisaFeeProps {
   isOpen: boolean;
   onClose: () => void;
+  selectedProgramIds?: string[];
   onSuccess?: () => void;
 }
 
 export default function DefaultVisaFee({
   isOpen,
   onClose,
+  selectedProgramIds,
   onSuccess,
 }: DefaultVisaFeeProps) {
-  const { updateDefaultVisaFee, loading } = useUpdateDefaultVisaFee();
+  const { batchUpdatePrograms, loading } = useBatchUpdatePrograms();
   const { showToast } = useToast();
 
   const [isVisible, setIsVisible] = useState(false);
@@ -56,9 +58,12 @@ export default function DefaultVisaFee({
 
   const handleSubmit = async () => {
     try {
-      await updateDefaultVisaFee({ amount: Number(formData.amount) });
+      await batchUpdatePrograms({
+        program_ids: selectedProgramIds ?? [],
+        visa_fee_amount: Number(formData.amount),
+      });
 
-      showToast("Default visa fee updated successfully.", "success");
+      showToast("Visa fee updated successfully.", "success");
 
       setTimeout(() => {
         onClose();

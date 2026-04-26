@@ -17,7 +17,6 @@ import {
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
 import OfferLetterCard from '../account-manager/OfferLetterCard';
-import VisaTrackingTimeline from '../account-manager/VisaTrackingTimeline';
 import AccountManagerTopBar from "../../topBar/AccountManagerTopBar";
 import ApplicationTimeline from '../ApplicationTimeline';
 import ApplicationCommission from '../account-manager/ApplicationCommission';
@@ -221,7 +220,6 @@ export default function ApplicationDetails({
 
       <ApplicationTimeline application={application} />
       <ApplicationCommission application={application} />
-      <VisaTrackingTimeline application={application} />
       <OfferLetterCard application={application} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">

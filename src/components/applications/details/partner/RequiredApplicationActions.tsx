@@ -5,6 +5,7 @@ import api from "../../../../lib/useApi";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import UploadDoc from "../../popups/partner/UploadDoc";
 import { AlertCircle } from "lucide-react";
+import { useToast } from "components/context/ToastContext";
 
 interface RequiredApplicationActionsProps {
   params: {
@@ -19,6 +20,7 @@ export default function RequiredApplicationActions({
   const [loading, setLoading] = useState(true);
   const [showResubmit, setShowResubmit] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   const id = params.id;
 
@@ -41,7 +43,7 @@ export default function RequiredApplicationActions({
     if (!file) return;
 
     try {
-      const presigned = await getPresignedUploads([file], "applications-files");
+      const presigned = await getPresignedUploads([file], "documents");
       const results = await uploadFilesToSpaces([file], presigned);
       const uploaded = results?.[0];
 
@@ -51,12 +53,17 @@ export default function RequiredApplicationActions({
         {
           document_type_id: documentTypeId,
           file_url: uploaded.public_url,
+          file_key: uploaded.file_key,
         },
       ];
 
       await api.post(`/applications/${id}/requested-documents/bulk`, payload);
+      showToast("Document uploaded successfully.", "success");
+      setShowResubmit(false);
+      setTimeout(() => window.location.reload(), 1500);
     } catch (err: any) {
-      console.error("Upload failed:", err.response?.data || err.message);
+      const message = err?.response?.data?.message || "Upload failed. Please try again.";
+      showToast(message, "error");
     }
   };
 

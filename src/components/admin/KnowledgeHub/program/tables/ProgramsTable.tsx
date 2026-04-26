@@ -833,6 +833,7 @@ const ProgramsTable = () => {
       <DefaultVisaFee
         isOpen={isVisaFeeOpen}
         onClose={() => setIsVisaFeeOpen(false)}
+        selectedProgramIds={selectedProgramIds}
       />
 
     </div>

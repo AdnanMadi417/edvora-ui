@@ -23,7 +23,6 @@ import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopB
 import RequiredAction from "components/applications/popups/partner/RequiredAction";
 import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
 import OfferLetterDecision from './OfferLetter';
-import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import VisaPaymentConfirmation from "components/applications/popups/partner/VisaPaymentConfirmation";
 import ArrivalDate from "components/applications/popups/partner/ArrivalDate";
 import EmgsEvalUpload from "components/applications/popups/partner/EmgsEvaluationUpload";
@@ -111,15 +110,10 @@ export default function ApplicationDetails({
 
   const [showVisaPaymentPopup, setShowVisaPaymentPopup] = useState(false);
 
-  const stageName = stage?.name;
   const currentStatusCode =
     actions?.status_code ||
     application?.status_code ||
     stage?.statuses?.[0]?.code;
-  const currentStatusName =
-    actions?.status ||
-    application?.status ||
-    stage?.statuses?.[0]?.name;
 
   const showVisaPayment =
     currentStatusCode === "WAITING_FOR_PAYMENT" ||
@@ -129,16 +123,11 @@ export default function ApplicationDetails({
   const [showEmgsUploadPopup, setShowEmgsUploadPopup] = useState(false);
 
   const showArrivalConfirmation =
-    stageName === "Student Arrival & Enrollment" &&
-    currentStatusName === "Waiting Partner to confirm arrival date";
+    currentStatusCode === "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE";
 
   const showEmgsUpload =
-    stageName === "Visa Processing" &&
-    (
-      actions?.status_code === "EVAL_READY" ||
-      actions?.status_code === "EVAL_PARTNER_UPLOAD" ||
-      actions?.status_code === "EVAL_REUPLOAD_REQUIRED"
-    );
+    currentStatusCode === "EVAL_PARTNER_UPLOAD" ||
+    currentStatusCode === "EVAL_REUPLOAD_REQUIRED";
 
   const formatGender = (value: boolean | null) => {
     if (value === null) return "Not provided";
@@ -311,7 +300,7 @@ export default function ApplicationDetails({
                           Upload Required Documents
                         </button>
                       )}
-                      {actions.partner_actions?.some((a) => a.is_requires_reason) && (
+                      {currentStatusCode === "PROGRAM_CHANGE_SUGGESTED" && (
                         <button
                           onClick={openProgramDecisionPopup}
                           className="flex w-full items-center justify-center gap-2 rounded-md bg-violet-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-violet-600"
@@ -504,7 +493,6 @@ export default function ApplicationDetails({
       
       <ApplicationTimeline application={application} />
       <ApplicationCommission application={application} />
-      <VisaTrackingTimeline application={application} />
       <OfferLetterDecision application={application} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
@@ -880,6 +868,7 @@ export default function ApplicationDetails({
           onClose={closeProgramDecisionPopup}
           applicationId={application.id}
           universityId={application.program?.university?.id || ""}
+          correctionReason={actions?.correction_reason ?? undefined}
         />
       )}
 

@@ -248,7 +248,7 @@ export default function DocumentUploadList({
             <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200">
               <div
                 className={`h-full rounded-full transition-all duration-500 ${
-                  allDone ? "bg-green-500" : "bg-slate-900"
+                  allDone ? "bg-green-500" : "bg-blue-600"
                 }`}
                 style={{ width: `${progressPct}%` }}
               />

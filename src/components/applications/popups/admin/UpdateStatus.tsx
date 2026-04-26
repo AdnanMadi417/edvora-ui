@@ -89,11 +89,11 @@ const DocumentRequestList = ({
                       key={t}
                       className="flex max-w-[160px] items-center gap-1 rounded-full bg-blue-100 py-0.5 pl-2.5 pr-1.5 text-xs font-medium text-blue-700"
                     >
-                      <span className="truncate">{label}</span>
+                      <span className="truncate text-slate-800">{label}</span>
                       <button
                         type="button"
                         onClick={() => toggleType(doc.id, t)}
-                        className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-blue-200 text-blue-600 hover:bg-blue-300"
+                        className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-blue-200 text-slate-800 hover:bg-blue-300"
                       >
                         ×
                       </button>
@@ -107,7 +107,7 @@ const DocumentRequestList = ({
               {documentTypes.map((d) => (
                 <label
                   key={d.id}
-                  className={`flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 transition-colors ${
+                  className={`flex cursor-pointer items-start gap-2.5 rounded-md px-3 py-2 transition-colors ${
                     doc.type.includes(d.id)
                       ? "bg-blue-50 text-blue-700"
                       : "text-gray-700 hover:bg-gray-50"
@@ -117,9 +117,14 @@ const DocumentRequestList = ({
                     type="checkbox"
                     checked={doc.type.includes(d.id)}
                     onChange={() => toggleType(doc.id, d.id)}
-                    className="h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="truncate text-sm">{d.label}</span>
+                  <div className="min-w-0">
+                    <span className="block truncate text-sm font-medium text-slate-800">{d.label}</span>
+                    {d.description && (
+                      <span className="block text-xs text-slate-400">{d.description}</span>
+                    )}
+                  </div>
                 </label>
               ))}
             </div>
@@ -152,7 +157,7 @@ export default function UpdateStatusPopup({
 
   const [statusOptions, setStatusOptions] = useState<StatusOption[]>([]);
   const [documentTypes, setDocumentTypes] = useState<
-    { id: string; label: string }[]
+    { id: string; label: string; description?: string }[]
   >([]);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -213,7 +218,8 @@ export default function UpdateStatusPopup({
     setDocumentTypes(
       (actions.document_types || []).map((d) => ({
         id: d.id,
-        label: d.description || d.type,
+        label: d.type,
+        description: d.description,
       }))
     );
 
@@ -520,6 +526,16 @@ export default function UpdateStatusPopup({
                 <pre className="mt-1 whitespace-pre-wrap font-mono text-xs text-red-700">
                   {error}
                 </pre>
+              </div>
+            </div>
+          )}
+
+          {actions?.correction_reason && (
+            <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+              <div>
+                <p className="text-xs font-semibold text-amber-700">Correction Reason</p>
+                <p className="mt-0.5 text-xs text-amber-800">{actions.correction_reason}</p>
               </div>
             </div>
           )}

@@ -14,6 +14,8 @@ interface BatchUpdateProgramPayload {
   expected_commission_from?: number | null;
   expected_commission_to?: number | null;
 
+  visa_fee_amount?: number;
+
   yearly_fees?: Array<{ year: number; fee: string }>;
   one_time_fees?: Array<{ description: string; fee: string }>;
 
