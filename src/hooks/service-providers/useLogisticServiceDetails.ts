@@ -33,6 +33,8 @@ export interface LogisticService {
   services_offered: ServicesOffered[]
   packages_offered: Package[]
   price_range: PriceRange
+  services_price_range: PriceRange | null
+  packages_price_range: PriceRange | null
   phone_number: string
   whatsapp: string
   is_active: boolean
