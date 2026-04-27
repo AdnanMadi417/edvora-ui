@@ -16,6 +16,7 @@ import {
 } from 'react-icons/fa';
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
+import PresignedImage from "components/ui/PresignedImage";
 import OfferLetterCard from '../account-manager/OfferLetterCard';
 import AccountManagerTopBar from "../../topBar/AccountManagerTopBar";
 import ApplicationTimeline from '../ApplicationTimeline';
@@ -94,9 +95,16 @@ export default function ApplicationDetails({
         {/* Top row: avatar + info | intake date */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-700 border-2 border-blue-200 text-xl font-bold text-white">
-              {student.name?.[0]?.toUpperCase() ?? "?"}
-            </div>
+            <PresignedImage
+              fileKey={application.student_photo_file_key}
+              alt={student.name}
+              className="h-16 w-16 shrink-0 rounded-full object-cover border-2 border-blue-200"
+              fallback={
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-700 border-2 border-blue-200 text-xl font-bold text-white">
+                  {student.name?.[0]?.toUpperCase() ?? "?"}
+                </div>
+              }
+            />
             <div>
               <h2 className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-slate-900">
                 {student.name}

@@ -13,6 +13,8 @@ export type AdminApplication = {
   student_name: string;
   student_email: string;
   passport_number?: string;
+  student_photo_file_key?: string;
+  student_photo_file_url?: string;
   stage: string;
   status: string;
   next_action: string;

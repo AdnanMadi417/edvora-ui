@@ -38,7 +38,7 @@ function DocRow({
   const file = formData.documents?.find((d) => d.document_type_id === docType.id);
   const isUploaded = !!(file?.file_key && !file?.uploading);
   const isUploading = !!file?.uploading;
-  const isRequired = docType.is_required_init_app_doc;
+  const isRequired = docType.is_required_for_current_upload;
   const errorMsg =
     fileError ||
     (errors[`documents.${docType.id}`] === "required"
@@ -211,14 +211,14 @@ export default function DocumentUploadList({
   removeDocument,
 }: Props) {
   const sorted = [...documentTypes].sort((a, b) => {
-    if (a.is_required_init_app_doc !== b.is_required_init_app_doc)
-      return a.is_required_init_app_doc ? -1 : 1;
+    if (a.is_required_for_current_upload !== b.is_required_for_current_upload)
+      return a.is_required_for_current_upload ? -1 : 1;
     const order: Record<string, number> = { passport: 1, transcript: 2, ielts: 3 };
     return (order[a.code] ?? 99) - (order[b.code] ?? 99);
   });
 
-  const required = sorted.filter((d) => d.is_required_init_app_doc);
-  const optional = sorted.filter((d) => !d.is_required_init_app_doc);
+  const required = sorted.filter((d) => d.is_required_for_current_upload);
+  const optional = sorted.filter((d) => !d.is_required_for_current_upload);
 
   const uploadedRequired = required.filter((d) =>
     formData.documents?.some(

@@ -126,7 +126,7 @@ export default function RequiredAction({
       return newErrors;
     }
 
-    const required = docTypes.filter((d) => d.is_required_init_app_doc);
+    const required = docTypes.filter((d) => d.is_required_for_current_upload);
 
     if (required.length > 0) {
       required.forEach((docType) => {
@@ -175,7 +175,7 @@ export default function RequiredAction({
   };
 
   const docTypes: DocumentType[] = actions?.document_types ?? [];
-  const requiredDocTypes = docTypes.filter((d) => d.is_required_init_app_doc);
+  const requiredDocTypes = docTypes.filter((d) => d.is_required_for_current_upload);
   const uploadedDocs = documents.filter((d) => d.file_url && !d.uploading);
   const allRequiredUploaded =
     requiredDocTypes.length > 0
