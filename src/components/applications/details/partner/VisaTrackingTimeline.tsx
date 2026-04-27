@@ -86,29 +86,9 @@ export default function VisaTrackingTimeline({
   if (!visaCase) return null;
 
   return (
-    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
-      <div className="mb-6 rounded-lg border bg-white">
-        <div className="flex items-start gap-3 border-b border-gray-200 p-6">
-          <div className="flex-1">
-            <div className="flex items-center gap-4">
-              <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-                <CreditCard className="text-xl text-blue-700" />
-              </span>
-              <div>
-                <h3 className="text-p3 font-semibold text-slate-900">
-                  Visa Payment
-                </h3>
-                <span className="text-sm text-slate-500">
-                  Visa processing fee details
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-        {(showEmgsUpload || application?.emgs_evaluation_document) && (
-        <div className="block space-y-4 border-b border-gray-200 p-6">
+    <>
+      {(showEmgsUpload || application?.emgs_evaluation_document) && (
+        <div className="block space-y-4 border-t border-gray-200 p-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
               EMGS Eval Document
@@ -220,7 +200,7 @@ export default function VisaTrackingTimeline({
         )}
 
         {showVisaPayment && (
-          <div className="p-6 block space-y-4">
+          <div className="border-t border-gray-200 p-6 block space-y-4">
 
           {paymentLoading ? (
           <div className="border-gray-200">
@@ -292,7 +272,7 @@ export default function VisaTrackingTimeline({
         )}
 
         {visaPayments.length > 0 && (
-        <div className="p-6">
+        <div className="border-t border-gray-200 p-6">
           <div className="space-y-4">
             <div className="mb-6 flex items-center justify-between">
               <div>
@@ -375,7 +355,7 @@ export default function VisaTrackingTimeline({
         )}
 
         {showArrivalConfirmation && (
-          <div className="border-b border-gray-200 p-6">
+          <div className="border-t border-gray-200 p-6">
             <div className="relative rounded-lg border border-gray-200 p-6">
               <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
 
@@ -406,7 +386,7 @@ export default function VisaTrackingTimeline({
         )}
 
         {application?.arrival_documents?.length > 0 && (
-        <div>
+        <div className="border-t border-gray-200">
           <div className="p-6">
             <h3 className="text-lg font-semibold text-gray-900">
               Arrival Documents
@@ -477,7 +457,6 @@ export default function VisaTrackingTimeline({
             applicationId={application.id}
           />
         )}
-      </div>
-    </section>
+    </>
   );
 }

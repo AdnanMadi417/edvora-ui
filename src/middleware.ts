@@ -6,7 +6,7 @@ const publicRoutes = ["/auth/sign-in", "/unauthorized", "/", "/api/health"];
 const protectedPrefixes: Record<string, string[]> = {
   "/admin": ["admin"],
   "/partner": ["partner"],
-  "/account-manager": ["account_manager"],
+  "/account-manager": ["account_manager", "admin"],
 };
 
 const roleHomePaths: Record<string, string> = {

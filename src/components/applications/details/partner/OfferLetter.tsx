@@ -133,8 +133,8 @@ export default function OfferLetterDecision({
                 <p className="text-sm text-slate-700">{visaCase.notes || "No notes"}</p>
               </div>
             </div>
-          </div>
           <VisaTrackingTimeline application={application} />
+          </div>
         </>
       )}
 

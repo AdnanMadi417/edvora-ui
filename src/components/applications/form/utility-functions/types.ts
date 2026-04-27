@@ -57,4 +57,5 @@ export interface DocumentType {
   description: string;
   is_init_app_doc: boolean;
   is_required_init_app_doc: boolean;
+  is_required_for_current_upload?: boolean;
 }

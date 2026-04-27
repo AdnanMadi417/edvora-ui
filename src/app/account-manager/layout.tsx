@@ -12,7 +12,7 @@ import { ToastProvider } from "components/context/ToastContext";
 
 const ACCOUNT_MANAGER_ROLES = ["admin", "account_manager"];
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AccountManagerLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 

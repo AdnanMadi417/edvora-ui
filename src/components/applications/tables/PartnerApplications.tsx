@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
+import PresignedImage from 'components/ui/PresignedImage';
 import {
   ChevronUp,
   ChevronDown,
@@ -428,9 +429,16 @@ const PartnerApplications = () => {
               onClick={() => router.push(`/partner/applications/${app.id}`)}
             >
               <div className="relative shrink-0">
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                  {app.student_name?.[0]?.toUpperCase() ?? '?'}
-                </div>
+                <PresignedImage
+                  fileKey={app.student_photo_file_key}
+                  alt={app.student_name}
+                  className="h-11 w-11 rounded-full object-cover"
+                  fallback={
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                      {app.student_name?.[0]?.toUpperCase() ?? '?'}
+                    </div>
+                  }
+                />
                 {needsPartnerAction(app.status) && (
                   <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-md bg-amber-400 ring-2 ring-white">
                     <span className="h-1.5 w-1.5 rounded-md bg-white" />
@@ -525,9 +533,16 @@ const PartnerApplications = () => {
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative shrink-0">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                          {app.student_name?.[0]?.toUpperCase() ?? '?'}
-                        </div>
+                        <PresignedImage
+                          fileKey={app.student_photo_file_key}
+                          alt={app.student_name}
+                          className="h-10 w-10 rounded-full object-cover"
+                          fallback={
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                              {app.student_name?.[0]?.toUpperCase() ?? '?'}
+                            </div>
+                          }
+                        />
                         {needsPartnerAction(app.status) && (
                           <span
                             className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-md bg-amber-400 ring-2 ring-white"

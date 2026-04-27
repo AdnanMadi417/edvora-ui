@@ -299,9 +299,8 @@ const UniversityEdit = ({ id }: Props) => {
         prev.map((p) => (p.id === method.id ? { ...p, ...payload } : p))
       );
 
-    } catch (err: any) {
-      const backendMessage = err?.response?.data?.message || "Please try again.";
-      showToast(`Failed to update payment method. ${backendMessage}`, "error");
+    } catch {
+      // hook already shows the error toast
     }
   };
 

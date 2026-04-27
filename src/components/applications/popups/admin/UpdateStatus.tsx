@@ -451,7 +451,6 @@ export default function UpdateStatusPopup({
         err.response?.data?.message ||
         err.message ||
         "Failed to update application";
-      showToast(msg, "error");
       setError(msg);
     } finally {
       setIsSubmitting(false);

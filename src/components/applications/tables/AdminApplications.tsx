@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import PresignedImage from "components/ui/PresignedImage";
 import {
   ChevronUp,
   ChevronDown,
@@ -375,9 +376,16 @@ const ModernApplicationsTable = () => {
               className="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50"
               onClick={() => router.push(`/admin/applications/${app.id}`)}
             >
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                {app.student_name?.[0]?.toUpperCase() ?? "?"}
-              </div>
+              <PresignedImage
+                fileKey={app.student_photo_file_key}
+                alt={app.student_name}
+                className="h-11 w-11 shrink-0 rounded-full object-cover"
+                fallback={
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                    {app.student_name?.[0]?.toUpperCase() ?? "?"}
+                  </div>
+                }
+              />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate text-sm font-semibold text-slate-900">{app.student_name}</span>
@@ -470,9 +478,16 @@ const ModernApplicationsTable = () => {
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                        {app.student_name?.[0]?.toUpperCase() ?? "?"}
-                      </div>
+                      <PresignedImage
+                        fileKey={app.student_photo_file_key}
+                        alt={app.student_name}
+                        className="h-10 w-10 shrink-0 rounded-full object-cover"
+                        fallback={
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                            {app.student_name?.[0]?.toUpperCase() ?? "?"}
+                          </div>
+                        }
+                      />
                       <div className="min-w-0">
                         <div className="truncate font-medium text-slate-900">{app.student_name}</div>
                         <div className="truncate text-xs text-slate-500">{app.passport_number ?? "—"}</div>
