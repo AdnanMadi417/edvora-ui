@@ -14,18 +14,27 @@ const STATUS_ICON: Record<string, React.ReactNode> = {
   '1': <Clock className="h-5 w-5 text-yellow-500" />,
   '2': <CheckCircle className="h-5 w-5 text-green-600" />,
   '3': <XCircle className="h-5 w-5 text-red-600" />,
+  pending: <Clock className="h-5 w-5 text-yellow-500" />,
+  approved: <CheckCircle className="h-5 w-5 text-green-600" />,
+  rejected: <XCircle className="h-5 w-5 text-red-600" />,
 };
 
 const STATUS_BADGE: Record<string, string> = {
   '1': 'border-yellow-200 bg-yellow-50 text-yellow-700',
   '2': 'border-green-200 bg-green-50 text-green-700',
   '3': 'border-red-200 bg-red-50 text-red-700',
+  pending: 'border-yellow-200 bg-yellow-50 text-yellow-700',
+  approved: 'border-green-200 bg-green-50 text-green-700',
+  rejected: 'border-red-200 bg-red-50 text-red-700',
 };
 
 const STATUS_LABEL: Record<string, string> = {
   '1': 'Pending',
   '2': 'Approved',
   '3': 'Rejected',
+  pending: 'Pending',
+  approved: 'Approved',
+  rejected: 'Rejected',
 };
 
 export default function ApplicationDocuments({ application }: ApplicationDocumentsProps) {
@@ -34,13 +43,7 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
   const { showToast } = useToast();
 
   const allDocs: any[] = application?.documents || [];
-  const passportDocs = allDocs.filter((d) => d.document_type?.toLowerCase() === 'passport');
-  const transcriptDocs = allDocs.filter((d) => d.document_type?.toLowerCase() === 'transcript');
-  const ieltsDocs = allDocs.filter((d) => d.document_type?.toLowerCase() === 'ielts');
-  const otherDocs = allDocs.filter(
-    (d) => !['passport', 'transcript', 'ielts'].includes(d.document_type?.toLowerCase()),
-  );
-  const documents = allDocs; // kept for totalDocuments / pendingDocuments counts
+  const documents = allDocs;
   const paymentDocuments: any[] = application?.payment_documents || [];
   const arrivalDocuments: any[] = application?.arrival_documents || [];
   const emgsEvalDoc: any = application?.emgs_evaluation_document || null;
@@ -49,8 +52,8 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
   const commissionDocuments: any[] = Object.values(application?.commission_documents || {}).filter(Boolean) as any[];
   const singleDocs = [emgsEvalDoc, offerLetterDoc, visaDoc].filter(Boolean);
   const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + singleDocs.length + commissionDocuments.length;
-  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...singleDocs, ...commissionDocuments].filter(
-    (d) => d.status === '1',
+  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...[emgsEvalDoc, visaDoc].filter(Boolean), ...commissionDocuments].filter(
+    (d) => d.status === '1' || d.status === 'pending',
   ).length;
 
   const handleDownload = async (fileKey: string, docId: string) => {
@@ -185,10 +188,7 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
 
       {showDocs && (
         <div className="space-y-6 rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
-          <DocGroup label="Passport" docs={passportDocs} />
-          <DocGroup label="Transcript" docs={transcriptDocs} />
-          <DocGroup label="IELTS" docs={ieltsDocs} />
-          <DocGroup label="Other Documents" docs={otherDocs} />
+          {allDocs.map((doc: any) => <DocRow key={doc.id} doc={doc} />)}
           <DocGroup label="Payment Documents" docs={paymentDocuments} />
           <DocGroup label="Arrival Documents" docs={arrivalDocuments} />
           <DocGroup label="EMGS Eval Document" docs={emgsEvalDoc ? [emgsEvalDoc] : []} />

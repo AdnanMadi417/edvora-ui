@@ -150,6 +150,7 @@ const PartnerApplications = () => {
       'waiting_partner_to_confirm_arrival_date',
       'eval_ready',
       'eval_partner_upload',
+      'upload_e-visa',
     ]);
   }, [stageStatuses]);
 

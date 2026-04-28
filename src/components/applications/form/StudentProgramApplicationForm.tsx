@@ -10,8 +10,7 @@ import {
 } from "lucide-react";
 import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from "../../../constants/lists";
 import { useToast } from "../../context/ToastContext";
-import api from "../../../lib/useApi";
-import Cookies from "js-cookie";
+import { useDocumentType } from "../../../hooks/useDocumentType";
 import { InputField, SelectField, RadioField } from "../../form";
 import {
   getPresignedUploads,
@@ -134,10 +133,6 @@ export default function StudentManualApplication() {
     errorCreatePartnerApplication,
   } = useCreatePartnerApplication(partnerId);
 
-  const [documentTypes, setDocumentTypes] = useState<
-    { id: string; type: string; description: string }[]
-  >([]);
-
   const { qualifications } = useAllQualifications();
 
   const getCurrentDate = () => {
@@ -203,6 +198,12 @@ export default function StudentManualApplication() {
   };
 
   const { intakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
+
+  const { documentTypes, loading: documentTypesLoading } = useDocumentType({
+    initOnly: true,
+    programId: formData.program_id || undefined,
+    nationality: formData.student.nationality || undefined,
+  });
 
   useEffect(() => {
     if (intakeDates.length > 0) {
@@ -316,27 +317,6 @@ export default function StudentManualApplication() {
     fetchApplications();
   }, []);
 
-  useEffect(() => {
-    const fetchDocumentTypes = async () => {
-      try {
-        const token = Cookies.get("token");
-        const params: Record<string, any> = { init_only: true };
-        if (formData.program_id) params.program_id = formData.program_id;
-        if (formData.student.nationality) params.nationality = formData.student.nationality;
-
-        const res = await api.get("/document-types", {
-          params,
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-
-        setDocumentTypes(res.data || []);
-      } catch (err) {
-        console.error("Failed to fetch document types", err);
-      }
-    };
-
-    fetchDocumentTypes();
-  }, [formData.program_id, formData.student.nationality]);
 
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -494,6 +474,7 @@ export default function StudentManualApplication() {
     }
 
     const missingDocs = documentTypes.filter((docType) => {
+      if (!docType.is_required_for_current_upload) return false;
       return !formData.documents.some(
         (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
       );

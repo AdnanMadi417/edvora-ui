@@ -24,13 +24,11 @@ export default function VisaTrackingTimeline({
 }: VisaTrackingTimelineProps) {
   const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
-  const isVisaStageOrLater = (application?.stage?.name || "").toLowerCase().includes("visa");
-
   const {
     visaCase,
     loading: visaLoading,
     error: visaError,
-  } = useVisaCase(isVisaStageOrLater ? application?.id || "" : "");
+  } = useVisaCase(application?.id || "");
 
   const {
     payments: visaPayments,

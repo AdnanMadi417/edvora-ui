@@ -242,6 +242,7 @@ export default function RequiredAction({
                   errors={errors}
                   handleFileUpload={handleFileUpload}
                   removeDocument={removeDocument}
+                  useCurrentUploadRequired
                 />
               </>
             ) : (
