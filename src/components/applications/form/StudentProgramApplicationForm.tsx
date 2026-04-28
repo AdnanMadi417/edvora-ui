@@ -8,8 +8,10 @@ import {
   ArrowLeft,
   ArrowRight,
 } from "lucide-react";
+import Cookies from "js-cookie";
 import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from "../../../constants/lists";
 import { useToast } from "../../context/ToastContext";
+import api from "lib/useApi";
 import { useDocumentType } from "../../../hooks/useDocumentType";
 import { InputField, SelectField, RadioField } from "../../form";
 import {
