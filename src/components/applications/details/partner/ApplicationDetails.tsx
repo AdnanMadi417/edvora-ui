@@ -27,6 +27,7 @@ import OfferLetterDecision from './OfferLetter';
 import VisaPaymentConfirmation from "components/applications/popups/partner/VisaPaymentConfirmation";
 import ArrivalDate from "components/applications/popups/partner/ArrivalDate";
 import EmgsEvalUpload from "components/applications/popups/partner/EmgsEvaluationUpload";
+import EVisaUpload from "components/applications/popups/partner/EVisaUpload";
 import ApplicationCommission from './ApplicationCommission';
 import { useToast } from '../../../context/ToastContext';
 import Dispute from 'components/applications/popups/partner/UpdatedDispute';
@@ -122,6 +123,7 @@ export default function ApplicationDetails({
 
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
   const [showEmgsUploadPopup, setShowEmgsUploadPopup] = useState(false);
+  const [showEVisaUploadPopup, setShowEVisaUploadPopup] = useState(false);
 
   const showArrivalConfirmation =
     currentStatusCode === "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE";
@@ -129,6 +131,8 @@ export default function ApplicationDetails({
   const showEmgsUpload =
     currentStatusCode === "EVAL_PARTNER_UPLOAD" ||
     currentStatusCode === "EVAL_REUPLOAD_REQUIRED";
+
+  const showEVisaUpload = currentStatusCode === "E_VISA_PARTNER_UPLOAD";
 
   const formatGender = (value: boolean | null) => {
     if (value === null) return "Not provided";
@@ -393,6 +397,18 @@ export default function ApplicationDetails({
                       Confirm Arrival
                     </button>
                   )}
+
+                  {showEVisaUpload && (
+                    <button
+                      type="button"
+                      onClick={() => setShowEVisaUploadPopup(true)}
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700"
+                    >
+                      <FileUp className="h-4 w-4" />
+                      Upload E-Visa
+                    </button>
+                  )}
+
 
                   {showEmgsUpload && (
 
@@ -861,6 +877,15 @@ export default function ApplicationDetails({
           applicationId={application.id}
         />
       )}
+
+      {showEVisaUploadPopup && (
+        <EVisaUpload
+          isOpen={showEVisaUploadPopup}
+          onClose={() => setShowEVisaUploadPopup(false)}
+          applicationId={application.id}
+        />
+      )}
+
 
       {showVisaPaymentPopup && (
         <VisaPaymentConfirmation

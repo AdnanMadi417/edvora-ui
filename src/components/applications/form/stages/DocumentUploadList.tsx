@@ -17,16 +17,19 @@ interface Props {
   errors: Record<string, string | undefined>;
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>, id: string) => void;
   removeDocument: (docTypeId: string) => void;
+  useCurrentUploadRequired?: boolean;
 }
 
 function DocRow({
   docType,
+  isRequired,
   formData,
   errors,
   handleFileUpload,
   removeDocument,
 }: {
   docType: DocumentType;
+  isRequired: boolean;
   formData: FormDataType;
   errors: Record<string, string | undefined>;
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>, id: string) => void;
@@ -38,7 +41,6 @@ function DocRow({
   const file = formData.documents?.find((d) => d.document_type_id === docType.id);
   const isUploaded = !!(file?.file_key && !file?.uploading);
   const isUploading = !!file?.uploading;
-  const isRequired = docType.is_required_for_current_upload;
   const errorMsg =
     fileError ||
     (errors[`documents.${docType.id}`] === "required"
@@ -143,50 +145,52 @@ function DocRow({
   /* ── Empty / error state ────────────────────────────── */
   return (
     <div
-      className={`flex items-center gap-3 rounded-2xl border p-4 transition ${
+      className={`block space-y-2 rounded-2xl border p-4 transition md:flex md:items-center md:gap-3 md:space-y-0 ${
         errorMsg
           ? "border-red-300 bg-red-50"
           : "border-dashed border-slate-300 bg-white"
       }`}
     >
-      <div
-        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
-          errorMsg ? "bg-red-100" : "bg-slate-100"
-        }`}
-      >
-        <FileText className={`h-5 w-5 ${errorMsg ? "text-red-400" : "text-slate-400"}`} />
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <div className="flex min-w-0 items-center gap-2">
-          <p className="truncate text-sm font-bold text-slate-900">{docType.type}</p>
-          <span
-            className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
-              isRequired ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500"
-            }`}
-          >
-            {isRequired ? "Required" : "Optional"}
-          </span>
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div
+          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+            errorMsg ? "bg-red-100" : "bg-slate-100"
+          }`}
+        >
+          <FileText className={`h-5 w-5 ${errorMsg ? "text-red-400" : "text-slate-400"}`} />
         </div>
 
-        {docType.description && (
-          <p className="mt-0.5 text-xs text-slate-400">{docType.description}</p>
-        )}
-
-        {errorMsg ? (
-          <div className="mt-0.5 flex items-center gap-1">
-            <AlertCircle className="h-3 w-3 shrink-0 text-red-500" />
-            <p className="text-xs text-red-600">{errorMsg}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex min-w-0 items-center gap-2">
+            <p className="truncate text-sm font-bold text-slate-900">{docType.type}</p>
+            <span
+              className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                isRequired ? "bg-amber-100 text-amber-700" : "bg-slate-100 text-slate-500"
+              }`}
+            >
+              {isRequired ? "Required" : "Optional"}
+            </span>
           </div>
-        ) : (
-          <p className="mt-0.5 text-xs text-slate-300">PDF, JPG, PNG</p>
-        )}
+
+          {docType.description && (
+            <p className="mt-0.5 text-xs text-slate-400">{docType.description}</p>
+          )}
+
+          {errorMsg ? (
+            <div className="mt-0.5 flex items-center gap-1">
+              <AlertCircle className="h-3 w-3 shrink-0 text-red-500" />
+              <p className="text-xs text-red-600">{errorMsg}</p>
+            </div>
+          ) : (
+            <p className="mt-0.5 text-xs text-slate-300">PDF, JPG, PNG</p>
+          )}
+        </div>
       </div>
 
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="flex shrink-0 items-center gap-2 rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
+        className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 md:w-auto md:shrink-0"
       >
         <Upload className="h-4 w-4" />
         Upload
@@ -209,16 +213,18 @@ export default function DocumentUploadList({
   errors,
   handleFileUpload,
   removeDocument,
+  useCurrentUploadRequired = false,
 }: Props) {
+  const isReq = (d: DocumentType) =>
+    useCurrentUploadRequired ? d.is_required_for_current_upload : d.is_required_init_app_doc;
+
   const sorted = [...documentTypes].sort((a, b) => {
-    if (a.is_required_for_current_upload !== b.is_required_for_current_upload)
-      return a.is_required_for_current_upload ? -1 : 1;
-    const order: Record<string, number> = { passport: 1, transcript: 2, ielts: 3 };
-    return (order[a.code] ?? 99) - (order[b.code] ?? 99);
+    if (isReq(a) !== isReq(b)) return isReq(a) ? -1 : 1;
+    return a.type.localeCompare(b.type);
   });
 
-  const required = sorted.filter((d) => d.is_required_for_current_upload);
-  const optional = sorted.filter((d) => !d.is_required_for_current_upload);
+  const required = sorted.filter(isReq);
+  const optional = sorted.filter((d) => !isReq(d));
 
   const uploadedRequired = required.filter((d) =>
     formData.documents?.some(
@@ -234,14 +240,14 @@ export default function DocumentUploadList({
     <div className="space-y-3">
       {/* Progress header card */}
       {required.length > 0 && (
-        <div className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-slate-100">
+        <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="hidden sm:flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-slate-100">
             <FileText className="h-7 w-7 text-slate-500" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-base font-bold text-slate-900">Required Documents</p>
-              <span className="shrink-0 text-base font-bold text-slate-900">
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <p className="truncate text-sm font-bold text-slate-900 sm:text-base">Required Documents</p>
+              <span className="shrink-0 text-sm font-bold text-slate-900 sm:text-base">
                 {uploadedRequired} of {required.length}
               </span>
             </div>
@@ -262,6 +268,7 @@ export default function DocumentUploadList({
         <DocRow
           key={docType.id}
           docType={docType}
+          isRequired={true}
           formData={formData}
           errors={errors}
           handleFileUpload={handleFileUpload}
@@ -279,6 +286,7 @@ export default function DocumentUploadList({
             <DocRow
               key={docType.id}
               docType={docType}
+              isRequired={false}
               formData={formData}
               errors={errors}
               handleFileUpload={handleFileUpload}

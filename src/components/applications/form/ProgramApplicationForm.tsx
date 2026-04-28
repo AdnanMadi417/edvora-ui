@@ -58,18 +58,15 @@ export default function StudentRegistrationForm() {
   const {
     universities,
     loading: universitiesLoading,
-    error: universitiesError,
   } = useUniversities();
 
   const {
     createPartnerApplication,
     loadingCreatePartnerApplication,
-    errorCreatePartnerApplication,
   } = useCreatePartnerApplication(partnerId);
 
   const {
     data: requiredFields,
-    loading: requiredFieldsLoading,
     getRequiredFields,
   } = useGetApplicationRequiredFields();
 
@@ -136,8 +133,6 @@ export default function StudentRegistrationForm() {
     }
   }, [intakeDates]);
 
-  const contact = formData.student.emergency_contacts[0];
-
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
   const updateFormData = (fieldPath: string, value: any) => {
@@ -181,7 +176,7 @@ export default function StudentRegistrationForm() {
     }
   };
 
-  const canAccessStage = (id) => {
+  const canAccessStage = (id: number) => {
     if (id === 1) return true;
     if (id === stage) return true;
     const idx = visibleStages.findIndex((s) => s.id === id);

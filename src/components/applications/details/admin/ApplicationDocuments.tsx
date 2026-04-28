@@ -60,12 +60,6 @@ export default function ApplicationDocuments({
   };
 
   const allDocs = application?.documents || [];
-  const passportDocs = allDocs.filter((d: any) => d.document_type?.toLowerCase() === 'passport');
-  const transcriptDocs = allDocs.filter((d: any) => d.document_type?.toLowerCase() === 'transcript');
-  const ieltsDocs = allDocs.filter((d: any) => d.document_type?.toLowerCase() === 'ielts');
-  const otherDocs = allDocs.filter(
-    (d: any) => !['passport', 'transcript', 'ielts'].includes(d.document_type?.toLowerCase()),
-  );
   const documents = allDocs;
   const paymentDocuments = application?.payment_documents || [];
   const arrivalDocuments = application?.arrival_documents || [];
@@ -77,16 +71,19 @@ export default function ApplicationDocuments({
   const singleDocs = [emgsEvalDoc, offerLetterDoc, visaDoc].filter(Boolean);
   const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + singleDocs.length + commissionDocuments.length;
   const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...singleDocs, ...commissionDocuments].filter(
-    (d) => d.status === "1"
+    (d) => d.status === "1" || d.status === "pending"
   ).length;
 
   const getFileStatus = (status: string) => {
     switch (status) {
       case "1":
+      case "pending":
         return <Clock className="h-5 w-5 text-yellow-500" />;
       case "2":
+      case "approved":
         return <CheckCircle className="h-5 w-5 text-green-600" />;
       case "3":
+      case "rejected":
         return <XCircle className="h-5 w-5 text-red-600" />;
       default:
         return <Clock className="h-5 w-5 text-yellow-500" />;
@@ -103,7 +100,7 @@ export default function ApplicationDocuments({
     return fileUrl.split("/").pop() || "document.pdf";
   };
 
-  if (documents.length === 0) {
+  if (totalDocuments === 0) {
     return <EmptyData />;
   }
 
@@ -169,17 +166,8 @@ export default function ApplicationDocuments({
       >
         <div className="space-y-4 rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
 
-          {[
-            { label: 'Passport', docs: passportDocs },
-            { label: 'Transcript', docs: transcriptDocs },
-            { label: 'IELTS', docs: ieltsDocs },
-            { label: 'Other Documents', docs: otherDocs },
-          ].map(({ label, docs }) =>
-            docs.length === 0 ? null : (
-              <div key={label} className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</p>
-                <div className="space-y-4">
-                  {docs.map((doc: any, index: number) => (
+          <div className="space-y-4">
+            {allDocs.map((doc: any, index: number) => (
               <div
                 key={doc.id}
                 className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
@@ -239,7 +227,6 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
-
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -267,13 +254,9 @@ export default function ApplicationDocuments({
                     <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
                 </div>
-
               </div>
             ))}
-                </div>
-              </div>
-            )
-          )}
+          </div>
 
           <div className="space-y-4">
             {paymentDocuments.map((doc: any, index: number) => (
