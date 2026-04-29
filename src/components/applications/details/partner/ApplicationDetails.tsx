@@ -34,6 +34,7 @@ import Dispute from 'components/applications/popups/partner/UpdatedDispute';
 import api from 'lib/useApi';
 import ApplicationTimeline from '../ApplicationTimeline';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
+import { useVisaCase } from "hooks/useVisaCase";
 
 interface ApplicationDetailsProps {
   application: any;
@@ -75,6 +76,7 @@ export default function ApplicationDetails({
   const closeRequiredActionPopup = () => setShowRequiredActionPopup(false);
 
   const { methods, loading: paymentLoading } = useVisaPaymentMethods(application?.id);
+  const { visaCase } = useVisaCase(application?.id || "");
   
   const { showToast } = useToast();
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -325,66 +327,75 @@ export default function ApplicationDetails({
                   )}
 
                   {showVisaPayment && (
-
                     <div className="block space-y-4">
-
-                      {showVisaPayment && (
-                        <div className=" block space-y-4">
-
-              {paymentLoading ? (
-              <div className="border-gray-200">
-                <p className="text-sm text-slate-500">Loading payment methods...</p>
-              </div>
-            ) : methods.length > 0 && (
-              <div className="">
-                <div className="mb-4 flex items-center gap-2">
-                  <Wallet className="h-4 w-4 text-blue-600" />
-                  <h4 className="text-sm font-semibold text-gray-900">Payment Methods</h4>
-                </div>
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {methods.map((method: any) => (
-                    <div
-                      key={method.id}
-                      className="rounded-lg border border-gray-200 bg-gray-50 p-4"
-                    >
-                      <div className="mb-2 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <CreditCard className="h-4 w-4 text-blue-600" />
-                          <span className="font-semibold text-gray-900">{method.name}</span>
+                      {/* Visa fee amount — focal point */}
+                      {visaCase?.visa_fee_amount && (
+                        <div className="flex items-center justify-between rounded-xl border border-green-200 bg-green-50 px-5 py-4">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-green-600">Amount Due</p>
+                            <p className="mt-0.5 text-2xl font-bold text-green-700">
+                              RM {Number(visaCase.visa_fee_amount).toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                            <Wallet className="h-5 w-5 text-green-600" />
+                          </div>
                         </div>
-                        {method.currency && (
-                          <span className="rounded-md border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-medium uppercase text-blue-700">
-                            {method.currency}
-                          </span>
-                        )}
-                      </div>
-                      {method.instructions && (
-                        <pre className="whitespace-pre-wrap text-xs leading-relaxed text-slate-600">
-                          {method.instructions}
-                        </pre>
                       )}
+
+                      {/* Notes — only if content exists */}
+                      {visaCase?.notes && (
+                        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+                          <span className="mt-0.5 text-xs text-amber-500">⚠</span>
+                          <p className="text-xs text-amber-800">{visaCase.notes}</p>
+                        </div>
+                      )}
+
+                      {paymentLoading ? (
+                        <p className="text-sm text-slate-500">Loading payment methods...</p>
+                      ) : methods.length > 0 && (
+                        <div>
+                          <div className="mb-3 flex items-center gap-2">
+                            <CreditCard className="h-4 w-4 text-blue-600" />
+                            <h4 className="text-sm font-semibold text-gray-900">Payment Methods</h4>
+                          </div>
+                          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                            {methods.map((method: any) => (
+                              <div
+                                key={method.id}
+                                className="rounded-lg border border-gray-200 bg-gray-50 p-4"
+                              >
+                                <div className="mb-2 flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <CreditCard className="h-4 w-4 text-blue-600" />
+                                    <span className="font-semibold text-gray-900">{method.name}</span>
+                                  </div>
+                                  {method.currency && (
+                                    <span className="rounded-md border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-medium uppercase text-blue-700">
+                                      {method.currency}
+                                    </span>
+                                  )}
+                                </div>
+                                {method.instructions && (
+                                  <pre className="whitespace-pre-wrap text-xs leading-relaxed text-slate-600">
+                                    {method.instructions}
+                                  </pre>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => setShowVisaPaymentPopup(true)}
+                        className="flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-green-700"
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        Proceed to Payment
+                      </button>
                     </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="">
-              <div className="" /></div>
-            </div>
-            )}
-
-                    <button
-                      type="button"
-                      onClick={() => setShowVisaPaymentPopup(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-green-700"
-                    >
-                      <CreditCard className="h-4 w-4" />
-                      Proceed to Payment
-                    </button>
-
-                  </div>
-
                   )}
 
                   {showArrivalConfirmation && (

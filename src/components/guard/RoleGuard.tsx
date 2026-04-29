@@ -44,6 +44,6 @@ export default function RoleGuard({ allowedRoles, children }: RoleGuardProps) {
   }, [allowedRoles, router]);
 
   if (authState === "loading") return <Loading />;
-  if (authState === "unauthorized") return null;
+  if (authState === "unauthorized") return <Loading />;
   return <>{children}</>;
 }

@@ -7,8 +7,11 @@ import {
   FileText,
   ArrowLeft, ArrowRight,
 } from 'lucide-react';
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from "../../../constants/lists";
 import { useToast } from "../../context/ToastContext";
+import api from "lib/useApi";
 
 import { useAllQualifications } from "../../../hooks/knowledge-hub/qualifications/useQualificationsList";
 import { useCreatePartnerApplication } from "../../../hooks/applications/useCreatePartnerApplication";
@@ -119,6 +122,7 @@ const stages = [
 ];
 
 export default function StudentManualApplicationForm() {
+  const router = useRouter();
   const [stage, setStage] = useState(1);
   const [completedStages, setCompletedStages] = useState([]);
   const { showToast } = useToast();
@@ -541,7 +545,7 @@ export default function StudentManualApplicationForm() {
       showToast("Application submitted successfully.", "success");
 
       setTimeout(() => {
-        window.location.reload();
+        router.push("/partner/applications");
       }, 3000);
     } catch (err: any) {
       console.error("Error submitting application:", err);
