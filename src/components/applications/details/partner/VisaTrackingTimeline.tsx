@@ -20,6 +20,7 @@ import VisaPaymentConfirmation from "../../../applications/popups/partner/VisaPa
 import ArrivalDate from "../../../applications/popups/partner/ArrivalDate";
 import EmgsEvalUpload from "../../../applications/popups/partner/EmgsEvaluationUpload";
 import EVisaUpload from "../../../applications/popups/partner/EVisaUpload";
+import RequiredAction from "../../../applications/popups/partner/RequiredAction";
 import { getDocumentDownloadUrl } from "../../../../services/documentService";
 
 interface VisaTrackingTimelineProps {
@@ -33,6 +34,7 @@ export default function VisaTrackingTimeline({
   const [isArrivalPopupOpen, setIsArrivalPopupOpen] = useState(false);
   const [isEmgsUploadOpen, setIsEmgsUploadOpen] = useState(false);
   const [isEVisaUploadOpen, setIsEVisaUploadOpen] = useState(false);
+  const [isPaymentProofOpen, setIsPaymentProofOpen] = useState(false);
 
   const { methods, loading: paymentLoading } = useVisaPaymentMethods(application?.id);
   const { actions } = useApplicationActions(application?.id);
@@ -54,6 +56,9 @@ export default function VisaTrackingTimeline({
 
   const showEVisaUpload =
     currentStatusCode === "E_VISA_PARTNER_UPLOAD";
+
+  const showAwaitingArrival =
+    currentStatusCode === "AWAITING_ARRIVAL";
 
   const {
     visaCase,
@@ -465,6 +470,34 @@ export default function VisaTrackingTimeline({
         </div>
         )}
 
+        {showAwaitingArrival && (
+          <div className="border-t border-gray-200 p-6">
+            <div className="relative rounded-lg border border-gray-200 p-6">
+              <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-inset ring-slate-100" />
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="max-w-xl">
+                  <h3 className="text-sm font-semibold text-slate-900">
+                    Upload Proof of Payment
+                  </h3>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                    Upload your payment receipt to confirm arrival and proceed with enrollment.
+                  </p>
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsPaymentProofOpen(true)}
+                    className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
+                  >
+                    <FileText className="h-4 w-4" />
+                    Upload Payment Proof
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {isVisaPopupOpen && (
           <VisaPaymentConfirmation
             isOpen={isVisaPopupOpen}
@@ -493,6 +526,14 @@ export default function VisaTrackingTimeline({
           <EVisaUpload
             isOpen={isEVisaUploadOpen}
             onClose={() => setIsEVisaUploadOpen(false)}
+            applicationId={application.id}
+          />
+        )}
+
+        {isPaymentProofOpen && (
+          <RequiredAction
+            isOpen={isPaymentProofOpen}
+            onClose={() => setIsPaymentProofOpen(false)}
             applicationId={application.id}
           />
         )}
