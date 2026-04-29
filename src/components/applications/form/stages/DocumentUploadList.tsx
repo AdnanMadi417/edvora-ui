@@ -215,6 +215,7 @@ export default function DocumentUploadList({
   removeDocument,
   useCurrentUploadRequired = false,
 }: Props) {
+  const [showOptional, setShowOptional] = useState(false);
   const isReq = (d: DocumentType) =>
     useCurrentUploadRequired ? d.is_required_for_current_upload : d.is_required_init_app_doc;
 
@@ -276,12 +277,33 @@ export default function DocumentUploadList({
         />
       ))}
 
-      {/* Optional section */}
+      {/* Optional section toggle */}
       {optional.length > 0 && (
+        <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-slate-700">Optional Documents</p>
+            <p className="text-xs text-slate-400">{optional.length} document{optional.length !== 1 ? "s" : ""} available</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={showOptional}
+            onClick={() => setShowOptional((v) => !v)}
+            className={`relative h-6 w-11 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+              showOptional ? "bg-blue-600" : "bg-slate-300"
+            }`}
+          >
+            <span
+              className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200 ${
+                showOptional ? "translate-x-5" : "translate-x-0"
+              }`}
+            />
+          </button>
+        </div>
+      )}
+
+      {optional.length > 0 && showOptional && (
         <>
-          <p className="pt-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Optional Documents
-          </p>
           {optional.map((docType) => (
             <DocRow
               key={docType.id}
