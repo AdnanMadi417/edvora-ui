@@ -6,8 +6,8 @@ import { FiAlignJustify } from "react-icons/fi";
 import { LogOut, Settings, Bell } from "lucide-react";
 import NavLink from "components/link/NavLink";
 import Link from "next/link";
-import api from "../../lib/useApi";
-import { useRouter } from "next/navigation";
+import api, { setLoggingOut } from "../../lib/useApi";
+
 import { useMe } from "hooks/useMe";
 import { profileRouteMap, notificationsRouteMap } from "components/navbar/config/navigation";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
@@ -25,7 +25,6 @@ const Navbar = ({
   open?: boolean;
   setOpen?: (v: boolean) => void;
 }) => {
-  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { user, loading } = useMe();
@@ -71,6 +70,8 @@ const Navbar = ({
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
+    setLoggingOut(true);
+
     try {
       await api.post("/auth/logout").catch(() => {});
     } catch (err) {
@@ -81,9 +82,7 @@ const Navbar = ({
     sessionStorage.clear();
     deleteAllCookies();
 
-    setTimeout(() => {
-      router.push("/auth/sign-in");
-    }, 100);
+    window.location.replace("/auth/sign-in");
   };
 
   return (
