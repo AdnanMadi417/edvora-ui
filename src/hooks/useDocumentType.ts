@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import api from "lib/useApi";
-import Cookies from "js-cookie";
 
 type DocumentType = {
   id: string;
@@ -37,8 +36,6 @@ export function useDocumentType(params?: DocumentTypeParams) {
     const fetchDocumentTypes = async () => {
       setLoading(true);
       try {
-        const token = Cookies.get("token");
-
         const queryParams: Record<string, any> = {};
         if (initOnly !== undefined) queryParams.init_only = initOnly;
         if (programId) queryParams.program_id = programId;
@@ -46,10 +43,7 @@ export function useDocumentType(params?: DocumentTypeParams) {
         if (applicationStageId) queryParams.application_stage_id = applicationStageId;
         if (nationality) queryParams.nationality = nationality;
 
-        const res = await api.get("/document-types", {
-          params: queryParams,
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await api.get("/document-types", { params: queryParams });
 
         setDocumentTypes(res.data || []);
       } catch (err) {

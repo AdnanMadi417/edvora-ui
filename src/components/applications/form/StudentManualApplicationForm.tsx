@@ -981,26 +981,41 @@ export default function StudentManualApplicationForm() {
                 </p>
               </div>
 
-              <div className="space-y-6">
-                {documentTypes.map((docType) => (
-                  <FileUploadField
-                    key={docType.id}
-                    label={
-                      docType.type.charAt(0).toUpperCase() +
-                      docType.type.slice(1)
-                    }
-                    field="documents"
-                    documentTypeId={docType.id}
-                    formData={formData}
-                    updateFormData={updateFormData}
-                    errors={errors}
-                    uploadHandler={handleFileUpload}
-                    removeHandler={removeDocument}
-                    multiple={false}
-                    accept="application/pdf,image/*"
-                  />
-                ))}
-              </div>
+              {documentTypesLoading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                      <div className="h-11 w-11 shrink-0 animate-pulse rounded-xl bg-slate-100" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
+                        <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+                      </div>
+                      <div className="h-9 w-24 animate-pulse rounded-xl bg-slate-100" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {documentTypes.map((docType) => (
+                    <FileUploadField
+                      key={docType.id}
+                      label={
+                        docType.type.charAt(0).toUpperCase() +
+                        docType.type.slice(1)
+                      }
+                      field="documents"
+                      documentTypeId={docType.id}
+                      formData={formData}
+                      updateFormData={updateFormData}
+                      errors={errors}
+                      uploadHandler={handleFileUpload}
+                      removeHandler={removeDocument}
+                      multiple={false}
+                      accept="application/pdf,image/*"
+                    />
+                  ))}
+                </div>
+              )}
 
               {errors.documents && (
                 <p className="mt-2 text-xs text-red-600">
