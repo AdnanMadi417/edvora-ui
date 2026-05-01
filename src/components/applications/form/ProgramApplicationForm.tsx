@@ -508,6 +508,7 @@ export default function StudentRegistrationForm() {
               documentTypes={safeDocumentTypes}
               handleFileUpload={handleFileUpload}
               removeDocument={removeDocument}
+              loading={documentTypesLoading}
             />
           )}
 

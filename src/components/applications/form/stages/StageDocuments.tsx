@@ -8,6 +8,7 @@ interface Props {
   documentTypes: any[];
   handleFileUpload: (e: React.ChangeEvent<HTMLInputElement>, id: string) => void;
   removeDocument: (doc: any) => void;
+  loading?: boolean;
 }
 
 export default function StageDocuments({
@@ -16,6 +17,7 @@ export default function StageDocuments({
   documentTypes,
   handleFileUpload,
   removeDocument,
+  loading,
 }: Props) {
   return (
     <div>
@@ -31,13 +33,28 @@ export default function StageDocuments({
         </p>
       </div>
 
-      <DocumentUploadList
-        documentTypes={documentTypes}
-        formData={formData}
-        errors={errors}
-        handleFileUpload={handleFileUpload}
-        removeDocument={removeDocument}
-      />
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+              <div className="h-11 w-11 shrink-0 animate-pulse rounded-xl bg-slate-100" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
+                <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+              </div>
+              <div className="h-9 w-24 animate-pulse rounded-xl bg-slate-100" />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <DocumentUploadList
+          documentTypes={documentTypes}
+          formData={formData}
+          errors={errors}
+          handleFileUpload={handleFileUpload}
+          removeDocument={removeDocument}
+        />
+      )}
     </div>
   );
 }
