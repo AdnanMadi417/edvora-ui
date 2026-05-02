@@ -29,6 +29,100 @@ import { useToast } from 'components/context/ToastContext';
 import DeleteProgramsConfirmation from 'components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation';
 import Loading from 'components/loading/Loading';
 
+type RequiredDocument = {
+  id: string;
+  type: string;
+  description: string;
+  is_required_for_init: boolean | null;
+  is_required_init_app_doc: boolean;
+};
+
+function DocumentsSection({ requiredDocuments }: { requiredDocuments: RequiredDocument[] }) {
+  const [showOptional, setShowOptional] = useState(false);
+  const isReq = (d: RequiredDocument) => d.is_required_for_init ?? d.is_required_init_app_doc;
+  const required = requiredDocuments.filter(isReq);
+  const optional = requiredDocuments.filter((d) => !isReq(d));
+
+  return (
+    <div className="mt-6">
+      <div className="rounded-md border border-default bg-card shadow-sm">
+        <div className="p-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
+              <FileText className="h-5 w-5 text-blue-600" />
+            </div>
+            <h4 className="text-base font-bold text-slate-900">Required Documents</h4>
+          </div>
+
+          {!requiredDocuments.length ? (
+            <p className="mt-6 text-sm text-slate-400">No documents configured for this program.</p>
+          ) : (
+            <div className="mt-6 space-y-3">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                {required.map((doc) => (
+                  <div key={doc.id} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+                      <FileText className="h-5 w-5 text-slate-400" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <p className="truncate text-sm font-bold text-slate-900">{doc.type}</p>
+                        <span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700">
+                          Required
+                        </span>
+                      </div>
+                      {doc.description && <p className="mt-0.5 text-xs text-slate-400">{doc.description}</p>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {optional.length > 0 && (
+                <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-slate-700">Optional Documents</p>
+                    <p className="text-xs text-slate-400">{optional.length} document{optional.length !== 1 ? 's' : ''} available</p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={showOptional}
+                    onClick={() => setShowOptional((v) => !v)}
+                    className={`relative h-6 w-11 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${showOptional ? 'bg-blue-600' : 'bg-slate-300'}`}
+                  >
+                    <span className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200 ${showOptional ? 'translate-x-5' : 'translate-x-0'}`} />
+                  </button>
+                </div>
+              )}
+
+              {showOptional && (
+                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                  {optional.map((doc) => (
+                    <div key={doc.id} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-100">
+                        <FileText className="h-5 w-5 text-slate-400" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <p className="truncate text-sm font-bold text-slate-900">{doc.type}</p>
+                          <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">
+                            Optional
+                          </span>
+                        </div>
+                        {doc.description && <p className="mt-0.5 text-xs text-slate-400">{doc.description}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface UniversityDetailsProps {
   id: string;
 }
@@ -448,43 +542,7 @@ const ProgramDetails = ({ id }: UniversityDetailsProps) => {
         </div>
       )}
 
-      {/* Required Documents */}
-      <div className="mt-6">
-        <div className="rounded-md border border-default bg-card shadow-sm">
-          <div className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
-                <FileText className="h-5 w-5 text-blue-600" />
-              </div>
-              <h4 className="text-base font-bold text-slate-900">Required Documents</h4>
-            </div>
-
-            {requiredDocuments.length > 0 ? (
-              <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
-                {requiredDocuments.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3"
-                  >
-                    <p className="text-sm font-medium text-slate-800">
-                      {item.description ?? item.type ?? 'Document'}
-                    </p>
-                    <span className={`shrink-0 rounded-md border px-3 py-1 text-xs ${
-                      item.is_required_init_app_doc
-                        ? 'border-blue-200 bg-blue-50 text-blue-600'
-                        : 'border-slate-200 bg-white text-slate-400'
-                    }`}>
-                      {item.is_required_init_app_doc ? 'Required' : 'Optional'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="mt-6 text-sm text-slate-400">No documents configured for this program.</p>
-            )}
-          </div>
-        </div>
-      </div>
+      <DocumentsSection requiredDocuments={requiredDocuments} />
 
       {/* Commission */}
       <div className="mt-6">

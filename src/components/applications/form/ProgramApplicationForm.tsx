@@ -120,18 +120,13 @@ export default function StudentRegistrationForm() {
       ?.filter((f: any) => f.is_required)
       ?.map((f: any) => f.field_key) || [];
 
-  const shouldShowStage3 = requiredFieldKeys.length > 0;
+  const { intakeDates, loading: loadingIntakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
+
+  const shouldShowStage3 = requiredFieldKeys.length > 0 || intakeDates.length > 1;
   const visibleStages = shouldShowStage3
     ? stages
     : stages.filter((s) => s.id !== 3);
 
-  const { intakeDates, loading: loadingIntakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
-
-  useEffect(() => {
-    if (intakeDates.length > 0) {
-      setFormData((prev) => ({ ...prev, intake_date: intakeDates[0] }));
-    }
-  }, [intakeDates]);
 
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
 
@@ -308,7 +303,7 @@ export default function StudentRegistrationForm() {
 
     const missingDocs = documentTypes.filter((docType) => {
 
-      if (!docType.is_required_init_app_doc) return false;
+      if (!(docType.is_required_for_init ?? docType.is_required_init_app_doc)) return false;
 
       return !formData.documents.some(
         (d) => d.document_type_id === docType.id && d.file_url && !d.uploading

@@ -8,7 +8,7 @@ import { IRoute } from "types/navigation";
 import Image from "next/image";
 
 import { useEffect, useState, useCallback } from "react";
-import api, { setLoggingOut } from "lib/useApi";
+import api, { setLoggingOut, SIGN_IN_URL } from "lib/useApi";
 
 interface User {
   id: string;
@@ -98,7 +98,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
     sessionStorage.clear();
     deleteAllCookies();
 
-    window.location.replace("/auth/sign-in");
+    window.location.replace(SIGN_IN_URL);
   };
 
   return (

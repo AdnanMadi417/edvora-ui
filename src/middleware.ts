@@ -15,32 +15,54 @@ const roleHomePaths: Record<string, string> = {
   account_manager: "/account-manager/applications",
 };
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return typeof payload.exp === "number" && payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
+function redirectTo(req: NextRequest, pathname: string) {
+  const url = req.nextUrl.clone();
+  url.pathname = pathname;
+  return url;
+}
+
+function redirectToSignIn(req: NextRequest) {
+  const res = NextResponse.redirect(redirectTo(req, "/auth/sign-in"));
+  res.cookies.delete("token");
+  res.cookies.delete("userRole");
+  return res;
+}
+
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("token")?.value;
   const role = req.cookies.get("userRole")?.value;
 
-  if (pathname === "/auth/sign-in" && token) {
+  if (pathname === "/auth/sign-in" && token && !isTokenExpired(token)) {
     const destination = (role && roleHomePaths[role]) ?? "/unauthorized";
-    return NextResponse.redirect(new URL(destination, req.url));
+    return NextResponse.redirect(redirectTo(req, destination));
   }
 
   if (publicRoutes.includes(pathname)) {
     return NextResponse.next();
   }
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/auth/sign-in", req.url));
+  if (!token || isTokenExpired(token)) {
+    return redirectToSignIn(req);
   }
 
   if (!role) {
-    return NextResponse.redirect(new URL("/auth/sign-in", req.url));
+    return redirectToSignIn(req);
   }
 
   for (const [prefix, allowedRoles] of Object.entries(protectedPrefixes)) {
     if (pathname === prefix || pathname.startsWith(prefix + "/")) {
       if (!allowedRoles.includes(role)) {
-        return NextResponse.redirect(new URL("/unauthorized", req.url));
+        return NextResponse.redirect(redirectTo(req, "/unauthorized"));
       }
       break;
     }

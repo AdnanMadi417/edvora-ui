@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { CheckCircle, Pause, XCircle, AlertCircle } from "lucide-react";
-import Cookies from "js-cookie";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import DocumentUploadList from "components/applications/form/stages/DocumentUploadList";
 import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
@@ -10,6 +9,8 @@ import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
 import { DocumentItem, DocumentType, FormDataType } from "components/applications/form/utility-functions/types";
+
+const FREE_UPLOAD_ID = "__free_upload__";
 
 interface RequiredActionProps {
   isOpen: boolean;
@@ -104,11 +105,7 @@ export default function RequiredAction({
 
     if (doc.file_key) {
       try {
-        const token = Cookies.get("token");
-        await api.delete("/storage/file", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-          data: { file_key: doc.file_key },
-        });
+        await api.delete("/storage/file", { data: { file_key: doc.file_key } });
       } catch {
         showToast("Failed to delete file from storage", "error");
         return;
@@ -137,7 +134,7 @@ export default function RequiredAction({
           newErrors[`documents.${docType.id}`] = "required";
         }
       });
-    } else if (!documents.some((d) => d.file_url && !d.uploading)) {
+    } else if (!freeUpload && !documents.some((d) => d.file_url && !d.uploading)) {
       newErrors["documents"] = "Please upload at least one document before confirming.";
     }
 
@@ -156,7 +153,7 @@ export default function RequiredAction({
       const payload = documents
         .filter((d) => d.file_key)
         .map((d) => ({
-          document_type_id: d.document_type_id,
+          ...(d.document_type_id !== FREE_UPLOAD_ID && { document_type_id: d.document_type_id }),
           file_url: d.file_url,
           file_key: d.file_key,
         }));
@@ -175,16 +172,19 @@ export default function RequiredAction({
   };
 
   const docTypes: DocumentType[] = actions?.document_types ?? [];
+  const freeUpload = docTypes.length === 0 && !!actions?.stage_statuses?.[0]?.is_requires_document_selection;
   const requiredDocTypes = docTypes.filter((d) => d.is_required_for_current_upload);
   const uploadedDocs = documents.filter((d) => d.file_url && !d.uploading);
   const allRequiredUploaded =
-    requiredDocTypes.length > 0
-      ? requiredDocTypes.every((d) =>
-          documents.some(
-            (doc) => doc.document_type_id === d.id && doc.file_url && !doc.uploading
+    freeUpload
+      ? true
+      : requiredDocTypes.length > 0
+        ? requiredDocTypes.every((d) =>
+            documents.some(
+              (doc) => doc.document_type_id === d.id && doc.file_url && !doc.uploading
+            )
           )
-        )
-      : uploadedDocs.length > 0;
+        : uploadedDocs.length > 0;
   const anyUploading = documents.some((d) => d.uploading);
 
   if (!isOpen) return null;
@@ -245,6 +245,23 @@ export default function RequiredAction({
                   useCurrentUploadRequired
                 />
               </>
+            ) : freeUpload ? (
+              <DocumentUploadList
+                documentTypes={[{
+                  id: FREE_UPLOAD_ID,
+                  type: "Payment Proof",
+                  code: "payment_proof",
+                  description: "Upload payment proof if available",
+                  is_init_app_doc: false,
+                  is_required_for_init: false,
+                  is_required_for_current_upload: true,
+                }]}
+                formData={formData}
+                errors={errors}
+                handleFileUpload={handleFileUpload}
+                removeDocument={removeDocument}
+                useCurrentUploadRequired
+              />
             ) : (
               <NoDocumentsRequired
                 title="No documents required"

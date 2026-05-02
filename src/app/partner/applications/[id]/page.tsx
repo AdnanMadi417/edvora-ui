@@ -27,26 +27,26 @@ export default function ApplicationPage() {
     applicationId,
   });
 
+  const fetchApplication = async () => {
+    try {
+      const token = Cookies.get("token");
+      const partnerId = localStorage.getItem("partnerId");
+      if (!token || !partnerId) return;
+
+      const res = await api.get(
+        `/partners/${partnerId}/applications/${applicationId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setApplication(res.data);
+    } catch (error) {
+      console.error("Error fetching application:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchApplication = async () => {
-      try {
-        const token = Cookies.get("token");
-        const partnerId = localStorage.getItem("partnerId");
-        if (!token || !partnerId) return;
-
-        const res = await api.get(
-          `/partners/${partnerId}/applications/${applicationId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        setApplication(res.data);
-      } catch (error) {
-        console.error("Error fetching application:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchApplication();
   }, [applicationId]);
 
@@ -55,7 +55,7 @@ export default function ApplicationPage() {
 
   return (
     <>
-      <ApplicationDetails application={application} />
+      <ApplicationDetails application={application} onRefetch={fetchApplication} />
       <ApplicationDocuments application={application} />
       <button
         onClick={() => setChatOpen((v) => !v)}

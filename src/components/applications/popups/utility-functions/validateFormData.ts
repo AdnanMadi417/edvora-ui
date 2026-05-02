@@ -94,7 +94,7 @@ export const validateFormData = (
       newErrors["documents"] = "Document types are still loading, please wait.";
     } else {
       documentTypes.forEach((docType) => {
-        if (!docType.is_required_init_app_doc) return;
+        if (!docType.is_required_for_init) return;
 
         const uploaded = formData.documents.find(
           (d) => d.document_type_id === docType.id && d.file_url && !d.uploading

@@ -217,7 +217,9 @@ export default function DocumentUploadList({
 }: Props) {
   const [showOptional, setShowOptional] = useState(false);
   const isReq = (d: DocumentType) =>
-    useCurrentUploadRequired ? d.is_required_for_current_upload : d.is_required_init_app_doc;
+    useCurrentUploadRequired
+      ? d.is_required_for_current_upload
+      : (d.is_required_for_init ?? d.is_required_init_app_doc);
 
   const sorted = [...documentTypes].sort((a, b) => {
     if (isReq(a) !== isReq(b)) return isReq(a) ? -1 : 1;
