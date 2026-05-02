@@ -6,7 +6,7 @@ import { FiAlignJustify } from "react-icons/fi";
 import { LogOut, Settings, Bell } from "lucide-react";
 import NavLink from "components/link/NavLink";
 import Link from "next/link";
-import api, { setLoggingOut } from "../../lib/useApi";
+import api, { setLoggingOut, SIGN_IN_URL } from "../../lib/useApi";
 
 import { useMe } from "hooks/useMe";
 import { profileRouteMap, notificationsRouteMap } from "components/navbar/config/navigation";
@@ -82,7 +82,7 @@ const Navbar = ({
     sessionStorage.clear();
     deleteAllCookies();
 
-    window.location.replace("/auth/sign-in");
+    window.location.replace(SIGN_IN_URL);
   };
 
   return (

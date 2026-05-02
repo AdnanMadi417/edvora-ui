@@ -4,30 +4,29 @@ import { CheckCircle, Download, CreditCard } from 'lucide-react';
 import { getDocumentDownloadUrl } from "services/documentService";
 import { submitOfferLetterDecision } from "services/offerLetterService";
 import { useToast } from "../../../context/ToastContext";
-import { useVisaCase } from "hooks/useVisaCase";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
-
-export type OfferLetterDecisionType = "accept" | "reject";
 
 interface OfferLetterDecisionProps {
   application: any;
+  visaCase: any;
+  onRefetch?: () => Promise<void>;
 }
 
 interface OfferLetterDecisionPayload {
-  decision: OfferLetterDecisionType;
-  reason?: string;
+  decision: "accept";
   notes?: string;
 }
 
 export default function OfferLetterDecision({
   application,
+  visaCase,
+  onRefetch,
 }: OfferLetterDecisionProps) {
   const offerLetter = application?.offer_letter_document;
 
   const [downloading, setDownloading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
-  const { visaCase } = useVisaCase(application?.id || "");
 
   const currentStatus =
     application?.stage?.statuses?.[0]?.name;
@@ -43,45 +42,29 @@ export default function OfferLetterDecision({
       setDownloading(true);
       const downloadUrl = await getDocumentDownloadUrl(fileKey);
       window.open(downloadUrl, "_blank", "noopener,noreferrer");
-    } catch (err) {
-      console.error(err);
-      alert("Download failed");
+    } catch {
+      showToast("Download failed", "error");
     } finally {
       setDownloading(false);
     }
   };
 
-  const handleDecision = async (decision: OfferLetterDecisionType) => {
+  const handleDecision = async (decision: "accept") => {
     if (!application?.id || submitting) return;
-
-    let reason: string | undefined;
-
-    if (decision === "reject") {
-      reason = prompt("Please provide a reason for rejection") || undefined;
-      if (!reason) return;
-    }
 
     try {
       setSubmitting(true);
 
       const payload: OfferLetterDecisionPayload = {
         decision,
-        reason,
         notes: "",
       };
 
       await submitOfferLetterDecision(application.id, payload);
 
-      showToast(
-        decision === "accept"
-          ? "Offer accepted successfully."
-          : "Offer rejected successfully.",
-        "success"
-      );
+      showToast("Offer accepted successfully.", "success");
 
-      setTimeout(() => {
-        location.reload();
-      }, 1500);
+      await onRefetch?.();
     } catch (err: any) {
       console.error(err);
       showToast(

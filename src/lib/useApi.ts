@@ -2,6 +2,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+export const SIGN_IN_URL = `${BASE_PATH}/auth/sign-in`;
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
@@ -9,6 +11,8 @@ const api = axios.create({
 
 let loggingOut = false;
 export const setLoggingOut = (value: boolean) => { loggingOut = value; };
+
+let authRedirectScheduled = false;
 
 api.interceptors.request.use((config) => {
   const token = Cookies.get("token");
@@ -19,9 +23,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401 && !loggingOut) {
+    if (err.response?.status === 401 && !loggingOut && !authRedirectScheduled) {
+      authRedirectScheduled = true;
       Cookies.remove("token");
-      window.location.replace("/auth/sign-in");
+      window.location.replace(SIGN_IN_URL);
     }
     return Promise.reject(err);
   }

@@ -37,10 +37,12 @@ const validateEmergencyContacts = (
   requiredFieldKeys: string[],
   errors: Record<string, string>
 ) => {
+  const fields = ["name", "relation", "phone", "email"] as const;
   (contacts || []).forEach((contact, idx) => {
-    ["name", "relation", "phone", "email"].forEach((f) => {
+    const hasAnyData = fields.some((f) => !isEmpty(contact[f]));
+    fields.forEach((f) => {
       const fullKey = `student.emergency_contacts[${idx}].${f}`;
-      if (requiredFieldKeys.includes(fullKey) && isEmpty(contact[f as keyof typeof contact])) {
+      if ((requiredFieldKeys.includes(fullKey) || hasAnyData) && isEmpty(contact[f])) {
         errors[fullKey] = "required";
       }
     });
@@ -52,10 +54,15 @@ const validateEducations = (
   requiredFieldKeys: string[],
   errors: Record<string, string>
 ) => {
+  const coreFields = ["qualification", "institution_name", "start_date", "end_date"] as const;
+  const allFields = [...coreFields, "field_of_study"] as const;
   (educations || []).forEach((edu, idx) => {
-    ["qualification", "institution_name", "start_date", "end_date"].forEach((f) => {
+    const hasAnyData = coreFields.some((f) => !isEmpty(edu[f]));
+    allFields.forEach((f) => {
       const fullKey = `student.previous_educations[${idx}].${f}`;
-      if (requiredFieldKeys.includes(fullKey) && isEmpty(edu[f as keyof typeof edu])) {
+      const isApiRequired = requiredFieldKeys.includes(fullKey);
+      const isCore = (coreFields as readonly string[]).includes(f);
+      if ((isApiRequired || (isCore && hasAnyData)) && isEmpty(edu[f as keyof typeof edu])) {
         errors[fullKey] = "required";
       }
     });
@@ -94,7 +101,7 @@ export const validateFormData = (
       newErrors["documents"] = "Document types are still loading, please wait.";
     } else {
       documentTypes.forEach((docType) => {
-        if (!docType.is_required_init_app_doc) return;
+        if (!(docType.is_required_for_init ?? docType.is_required_init_app_doc)) return;
 
         const uploaded = formData.documents.find(
           (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
@@ -108,6 +115,9 @@ export const validateFormData = (
   }
 
   if (stageNum === 3) {
+    if (requiredFieldKeys.includes("intake_date") && isEmpty(formData.intake_date)) {
+      newErrors["intake_date"] = "required";
+    }
     validateStudentFields(student, requiredFieldKeys, newErrors);
     validateEmergencyContacts(student.emergency_contacts || [], requiredFieldKeys, newErrors);
     validateEducations(student.previous_educations || [], requiredFieldKeys, newErrors);

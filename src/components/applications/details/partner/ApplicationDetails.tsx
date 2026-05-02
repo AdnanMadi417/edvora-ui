@@ -38,10 +38,12 @@ import { useVisaCase } from "hooks/useVisaCase";
 
 interface ApplicationDetailsProps {
   application: any;
+  onRefetch?: () => Promise<void>;
 }
 
 export default function ApplicationDetails({
   application,
+  onRefetch,
 }: ApplicationDetailsProps) {
   function daysSince(dateString: string) {
     if (!dateString) return 0;
@@ -135,6 +137,9 @@ export default function ApplicationDetails({
     currentStatusCode === "EVAL_REUPLOAD_REQUIRED";
 
   const showEVisaUpload = currentStatusCode === "E_VISA_PARTNER_UPLOAD";
+
+  const showAwaitingArrival =
+    currentStatusCode === "AWAITING_ARRIVAL" && !actions?.document_types?.length;
 
   const formatGender = (value: boolean | null) => {
     if (value === null) return "Not provided";
@@ -420,6 +425,17 @@ export default function ApplicationDetails({
                     </button>
                   )}
 
+                  {showAwaitingArrival && (
+                    <button
+                      type="button"
+                      onClick={openRequiredActionPopup}
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700"
+                    >
+                      <FileUp className="h-4 w-4" />
+                      Upload Payment Proof
+                    </button>
+                  )}
+
 
                   {showEmgsUpload && (
 
@@ -527,8 +543,8 @@ export default function ApplicationDetails({
       </div>
       
       <ApplicationTimeline application={application} />
-      <ApplicationCommission application={application} />
-      <OfferLetterDecision application={application} />
+      <ApplicationCommission application={application} actions={actions} />
+      <OfferLetterDecision application={application} visaCase={visaCase} onRefetch={onRefetch} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
