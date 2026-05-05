@@ -310,7 +310,7 @@ export default function ApplicationDetails({
           <div className="space-y-2">
                   {actions && (
                     <>
-                      {actions.document_types?.length > 0 && (
+                      {actions.document_types?.some((d: any) => d.is_required_for_current_upload) && (
                         <button
                           onClick={openRequiredActionPopup}
                           className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"

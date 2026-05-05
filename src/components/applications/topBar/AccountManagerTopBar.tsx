@@ -63,6 +63,7 @@ export default function AccountManagerTopBar({ application }: Props) {
 
   const handleConfirmUpdate = () => {
     setShowUpdatePopup(false);
+    router.refresh();
   };
 
   return (

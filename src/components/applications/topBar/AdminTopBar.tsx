@@ -63,6 +63,7 @@ export default function AdminTopBar({ application }: Props) {
 
   const handleConfirmUpdate = () => {
     setShowUpdatePopup(false);
+    router.refresh();
   };
 
   return (
