@@ -12,7 +12,8 @@ export default function ApplicationCommissions({
   application,
 }: ApplicationCommissionsProps) {
   const commissions = application?.commissions || [];
-  const [downloading, setDownloading] = useState(false);
+  
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const commissionDocs = Object.values(
     application?.commission_documents || {}
@@ -20,18 +21,24 @@ export default function ApplicationCommissions({
 
   const hasCommissions = commissions.length > 0;
 
+  const formatLabel = (text?: string) =>
+  text
+    ? text.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+    : "Commission Document";
+
   if (!hasCommissions && commissionDocs.length === 0) return null;
 
-  const handleDownload = async (fileKey?: string) => {
-    if (!fileKey || downloading) return;
+  const handleDownload = async (doc: any) => {
+    if (!doc?.file_key || downloadingId) return;
+
     try {
-      setDownloading(true);
-      const url = await getDocumentDownloadUrl(fileKey);
+      setDownloadingId(doc.id);
+      const url = await getDocumentDownloadUrl(doc.file_key);
       window.open(url, "_blank", "noopener,noreferrer");
     } catch {
       alert("Download failed");
     } finally {
-      setDownloading(false);
+      setDownloadingId(null);
     }
   };
 
@@ -46,51 +53,52 @@ export default function ApplicationCommissions({
             <h3 className="text-p3 font-semibold text-slate-900">
               Commission Details
             </h3>
+    
+            <span className="text-sm text-slate-500">
+              Track payments, status, and resolve disputes 
+            </span>
+    
           </div>
         </div>
 
         <div className="space-y-4 p-6">
-          {hasCommissions ? (
-            commissions.map((commission: any) => {
-              const commissionName =
-                commissionDocs[0]?.document_type || "Commission Payment";
-              return (
-                <div
-                  key={commission.id}
-                  className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
-                        <Receipt className="h-5 w-5 text-green-600" />
-                      </div>
-                      <p className="font-medium text-gray-900">
-                        {commissionName}
-                      </p>
+          {commissionDocs.length > 0 ? (
+            commissionDocs.map((doc: any) => (
+              <div
+                key={doc.id}
+                className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
+                      <Receipt className="h-5 w-5 text-green-600" />
                     </div>
-                    <div className="flex items-center gap-2">
-                      {commissionDocs.map((doc: any) => (
-                        <button
-                          key={doc.id}
-                          onClick={() => handleDownload(doc.file_key)}
-                          disabled={downloading}
-                          title={doc.document_type}
-                          className="flex h-9 w-9 items-center justify-center rounded-md border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
-                        >
-                          <Download className="h-4 w-4" />
-                        </button>
-                      ))}
-                    </div>
+
+                    <p className="font-medium text-gray-900">
+                      {formatLabel(doc.document_type)}
+                    </p>
+
                   </div>
+
+                  <button
+                    title={doc.document_type}
+                    onClick={() => handleDownload(doc)}
+                    disabled={downloadingId === doc.id}
+                    className="flex h-9 w-9 items-center justify-center rounded-md border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                  >
+                    <Download className="h-4 w-4" />
+                  </button>
                 </div>
-              );
-            })
+              </div>
+            ))
           ) : (
             <p className="text-center text-gray-500">
               No commission records found.
             </p>
           )}
         </div>
+
+     
       </div>
     </section>
   );
