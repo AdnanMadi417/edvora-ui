@@ -43,7 +43,7 @@ export default function EmgsEvalUpload({
       const message =
         error?.response?.data?.message ||
         error?.message ||
-        "Failed to upload EMGS evaluation document";
+        "Failed to upload EMGS eval document";
       setUploadError(message);
     }
   };
@@ -86,7 +86,7 @@ export default function EmgsEvalUpload({
                     Upload EMGS Eval Document
                   </h5>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    Upload the evaluation document to proceed
+                    Upload the eval document to proceed
                   </p>
                 </div>
               </div>
@@ -105,8 +105,8 @@ export default function EmgsEvalUpload({
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
             <StatusFileUpload
               label="EMGS Eval Document"
-              description="Upload the EMGS evaluation document downloaded from the EMGS portal"
-              id="emgs_evaluation"
+              description="Upload the EMGS eval document downloaded from the EMGS portal"
+              id="emgs_eval"
               file={file}
               onFileChange={(f) => { setFile(f); setUploadError(""); }}
               onRemove={() => { setFile(null); setUploadError(""); }}

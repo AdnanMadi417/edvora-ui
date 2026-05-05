@@ -94,7 +94,7 @@ export default function VisaTrackingTimeline({
               <h3 className="text-lg font-semibold text-gray-900">
                 EMGS Eval Document
               </h3>
-              <p className="text-sm text-slate-500">EMGS evaluation file</p>
+              <p className="text-sm text-slate-500">EMGS eval file</p>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
               <div className="flex items-center gap-4">

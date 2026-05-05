@@ -58,7 +58,7 @@ export default function StageAdditionalInfo({
   return (
     <div className="space-y-5">
 
-      {intakeDates.length > 1 && (
+      {isFieldRequired("intake_date") && intakeDates.length > 1 && (
         <div className="mb-8">
           <h3 className="mb-4 font-semibold uppercase text-slate-900">Intake Date</h3>
           <IntakeDatePicker

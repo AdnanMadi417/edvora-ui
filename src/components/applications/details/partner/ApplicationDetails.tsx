@@ -451,7 +451,7 @@ export default function ApplicationDetails({
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="mb-1 text-sm font-semibold text-slate-800">Download Your Eval</p>
-                          <p className="mb-2 text-xs text-slate-500">Your evaluation is ready. Download it directly from the EMGS app.</p>
+                          <p className="mb-2 text-xs text-slate-500">Your eval is ready. Download it directly from the EMGS app.</p>
                           <a
                             href="https://www.youtube.com/shorts/fT4Wmm4eWwI"
                             target="_blank"
