@@ -17,7 +17,6 @@ import { useVisaSetup } from "hooks/applications/useVisaSetup";
 import { useStatusUpdate } from "hooks/applications/useStatusUpdate";
 import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 import { useCommissionPaymentUpload } from 'hooks/applications/files/useCommissionPaymentUpload';
-import { useVisaCase } from 'hooks/useDefaultVisaCase';
 
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
@@ -60,7 +59,7 @@ const DocumentRequestList = ({
 
   return (
     <div className="space-y-4">
-      {documents.map((doc, index) => (
+      {documents.map((doc) => (
         <div
           key={doc.id}
           className="relative space-y-3 rounded-md border bg-card p-4"
@@ -75,7 +74,7 @@ const DocumentRequestList = ({
             </button>
           )}
 
-          <div>
+          {documentTypes.length > 0 && <div>
             <label className="mb-2 block text-p2 font-medium text-gray-900">
               Document Type
             </label>
@@ -128,7 +127,7 @@ const DocumentRequestList = ({
                 </label>
               ))}
             </div>
-          </div>
+          </div>}
         </div>
       ))}
     </div>
@@ -209,8 +208,7 @@ export default function UpdateStatusPopup({
     };
   };
 
-  const { actions, loading } = useApplicationActions(application?.id);
-  const { amount } = useVisaCase();
+  const { actions } = useApplicationActions(application?.id);
   
   useEffect(() => {
     if (!actions) return;
@@ -264,7 +262,15 @@ export default function UpdateStatusPopup({
 
   const isCommissionPaid = selectedOption?.label === "Commission Paid";
 
-  const { uploadOfferLetter, isUploading } = useOfferLetterUpload();
+  const safeDocumentTypes = documentTypes ?? [];
+  const shouldShowDocumentSection =
+    requiresDocuments &&
+    safeDocumentTypes.length > 0 &&
+    !isUniversityApproved &&
+    !isVisaIssued &&
+    !isCommissionPaid;
+
+  const { uploadOfferLetter } = useOfferLetterUpload();
 
   const handleOfferLetterUpload = async () => {
     if (!offerLetterFile || !isUniversityApproved) return;
@@ -272,7 +278,7 @@ export default function UpdateStatusPopup({
     await uploadOfferLetter(offerLetterFile, application.id);
   };
 
-  const { submitVisaFee, isSubmitting: isVisaSubmitting } = useVisaSetup();
+  const { submitVisaFee } = useVisaSetup();
 
   const handleVisaSetup = async () => {
     if (!isVisaSetupSelected) return;
@@ -282,7 +288,7 @@ export default function UpdateStatusPopup({
     await submitVisaFee(application.id, finalAmount);
   };
 
-  const { uploadVisaDocument, isUploading: isVisaUploading } = useVisaDocumentUpload();
+  const { uploadVisaDocument } = useVisaDocumentUpload();
 
   const handleVisaIssuedUpload = async () => {
     if (!visaDocumentFile || selectedOption?.label !== "Visa Issued") return;
@@ -290,7 +296,7 @@ export default function UpdateStatusPopup({
     await uploadVisaDocument(visaDocumentFile, application.id);
   };
 
-  const { updateStatus, isUpdating: isStatusUpdating } = useStatusUpdate();
+  const { updateStatus } = useStatusUpdate();
 
   const handleStatusUpdate = async () => {
     await updateStatus({
@@ -298,10 +304,9 @@ export default function UpdateStatusPopup({
       statusId: selectedStatus,
       reason,
       notes,
-      requiredDocumentTypeIds:
-        requiresDocuments && !isUniversityApproved && !isCommissionPaid
-          ? documents.flatMap((doc) => doc.type)
-          : [],
+      requiredDocumentTypeIds: shouldShowDocumentSection
+        ? documents.flatMap((doc) => doc.type)
+        : [],
     });
   };
 
@@ -353,15 +358,9 @@ export default function UpdateStatusPopup({
       return false;
     }
 
-    if (
-      requiresDocuments &&
-      !isUniversityApproved &&
-      selectedOption?.label !== "Visa Issued"
-    ) {
-      if (documents.some((doc) => doc.type.length === 0)) {
-        setError("Please select at least one document type");
-        return false;
-      }
+    if (shouldShowDocumentSection && documents.some((doc) => doc.type.length === 0)) {
+      setError("Please select at least one document type");
+      return false;
     }
 
     if (isUniversityApproved && !offerLetterFile) {
@@ -445,7 +444,6 @@ export default function UpdateStatusPopup({
 
       onConfirm(selectedStatus, reason, notes);
       handleClose();
-      setTimeout(() => window.location.reload(), 2000);
     } catch (err: any) {
       const msg =
         err.response?.data?.message ||
@@ -557,7 +555,7 @@ export default function UpdateStatusPopup({
                 subtitle="There are no status options available at the moment."
               />
             ) : (
-              statusOptions.map((option, index) => {
+              statusOptions.map((option) => {
                 const Icon = option.icon;
                 const isSelected = selectedStatus === option.id;
 
@@ -615,16 +613,13 @@ export default function UpdateStatusPopup({
             )}
           </div>
 
-          {requiresDocuments &&
-            !isUniversityApproved &&
-            !isVisaIssued &&
-            !isCommissionPaid && (
-              <DocumentRequestList
-                documents={documents}
-                setDocuments={setDocuments}
-                documentTypes={documentTypes}
-              />
-            )}
+          {shouldShowDocumentSection && (
+            <DocumentRequestList
+              documents={documents}
+              setDocuments={setDocuments}
+              documentTypes={safeDocumentTypes}
+            />
+          )}
 
           {isUniversityApproved && (
             <StatusFileUpload

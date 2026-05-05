@@ -28,7 +28,7 @@ export default function ApplicationCommission({
     application?.commission_documents || {}
   ).filter((doc: any) => doc !== null) as any[];
 
-  if (!hasCommissions) return null;
+  if (!hasCommissions && commissionDocs.length === 0) return null;
 
   const handleDownload = async (fileKey?: string) => {
     if (!fileKey || downloading) return;
@@ -65,50 +65,40 @@ export default function ApplicationCommission({
         </div>
 
         <div className="space-y-4 p-6">
-          {application.commissions.map((commission: any) => {
-            const name =
-              commissionDocs.find(
-                (doc) => doc.commission_id === commission.id
-              )?.document_type ??
-              commissionDocs[0]?.document_type ??
-              "Commission Payment";
 
-            const docs = commissionDocs.filter(
-              (doc) =>
-                doc.commission_id === commission.id || !doc.commission_id
-            );
-
-            return (
-              <div
-                key={commission.id}
-                className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
-                      <Receipt className="h-5 w-5 text-green-600" />
-                    </div>
-                    <p className="font-medium text-gray-900">{name}</p>
+          {commissionDocs.length > 0 ? (
+            commissionDocs.map((doc: any) => (
+               <div
+              key={doc.id}
+              className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
+                    <Receipt className="h-5 w-5 text-green-600" />
                   </div>
-                  {docs.length > 0 && (
-                    <div className="flex items-center gap-2">
-                      {docs.map((doc: any) => (
-                        <button
-                          key={doc.id}
-                          onClick={() => handleDownload(doc.file_key)}
-                          disabled={downloading}
-                          title={doc.document_type}
-                          className="flex h-9 w-9 items-center justify-center rounded-md border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
-                        >
-                          <Download className="h-4 w-4" />
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <p className="font-medium text-gray-900">
+                    {doc.document_type || "Commission Document"}
+                  </p>
                 </div>
+
+                <button
+                  onClick={() => handleDownload(doc.file_key)}
+                  disabled={downloading}
+                  title={doc.document_type}
+                  className="flex h-9 w-9 items-center justify-center rounded-md border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
               </div>
-            );
-          })}
+            </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">
+              No commission documents available.
+            </p>
+          )}
+          
         </div>
       </div>
     </section>

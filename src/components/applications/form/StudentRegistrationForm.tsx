@@ -118,7 +118,7 @@ export default function StudentRegistrationForm() {
 
   const { intakeDates, loading: loadingIntakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
 
-  const shouldShowStage3 = requiredFieldKeys.length > 0 || intakeDates.length > 1;
+  const shouldShowStage3 = requiredFieldKeys.length > 0;
   const visibleStages = shouldShowStage3
     ? stages
     : stages.filter((s) => s.id !== 3);

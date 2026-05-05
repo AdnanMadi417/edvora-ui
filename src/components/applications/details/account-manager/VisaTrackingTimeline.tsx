@@ -72,7 +72,7 @@ export default function VisaTrackingTimeline({
       {application?.emgs_evaluation_document && (
         <div className="border-t border-gray-200 p-6">
           <h3 className="mb-1 text-sm font-semibold text-gray-900">EMGS Eval Document</h3>
-          <p className="mb-4 text-xs text-slate-500">EMGS evaluation file</p>
+          <p className="mb-4 text-xs text-slate-500">EMGS eval file</p>
           <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
             <div className="flex items-center gap-4">
               <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
@@ -90,6 +90,34 @@ export default function VisaTrackingTimeline({
             </div>
             <button
               onClick={() => handleDownload(application.emgs_evaluation_document.file_key)}
+              disabled={downloading}
+              className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+              title="Download document"
+            >
+              <Download className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {application?.visa_document && (
+        <div className="border-t border-gray-200 p-6">
+          <h3 className="mb-1 text-sm font-semibold text-gray-900">Visa Document</h3>
+          <p className="mb-4 text-xs text-slate-500">Visa issued by the immigration authority</p>
+          <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
+                <FileText className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">{application.visa_document.document_type}</p>
+                <p className="text-xs text-slate-500">
+                  Uploaded on {new Date(application.visa_document.created_at).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => handleDownload(application.visa_document.file_key)}
               disabled={downloading}
               className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
               title="Download document"

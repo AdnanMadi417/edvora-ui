@@ -73,7 +73,7 @@ const DocumentRequestList = ({
             </button>
           )}
 
-          <div>
+          {documentTypes.length > 0 && <div>
             <label className="mb-2 block text-p2 font-medium text-gray-900">
               Document Type
             </label>
@@ -126,7 +126,7 @@ const DocumentRequestList = ({
                 </label>
               ))}
             </div>
-          </div>
+          </div>}
         </div>
       ))}
     </div>
@@ -260,6 +260,14 @@ export default function UpdateStatusPopup({
 
   const isCommissionPaid = selectedOption?.label === "Commission Paid";
 
+  const safeDocumentTypes = documentTypes ?? [];
+  const shouldShowDocumentSection =
+    requiresDocuments &&
+    safeDocumentTypes.length > 0 &&
+    !isUniversityApproved &&
+    !isVisaIssued &&
+    !isCommissionPaid;
+
   const { uploadOfferLetter } = useOfferLetterUpload();
 
   const handleOfferLetterUpload = async () => {
@@ -274,7 +282,7 @@ export default function UpdateStatusPopup({
     if (!isVisaSetupSelected) return;
 
     const enteredAmount = Number(formData.visa_fee_amount);
-    const finalAmount = enteredAmount > 0 ? enteredAmount : 0;
+    const finalAmount = enteredAmount > 0 ? enteredAmount : Number(amount?.amount ?? 0);
     await submitVisaFee(application.id, finalAmount);
   };
 
@@ -294,15 +302,16 @@ export default function UpdateStatusPopup({
       statusId: selectedStatus,
       reason,
       notes,
-      requiredDocumentTypeIds:
-        requiresDocuments && !isUniversityApproved && !isCommissionPaid
-          ? documents.flatMap((doc) => doc.type)
-          : [],
+      requiredDocumentTypeIds: shouldShowDocumentSection
+      ? documents.flatMap((doc) => doc.type)
+      : [],
     });
   };
 
   const { uploadCommissionPayment, } =
     useCommissionPaymentUpload();
+
+
 
   const handleCommissionPaymentUpload = async () => {
     if (!commissionPaymentFile || !application?.id) return;
@@ -349,14 +358,11 @@ export default function UpdateStatusPopup({
     }
 
     if (
-      requiresDocuments &&
-      !isUniversityApproved &&
-      selectedOption?.label !== "Visa Issued"
+      shouldShowDocumentSection &&
+      documents.some((doc) => doc.type.length === 0)
     ) {
-      if (documents.some((doc) => doc.type.length === 0)) {
-        setError("Please select at least one document type");
-        return false;
-      }
+      setError("Please select at least one document type");
+      return false;
     }
 
     if (isUniversityApproved && !offerLetterFile) {
@@ -439,7 +445,6 @@ export default function UpdateStatusPopup({
 
       onConfirm(selectedStatus, reason, notes);
       handleClose();
-      setTimeout(() => window.location.reload(), 2000);
     } catch (err: any) {
       const msg =
         err.response?.data?.message ||
@@ -609,16 +614,13 @@ export default function UpdateStatusPopup({
             )}
           </div>
 
-          {requiresDocuments &&
-            !isUniversityApproved &&
-            !isVisaIssued &&
-            !isCommissionPaid && (
-              <DocumentRequestList
-                documents={documents}
-                setDocuments={setDocuments}
-                documentTypes={documentTypes}
-              />
-            )}
+          {shouldShowDocumentSection && (
+            <DocumentRequestList
+            documents={documents}
+            setDocuments={setDocuments}
+            documentTypes={safeDocumentTypes}
+          />
+        )}
 
           {isUniversityApproved && (
             <StatusFileUpload
@@ -661,6 +663,14 @@ export default function UpdateStatusPopup({
                 errors={formErrors}
                 updateFormData={updateFormData}
               />
+              {amount?.amount && (
+                <div className="flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>
+                    Default visa fee is <strong>{amount.amount}</strong>. You can enter a different amount if needed.
+                  </span>
+                </div>
+              )}
             </div>
           )}
 

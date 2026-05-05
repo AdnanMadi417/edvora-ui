@@ -19,7 +19,7 @@ export const useEmgsEvalUpload = (): UseEmgsEvalUploadReturn => {
 
     try {
       setIsUploading(true);
-      showToast("Uploading EMGS evaluation document...", "info");
+      showToast("Uploading EMGS eval document...", "info");
 
       const presigned = await getPresignedUploads([file], "documents");
 
@@ -27,7 +27,7 @@ export const useEmgsEvalUpload = (): UseEmgsEvalUploadReturn => {
       const uploaded = results?.[0];
 
       if (!uploaded?.file_key || !uploaded?.public_url) {
-        throw new Error("EMGS evaluation document upload failed");
+        throw new Error("EMGS eval document upload failed");
       }
 
       await api.post(`/applications/${applicationId}/emgs-evaluation-document`, {
@@ -35,7 +35,7 @@ export const useEmgsEvalUpload = (): UseEmgsEvalUploadReturn => {
         file_url: uploaded.public_url,
       });
 
-      showToast("EMGS evaluation document uploaded successfully.", "success");
+      showToast("EMGS eval document uploaded successfully.", "success");
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message || "Upload failed";
       showToast(msg, "error");

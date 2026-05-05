@@ -310,7 +310,7 @@ export default function ApplicationDetails({
           <div className="space-y-2">
                   {actions && (
                     <>
-                      {actions.document_types?.length > 0 && (
+                      {actions.document_types?.some((d: any) => d.is_required_for_current_upload) && (
                         <button
                           onClick={openRequiredActionPopup}
                           className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"
@@ -451,7 +451,7 @@ export default function ApplicationDetails({
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="mb-1 text-sm font-semibold text-slate-800">Download Your Eval</p>
-                          <p className="mb-2 text-xs text-slate-500">Your evaluation is ready. Download it directly from the EMGS app.</p>
+                          <p className="mb-2 text-xs text-slate-500">Your eval is ready. Download it directly from the EMGS app.</p>
                           <a
                             href="https://www.youtube.com/shorts/fT4Wmm4eWwI"
                             target="_blank"

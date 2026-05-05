@@ -192,6 +192,7 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
           <DocGroup label="Payment Documents" docs={paymentDocuments} />
           <DocGroup label="Arrival Documents" docs={arrivalDocuments} />
           <DocGroup label="EMGS Eval Document" docs={emgsEvalDoc ? [emgsEvalDoc] : []} />
+          <DocGroup label="Visa Document" docs={visaDoc ? [visaDoc] : []} />
           <DocGroup label="Commission Documents" docs={commissionDocuments} />
         </div>
       )}

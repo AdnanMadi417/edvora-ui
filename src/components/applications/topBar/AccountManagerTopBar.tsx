@@ -53,7 +53,7 @@ export default function AccountManagerTopBar({ application }: Props) {
     setShowHoldPopup(true);
   };
 
-  const handleConfirmHold = (reason: string) => {
+  const handleConfirmHold = (_reason: string) => {
     setShowHoldPopup(false);
   };
 
@@ -63,6 +63,7 @@ export default function AccountManagerTopBar({ application }: Props) {
 
   const handleConfirmUpdate = () => {
     setShowUpdatePopup(false);
+    setTimeout(() => window.location.reload(), 1500);
   };
 
   return (
