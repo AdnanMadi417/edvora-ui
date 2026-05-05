@@ -132,11 +132,17 @@ export default function ApplicationDetails({
   const showArrivalConfirmation =
     currentStatusCode === "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE";
 
-  const showEmgsUpload =
-    currentStatusCode === "EVAL_PARTNER_UPLOAD" ||
-    currentStatusCode === "EVAL_REUPLOAD_REQUIRED";
+  const hasRequiredDocs = actions?.document_types?.some(
+    (d: any) => d.is_required_for_current_upload
+  );
 
-  const showEVisaUpload = currentStatusCode === "E_VISA_PARTNER_UPLOAD";
+  const showEmgsUpload =
+    !hasRequiredDocs &&
+    (currentStatusCode === "EVAL_PARTNER_UPLOAD" ||
+      currentStatusCode === "EVAL_REUPLOAD_REQUIRED");
+
+  const showEVisaUpload =
+    !hasRequiredDocs && currentStatusCode === "E_VISA_PARTNER_UPLOAD";
 
   const showAwaitingArrival =
     currentStatusCode === "AWAITING_ARRIVAL" && !actions?.document_types?.length;
@@ -310,7 +316,7 @@ export default function ApplicationDetails({
           <div className="space-y-2">
                   {actions && (
                     <>
-                      {actions.document_types?.some((d: any) => d.is_required_for_current_upload) && (
+                      {hasRequiredDocs && (
                         <button
                           onClick={openRequiredActionPopup}
                           className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"
