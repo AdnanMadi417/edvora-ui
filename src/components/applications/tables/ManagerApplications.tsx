@@ -92,9 +92,6 @@ const ModernApplicationsTable = () => {
   const { stages } = useAllStages();
   const { stageStatuses, stageStatusesLoading } = useAllStageStatuses();
 
-  console.log("Stages:", stages);
-  console.log("Stage Statuses:", stageStatuses);
-
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedStages, setSelectedStages] = useState<string>("all");
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
