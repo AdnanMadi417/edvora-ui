@@ -139,20 +139,23 @@ const PartnerApplications = () => {
     }));
   };
 
-  const actionRequiredStatuses = useMemo(() => {
-    const fromApi = stageStatuses
-      .filter((s) => s.is_requires_reason || s.is_requires_document_selection || s.is_triggers_stage_advance)
-      .map((s) => s.name.toLowerCase().replace(/\s+/g, '_'));
-    return new Set([
-      ...fromApi,
-      'correction_requested_by_account_manager',
-      'waiting_for_payment',
-      'waiting_partner_to_confirm_arrival_date',
-      'eval_ready',
-      'eval_partner_upload',
-      'upload_e-visa',
-    ]);
-  }, [stageStatuses]);
+  const actionRequiredStatuses = useMemo(() => new Set([
+    'correction_requested_by_account_manager',
+    'university_requested_corrections',
+    'program_change_suggested',
+    'waiting_for_payment',
+    'payment_rejected',
+    'waiting_partner_to_confirm_arrival_date',
+    'upload_emgs_eval',
+    'eval_re-upload_required',
+    'upload_e-visa',
+    'e-visa_re-upload_required',
+    'upload_visa_stage_documents',
+    'visa_documents_re-upload_required',
+    'upload_extra_arrival_documents',
+    'extra_arrival_documents_re-upload_required',
+    'commission_ready',
+  ]), []);
 
   const needsPartnerAction = (status: string) =>
     actionRequiredStatuses.has(status?.toLowerCase().replace(/\s+/g, '_'));
