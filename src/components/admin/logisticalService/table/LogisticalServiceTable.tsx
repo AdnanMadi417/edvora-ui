@@ -11,7 +11,7 @@ import {
   User,
   Globe,
   Settings,
-  Eye,
+  ChevronRight,
   Pencil,
   DollarSign,
   BookOpen, Trash2,
@@ -25,6 +25,7 @@ import EmptyData from "components/emptyData/EmptyTableData";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import { useToast } from 'components/context/ToastContext';
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import { useServiceProviders } from "hooks/service-providers/useServiceProviders";
@@ -32,6 +33,7 @@ import { useDeleteLogisticProvider } from "hooks/service-providers/useDeleteLogi
 import DeleteUniversityConfirmation from 'components/admin/logisticalService/DeleteServiceConfirmation';
 
 const LogisticalServiceTable = () => {
+  const router = useRouter();
   const { serviceProviders, loading, error } = useServiceProviders();
   const { showToast } = useToast();
 
@@ -127,12 +129,12 @@ const LogisticalServiceTable = () => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
             <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+              className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
               href="/admin/logistical-service/create"
             >
               <MdAddBusiness className="h-4 w-4" />
@@ -234,7 +236,8 @@ const LogisticalServiceTable = () => {
                     currentServiceProviders.map((provider) => (
                       <tr
                         key={provider.id}
-                        className="hover:bg-primary/10 group transition-colors"
+                        className="group cursor-pointer transition-colors hover:bg-primary/10"
+                        onClick={() => router.push(`/admin/logistical-service/${provider.id}`)}
                       >
                         <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -276,7 +279,7 @@ const LogisticalServiceTable = () => {
                         </td>
 
                         <td className="block min-w-[200px] max-w-[250px] space-y-1 px-4 py-3">
-                          <div className="flex items-center text-sm ">
+                          <div className="truncate text-sm">
                             {provider?.phone_number}
                           </div>
                         </td>
@@ -292,7 +295,7 @@ const LogisticalServiceTable = () => {
                                 .map((uni) => (
                                   <span
                                     key={uni}
-                                    className="truncate rounded-full border bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                                    className="truncate rounded-md border bg-white px-3 py-1 text-xs font-medium text-slate-700"
                                   >
                                     {uni}
                                   </span>
@@ -316,7 +319,7 @@ const LogisticalServiceTable = () => {
                               provider.languages.slice(0, 2).map((lang) => (
                                 <span
                                   key={lang}
-                                  className="rounded-full text-xs font-medium text-slate-700"
+                                  className="rounded-md text-xs font-medium text-slate-700"
                                 >
                                   {lang}
                                 </span>
@@ -336,7 +339,7 @@ const LogisticalServiceTable = () => {
 
                         <td className="px-6 py-4">
                           <div
-                            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold ${
+                            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-3 py-1 text-xs font-semibold ${
                               provider.is_active
                                 ? "border-green-600 bg-green-100 text-green-700"
                                 : "border-slate-300 bg-slate-100 text-slate-500"
@@ -355,20 +358,10 @@ const LogisticalServiceTable = () => {
                           <div className="flex items-center gap-2">
                             <a
                               role="menuitem"
-                              aria-label="View Provider"
-                              href={`/admin/logistical-service/${provider.id}`}
-                              className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                            >
-                              <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                            </a>
-
-                            <div className="h-6 border-l border-slate-200" />
-
-                            <a
-                              role="menuitem"
                               aria-label="Edit Provider"
                               href={`/admin/logistical-service/${provider.id}/edit`}
-                              className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                              onClick={(e) => e.stopPropagation()}
+                              className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                             >
                               <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                             </a>
@@ -378,17 +371,20 @@ const LogisticalServiceTable = () => {
                             <button
                               role="menuitem"
                               aria-label="Delete Provider"
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 setSelectedServiceId(provider.id);
                                 setSelectedServiceName(provider.name);
                                 setIsDeleteOpen(true);
                               }}
-                              className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                              className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                             >
                               <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                             </button>
-
                           </div>
+                        </td>
+                        <td className="px-4 py-4">
+                          <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                         </td>
                       </tr>
                     ))

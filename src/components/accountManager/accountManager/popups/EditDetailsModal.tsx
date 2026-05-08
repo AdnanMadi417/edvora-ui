@@ -140,7 +140,7 @@ export default function EditAccountManagerModal({
         <div className="flex justify-end gap-3 border-t px-6 py-4">
           <button
             onClick={onClose}
-            className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 shadow-md transition hover:scale-105 hover:border-gray-700  hover:text-gray-700 disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 shadow-md transition hover:scale-105 hover:border-gray-700  hover:text-gray-700 disabled:opacity-50"
           >
             <XCircle className="h-4 w-4" />
             Cancel

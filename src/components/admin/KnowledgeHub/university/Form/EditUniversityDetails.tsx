@@ -299,9 +299,8 @@ const UniversityEdit = ({ id }: Props) => {
         prev.map((p) => (p.id === method.id ? { ...p, ...payload } : p))
       );
 
-    } catch (err: any) {
-      const backendMessage = err?.response?.data?.message || "Please try again.";
-      showToast(`Failed to update payment method. ${backendMessage}`, "error");
+    } catch {
+      // hook already shows the error toast
     }
   };
 
@@ -446,7 +445,7 @@ const UniversityEdit = ({ id }: Props) => {
             <h2 className="text-lg font-semibold">{university.name}</h2>
             <p className="text-sm text-slate-500">{university.country}</p>
             {logoFile && !logoUploading && (
-              <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+              <span className="mt-1 inline-block rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
                 Logo ready — click Save Changes
               </span>
             )}
@@ -457,7 +456,7 @@ const UniversityEdit = ({ id }: Props) => {
 
           <button
             onClick={handleBack}
-            className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
+            className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
           >
             <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
             <span className="hidden sm:inline">Back to universities</span>

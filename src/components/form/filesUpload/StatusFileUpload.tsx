@@ -5,6 +5,7 @@ import { useToast } from "components/context/ToastContext";
 
 interface StatusFileUploadProps {
   label: string;
+  description?: string;
   id: string;
   file: File | null;
   onFileChange: (file: File) => void;
@@ -18,6 +19,7 @@ interface StatusFileUploadProps {
 
 export default function StatusFileUpload({
   label,
+  description,
   id,
   file,
   onFileChange,
@@ -55,15 +57,20 @@ export default function StatusFileUpload({
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-900">
-        {label} {required && <span className="text-red-500">*</span>}
-      </label>
+      <div>
+        <label className="block text-sm font-medium text-gray-900">
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        {description && (
+          <p className="mt-0.5 text-xs text-slate-400">{description}</p>
+        )}
+      </div>
 
       <label
         htmlFor={id}
         className="group relative flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-gray-300 bg-white px-6 py-10 text-center transition-all duration-200 hover:border-blue-500 hover:bg-blue-50/40"
       >
-        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-100 text-blue-600 transition">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-md bg-blue-100 text-blue-600 transition">
           <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -95,7 +102,7 @@ export default function StatusFileUpload({
               <button
                 type="button"
                 onClick={onRemove}
-                className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
               >
                 <Trash2 className="h-4 w-4" />
                 Remove
@@ -107,9 +114,9 @@ export default function StatusFileUpload({
           </div>
 
           {uploading && (
-            <div className="mt-3 h-1.5 w-full rounded-full bg-slate-100">
+            <div className="mt-3 h-1.5 w-full rounded-md bg-slate-100">
               <div
-                className="h-full rounded-full bg-blue-500 transition-all duration-300"
+                className="h-full rounded-md bg-blue-500 transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>

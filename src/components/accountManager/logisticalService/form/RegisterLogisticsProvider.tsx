@@ -211,7 +211,7 @@ export default function RegisterLogisticsProvider() {
       <div className="rounded-md border bg-slate-50 shadow-sm">
 
         <div className="flex items-start gap-x-4 rounded-t-xl border-b px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <Truck className="text-blue-700" size={24} />
           </div>
           <div>
@@ -319,7 +319,7 @@ export default function RegisterLogisticsProvider() {
                 <button
                   type="button"
                   onClick={() => removePackage(index)}
-                  className="flex items-center justify-center gap-2 rounded-full border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+                  className="flex items-center justify-center gap-2 rounded-md border border-red-600 text-red-600  px-4 py-2 text-sm font-medium transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                 >
                   <Trash2 className="h-4 w-4" />
                   Remove
@@ -390,7 +390,7 @@ export default function RegisterLogisticsProvider() {
                           const updated = pkg.includes.filter((_, idx) => idx !== i);
                           updatePackage(index, "includes", updated);
                         }}
-                        className="flex items-center justify-center rounded-full border border-red-600 text-red-600 p-1 transition hover:border-red-700 hover:text-red-700"
+                        className="flex items-center justify-center rounded-md border border-red-600 text-red-600 p-1 transition hover:border-red-700 hover:text-red-700"
                         aria-label="Remove item"
                       >
                         <Trash2 className="h-4 w-4" />

@@ -14,18 +14,27 @@ const STATUS_ICON: Record<string, React.ReactNode> = {
   '1': <Clock className="h-5 w-5 text-yellow-500" />,
   '2': <CheckCircle className="h-5 w-5 text-green-600" />,
   '3': <XCircle className="h-5 w-5 text-red-600" />,
+  pending: <Clock className="h-5 w-5 text-yellow-500" />,
+  approved: <CheckCircle className="h-5 w-5 text-green-600" />,
+  rejected: <XCircle className="h-5 w-5 text-red-600" />,
 };
 
 const STATUS_BADGE: Record<string, string> = {
   '1': 'border-yellow-200 bg-yellow-50 text-yellow-700',
   '2': 'border-green-200 bg-green-50 text-green-700',
   '3': 'border-red-200 bg-red-50 text-red-700',
+  pending: 'border-yellow-200 bg-yellow-50 text-yellow-700',
+  approved: 'border-green-200 bg-green-50 text-green-700',
+  rejected: 'border-red-200 bg-red-50 text-red-700',
 };
 
 const STATUS_LABEL: Record<string, string> = {
   '1': 'Pending',
   '2': 'Approved',
   '3': 'Rejected',
+  pending: 'Pending',
+  approved: 'Approved',
+  rejected: 'Rejected',
 };
 
 export default function ApplicationDocuments({ application }: ApplicationDocumentsProps) {
@@ -33,13 +42,18 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
   const [downloading, setDownloading] = useState<string | null>(null);
   const { showToast } = useToast();
 
-  const documents: any[] = application?.documents || [];
+  const allDocs: any[] = application?.documents || [];
+  const documents = allDocs;
   const paymentDocuments: any[] = application?.payment_documents || [];
   const arrivalDocuments: any[] = application?.arrival_documents || [];
-  const emgsEvaluationDoc: any = application?.emgs_evaluation_document || null;
-  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + (emgsEvaluationDoc ? 1 : 0);
-  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...(emgsEvaluationDoc ? [emgsEvaluationDoc] : [])].filter(
-    (d) => d.status === '1',
+  const emgsEvalDoc: any = application?.emgs_evaluation_document || null;
+  const offerLetterDoc: any = application?.offer_letter_document || null;
+  const visaDoc: any = application?.visa_document || null;
+  const commissionDocuments: any[] = Object.values(application?.commission_documents || {}).filter(Boolean) as any[];
+  const singleDocs = [emgsEvalDoc, offerLetterDoc, visaDoc].filter(Boolean);
+  const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + singleDocs.length + commissionDocuments.length;
+  const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...[emgsEvalDoc, visaDoc].filter(Boolean), ...commissionDocuments].filter(
+    (d) => d.status === '1' || d.status === 'pending',
   ).length;
 
   const handleDownload = async (fileKey: string, docId: string) => {
@@ -96,7 +110,7 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
         <button
           onClick={() => doc.file_key && handleDownload(doc.file_key, doc.id)}
           disabled={!doc.file_key || !!downloading}
-          className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-40"
+          className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-40"
           title="Download"
         >
           <Download className={`h-4 w-4 ${isDownloading ? 'animate-pulse' : ''}`} />
@@ -122,49 +136,64 @@ export default function ApplicationDocuments({ application }: ApplicationDocumen
   return (
     <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
       <div
-        className={`flex cursor-pointer items-center justify-between border border-gray-200 p-5 transition-colors hover:bg-slate-50 ${
+        className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80 ${
           showDocs ? 'rounded-t-lg' : 'rounded-lg'
         }`}
         onClick={() => setShowDocs(!showDocs)}
       >
-        <div className="flex items-center gap-3">
-          <span className="relative flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-            <FolderOpen className="h-5 w-5 text-blue-700" />
+        {/* Left: icon + info */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="relative shrink-0">
+            <div className="flex h-11 w-11 items-center justify-center rounded-md bg-blue-50">
+              <FolderOpen className="h-5 w-5 text-blue-600" />
+            </div>
             {pendingDocuments > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-white">
+              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-md bg-amber-500 text-[10px] font-bold text-white">
                 {pendingDocuments}
               </span>
             )}
-          </span>
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-slate-900">Documents</h3>
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-              {totalDocuments}
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Application Documents</h3>
+            <p className="mt-0.5 text-xs text-slate-500">
+              {totalDocuments} {totalDocuments === 1 ? 'file' : 'files'}
+              {pendingDocuments > 0 && (
+                <span className="font-medium text-amber-600"> · {pendingDocuments} pending review</span>
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Right: badges + chevron */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+              {totalDocuments} Total
             </span>
             {pendingDocuments > 0 && (
-              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
-                {pendingDocuments} pending
+              <span className="rounded-md bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">
+                {pendingDocuments} Pending
               </span>
             )}
           </div>
+          <div
+            className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
+              showDocs ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-500'
+            } group-hover:bg-blue-50 group-hover:text-blue-600`}
+          >
+            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${showDocs ? 'rotate-180' : ''}`} />
+          </div>
         </div>
-        <button
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200"
-          aria-label="Toggle documents"
-          aria-expanded={showDocs}
-        >
-          <ChevronDown
-            className={`h-4 w-4 transition-transform duration-200 ${showDocs ? 'rotate-180' : ''}`}
-          />
-        </button>
       </div>
 
       {showDocs && (
         <div className="space-y-6 rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
-          <DocGroup label="Application Documents" docs={documents} />
+          {allDocs.map((doc: any) => <DocRow key={doc.id} doc={doc} />)}
           <DocGroup label="Payment Documents" docs={paymentDocuments} />
           <DocGroup label="Arrival Documents" docs={arrivalDocuments} />
-          <DocGroup label="EMGS Evaluation Document" docs={emgsEvaluationDoc ? [emgsEvaluationDoc] : []} />
+          <DocGroup label="EMGS Eval Document" docs={emgsEvalDoc ? [emgsEvalDoc] : []} />
+          <DocGroup label="Visa Document" docs={visaDoc ? [visaDoc] : []} />
+          <DocGroup label="Commission Documents" docs={commissionDocuments} />
         </div>
       )}
     </section>

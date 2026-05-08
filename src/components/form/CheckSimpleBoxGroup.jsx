@@ -57,7 +57,7 @@ const CheckSimpleBoxGroup = ({
               placeholder="Search value..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-full border border-slate-200 px-4 py-2 pl-10 text-sm
+              className="w-full rounded-md border border-slate-200 px-4 py-2 pl-10 text-sm
                    outline-none focus:border-blue-500"
             />
           </div>

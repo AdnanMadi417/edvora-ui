@@ -58,7 +58,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
                   }
                 />
                 <span
-                  className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-[3px] border-white ${
+                  className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-md border-[3px] border-white ${
                     service.is_active ? "bg-emerald-500" : "bg-red-500"
                   }`}
                 />
@@ -77,7 +77,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
             <div className="flex items-center gap-2 sm:gap-6">
               <button
                 onClick={handleBack}
-                className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
+                className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
                 <span className="hidden sm:inline">Back to services</span>
@@ -86,7 +86,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
           </div>
 
           <div className="relative overflow-hidden rounded-xl bg-white py-5 px-6">
-            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-blue-100/20 blur-2xl" />
+            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-md bg-blue-100/20 blur-2xl" />
 
             <div className="flex flex-col md:flex-row md:justify-between md:items-start space-y-3 md:space-y-0">
               <div>
@@ -114,7 +114,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
                 <MapPin className="h-4 w-4 text-slate-400" />
                 <span>Residence</span>
               </div>
-              <span className="truncate rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700">
+              <span className="truncate rounded-md bg-white px-3 py-1 text-xs font-medium text-slate-700">
         {service?.main_location || "Not provided"}
       </span>
             </div>
@@ -125,7 +125,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
                 <Globe className="h-4 w-4 text-slate-400" />
                 <span>Nationality</span>
               </div>
-              <span className="truncate rounded-full bg-white px-3 py-1 text-xs font-medium text-slate-700">
+              <span className="truncate rounded-md bg-white px-3 py-1 text-xs font-medium text-slate-700">
         {service?.nationality || "Not provided"}
       </span>
             </div>
@@ -140,7 +140,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
                   service.languages.map(lang => (
                     <span
                       key={lang}
-                      className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                      className="rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                     >
               {lang}
             </span>
@@ -164,7 +164,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
                   service.service_locations.map(loc => (
                     <span
                       key={loc}
-                      className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                      className="rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                     >
           {loc}
         </span>
@@ -183,7 +183,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
                 {service?.universities_served?.length ? (
                   service.universities_served.map(uni => (
                     <li key={uni} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                      <span className="h-1.5 w-1.5 rounded-md bg-blue-500" />
                       {uni}
                     </li>
                   ))
@@ -200,7 +200,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
               {service?.services_offered?.length ? (
                 <div className="flex flex-wrap gap-2">
                   {service.services_offered.map(srv => (
-                    <div key={srv.id} className="flex items-center gap-0 overflow-hidden rounded-full border border-emerald-200">
+                    <div key={srv.id} className="flex items-center gap-0 overflow-hidden rounded-md border border-emerald-200">
                       <span className="bg-white px-3 py-1 text-xs font-medium text-slate-700">{srv.name}</span>
                       <span className="bg-emerald-500 px-3 py-1 text-xs font-semibold text-white">RM {srv.price ?? 0}</span>
                     </div>
@@ -249,7 +249,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
                         <ul className="space-y-1">
                           {pkg.includes.map((i) => (
                             <li key={i} className="flex items-center gap-2">
-                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                              <span className="h-1.5 w-1.5 rounded-md bg-emerald-500" />
                               {i}
                             </li>
                           ))}
@@ -298,7 +298,7 @@ const MarketplaceDetails = ({ id }: MarketplaceDetailsProps) => {
                 onClick={() =>
                   window.open(`https://wa.me/${service.whatsapp}`, "_blank")
                 }
-                className="rounded-full bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700"
+                className="rounded-md bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700"
               >
                 Contact on WhatsApp
               </button>

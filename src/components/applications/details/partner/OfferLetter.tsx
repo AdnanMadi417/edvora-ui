@@ -1,24 +1,26 @@
 import React, { useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
-import { CheckCircle, Download } from 'lucide-react';
+import { CheckCircle, Download, CreditCard } from 'lucide-react';
 import { getDocumentDownloadUrl } from "services/documentService";
 import { submitOfferLetterDecision } from "services/offerLetterService";
 import { useToast } from "../../../context/ToastContext";
-
-export type OfferLetterDecisionType = "accept" | "reject";
+import VisaTrackingTimeline from "./VisaTrackingTimeline";
 
 interface OfferLetterDecisionProps {
   application: any;
+  visaCase: any;
+  onRefetch?: () => Promise<void>;
 }
 
 interface OfferLetterDecisionPayload {
-  decision: OfferLetterDecisionType;
-  reason?: string;
+  decision: "accept";
   notes?: string;
 }
 
 export default function OfferLetterDecision({
   application,
+  visaCase,
+  onRefetch,
 }: OfferLetterDecisionProps) {
   const offerLetter = application?.offer_letter_document;
 
@@ -40,45 +42,29 @@ export default function OfferLetterDecision({
       setDownloading(true);
       const downloadUrl = await getDocumentDownloadUrl(fileKey);
       window.open(downloadUrl, "_blank", "noopener,noreferrer");
-    } catch (err) {
-      console.error(err);
-      alert("Download failed");
+    } catch {
+      showToast("Download failed", "error");
     } finally {
       setDownloading(false);
     }
   };
 
-  const handleDecision = async (decision: OfferLetterDecisionType) => {
+  const handleDecision = async (decision: "accept") => {
     if (!application?.id || submitting) return;
-
-    let reason: string | undefined;
-
-    if (decision === "reject") {
-      reason = prompt("Please provide a reason for rejection") || undefined;
-      if (!reason) return;
-    }
 
     try {
       setSubmitting(true);
 
       const payload: OfferLetterDecisionPayload = {
         decision,
-        reason,
         notes: "",
       };
 
       await submitOfferLetterDecision(application.id, payload);
 
-      showToast(
-        decision === "accept"
-          ? "Offer accepted successfully."
-          : "Offer rejected successfully.",
-        "success"
-      );
+      showToast("Offer accepted successfully.", "success");
 
-      setTimeout(() => {
-        location.reload();
-      }, 1500);
+      await onRefetch?.();
     } catch (err: any) {
       console.error(err);
       showToast(
@@ -94,9 +80,50 @@ export default function OfferLetterDecision({
 
   return (
     <section className="max-w-5xl mx-auto">
+
+      {visaCase && (
+        <>
+          <div className="my-5 rounded-lg border border-gray-200 bg-card shadow-sm">
+            <div className="flex items-center gap-4 border-b border-gray-200 p-6">
+              <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
+                <CreditCard className="text-xl text-blue-700" />
+              </span>
+              <div>
+                <h3 className="text-p3 font-semibold text-slate-900">Visa Payment</h3>
+                <span className="text-sm text-slate-500">Visa processing fee details</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-3">
+              <div>
+                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">Visa Fee Amount</p>
+                <p className="text-lg font-bold text-slate-900">
+                  {visaCase.visa_fee_amount
+                    ? `RM ${Number(visaCase.visa_fee_amount).toLocaleString()}`
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">Created At</p>
+                <p className="text-sm text-slate-700">
+                  {visaCase.created_at
+                    ? new Date(visaCase.created_at).toLocaleString()
+                    : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">Notes</p>
+                <p className="text-sm text-slate-700">{visaCase.notes || "No notes"}</p>
+              </div>
+            </div>
+          <VisaTrackingTimeline application={application} />
+          </div>
+        </>
+      )}
+
       <div className="mb-5 mt-5 space-y-4 rounded-lg border border-gray-200 bg-card p-4 shadow-sm sm:p-6">
         <div className="flex items-start gap-4">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-200">
+          <span className="flex h-10 w-10 items-center justify-center rounded-md bg-blue-200">
             <FaFilePdf className="text-lg text-blue-700" />
           </span>
 
@@ -131,12 +158,13 @@ export default function OfferLetterDecision({
           <button
             onClick={() => handleDownload(offerLetter.file_key)}
             disabled={downloading}
-            className="group rounded-full border border-transparent bg-green-50 p-2 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
+            className="group rounded-md border border-transparent bg-green-50 p-2 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
             title="Download Offer Letter"
           >
             <Download className="h-4 w-4 transition-transform group-hover:scale-110" />
           </button>
         </div>
+
 
         {isUniversityApproved && (
           <>
@@ -148,7 +176,7 @@ export default function OfferLetterDecision({
               <button
                 onClick={() => handleDecision("accept")}
                 disabled={submitting}
-                className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200"
+                className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200"
               >
                 <CheckCircle className="h-4 w-4" />
                 Accept Offer
@@ -159,7 +187,7 @@ export default function OfferLetterDecision({
       <button
         onClick={() => handleDecision("reject")}
         disabled={submitting}
-        className="rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 transition hover:border-text-error hover:text-text-error disabled:opacity-50"
+        className="rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 transition hover:border-text-error hover:text-text-error disabled:opacity-50"
       >
         Reject Offer
       </button>
@@ -170,6 +198,7 @@ export default function OfferLetterDecision({
 
 
       </div>
+    
     </section>
   );
 }

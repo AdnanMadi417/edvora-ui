@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import PresignedImage from "components/ui/PresignedImage";
 import {
   ChevronUp,
   ChevronDown,
@@ -14,6 +15,7 @@ import {
   GitBranch,
   RotateCcw,
   Flag,
+  SlidersHorizontal,
 } from "lucide-react";
 import { MdSchool } from "react-icons/md";
 
@@ -48,7 +50,7 @@ const SkeletonRow = () => (
   <tr className="border-b border-gray-100">
     <td className="px-6 py-4">
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 shrink-0 animate-pulse rounded-full bg-gray-200" />
+        <div className="h-10 w-10 shrink-0 animate-pulse rounded-md bg-gray-200" />
         <div className="space-y-2">
           <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
           <div className="h-3 w-44 animate-pulse rounded bg-gray-200" />
@@ -70,7 +72,7 @@ const SkeletonRow = () => (
     <td className="px-6 py-4">
       <div className="space-y-2">
         <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
-        <div className="h-6 w-32 animate-pulse rounded-full bg-gray-200" />
+        <div className="h-6 w-32 animate-pulse rounded-md bg-gray-200" />
       </div>
     </td>
     <td className="px-6 py-4">
@@ -105,6 +107,7 @@ const ModernApplicationsTable = () => {
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [searchTerm, setSearchTerm] = useState("");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -132,7 +135,7 @@ const ModernApplicationsTable = () => {
       filtered = filtered.filter(
         (app) =>
           (app.student_name?.toLowerCase() ?? "").includes(term) ||
-          (app.student_email?.toLowerCase() ?? "").includes(term) ||
+          (app.passport_number?.toLowerCase() ?? "").includes(term) ||
           (app.partner_name?.toLowerCase() ?? "").includes(term) ||
           (app.account_manager_name?.toLowerCase() ?? "").includes(term) ||
           (app.program_name?.toLowerCase() ?? "").includes(term) ||
@@ -226,7 +229,7 @@ const ModernApplicationsTable = () => {
 
     return (
       <span
-        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${config.bg} ${config.text}`}
+        className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium ${config.bg} ${config.text}`}
         title={config.label}
       >
         <span className="truncate max-w-[160px]">{config.label}</span>
@@ -270,68 +273,135 @@ const ModernApplicationsTable = () => {
 
           {/* Filter bar */}
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-3">
-            <div className="relative w-full sm:w-64 flex-shrink-0">
-              <UserSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search applications..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 text-sm text-slate-700 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-              />
-            </div>
-
-            <div className="w-full sm:w-44 flex-shrink-0">
-              <FilterSelectField
-                value={selectedStages}
-                onChange={(val: string) => setSelectedStages(val)}
-                options={stages}
-                icon={GitBranch}
-                defaultOption="All Stages"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedUniversity}
-                onChange={(val: string) => setSelectedUniversity(val)}
-                options={universities}
-                icon={MdSchool}
-                defaultOption="All Universities"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedStageStatus}
-                onChange={(val: string) => setSelectedStageStatus(val)}
-                options={stageStatuses.map((s) => ({
-                  label: s.name,
-                  value: s.name.toLowerCase().replace(/\s+/g, "_"),
-                }))}
-                icon={BadgeCheck}
-                defaultOption={stageStatusesLoading ? "Loading..." : "All Statuses"}
-              />
-            </div>
-
-            {activeFiltersCount > 0 && (
-              <div className="relative flex-shrink-0">
-                <ClearButton
-                  onClick={handleClearFilters}
-                  text="Clear"
-                  icon={<RotateCcw className="h-4 w-4" />}
+            {/* Search + mobile filter toggle */}
+            <div className="flex items-center gap-2 sm:contents">
+              <div className="relative flex-1 sm:w-64 sm:flex-none flex-shrink-0">
+                <UserSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search applications..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 text-sm text-slate-700 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
-                <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                  {activeFiltersCount}
-                </span>
               </div>
-            )}
+              <button
+                className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-background text-slate-500 hover:bg-slate-50"
+                onClick={() => setShowMobileFilters((v) => !v)}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                {activeFiltersCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </button>
+            </div>
+
+            {/* Filter selects — collapsible on mobile, always visible on sm+ */}
+            <div className={`flex-col gap-3 sm:contents ${showMobileFilters ? "flex" : "hidden sm:contents"}`}>
+              <div className="w-full sm:w-44 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedStages}
+                  onChange={(val: string) => setSelectedStages(val)}
+                  options={stages}
+                  icon={GitBranch}
+                  defaultOption="All Stages"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedUniversity}
+                  onChange={(val: string) => setSelectedUniversity(val)}
+                  options={universities}
+                  icon={MdSchool}
+                  defaultOption="All Universities"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedStageStatus}
+                  onChange={(val: string) => setSelectedStageStatus(val)}
+                  options={stageStatuses.map((s) => ({
+                    label: s.name,
+                    value: s.name.toLowerCase().replace(/\s+/g, "_"),
+                  }))}
+                  icon={BadgeCheck}
+                  defaultOption={stageStatusesLoading ? "Loading..." : "All Statuses"}
+                />
+              </div>
+
+              {activeFiltersCount > 0 && (
+                <div className="relative flex-shrink-0">
+                  <ClearButton
+                    onClick={handleClearFilters}
+                    text="Clear"
+                    icon={<RotateCcw className="h-4 w-4" />}
+                  />
+                  <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-md bg-red-500 text-[10px] font-bold text-white">
+                    {activeFiltersCount}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
 
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-card">
+      {/* Mobile card list */}
+      <div className="md:hidden rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-card divide-y divide-gray-100">
+        {loading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="flex items-center gap-3 px-4 py-3.5">
+              <div className="h-11 w-11 shrink-0 animate-pulse rounded-md bg-gray-200" />
+              <div className="min-w-0 flex-1 space-y-2">
+                <div className="flex justify-between gap-2">
+                  <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
+                  <div className="h-3 w-12 animate-pulse rounded bg-gray-200" />
+                </div>
+                <div className="h-3 w-24 animate-pulse rounded bg-gray-200" />
+                <div className="h-5 w-28 animate-pulse rounded-md bg-gray-200" />
+              </div>
+            </div>
+          ))
+        ) : paginatedApplications.length === 0 ? (
+          <div className="px-6 py-8 text-center"><EmptyData /></div>
+        ) : (
+          paginatedApplications.map((app) => (
+            <div
+              key={app.id}
+              className="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50"
+              onClick={() => router.push(`/admin/applications/${app.id}`)}
+            >
+              <PresignedImage
+                fileKey={app.student_photo_file_key}
+                alt={app.student_name}
+                className="h-11 w-11 shrink-0 rounded-full object-cover"
+                fallback={
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                    {app.student_name?.[0]?.toUpperCase() ?? "?"}
+                  </div>
+                }
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate text-sm font-semibold text-slate-900">{app.student_name}</span>
+                  <span className="shrink-0 text-xs text-slate-400">{getRelativeTime(app.updated_at)}</span>
+                </div>
+                <div className="mt-0.5 truncate text-xs text-slate-500">{app.program_name}</div>
+                <div className="mt-1.5"><StatusBadge status={app.status} /></div>
+              </div>
+              <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-card">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200 bg-card">
@@ -408,19 +478,26 @@ const ModernApplicationsTable = () => {
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                        {app.student_name?.[0]?.toUpperCase() ?? "?"}
-                      </div>
+                      <PresignedImage
+                        fileKey={app.student_photo_file_key}
+                        alt={app.student_name}
+                        className="h-10 w-10 shrink-0 rounded-full object-cover"
+                        fallback={
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                            {app.student_name?.[0]?.toUpperCase() ?? "?"}
+                          </div>
+                        }
+                      />
                       <div className="min-w-0">
                         <div className="truncate font-medium text-slate-900">{app.student_name}</div>
-                        <div className="truncate text-xs text-slate-500">{app.student_email}</div>
+                        <div className="truncate text-xs text-slate-500">{app.passport_number ?? "—"}</div>
                       </div>
                     </div>
                   </td>
 
                   <td className="min-w-[250px] max-w-[300px] px-6 py-4">
-                    <div className="font-medium text-slate-900 truncate">{app.program_name}</div>
-                    <div className="truncate text-xs text-slate-500 truncate">{app.university_name}</div>
+                    <div className="truncate font-medium text-slate-900">{app.program_name}</div>
+                    <div className="truncate text-xs text-slate-500">{app.university_name}</div>
                   </td>
 
                   <td className="min-w-[200px] max-w-[250px] px-6 py-4">
@@ -477,7 +554,7 @@ const ModernApplicationsTable = () => {
             <PrevButton
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              text="Previous"
+              text="Prev"
               icon={<ArrowLeft className="h-4 w-4" />}
             />
             <span className="px-2 text-slate-500">

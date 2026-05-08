@@ -8,10 +8,12 @@ import {
   ArrowLeft,
   ArrowRight,
 } from "lucide-react";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from "../../../constants/lists";
 import { useToast } from "../../context/ToastContext";
-import api from "../../../lib/useApi";
-import Cookies from "js-cookie";
+import api from "lib/useApi";
+import { useDocumentType } from "../../../hooks/useDocumentType";
 import { InputField, SelectField, RadioField } from "../../form";
 import {
   getPresignedUploads,
@@ -120,6 +122,7 @@ const stages = [
 ];
 
 export default function StudentManualApplication() {
+  const router = useRouter();
   const [stage, setStage] = useState(1);
   const [completedStages, setCompletedStages] = useState([]);
   const { showToast } = useToast();
@@ -133,12 +136,6 @@ export default function StudentManualApplication() {
     loadingCreatePartnerApplication,
     errorCreatePartnerApplication,
   } = useCreatePartnerApplication(partnerId);
-
-  const [documentTypes, setDocumentTypes] = useState<
-    { id: string; type: string; description: string }[]
-  >([]);
-
-  const [initOnly, setInitOnly] = useState(true);
 
   const { qualifications } = useAllQualifications();
 
@@ -205,6 +202,12 @@ export default function StudentManualApplication() {
   };
 
   const { intakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
+
+  const { documentTypes, loading: documentTypesLoading } = useDocumentType({
+    initOnly: true,
+    programId: formData.program_id || undefined,
+    nationality: formData.student.nationality || undefined,
+  });
 
   useEffect(() => {
     if (intakeDates.length > 0) {
@@ -318,41 +321,6 @@ export default function StudentManualApplication() {
     fetchApplications();
   }, []);
 
-  useEffect(() => {
-    const fetchDocumentTypes = async () => {
-      const token = Cookies.get("token");
-
-      const res = await api.get("/document-types", {
-        params: { init_only: initOnly },
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-
-      setDocumentTypes(res.data || []);
-    };
-
-    fetchDocumentTypes();
-  }, [initOnly]);
-
-  useEffect(() => {
-    const fetchDocumentTypes = async () => {
-      try {
-        const token = Cookies.get("token");
-
-        const res = await api.get("/document-types", {
-          params: {
-            init_only: true, // or false
-          },
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-
-        setDocumentTypes(res.data || []);
-      } catch (err) {
-        console.error("Failed to fetch document types", err);
-      }
-    };
-
-    fetchDocumentTypes();
-  }, []);
 
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -510,6 +478,7 @@ export default function StudentManualApplication() {
     }
 
     const missingDocs = documentTypes.filter((docType) => {
+      if (!docType.is_required_for_current_upload) return false;
       return !formData.documents.some(
         (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
       );
@@ -579,7 +548,7 @@ export default function StudentManualApplication() {
       showToast("Application submitted successfully.", "success");
 
       setTimeout(() => {
-        window.location.reload();
+        router.push("/partner/applications");
       }, 3000);
     } catch (err: any) {
       console.error("Error submitting application:", err);
@@ -598,7 +567,7 @@ export default function StudentManualApplication() {
   }
 
   return (
-    <section className="mx-auto mt-5">
+    <section className="mx-auto mt-5 max-w-5xl">
       <div className="rounded-lg border border-slate-200 bg-card p-6">
         <div className="mb-6 flex items-start gap-x-3 border-b-2 border-slate-100 pb-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
@@ -637,7 +606,7 @@ export default function StudentManualApplication() {
                   <button
                     onClick={() => canAccess && setStage(s.id)}
                     disabled={!canAccess}
-                    className={`mb-2 flex h-12 w-12 items-center justify-center rounded-full transition ${
+                    className={`mb-2 flex h-12 w-12 items-center justify-center rounded-md transition ${
                       isCompleted
                         ? "bg-blue-500 text-white"
                         : isActive
@@ -971,26 +940,41 @@ export default function StudentManualApplication() {
                 </p>
               </div>
 
-              <div className="space-y-6">
-                {documentTypes.map((docType) => (
-                  <FileUploadField
-                    key={docType.id}
-                    label={
-                      docType.type.charAt(0).toUpperCase() +
-                      docType.type.slice(1)
-                    }
-                    field="documents"
-                    documentTypeId={docType.id}
-                    formData={formData}
-                    updateFormData={updateFormData}
-                    errors={errors}
-                    uploadHandler={handleFileUpload}
-                    removeHandler={removeDocument}
-                    multiple={false}
-                    accept="application/pdf,image/*"
-                  />
-                ))}
-              </div>
+              {documentTypesLoading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                      <div className="h-11 w-11 shrink-0 animate-pulse rounded-xl bg-slate-100" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
+                        <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+                      </div>
+                      <div className="h-9 w-24 animate-pulse rounded-xl bg-slate-100" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {documentTypes.map((docType) => (
+                    <FileUploadField
+                      key={docType.id}
+                      label={
+                        docType.type.charAt(0).toUpperCase() +
+                        docType.type.slice(1)
+                      }
+                      field="documents"
+                      documentTypeId={docType.id}
+                      formData={formData}
+                      updateFormData={updateFormData}
+                      errors={errors}
+                      uploadHandler={handleFileUpload}
+                      removeHandler={removeDocument}
+                      multiple={false}
+                      accept="application/pdf,image/*"
+                    />
+                  ))}
+                </div>
+              )}
 
               {errors.documents && (
                 <p className="mt-2 text-xs text-red-600">
@@ -1010,7 +994,7 @@ export default function StudentManualApplication() {
             {stage > 1 && (
               <PrevButton
                 onClick={prevStage}
-                text="Previous"
+                text="Prev"
                 icon={<ArrowLeft className="h-4 w-4" />}
                 disabled={stage === 1}
               />

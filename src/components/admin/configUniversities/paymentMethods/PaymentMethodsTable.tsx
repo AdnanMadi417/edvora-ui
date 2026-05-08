@@ -7,7 +7,7 @@ import {
   ArrowRight,
   ArrowLeft,
   Settings,
-  Eye,
+  ChevronRight,
   Pencil,
   Trash2,
   CreditCard,
@@ -27,10 +27,12 @@ import CreatePayment from "components/admin/configUniversities/paymentMethods/po
 
 import Loading from "components/loading/Loading";
 
+import { useRouter } from "next/navigation";
 import { useToast } from "components/context/ToastContext";
 import Button from "components/ui/buttons/Button";
 
 const PaymentMethodsTable = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const { showToast } = useToast();
 
@@ -171,7 +173,7 @@ const PaymentMethodsTable = () => {
                 placeholder="Search by university name or level"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="w-full rounded-full border border-gray-300 bg-white px-4 py-2.5 pl-10 pr-4 text-sm text-slate-600 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-100"
+                className="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 pl-10 pr-4 text-sm text-slate-600 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-100"
               />
             </div>
 
@@ -182,7 +184,7 @@ const PaymentMethodsTable = () => {
                 setSelectedField("all");
                 setCurrentPage(1);
               }}
-              className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
             >
               <RefreshCw className="h-4 w-4" />
               Clear
@@ -256,13 +258,14 @@ const PaymentMethodsTable = () => {
                   currentPaymentMethods.map((payment) => (
                     <tr
                       key={payment.id}
-                      className="hover:bg-primary/10 group transition-colors"
+                      className="group cursor-pointer transition-colors hover:bg-primary/10"
+                      onClick={() => router.push(`/admin/config-universities/payment-methods/${payment.id}`)}
                     >
                       <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div
                             className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-full bg-accent-light text-h6 font-medium text-blue-700 "
+                rounded-md bg-accent-light text-h6 font-medium text-blue-700 "
                           >
                             <CreditCard className="h-5 w-5 text-blue-700" />
                           </div>
@@ -289,20 +292,10 @@ const PaymentMethodsTable = () => {
                         <div className="flex items-center gap-2">
                           <a
                             role="menuitem"
-                            aria-label="View Payment Method"
-                            href={`/admin/config-universities/payment-methods/${payment.id}`}
-                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                          >
-                            <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                          </a>
-
-                          <div className="h-6 border-l border-slate-200" />
-
-                          <a
-                            role="menuitem"
                             aria-label="Edit Payment Method"
                             href={`/admin/config-universities/payment-methods/${payment.id}/edit`}
-                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                            onClick={(e) => e.stopPropagation()}
+                            className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
                             <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                           </a>
@@ -312,16 +305,20 @@ const PaymentMethodsTable = () => {
                           <button
                             role="menuitem"
                             aria-label="Delete Payment Method"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setSelectedPaymentId(payment.id);
                               setSelectedPaymentMethodName(payment.name);
                               setIsDeleteOpen(true);
                             }}
-                            className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                            className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
                             <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                           </button>
                         </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                       </td>
                     </tr>
                   ))}

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { ChevronUp,
   ChevronDown,
-  Eye,
+  ChevronRight,
   Building,
   Tag,
   Phone,
@@ -14,9 +14,11 @@ import Image from "next/image";
 import partner from "/public/img/dashboards/partner-icon.png";
 import { partners as initialPartners } from "components/data/applications";
 import EmptyData from '../../emptyData/EmptyTableData';
+import { useRouter } from "next/navigation";
 import Link from 'next/link';
 
 const ModernPartnersTable = () => {
+  const router = useRouter();
   const [partners] = useState(initialPartners);
 
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
@@ -93,7 +95,7 @@ const ModernPartnersTable = () => {
 
     return (
       <span
-        className={`inline-flex rounded-full border px-2 py-1 text-p2 ${config.bg} ${config.text}`}
+        className={`inline-flex rounded-md border px-2 py-1 text-p2 ${config.bg} ${config.text}`}
       >
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
@@ -136,11 +138,11 @@ const ModernPartnersTable = () => {
                 placeholder="Search partners by name or business..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full rounded-full border border-default bg-card px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-0 focus:ring-blue-500 sm:w-64"
+                className="w-full rounded-md border border-default bg-card px-4 py-2.5 outline-none focus:border-blue-500 focus:ring-0 focus:ring-blue-500 sm:w-64"
               />
 
               <select
-                className="rounded-full border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="rounded-md border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
               >
@@ -151,7 +153,7 @@ const ModernPartnersTable = () => {
               </select>
 
               {/*<select*/}
-              {/*  className="rounded-full border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"*/}
+              {/*  className="rounded-md border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"*/}
               {/*  value={filterCountry}*/}
               {/*  onChange={(e) => setFilterCountry(e.target.value)}*/}
               {/*>*/}
@@ -161,7 +163,7 @@ const ModernPartnersTable = () => {
               {/*</select>*/}
 
               <select
-                className="rounded-full border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="rounded-md border border-default px-3 py-2 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
               >
@@ -177,7 +179,7 @@ const ModernPartnersTable = () => {
                   setFilterType("all");
                   setFilterCountry("all");
                 }}
-                className="bg-background flex items-center justify-center gap-2 rounded-full border border-default px-4 py-2.5 text-sm text-slate-600 outline-0 transition hover:border-text-error hover:text-text-error sm:w-auto"
+                className="bg-background flex items-center justify-center gap-2 rounded-md border border-default px-4 py-2.5 text-sm text-slate-600 outline-0 transition hover:border-text-error hover:text-text-error sm:w-auto"
               >
                 Clear
               </button>
@@ -235,12 +237,7 @@ const ModernPartnersTable = () => {
               </div>
             </th>
 
-            <th className="min-w-[150px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-              <div className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Actions
-              </div>
-            </th>
+            <th className="px-4 py-4" />
           </tr>
           </thead>
 
@@ -268,38 +265,38 @@ const ModernPartnersTable = () => {
               paginatedPartners.map((app) => (
                 <tr
                   key={app.id}
-                  className="group transition-colors hover:bg-primary"
+                  className="group cursor-pointer transition-colors hover:bg-primary"
+                  onClick={() => router.push(`/account-manager/partners/${app.id}`)}
                 >
 
-                  <td className="min-w-[250px] px-6 py-4 flex  items-center gap-2 text-slate-900">
-                    <div className="">
+                  <td className="min-w-[250px] px-6 py-4 flex items-center gap-2 text-slate-900">
+                    <div className="shrink-0">
                       <Image
                         width="40"
                         height="40"
-                        className="h-10 w-10 rounded-full"
+                        className="h-10 w-10 rounded-md"
                         src={partner}
                         alt="Profile"
                       />
                     </div>
-
-                    {app.businessName}
+                    <div className="min-w-0 truncate">{app.businessName}</div>
                   </td>
 
                   <td className="min-w-[200px] px-6 py-4 text-slate-600">
-                    {app.type}
+                    <div className="truncate">{app.type}</div>
                   </td>
 
                   <td className="min-w-[200px] px-6 py-4 text-slate-600">
-                    <span className="block font-semibold">
+                    <span className="block truncate font-semibold">
                       {app.emailContact}
                     </span>
-                    <span className="block font-normal text-slate-900">
+                    <span className="block truncate font-normal text-slate-900">
                       {app.phoneContact}
                     </span>
                   </td>
 
                   <td className="min-w-[150px] px-6 py-4 text-slate-600">
-                    {app.country}
+                    <div className="truncate">{app.country}</div>
                   </td>
 
                   <td className="min-w-[100px] px-6 py-4">
@@ -310,15 +307,8 @@ const ModernPartnersTable = () => {
                     {new Date(app.registeredAt).toLocaleDateString()}
                   </td>
 
-                  <td className="min-w-[150px] px-6 py-4">
-                    <Link
-                      href={`/account-manager/partners/${app.id}`}
-                      aria-label="View Partner"
-                      className="bg-background-700 flex items-center justify-center outline-0 gap-2 rounded-full border border-default p-2 text-sm text-slate-600 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-                    >
-                      <Eye className="h-4 w-4" />
-                      <span className="text-caption">View </span>
-                    </Link>
+                  <td className="px-4 py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
 
 
@@ -354,9 +344,9 @@ const ModernPartnersTable = () => {
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className="rounded-full border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
             >
-              Previous
+              Prev
             </button>
             <span className="px-2 text-slate-600">
               Page {currentPage} of {totalPages}
@@ -364,7 +354,7 @@ const ModernPartnersTable = () => {
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="rounded-full border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-md border border-default bg-card px-3 py-2 transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
             >
               Next
             </button>

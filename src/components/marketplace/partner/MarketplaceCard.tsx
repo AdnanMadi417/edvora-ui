@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PresignedImage from "components/ui/PresignedImage";
 import {
   ArrowRight,
@@ -40,15 +40,6 @@ const MarketplaceCard = () => {
     indexOfLastItem
   );
 
-  useEffect(() => {
-    if (serviceProviders.length) {
-      const defaults = {};
-      serviceProviders.forEach((p) => {
-        defaults[p.id] = 1;
-      });
-    }
-  }, [serviceProviders]);
-
   return (
     <div className="mt-6 overflow-hidden text-p2 max-w-5xl mx-auto">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-card">
@@ -66,7 +57,6 @@ const MarketplaceCard = () => {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
-
             <div className="relative w-full sm:w-64 flex-shrink-0">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <input
@@ -77,12 +67,10 @@ const MarketplaceCard = () => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="bg-background w-full rounded-full border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
-
           </div>
-
         </div>
 
         <div className="block">
@@ -101,27 +89,23 @@ const MarketplaceCard = () => {
                 <a
                   href={`/partner/marketplace/${m.id}`}
                   key={m.id}
-                  className="flex flex-col overflow-hidden contract-trigger rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+                  className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
                 >
                   {/* Header */}
                   <div className="flex items-center gap-4 px-5 py-5">
                     <div className="relative flex-shrink-0">
-                      {m.picture_file_key ? (
-                        <PresignedImage
-                          fileKey={m.picture_file_key}
-                          alt={m.name}
-                          className="h-14 w-14 rounded-full object-cover"
-                          fallback={
-                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
-                              <span className="text-base font-semibold uppercase text-blue-700">{m.name?.slice(0, 2)}</span>
-                            </div>
-                          }
-                        />
-                      ) : (
-                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
-                          <span className="text-base font-semibold uppercase text-blue-700">{m.name?.slice(0, 2)}</span>
-                        </div>
-                      )}
+                      <PresignedImage
+                        fileKey={m.picture_file_key}
+                        alt={m.name}
+                        className="h-14 w-14 rounded-full object-cover"
+                        fallback={
+                          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
+                            <span className="text-base font-semibold uppercase text-blue-700">
+                              {m.name?.slice(0, 2)}
+                            </span>
+                          </div>
+                        }
+                      />
                       <span
                         className={`absolute bottom-0 left-0 h-3.5 w-3.5 rounded-full border-2 border-white ${
                           m.is_active ? "bg-emerald-500" : "bg-slate-400"
@@ -134,9 +118,9 @@ const MarketplaceCard = () => {
                         <span className="truncate">{m.name}</span>
                         <CheckCircle className="h-4 w-4 flex-shrink-0 fill-blue-500 text-white" />
                       </h3>
-                      <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500">
-                        <MdLocationOn className="h-3.5 w-3.5" />
-                        {m.main_location || "Not Provided"}
+                      <p className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-slate-500">
+                        <MdLocationOn className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{m.main_location || "Not Provided"}</span>
                       </p>
                     </div>
                   </div>
@@ -151,7 +135,9 @@ const MarketplaceCard = () => {
                         Single Service
                       </span>
                       <p className="text-sm font-bold text-slate-900">
-                        From {m.price_range ? `RM ${m.price_range.min_price}` : "-"}
+                        {m.services_price_range
+                          ? `From RM ${m.services_price_range.min_price}`
+                          : "-"}
                       </p>
                     </div>
                     <div className="flex justify-between">
@@ -159,20 +145,26 @@ const MarketplaceCard = () => {
                         Package
                       </span>
                       <p className="text-sm font-bold text-slate-900">
-                        From {m.price_range ? `RM ${m.price_range.max_price}` : "-"}
+                        {m.packages_price_range
+                          ? `From RM ${m.packages_price_range.min_price}`
+                          : "-"}
                       </p>
                     </div>
                   </div>
 
                   {/* Info */}
                   <div className="space-y-2 px-5 pb-4 text-xs text-slate-600">
-                    <p className="flex items-center gap-1.5">
-                      <MdOutlineTranslate className="h-4 w-4 text-slate-400" />
-                      {m.languages?.slice(0, 3).join(" • ") || "Language not provided"}
+                    <p className="flex min-w-0 items-center gap-1.5">
+                      <MdOutlineTranslate className="h-4 w-4 shrink-0 text-slate-400" />
+                      <span className="truncate">
+                        {m.languages?.slice(0, 3).join(" • ") || "Language not provided"}
+                      </span>
                     </p>
-                    <p className="flex items-center gap-1.5">
-                      <MdLocationOn className="h-4 w-4 text-slate-400" />
-                      {m.service_locations?.slice(0, 2).join(" • ") || "Location not provided"}
+                    <p className="flex min-w-0 items-center gap-1.5">
+                      <MdLocationOn className="h-4 w-4 shrink-0 text-slate-400" />
+                      <span className="truncate">
+                        {m.service_locations?.slice(0, 2).join(" • ") || "Location not provided"}
+                      </span>
                     </p>
                   </div>
 
@@ -186,13 +178,13 @@ const MarketplaceCard = () => {
                       {m.services_offered?.slice(0, 1).map((service) => (
                         <span
                           key={service.id}
-                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                          className="max-w-[160px] truncate rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                         >
                           {service.name}
                         </span>
                       ))}
                       {m.services_offered?.length > 1 && (
-                        <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500">
+                        <span className="rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-500">
                           +{m.services_offered.length - 1} more
                         </span>
                       )}
@@ -200,16 +192,17 @@ const MarketplaceCard = () => {
                   </div>
 
                   {/* WhatsApp Button */}
-                  <div className="mt-auto px-4 pb-4 border-t border-slate-100 pt-5">
+                  <div className="mt-auto border-t border-slate-100 px-4 pb-4 pt-4">
                     <button
                       aria-label="Contact via WhatsApp"
                       onClick={(e) => {
+                        e.preventDefault();
                         e.stopPropagation();
                         if (!m?.whatsapp) return;
                         const number = m.whatsapp.replace("+", "");
                         window.open(`https://wa.me/${number}`, "_blank");
                       }}
-                      className="flex w-full items-center justify-center gap-2 rounded-full bg-green-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-green-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
                     >
                       <MdWhatsapp className="h-5 w-5" />
                       Contact on WhatsApp
@@ -229,10 +222,7 @@ const MarketplaceCard = () => {
                 </span>
                 to
                 <span className="font-medium">
-                  {Math.min(
-                    currentPage * itemsPerPage,
-                    filteredProviders.length
-                  )}
+                  {Math.min(currentPage * itemsPerPage, filteredProviders.length)}
                 </span>
                 of
                 <span className="font-medium">{filteredProviders.length}</span>
@@ -263,8 +253,7 @@ const MarketplaceCard = () => {
                   )
                 }
                 disabled={
-                  currentPage ===
-                  Math.ceil(filteredProviders.length / itemsPerPage)
+                  currentPage === Math.ceil(filteredProviders.length / itemsPerPage)
                 }
                 text="Next"
                 icon={<ArrowRight className="h-4 w-4" />}
@@ -273,7 +262,6 @@ const MarketplaceCard = () => {
           </div>
         </div>
       </div>
-
     </div>
   );
 };

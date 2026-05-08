@@ -12,6 +12,7 @@ interface ProgramDecisionModalProps {
   onClose: () => void;
   applicationId: string | number;
   universityId: string;
+  correctionReason?: string;
 }
 
 export default function ProgramDecisionModal({
@@ -19,6 +20,7 @@ export default function ProgramDecisionModal({
                                                onClose,
                                                applicationId,
                                                universityId,
+                                               correctionReason,
                                              }: ProgramDecisionModalProps) {
 
   const { universities } = useUniversities();
@@ -64,7 +66,7 @@ export default function ProgramDecisionModal({
         <div className="relative overflow-visible rounded-2xl bg-card shadow-lg">
           <div className="flex items-start justify-between border-b border-default px-6 pb-4 pt-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-200 bg-blue-50">
+              <div className="flex h-12 w-12 items-center justify-center rounded-md border border-blue-200 bg-blue-50">
                 <RefreshCcw
                   className="h-6 w-6 text-blue-600"
                   strokeWidth={2.5}
@@ -83,7 +85,7 @@ export default function ProgramDecisionModal({
             <button
               onClick={onClose}
               aria-label="Close"
-              className="group flex h-9 w-9 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              className="group flex h-9 w-9 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600"
             >
               <XCircle className="h-5 w-5" strokeWidth={2} />
             </button>
@@ -93,9 +95,7 @@ export default function ProgramDecisionModal({
             <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
               <RefreshCcw className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
               <p className="text-p2 leading-relaxed text-slate-900">
-                The university has requested that this applicant’s program be
-                updated. Please select the new program and provide a brief
-                reason.
+                {correctionReason ?? "The university has requested that this applicant’s program be updated. Please select the new program and provide a brief reason."}
               </p>
             </div>
 
@@ -119,7 +119,7 @@ export default function ProgramDecisionModal({
             <button
               onClick={onClose}
               disabled={loading}
-              className="flex items-center justify-center gap-2 rounded-full border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-md border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
             >
               <XCircle className="h-4 w-4" />
               Cancel
@@ -128,7 +128,7 @@ export default function ProgramDecisionModal({
             <button
               onClick={handleSubmit}
               disabled={loading || !formData.program_id}
-              className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
             >
               <CheckCircle className="h-4 w-4" />
               {loading ? "Submitting..." : "Confirm"}

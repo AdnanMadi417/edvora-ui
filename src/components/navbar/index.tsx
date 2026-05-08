@@ -6,8 +6,8 @@ import { FiAlignJustify } from "react-icons/fi";
 import { LogOut, Settings, Bell } from "lucide-react";
 import NavLink from "components/link/NavLink";
 import Link from "next/link";
-import api from "../../lib/useApi";
-import { useRouter } from "next/navigation";
+import api, { setLoggingOut, SIGN_IN_URL } from "../../lib/useApi";
+
 import { useMe } from "hooks/useMe";
 import { profileRouteMap, notificationsRouteMap } from "components/navbar/config/navigation";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
@@ -25,11 +25,16 @@ const Navbar = ({
   open?: boolean;
   setOpen?: (v: boolean) => void;
 }) => {
-  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const { user, loading } = useMe();
-  const { unreadCount } = useUnreadCount({ pollIntervalMs: 30000 });
+  const { unreadCount, refetch: refetchUnreadCount } = useUnreadCount({ pollIntervalMs: 30000 });
+
+  useEffect(() => {
+    const handler = () => refetchUnreadCount();
+    window.addEventListener('notifications:refetch', handler);
+    return () => window.removeEventListener('notifications:refetch', handler);
+  }, [refetchUnreadCount]);
 
   const getProfileRoute = (role?: string) => {
     if (!role) return "/auth/sign-in";
@@ -65,6 +70,8 @@ const Navbar = ({
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
+    setLoggingOut(true);
+
     try {
       await api.post("/auth/logout").catch(() => {});
     } catch (err) {
@@ -75,9 +82,7 @@ const Navbar = ({
     sessionStorage.clear();
     deleteAllCookies();
 
-    setTimeout(() => {
-      router.push("/auth/sign-in");
-    }, 100);
+    window.location.replace(SIGN_IN_URL);
   };
 
   return (
@@ -109,7 +114,7 @@ const Navbar = ({
         </p>
       </div>
 
-      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-full border border-default bg-card px-2 py-2">
+      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-md border border-default bg-card px-2 py-2">
         <span
           className="flex h-5 w-5 cursor-pointer items-center justify-center xl:hidden"
           onClick={onOpenSidenav}
@@ -138,7 +143,7 @@ const Navbar = ({
                 {user ? (
                   user.name[0].toUpperCase()
                 ) : (
-                  <div className="h-5 w-5 animate-pulse rounded-full" />
+                  <div className="h-5 w-5 animate-pulse rounded-md" />
                 )}
               </div>
 

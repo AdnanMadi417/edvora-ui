@@ -71,7 +71,7 @@ export default function ViewDetailsModal({
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-4 py-5">
             <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 p-5 shadow-md">
-              <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-white/10 blur-2xl" />
+              <div className="absolute -right-16 -top-16 h-40 w-40 rounded-md bg-white/10 blur-2xl" />
 
               <div className="relative space-y-3">
                 <div className="flex items-start justify-between">
@@ -84,7 +84,7 @@ export default function ViewDetailsModal({
                     </p>
                   </div>
 
-                  <div className="rounded-full bg-white/20 p-3 backdrop-blur">
+                  <div className="rounded-md bg-white/20 p-3 backdrop-blur">
                     <MdLocalAirport className="h-6 w-6 text-white" />
                   </div>
                 </div>
@@ -113,7 +113,7 @@ export default function ViewDetailsModal({
                 </div>
 
                 {provider.main_location ? (
-                  <span className="truncate rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                  <span className="truncate rounded-md bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
                     {provider.main_location}
                   </span>
                 ) : (
@@ -130,7 +130,7 @@ export default function ViewDetailsModal({
                 </div>
 
                 {provider.nationality ? (
-                  <span className="truncate rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
+                  <span className="truncate rounded-md bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">
                     {provider.nationality}
                   </span>
                 ) : (
@@ -152,7 +152,7 @@ export default function ViewDetailsModal({
                   provider.languages.map((lang) => (
                     <span
                       key={lang}
-                      className="rounded-full border border-slate-100 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                      className="rounded-md border border-slate-100 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                     >
                       {lang}
                     </span>
@@ -173,7 +173,7 @@ export default function ViewDetailsModal({
                   provider.service_locations.map((loc) => (
                     <span
                       key={loc}
-                      className="rounded-full border border-slate-100 bg-white px-3 py-1 text-xs font-medium text-slate-700"
+                      className="rounded-md border border-slate-100 bg-white px-3 py-1 text-xs font-medium text-slate-700"
                     >
                       {loc}
                     </span>
@@ -194,7 +194,7 @@ export default function ViewDetailsModal({
                 {provider?.universities_served?.length ? (
                   provider.universities_served.map((uni) => (
                     <li key={uni} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
+                      <span className="h-1.5 w-1.5 rounded-md bg-blue-500" />
                       {uni}
                     </li>
                   ))
@@ -258,7 +258,7 @@ export default function ViewDetailsModal({
                       <ul className="space-y-1">
                         {pkg.includes.map((i) => (
                           <li key={i} className="flex items-center gap-2">
-                            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                            <span className="h-1.5 w-1.5 rounded-md bg-emerald-500" />
                             {i}
                           </li>
                         ))}
@@ -295,7 +295,7 @@ export default function ViewDetailsModal({
                 onClick={() =>
                   window.open(`https://wa.me/${provider.whatsapp}`, "_blank")
                 }
-                className="rounded-full bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700"
+                className="rounded-md bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700"
               >
                 Contact on WhatsApp
               </button>

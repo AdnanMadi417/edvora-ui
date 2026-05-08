@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Check, ChevronLeft, Edit2, Pencil, Plus, Trash2, X } from "lucide-react";
-import { BiArrowBack } from "react-icons/bi";
 
 import { useLogisticServiceDetails } from "hooks/service-providers/useLogisticServiceDetails";
 import { useLogisticServices } from "hooks/service-providers/useLogisticServicesList";
@@ -316,7 +315,7 @@ const EditMarketplaceDetails = ({ id }: Props) => {
               <h3 className="text-lg font-semibold text-slate-900">Edit Logistical Service Provider</h3>
               <p className="mt-1 text-sm text-slate-500">Modify provider information and service coverage</p>
               {logoFile && !logoUploading && (
-                <span className="mt-1 inline-block rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                <span className="mt-1 inline-block rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
                   Picture ready — click Update Service
                 </span>
               )}
@@ -326,7 +325,7 @@ const EditMarketplaceDetails = ({ id }: Props) => {
           <div className="flex items-center gap-2 sm:gap-6">
             <button
               onClick={() => router.push("/admin/logistical-service/")}
-              className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
+              className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
             >
               <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
               <span className="hidden sm:inline">Back to services</span>
@@ -396,10 +395,10 @@ const EditMarketplaceDetails = ({ id }: Props) => {
                   onChange={(e) => updateFormData("is_active", e.target.checked)}
                   className="peer sr-only"
                 />
-                <div className="h-6 w-11 rounded-full bg-slate-300 transition-colors peer-checked:bg-blue-600" />
-                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+                <div className="h-6 w-11 rounded-md bg-slate-300 transition-colors peer-checked:bg-blue-600" />
+                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-md bg-white shadow transition-transform peer-checked:translate-x-5" />
               </div>
-              {formData.is_active && <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-blue-600" />}
+              {formData.is_active && <span className="absolute right-3 top-3 h-2 w-2 rounded-md bg-blue-600" />}
             </label>
           </div>
 
@@ -432,7 +431,7 @@ const EditMarketplaceDetails = ({ id }: Props) => {
                   <button
                     type="button"
                     onClick={() => removePackage(index)}
-                    className="flex items-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700"
+                    className="flex items-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700"
                   >
                     <Trash2 className="h-4 w-4" />
                     Remove
@@ -485,7 +484,7 @@ const EditMarketplaceDetails = ({ id }: Props) => {
                         <button
                           type="button"
                           onClick={() => updatePackage(index, "includes", pkg.includes.filter((_, idx) => idx !== i))}
-                          className="flex items-center justify-center rounded-full border border-red-600 p-1 text-red-600 transition hover:border-red-700"
+                          className="flex items-center justify-center rounded-md border border-red-600 p-1 text-red-600 transition hover:border-red-700"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -551,10 +550,10 @@ const EditMarketplaceDetails = ({ id }: Props) => {
                               autoFocus
                               className="w-32 rounded-md border border-blue-400 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
                             />
-                            <button onClick={() => saveEditService(svc.id)} disabled={loadingEditLogisticService} aria-label="Save" className="flex items-center justify-center rounded-full border border-green-500 p-1 text-green-600 transition hover:bg-green-50 disabled:opacity-50">
+                            <button onClick={() => saveEditService(svc.id)} disabled={loadingEditLogisticService} aria-label="Save" className="flex items-center justify-center rounded-md border border-green-500 p-1 text-green-600 transition hover:bg-green-50 disabled:opacity-50">
                               <Check className="h-3.5 w-3.5" />
                             </button>
-                            <button onClick={cancelEditService} aria-label="Cancel" className="flex items-center justify-center rounded-full border border-slate-300 p-1 text-slate-500 transition hover:bg-slate-50">
+                            <button onClick={cancelEditService} aria-label="Cancel" className="flex items-center justify-center rounded-md border border-slate-300 p-1 text-slate-500 transition hover:bg-slate-50">
                               <X className="h-3.5 w-3.5" />
                             </button>
                           </div>
@@ -566,7 +565,7 @@ const EditMarketplaceDetails = ({ id }: Props) => {
                         <button
                           onClick={() => startEditService(svc.id, svc.name)}
                           aria-label="Rename"
-                          className="shrink-0 rounded-full p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                          className="shrink-0 rounded-md p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
@@ -623,7 +622,7 @@ const EditMarketplaceDetails = ({ id }: Props) => {
         <div className="flex justify-end gap-2 border-t border-gray-200 px-6 py-5">
           <Button
             onClick={() => router.push("/admin/logistical-service/")}
-            icon={<BiArrowBack className="h-5 w-5" />}
+            icon={<X className="h-5 w-5" />}
             text="Cancel"
             bgColor="bg-slate-50"
             textColor="text-slate-700"

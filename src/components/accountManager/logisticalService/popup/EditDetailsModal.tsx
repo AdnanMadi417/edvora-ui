@@ -365,13 +365,13 @@ export default function EditDetailsModal({
                     aria-checked={formData.is_active}
                   />
 
-                  <div className="h-6 w-11 rounded-full bg-slate-300 transition-colors peer-checked:bg-blue-600" />
+                  <div className="h-6 w-11 rounded-md bg-slate-300 transition-colors peer-checked:bg-blue-600" />
 
-                  <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+                  <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-md bg-white shadow transition-transform peer-checked:translate-x-5" />
                 </div>
 
                 {formData.is_active && (
-                  <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-blue-600" />
+                  <span className="absolute right-3 top-3 h-2 w-2 rounded-md bg-blue-600" />
                 )}
               </label>
             </div>
@@ -418,7 +418,7 @@ export default function EditDetailsModal({
                     <button
                       type="button"
                       onClick={() => removePackage(index)}
-                      className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4  py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+                      className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4  py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
                     >
                       <Trash2 className="h-4 w-4" />
                       Remove
@@ -489,7 +489,7 @@ export default function EditDetailsModal({
                               );
                               updatePackage(index, "includes", updated);
                             }}
-                            className="flex items-center justify-center rounded-full border border-red-600 p-1 text-red-600 transition hover:border-red-700 hover:text-red-700"
+                            className="flex items-center justify-center rounded-md border border-red-600 p-1 text-red-600 transition hover:border-red-700 hover:text-red-700"
                             aria-label="Remove item"
                           >
                             <Trash2 className="h-4 w-4" />

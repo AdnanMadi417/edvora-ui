@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { FaArrowCircleRight, FaFileAlt } from "react-icons/fa";
+import { FaFileAlt } from "react-icons/fa";
+import { MdAssignment } from "react-icons/md";
 import api from "../../../../lib/useApi";
+import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import UploadDoc from "../../popups/partner/UploadDoc";
-import { AlertCircle, ArrowRightCircle } from "lucide-react";
+import { AlertCircle } from "lucide-react";
+import { useToast } from "components/context/ToastContext";
 
 interface RequiredApplicationActionsProps {
   params: {
@@ -16,8 +19,8 @@ export default function RequiredApplicationActions({
   const [appDetails, setAppDetails] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [showResubmit, setShowResubmit] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState<any>(null);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   const id = params.id;
 
@@ -40,26 +43,31 @@ export default function RequiredApplicationActions({
     if (!file) return;
 
     try {
-      const dummyUrl = "https://example.com/dummy-file.pdf";
+      const presigned = await getPresignedUploads([file], "documents");
+      const results = await uploadFilesToSpaces([file], presigned);
+      const uploaded = results?.[0];
+
+      if (!uploaded?.public_url) throw new Error("File upload failed");
 
       const payload = [
         {
           document_type_id: documentTypeId,
-          file_url: dummyUrl, // send ONLY STRING
+          file_url: uploaded.public_url,
+          file_key: uploaded.file_key,
         },
       ];
 
-      const res = await api.post(
-        `/applications/${id}/requested-documents/bulk`,
-        payload
-      );
+      await api.post(`/applications/${id}/requested-documents/bulk`, payload);
+      showToast("Document uploaded successfully.", "success");
+      setShowResubmit(false);
+      setTimeout(() => window.location.reload(), 1500);
     } catch (err: any) {
-      console.error("Upload failed:", err.response?.data || err.message);
+      const message = err?.response?.data?.message || "Upload failed. Please try again.";
+      showToast(message, "error");
     }
   };
 
-  const handleResubmit = (status: any, docId?: string) => {
-    setSelectedStatus(status);
+  const handleResubmit = (_status: any, docId?: string) => {
     setSelectedDocId(docId || null);
     setShowResubmit(true);
   };
@@ -71,8 +79,8 @@ export default function RequiredApplicationActions({
     <section className="max-w-5xl mx-auto">
       <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-            <FaArrowCircleRight className="text-xl text-blue-700" />
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
+            <MdAssignment className="text-xl text-blue-700" />
           </span>
 
           <span className="flex flex-col">
@@ -103,7 +111,7 @@ export default function RequiredApplicationActions({
                   }}
                 >
                   <div className="mb-3 flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100">
                       <FaFileAlt className="h-4 w-4 text-blue-700" />
                     </div>
                     <h3 className="truncate text-base font-semibold text-slate-900">
@@ -123,7 +131,7 @@ export default function RequiredApplicationActions({
                               <strong>{doc.type}:</strong> {doc.description}
                             </span>
                             <button
-                              className="rounded-full border border-gray-200 px-2 py-1 text-xs text-blue-700 transition hover:bg-blue-50"
+                              className="rounded-md border border-gray-200 px-2 py-1 text-xs text-blue-700 transition hover:bg-blue-50"
                               onClick={() => handleResubmit(status, doc.id)}
                             >
                               Upload Document
@@ -134,18 +142,11 @@ export default function RequiredApplicationActions({
                     )}
 
                     {hasStageInfo && (
-                      <div className="mt-3 w-fit space-y-2 text-xs text-slate-500">
-                        {status.is_requires_reason && (
-                          <div className="flex items-center gap-2">
-                            <AlertCircle className="h-3.5 w-3.5" />
-                            <span>Requires Reason: Yes</span>
-                          </div>
-                        )}
-
-                        {status.is_triggers_stage_advance && (
-                          <div className="flex items-center gap-2">
-                            <ArrowRightCircle className="h-3.5 w-3.5" />
-                            <span>Triggers Stage Advance: Yes</span>
+                      <div className="mt-3 space-y-2 text-xs text-slate-500">
+                        {status.is_requires_reason && (status.reason || status.notes || status.reason_text) && (
+                          <div className="flex items-start gap-2 rounded-md bg-amber-50 border border-amber-200 p-2.5 text-amber-800">
+                            <AlertCircle className="h-3.5 w-3.5 mt-0.5 shrink-0 text-amber-500" />
+                            <span>{status.reason || status.notes || status.reason_text}</span>
                           </div>
                         )}
                       </div>

@@ -88,7 +88,7 @@ export default function ViewDetailsModal({
       Status
     </span>
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    className={`rounded-md px-3 py-1 text-xs font-semibold ${
                       manager.is_active
                         ? "bg-green-100 text-green-700"
                         : "bg-slate-100 text-slate-500"
@@ -104,7 +104,7 @@ export default function ViewDetailsModal({
           <div className="flex justify-end border-t border-gray-200 px-6 py-4">
             <button
               onClick={closeModal}
-              className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
             >
               <XCircle className="h-4 w-4" />
               Cancel

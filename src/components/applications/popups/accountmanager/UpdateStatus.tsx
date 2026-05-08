@@ -17,7 +17,6 @@ import { useVisaSetup } from "hooks/applications/useVisaSetup";
 import { useStatusUpdate } from "hooks/applications/useStatusUpdate";
 import { useCommissionPaymentUpload } from "hooks/applications/files/useCommissionPaymentUpload";
 import { useApplicationActions } from 'hooks/applications/stages/useApplicationActions';
-import { useVisaCase } from 'hooks/useDefaultVisaCase';
 
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
@@ -59,7 +58,7 @@ const DocumentRequestList = ({
 
   return (
     <div className="space-y-4">
-      {documents.map((doc, index) => (
+      {documents.map((doc) => (
         <div
           key={doc.id}
           className="relative space-y-3 rounded-md border bg-card p-4"
@@ -74,49 +73,60 @@ const DocumentRequestList = ({
             </button>
           )}
 
-          <div>
+          {documentTypes.length > 0 && <div>
             <label className="mb-2 block text-p2 font-medium text-gray-900">
               Document Type
             </label>
 
-            <div className="mb-2 flex flex-wrap gap-2">
-              {doc.type.map((t) => {
-                const label = documentTypes.find((d) => d.id === t)?.label || t;
-                return (
-                  <span
-                    key={t}
-                    className="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-sm text-blue-700"
-                  >
-                    {label}
-                    <button
-                      type="button"
-                      onClick={() => toggleType(doc.id, t)}
-                      className="text-blue-500 hover:text-blue-700"
+            {doc.type.length > 0 && (
+              <div className="mb-2 flex flex-wrap gap-1.5">
+                {doc.type.map((t) => {
+                  const label = documentTypes.find((d) => d.id === t)?.label || t;
+                  return (
+                    <span
+                      key={t}
+                      className="flex max-w-[160px] items-center gap-1 rounded-full bg-blue-100 py-0.5 pl-2.5 pr-1.5 text-xs font-medium text-blue-700"
                     >
-                      ×
-                    </button>
-                  </span>
-                );
-              })}
-            </div>
+                      <span className="truncate">{label}</span>
+                      <button
+                        type="button"
+                        onClick={() => toggleType(doc.id, t)}
+                        className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-blue-200 text-blue-600 hover:bg-blue-300"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
 
-            <div className="grid grid-cols-1 gap-2 p-2">
+            <div className="flex max-h-48 flex-col gap-1 overflow-y-auto rounded-lg border border-gray-200 p-1.5">
               {documentTypes.map((d) => (
                 <label
                   key={d.id}
-                  className="flex cursor-pointer items-center gap-2 text-p2"
+                  className={`flex cursor-pointer items-start gap-2.5 rounded-md px-3 py-2 transition-colors ${
+                    doc.type.includes(d.id)
+                      ? "bg-blue-50 text-blue-700"
+                      : "text-gray-700 hover:bg-gray-50"
+                  }`}
                 >
                   <input
                     type="checkbox"
                     checked={doc.type.includes(d.id)}
                     onChange={() => toggleType(doc.id, d.id)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  {d.label}
+                  <div className="min-w-0 ">
+                    <span className="block truncate text-sm font-medium text-slate-800">{d.label}</span>
+                    {d.description && (
+                      <span className="block text-xs text-slate-400">{d.description}</span>
+                    )}
+                  </div>
                 </label>
               ))}
             </div>
-          </div>
+          </div>}
         </div>
       ))}
     </div>
@@ -144,7 +154,7 @@ export default function UpdateStatusPopup({
   ]);
   const [statusOptions, setStatusOptions] = useState<StatusOption[]>([]);
   const [documentTypes, setDocumentTypes] = useState<
-    { id: string; label: string }[]
+    { id: string; label: string; description?: string }[]
   >([]);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -196,8 +206,7 @@ export default function UpdateStatusPopup({
     };
   };
 
-  const { actions, loading } = useApplicationActions(application?.id);
-  const { amount: defaultVisaFee } = useVisaCase();
+  const { actions } = useApplicationActions(application?.id);
 
   useEffect(() => {
     if (!actions) return;
@@ -205,7 +214,8 @@ export default function UpdateStatusPopup({
     setDocumentTypes(
       (actions.document_types || []).map((d) => ({
         id: d.id,
-        label: d.description || d.type,
+        label: d.type,
+        description: d.description,
       }))
     );
 
@@ -250,7 +260,15 @@ export default function UpdateStatusPopup({
 
   const isCommissionPaid = selectedOption?.label === "Commission Paid";
 
-  const { uploadOfferLetter, isUploading } = useOfferLetterUpload();
+  const safeDocumentTypes = documentTypes ?? [];
+  const shouldShowDocumentSection =
+    requiresDocuments &&
+    safeDocumentTypes.length > 0 &&
+    !isUniversityApproved &&
+    !isVisaIssued &&
+    !isCommissionPaid;
+
+  const { uploadOfferLetter } = useOfferLetterUpload();
 
   const handleOfferLetterUpload = async () => {
     if (!offerLetterFile || !isUniversityApproved) return;
@@ -258,17 +276,17 @@ export default function UpdateStatusPopup({
     await uploadOfferLetter(offerLetterFile, application.id);
   };
 
-  const { submitVisaFee, isSubmitting: isVisaSubmitting } = useVisaSetup();
+  const { submitVisaFee } = useVisaSetup();
 
   const handleVisaSetup = async () => {
     if (!isVisaSetupSelected) return;
 
     const enteredAmount = Number(formData.visa_fee_amount);
-    const finalAmount = enteredAmount > 0 ? enteredAmount : Number(defaultVisaFee?.amount ?? 0);
+    const finalAmount = enteredAmount > 0 ? enteredAmount : Number(amount?.amount ?? 0);
     await submitVisaFee(application.id, finalAmount);
   };
 
-  const { uploadVisaDocument, isUploading: isVisaUploading } = useVisaDocumentUpload();
+  const { uploadVisaDocument } = useVisaDocumentUpload();
 
   const handleVisaIssuedUpload = async () => {
     if (!visaDocumentFile || selectedOption?.label !== "Visa Issued") return;
@@ -276,7 +294,7 @@ export default function UpdateStatusPopup({
     await uploadVisaDocument(visaDocumentFile, application.id);
   };
 
-  const { updateStatus, isUpdating: isStatusUpdating } = useStatusUpdate();
+  const { updateStatus } = useStatusUpdate();
 
   const handleStatusUpdate = async () => {
     await updateStatus({
@@ -284,15 +302,16 @@ export default function UpdateStatusPopup({
       statusId: selectedStatus,
       reason,
       notes,
-      requiredDocumentTypeIds:
-        requiresDocuments && !isUniversityApproved && !isCommissionPaid
-          ? documents.flatMap((doc) => doc.type)
-          : [],
+      requiredDocumentTypeIds: shouldShowDocumentSection
+      ? documents.flatMap((doc) => doc.type)
+      : [],
     });
   };
 
   const { uploadCommissionPayment, } =
     useCommissionPaymentUpload();
+
+
 
   const handleCommissionPaymentUpload = async () => {
     if (!commissionPaymentFile || !application?.id) return;
@@ -339,14 +358,11 @@ export default function UpdateStatusPopup({
     }
 
     if (
-      requiresDocuments &&
-      !isUniversityApproved &&
-      selectedOption?.label !== "Visa Issued"
+      shouldShowDocumentSection &&
+      documents.some((doc) => doc.type.length === 0)
     ) {
-      if (documents.some((doc) => doc.type.length === 0)) {
-        setError("Please select at least one document type");
-        return false;
-      }
+      setError("Please select at least one document type");
+      return false;
     }
 
     if (isUniversityApproved && !offerLetterFile) {
@@ -429,13 +445,11 @@ export default function UpdateStatusPopup({
 
       onConfirm(selectedStatus, reason, notes);
       handleClose();
-      setTimeout(() => window.location.reload(), 2000);
     } catch (err: any) {
       const msg =
         err.response?.data?.message ||
         err.message ||
         "Failed to update application";
-      showToast(msg, "error");
       setError(msg);
     } finally {
       setIsSubmitting(false);
@@ -465,7 +479,7 @@ export default function UpdateStatusPopup({
         <div className="relative border-b border-default px-6 pb-4 pt-6">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
                 <Clock className="h-6 w-6 text-blue-600" strokeWidth={2.5} />
               </div>
               <div>
@@ -494,7 +508,7 @@ export default function UpdateStatusPopup({
             <button
               onClick={handleClose}
               aria-label="Close dialog"
-              className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               <XCircle className="h-5 w-5" strokeWidth={2} />
             </button>
@@ -510,6 +524,16 @@ export default function UpdateStatusPopup({
                 <pre className="mt-1 whitespace-pre-wrap font-mono text-xs text-red-700">
                   {error}
                 </pre>
+              </div>
+            </div>
+          )}
+
+          {actions?.correction_reason && (
+            <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
+              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+              <div>
+                <p className="text-xs font-semibold text-amber-700">Correction Reason</p>
+                <p className="mt-0.5 text-xs text-amber-800">{actions.correction_reason}</p>
               </div>
             </div>
           )}
@@ -532,7 +556,7 @@ export default function UpdateStatusPopup({
                 subtitle="There are no status options available at the moment."
               />
             ) : (
-              statusOptions.map((option, index) => {
+              statusOptions.map((option) => {
                 const Icon = option.icon;
                 const isSelected = selectedStatus === option.id;
 
@@ -590,20 +614,18 @@ export default function UpdateStatusPopup({
             )}
           </div>
 
-          {requiresDocuments &&
-            !isUniversityApproved &&
-            !isVisaIssued &&
-            !isCommissionPaid && (
-              <DocumentRequestList
-                documents={documents}
-                setDocuments={setDocuments}
-                documentTypes={documentTypes}
-              />
-            )}
+          {shouldShowDocumentSection && (
+            <DocumentRequestList
+            documents={documents}
+            setDocuments={setDocuments}
+            documentTypes={safeDocumentTypes}
+          />
+        )}
 
           {isUniversityApproved && (
             <StatusFileUpload
               label="Upload Offer Letter"
+              description="Upload the official offer letter issued by the university"
               id="offer-letter"
               file={offerLetterFile}
               onFileChange={setOfferLetterFile}
@@ -641,11 +663,11 @@ export default function UpdateStatusPopup({
                 errors={formErrors}
                 updateFormData={updateFormData}
               />
-              {defaultVisaFee?.amount && (
+              {amount?.amount && (
                 <div className="flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <span>
-                    Default visa fee is <strong>{defaultVisaFee.amount}</strong>. You can enter a different amount if needed.
+                    Default visa fee is <strong>{amount.amount}</strong>. You can enter a different amount if needed.
                   </span>
                 </div>
               )}
@@ -655,6 +677,7 @@ export default function UpdateStatusPopup({
           {isVisaIssued && (
             <StatusFileUpload
               label="Upload Visa Document"
+              description="Upload the visa document issued by the immigration authority"
               id="visa-document"
               file={visaDocumentFile}
               onFileChange={setVisaDocumentFile}
@@ -668,6 +691,7 @@ export default function UpdateStatusPopup({
           {isCommissionPaid && (
             <StatusFileUpload
               label="Upload Commission Payment Proof"
+              description="Upload proof of commission payment (receipt or transfer confirmation)"
               id="commission-payment"
               file={commissionPaymentFile}
               onFileChange={setCommissionPaymentFile}
@@ -683,7 +707,7 @@ export default function UpdateStatusPopup({
           <button
             onClick={handleClose}
             disabled={isSubmitting}
-            className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
           >
             <XCircle className="h-4 w-4" />
             Cancel
@@ -696,7 +720,7 @@ export default function UpdateStatusPopup({
               !!error ||
               (requiresReason && !reason.trim())
             }
-            className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
+            className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
           >
             <CheckCircle className="h-4 w-4" />
             {isSubmitting ? "Updating..." : "Update Status"}

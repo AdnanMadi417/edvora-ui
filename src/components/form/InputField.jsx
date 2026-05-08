@@ -11,6 +11,8 @@ const getNestedValue = (obj, path) => {
 const InputField = ({ label, field, type = "text", required = true, placeholder = "", formData, errors, updateFormData }) => {
   const value = getNestedValue(formData, field) ?? "";
 
+  const dateProps = type === "date" ? { min: "1900-01-01", max: "2099-12-31" } : {};
+
   return (
     <div className="mb-4">
       <label className="block text-p2 font-medium text-slate-900">
@@ -20,8 +22,9 @@ const InputField = ({ label, field, type = "text", required = true, placeholder 
       <input
         type={type}
         value={value}
-        onChange={(e) => updateFormData(field, e.target.value)}
+        onChange={(e) => updateFormData(field, type === "email" ? e.target.value.toLowerCase() : e.target.value)}
         placeholder={placeholder}
+        {...dateProps}
         className={`mt-2 flex h-12 w-full items-center justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1  focus:ring-blue-500 ${
           getNestedValue(errors, field) ? "border-red-500" : "border-default"
         }`}
