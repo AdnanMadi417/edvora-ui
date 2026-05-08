@@ -10,12 +10,14 @@ import adminRoutes from '../../routes/adminRoutes';
 import RoleGuard from "components/guard/RoleGuard";
 import { ToastProvider } from "components/context/ToastContext";
 
+const ADMIN_ROLES = ["admin"];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
   return (
-    <RoleGuard allowedRoles={["admin"]}>
+    <RoleGuard allowedRoles={ADMIN_ROLES}>
 
       <ToastProvider>
         <div className="relative flex min-h-screen w-full bg-background-100 dark:bg-background-900">

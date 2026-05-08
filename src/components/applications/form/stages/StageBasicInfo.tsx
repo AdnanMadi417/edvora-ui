@@ -1,6 +1,8 @@
 import React from "react";
 import { InputField } from "components/form";
 import SearchableSelect from "components/form/SearchableSelect";
+import SearchableDropdown from "components/form/search/SearchableDropdown";
+import { NATIONALITIES } from "constants/lists";
 
 interface Props {
   formData: any;
@@ -39,6 +41,27 @@ export default function StageBasicInfo({
           updateFormData={updateFormData}
         />
 
+        <InputField
+          label="Passport Number"
+          field="student.passport_number"
+          placeholder="A1234567"
+          formData={formData}
+          errors={errors}
+          updateFormData={updateFormData}
+        />
+
+        <SearchableDropdown
+          label="Nationality"
+          field="student.nationality"
+          options={NATIONALITIES.map((q) => ({
+            value: String(q.label),
+            label: q.name,
+          }))}
+          formData={formData}
+          errors={errors}
+          updateFormData={updateFormData}
+        />
+
         <SearchableSelect
           label="University"
           field="university_id"
@@ -65,6 +88,7 @@ export default function StageBasicInfo({
           errors={errors}
           updateFormData={updateFormData}
         />
+
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { GraduationCap, Building2,  Globe, Calendar, ArrowRight } from "lucide-react";
+import { GraduationCap, Building2,  Globe, Calendar, ArrowRight, Wallet } from "lucide-react";
 import {
   FaUser,
   FaBirthdayCake,
@@ -15,30 +15,35 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { Clock, Wallet, Plane, CheckCircle, XCircle, FileText } from 'lucide-react';
+import { Clock, Upload, ClipboardCheck, CreditCard, Plane, CheckCircle, XCircle, FileUp } from 'lucide-react';
 import Button from 'components/ui/buttons/Button';
 import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 
 import ApplicationPartnerTopBar from "components/applications/topBar/PartnerTopBar";
 import RequiredAction from "components/applications/popups/partner/RequiredAction";
 import ProgramDecision from "components/applications/popups/partner/ProgramDecision";
+import PresignedImage from "components/ui/PresignedImage";
 import OfferLetterDecision from './OfferLetter';
-import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import VisaPaymentConfirmation from "components/applications/popups/partner/VisaPaymentConfirmation";
 import ArrivalDate from "components/applications/popups/partner/ArrivalDate";
-import EmgsEvaluationUpload from "components/applications/popups/partner/EmgsEvaluationUpload";
+import EmgsEvalUpload from "components/applications/popups/partner/EmgsEvaluationUpload";
+import EVisaUpload from "components/applications/popups/partner/EVisaUpload";
 import ApplicationCommission from './ApplicationCommission';
 import { useToast } from '../../../context/ToastContext';
 import Dispute from 'components/applications/popups/partner/UpdatedDispute';
 import api from 'lib/useApi';
 import ApplicationTimeline from '../ApplicationTimeline';
+import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
+import { useVisaCase } from "hooks/useVisaCase";
 
 interface ApplicationDetailsProps {
   application: any;
+  onRefetch?: () => Promise<void>;
 }
 
 export default function ApplicationDetails({
   application,
+  onRefetch,
 }: ApplicationDetailsProps) {
   function daysSince(dateString: string) {
     if (!dateString) return 0;
@@ -72,6 +77,9 @@ export default function ApplicationDetails({
   const openRequiredActionPopup = () => setShowRequiredActionPopup(true);
   const closeRequiredActionPopup = () => setShowRequiredActionPopup(false);
 
+  const { methods, loading: paymentLoading } = useVisaPaymentMethods(application?.id);
+  const { visaCase } = useVisaCase(application?.id || "");
+  
   const { showToast } = useToast();
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [showDispute, setShowDispute] = useState(false);
@@ -108,22 +116,36 @@ export default function ApplicationDetails({
 
   const [showVisaPaymentPopup, setShowVisaPaymentPopup] = useState(false);
 
-  const stageName = stage?.name;
-  const stageStatuses = stage?.statuses || [];
+  const currentStatusCode =
+    actions?.status_code ||
+    application?.status_code ||
+    stage?.statuses?.[0]?.code;
+
   const showVisaPayment =
-    stageName === "Visa Processing" &&
-    stageStatuses.some((s: any) => s.name === "Waiting for Payment");
+    currentStatusCode === "WAITING_FOR_PAYMENT" ||
+    currentStatusCode === "PAYMENT_REJECTED";
 
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
   const [showEmgsUploadPopup, setShowEmgsUploadPopup] = useState(false);
+  const [showEVisaUploadPopup, setShowEVisaUploadPopup] = useState(false);
 
   const showArrivalConfirmation =
-    stageName === "Student Arrival & Enrollment" &&
-    stageStatuses.some((s: any) => s.name === "Waiting Partner to confirm arrival date");
+    currentStatusCode === "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE";
+
+  const hasRequiredDocs = actions?.document_types?.some(
+    (d: any) => d.is_required_for_current_upload
+  );
 
   const showEmgsUpload =
-    stageName === "Visa Processing" &&
-    actions?.status_code === "EVAL_PARTNER_UPLOAD";
+    !hasRequiredDocs &&
+    (currentStatusCode === "EVAL_PARTNER_UPLOAD" ||
+      currentStatusCode === "EVAL_REUPLOAD_REQUIRED");
+
+  const showEVisaUpload =
+    !hasRequiredDocs && currentStatusCode === "E_VISA_PARTNER_UPLOAD";
+
+  const showAwaitingArrival =
+    currentStatusCode === "AWAITING_ARRIVAL" && !actions?.document_types?.length;
 
   const formatGender = (value: boolean | null) => {
     if (value === null) return "Not provided";
@@ -153,16 +175,25 @@ export default function ApplicationDetails({
   return (
     <section className="max-w-5xl mx-auto">
 
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-slate-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
-  
-          <ApplicationPartnerTopBar application={application} />
+      <div className="mb-5 mt-5 block space-y-2">
+
+        <ApplicationPartnerTopBar application={application} />
+
+          <div className=" block space-y-4 rounded-lg border border-slate-200 bg-card p-4 shadow-sm sm:p-6">
   
           {/* Top row: avatar + info | intake date */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-700 border-2 border-blue-200 text-xl font-bold text-white">
-                {student.name?.[0]?.toUpperCase() ?? "?"}
-              </div>
+              <PresignedImage
+                fileKey={application.student_photo_file_key}
+                alt={student.name}
+                className="h-16 w-16 shrink-0 rounded-full object-cover border-2 border-blue-200"
+                fallback={
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-700 border-2 border-blue-200 text-xl font-bold text-white">
+                    {student.name?.[0]?.toUpperCase() ?? "?"}
+                  </div>
+                }
+              />
               <div>
                 <h2 className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-slate-900">
                   {student.name}
@@ -246,16 +277,19 @@ export default function ApplicationDetails({
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Current Status</p>
               <div className="flex flex-wrap gap-2">
                 {currentStatus.name && (
-                  <span className="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-normal text-amber-700">
+                  <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-normal text-amber-700">
                     {currentStatus.name}
                   </span>
                 )}
                 {stage.name && (
-                  <span className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm font-normal text-slate-800">
+                  <span className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-1 text-sm font-normal text-slate-800">
                     {stage.name}
                   </span>
                 )}
-                <p className="inline-flex items-center px-3 py-1 text-xs font-normal text-slate-600">{daysSince(application.updated_at)} days in stage</p>
+                <p className="inline-flex items-center text-xs font-normal text-slate-600">
+                  <span className="sm:hidden rounded-md border border-slate-200 bg-white px-3 py-1">{daysSince(application.updated_at)} d</span>
+                  <span className="hidden sm:inline">{daysSince(application.updated_at)} days in stage</span>
+                </p>
               </div>
             </div>
   
@@ -282,51 +316,136 @@ export default function ApplicationDetails({
           <div className="space-y-2">
                   {actions && (
                     <>
-                      {actions.document_types?.length > 0 ? (
+                      {hasRequiredDocs && (
                         <button
                           onClick={openRequiredActionPopup}
-                          className="flex w-full items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-orange-200 focus-visible:ring-2 focus-visible:ring-orange-400"
+                          className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"
                         >
-                          <Clock className="h-4 w-4 text-orange-500" />
+                          <Upload className="h-4 w-4" />
                           Upload Required Documents
                         </button>
-                      ) : actions.stage_statuses?.some((status) => status.is_requires_reason) ? (
+                      )}
+                      {currentStatusCode === "PROGRAM_CHANGE_SUGGESTED" && (
                         <button
                           onClick={openProgramDecisionPopup}
-                          className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-200 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-slate-800 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                          className="flex w-full items-center justify-center gap-2 rounded-md bg-violet-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-violet-600"
                         >
-                          <Clock className="h-4 w-4 text-blue-500" />
+                          <ClipboardCheck className="h-4 w-4" />
                           Submit Program Decision
                         </button>
-                      ) : null}
+                      )}
                     </>
                   )}
 
                   {showVisaPayment && (
-                    <button
-                      type="button"
-                      onClick={() => setShowVisaPaymentPopup(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    >
-                      <Wallet className="h-4 w-4" />
-                      Proceed to Payment
-                    </button>
+                    <div className="block space-y-4">
+                      {/* Visa fee amount — focal point */}
+                      {visaCase?.visa_fee_amount && (
+                        <div className="flex items-center justify-between rounded-xl border border-green-200 bg-green-50 px-5 py-4">
+                          <div>
+                            <p className="text-xs font-semibold uppercase tracking-wider text-green-600">Amount Due</p>
+                            <p className="mt-0.5 text-2xl font-bold text-green-700">
+                              RM {Number(visaCase.visa_fee_amount).toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+                            <Wallet className="h-5 w-5 text-green-600" />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Notes — only if content exists */}
+                      {visaCase?.notes && (
+                        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
+                          <span className="mt-0.5 text-xs text-amber-500">⚠</span>
+                          <p className="text-xs text-amber-800">{visaCase.notes}</p>
+                        </div>
+                      )}
+
+                      {paymentLoading ? (
+                        <p className="text-sm text-slate-500">Loading payment methods...</p>
+                      ) : methods.length > 0 && (
+                        <div>
+                          <div className="mb-3 flex items-center gap-2">
+                            <CreditCard className="h-4 w-4 text-blue-600" />
+                            <h4 className="text-sm font-semibold text-gray-900">Payment Methods</h4>
+                          </div>
+                          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                            {methods.map((method: any) => (
+                              <div
+                                key={method.id}
+                                className="rounded-lg border border-gray-200 bg-gray-50 p-4"
+                              >
+                                <div className="mb-2 flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <CreditCard className="h-4 w-4 text-blue-600" />
+                                    <span className="font-semibold text-gray-900">{method.name}</span>
+                                  </div>
+                                  {method.currency && (
+                                    <span className="rounded-md border border-blue-200 bg-blue-50 px-2.5 py-0.5 text-xs font-medium uppercase text-blue-700">
+                                      {method.currency}
+                                    </span>
+                                  )}
+                                </div>
+                                {method.instructions && (
+                                  <pre className="whitespace-pre-wrap text-xs leading-relaxed text-slate-600">
+                                    {method.instructions}
+                                  </pre>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => setShowVisaPaymentPopup(true)}
+                        className="flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-green-700"
+                      >
+                        <CreditCard className="h-4 w-4" />
+                        Proceed to Payment
+                      </button>
+                    </div>
                   )}
 
                   {showArrivalConfirmation && (
                     <button
                       type="button"
                       onClick={() => setShowArrivalPopup(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-emerald-700"
                     >
                       <Plane className="h-4 w-4" />
                       Confirm Arrival
                     </button>
                   )}
 
+                  {showEVisaUpload && (
+                    <button
+                      type="button"
+                      onClick={() => setShowEVisaUploadPopup(true)}
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700"
+                    >
+                      <FileUp className="h-4 w-4" />
+                      Upload E-Visa
+                    </button>
+                  )}
+
+                  {showAwaitingArrival && (
+                    <button
+                      type="button"
+                      onClick={openRequiredActionPopup}
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700"
+                    >
+                      <FileUp className="h-4 w-4" />
+                      Upload Payment Proof
+                    </button>
+                  )}
+
+
                   {showEmgsUpload && (
 
-                    <div className="block space-y-2">
+                    <div className="block space-y-4">
 
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 
@@ -337,8 +456,8 @@ export default function ApplicationDetails({
                           </svg>
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="mb-1 text-sm font-semibold text-slate-800">Download Your Evaluation</p>
-                          <p className="mb-2 text-xs text-slate-500">Your evaluation is ready. Download it directly from the EMGS app.</p>
+                          <p className="mb-1 text-sm font-semibold text-slate-800">Download Your Eval</p>
+                          <p className="mb-2 text-xs text-slate-500">Your eval is ready. Download it directly from the EMGS app.</p>
                           <a
                             href="https://www.youtube.com/shorts/fT4Wmm4eWwI"
                             target="_blank"
@@ -381,10 +500,10 @@ export default function ApplicationDetails({
                       <button
                       type="button"
                       onClick={() => setShowEmgsUploadPopup(true)}
-                      className="flex w-full items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-center text-sm font-medium text-blue-700 transition-all hover:bg-blue-200 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700"
                     >
-                      <FileText className="h-4 w-4" />
-                      Upload EMGS Evaluation
+                      <FileUp className="h-4 w-4" />
+                      Upload EMGS Eval
                     </button>
 
                     </div>
@@ -426,14 +545,16 @@ export default function ApplicationDetails({
 
         </div>
 
+
+      </div>
+      
       <ApplicationTimeline application={application} />
-      <ApplicationCommission application={application} />
-      <VisaTrackingTimeline application={application} />
-      <OfferLetterDecision application={application} />
+      <ApplicationCommission application={application} actions={actions} />
+      <OfferLetterDecision application={application} visaCase={visaCase} onRefetch={onRefetch} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <MdAssignmentTurnedIn className="text-xl text-blue-700" />
           </span>
           Application Information
@@ -516,7 +637,7 @@ export default function ApplicationDetails({
 
       <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FaUser className="text-xl text-blue-700" />
           </span>
           Student Information
@@ -783,12 +904,21 @@ export default function ApplicationDetails({
       )}
 
       {showEmgsUploadPopup && (
-        <EmgsEvaluationUpload
+        <EmgsEvalUpload
           isOpen={showEmgsUploadPopup}
           onClose={() => setShowEmgsUploadPopup(false)}
           applicationId={application.id}
         />
       )}
+
+      {showEVisaUploadPopup && (
+        <EVisaUpload
+          isOpen={showEVisaUploadPopup}
+          onClose={() => setShowEVisaUploadPopup(false)}
+          applicationId={application.id}
+        />
+      )}
+
 
       {showVisaPaymentPopup && (
         <VisaPaymentConfirmation
@@ -804,6 +934,7 @@ export default function ApplicationDetails({
           onClose={closeProgramDecisionPopup}
           applicationId={application.id}
           universityId={application.program?.university?.id || ""}
+          correctionReason={actions?.correction_reason ?? undefined}
         />
       )}
 

@@ -39,7 +39,7 @@ export default function ApplicationPage() {
           {chatOpen ? <X size={26} /> : <MessageCircle size={28} />}
 
           {unreadCount > 0 && !chatOpen && (
-            <span className="absolute -right-6 -top-6 flex h-5 w-5 border-3 border-slate-200  items-center justify-center rounded-full bg-red-500 text-xs font-medium">
+            <span className="absolute -right-6 -top-6 flex h-5 w-5 border-3 border-slate-200  items-center justify-center rounded-md bg-red-500 text-xs font-medium">
         {unreadCount}
       </span>
           )}

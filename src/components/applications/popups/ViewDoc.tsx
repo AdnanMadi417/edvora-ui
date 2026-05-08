@@ -38,7 +38,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
           <div className="relative border-b border-default px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
+                <div className="flex h-12 w-12 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
                   <FileText
                     className="h-6 w-6 text-blue-600"
                     strokeWidth={2.5}
@@ -54,7 +54,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
                       {doc.name}
                     </span>
 
-                    <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium text-blue-700">
+                    <span className="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium text-blue-700">
                       <FileText className="mr-1 h-4 w-4" strokeWidth={1.5} />
                       {doc.type}
                     </span>
@@ -65,7 +65,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
               <button
                 onClick={handleClose}
                 aria-label="Close dialog"
-                className="group flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600"
+                className="group flex h-9 w-9 items-center justify-center rounded-md text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600"
               >
                 <XCircle className="h-5 w-5" strokeWidth={2} />
               </button>
@@ -94,7 +94,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
           <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
             <button
               onClick={handleClose}
-              className="rounded-full border bg-card px-5 py-2.5 text-gray-700"
+              className="rounded-md border bg-card px-5 py-2.5 text-gray-700"
             >
               Cancel
             </button>
@@ -105,7 +105,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
                 link.download = fileUrl.split("/").pop() || "document.pdf";
                 link.click();
               }}
-              className="rounded-full bg-blue-600 px-5 py-2.5 text-white"
+              className="rounded-md bg-blue-600 px-5 py-2.5 text-white"
             >
               Download
             </button>

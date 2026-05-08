@@ -7,14 +7,15 @@ import {
   FileText,
   ArrowLeft, ArrowRight,
 } from 'lucide-react';
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 import { ENGLISH_TEST_OPTIONS, NATIONALITIES } from "../../../constants/lists";
 import { useToast } from "../../context/ToastContext";
+import api from "lib/useApi";
 
-import api from "../../../lib/useApi";
 import { useAllQualifications } from "../../../hooks/knowledge-hub/qualifications/useQualificationsList";
 import { useCreatePartnerApplication } from "../../../hooks/applications/useCreatePartnerApplication";
-
-import Cookies from "js-cookie";
+import { useDocumentType } from "../../../hooks/useDocumentType";
 import { useUniversities } from "../../../hooks/useUniversities";
 import { InputField, SelectField, RadioField } from "../../form";
 import {
@@ -69,11 +70,6 @@ interface DocumentItem {
   progress?: number;
 }
 
-type DocumentType = {
-  id: string;
-  type: string;
-  description: string;
-};
 
 interface FormDataType {
   program_id: string;
@@ -126,6 +122,7 @@ const stages = [
 ];
 
 export default function StudentManualApplicationForm() {
+  const router = useRouter();
   const [stage, setStage] = useState(1);
   const [completedStages, setCompletedStages] = useState([]);
   const { showToast } = useToast();
@@ -147,12 +144,6 @@ export default function StudentManualApplicationForm() {
   } = useCreatePartnerApplication(partnerId);
 
   const { qualifications } = useAllQualifications();
-
-  const [documentTypes, setDocumentTypes] = useState<
-    { id: string; type: string; description: string }[]
-  >([]);
-
-  const [initOnly, setInitOnly] = useState(true);
 
   const getCurrentDate = () => {
     const d = new Date();
@@ -200,6 +191,12 @@ export default function StudentManualApplicationForm() {
   };
 
   const { intakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
+
+  const { documentTypes, loading: documentTypesLoading } = useDocumentType({
+    initOnly: true,
+    programId: formData.program_id || undefined,
+    nationality: formData.student.nationality || undefined,
+  });
 
   useEffect(() => {
     if (intakeDates.length > 0) {
@@ -321,41 +318,6 @@ export default function StudentManualApplicationForm() {
     fetchApplications();
   }, []);
 
-  useEffect(() => {
-    const fetchDocumentTypes = async () => {
-      const token = Cookies.get("token");
-
-      const res = await api.get("/document-types", {
-        params: { init_only: initOnly },
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-
-      setDocumentTypes(res.data || []);
-    };
-
-    fetchDocumentTypes();
-  }, [initOnly]);
-
-  useEffect(() => {
-    const fetchDocumentTypes = async () => {
-      try {
-        const token = Cookies.get("token");
-
-        const res = await api.get("/document-types", {
-          params: {
-            init_only: true, // or false
-          },
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-
-        setDocumentTypes(res.data || []);
-      } catch (err) {
-        console.error("Failed to fetch document types", err);
-      }
-    };
-
-    fetchDocumentTypes();
-  }, []);
 
   const handleFileUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -513,6 +475,7 @@ export default function StudentManualApplicationForm() {
     }
 
     const missingDocs = documentTypes.filter((docType) => {
+      if (!docType.is_required_for_current_upload) return false;
       return !formData.documents.some(
         (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
       );
@@ -582,7 +545,7 @@ export default function StudentManualApplicationForm() {
       showToast("Application submitted successfully.", "success");
 
       setTimeout(() => {
-        window.location.reload();
+        router.push("/partner/applications");
       }, 3000);
     } catch (err: any) {
       console.error("Error submitting application:", err);
@@ -601,10 +564,10 @@ export default function StudentManualApplicationForm() {
   }
 
   return (
-    <section className="mx-auto mt-5">
+    <section className="mx-auto mt-5 max-w-5xl">
       <div className="rounded-lg border border-slate-200 bg-card p-6">
         <div className="mb-6 flex items-start gap-x-3 border-b-2 border-slate-100 pb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FileText className="text-blue-700" size={24} />
           </div>
           <div>
@@ -1018,26 +981,41 @@ export default function StudentManualApplicationForm() {
                 </p>
               </div>
 
-              <div className="space-y-6">
-                {documentTypes.map((docType) => (
-                  <FileUploadField
-                    key={docType.id}
-                    label={
-                      docType.type.charAt(0).toUpperCase() +
-                      docType.type.slice(1)
-                    }
-                    field="documents"
-                    documentTypeId={docType.id}
-                    formData={formData}
-                    updateFormData={updateFormData}
-                    errors={errors}
-                    uploadHandler={handleFileUpload}
-                    removeHandler={removeDocument}
-                    multiple={false}
-                    accept="application/pdf,image/*"
-                  />
-                ))}
-              </div>
+              {documentTypesLoading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                      <div className="h-11 w-11 shrink-0 animate-pulse rounded-xl bg-slate-100" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-40 animate-pulse rounded bg-slate-200" />
+                        <div className="h-3 w-24 animate-pulse rounded bg-slate-100" />
+                      </div>
+                      <div className="h-9 w-24 animate-pulse rounded-xl bg-slate-100" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {documentTypes.map((docType) => (
+                    <FileUploadField
+                      key={docType.id}
+                      label={
+                        docType.type.charAt(0).toUpperCase() +
+                        docType.type.slice(1)
+                      }
+                      field="documents"
+                      documentTypeId={docType.id}
+                      formData={formData}
+                      updateFormData={updateFormData}
+                      errors={errors}
+                      uploadHandler={handleFileUpload}
+                      removeHandler={removeDocument}
+                      multiple={false}
+                      accept="application/pdf,image/*"
+                    />
+                  ))}
+                </div>
+              )}
 
               {errors.documents && (
                 <p className="mt-2 text-xs text-red-600">
@@ -1057,7 +1035,7 @@ export default function StudentManualApplicationForm() {
             {stage > 1 && (
               <PrevButton
                 onClick={prevStage}
-                text="Previous"
+                text="Prev"
                 icon={<ArrowLeft className="h-4 w-4" />}
                 disabled={stage === 1}
               />

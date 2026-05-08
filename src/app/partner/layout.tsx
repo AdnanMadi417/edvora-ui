@@ -10,12 +10,14 @@ import partnerRoutes from '../../routes/partnerRoutes';
 import RoleGuard from "components/guard/RoleGuard";
 import { ToastProvider } from "components/context/ToastContext";
 
+const PARTNER_ROLES = ["partner"];
+
 export default function PartnerLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
   return (
-    <RoleGuard allowedRoles={["partner"]}>
+    <RoleGuard allowedRoles={PARTNER_ROLES}>
 
       <ToastProvider>
         <div className="relative flex min-h-screen w-full bg-background-100 dark:bg-background-900">

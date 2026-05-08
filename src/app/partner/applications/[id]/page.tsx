@@ -27,26 +27,26 @@ export default function ApplicationPage() {
     applicationId,
   });
 
+  const fetchApplication = async () => {
+    try {
+      const token = Cookies.get("token");
+      const partnerId = localStorage.getItem("partnerId");
+      if (!token || !partnerId) return;
+
+      const res = await api.get(
+        `/partners/${partnerId}/applications/${applicationId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setApplication(res.data);
+    } catch (error) {
+      console.error("Error fetching application:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchApplication = async () => {
-      try {
-        const token = Cookies.get("token");
-        const partnerId = localStorage.getItem("partnerId");
-        if (!token || !partnerId) return;
-
-        const res = await api.get(
-          `/partners/${partnerId}/applications/${applicationId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        setApplication(res.data);
-      } catch (error) {
-        console.error("Error fetching application:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchApplication();
   }, [applicationId]);
 
@@ -55,7 +55,7 @@ export default function ApplicationPage() {
 
   return (
     <>
-      <ApplicationDetails application={application} />
+      <ApplicationDetails application={application} onRefetch={fetchApplication} />
       <ApplicationDocuments application={application} />
       <button
         onClick={() => setChatOpen((v) => !v)}
@@ -66,7 +66,7 @@ export default function ApplicationPage() {
           {chatOpen ? <X size={26} /> : <MessageCircle size={28} />}
 
           {unreadCount > 0 && !chatOpen && (
-            <span className="absolute -right-6 -top-6 flex h-5 w-5 border-3 border-slate-200  items-center justify-center rounded-full bg-red-500 text-xs font-medium">
+            <span className="absolute -right-6 -top-6 flex h-5 w-5 border-3 border-slate-200  items-center justify-center rounded-md bg-red-500 text-xs font-medium">
         {unreadCount}
       </span>
           )}

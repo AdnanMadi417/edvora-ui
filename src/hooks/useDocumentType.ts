@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import api from "lib/useApi";
-import Cookies from "js-cookie";
 
 type DocumentType = {
   id: string;
@@ -9,23 +8,43 @@ type DocumentType = {
   description: string;
   is_init_app_doc: boolean;
   is_required_init_app_doc: boolean;
+  is_required_for_init: boolean;
+  is_required_for_current_upload?: boolean;
 };
 
-export function useDocumentType(initOnly?: boolean) {
+type DocumentTypeParams = {
+  initOnly?: boolean;
+  programId?: string;
+  qualificationId?: string;
+  applicationStageId?: string;
+  nationality?: string;
+};
+
+export function useDocumentType(params?: DocumentTypeParams) {
   const [documentTypes, setDocumentTypes] = useState<DocumentType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const {
+    initOnly,
+    programId,
+    qualificationId,
+    applicationStageId,
+    nationality,
+  } = params ?? {};
 
   useEffect(() => {
     const fetchDocumentTypes = async () => {
       setLoading(true);
       try {
-        const token = Cookies.get("token");
+        const queryParams: Record<string, any> = {};
+        if (initOnly !== undefined) queryParams.init_only = initOnly;
+        if (programId) queryParams.program_id = programId;
+        if (qualificationId) queryParams.qualification_id = qualificationId;
+        if (applicationStageId) queryParams.application_stage_id = applicationStageId;
+        if (nationality) queryParams.nationality = nationality;
 
-        const res = await api.get("/document-types", {
-          params: initOnly !== undefined ? { init_only: initOnly } : {},
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await api.get("/document-types", { params: queryParams });
 
         setDocumentTypes(res.data || []);
       } catch (err) {
@@ -37,7 +56,7 @@ export function useDocumentType(initOnly?: boolean) {
     };
 
     fetchDocumentTypes();
-  }, [initOnly]);
+  }, [initOnly, programId, qualificationId, applicationStageId, nationality]);
 
   return { documentTypes, loading, error };
 }

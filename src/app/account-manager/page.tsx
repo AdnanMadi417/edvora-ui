@@ -1,4 +1,4 @@
 import { redirect } from 'next/navigation';
 export default function Home({}) {
-  redirect('/account-manager/default');
+  redirect('/account-manager/applications');
 }

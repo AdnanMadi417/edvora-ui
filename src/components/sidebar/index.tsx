@@ -6,9 +6,9 @@ import Links from "./components/Links";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import { IRoute } from "types/navigation";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+
 import { useEffect, useState, useCallback } from "react";
-import api from "lib/useApi";
+import api, { setLoggingOut, SIGN_IN_URL } from "lib/useApi";
 
 interface User {
   id: string;
@@ -19,7 +19,7 @@ interface User {
 
 function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
-  const router = useRouter();
+
 
   const [user, setUser] = useState<User | null>(null);
   const [userError, setUserError] = useState(false);
@@ -69,7 +69,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i];
       const eqPos = cookie.indexOf("=");
-      const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+      const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
 
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
 
@@ -86,6 +86,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
+    setLoggingOut(true);
 
     try {
       await api.post("/auth/logout").catch(() => {});
@@ -94,14 +95,10 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
     }
 
     localStorage.clear();
-
     sessionStorage.clear();
-
     deleteAllCookies();
 
-    setTimeout(() => {
-      router.push("/auth/sign-in");
-    }, 100);
+    window.location.replace(SIGN_IN_URL);
   };
 
   return (
@@ -164,7 +161,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
                 {user ? (
                   user.name[0].toUpperCase()
                 ) : (
-                  <div className="h-5 w-5 animate-pulse rounded-full bg-gray-300" />
+                  <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
                 )}
               </div>
               <div className="min-w-0 flex-1">
@@ -205,7 +202,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="flex w-full items-center gap-3 rounded-full
+            className="flex w-full items-center gap-3 rounded-md
         border border-transparent px-4 py-3 text-left
         font-medium text-red-600 transition-all duration-200
         hover:border-red-100 hover:bg-red-50

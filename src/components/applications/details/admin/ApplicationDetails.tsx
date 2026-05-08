@@ -17,9 +17,10 @@ import {
 } from "react-icons/fa";
 
 import { MdAssignmentTurnedIn } from "react-icons/md";
+import PresignedImage from "components/ui/PresignedImage";
 import OfferLetterCard from './OfferLetterCard';
-import VisaTrackingTimeline from './VisaTrackingTimeline';
 import ApplicationTimeline from '../ApplicationTimeline';
+import ApplicationCommission from './ApplicationCommission';
 
 interface ApplicationDetailsProps {
   application: any;
@@ -81,16 +82,25 @@ export default function ApplicationDetails({
   return (
     <section className="max-w-5xl mx-auto">
 
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-slate-200 bg-card p-4 pt-0 shadow-sm sm:p-6">
+      <div className="mb-5 mt-5 block space-y-2">
 
         <AdminTopBar application={application} />
+
+          <div className="block space-y-4 rounded-lg border border-slate-200 bg-card p-4 shadow-sm sm:p-6">
 
         {/* Top row: avatar + info | intake date */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-700 border-2 border-blue-200 text-xl font-bold text-white">
-              {student.name?.[0]?.toUpperCase() ?? "?"}
-            </div>
+            <PresignedImage
+              fileKey={application.student_photo_file_key}
+              alt={student.name}
+              className="h-16 w-16 shrink-0 rounded-full object-cover border-2 border-blue-200"
+              fallback={
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-blue-700 border-2 border-blue-200 text-xl font-bold text-white">
+                  {student.name?.[0]?.toUpperCase() ?? "?"}
+                </div>
+              }
+            />
             <div>
               <h2 className="text-sm sm:text-base md:text-lg lg:text-2xl font-bold text-slate-900">
                 {student.name}
@@ -174,16 +184,19 @@ export default function ApplicationDetails({
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Current Status</p>
             <div className="flex flex-wrap gap-2">
               {currentStatus.name && (
-                <span className="inline-flex items-center rounded-lg border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-normal text-amber-700">
+                <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-normal text-amber-700">
                   {currentStatus.name}
                 </span>
               )}
               {stage.name && (
-                <span className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-sm font-normal text-slate-800">
+                <span className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-1 text-sm font-normal text-slate-800">
                   {stage.name}
                 </span>
               )}
-              <p className="inline-flex items-center px-3 py-1 text-xs font-normal text-slate-600">{daysSince(application.updated_at)} days in stage</p>
+              <p className="inline-flex items-center text-xs font-normal text-slate-600">
+                <span className="sm:hidden rounded-md border border-slate-200 bg-white px-3 py-1">{daysSince(application.updated_at)} d</span>
+                <span className="hidden sm:inline">{daysSince(application.updated_at)} days in stage</span>
+              </p>
             </div>
           </div>
 
@@ -207,13 +220,15 @@ export default function ApplicationDetails({
         
       </div>
 
+      </div>
+      
       <ApplicationTimeline application={application} />
-      <VisaTrackingTimeline application={application} />
+      <ApplicationCommission application={application}/>
       <OfferLetterCard application={application} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <MdAssignmentTurnedIn className="text-xl text-blue-700" />
           </span>
           Application Information
@@ -296,7 +311,7 @@ export default function ApplicationDetails({
 
       <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FaUser className="text-xl text-blue-700" />
           </span>
           Student Information

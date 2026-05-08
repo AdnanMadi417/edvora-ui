@@ -323,7 +323,7 @@ export default function RegisterProgram() {
     <section className="mx-auto mt-5 max-w-5xl">
       <div className="mt-6 rounded-md border bg-white">
         <div className="flex items-start gap-x-4 border-b px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <BookOpen className="text-blue-700" size={24} />
           </div>
 
@@ -641,7 +641,7 @@ export default function RegisterProgram() {
                     <div className="mb-5 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div
-                          className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-600">
+                          className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-600">
                           {index + 1}
                         </div>
 

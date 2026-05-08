@@ -28,9 +28,11 @@ export function useVisaCase(applicationId: string) {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         setVisaCase(res.data);
-      } catch (err) {
-        setError("Failed to fetch visa case");
-        console.error(err);
+      } catch (err: any) {
+        if (err?.response?.status !== 404) {
+          setError("Failed to fetch visa case");
+          console.error(err);
+        }
       } finally {
         setLoading(false);
       }

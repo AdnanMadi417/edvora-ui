@@ -73,20 +73,6 @@ export default function StudentRegistrationForm() {
     getRequiredFields,
   } = useGetApplicationRequiredFields();
 
-  const { documentTypes } = useDocumentType(true);
-  const { qualifications } = useAllQualifications();
-  const safeDocumentTypes = documentTypes ?? [];
-
-  const requiredFieldKeys =
-    requiredFields?.fields
-      ?.filter((f) => f.is_required)
-      ?.map((f) => f.field_key) || [];
-
-  const shouldShowStage3 = requiredFieldKeys.length > 0;
-  const visibleStages = shouldShowStage3
-    ? stages
-    : stages.filter((s) => s.id !== 3);
-
   const [formData, setFormData] = useState<FormDataType>({
     program_id: "",
     university_id: "",
@@ -117,13 +103,26 @@ export default function StudentRegistrationForm() {
     is_draft: false,
   });
 
+  const { documentTypes, loading: documentTypesLoading } = useDocumentType({
+    initOnly: true,
+    programId: formData.program_id || undefined,
+    nationality: formData.student.nationality || undefined,
+  });
+  const { qualifications } = useAllQualifications();
+  const safeDocumentTypes = documentTypes ?? [];
+
+  const requiredFieldKeys =
+    (requiredFields as any)?.fields
+      ?.filter((f: any) => f.is_required)
+      ?.map((f: any) => f.field_key) || [];
+
   const { intakeDates, loading: loadingIntakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
 
-  useEffect(() => {
-    if (intakeDates.length > 0) {
-      setFormData((prev) => ({ ...prev, intake_date: intakeDates[0] }));
-    }
-  }, [intakeDates]);
+  const shouldShowStage3 = requiredFieldKeys.length > 0;
+  const visibleStages = shouldShowStage3
+    ? stages
+    : stages.filter((s) => s.id !== 3);
+
 
   const contact = formData.student.emergency_contacts[0];
 
@@ -144,12 +143,13 @@ export default function StudentRegistrationForm() {
         formData,
         stageNum,
         requiredFieldKeys,
-        safeDocumentTypes
+        safeDocumentTypes,
+        documentTypesLoading
       );
       setErrors(errors);
       return isValid;
     },
-    [formData, requiredFieldKeys, safeDocumentTypes]
+    [formData, requiredFieldKeys, safeDocumentTypes, documentTypesLoading]
   );
 
   const nextStage = async () => {
@@ -269,8 +269,8 @@ export default function StudentRegistrationForm() {
   );
 
   const isStageValid = React.useMemo(() => {
-    return validateFormData(formData, stage, requiredFieldKeys, documentTypes).isValid;
-  }, [stage, formData, requiredFieldKeys, documentTypes]);
+    return validateFormData(formData, stage, requiredFieldKeys, documentTypes, documentTypesLoading).isValid;
+  }, [stage, formData, requiredFieldKeys, documentTypes, documentTypesLoading]);
 
   const handleSubmit = async () => {
     for (const s of visibleStages) {
@@ -290,7 +290,7 @@ export default function StudentRegistrationForm() {
 
     const missingDocs = documentTypes.filter((docType) => {
 
-      if (!docType.is_required_init_app_doc) return false;
+      if (!(docType.is_required_for_init ?? docType.is_required_init_app_doc)) return false;
 
       return !formData.documents.some(
         (d) => d.document_type_id === docType.id && d.file_url && !d.uploading
@@ -397,10 +397,10 @@ export default function StudentRegistrationForm() {
   }
 
   return (
-    <section className="mx-auto mt-5">
+    <section className="mx-auto mt-5 max-w-5xl">
       <div className="rounded-lg border border-slate-200 bg-card p-6">
         <div className="mb-6 flex items-start gap-x-3 border-b-2 border-slate-100 pb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
+          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FileText className="text-blue-700" size={24} />
           </div>
           <div>
@@ -479,7 +479,7 @@ export default function StudentRegistrationForm() {
               errors={errors}
               updateFormData={updateFormData}
               universities={universities}
-f            />
+            />
           )}
 
           {stage === 2 && (
@@ -490,6 +490,7 @@ f            />
               documentTypes={safeDocumentTypes}
               handleFileUpload={handleFileUpload}
               removeDocument={removeDocument}
+              loading={documentTypesLoading}
             />
           )}
 
@@ -515,7 +516,7 @@ f            />
 
         </div>
 
-        <div className="flex-col content-center justify-content items-center gap-2 space-y-2 sm:flex-row md:flex md:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="text-sm text-slate-500">
             Step {stage} of {visibleStages.length} — {completedStages.length}{" "}
             completed
@@ -525,7 +526,7 @@ f            />
             {stage > 1 && (
               <PrevButton
                 onClick={prevStage}
-                text="Previous"
+                text="Prev"
                 icon={<ArrowLeft className="h-4 w-4" />}
                 disabled={stage === 1 || loadingCreatePartnerApplication}
               />

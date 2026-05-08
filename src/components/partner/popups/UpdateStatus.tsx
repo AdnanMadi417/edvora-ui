@@ -286,12 +286,12 @@ export default function UpdateStatusPopup({
 
             <div className="relative flex items-start justify-between">
               <div className="flex items-center gap-4">
-                <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-blue-200/50 bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 shadowsm">
+                <div className="relative flex h-12 w-12 items-center justify-center rounded-md border border-blue-200/50 bg-gradient-to-br from-blue-50 via-blue-100 to-indigo-100 shadowsm">
                   <FileEdit
                     className="h-7 w-7 text-blue-600"
                     strokeWidth={2.5}
                   />
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-white/40 to-transparent opacity-60" />
+                  <div className="absolute inset-0 rounded-md bg-gradient-to-tr from-white/40 to-transparent opacity-60" />
                 </div>
 
                 <div className="space-y-1">
@@ -304,7 +304,7 @@ export default function UpdateStatusPopup({
               <button
                 onClick={handleClose}
                 aria-label="Close dialog"
-                className="group relative flex h-10 w-10 items-center justify-center rounded-full text-slate-600 transition-all duration-200 hover:bg-gray-100 hover:text-slate-600 active:scale-95"
+                className="group relative flex h-10 w-10 items-center justify-center rounded-md text-slate-600 transition-all duration-200 hover:bg-gray-100 hover:text-slate-600 active:scale-95"
               >
                 <XCircle className="h-5 w-5 transition-transform duration-200 " />
               </button>
@@ -348,7 +348,7 @@ export default function UpdateStatusPopup({
                     >
                       <div className="flex items-start gap-3">
                         <div
-                          className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full transition-all duration-200 ${
+                          className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md transition-all duration-200 ${
                             isSelected ? option.bgColor : "bg-gray-50"
                           }`}
                         >
@@ -381,7 +381,7 @@ export default function UpdateStatusPopup({
                         </div>
 
                         <div
-                          className={`mt-1 h-5 w-5 flex-shrink-0 rounded-full border transition-all duration-200 ${
+                          className={`mt-1 h-5 w-5 flex-shrink-0 rounded-md border transition-all duration-200 ${
                             isSelected
                               ? `${option.borderColor} bg-card`
                               : "border-gray-300 bg-card"
@@ -389,7 +389,7 @@ export default function UpdateStatusPopup({
                         >
                           {isSelected && (
                             <div
-                              className={`h-full w-full scale-50 rounded-full ${option.bgColor
+                              className={`h-full w-full scale-50 rounded-md ${option.bgColor
                                 .replace("bg-", "bg-")
                                 .replace("-50", "-500")}`}
                             />
@@ -447,7 +447,7 @@ export default function UpdateStatusPopup({
             <div className="flex justify-center sm:justify-end gap-3 w-full sm:w-auto">
               <button
                 onClick={handleClose}
-                className="rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm sm:text-p2 font-medium text-slate-600 transition-all duration-200 hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                className="rounded-md border border-gray-300 bg-white px-5 py-2.5 text-sm sm:text-p2 font-medium text-slate-600 transition-all duration-200 hover:bg-gray-100 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-200"
               >
                 Cancel
               </button>
@@ -455,7 +455,7 @@ export default function UpdateStatusPopup({
               <button
                 onClick={handleConfirm}
                 disabled={!selectedStatus || (requiresReason && !reason.trim())}
-                className="rounded-full bg-blue-600 px-6 py-2.5 text-sm sm:text-p2 font-medium text-white shadow-md transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-md bg-blue-600 px-6 py-2.5 text-sm sm:text-p2 font-medium text-white shadow-md transition-all duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Update Status
               </button>

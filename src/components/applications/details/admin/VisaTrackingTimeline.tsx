@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import {
-  CreditCard,
   Download,
   CheckCircle,
   FileText,
@@ -88,108 +87,76 @@ export default function VisaTrackingTimeline({
   }
 
   return (
-    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
-      <div className="mb-6 rounded-lg border bg-white">
-        <div className="flex items-start gap-3 border-b border-gray-200 p-6">
-          <div className="flex-1">
-            <div className="flex items-center gap-4">
-              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-                <CreditCard className="text-xl text-blue-700" />
-              </span>
-              <div>
-                <h3 className="text-p3 font-semibold text-slate-900">
-                  Visa Payment
-                </h3>
-                <span className="text-sm text-slate-500">
-                  Visa processing fee details
-                </span>
+    <>
+      {application?.emgs_evaluation_document && (
+          <div className="block space-y-4 border-t border-gray-200 p-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">
+                EMGS Eval Document
+              </h3>
+              <p className="text-sm text-slate-500">EMGS eval file</p>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
+                  <FileText className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">
+                    {application.emgs_evaluation_document.document_type}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    Uploaded on{" "}
+                    {new Date(application.emgs_evaluation_document.created_at).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {visaCase && (
-          <div className="mt-4 grid grid-cols-1 gap-4 border-b border-gray-200 p-6 sm:grid-cols-2">
-            <div>
-              <p className="mb-2 text-sm tracking-wide text-slate-500">
-                Visa Fee Amount
-              </p>
-              <p className="text-lg font-bold ">
-                {visaCase.visa_fee_amount
-                  ? `RM ${visaCase.visa_fee_amount.toLocaleString()}`
-                  : "—"}
-              </p>
-            </div>
-
-            <div>
-              <p className="mb-2 text-sm tracking-wide text-slate-500">
-                Created At
-              </p>
-              <p className="text-sm">
-                {visaCase.created_at
-                  ? new Date(visaCase.created_at).toLocaleString()
-                  : "—"}
-              </p>
-            </div>
-
-            <div>
-              <p className="mb-2 text-sm tracking-wide text-slate-500">Notes</p>
-              <p className="text-sm">{visaCase.notes || "No notes"}</p>
+              <button
+                onClick={() => handleDownload(application.emgs_evaluation_document.file_key)}
+                disabled={downloading}
+                className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                title="Download document"
+              >
+                <Download className="h-4 w-4" />
+              </button>
             </div>
           </div>
         )}
 
-        <div className="block space-y-4 border-b border-gray-200 p-6">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              EMGS Evaluation Document
-            </h3>
-            <p className="text-sm text-slate-500">
-              EMGS evaluation file
-            </p>
-          </div>
-
-          <div>
-            {!application?.emgs_evaluation_document ? (
-              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-10">
-                <FileText className="h-8 w-8 text-gray-400" />
-                <p className="mt-2 text-sm text-slate-500">
-                  No EMGS evaluation document uploaded
-                </p>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
-                    <FileText className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-gray-900">
-                      {application.emgs_evaluation_document.document_type}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      Uploaded on{" "}
-                      {new Date(application.emgs_evaluation_document.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
+        {application?.visa_document && (
+          <div className="block space-y-4 border-t border-gray-200 p-6">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Visa Document</h3>
+              <p className="text-sm text-slate-500">Visa issued by the immigration authority</p>
+            </div>
+            <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="flex items-center gap-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
+                  <FileText className="h-5 w-5 text-green-600" />
                 </div>
-                <button
-                  onClick={() => handleDownload(application.emgs_evaluation_document.file_key)}
-                  disabled={downloading}
-                  className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
-                  title="Download document"
-                >
-                  <Download className="h-4 w-4" />
-                </button>
+                <div>
+                  <p className="font-medium text-gray-900">{application.visa_document.document_type}</p>
+                  <p className="text-xs text-slate-500">
+                    Uploaded on {new Date(application.visa_document.created_at).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
-            )}
+              <button
+                onClick={() => handleDownload(application.visa_document.file_key)}
+                disabled={downloading}
+                className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                title="Download document"
+              >
+                <Download className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
-        <div className="border-b border-gray-200 p-6 ">
+        <div className="border-t border-gray-200 p-6">
           {visaPayments.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-12">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-md bg-gray-100">
                 <Receipt className="h-8 w-8 text-gray-400" />
               </div>
               <p className="text-base font-medium text-gray-900">
@@ -254,7 +221,7 @@ export default function VisaTrackingTimeline({
                       </p>
 
                       {payment.documents.length === 0 ? (
-                        <div className="flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1.5">
+                        <div className="flex items-center gap-1.5 rounded-md bg-red-50 px-3 py-1.5">
                           <XCircle className="h-3.5 w-3.5 text-red-500" />
                           <span className="text-sm font-medium text-red-600">
                             No documents
@@ -267,7 +234,7 @@ export default function VisaTrackingTimeline({
                               <button
                                 onClick={() => handleDownload(doc.file_key)}
                                 disabled={downloading}
-                                className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                                className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 hover:bg-green-100 disabled:opacity-50"
                               >
                                 <Download className="h-4 w-4" />
                               </button>
@@ -276,7 +243,7 @@ export default function VisaTrackingTimeline({
                                 <button
                                   onClick={() => handleApprove(payment.id)}
                                   disabled={loading}
-                                  className="rounded-full border border-blue-600 bg-blue-50 p-2 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
+                                  className="rounded-md border border-blue-600 bg-blue-50 p-2 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
                                 >
                                   <CheckCircle className="h-4 w-4" />
                                 </button>
@@ -293,26 +260,15 @@ export default function VisaTrackingTimeline({
           )}
         </div>
 
-        <div>
-          <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900">
-              Arrival Documents
-            </h3>
-            <p className="text-sm text-slate-500">
-              Travel and arrival-related files
-            </p>
-          </div>
-
-          <div className="p-6 pt-0">
-            {!application?.arrival_documents ||
-            application.arrival_documents.length === 0 ? (
-              <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-10">
-                <FileText className="h-8 w-8 text-gray-400" />
-                <p className="mt-2 text-sm text-slate-500">
-                  No arrival documents uploaded
-                </p>
-              </div>
-            ) : (
+        {application?.arrival_documents?.length > 0 && (
+          <div className="border-t border-gray-200">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Arrival Documents
+              </h3>
+              <p className="text-sm text-slate-500">Travel and arrival-related files</p>
+            </div>
+            <div className="p-6 pt-0">
               <div className="space-y-4">
                 {application.arrival_documents.map((doc: any) => (
                   <div
@@ -320,25 +276,20 @@ export default function VisaTrackingTimeline({
                     className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
                         <FileText className="h-5 w-5 text-green-600" />
                       </div>
-
                       <div>
-                        <p className="font-medium text-gray-900">
-                          {doc.document_type}
-                        </p>
+                        <p className="font-medium text-gray-900">{doc.document_type}</p>
                         <p className="text-xs text-slate-500">
-                          Uploaded on{" "}
-                          {new Date(doc.created_at).toLocaleDateString()}
+                          Uploaded on {new Date(doc.created_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
-
                     <button
                       onClick={() => handleDownload(doc.file_key)}
                       disabled={downloading}
-                      className="rounded-full border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
+                      className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
                       title="Download document"
                     >
                       <Download className="h-4 w-4" />
@@ -346,11 +297,10 @@ export default function VisaTrackingTimeline({
                   </div>
                 ))}
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
-      </div>
-    </section>
+    </>
   );
 }

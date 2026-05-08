@@ -3,10 +3,12 @@
 import { useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { isAxiosError } from "axios";
+import axios, { isAxiosError } from "axios";
 import AuthLayout from "components/auth/AuthLayout";
 import SignInForm from "components/auth/SignInForm";
 import api from "lib/useApi";
+
+const authApi = axios.create({ baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api` });
 
 export default function SignInPage() {
   const router = useRouter();
@@ -16,7 +18,7 @@ export default function SignInPage() {
     setError("");
 
     try {
-      const loginRes = await api.post("/auth/login", { email, password });
+      const loginRes = await authApi.post("/auth/login", { email, password });
       const token = loginRes.data.access_token;
 
       Cookies.set("token", token, { expires: keepLoggedIn ? 30 : 1, path: "/" });

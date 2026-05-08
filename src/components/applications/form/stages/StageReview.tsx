@@ -199,13 +199,13 @@ export default function StageReview({
             return (
               <div
                 key={docType.id}
-                className="flex items-center justify-between gap-2"
+                className="flex min-w-0 items-center justify-between gap-2"
               >
-                <div className="flex items-center gap-1 text-xs text-slate-500">
-                  <File className="h-3.5 w-3.5" />
-                  {docType.description}
+                <div className="flex min-w-0 items-center gap-1 text-xs text-slate-500">
+                  <File className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{docType.description}</span>
                 </div>
-                <div className="mt-1">
+                <div className="mt-1 shrink-0">
 
                   {uploadedDoc ? (
                     <span className="flex items-center gap-1 text-green-600">

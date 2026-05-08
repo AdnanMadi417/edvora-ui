@@ -10,7 +10,7 @@ import {
   BookOpen,
   DollarSign,
   Settings,
-  Eye,
+  ChevronRight,
   CheckCircle,
   Pencil,
   XCircle,
@@ -19,8 +19,10 @@ import {
   ClipboardCheck,
   CalendarDays,
   Sliders,
+  SlidersHorizontal,
+  Plus,
 } from 'lucide-react';
-import { MdSchool, MdLibraryAdd, MdVerified } from 'react-icons/md';
+import { MdSchool, MdVerified } from 'react-icons/md';
 import PresignedImage from "components/ui/PresignedImage";
 import { AiOutlineBank } from "react-icons/ai";
 
@@ -38,6 +40,7 @@ import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Loading from "components/loading/Loading";
 import NoMessagesFound from 'components/emptyData/NoMessagesFound';
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 import DeleteProgramsConfirmation from "components/admin/KnowledgeHub/program/popups/DeleteProgramsConfirmation";
@@ -48,6 +51,7 @@ import BatchProgramScholarship from "components/admin/KnowledgeHub/program/popup
 
 
 const ProgramsTable = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
 
   const {
@@ -79,6 +83,7 @@ const ProgramsTable = () => {
   const [isBatchIntakesUpdateOpen, setIsBatchIntakesUpdateOpen] = useState(false);
   const [isBatchScholarshipsUpdateOpen, setIsBatchScholarshipsUpdateOpen] = useState(false);
   const [isBulkMenuOpen, setIsBulkMenuOpen] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const { showToast } = useToast();
 
@@ -134,6 +139,14 @@ const ProgramsTable = () => {
 
   const totalItems = filteredPrograms.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const activeFiltersCount = [
+    selectedState !== "all",
+    selectedField !== "all",
+    selectedUniversity !== "all",
+    selectedLevel !== "all",
+    searchTerm !== "",
+  ].filter(Boolean).length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -250,90 +263,103 @@ const ProgramsTable = () => {
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
 
-            <div className="relative w-full sm:w-64 flex-shrink-0">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search by university, program, or level..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="bg-background w-full rounded-full border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedState}
-                onChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
-                options={states}
-                icon={Globe}
-                defaultOption="All Locations"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedField}
-                onChange={(val) => {
-                  setSelectedField(val);
-                  setCurrentPage(1);
-                }}
-                options={fields}
-                icon={MdSchool}
-                defaultOption="All Fields"
-              />
-
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedUniversity}
-                onChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
-                options={universities}
-                icon={MdSchool}
-                defaultOption="All Universities"
-              />
-            </div>
-
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <FilterSelectField
-                value={selectedLevel}
-                onChange={(val) => { setSelectedLevel(val); setCurrentPage(1); }}
-                options={qualifications}
-                icon={MdVerified}
-                defaultOption="All Qualifications"
-              />
-            </div>
-
-            <div className="w-full sm:w-auto flex-shrink-0">
+            {/* Search + mobile filter toggle */}
+            <div className="flex items-center gap-2 sm:contents">
+              <div className="relative flex-1 sm:w-64 sm:flex-none flex-shrink-0">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search by university, program, or level..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                />
+              </div>
               <button
-                onClick={() => {
-                  setSearchTerm("");
-                  setSelectedState("all");
-                  setSelectedField("all");
-                  setSelectedUniversity("all");
-                  setSelectedLevel("all");
-                  setCurrentPage(1);
-                }}
-                className="flex items-center justify-center gap-2 rounded-full border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+                className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-background text-slate-500 hover:bg-slate-50"
+                onClick={() => setShowMobileFilters((v) => !v)}
               >
-                <RefreshCw className="h-4 w-4" />
-                Clear
+                <SlidersHorizontal className="h-4 w-4" />
+                {activeFiltersCount > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                    {activeFiltersCount}
+                  </span>
+                )}
               </button>
+            </div>
+
+            {/* Filter selects — collapsible on mobile, always visible on sm+ */}
+            <div className={`flex-col gap-3 sm:contents ${showMobileFilters ? 'flex' : 'hidden sm:contents'}`}>
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedState}
+                  onChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
+                  options={states}
+                  icon={Globe}
+                  defaultOption="All Locations"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedField}
+                  onChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
+                  options={fields}
+                  icon={MdSchool}
+                  defaultOption="All Fields"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedUniversity}
+                  onChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
+                  options={universities}
+                  icon={MdSchool}
+                  defaultOption="All Universities"
+                />
+              </div>
+
+              <div className="w-full sm:w-48 flex-shrink-0">
+                <FilterSelectField
+                  value={selectedLevel}
+                  onChange={(val) => { setSelectedLevel(val); setCurrentPage(1); }}
+                  options={qualifications}
+                  icon={MdVerified}
+                  defaultOption="All Qualifications"
+                />
+              </div>
+
+              <div className="w-full sm:w-auto flex-shrink-0">
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedState("all");
+                    setSelectedField("all");
+                    setSelectedUniversity("all");
+                    setSelectedLevel("all");
+                    setCurrentPage(1);
+                  }}
+                  className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Clear
+                </button>
+              </div>
             </div>
 
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
 
               <Link
-                className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+                className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
                 href="/admin/knowledge-hub/programs/create"
               >
-                <MdLibraryAdd className="h-4 w-4" />
+                <Plus className="h-4 w-4" />
                 Create Program
               </Link>
 
               {selectedCount > 0 && (
-                <div className="flex items-center gap-2 rounded-full border border-slate-100 bg-slate-50/60 px-3 py-1.5">
+                <div className="flex items-center gap-2 rounded-md border border-slate-100 bg-slate-50/60 px-3 py-1.5">
                   <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
                     <CheckCircle className="h-4 w-4" />
                     {selectedCount} selected
@@ -486,9 +512,10 @@ const ProgramsTable = () => {
               {!error && currentPrograms.map((Program) => (
                 <tr
                   key={Program.id}
-                  className="hover:bg-primary/10 group transition-colors"
+                  className="group cursor-pointer transition-colors hover:bg-primary/10"
+                  onClick={() => router.push(`/admin/knowledge-hub/programs/${Program.id}`)}
                 >
-                  <td className="pl-6">
+                  <td className="pl-6" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
                       aria-label={`Select ${Program.name}`}
@@ -537,7 +564,7 @@ const ProgramsTable = () => {
 
                           <span className="text-slate-300">•</span>
 
-                          <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
                                 {Program.duration} Years
                               </span>
                         </div>
@@ -595,7 +622,7 @@ const ProgramsTable = () => {
                             <span
                               key={index}
                               title={tag.label}
-                              className={`truncate rounded-full px-2 py-0.5 font-medium transition ${
+                              className={`truncate rounded-md px-2 py-0.5 font-medium transition ${
                                 tag.color === "green"
                                   ? "bg-green-50 text-green-700"
                                   : tag.color === "blue"
@@ -608,7 +635,7 @@ const ProgramsTable = () => {
                           ))}
 
                           {hiddenCount > 0 && (
-                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+                            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
                                   +{hiddenCount} more
                                 </span>
                           )}
@@ -637,11 +664,11 @@ const ProgramsTable = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2 text-sm">
                       {Program.has_scholarship ? (
-                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
+                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
                               <CheckCircle className="h-4 w-4" /> Available
                             </span>
                       ) : (
-                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-full border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
+                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
                               <XCircle className="h-4 w-4" /> Not Available
                             </span>
                       )}
@@ -660,20 +687,10 @@ const ProgramsTable = () => {
                     <div className="flex items-center gap-2">
                       <a
                         role="menuitem"
-                        aria-label="View Program"
-                        href={`/admin/knowledge-hub/programs/${Program.id}`}
-                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                      >
-                        <Eye className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                      </a>
-
-                      <div className="h-6 border-l border-slate-200" />
-
-                      <a
-                        role="menuitem"
                         aria-label="Edit Program"
                         href={`/admin/knowledge-hub/programs/${Program.id}/edit`}
-                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                       >
                         <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                       </a>
@@ -683,16 +700,20 @@ const ProgramsTable = () => {
                       <button
                         role="menuitem"
                         aria-label="Delete Program"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedProgramId(Program.id);
                           setDeleteMode("single");
                           setIsDeleteOpen(true);
                         }}
-                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                       >
                         <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                       </button>
                     </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
                 </tr>
               ))}

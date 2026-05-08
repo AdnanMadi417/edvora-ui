@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Search,
-  Eye,
+  ChevronRight,
   User,
   Mail,
   CheckCircle,
@@ -99,7 +99,7 @@ const ModernAccountManagersTable = () => {
                 placeholder="Search Account Managers by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -112,7 +112,7 @@ const ModernAccountManagersTable = () => {
             />
 
             <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+              className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
               href="/admin/account-managers/create"
             >
               <MdPersonAdd className="h-4 w-4" />
@@ -182,7 +182,8 @@ const ModernAccountManagersTable = () => {
             paginatedAccountManagers.map((app) => (
               <tr
                 key={app.id}
-                className="hover:bg-primary/10 group transition-colors"
+                className="group cursor-pointer transition-colors hover:bg-primary/10"
+                onClick={() => { setSelectedManager(app); setViewModal(true); setOpenDropdownId(null); }}
               >
                 <td className="min-w-[200px] max-w-[250px] px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -207,7 +208,7 @@ const ModernAccountManagersTable = () => {
 
                 <td className="px-6 py-4">
                   <div
-                    className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold
+                    className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-3 py-1 text-xs font-semibold
         ${
                       app.is_active
                         ? 'border-green-600 bg-green-100 text-green-700'
@@ -227,22 +228,6 @@ const ModernAccountManagersTable = () => {
                   <div className="flex items-center gap-2">
                     <button
                       role="menuitem"
-                      aria-label="View Manager"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedManager(app);
-                        setViewModal(true);
-                        setOpenDropdownId(null);
-                      }}
-                      className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:outline-none"
-                    >
-                      <Eye className="h-4 w-4 text-slate-500 transition-colors hover:text-slate-700" />
-                    </button>
-
-                    <div className="h-6 border-l border-slate-200" />
-
-                    <button
-                      role="menuitem"
                       aria-label="Edit Manager"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -250,11 +235,14 @@ const ModernAccountManagersTable = () => {
                         setEditModal(true);
                         setOpenDropdownId(null);
                       }}
-                      className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:outline-none"
+                      className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:outline-none"
                     >
                       <Pencil className="h-4 w-4 text-slate-500 transition-colors hover:text-slate-700" />
                     </button>
                   </div>
+                </td>
+                <td className="px-4 py-4">
+                  <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                 </td>
 
               </tr>
@@ -289,7 +277,7 @@ const ModernAccountManagersTable = () => {
             <PrevButton
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              text="Previous"
+              text="Prev"
               icon={<ArrowLeft className="h-4 w-4" />}
             />
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { InputField, RadioField } from "components/form";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
-import { NATIONALITIES } from "constants/lists";
+import IntakeDatePicker from "components/form/IntakeDatePicker";
 import { BookOpen } from "lucide-react";
 import IconButton from "components/ui/buttons/IconButton";
 
@@ -58,28 +58,15 @@ export default function StageAdditionalInfo({
   return (
     <div className="space-y-5">
 
-      {intakeDates.length > 1 && (
+      {isFieldRequired("intake_date") && intakeDates.length > 1 && (
         <div className="mb-8">
           <h3 className="mb-4 font-semibold uppercase text-slate-900">Intake Date</h3>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-            <div>
-              <label className="block text-sm font-medium text-slate-900">
-                Intake Date <span className="text-red-600">*</span>
-              </label>
-              <select
-                value={formData.intake_date ?? ""}
-                onChange={(e) => updateFormData("intake_date", e.target.value)}
-                className="mt-2 flex h-12 w-full items-center rounded-md border border-default p-3 text-sm outline-none focus:outline-none focus:ring-1 focus:ring-blue-500"
-              >
-                {intakeDates.map((date) => (
-                  <option key={date} value={date}>{date}</option>
-                ))}
-              </select>
-              {errors?.["intake_date"] && (
-                <p className="mt-1 text-xs text-red-600">{errors["intake_date"]}</p>
-              )}
-            </div>
-          </div>
+          <IntakeDatePicker
+            dates={intakeDates}
+            value={formData.intake_date ?? ""}
+            onChange={(date) => updateFormData("intake_date", date)}
+            error={errors?.["intake_date"]}
+          />
         </div>
       )}
 
@@ -115,32 +102,8 @@ export default function StageAdditionalInfo({
               />
             )}
 
-            {isFieldRequired("student.nationality") && (
-              <SearchableDropdown
-                label="Nationality"
-                field="student.nationality"
-                options={NATIONALITIES.map((q) => ({
-                  value: String(q.label),
-                  label: q.name,
-                }))}
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
-            )}
 
-            {isFieldRequired("student.passport_number") && (
-              <InputField
-                label="Passport Number"
-                field="student.passport_number"
-                placeholder="A1234567"
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
-            )}
-
-            {isFieldRequired("student.email") && (
+{isFieldRequired("student.email") && (
               <InputField
                 label="Email Address"
                 field="student.email"

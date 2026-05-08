@@ -2,26 +2,26 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
-import { useEmgsEvaluationUpload } from "hooks/applications/files/useEmgsEvaluationUpload";
+import { useEmgsEvalUpload } from "hooks/applications/files/useEmgsEvaluationUpload";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
 
-interface EmgsEvaluationUploadProps {
+interface EmgsEvalUploadProps {
   isOpen: boolean;
   onClose: () => void;
   applicationId: string;
 }
 
-export default function EmgsEvaluationUpload({
+export default function EmgsEvalUpload({
   isOpen,
   onClose,
   applicationId,
-}: EmgsEvaluationUploadProps) {
+}: EmgsEvalUploadProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
   const [uploadError, setUploadError] = useState("");
 
-  const { uploadEmgsEvaluation, isUploading } = useEmgsEvaluationUpload();
+  const { uploadEmgsEval, isUploading } = useEmgsEvalUpload();
 
   useEffect(() => {
     if (isOpen) setIsVisible(true);
@@ -36,14 +36,14 @@ export default function EmgsEvaluationUpload({
 
     setUploadError("");
     try {
-      await uploadEmgsEvaluation(file, applicationId);
+      await uploadEmgsEval(file, applicationId);
       handleClose();
       setTimeout(() => window.location.reload(), 2000);
     } catch (error: any) {
       const message =
         error?.response?.data?.message ||
         error?.message ||
-        "Failed to upload EMGS evaluation document";
+        "Failed to upload EMGS eval document";
       setUploadError(message);
     }
   };
@@ -78,15 +78,15 @@ export default function EmgsEvaluationUpload({
           <div className="relative border-b border-default px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
                   <FileText className="h-6 w-6 text-blue-600" strokeWidth={2.5} />
                 </div>
                 <div>
                   <h5 className="text-lg font-bold text-gray-900">
-                    Upload EMGS Evaluation Document
+                    Upload EMGS Eval Document
                   </h5>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    Upload the evaluation document to proceed
+                    Upload the eval document to proceed
                   </p>
                 </div>
               </div>
@@ -94,7 +94,7 @@ export default function EmgsEvaluationUpload({
               <button
                 onClick={handleClose}
                 aria-label="Close dialog"
-                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 <XCircle className="h-5 w-5" strokeWidth={2} />
               </button>
@@ -104,8 +104,9 @@ export default function EmgsEvaluationUpload({
           {/* Body */}
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
             <StatusFileUpload
-              label="EMGS Evaluation Document"
-              id="emgs_evaluation"
+              label="EMGS Eval Document"
+              description="Upload the EMGS eval document downloaded from the EMGS portal"
+              id="emgs_eval"
               file={file}
               onFileChange={(f) => { setFile(f); setUploadError(""); }}
               onRemove={() => { setFile(null); setUploadError(""); }}
@@ -134,7 +135,7 @@ export default function EmgsEvaluationUpload({
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleClose}
-                className="flex items-center justify-center gap-2 rounded-full border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
               >
                 <XCircle className="h-4 w-4" />
                 Cancel
@@ -143,7 +144,7 @@ export default function EmgsEvaluationUpload({
               <button
                 disabled={!file || !!fileError || !!uploadError || isUploading}
                 onClick={handleConfirmUpload}
-                className="flex items-center justify-center gap-2 rounded-full border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
               >
                 <CheckCircle className="h-4 w-4" />
                 {isUploading ? "Uploading..." : "Submit Document"}

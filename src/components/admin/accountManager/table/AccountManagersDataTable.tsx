@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import {
   Search,
-  Eye,
+  ChevronRight,
   User,
   Mail,
   CheckCircle,
@@ -13,7 +13,7 @@ import {
   Users,
   AlertCircle, Trash2,
 } from 'lucide-react';
-import { MdAdminPanelSettings } from "react-icons/md";
+import { MdPersonAdd } from "react-icons/md";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 import { useAccountManagerList } from "hooks/account-managers/useAccountManagerList";
@@ -27,9 +27,11 @@ import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
 
 import ClearButton from "components/ui/buttons/DangerButton";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const ModernAccountManagersTable = () => {
+  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
 
   const { accountManagers, loading } = useAccountManagerList();
@@ -129,7 +131,7 @@ const ModernAccountManagersTable = () => {
                 placeholder="Search Account Managers by name..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-full border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -142,10 +144,10 @@ const ModernAccountManagersTable = () => {
             />
 
             <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-full border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+              className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
               href="/admin/account-managers/create"
             >
-              <MdAdminPanelSettings className="h-4 w-4" />
+              <MdPersonAdd className="h-4 w-4" />
               Create Manager
             </Link>
           </div>
@@ -219,7 +221,8 @@ const ModernAccountManagersTable = () => {
               paginatedAccountManagers.map((app) => (
                 <tr
                   key={app.id}
-                  className="hover:bg-primary/10 group transition-colors"
+                  className="group cursor-pointer transition-colors hover:bg-primary/10"
+                  onClick={() => router.push(`/admin/account-managers/profile/${app.id}`)}
                 >
                   <td className="min-w-[200px] max-w-[250px] px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -244,13 +247,13 @@ const ModernAccountManagersTable = () => {
 
                   <td className="px-6 py-4">
                     {Number(app.assigned_partners_count) > 0 ? (
-                      <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                      <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
                         <Users className="h-3 w-3" />
                         {Number(app.assigned_partners_count)} Partner
                         {Number(app.assigned_partners_count) !== 1 && "s"}
                       </div>
                     ) : (
-                      <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
+                      <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
                         <AlertCircle className="h-3 w-3" />
                         Needs Partner
                       </div>
@@ -259,7 +262,7 @@ const ModernAccountManagersTable = () => {
 
                   <td className="px-6 py-4">
                     <div
-                      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold
+                      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-3 py-1 text-xs font-semibold
         ${
                         app.is_active
                           ? "border-green-600 bg-green-100 text-green-700"
@@ -278,19 +281,10 @@ const ModernAccountManagersTable = () => {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <Link
-                        href={`/admin/account-managers/profile/${app.id}`}
-                        aria-label="View Manager"
-                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:outline-none"
-                      >
-                        <Eye className="h-4 w-4 text-slate-500 transition-colors hover:text-slate-700" />
-                      </Link>
-
-                      <div className="h-6 border-l border-slate-200" />
-
-                      <Link
                         href={`/admin/account-managers/profile/${app.id}/edit`}
                         aria-label="Edit Manager"
-                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:outline-none"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:outline-none"
                       >
                         <Pencil className="h-4 w-4 text-slate-500 transition-colors hover:text-slate-700" />
                       </Link>
@@ -300,17 +294,20 @@ const ModernAccountManagersTable = () => {
                       <button
                         role="menuitem"
                         aria-label="Delete Account Manager"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedUniversityId(app.id);
                           setSelectedAccountManager(app.name);
                           setIsDeleteOpen(true);
                         }}
-                        className="flex items-center justify-center rounded-full p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
+                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                       >
                         <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
                       </button>
-
                     </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
                 </tr>
               ))
@@ -344,7 +341,7 @@ const ModernAccountManagersTable = () => {
             <PrevButton
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              text="Previous"
+              text="Prev"
               icon={<ArrowLeft className="h-4 w-4" />}
             />
 

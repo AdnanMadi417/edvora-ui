@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { getDocumentDownloadUrl } from "services/documentService";
 
 interface PresignedImageProps {
-  fileKey: string;
-  alt: string;
+  fileKey?: string;
+  alt?: string;
   className?: string;
   fallback: React.ReactNode;
 }

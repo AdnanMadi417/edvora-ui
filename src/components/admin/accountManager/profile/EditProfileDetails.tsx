@@ -140,7 +140,7 @@ export default function EditProfileDetails({
                   Edit Account Manager
                 </h1>
 
-                <span className="inline-flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700">
+                <span className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700">
                   <Pencil className="h-3 w-3" />
                   Editing
                 </span>

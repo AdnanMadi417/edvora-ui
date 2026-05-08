@@ -30,16 +30,12 @@ export default function Notifications() {
     try {
       await markRead(id);
       await Promise.all([refetchNotifications(), refetchCount()]);
+      window.dispatchEvent(new CustomEvent('notifications:refetch'));
     } catch (err) {
       console.error("Failed to mark notification as read", err);
     }
   };
 
-  const markAllAsRead = async () => {
-    const unread = notifications.filter((n) => n.read_at === null);
-    await Promise.allSettled(unread.map((n) => markRead(n.id)));
-    await Promise.all([refetchNotifications(), refetchCount()]);
-  };
 
   const displayed = [...(filter === "unread"
     ? notifications.filter((n) => n.read_at === null)
@@ -59,14 +55,6 @@ export default function Notifications() {
             </p>
           )}
         </div>
-        {unreadCount > 0 && (
-          <button
-            onClick={markAllAsRead}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-blue-600 transition hover:bg-blue-50"
-          >
-            Mark all as read
-          </button>
-        )}
       </div>
 
       {/* Filter tabs */}
@@ -86,7 +74,7 @@ export default function Notifications() {
               </span>
             )}
             {filter === tab && (
-              <span className="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-blue-600" />
+              <span className="absolute bottom-0 left-0 h-0.5 w-full rounded-md bg-blue-600" />
             )}
           </button>
         ))}
@@ -98,7 +86,7 @@ export default function Notifications() {
           <div className="flex flex-col">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-start gap-4 px-4 py-4">
-                <div className="h-11 w-11 animate-pulse rounded-full bg-slate-100" />
+                <div className="h-11 w-11 animate-pulse rounded-md bg-slate-100" />
                 <div className="flex-1 space-y-2 pt-1">
                   <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100" />
                   <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100" />
@@ -111,7 +99,7 @@ export default function Notifications() {
           <div className="px-6 py-12 text-center text-sm text-red-500">{error}</div>
         ) : displayed.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-slate-400">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
+            <div className="flex h-16 w-16 items-center justify-center rounded-md bg-slate-100">
               <Bell className="h-8 w-8 text-slate-300" />
             </div>
             <p className="text-sm font-medium">
@@ -129,9 +117,9 @@ export default function Notifications() {
               return (
                 <div
                   key={notification.id}
-                  onClick={() => {
+                  onClick={async () => {
+                    if (isUnread) await markAsRead(notification.id);
                     if (notification.application_id) router.push(`/partner/applications/${notification.application_id}`);
-                    if (isUnread) markAsRead(notification.id);
                   }}
                   className={`flex cursor-pointer items-start gap-4 px-4 py-3 transition-colors ${
                     index !== displayed.length - 1 ? "border-b border-slate-50" : ""
@@ -139,7 +127,7 @@ export default function Notifications() {
                 >
                   {/* Icon with type badge */}
                   <div className="relative flex-shrink-0">
-                    <div className={`flex h-11 w-11 items-center justify-center rounded-full ${config.bg}`}>
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-md ${config.bg}`}>
                       <Icon className={`h-5 w-5 ${config.iconColor}`} />
                     </div>
                     <span className={`absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-white ${config.badgeBg}`}>
@@ -171,7 +159,7 @@ export default function Notifications() {
                         href={`/partner/applications/${notification.application_id}`}
                         onClick={(e) => e.stopPropagation()}
                         title="View application"
-                        className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-blue-100 hover:text-blue-600"
+                        className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-500 transition hover:bg-blue-100 hover:text-blue-600"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Link>

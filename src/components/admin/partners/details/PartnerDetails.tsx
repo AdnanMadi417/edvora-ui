@@ -45,7 +45,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                 </div>
 
                 <span
-                  className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${
+                  className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-md border-2 border-white ${
                     partner.is_active
                       ? "bg-emerald-500"
                       : "bg-slate-300"
@@ -69,7 +69,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
             <div className="flex items-center gap-2 sm:gap-6">
               <button
                 onClick={handleBack}
-                className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
+                className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
                 <span className="hidden sm:inline">Back to partners</span>
@@ -86,59 +86,59 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 
               <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
                   <MdPublic className="h-4 w-4" />
                 </div>
 
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Country</p>
-                  <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
+                  <p className="mt-0.5 truncate text-sm font-medium capitalize text-slate-900">
                     {partner.country || "Not Provided"}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
                   <MdPhone className="h-4 w-4" />
                 </div>
 
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Phone Number</p>
-                  <p className="mt-0.5 text-sm font-medium text-slate-900">
+                  <p className="mt-0.5 truncate text-sm font-medium text-slate-900">
                     {partner.phone || "Not Provided"}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
                   <MdCategory className="h-4 w-4" />
                 </div>
 
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Partner Type</p>
-                  <p className="mt-0.5 text-sm font-medium capitalize text-slate-900">
+                  <p className="mt-0.5 truncate text-sm font-medium capitalize text-slate-900">
                     {partner.type}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
                   <MdSupervisorAccount className="h-4 w-4" />
                 </div>
 
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Assigned Manager</p>
-                  <p className="mt-0.5 text-sm font-medium text-slate-900">
+                  <p className="mt-0.5 truncate text-sm font-medium text-slate-900">
                     {partner.assigned_manager_name || "Not Assigned"}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
                   <MdVerified className="h-4 w-4" />
                 </div>
 
@@ -151,7 +151,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
               </div>
 
               <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
                   <MdToggleOn className="h-4 w-4" />
                 </div>
 

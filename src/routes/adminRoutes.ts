@@ -11,6 +11,8 @@ import {
   MdCategory,
   MdAddCircle,
   MdBuild,
+  MdTune,
+  MdLocalShipping,
 } from 'react-icons/md';
 import { BookOpen, CreditCard, Settings } from 'lucide-react';
 
@@ -56,7 +58,7 @@ const AdminRoutes: IRoute[] = [
     name: "University Configuration",
     layout: "/admin",
     path: "/config-universities",
-    icon: MdAdminPanelSettings,
+    icon: MdTune,
     children: [
       {
         name: "Payment methods",
@@ -88,7 +90,7 @@ const AdminRoutes: IRoute[] = [
         name: "logistical service",
         layout: "/admin/logistical-service",
         path: "",
-        icon: MdBuild,
+        icon: MdLocalShipping,
       },
       {
         name: "Service Types",
