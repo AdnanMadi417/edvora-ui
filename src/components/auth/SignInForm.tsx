@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import InputField from "../form/InputField";
 import PasswordField from "../form/PasswordField";
-import Checkbox from "../checkbox";
-import { Lock } from "lucide-react";
 
 interface SignInFormProps {
   onSubmit: (email: string, password: string, keepLoggedIn: boolean) => Promise<void> | void;
@@ -12,9 +11,10 @@ interface SignInFormProps {
 
 export default function SignInForm({ onSubmit }: SignInFormProps) {
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+
+  const isDisabled = loading || !formData.email || !formData.password;
 
   const updateFormData = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -42,7 +42,7 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
     if (!validate()) return;
     setLoading(true);
     try {
-      await onSubmit(formData.email, formData.password, keepLoggedIn);
+      await onSubmit(formData.email, formData.password, false);
     } finally {
       setLoading(false);
     }
@@ -54,10 +54,10 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
         className="flex w-full max-w-[400px] flex-col gap-4"
         onSubmit={handleSubmit}
       >
-        <div className="mb-6 text-center">
-          <h1 className="text-xl font-medium text-slate-900">Welcome back</h1>
-          <p className="mt-2 text-sm text-slate-600">
-            Sign in to your account
+        <div className="mb-4 text-center">
+          <h1 className="text-2xl font-bold text-slate-900">Sign In</h1>
+          <p className="mt-1.5 text-sm text-slate-500">
+            Welcome back! Sign in to get started
           </p>
         </div>
 
@@ -66,46 +66,46 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
             label="Email"
             field="email"
             type="email"
-            placeholder="mail@gmail.com"
+            placeholder="Enter your email"
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
           />
 
-          <PasswordField
-            label="Password"
-            field="password"
-            placeholder="Min. 8 characters"
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
-        </div>
-
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center">
-            <Checkbox
-              id="remember"
-              checked={keepLoggedIn}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setKeepLoggedIn(e.target.checked)}
+          <div>
+            <PasswordField
+              label="Password"
+              field="password"
+              placeholder="Enter your password"
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
             />
-            <label
-              htmlFor="remember"
-              className="ml-2 cursor-pointer text-p2 font-normal text-slate-600"
-            >
-              Keep me logged in
-            </label>
+            <div className="mt-1 text-right">
+              <Link
+                href="/auth/forgot-password"
+                className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
+              >
+                Forgot Password?
+              </Link>
+            </div>
           </div>
         </div>
 
         <button
           type="submit"
-          disabled={loading}
-          className="group relative flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-4 py-3 font-semibold text-sm text-white shadow-md transition-all duration-200 hover:bg-blue-700 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={isDisabled}
+          className="mt-2 flex w-full items-center justify-center rounded-full bg-blue-500 px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <Lock className="h-4 w-4 text-white transition-colors group-hover:text-blue-100" />
-          {loading ? "Signing in..." : "Sign In"}
+          {loading ? "Signing in..." : "Sign in"}
         </button>
+
+        <p className="text-center text-sm text-slate-500">
+          Not registered yet?{" "}
+          <Link href="/auth/sign-up" className="font-medium text-blue-600 hover:underline">
+            Sign Up
+          </Link>
+        </p>
       </form>
     </div>
   );
