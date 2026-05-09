@@ -234,7 +234,6 @@ export default function ApplicationDetails({
   
             </div>
   
-            
               <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
                   {program.name && (
                     <span className="flex items-center gap-1 flex md:hidden">
