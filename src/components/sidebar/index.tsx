@@ -8,7 +8,7 @@ import { IRoute } from "types/navigation";
 import Image from "next/image";
 
 import { useEffect, useState, useCallback } from "react";
-import api from "lib/useApi";
+import api, { SIGN_IN_URL, LOGOUT_URL } from "lib/useApi";
 
 interface User {
   id: string;
@@ -65,17 +65,14 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
+    try {
+      await fetch(LOGOUT_URL, { method: "POST" });
+    } catch {
+      // non-fatal
+    }
     localStorage.clear();
     sessionStorage.clear();
-
-    // POST to the Next.js logout route — it calls the backend, clears
-    // HttpOnly cookies server-side, then redirects to sign-in as a full
-    // HTML response (no RSC payload, no client-side redirect chain).
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = "/api/auth/logout";
-    document.body.appendChild(form);
-    form.submit();
+    window.location.replace(SIGN_IN_URL);
   };
 
   return (
