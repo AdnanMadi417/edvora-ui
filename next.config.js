@@ -34,6 +34,19 @@ const nextConfig = {
   },
   // Disable source maps in production to save memory
   productionBrowserSourceMaps: false,
+  async headers() {
+    return [
+      {
+        // All page routes — tell CDN never to cache HTML/RSC responses.
+        // Static assets under /_next/static are fingerprinted and safe to cache.
+        source: '/((?!_next/static|_next/image|favicon.ico).*)',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, must-revalidate' },
+          { key: 'Vary', value: 'RSC, Next-Router-State-Tree, Next-Router-Prefetch' },
+        ],
+      },
+    ];
+  },
   images: {
     domains: [
       'images.unsplash.com',

@@ -24,7 +24,7 @@ const SelectField = ({ label, field, options, required = true, formData, errors,
           getNestedValue(errors, field) ? "border-red-500" : "border-default"
         }`}
       >
-        <option value="">Select ...</option>
+        <option value="" disabled>Select ...</option>
         {options.map((opt, index) =>
           typeof opt === "object" && opt !== null ? (
             <option key={opt.value ?? index} value={opt.value ?? ""}>

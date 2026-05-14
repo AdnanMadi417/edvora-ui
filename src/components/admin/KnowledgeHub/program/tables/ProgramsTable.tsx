@@ -204,7 +204,7 @@ const ProgramsTable = () => {
     }
   };
 
-  const selectedCount = Object.values(selectedPrograms).filter(Boolean).length;
+  const selectedCount = filteredPrograms.filter((p) => selectedPrograms[p.id]).length;
 
   const handleSelectProgram = (id: string) => {
     setSelectedPrograms((prev) => ({
@@ -230,10 +230,10 @@ const ProgramsTable = () => {
   }, [searchTerm, selectedState, selectedField, selectedUniversity, selectedLevel]);
 
   const selectedProgramIds = useMemo(() => {
-    return Object.keys(selectedPrograms).filter(
-      (id) => selectedPrograms[id]
-    );
-  }, [selectedPrograms]);
+    return filteredPrograms
+      .filter((p) => selectedPrograms[p.id])
+      .map((p) => p.id);
+  }, [filteredPrograms, selectedPrograms]);
 
   const handleSelectAll = () => {
     const filteredIds = filteredPrograms.map((p) => p.id);

@@ -73,7 +73,7 @@ export default function CreateUniversity({
       showToast("University created successfully.", "success");
       onClose();
 
-      setTimeout(() => router.push("admin/knowledge-hub/programs/create"), 1500);
+      setTimeout(() => router.push("/admin/knowledge-hub/programs/create"), 1500);
 
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";

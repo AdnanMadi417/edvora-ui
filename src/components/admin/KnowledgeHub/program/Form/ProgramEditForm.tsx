@@ -156,6 +156,10 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   }, [commissionTypes]);
 
   const handleUpdate = async () => {
+    if (Number(formData.commission_amount) > 29999) {
+      showToast('Commission amount cannot exceed RM 29,999', 'error');
+      return;
+    }
     try {
       const payload: UpdateProgramPayload = {
         uni_id: String(formData.uni_id),
