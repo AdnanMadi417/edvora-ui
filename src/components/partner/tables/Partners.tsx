@@ -266,7 +266,7 @@ const ModernPartnersTable = () => {
                 <tr
                   key={app.id}
                   className="group cursor-pointer transition-colors hover:bg-primary"
-                  onClick={() => router.push(`/account-manager/partners/${app.id}`)}
+                  onClick={() => router.push(`/partner/applications/${app.id}`)}
                 >
 
                   <td className="min-w-[250px] px-6 py-4 flex items-center gap-2 text-slate-900">
