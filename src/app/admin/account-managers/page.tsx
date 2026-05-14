@@ -1,10 +1,7 @@
-'use client';
-import AccountManagersDataTable from 'components/admin/accountManager/table/AccountManagersDataTable';
+"use client";
 
-const AccountManagersDataTableOverview = () => {
-  return (
-    <AccountManagersDataTable />
-  );
-};
+import { AccountManagersTable } from "features/account-managers";
 
-export default AccountManagersDataTableOverview;
+export default function AccountManagersPage() {
+  return <AccountManagersTable />;
+}

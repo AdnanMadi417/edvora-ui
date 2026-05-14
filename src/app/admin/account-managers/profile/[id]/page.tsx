@@ -1,15 +1,13 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useAccountManagerDetails } from "hooks/account-managers/useAccountManagerDetails";
-import ProfileDetails from "components/admin/accountManager/profile/ProfileDetails";
+import { useAccountManagerDetails, AccountManagerProfile } from "features/account-managers";
 
-export default function AccountManagerProfile() {
+export default function AccountManagerProfilePage() {
   const params = useParams();
   const id = params.id as string;
 
-  const { manager, loading, error } =
-    useAccountManagerDetails(id);
+  const { manager, loading, error } = useAccountManagerDetails(id);
 
   if (loading) return <div className="p-6">Loading...</div>;
   if (error) return <div className="p-6 text-red-500">{error}</div>;
@@ -17,7 +15,7 @@ export default function AccountManagerProfile() {
 
   return (
     <div className="pt-6">
-      <ProfileDetails manager={manager} />
+      <AccountManagerProfile manager={manager} />
     </div>
   );
 }
