@@ -183,7 +183,7 @@ export default function RegisterLogisticsProvider() {
       setErrors({})
 
       setTimeout(() => {
-        router.push("/admin/logistical-service")
+        router.push("/account-manager/logistical-service")
       }, 1500)
 
     } catch (error) {

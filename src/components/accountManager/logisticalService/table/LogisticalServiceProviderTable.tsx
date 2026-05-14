@@ -131,7 +131,7 @@ const LogisticalServiceProviderTable = () => {
 
             <Link
               className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href="/admin/logistical-service/create"
+              href="/account-manager/logistical-service/create"
             >
               <MdAddBusiness className="h-4 w-4" />
               Create Service

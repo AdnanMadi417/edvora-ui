@@ -11,7 +11,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import ViewPopup from "components/applications/popups/ViewDoc";
-import HoldPopup from "../../popups/admin/ResubmitDoc";
+import HoldPopup from "../../popups/accountmanager/ResubmitDoc";
 import EmptyData from "components/emptyData/EmptyData";
 import { getDocumentDownloadUrl } from "services/documentService";
 import api from "lib/useApi"
