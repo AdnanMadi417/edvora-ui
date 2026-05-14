@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EditPartnerDetails from "components/admin/partners/form/EditPartnerDetails";
+import { EditPartnerDetails } from "features/partners-manaagement";
 
 export default function PartnerPage() {
   const params = useParams();

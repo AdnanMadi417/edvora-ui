@@ -1,24 +1,18 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Trash2, XCircle } from 'lucide-react';
+import { Trash2, XCircle } from "lucide-react";
 import ModalHeader from "components/ui/modal/ModalHeader";
-import DeleteBtn from 'components/ui/buttons/Button';
-import Button from 'components/ui/buttons/Button';
+import Button from "components/ui/buttons/Button";
 
-interface DeletePartnerConfirmationProps {
+interface Props {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
   isDeleting: boolean;
 }
 
-export default function DeleteUniversityConfirmation({
-  isOpen,
-  onClose,
-  onConfirm,
-  isDeleting,
-}: DeletePartnerConfirmationProps) {
+export default function DeletePartner({ isOpen, onClose, onConfirm, isDeleting }: Props) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -41,9 +35,7 @@ export default function DeleteUniversityConfirmation({
     >
       <div
         className={`w-full max-w-lg transform transition-all duration-300 md:max-w-xl ${
-          isOpen
-            ? "translate-y-0 scale-100 opacity-100"
-            : "translate-y-4 scale-95 opacity-0"
+          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-95 opacity-0"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -61,9 +53,7 @@ export default function DeleteUniversityConfirmation({
 
           <div className="space-y-4 px-7 py-6">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900">
-                Confirm Deletion
-              </h3>
+              <h3 className="text-lg font-semibold text-slate-900">Confirm Deletion</h3>
               <p className="text-sm text-slate-500">
                 Are you sure you want to remove this partner from the system?
               </p>
@@ -71,11 +61,10 @@ export default function DeleteUniversityConfirmation({
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-
             <Button
               onClick={onClose}
               disabled={isDeleting}
-              icon={<XCircle  className="h-5 w-5" />}
+              icon={<XCircle className="h-5 w-5" />}
               text={isDeleting ? "Cancelling..." : "Cancel"}
               bgColor="bg-slate-50"
               textColor="text-slate-700"
@@ -84,11 +73,9 @@ export default function DeleteUniversityConfirmation({
               hoverBorderColor="hover:border-slate-700"
             />
 
-            <DeleteBtn
+            <Button
               icon={<Trash2 className="h-5 w-5" />}
-              text={
-                isDeleting ? "Deleting..." : "Delete Partner"
-              }
+              text={isDeleting ? "Deleting..." : "Delete Partner"}
               bgColor="bg-red-50"
               textColor="text-red-700"
               borderColor="border-red-600"
@@ -97,7 +84,6 @@ export default function DeleteUniversityConfirmation({
               onClick={onConfirm}
               disabled={isDeleting}
             />
-
           </div>
         </div>
       </div>

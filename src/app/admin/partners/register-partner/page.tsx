@@ -1,5 +1,5 @@
 "use client";
-import RegisterPartner from "components/admin/partners/form/RegisterPartner";
+import { RegisterPartner } from "features/partners-manaagement";
 
 const CreatePartner = () => {
   return <RegisterPartner />;

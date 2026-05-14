@@ -1,6 +1,6 @@
 "use client";
 
-import PartnersTable from "components/admin/partners/tables/PartnersTable";
+import { PartnersTable } from "features/partners-manaagement";
 
 const partnersTableOverview = () => {
   return (
