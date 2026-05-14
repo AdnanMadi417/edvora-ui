@@ -10,7 +10,7 @@ import {
   MdToggleOn,
   MdVerified,
 } from "react-icons/md";
-import { usePartnerProfile } from "features/partners-manaagement";
+import { usePartnerProfile } from "features/partners";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import { ChevronLeft, Clock, MoreVertical } from "lucide-react";

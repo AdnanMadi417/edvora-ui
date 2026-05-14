@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { EditPartnerDetails } from "features/partners-manaagement";
+import { EditPartnerDetails } from "features/partners";
 
 export default function PartnerPage() {
   const params = useParams();

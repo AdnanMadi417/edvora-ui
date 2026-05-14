@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Save } from "lucide-react";
 
-import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners-manaagement";
-import type { PartnerDetails } from "features/partners-manaagement";
+import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners";
+import type { PartnerDetails } from "features/partners";
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
