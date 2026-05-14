@@ -185,6 +185,21 @@ const ModernApplicationsTable = () => {
   const totalPages = Math.ceil(total / itemsPerPage);
   const paginatedApplications = filteredAndSortedApplications;
 
+  const actionRequiredStatuses = useMemo(() => new Set([
+    'new_application',
+    'payment_submitted',
+    'eval_under_review',
+    'e-visa_under_review',
+    'visa_documents_under_review',
+    'arrival_confirmed',
+    'extra_arrival_documents_under_review',
+    'issue_response_received',
+    'commission_disputed',
+  ]), []);
+
+  const needsAction = (status: string) =>
+    actionRequiredStatuses.has(status?.toLowerCase().replace(/\s+/g, '_'));
+
   const StatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<string, any> = {
       new_application: {
@@ -373,19 +388,28 @@ const ModernApplicationsTable = () => {
           paginatedApplications.map((app) => (
             <div
               key={app.id}
-              className="flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50"
+              className={`flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50 ${
+                needsAction(app.status) ? 'border-l-2 border-l-amber-400 bg-amber-50/30' : ''
+              }`}
               onClick={() => router.push(`/admin/applications/${app.id}`)}
             >
-              <PresignedImage
-                fileKey={app.student_photo_file_key}
-                alt={app.student_name}
-                className="h-11 w-11 shrink-0 rounded-full object-cover"
-                fallback={
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                    {app.student_name?.[0]?.toUpperCase() ?? "?"}
-                  </div>
-                }
-              />
+              <div className="relative shrink-0">
+                <PresignedImage
+                  fileKey={app.student_photo_file_key}
+                  alt={app.student_name}
+                  className="h-11 w-11 rounded-full object-cover"
+                  fallback={
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                      {app.student_name?.[0]?.toUpperCase() ?? "?"}
+                    </div>
+                  }
+                />
+                {needsAction(app.status) && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-md bg-amber-400 ring-2 ring-white">
+                    <span className="h-1.5 w-1.5 rounded-md bg-white" />
+                  </span>
+                )}
+              </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate text-sm font-semibold text-slate-900">{app.student_name}</span>
@@ -473,21 +497,33 @@ const ModernApplicationsTable = () => {
               paginatedApplications.map((app) => (
                 <tr
                   key={app.id}
-                  className="group cursor-pointer transition-colors hover:bg-slate-50"
+                  className={`group cursor-pointer transition-colors hover:bg-slate-50 ${
+                    needsAction(app.status) ? 'border-l-2 border-l-amber-400 bg-amber-50/30' : ''
+                  }`}
                   onClick={() => router.push(`/admin/applications/${app.id}`)}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <PresignedImage
-                        fileKey={app.student_photo_file_key}
-                        alt={app.student_name}
-                        className="h-10 w-10 shrink-0 rounded-full object-cover"
-                        fallback={
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                            {app.student_name?.[0]?.toUpperCase() ?? "?"}
-                          </div>
-                        }
-                      />
+                      <div className="relative shrink-0">
+                        <PresignedImage
+                          fileKey={app.student_photo_file_key}
+                          alt={app.student_name}
+                          className="h-10 w-10 rounded-full object-cover"
+                          fallback={
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                              {app.student_name?.[0]?.toUpperCase() ?? "?"}
+                            </div>
+                          }
+                        />
+                        {needsAction(app.status) && (
+                          <span
+                            className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-md bg-amber-400 ring-2 ring-white"
+                            title="Needs review"
+                          >
+                            <span className="h-1.5 w-1.5 rounded-md bg-white" />
+                          </span>
+                        )}
+                      </div>
                       <div className="min-w-0">
                         <div className="truncate font-medium text-slate-900">{app.student_name}</div>
                         <div className="truncate text-xs text-slate-500">{app.passport_number ?? "—"}</div>

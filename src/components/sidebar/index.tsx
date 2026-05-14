@@ -8,7 +8,7 @@ import { IRoute } from "types/navigation";
 import Image from "next/image";
 
 import { useEffect, useState, useCallback } from "react";
-import api, { setLoggingOut, SIGN_IN_URL } from "lib/useApi";
+import api, { SIGN_IN_URL, LOGOUT_URL } from "lib/useApi";
 
 interface User {
   id: string;
@@ -63,41 +63,15 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
     setOpen(false);
   }, [setOpen]);
 
-  const deleteAllCookies = () => {
-    const cookies = document.cookie.split(";");
-
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i];
-      const eqPos = cookie.indexOf("=");
-      const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
-
-      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-
-      const domain = window.location.hostname;
-      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${domain}`;
-
-      const parts = domain.split(".");
-      if (parts.length > 2) {
-        const parentDomain = parts.slice(-2).join(".");
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${parentDomain}`;
-      }
-    }
-  };
-
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    setLoggingOut(true);
-
     try {
-      await api.post("/auth/logout").catch(() => {});
-    } catch (err) {
-      console.error("Logout API error:", err);
+      await fetch(LOGOUT_URL, { method: "POST" });
+    } catch {
+      // non-fatal
     }
-
     localStorage.clear();
     sessionStorage.clear();
-    deleteAllCookies();
-
     window.location.replace(SIGN_IN_URL);
   };
 
