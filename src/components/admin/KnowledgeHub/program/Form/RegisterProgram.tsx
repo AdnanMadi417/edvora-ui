@@ -184,10 +184,15 @@ export default function RegisterProgram() {
         (f) => f.description.trim() !== '' && f.fee > 0,
       );
 
+    const commissionValid =
+      formData.commission_amount === 0 ||
+      Number(formData.commission_amount) <= 29999;
+
     return (
       basicValid &&
       yearlyFeesValid &&
-      oneTimeFeesValid
+      oneTimeFeesValid &&
+      commissionValid
     );
   }, [formData]);
 
@@ -509,7 +514,15 @@ export default function RegisterProgram() {
                 formData={formData}
                 errors={errors}
                 required={false}
-                updateFormData={updateFormData}
+                updateFormData={(field, value) => {
+                  updateFormData(field, value);
+                  const num = Number(value);
+                  if (value !== '' && value !== 0 && num > 29999) {
+                    setErrors((prev) => ({ ...prev, commission_amount: 'Commission amount cannot exceed RM 29,999' }));
+                  } else {
+                    setErrors((prev) => ({ ...prev, commission_amount: '' }));
+                  }
+                }}
               />
 
               <SelectField

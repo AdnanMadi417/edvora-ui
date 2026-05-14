@@ -49,6 +49,7 @@ export default function CreateBranch({
 
   const isFormValid =
     formData.commission_amount !== "" &&
+    Number(formData.commission_amount) <= 29999 &&
     formData.commission_type_id !== "" &&
     formData.expected_commission_from != "" &&
     formData.expected_commission_to != "" &&
@@ -84,11 +85,15 @@ export default function CreateBranch({
       [field]: value,
     }));
 
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
+    if (field === 'commission_amount') {
+      const num = Number(value);
+      if (value !== '' && num > 29999) {
+        setErrors((prev) => ({ ...prev, commission_amount: 'Commission amount cannot exceed RM 29,999' }));
+      } else {
+        setErrors((prev) => ({ ...prev, commission_amount: '' }));
+      }
+    } else if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
 
