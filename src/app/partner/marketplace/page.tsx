@@ -1,11 +1,11 @@
 'use client';
 
-import MarketplaceCard from "../../../components/marketplace/partner/MarketplaceCard";
+import LogisticalServiceMarketplace from "features/logistical-service/components/partner/LogisticalServiceMarketplace";
 
 const Dashboard = () => {
   return (
     <div>
-      <MarketplaceCard/>
+      <LogisticalServiceMarketplace/>
     </div>
   );
 };
