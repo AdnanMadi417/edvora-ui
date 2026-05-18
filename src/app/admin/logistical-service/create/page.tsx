@@ -1,6 +1,6 @@
 "use client";
 
-import RegisterLogisticsProviderForm from "components/admin/logisticalService/form/RegisterLogisticsProvider"
+import RegisterLogisticsProviderForm from "features/logistical-service/components/admin/form/RegisterLogisticsProvider"
 
 const RegisterLogisticsProvider = () => {
   return (
