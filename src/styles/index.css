@@ -110,6 +110,15 @@
   --transition-slow: all 0.5s ease-in-out;
 }
 
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
 @layer base {
   html {
     font-family: 'DM Sans', sans-serif !important;

@@ -4,20 +4,14 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Save } from "lucide-react";
 
-import {
-  usePartnerProfile,
-  PartnerDetails,
-} from "hooks/partners/usePartnerProfile";
-import { useUpdatePartnerProfile } from "hooks/partners/useUpdatePartnerProfile";
+import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners";
+import type { PartnerDetails } from "features/partners";
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 
 import InputField from "components/form/InputField";
-import SelectField from "components/form/SelectField";
-import SearchableDropdown from "components/form/search/SearchableDropdown";
 
-import { COUNTRIES, PARTNER_TYPE } from "constants/lists";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 

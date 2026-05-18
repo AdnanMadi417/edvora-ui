@@ -65,7 +65,7 @@ export default function CreateCommissionType({
 
       showToast("Commission type created successfully.", "success");
 
-      router.push("admin/knowledge-hub/programs/create");
+      router.push("/admin/knowledge-hub/programs/create");
 
       onClose();
 

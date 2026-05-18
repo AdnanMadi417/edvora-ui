@@ -50,7 +50,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
 
   const handleBack = () => {
     setIsDropdownOpen(false);
-    router.push("/account-manager/partners");
+    router.push("/partner/applications");
   };
 
   const handleHold = () => {
@@ -79,7 +79,7 @@ export default function PartnerPage({ params }: PartnerPageProps) {
           <div className="flex flex-wrap items-center justify-between gap-3 py-3 sm:h-16 sm:gap-6">
             <div className="flex items-center gap-3 sm:gap-6">
               <Link
-                href="/account-manager/partners"
+                href="/partner/applications"
                 className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />

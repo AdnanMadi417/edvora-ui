@@ -389,7 +389,7 @@ const ModernApplicationsTable = () => {
             <div
               key={app.id}
               className={`flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-50 ${
-                needsAction(app.status) ? 'border-l-2 border-l-amber-400 bg-amber-50/30' : ''
+                needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
               }`}
               onClick={() => router.push(`/admin/applications/${app.id}`)}
             >
@@ -405,7 +405,7 @@ const ModernApplicationsTable = () => {
                   }
                 />
                 {needsAction(app.status) && (
-                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-md bg-amber-400 ring-2 ring-white">
+                  <span className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-md bg-blue-400 ring-2 ring-white">
                     <span className="h-1.5 w-1.5 rounded-md bg-white" />
                   </span>
                 )}
@@ -498,7 +498,7 @@ const ModernApplicationsTable = () => {
                 <tr
                   key={app.id}
                   className={`group cursor-pointer transition-colors hover:bg-slate-50 ${
-                    needsAction(app.status) ? 'border-l-2 border-l-amber-400 bg-amber-50/30' : ''
+                    needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
                   }`}
                   onClick={() => router.push(`/admin/applications/${app.id}`)}
                 >
@@ -517,7 +517,7 @@ const ModernApplicationsTable = () => {
                         />
                         {needsAction(app.status) && (
                           <span
-                            className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-md bg-amber-400 ring-2 ring-white"
+                            className="absolute -right-0.5 -top-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-md bg-blue-400 ring-2 ring-white"
                             title="Needs review"
                           >
                             <span className="h-1.5 w-1.5 rounded-md bg-white" />

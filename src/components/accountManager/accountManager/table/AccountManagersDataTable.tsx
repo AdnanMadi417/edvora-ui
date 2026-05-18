@@ -20,8 +20,6 @@ import ClearButton from 'components/ui/buttons/DangerButton';
 import { useAccountManagerList } from 'hooks/account-managers/useAccountManagerList';
 import ViewDetailsModal from '../../accountManager/popups/ViewDetailsModal';
 import EditDetailsModal from '../../accountManager/popups/EditDetailsModal';
-import Link from 'next/link';
-import { MdPersonAdd } from 'react-icons/md';
 
 const ModernAccountManagersTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -110,14 +108,6 @@ const ModernAccountManagersTable = () => {
               text="Clear"
               icon={<RefreshCw className="h-4 w-4" />}
             />
-
-            <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href="/admin/account-managers/create"
-            >
-              <MdPersonAdd className="h-4 w-4" />
-              Create Account Manager
-            </Link>
 
           </div>
         </div>
