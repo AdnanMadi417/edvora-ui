@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useEffect, useState } from 'react';
 import {
@@ -18,9 +18,8 @@ import {
 } from 'lucide-react';
 import { CheckCircle, XCircle } from 'lucide-react';
 
-import { useUniversityTypes } from 'hooks/knowledge-hub/config-universities/useUniversityTypesQuery';
-import { useDeleteUniversityType } from 'hooks/knowledge-hub/config-universities/useDeleteUniversityType';
-import DeleteUniversityConfirmation from 'components/admin/KnowledgeHub/university/popups/DeleteUniversityConfirmation';
+import { useUniversityTypes, useDeleteUniversityType } from "features/universities/hooks";
+import DeleteUniversityConfirmation from 'features/universities/components/admin/popups/DeleteUniversityConfirmation';
 
 
 import NextButton from 'components/ui/buttons/NextButton';
@@ -484,3 +483,4 @@ const UniversityManagementTable = () => {
 };
 
 export default UniversityManagementTable;
+

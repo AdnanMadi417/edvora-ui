@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { BookOpen, CalendarPlus, ChevronLeft, Plus, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -8,9 +8,8 @@ import { useRouter } from 'next/navigation';
 import { IELTS_BANDS, MONTHS } from 'constants/lists';
 
 import { useCreateProgram } from 'hooks/knowledge-hub/programs/useCreateProgram';
-import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
+import { useUniversities, useBranches } from "features/universities/hooks";
 import { useAllFields } from 'hooks/knowledge-hub/field-of-study/useFieldsList';
-import { useAllBranches } from 'hooks/knowledge-hub/universities/useBranchesList';
 import { useCommissionTypes } from 'hooks/knowledge-hub/commission/useCommissionTypes';
 import { useAllQualifications } from 'hooks/knowledge-hub/qualifications/useQualificationsList';
 
@@ -117,8 +116,8 @@ export default function RegisterProgram() {
 
   const { fields } = useAllFields();
   const { qualifications } = useAllQualifications();
-  const { branches } = useAllBranches(formData.uni_id);
-  const { universities } = useAllUniversities();
+  const { branches } = useBranches(formData.uni_id);
+  const { universities } = useUniversities();
 
   const removeScholarship = (index: number) => {
     setFormData((prev) => ({
@@ -823,3 +822,4 @@ export default function RegisterProgram() {
     </section>
   );
 }
+
