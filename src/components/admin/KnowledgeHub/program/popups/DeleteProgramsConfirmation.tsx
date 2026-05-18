@@ -93,7 +93,7 @@ export default function DeleteProgramsConfirmation({
             <DeleteBtn
               icon={<XCircle className="h-5 w-5" />}
               text={
-                isDeleting ? "Cancelling..." : "Cancel Program"
+                isDeleting ? "Cancelling..." : "Cancel Deletion"
               }
               bgColor="bg-slate-50"
               textColor="text-slate-700"
