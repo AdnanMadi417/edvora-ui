@@ -11,8 +11,12 @@ export function useCreateUniversity() {
     setLoading(true);
     setError("");
     setSuccess(false);
+    const payload = {
+      ...data,
+      intake_months: (data.intake_months ?? []).filter((m) => m.trim() !== ""),
+    };
     try {
-      const res = await universityApi.universities.create(data);
+      const res = await universityApi.universities.create(payload);
       setSuccess(true);
       return res.data;
     } catch (err: any) {

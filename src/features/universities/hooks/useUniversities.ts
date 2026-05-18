@@ -7,21 +7,20 @@ export function useUniversities() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await universityApi.universities.list();
-        setUniversities(res.data);
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch universities");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetch();
-  }, []);
+  const fetch = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await universityApi.universities.list();
+      setUniversities(res.data);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch universities");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return { universities, loading, error };
+  useEffect(() => { fetch(); }, []);
+
+  return { universities, loading, error, refetch: fetch };
 }

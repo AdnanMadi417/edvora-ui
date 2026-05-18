@@ -17,6 +17,7 @@ interface BatchUniversitiesProps {
   isOpen: boolean;
   onClose: () => void;
   selectedUniversityIds: string[];
+  onSuccess?: () => void;
 }
 
 interface FormData {
@@ -31,6 +32,7 @@ export default function BatchUniversities({
   isOpen,
   onClose,
   selectedUniversityIds,
+  onSuccess,
 }: BatchUniversitiesProps) {
   const { paymentMethods } = useAllPaymentMethods();
   const { batchAssignPaymentMethod, loading } = useBatchAssignPaymentMethod();
@@ -78,8 +80,8 @@ export default function BatchUniversities({
       });
 
       showToast("Payment method assigned successfully.", "success");
-      setTimeout(() => location.reload(), 1500);
       onClose();
+      onSuccess?.();
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
       showToast(`Failed to assign payment method. ${backendMessage}`, "error");

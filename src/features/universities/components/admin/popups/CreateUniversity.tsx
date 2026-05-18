@@ -14,11 +14,13 @@ import { useToast } from "components/context/ToastContext";
 interface CreateUniversityProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export default function CreateUniversity({
   isOpen,
   onClose,
+  onSuccess,
 }: CreateUniversityProps) {
   const { createUniversity, loading } = useCreateUniversity();
   const { showToast } = useToast();
@@ -38,7 +40,7 @@ export default function CreateUniversity({
   const isFormValid =
     formData.name.trim() &&
     formData.description.trim() &&
-    formData.intake_months.length > 0;
+    formData.intake_months.some((m) => m.trim() !== "");
 
   useEffect(() => {
     if (isOpen) {
@@ -70,7 +72,7 @@ export default function CreateUniversity({
       showToast("University created successfully.", "success");
 
       onClose();
-      setTimeout(() => location.reload(), 1500);
+      onSuccess?.();
     } catch (err: any) {
       const apiErrors = err?.response?.data?.detail;
       const code = err?.response?.data?.code;
