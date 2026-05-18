@@ -1,0 +1,1 @@
+export { logisticServiceApi } from "./logisticServiceApi";

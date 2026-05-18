@@ -1,6 +1,6 @@
 "use client";
 
-import LogisticalServiceTable from "../../../components/admin/logisticalService/table/LogisticalServiceTable";
+import LogisticalServiceTable from "features/logistical-service/components/admin/table/LogisticalServiceTable";
 
 const LogisticalServiceProviders = () => {
   return (

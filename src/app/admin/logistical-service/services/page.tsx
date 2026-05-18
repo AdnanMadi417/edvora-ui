@@ -1,6 +1,6 @@
 "use client";
 
-import LogisticServicesConfig from "components/admin/logisticalService/config/LogisticServicesConfig";
+import LogisticServicesConfig from "features/logistical-service/components/admin/config/LogisticServicesConfig";
 
 const LogisticServicesPage = () => {
   return (
