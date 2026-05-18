@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { GraduationCap, PlusCircle, XCircle } from 'lucide-react';
@@ -10,7 +10,7 @@ import MultipleDatePickerModal from "../../../../form/MultipleDatePickerModal";
 
 import InputField from "../../../../form/InputField";
 
-import { useCreateUniversity } from "../../../../../hooks/knowledge-hub/universities/useCreateUniversity";
+import { useCreateUniversity } from "features/universities/hooks";
 import { useToast } from "components/context/ToastContext";
 import { router } from 'next/client';
 
@@ -171,3 +171,4 @@ export default function CreateUniversity({
     </div>
   );
 }
+

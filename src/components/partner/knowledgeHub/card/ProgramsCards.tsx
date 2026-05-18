@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import {
@@ -22,7 +22,7 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { useAllPrograms } from "hooks/knowledge-hub/programs/useProgramsList";
 import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
 import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
-import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
+import { useUniversities } from "features/universities/hooks";
 
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import NextButton from "components/ui/buttons/NextButton";
@@ -39,7 +39,7 @@ const ProgramsCards = () => {
   } = useAllPrograms({});
   const { states, stateLoading, stateError } = useAllStates();
   const { fields, fieldsLoading, fieldsError } = useAllFields();
-  const { universities } = useAllUniversities();
+  const { universities } = useUniversities();
 
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
@@ -405,3 +405,4 @@ const ProgramsCards = () => {
 };
 
 export default ProgramsCards;
+

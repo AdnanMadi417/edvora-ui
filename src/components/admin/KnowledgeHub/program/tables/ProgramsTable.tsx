@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState, useMemo } from "react";
 import {
@@ -33,7 +33,7 @@ import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
 import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
 import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
 import { useDeletePrograms } from "hooks/knowledge-hub/programs/useDeletePrograms";
-import { useAllUniversities } from 'hooks/knowledge-hub/universities/useUniversitiesList';
+import { useUniversities } from "features/universities/hooks";
 
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import NextButton from "components/ui/buttons/NextButton";
@@ -64,7 +64,7 @@ const ProgramsTable = () => {
 
   const { states } = useAllStates();
   const { fields} = useAllFields();
-  const { universities } = useAllUniversities();
+  const { universities } = useUniversities();
   const { qualifications } = useAllQualifications();
 
   const [selectedState, setSelectedState] = useState<string>("all");
@@ -841,3 +841,4 @@ const ProgramsTable = () => {
 };
 
 export default ProgramsTable;
+

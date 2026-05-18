@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -26,8 +26,7 @@ import {
   UpdateProgramPayload,
 } from "hooks/knowledge-hub/programs/useUpdateProgram";
 import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
-import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
-import { useAllBranches } from "hooks/knowledge-hub/universities/useBranchesList";
+import { useUniversities, useBranches } from "features/universities/hooks";
 import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
 import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
 
@@ -66,8 +65,8 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   const [formData, setFormData] = useState<any>({});
 
   const { fields } = useAllFields();
-  const { universities } = useAllUniversities();
-  const { branches } = useAllBranches(formData.uni_id);
+  const { universities } = useUniversities();
+  const { branches } = useBranches(formData.uni_id);
 
   const removeScholarship = (index: number) => {
     setFormData((prev) => ({
@@ -797,3 +796,4 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 };
 
 export default EditKnowledgeHubProgramDetails;
+

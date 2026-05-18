@@ -1,0 +1,9 @@
+export { default as UniversitiesTable } from "./admin/table/UniversitiesTable";
+export { default as UniversityDetails } from "./admin/details/UniversityDetails";
+export { default as DeleteUniversityConfirmation } from "./admin/popups/DeleteUniversityConfirmation";
+export { default as AssignPaymentUniversity } from "./admin/popups/AssignPaymentMethods";
+export { default as AssignUniversityTypeModal } from "./admin/popups/UpdateUniversityType";
+export { default as CreateUniversity } from "./admin/popups/CreateUniversity";
+export { default as RegisterUniversity } from "./admin/form/RegisterUniversity";
+export { default as EditUniversityDetails } from "./admin/form/EditUniversityDetails";
+export { default as BatchAssignPaymentMethod } from "./admin/payment-methods/BatchAssignPaymentMethod";

@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 
 import { ArrowLeft, Layers, } from 'lucide-react';
 
-import { useApplicationSubmissionFields } from "hooks/knowledge-hub/config-universities/useApplicationSubmissionFields";
-import { useCreateUniversityType } from "hooks/knowledge-hub/config-universities/useCreateUniversityType";
+import { useApplicationSubmissionFields, useCreateUniversityType } from "features/universities/hooks";
 
 import { useToast } from "components/context/ToastContext";
 import InputField from "components/form/InputField";
@@ -184,3 +183,4 @@ export default function UniversityTypeForm() {
     </section>
   );
 }
+

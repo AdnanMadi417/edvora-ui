@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { GraduationCap, Building2, XCircle } from 'lucide-react';
@@ -8,7 +8,7 @@ import Button from "components/ui/buttons/Button";
 
 import InputField from "components/form/InputField";
 
-import { useCreateUniversityType } from "hooks/knowledge-hub/config-universities/useCreateUniversityType";
+import { useCreateUniversityType } from "features/universities/hooks";
 import { useToast } from "components/context/ToastContext";
 
 interface CreateUniversityProps {
@@ -167,3 +167,4 @@ export default function CreateUniversityType({
     </div>
   );
 }
+
