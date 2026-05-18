@@ -71,8 +71,8 @@ const UniversityEdit = ({ id }: Props) => {
   const { showToast } = useToast();
   const router = useRouter();
 
-  const { university, branches, universityLoading } = useUniversityDetails(id);
-  const { universityPaymentMethods } = useUniversityPaymentMethods(id);
+  const { university, branches, universityLoading, refetch: refetchUniversity } = useUniversityDetails(id);
+  const { universityPaymentMethods, refetch: refetchPayments } = useUniversityPaymentMethods(id);
   const { paymentMethods } = useAllPaymentMethods();
   const { assignUniversityType } = useAssignUniversityType(id);
   const { universities: universityTypes } = useUniversityTypes();
@@ -240,9 +240,7 @@ const UniversityEdit = ({ id }: Props) => {
         branches: prev.branches.filter((_: any, i: number) => i !== index),
       }));
 
-      setTimeout(() => {
-        router.refresh()
-      })
+      refetchUniversity();
 
     } catch (error: any) {
       const backendMessage =
@@ -325,9 +323,7 @@ const UniversityEdit = ({ id }: Props) => {
 
       showToast("Payment method deleted successfully", "success");
 
-      setTimeout(() => {
-        router.refresh()
-      })
+      refetchPayments();
 
     } catch (error: any) {
       const backendMessage =
@@ -352,9 +348,7 @@ const UniversityEdit = ({ id }: Props) => {
 
       showToast("Payment method assigned successfully.", "success");
 
-      setTimeout(() => {
-        router.refresh()
-      })
+      refetchPayments();
 
     } catch (err: any) {
       const apiErrors = err?.response?.data?.detail;
@@ -411,9 +405,8 @@ const UniversityEdit = ({ id }: Props) => {
 
       showToast("University updated successfully.", "success");
 
-      setTimeout(() => {
-        router.refresh()
-      })
+      refetchUniversity();
+      refetchPayments();
 
     } catch (error: any) {
       const backendMessage =
@@ -423,7 +416,7 @@ const UniversityEdit = ({ id }: Props) => {
   };
 
   const handleBack = () => {
-    router.refresh();
+    router.push("/admin/universities");
   };
 
   if (universityLoading) {

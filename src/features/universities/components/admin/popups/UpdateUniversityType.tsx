@@ -17,6 +17,7 @@ interface Props {
   initialData?: {
     university_type_id?: string | null;
   } | null;
+  onSuccess?: () => void;
 }
 
 export default function AssignUniversityTypeModal({
@@ -24,6 +25,7 @@ export default function AssignUniversityTypeModal({
   onClose,
   universityId,
   initialData,
+  onSuccess,
 }: Props) {
   const { assignUniversityType, loading } =
     useAssignUniversityType(universityId);
@@ -105,9 +107,8 @@ export default function AssignUniversityTypeModal({
 
       showToast("University type assigned successfully", "success");
 
-      location.reload();
-
       onClose();
+      onSuccess?.();
     } catch (error: any) {
       const backendMessage =
         error?.response?.data?.message || "Please try again.";

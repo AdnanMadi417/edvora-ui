@@ -8,23 +8,22 @@ export function useUniversityDetails(universityId: string) {
   const [universityLoading, setLoading] = useState(false);
   const [universityError, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetch = async () => {
     if (!universityId) return;
-    const fetch = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await universityApi.universities.get(universityId);
-        setUniversity(res.data.university);
-        setBranches(res.data.branches);
-      } catch (err: any) {
-        setError(err?.response?.data?.detail || "Failed to fetch university");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetch();
-  }, [universityId]);
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await universityApi.universities.get(universityId);
+      setUniversity(res.data.university);
+      setBranches(res.data.branches);
+    } catch (err: any) {
+      setError(err?.response?.data?.detail || "Failed to fetch university");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return { university, branches, universityLoading, universityError };
+  useEffect(() => { fetch(); }, [universityId]);
+
+  return { university, branches, universityLoading, universityError, refetch: fetch };
 }

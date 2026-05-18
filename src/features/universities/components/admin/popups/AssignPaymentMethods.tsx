@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard } from "lucide-react";
 
-import { useRouter } from "next/navigation";
-
 import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
 import { useUniversityPaymentMethods, useAssignUniversityPaymentMethod } from "features/universities/hooks";
 
@@ -21,12 +19,14 @@ interface AssignPaymentUniversityProps {
   isOpen: boolean;
   onClose: () => void;
   universityId: string;
+  onSuccess?: () => void;
 }
 
 export default function AssignPaymentUniversity({
   isOpen,
   onClose,
   universityId,
+  onSuccess,
 }: AssignPaymentUniversityProps) {
 
   const { paymentMethods, loading } = useAllPaymentMethods();
@@ -34,7 +34,6 @@ export default function AssignPaymentUniversity({
   const { assignPaymentMethod, loading: assigning } = useAssignUniversityPaymentMethod();
 
   const { showToast } = useToast();
-  const router = useRouter();
 
   const [formData, setFormData] = useState({
     payment_method_id: "",
@@ -94,8 +93,8 @@ export default function AssignPaymentUniversity({
 
       showToast("Payment method assigned successfully.", "success");
 
-      router.refresh();
       onClose();
+      onSuccess?.();
 
     } catch (err: any) {
       const apiErrors = err?.response?.data?.detail;

@@ -43,7 +43,7 @@ const UniversitiesTable = () => {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { universities, loading, error } = useUniversities();
+  const { universities, loading, error, refetch } = useUniversities();
 
   const { deleteUniversity, isDeleting } = useDeleteUniversity();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -240,7 +240,7 @@ const UniversitiesTable = () => {
       setSelectedUniversityId(null);
       setSelectedUniversityName("");
 
-      setTimeout(() => location.reload(), 2000);
+      refetch();
     }
     catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
@@ -647,17 +647,20 @@ const UniversitiesTable = () => {
         isOpen={isBatchAssignOpen}
         onClose={() => setIsBatchAssignOpen(false)}
         selectedUniversityIds={selectedUniversityIds}
+        onSuccess={refetch}
       />
 
       <CreateUniversity
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
+        onSuccess={refetch}
       />
 
       <AssignPaymentUniversity
         isOpen={isAssignPaymentOpen}
         onClose={() => setIsAssignPaymentOpen(false)}
         universityId={assignPaymentUniversityId}
+        onSuccess={refetch}
       />
 
     </div>
