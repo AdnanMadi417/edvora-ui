@@ -186,6 +186,17 @@ const UniversityEdit = ({ id }: Props) => {
     }));
   };
 
+  const isFormValid = React.useMemo(() => {
+    return (
+      formData.name?.trim() !== "" &&
+      formData.country?.trim() !== "" &&
+      formData.university_type_id !== "" &&
+      formData.branches.every(
+        (b: any) => b.name?.trim() && b.location?.trim() && b.state_id
+      )
+    );
+  }, [formData]);
+
   const isFormChanged = React.useMemo(() => {
     if (!initialFormData) return false;
 
@@ -796,7 +807,7 @@ const UniversityEdit = ({ id }: Props) => {
               await handleAssign();
             }
           }}
-          disabled={logoUploading || updateLoading || (!isFormChanged && !formData.payment_method_id)}
+          disabled={logoUploading || updateLoading || !isFormValid || (!isFormChanged && !formData.payment_method_id)}
           icon={<Pencil className="h-5 w-5" />}
           text={updateLoading ? "Updating..." : "Save Changes"}
           bgColor="bg-blue-50"
