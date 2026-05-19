@@ -250,7 +250,7 @@ const ProgramsTable = () => {
   };
 
   return (
-    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
+    <div className="mt-6 max-w-7xl mx-auto overflow-hidden text-p2">
       <div className="relative mb-8 rounded-lg border border-gray-200 bg-card">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
@@ -531,8 +531,8 @@ const ProgramsTable = () => {
                     />
                   </td>
 
-                  <td className="min-w-[200px] max-w-[300px] px-6 py-4">
-                    <div className="flex items-center gap-3">
+                  <td className="min-w-[280px] max-w-[420px] px-6 py-4">
+                    <div className="flex items-start gap-3">
                       <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
                         {Program.university?.logo_file_key ? (
                           <PresignedImage
@@ -553,26 +553,23 @@ const ProgramsTable = () => {
                       </div>
 
                       <div className="w-full min-w-0">
-                        <h3 className="truncate text-sm font-semibold text-slate-900">
+                        <h3
+                          className="line-clamp-3 text-sm font-semibold leading-snug text-slate-900"
+                          title={Program.name}
+                        >
                           {Program.name}
                         </h3>
 
-                        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-                              <span className="font-medium capitalize text-slate-700">
-                                {Program.qualification_level}
-                              </span>
-
-                          <span className="text-slate-300">•</span>
-
-                          <span className="max-w-[160px] truncate">
-                                {Program.field_of_study?.name}
-                              </span>
+                        <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
+                          <span className="font-medium capitalize text-slate-700">
+                            {Program.qualification_level}
+                          </span>
 
                           <span className="text-slate-300">•</span>
 
                           <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-                                {Program.duration} Years
-                              </span>
+                            {Program.duration} Years
+                          </span>
                         </div>
                       </div>
                     </div>
