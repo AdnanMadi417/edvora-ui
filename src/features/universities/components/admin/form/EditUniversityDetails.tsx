@@ -11,6 +11,15 @@ import {
   Trash2,
 } from "lucide-react";
 
+const FIELD_LABELS: Record<string, string> = {
+  name: "University Name",
+  description: "Description",
+  intake_months: "Intake Dates",
+  country: "Country",
+  university_type_id: "University Type",
+  branches: "Branches",
+};
+
 import { useToast } from "components/context/ToastContext";
 import { CURRENCY } from "constants/lists";
 
@@ -27,7 +36,7 @@ import {
 } from "features/universities/hooks";
 
 import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
-import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
+import { useStates } from "features/programs/hooks";
 
 import InputField from "components/form/InputField";
 import SelectField from "components/form/SelectField";
@@ -83,7 +92,7 @@ const UniversityEdit = ({ id }: Props) => {
   const { assignPaymentMethod } = useAssignUniversityPaymentMethod();
   const { deleteUniversityPaymentMethod } = useDeleteUniversityPaymentMethod();
   const { deleteBranch } = useDeleteBranch();
-  const { states } = useAllStates();
+  const { states } = useStates();
   const { updateUniversity, updateLoading } = useUpdateUniversity(id);
   const [showAddPayment, setShowAddPayment] = useState(false);
 
@@ -184,6 +193,10 @@ const UniversityEdit = ({ id }: Props) => {
       ...prev,
       [field]: value,
     }));
+
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
   };
 
   const isFormValid = React.useMemo(() => {
@@ -409,9 +422,26 @@ const UniversityEdit = ({ id }: Props) => {
       refetchPayments();
 
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
-      showToast(`Update failed. ${backendMessage}`, "error");
+      const details = error?.response?.data?.details;
+
+      if (Array.isArray(details)) {
+        const newErrors: Record<string, string> = {};
+        details.forEach((e: any) => {
+          const field = e?.loc?.[1];
+          if (field) newErrors[field] = e.msg;
+        });
+        setErrors(newErrors);
+      }
+
+      let message = error?.response?.data?.message || "Please try again.";
+      if (Array.isArray(details) && details.length > 0) {
+        const first = details[0];
+        const field = first?.loc?.[1];
+        const label = field ? (FIELD_LABELS[field] ?? field) : null;
+        message = label ? `${label}: ${first.msg}` : first.msg;
+      }
+
+      showToast(`Update failed. ${message}`, "error");
     }
   };
 
@@ -485,7 +515,7 @@ const UniversityEdit = ({ id }: Props) => {
               field="name"
               required
               formData={formData}
-              errors={{}}
+              errors={errors}
               updateFormData={updateFormData}
             />
 
@@ -494,7 +524,7 @@ const UniversityEdit = ({ id }: Props) => {
               field="country"
               required
               formData={formData}
-              errors={{}}
+              errors={errors}
               updateFormData={updateFormData}
             />
 
@@ -502,7 +532,7 @@ const UniversityEdit = ({ id }: Props) => {
               label="Description"
               field="description"
               formData={formData}
-              errors={{}}
+              errors={errors}
               updateFormData={updateFormData}
               required={false}
             />
@@ -514,7 +544,7 @@ const UniversityEdit = ({ id }: Props) => {
             field="intake_months"
             required={false}
             formData={formData}
-            errors={{}}
+            errors={errors}
             updateFormData={updateFormData}
           />
 
@@ -529,7 +559,7 @@ const UniversityEdit = ({ id }: Props) => {
                 label: type.name,
               }))}
               formData={formData}
-              errors={{}}
+              errors={errors}
               updateFormData={(field, value) => {
                 updateFormData(field, value);
               }}
