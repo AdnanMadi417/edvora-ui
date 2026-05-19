@@ -3,6 +3,15 @@
 import React, { useState } from "react";
 import { GraduationCap, ChevronLeft, CalendarPlus, Trash2 } from 'lucide-react';
 
+const FIELD_LABELS: Record<string, string> = {
+  name: "University Name",
+  description: "Description",
+  intake_months: "Intake Dates",
+  country: "Country",
+  university_type_id: "University Type",
+  branches: "Branches",
+};
+
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
 
@@ -153,11 +162,26 @@ export default function RegisterUniversity() {
       }, 2000);
 
     } catch (error: any) {
+      const details = error?.response?.data?.details;
       const code = error?.response?.data?.code;
-      let message = "Please try again.";
 
+      if (Array.isArray(details)) {
+        const newErrors: Record<string, string> = {};
+        details.forEach((e: any) => {
+          const field = e?.loc?.[1];
+          if (field) newErrors[field] = e.msg;
+        });
+        setErrors(newErrors);
+      }
+
+      let message = "Please try again.";
       if (code === "university_name_exists") {
         message = "A university with this name already exists. Please use a different name.";
+      } else if (Array.isArray(details) && details.length > 0) {
+        const first = details[0];
+        const field = first?.loc?.[1];
+        const label = field ? (FIELD_LABELS[field] ?? field) : null;
+        message = label ? `${label}: ${first.msg}` : first.msg;
       } else if (error?.response?.data?.message) {
         message = error.response.data.message;
       }

@@ -3,6 +3,15 @@
 import React, { useState, useEffect } from "react";
 import { GraduationCap, PlusCircle, XCircle } from 'lucide-react';
 
+const FIELD_LABELS: Record<string, string> = {
+  name: "University Name",
+  description: "Description",
+  intake_months: "Intake Dates",
+  country: "Country",
+  university_type_id: "University Type",
+  branches: "Branches",
+};
+
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import MultipleDatePickerModal from "components/form/MultipleDatePickerModal";
@@ -74,16 +83,15 @@ export default function CreateUniversity({
       onClose();
       onSuccess?.();
     } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
+      const details = err?.response?.data?.details;
       const code = err?.response?.data?.code;
       const backendMessage = err?.response?.data?.message;
 
-      if (Array.isArray(apiErrors)) {
+      if (Array.isArray(details)) {
         const newErrors: Record<string, string> = {};
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
+        details.forEach((e: any) => {
+          const field = e?.loc?.[1];
+          if (field) newErrors[field] = e.msg;
         });
         setErrors(newErrors);
       }
@@ -91,6 +99,11 @@ export default function CreateUniversity({
       let message = "Please try again.";
       if (code === "university_name_exists") {
         message = "A university with this name already exists.";
+      } else if (Array.isArray(details) && details.length > 0) {
+        const first = details[0];
+        const field = first?.loc?.[1];
+        const label = field ? (FIELD_LABELS[field] ?? field) : null;
+        message = label ? `${label}: ${first.msg}` : first.msg;
       } else if (backendMessage) {
         message = backendMessage;
       }
