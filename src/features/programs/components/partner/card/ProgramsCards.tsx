@@ -220,7 +220,7 @@ const ProgramsCards = () => {
                   <a
                     href={`/partner/knowledge-hub/${program.id}`}
                     key={program.id}
-                    className="relative cursor-pointer flex flex-col overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50/40 hover:shadow-md"
+                    className="group relative cursor-pointer flex flex-col overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50/40 hover:shadow-md"
                   >
                     {/* Header */}
                     <div className="flex items-start gap-3 px-4 pt-5 pb-4">
@@ -244,7 +244,7 @@ const ProgramsCards = () => {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="text-sm font-bold text-slate-900 leading-snug line-clamp-2">
+                        <h3 className="text-sm font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 " title={program.name}>
                           {program.name}
                         </h3>
                         <p className="mt-0.5 text-xs text-slate-500 truncate">
