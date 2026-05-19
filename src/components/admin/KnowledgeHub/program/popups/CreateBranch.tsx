@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, GitBranch } from "lucide-react";
@@ -6,7 +6,7 @@ import { XCircle, GitBranch } from "lucide-react";
 import { useRouter } from 'next/navigation';
 import { useToast } from "components/context/ToastContext";
 
-import { useCreateBranch } from "hooks/knowledge-hub/universities/useCreateBranch";
+import { useCreateBranch } from "features/universities/hooks";
 import { useAllStates } from "../../../../../hooks/knowledge-hub/programs/useStates";
 
 import ModalHeader from "components/ui/modal/ModalHeader";

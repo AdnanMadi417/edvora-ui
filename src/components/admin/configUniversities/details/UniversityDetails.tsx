@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,7 @@ import {
   FileCheck,
 } from "lucide-react";
 
-import { useUniversityDetails } from "hooks/knowledge-hub/config-universities/useUniversityDetails";
+import { useUniversityTypeDetails } from "features/universities/hooks";
 
 import Loading from "components/loading/Loading";
 
@@ -24,7 +24,7 @@ interface UniversityDetailsProps {
 const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const router = useRouter();
 
-  const { university, loading, error } = useUniversityDetails(id);
+  const { university, loading, error } = useUniversityTypeDetails(id);
 
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
@@ -229,3 +229,4 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 };
 
 export default UniversityDetails;
+

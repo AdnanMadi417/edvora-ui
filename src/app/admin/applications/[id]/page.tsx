@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import EmptyData from "components/emptyData/EmptyData";
-import ApplicationDetails from "components/applications/details/admin/ApplicationDetails";
-import ApplicationDocuments from "components/applications/details/admin/ApplicationDocuments";
+import ApplicationDetails from "features/applications/components/admin/details/ApplicationDetails";
+import ApplicationDocuments from "features/applications/components/admin/details/ApplicationDocuments";
 import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';

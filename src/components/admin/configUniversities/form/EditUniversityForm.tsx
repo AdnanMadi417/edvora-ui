@@ -1,12 +1,10 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Clock, MoreVertical, Pencil } from "lucide-react";
 
-import { useUniversityDetails } from "hooks/knowledge-hub/config-universities/useUniversityDetails";
-import { useUpdateUniversityType } from "hooks/knowledge-hub/config-universities/useUpdateUniversityType";
-import { useApplicationSubmissionFields } from "hooks/knowledge-hub/config-universities/useApplicationSubmissionFields";
+import { useUniversityTypeDetails, useUpdateUniversityType, useApplicationSubmissionFields } from "features/universities/hooks";
 
 import InputField from "components/form/InputField";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
@@ -24,7 +22,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const { showToast } = useToast();
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
-  const { university, error } = useUniversityDetails(id);
+  const { university, error } = useUniversityTypeDetails(id);
   const { submissionFields } = useApplicationSubmissionFields();
 
   const [formData, setFormData] = useState<Record<string, any>>({});
@@ -293,3 +291,4 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 };
 
 export default UniversityDetails;
+

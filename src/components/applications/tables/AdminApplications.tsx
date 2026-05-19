@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from "react";
+﻿import React, { useState, useMemo, useEffect } from "react";
 import PresignedImage from "components/ui/PresignedImage";
 import {
   ChevronUp,
@@ -20,7 +20,7 @@ import {
 import { MdSchool } from "react-icons/md";
 
 import { useAdminApplications } from "hooks/applications/useAdminApplications";
-import { useAllUniversities } from "hooks/knowledge-hub/universities/useUniversitiesList";
+import { useUniversities } from "features/universities/hooks";
 import { useAllStages } from "hooks/applications/stages/useStages";
 import { useAllStageStatuses } from "hooks/applications/stages/useStageStatuses";
 
@@ -98,7 +98,7 @@ const ModernApplicationsTable = () => {
     status: "active",
   });
 
-  const { universities } = useAllUniversities();
+  const { universities } = useUniversities();
   const { stages } = useAllStages();
   const { stageStatuses, stageStatusesLoading } = useAllStageStatuses();
 
@@ -610,3 +610,4 @@ const ModernApplicationsTable = () => {
 };
 
 export default ModernApplicationsTable;
+

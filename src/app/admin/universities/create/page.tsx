@@ -1,5 +1,5 @@
 "use client";
-import RegisterUniversity from "components/admin/KnowledgeHub/university/Form/RegisterUniversity";
+import RegisterUniversity from "features/universities/components/admin/form/RegisterUniversity";
 
 const CreateProgram = () => {
   return <RegisterUniversity />;

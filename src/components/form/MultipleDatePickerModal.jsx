@@ -20,10 +20,6 @@ const MultipleDatePickerModal = ({
 }) => {
   const dates = getNestedValue(formData, field) || [];
 
-  React.useEffect(() => {
-    if (dates.length === 0) updateFormData(field, [""]);
-  }, [dates.length, field, updateFormData]);
-
   const addDate = () => updateFormData(field, [...dates, ""]);
 
   const updateDate = (index, value) => {
@@ -33,10 +29,7 @@ const MultipleDatePickerModal = ({
   };
 
   const removeDate = (index) => {
-    if (dates.length <= 1) return; // prevent removing last date
-    const newDates = [...dates];
-    newDates.splice(index, 1);
-    updateFormData(field, newDates);
+    updateFormData(field, dates.filter((_, i) => i !== index));
   };
 
   return (
@@ -59,6 +52,9 @@ const MultipleDatePickerModal = ({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">
+        {dates.length === 0 && (
+          <p className="w-full text-sm text-slate-400">No intake dates added yet.</p>
+        )}
         {dates.map((date, i) => (
           <div key={i} className="flex w-full items-center gap-2 rounded-md border p-2">
             <input
@@ -76,9 +72,8 @@ const MultipleDatePickerModal = ({
             <button
               type="button"
               onClick={() => removeDate(i)}
-              disabled={dates.length <= 1}
               aria-label={`Remove intake date ${i + 1}`}
-              className="flex h-8 w-8 items-center justify-center rounded-md border border-red-600 text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+              className="flex h-8 w-8 items-center justify-center rounded-md border border-red-600 text-red-600 transition hover:border-red-700 hover:text-red-700"
               title="Remove this date"
             >
               <Trash2 className="h-4 w-4" />

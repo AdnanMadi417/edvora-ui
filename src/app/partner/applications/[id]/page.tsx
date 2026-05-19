@@ -10,8 +10,8 @@ import Cookies from "js-cookie";
 import EmptyData from "components/emptyData/EmptyData";
 import Loading from "components/loading/Loading";
 
-import ApplicationDetails from "components/applications/details/partner/ApplicationDetails";
-import ApplicationDocuments from "components/applications/details/partner/ApplicationDocuments";
+import ApplicationDetails from "features/applications/components/partner/details/ApplicationDetails";
+import ApplicationDocuments from "features/applications/components/partner/details/ApplicationDocuments";
 import AgentPartnerChat from "components/chat/ApplicationChat";
 import { useUnreadCount } from 'hooks/chat/useUnreadCount';
 

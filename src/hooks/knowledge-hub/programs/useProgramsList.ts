@@ -85,26 +85,26 @@ export function useAllPrograms(params?: GetProgramsParams) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchPrograms = async () => {
+    setLoading(true);
+    try {
+      const token = Cookies.get("token");
+      const res = await api.get("/knowledge-hub/programs", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        params,
+      });
+      setPrograms(res.data || []);
+    } catch (err) {
+      setError("Failed to fetch programs");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchPrograms = async () => {
-      setLoading(true);
-      try {
-        const token = Cookies.get("token");
-        const res = await api.get("/knowledge-hub/programs", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-          params,
-        });
-        setPrograms(res.data || []);
-      } catch (err) {
-        setError("Failed to fetch programs");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchPrograms();
-  }, [JSON.stringify(params)]); // Re-fetch when params change
+  }, [JSON.stringify(params)]);
 
-  return { programs, loading, error };
+  return { programs, loading, error, refetch: fetchPrograms };
 }
