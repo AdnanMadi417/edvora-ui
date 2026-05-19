@@ -16,7 +16,7 @@ import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
 
 import { useCreateUniversity, useUniversityTypes } from "features/universities/hooks";
-import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
+import { useStates } from "features/programs/hooks";
 
 import InputField from "components/form/InputField";
 import MultipleDatePickerModal from "components/form/MultipleDatePickerModal";
@@ -30,7 +30,7 @@ import { getPresignedUploads, uploadFilesToSpaces } from 'services/uploadService
 
 export default function RegisterUniversity() {
   const { createUniversity, loading } = useCreateUniversity();
-  const { states } = useAllStates();
+  const { states } = useStates();
   const { universities } = useUniversityTypes();
 
   const { showToast } = useToast();

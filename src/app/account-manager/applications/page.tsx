@@ -1,6 +1,6 @@
 "use client";
 
-import Applications from '../../../components/applications/tables/ManagerApplications';
+import Applications from 'features/applications/components/account-manager/table/ManagerApplications';
 
 const ProfileOverview = () => {
   return (

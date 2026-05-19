@@ -36,7 +36,7 @@ import {
 } from "features/universities/hooks";
 
 import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
-import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
+import { useStates } from "features/programs/hooks";
 
 import InputField from "components/form/InputField";
 import SelectField from "components/form/SelectField";
@@ -92,7 +92,7 @@ const UniversityEdit = ({ id }: Props) => {
   const { assignPaymentMethod } = useAssignUniversityPaymentMethod();
   const { deleteUniversityPaymentMethod } = useDeleteUniversityPaymentMethod();
   const { deleteBranch } = useDeleteBranch();
-  const { states } = useAllStates();
+  const { states } = useStates();
   const { updateUniversity, updateLoading } = useUpdateUniversity(id);
   const [showAddPayment, setShowAddPayment] = useState(false);
 

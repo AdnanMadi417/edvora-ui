@@ -3,14 +3,14 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import EmptyData from "components/emptyData/EmptyData";
-import ApplicationDetails from "components/applications/details/account-manager/ApplicationDetails";
-import ApplicationDocuments from "components/applications/details/account-manager/ApplicationDocuments";
+import ApplicationDetails from "features/applications/components/account-manager/details/ApplicationDetails";
+import ApplicationDocuments from "features/applications/components/account-manager/details/ApplicationDocuments";
 import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import AgentPartnerChat from "components/chat/ApplicationChat";
 import { useUnreadCount } from 'hooks/chat/useUnreadCount';
-import { useAccountManagerApplication } from 'hooks/applications/useAccountManagerApplication';
+import { useAccountManagerApplication } from 'features/applications/hooks';
 import { useMe } from 'hooks/useMe';
 
 export default function ApplicationPage() {
