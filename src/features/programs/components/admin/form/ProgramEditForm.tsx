@@ -12,7 +12,7 @@ import {
   Plus,
 } from "lucide-react";
 
-import { IELTS_BANDS, MONTHS } from 'constants/lists';
+import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
 
 import { useToast } from "components/context/ToastContext";
 import Loading from "components/loading/Loading";
@@ -125,6 +125,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       is_online: program.is_online ?? false,
       has_scholarship: program.has_scholarship ?? false,
       commission_amount: Number(program.commission_amount) || 0,
+      commission_currency: program.commission_currency || "rm",
       commission_type_id: String(commissionTypes[0]?.id || ""),
       commission_notes: commission?.notes ?? "",
       expected_commission_from: commission?.expected_commission_from ?? "",
@@ -174,6 +175,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
         has_scholarship: Boolean(formData.has_scholarship),
 
         commission_amount: Number(formData.commission_amount) || 0,
+        commission_currency: formData.commission_currency || "rm",
         commission_type_id: String(formData.commission_type_id || commissionTypes[0]?.id || ""),
         commission_notes: String(formData.commission_notes || ""),
         expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
@@ -481,14 +483,28 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
               </h3>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <InputField
-                  label="Commission Amount"
-                  field="commission_amount"
-                  type="number"
-                  formData={formData}
-                  errors={{}}
-                  updateFormData={updateFormData}
-                />
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <InputField
+                      label="Commission Amount"
+                      field="commission_amount"
+                      type="number"
+                      formData={formData}
+                      errors={{}}
+                      updateFormData={updateFormData}
+                    />
+                  </div>
+                  <div className="w-32">
+                    <SelectField
+                      label="Currency"
+                      field="commission_currency"
+                      options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
+                      formData={formData}
+                      errors={{}}
+                      updateFormData={updateFormData}
+                    />
+                  </div>
+                </div>
 
                 <SelectField
                   label="Expected From"
