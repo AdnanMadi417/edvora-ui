@@ -39,6 +39,7 @@ export interface Scholarship {
 
 export interface Commission {
   amount: number | null;
+  currency?: string | null;
   type: string | null;
   notes: string | null;
   expected_commission_from: string;
@@ -87,6 +88,7 @@ export interface Program {
 
   commission: Commission | null;
   commission_amount?: number | null;
+  commission_currency?: string | null;
 
   qualification_level: "bachelor" | "master" | "phd" | string;
 
@@ -135,6 +137,7 @@ export interface CreateProgramPayload {
   has_scholarship: boolean;
 
   commission_amount: number;
+  commission_currency?: string;
   commission_type_id: string;
   commission_notes: string;
   expected_commission_from: number | null;
@@ -172,6 +175,7 @@ export interface UpdateProgramPayload {
   qualification_id: string;
 
   commission_amount?: number | null;
+  commission_currency?: string;
   commission_type_id?: string | null;
   commission_notes?: string | null;
   expected_commission_from?: number | null;
@@ -193,23 +197,27 @@ export interface UpdateProgramPayload {
 export interface BatchUpdateProgramPayload {
   program_ids: string[];
 
-  english_required_score?: string;
-  intake_dates?: string[];
   commission_amount?: number;
+  commission_currency?: string;
   commission_type_id?: string;
   commission_notes?: string;
-  expected_commission_from?: number | null;
-  expected_commission_to?: number | null;
+  expected_commission_from?: number;
+  expected_commission_to?: number;
 
+  tuition_fee?: number;
   visa_fee_amount?: number;
 
-  yearly_fees?: Array<{ year: number; fee: string }>;
-  one_time_fees?: Array<{ description: string; fee: string }>;
+  intake_dates?: string[];
+  english_required_score?: string;
+
+  yearly_fees?: Array<{ year: number; fee: number }>;
+  one_time_fees?: Array<{ description: string; fee: number }>;
 
   scholarships?: Array<{
     type: number;
     coverage_percent: number;
     max_amount: number;
+    currency?: string;
     name: string;
     description: string;
     conditions: string[];

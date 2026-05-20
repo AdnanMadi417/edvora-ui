@@ -31,7 +31,7 @@ export const programApi = {
         headers: authHeader(),
       }),
     batchUpdate: (data: BatchUpdateProgramPayload) =>
-      api.put("/knowledge-hub/programs-batch", data),
+      api.put("/knowledge-hub/programs-batch", data, { headers: authHeader() }),
   },
 
   states: {

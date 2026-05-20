@@ -3,10 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, Percent } from "lucide-react";
 
-import {MONTHS} from "constants/lists"
+import { MONTHS, CURRENCY } from "constants/lists";
 
 import { useBatchUpdatePrograms } from "features/programs/hooks";
-import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
@@ -14,35 +13,31 @@ import InputField from "components/form/InputField";
 import SelectField from "components/form/SelectField";
 
 import { useToast } from "components/context/ToastContext";
-import { useRouter } from "next/navigation";
 
-interface CreateBranchProps {
+interface BatchCommissionProgramsProps {
   isOpen: boolean;
   onClose: () => void;
   selectedProgramIds: string[];
   onSuccess?: () => void;
 }
 
-export default function CreateBranch({
+export default function BatchCommissionPrograms({
   isOpen,
   onClose,
   selectedProgramIds,
   onSuccess,
-}: CreateBranchProps) {
+}: BatchCommissionProgramsProps) {
   const { batchUpdatePrograms, loading } = useBatchUpdatePrograms();
   const { showToast } = useToast();
-  const { commissionTypes, commissionTypesLoading } = useCommissionTypes();
-  const router = useRouter();
 
   const [isVisible, setIsVisible] = useState(false);
 
   const [formData, setFormData] = useState({
-    program_ids: [] as string[],
     commission_amount: "",
-    commission_type_id: "",
+    commission_currency: "rm",
     commission_notes: "",
     expected_commission_from: "",
-    expected_commission_to:"",
+    expected_commission_to: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -50,9 +45,8 @@ export default function CreateBranch({
   const isFormValid =
     formData.commission_amount !== "" &&
     Number(formData.commission_amount) <= 29999 &&
-    formData.commission_type_id !== "" &&
-    formData.expected_commission_from != "" &&
-    formData.expected_commission_to != "" &&
+    formData.expected_commission_from !== "" &&
+    formData.expected_commission_to !== "" &&
     !loading;
 
   useEffect(() => {
@@ -67,67 +61,49 @@ export default function CreateBranch({
   useEffect(() => {
     if (isOpen) {
       setFormData({
-        program_ids: selectedProgramIds || [],
         commission_amount: "",
-        commission_type_id: commissionTypes[0] ? String(commissionTypes[0].id) : "",
+        commission_currency: "rm",
         commission_notes: "",
-        expected_commission_from:"",
-        expected_commission_to:"",
+        expected_commission_from: "",
+        expected_commission_to: "",
       });
-
       setErrors({});
     }
-  }, [isOpen, selectedProgramIds, commissionTypes]);
+  }, [isOpen, selectedProgramIds]);
 
   const updateFormData = (field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
 
-    if (field === 'commission_amount') {
+    if (field === "commission_amount") {
       const num = Number(value);
-      if (value !== '' && num > 29999) {
-        setErrors((prev) => ({ ...prev, commission_amount: 'Commission amount cannot exceed RM 29,999' }));
+      if (value !== "" && num > 29999) {
+        setErrors((prev) => ({ ...prev, commission_amount: "Commission amount cannot exceed RM 29,999" }));
       } else {
-        setErrors((prev) => ({ ...prev, commission_amount: '' }));
+        setErrors((prev) => ({ ...prev, commission_amount: "" }));
       }
     } else if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
-  const handleCreate = async () => {
+  const handleSubmit = async () => {
     try {
-      const amount =
-        formData.commission_amount !== ""
-          ? Number(formData.commission_amount)
-          : undefined;
-
-      const payload = {
+      await batchUpdatePrograms({
         program_ids: selectedProgramIds,
-        commission_type_id: formData.commission_type_id || undefined,
-        commission_notes: formData.commission_notes?.trim() || undefined,
-        expected_commission_from: formData.expected_commission_from || undefined,
-        expected_commission_to: formData.expected_commission_to || undefined,
-        ...(amount !== undefined && !isNaN(amount)
-          ? { commission_amount: amount }
-          : {}),
-      };
+        commission_amount: formData.commission_amount !== "" ? Number(formData.commission_amount) : undefined,
+        commission_currency: formData.commission_currency || undefined,
+        commission_notes: formData.commission_notes.trim() || undefined,
+        expected_commission_from: formData.expected_commission_from !== "" ? Number(formData.expected_commission_from) : undefined,
+        expected_commission_to: formData.expected_commission_to !== "" ? Number(formData.expected_commission_to) : undefined,
+      });
 
-      await batchUpdatePrograms(payload);
-
-      showToast("Programs updated successfully.", "success");
-
+      showToast("Commission updated successfully.", "success");
       setTimeout(() => {
-        router.push("/admin/knowledge-hub/programs");
         onClose();
         onSuccess?.();
-      }, 2000);
-
+      }, 1500);
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      const backendMessage = error?.response?.data?.message || "Please try again.";
       showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
@@ -162,19 +138,46 @@ export default function CreateBranch({
           />
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
-            <InputField
-              label="Commission Amount"
-              field="commission_amount"
-              type="number"
-              placeholder="e.g. 10"
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-            />
 
+            <div className="grid grid-cols-2 gap-4">
+              <div className="mb-4">
+                <label className="block text-p2 font-medium text-slate-900">
+                  Commission Amount <span className="text-red-600">*</span>
+                </label>
+                <div
+                  className={`mt-2 flex h-12 w-full items-center overflow-hidden rounded-md border focus-within:ring-1 focus-within:ring-blue-500 ${
+                    errors.commission_amount ? "border-red-500" : "border-default"
+                  }`}
+                >
+                  <span className="flex h-full items-center border-r border-default bg-slate-50 px-3 text-sm font-medium text-slate-500">
+                    {(CURRENCY.find((c) => c.value === formData.commission_currency)?.label ?? formData.commission_currency).toUpperCase()}
+                  </span>
+                  <input
+                    type="number"
+                    value={formData.commission_amount}
+                    onChange={(e) => updateFormData("commission_amount", e.target.value)}
+                    placeholder="e.g. 1000"
+                    className="h-full flex-1 px-3 text-sm outline-none"
+                  />
+                </div>
+                {errors.commission_amount && (
+                  <p className="mt-1 text-xs text-red-600">{errors.commission_amount}</p>
+                )}
+              </div>
 
-            <SelectField
-                label="Expected from"
+              <SelectField
+                label="Currency"
+                field="commission_currency"
+                options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <SelectField
+                label="Expected From"
                 field="expected_commission_from"
                 options={MONTHS.map((m) => ({
                   value: m.value,
@@ -196,6 +199,7 @@ export default function CreateBranch({
                 errors={errors}
                 updateFormData={updateFormData}
               />
+            </div>
 
             <InputField
               label="Commission Notes"
@@ -212,7 +216,7 @@ export default function CreateBranch({
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
-              text={"Cancel"}
+              text="Cancel"
               bgColor="bg-slate-50"
               textColor="text-slate-700"
               borderColor="border-slate-600"
@@ -221,7 +225,7 @@ export default function CreateBranch({
             />
 
             <Button
-              onClick={handleCreate}
+              onClick={handleSubmit}
               disabled={!isFormValid || loading}
               icon={<Percent className="h-5 w-5" />}
               text={loading ? "Updating..." : "Update Commission"}

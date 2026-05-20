@@ -217,7 +217,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
               {commission?.amount != null && (
                 <div className="rounded-md border border-green-300 bg-green-50 px-3 py-1.5 text-right shadow sm:px-4 sm:py-2">
                   <p className="hidden text-xs font-semibold uppercase tracking-wider text-green-600 sm:block">Your Earnings</p>
-                  <p className="text-sm font-bold text-green-700 sm:text-base">RM {commission.amount.toLocaleString()}</p>
+                  <p className="text-sm font-bold text-green-700 sm:text-base">{(commission.currency || "RM").toUpperCase()} {commission.amount.toLocaleString()}</p>
                 </div>
               )}
               <button
@@ -244,7 +244,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
           <CircleDollarSign className="h-5 w-5 text-green-600" />
           <p className="text-xs text-green-600">Commission</p>
           <p className="text-xl font-bold text-green-700">
-            {commission?.amount != null ? `RM ${commission.amount.toLocaleString()}` : "—"}
+            {commission?.amount != null ? `${(commission.currency || "RM").toUpperCase()} ${commission.amount.toLocaleString()}` : "—"}
           </p>
         </div>
 
@@ -490,7 +490,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
             <div>
               <p className="text-base font-bold text-green-900">Your Commission</p>
               <p className="mt-1 text-3xl font-bold text-green-700">
-                RM {commission?.amount?.toLocaleString() ?? "—"}
+                {(commission?.currency || "RM").toUpperCase()} {commission?.amount?.toLocaleString() ?? "—"}
               </p>
               <div className="mt-3 space-y-1.5">
                 {commission?.notes && (

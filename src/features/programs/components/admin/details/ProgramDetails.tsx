@@ -251,7 +251,7 @@ const ProgramDetails = ({ id }: Props) => {
           <CircleDollarSign className="h-5 w-5 text-green-600" />
           <p className="text-xs text-green-600">Commission</p>
           <p className="text-xl font-bold text-green-700">
-            {commission?.amount != null ? `RM ${commission.amount.toLocaleString()}` : '—'}
+            {commission?.amount != null ? `${(commission.currency || "RM").toUpperCase()} ${commission.amount.toLocaleString()}` : '—'}
           </p>
         </div>
 
@@ -505,7 +505,7 @@ const ProgramDetails = ({ id }: Props) => {
             <div>
               <p className="text-base font-bold text-green-900">Partner Commission</p>
               <p className="mt-1 text-3xl font-bold text-green-700">
-                RM {commission?.amount?.toLocaleString() ?? '—'}
+                {(commission?.currency || "RM").toUpperCase()} {commission?.amount?.toLocaleString() ?? '—'}
               </p>
               <div className="mt-3 space-y-1.5">
                 {commission?.notes && (
