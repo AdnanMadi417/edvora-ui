@@ -306,7 +306,7 @@ const ProgramsCards = () => {
                       <span className="text-sm font-medium text-emerald-700">Your Commission</span>
                       <span className="text-lg font-bold text-emerald-600">
                         {program.commission_amount
-                          ? `RM ${program.commission_amount.toLocaleString()}`
+                          ? `${(program.commission_currency || "RM").toUpperCase()} ${program.commission_amount.toLocaleString()}`
                           : "N/A"}
                       </span>
                     </div>

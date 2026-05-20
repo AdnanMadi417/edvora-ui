@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useToast } from 'components/context/ToastContext';
 import { useRouter } from 'next/navigation';
 
-import { IELTS_BANDS, MONTHS } from 'constants/lists';
+import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
 
 import { useCreateProgram } from 'features/programs/hooks';
 import { useUniversities, useBranches } from "features/universities/hooks";
@@ -39,6 +39,7 @@ export interface FormData {
   has_scholarship: boolean;
 
   commission_amount:number;
+  commission_currency: string;
   commission_type_id: string;
   commission_notes: string;
   expected_commission_from: string;
@@ -93,6 +94,7 @@ export default function RegisterProgram() {
     has_scholarship: false,
 
     commission_type_id: '',
+    commission_currency: 'rm',
     commission_notes:'' ,
     commission_amount: 0,
     expected_commission_from:'',
@@ -274,6 +276,7 @@ export default function RegisterProgram() {
         qualification_id: formData.qualification_id,
 
         commission_amount: Number(formData.commission_amount || 0),
+        commission_currency: formData.commission_currency || 'rm',
         expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
         expected_commission_to: formData.expected_commission_to ? Number(formData.expected_commission_to) : null,
 
@@ -505,24 +508,39 @@ export default function RegisterProgram() {
             </h3>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <InputField
-                label="Commission Amount"
-                field="commission_amount"
-                type="number"
-                placeholder="e.g. 10"
-                formData={formData}
-                errors={errors}
-                required={false}
-                updateFormData={(f: string, v: any) => {
-                  updateFormData(f, v);
-                  const num = Number(v);
-                  if (v !== '' && v !== 0 && num > 29999) {
-                    setErrors((prev) => ({ ...prev, commission_amount: 'Commission amount cannot exceed RM 29,999' }));
-                  } else {
-                    setErrors((prev) => ({ ...prev, commission_amount: '' }));
-                  }
-                }}
-              />
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <InputField
+                    label="Commission Amount"
+                    field="commission_amount"
+                    type="number"
+                    placeholder="e.g. 10"
+                    formData={formData}
+                    errors={errors}
+                    required={false}
+                    updateFormData={(f: string, v: any) => {
+                      updateFormData(f, v);
+                      const num = Number(v);
+                      if (v !== '' && v !== 0 && num > 29999) {
+                        setErrors((prev) => ({ ...prev, commission_amount: 'Commission amount cannot exceed RM 29,999' }));
+                      } else {
+                        setErrors((prev) => ({ ...prev, commission_amount: '' }));
+                      }
+                    }}
+                  />
+                </div>
+                <div className="w-32">
+                  <SelectField
+                    label="Currency"
+                    field="commission_currency"
+                    options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
+                    formData={formData}
+                    errors={errors}
+                    required={false}
+                    updateFormData={updateFormData}
+                  />
+                </div>
+              </div>
 
               <SelectField
                 label="Expected from"

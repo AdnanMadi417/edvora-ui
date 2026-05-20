@@ -11,7 +11,6 @@ import IconButton from "components/ui/buttons/IconButton";
 import InputField from "components/form/InputField";
 
 import { useToast } from "components/context/ToastContext";
-import { useRouter } from "next/navigation";
 
 interface BatchProgramScholarshipsProps {
   isOpen: boolean;
@@ -46,7 +45,6 @@ export default function BatchProgramScholarships({
 }: BatchProgramScholarshipsProps) {
   const { batchUpdatePrograms, loading } = useBatchUpdatePrograms();
   const { showToast } = useToast();
-  const router = useRouter();
 
   const [isVisible, setIsVisible] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -144,10 +142,9 @@ export default function BatchProgramScholarships({
       showToast("Programs updated successfully.", "success");
 
       setTimeout(() => {
-        router.push("/admin/knowledge-hub/programs");
         onClose();
         onSuccess?.();
-      }, 2000);
+      }, 1500);
     } catch (error: any) {
       const backendMessage =
         error?.response?.data?.message || "Please try again.";

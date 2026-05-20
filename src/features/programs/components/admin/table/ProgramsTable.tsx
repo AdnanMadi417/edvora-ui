@@ -606,7 +606,11 @@ const ProgramsTable = () => {
                       </div>
                       <div className="flex items-center gap-1">
                         <span className="font-semibold text-slate-700">Commission:</span>
-                        <span>{Program.commission_amount ?? "—"} RM</span>
+                        <span>
+                          {Program.commission_amount != null
+                            ? `${(Program.commission_currency || "RM").toUpperCase()} ${Program.commission_amount.toLocaleString()}`
+                            : "—"}
+                        </span>
                       </div>
                     </div>
                   </td>

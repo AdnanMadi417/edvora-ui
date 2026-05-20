@@ -10,7 +10,6 @@ import Button from "components/ui/buttons/Button";
 import ArrayObjectField from "components/form/ArrayObjectField";
 
 import { useToast } from "components/context/ToastContext";
-import { useRouter } from "next/navigation";
 
 interface CreateFeesProps {
   isOpen: boolean;
@@ -27,7 +26,6 @@ export default function CreateFees({
 }: CreateFeesProps) {
   const { batchUpdatePrograms, loading } = useBatchUpdatePrograms();
   const { showToast } = useToast();
-  const router = useRouter();
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -89,10 +87,9 @@ export default function CreateFees({
       showToast("Programs updated successfully.", "success");
 
       setTimeout(() => {
-        router.push("/admin/knowledge-hub/programs");
         onClose();
         onSuccess?.();
-      }, 2000);
+      }, 1500);
 
     } catch (error: any) {
       const backendMessage =
