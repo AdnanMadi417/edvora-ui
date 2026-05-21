@@ -67,7 +67,7 @@ export default function DeleteFieldConfirmation({
                 Confirm Deletion
               </h3>
               <p className="text-sm text-slate-500">
-                Are you sure you want to remove this account manager from the system?
+                Are you sure you want to permanently delete this field of study from the system?
               </p>
             </div>
 
