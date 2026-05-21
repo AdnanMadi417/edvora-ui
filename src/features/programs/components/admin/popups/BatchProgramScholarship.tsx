@@ -60,7 +60,7 @@ export default function BatchProgramScholarships({
   const isFormValid =
     formData.scholarships.length > 0 &&
     formData.scholarships.every(
-      (s) => s.name.trim().length >= 5 && s.description.trim().length >= 5
+      (s) => s.name.trim().length >= 5 && s.description.trim().length >= 10
     );
 
   useEffect(() => {
@@ -76,7 +76,6 @@ export default function BatchProgramScholarships({
     if (isOpen) {
       setFormData({
         program_ids: selectedProgramIds || [],
-        has_scholarship: false,
         scholarships: [defaultScholarship()],
       });
       setErrors({});
@@ -124,7 +123,6 @@ export default function BatchProgramScholarships({
         scholarships: formData.scholarships
           .filter((s) => s.name && s.description)
           .map((s) => ({
-            type: Number(s.type ?? 1),
             coverage_percent: Number(s.coverage_percent || 0),
             max_amount: Number(s.max_amount || 0),
             name: s.name,

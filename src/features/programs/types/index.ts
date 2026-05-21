@@ -149,7 +149,7 @@ export interface CreateProgramPayload {
   one_time_fees?: Array<{ description: string; fee: number }>;
 
   scholarships?: Array<{
-    type: number;
+    type?: number | null;
     coverage_percent: number;
     max_amount: number;
     name: string;
@@ -185,7 +185,7 @@ export interface UpdateProgramPayload {
   one_time_fees?: Array<{ description: string; fee: number }>;
 
   scholarships?: Array<{
-    type: number;
+    type?: number | null;
     coverage_percent: number;
     max_amount: number;
     name: string;
@@ -214,7 +214,7 @@ export interface BatchUpdateProgramPayload {
   one_time_fees?: Array<{ description: string; fee: number }>;
 
   scholarships?: Array<{
-    type: number;
+    type?: number | null;
     coverage_percent: number;
     max_amount: number;
     currency?: string;

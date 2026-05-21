@@ -39,9 +39,17 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { validateProgram } from "./validateProgram";
 import type { FormData as ProgramFormData } from "./RegisterProgram";
 
+const SCHOLARSHIP_TYPE_MAP: Record<string, number> = { full: 1, partial: 2, mixed: 3 };
+const toScholarshipTypeInt = (t: any): number | null => {
+  if (typeof t === "number" && [1, 2, 3].includes(t)) return t;
+  if (typeof t === "string") return SCHOLARSHIP_TYPE_MAP[t.toLowerCase()] ?? null;
+  return null;
+};
+
 interface Props {
   id: string;
 }
+
 
 const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -162,6 +170,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       one_time_fees: program.one_time_fees ?? [],
       scholarships: (program.scholarships ?? []).map((s: any) => ({
         ...s,
+        type: toScholarshipTypeInt(s.type),
         conditions: s.conditions ?? [],
       })),
     };
@@ -232,7 +241,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
         scholarships: formData.has_scholarship
           ? Array.isArray(formData.scholarships)
             ? formData.scholarships.map((s: any) => ({
-              type: Number(s.type) || 1,
+              type: toScholarshipTypeInt(s.type),
               coverage_percent: Number(s.coverage_percent) || 0,
               max_amount: Number(s.max_amount) || 0,
               name: String(s.name || ""),
@@ -430,7 +439,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 Academic Details
               </h3>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <InputField
                   label="Duration (Years)"
                   field="duration"
@@ -467,8 +476,9 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                   updateFormData={updateFormData}
                   onSelect={(v) => validateField('qualification_id', v)}
                 />
+              </div>
 
-                <div className="md:col-span-2">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <TextareaField
                     label="Overview"
                     field="overview"
@@ -478,9 +488,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                     errors={errors}
                     updateFormData={updateFormData}
                   />
-                </div>
 
-                <div className="md:col-span-2">
                   <TextareaField
                     label="Curriculum"
                     field="curriculum"
@@ -491,7 +499,8 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                     updateFormData={updateFormData}
                   />
                 </div>
-              </div>
+
+
             </div>
 
             <div className="space-y-6 px-6 pb-5 border-b border-slate-200">
@@ -532,33 +541,32 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 Commission Structure
               </h3>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <InputField
-                      label="Commission Amount"
-                      field="commission_amount"
-                      type="number"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                  <div className="w-32">
-                    <SelectField
-                      label="Currency"
-                      field="commission_currency"
-                      options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+
+                <InputField
+                  label="Commission Amount"
+                  field="commission_amount"
+                  type="number"
+                  required={false}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+
+                <SelectField
+                  label="Currency"
+                  field="commission_currency"
+                  required={false}
+                  options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
 
                 <SelectField
                   label="Expected From"
                   field="expected_commission_from"
+                  required={false}
                   options={MONTHS.map((m) => ({ value: m.value, label: m.label }))}
                   formData={formData}
                   errors={errors}
@@ -568,13 +576,14 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 <SelectField
                   label="Expected To"
                   field="expected_commission_to"
+                  required={false}
                   options={MONTHS.map((m) => ({ value: m.value, label: m.label }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
 
-                <div className="md:col-span-2">
+                <div className="md:col-span-4">
                   <TextareaField
                     label="Commission Notes"
                     field="commission_notes"

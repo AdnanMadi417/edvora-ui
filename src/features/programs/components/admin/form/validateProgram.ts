@@ -66,34 +66,64 @@ export const validateProgram = (formData: FormData): ProgramValidationResult => 
     errors.commission_notes = "Commission notes must not exceed 500 characters";
   }
 
-  // yearly_fees — if rows exist, year > 0 and fee > 0
+  // yearly_fees — if rows exist, year > 0 and fee > 0, max Numeric12,2
   (formData.yearly_fees || []).forEach((y, i) => {
     if (!y.year || Number(y.year) <= 0)
       errors[`yearly_fees[${i}].year`] = "Year must be greater than 0";
     if (!y.fee || Number(y.fee) <= 0)
       errors[`yearly_fees[${i}].fee`] = "Fee must be greater than 0";
+    else if (Number(y.fee) > 9_999_999_999.99)
+      errors[`yearly_fees[${i}].fee`] = "Fee cannot exceed 9,999,999,999.99";
   });
 
-  // one_time_fees — description required, fee > 0
+  // one_time_fees — description required (max 255), fee > 0, max Numeric12,2
   (formData.one_time_fees || []).forEach((f, i) => {
     if (!f.description?.trim())
       errors[`one_time_fees[${i}].description`] = "Description is required";
+    else if (f.description.trim().length > 255)
+      errors[`one_time_fees[${i}].description`] = "Description must not exceed 255 characters";
     if (!f.fee || Number(f.fee) <= 0)
       errors[`one_time_fees[${i}].fee`] = "Fee must be greater than 0";
+    else if (Number(f.fee) > 9_999_999_999.99)
+      errors[`one_time_fees[${i}].fee`] = "Fee cannot exceed 9,999,999,999.99";
   });
 
-  // scholarships — name + description required when has_scholarship
+  // intake_dates — no past dates allowed
+  const today = new Date().toISOString().split("T")[0];
+  (formData.intake_dates || []).forEach((d, i) => {
+    if (d && d < today) {
+      errors[`intake_dates[${i}]`] = "Intake date cannot be in the past";
+    }
+  });
+
+  // scholarships — validate when has_scholarship
   if (formData.has_scholarship) {
     (formData.scholarships || []).forEach((s, i) => {
       if (!s.name?.trim()) {
         errors[`scholarships[${i}].name`] = "Scholarship name is required";
       } else if (s.name.trim().length < 5) {
         errors[`scholarships[${i}].name`] = "Name must be at least 5 characters";
+      } else if (s.name.trim().length > 255) {
+        errors[`scholarships[${i}].name`] = "Name must not exceed 255 characters";
       }
       if (!s.description?.trim()) {
         errors[`scholarships[${i}].description`] = "Description is required";
-      } else if (s.description.trim().length < 5) {
-        errors[`scholarships[${i}].description`] = "Description must be at least 5 characters";
+      } else if (s.description.trim().length < 10) {
+        errors[`scholarships[${i}].description`] = "Description must be at least 10 characters";
+      }
+      // coverage_percent — optional, 0–100 (Numeric5,2)
+      if (s.coverage_percent !== undefined && s.coverage_percent !== null && s.coverage_percent !== 0) {
+        const pct = Number(s.coverage_percent);
+        if (isNaN(pct) || pct < 0 || pct > 100)
+          errors[`scholarships[${i}].coverage_percent`] = "Coverage must be between 0 and 100";
+      }
+      // max_amount — optional, >= 0, max Numeric12,2
+      if (s.max_amount !== undefined && s.max_amount !== null && s.max_amount !== 0) {
+        const amt = Number(s.max_amount);
+        if (isNaN(amt) || amt < 0)
+          errors[`scholarships[${i}].max_amount`] = "Max amount must be 0 or greater";
+        else if (amt > 9_999_999_999.99)
+          errors[`scholarships[${i}].max_amount`] = "Max amount cannot exceed 9,999,999,999.99";
       }
     });
   }
@@ -108,11 +138,13 @@ export const isProgramComplete = (formData: FormData): boolean => {
   if (!formData.qualification_id) return false;
   if (!formData.field_of_study_id) return false;
   if (!formData.is_on_campus && !formData.is_online) return false;
+  const _today = new Date().toISOString().split("T")[0];
+  if ((formData.intake_dates || []).some((d) => d && d < _today)) return false;
   if (formData.commission_amount && Number(formData.commission_amount) > 29_999) return false;
   if ((formData.yearly_fees || []).some((y) => !y.year || Number(y.year) <= 0 || !y.fee || Number(y.fee) <= 0)) return false;
   if ((formData.one_time_fees || []).some((f) => !f.description?.trim() || !f.fee || Number(f.fee) <= 0)) return false;
   if (formData.has_scholarship) {
-    if ((formData.scholarships || []).some((s) => !s.name?.trim() || s.name.trim().length < 5 || !s.description?.trim() || s.description.trim().length < 5)) return false;
+    if ((formData.scholarships || []).some((s) => !s.name?.trim() || s.name.trim().length < 5 || !s.description?.trim() || s.description.trim().length < 10)) return false;
   }
   return true;
 };

@@ -41,8 +41,10 @@ export default function BatchProgramIntakes({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const today = new Date().toISOString().split("T")[0];
   const isFormValid =
-    formData.intake_dates.length > 0;
+    formData.intake_dates.length > 0 &&
+    formData.intake_dates.every((d: string) => d !== "" && d >= today);
 
   useEffect(() => {
     if (isOpen) {
