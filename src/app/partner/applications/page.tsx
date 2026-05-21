@@ -1,6 +1,6 @@
 'use client';
 
-import Applications from 'features/applications/components/partner/table/PartnerApplications'
+import Applications from 'features/applications/partner/components/table/PartnerApplications'
 
 const ProfileOverview = () => {
   return (
