@@ -82,6 +82,27 @@ export default function BatchProgramScholarships({
     }
   }, [isOpen, selectedProgramIds]);
 
+  const validateField = (field: string, value: string) => {
+    let error = "";
+    if (field.endsWith(".name")) {
+      if (!value.trim()) error = "Scholarship name is required";
+      else if (value.trim().length < 5) error = "Name must be at least 5 characters";
+      else if (value.trim().length > 255) error = "Name must not exceed 255 characters";
+    } else if (field.endsWith(".description")) {
+      if (!value.trim()) error = "Description is required";
+      else if (value.trim().length < 10) error = "Description must be at least 10 characters";
+    } else if (field.endsWith(".coverage_percent")) {
+      const n = Number(value);
+      if (value !== "" && (isNaN(n) || n < 0 || n > 100))
+        error = "Coverage must be between 0 and 100";
+    } else if (field.endsWith(".max_amount")) {
+      const n = Number(value);
+      if (value !== "" && (isNaN(n) || n < 0))
+        error = "Max amount must be 0 or greater";
+    }
+    setErrors((prev) => ({ ...prev, [field]: error }));
+  };
+
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => {
       const updated = structuredClone(prev);
@@ -234,6 +255,7 @@ export default function BatchProgramScholarships({
                         formData={formData}
                         errors={errors}
                         updateFormData={updateFormData}
+                        onBlur={() => validateField(`scholarships[${index}].name`, formData.scholarships[index].name)}
                       />
                     </div>
 
@@ -246,6 +268,7 @@ export default function BatchProgramScholarships({
                       errors={errors}
                       updateFormData={updateFormData}
                       required={false}
+                      onBlur={() => validateField(`scholarships[${index}].coverage_percent`, String(formData.scholarships[index].coverage_percent))}
                     />
 
                     <InputField
@@ -257,6 +280,7 @@ export default function BatchProgramScholarships({
                       errors={errors}
                       updateFormData={updateFormData}
                       required={false}
+                      onBlur={() => validateField(`scholarships[${index}].max_amount`, String(formData.scholarships[index].max_amount))}
                     />
 
                     <div className="md:col-span-2">
@@ -268,6 +292,7 @@ export default function BatchProgramScholarships({
                         formData={formData}
                         errors={errors}
                         updateFormData={updateFormData}
+                        onBlur={() => validateField(`scholarships[${index}].description`, formData.scholarships[index].description)}
                       />
                     </div>
 

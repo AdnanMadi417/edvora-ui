@@ -39,7 +39,7 @@ interface FormData {
   selectedLocations: string[];
 }
 
-type FormErrors = Partial<Record<keyof FormData, string>>;
+type FormErrors = Record<string, string>;
 
 export default function RegisterLogisticsProvider() {
   const { showToast } = useToast();
@@ -75,7 +75,7 @@ export default function RegisterLogisticsProvider() {
 
   const updateFormData = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const handleLogoSelect = async (file: File) => {
@@ -147,22 +147,72 @@ export default function RegisterLogisticsProvider() {
     }));
   };
 
+  const validateField = (field: string, value: string) => {
+    let error = "";
+    if (field === "name") {
+      if (!value.trim()) error = "Name is required";
+      else if (value.trim().length < 5) error = "Name must be at least 5 characters";
+      else if (value.trim().length > 255) error = "Name must not exceed 255 characters";
+    } else if (field === "phone_number") {
+      if (!value.trim()) error = "Phone number is required";
+      else if (value.trim().length > 50) error = "Phone number must not exceed 50 characters";
+    } else if (field === "whatsapp") {
+      if (value.trim().length > 50) error = "WhatsApp number must not exceed 50 characters";
+    } else if (field.endsWith(".name")) {
+      if (!value.trim()) error = "Package name is required";
+      else if (value.trim().length < 5) error = "Package name must be at least 5 characters";
+      else if (value.trim().length > 255) error = "Package name must not exceed 255 characters";
+    }
+    setErrors((prev) => ({ ...prev, [field]: error }));
+  };
+
   const isFormValid = () =>
-    formData.name.trim() !== "" &&
+    formData.name.trim().length >= 5 &&
     formData.nationality.trim() !== "" &&
     formData.main_location.trim() !== "" &&
     formData.phone_number.trim() !== "" &&
     formData.selectedServices.length > 0 &&
     formData.selectedLanguages.length > 0 &&
     formData.selectedUniversities.length > 0 &&
+    formData.packages_offered.every((p) => p.name.trim().length >= 5) &&
     !logoUploading;
 
   const handleSubmit = async () => {
-    const newErrors: FormErrors = {};
-    if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.nationality) newErrors.nationality = "Nationality is required";
-    if (!formData.phone_number) newErrors.phone_number = "Phone number is required";
-    if (!formData.main_location) newErrors.main_location = "Location is required";
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (formData.name.trim().length < 5) {
+      newErrors.name = "Name must be at least 5 characters";
+    } else if (formData.name.trim().length > 255) {
+      newErrors.name = "Name must not exceed 255 characters";
+    }
+    if (!formData.nationality.trim()) {
+      newErrors.nationality = "Nationality is required";
+    } else if (formData.nationality.trim().length > 100) {
+      newErrors.nationality = "Nationality must not exceed 100 characters";
+    }
+    if (!formData.main_location.trim()) {
+      newErrors.main_location = "Location is required";
+    } else if (formData.main_location.trim().length > 255) {
+      newErrors.main_location = "Location must not exceed 255 characters";
+    }
+    if (!formData.phone_number.trim()) {
+      newErrors.phone_number = "Phone number is required";
+    } else if (formData.phone_number.trim().length > 50) {
+      newErrors.phone_number = "Phone number must not exceed 50 characters";
+    }
+    if (formData.whatsapp.trim().length > 50) {
+      newErrors.whatsapp = "WhatsApp number must not exceed 50 characters";
+    }
+    formData.packages_offered.forEach((pkg, i) => {
+      if (!pkg.name.trim()) {
+        newErrors[`packages_offered[${i}].name`] = "Package name is required";
+      } else if (pkg.name.trim().length < 5) {
+        newErrors[`packages_offered[${i}].name`] = "Package name must be at least 5 characters";
+      } else if (pkg.name.trim().length > 255) {
+        newErrors[`packages_offered[${i}].name`] = "Package name must not exceed 255 characters";
+      }
+    });
     if (!formData.selectedServices.length) newErrors.selectedServices = "Please select at least one service";
     if (!formData.selectedLanguages.length) newErrors.selectedLanguages = "Please select at least one language";
     if (!formData.selectedUniversities.length) newErrors.selectedUniversities = "Please select at least one university";
@@ -251,6 +301,7 @@ export default function RegisterLogisticsProvider() {
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
+            onBlur={() => validateField("name", formData.name)}
           />
           <SearchableDropdown
             label="Nationality"
@@ -276,15 +327,16 @@ export default function RegisterLogisticsProvider() {
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
+            onBlur={() => validateField("phone_number", formData.phone_number)}
           />
           <InputField
             label="WhatsApp Contact"
             field="whatsapp"
             placeholder="e.g. +60 12 345 6789"
-            required
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
+            onBlur={() => validateField("whatsapp", formData.whatsapp)}
           />
         </div>
 
@@ -331,8 +383,12 @@ export default function RegisterLogisticsProvider() {
                   placeholder="e.g. Basic Package"
                   required
                   formData={{ name: pkg.name }}
-                  errors={{}}
-                  updateFormData={(_: string, value: string) => updatePackage(index, "name", value)}
+                  errors={{ name: errors[`packages_offered[${index}].name`] || "" }}
+                  updateFormData={(_: string, value: string) => {
+                    updatePackage(index, "name", value);
+                    setErrors((prev) => ({ ...prev, [`packages_offered[${index}].name`]: "" }));
+                  }}
+                  onBlur={() => validateField(`packages_offered[${index}].name`, formData.packages_offered[index].name)}
                 />
                 <InputField
                   label="Price (RM)"
