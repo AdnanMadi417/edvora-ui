@@ -163,7 +163,7 @@ export default function HoldPopup({
               </button>
               <button
                 onClick={handleConfirm}
-                disabled={isConfirming}
+                disabled={isConfirming || status === currentStatus}
                 className="flex items-center justify-center gap-2 rounded-md border border-amber-600 bg-amber-100 text-amber-700 px-4 py-2 text-sm font-medium transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
               >
                 <CheckCircle className="h-4 w-4" />

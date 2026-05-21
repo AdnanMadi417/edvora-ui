@@ -21,7 +21,7 @@ const SelectField = ({ label, field, options, required = true, formData, errors,
         value={value}
         onChange={(e) => updateFormData(field, e.target.value)}
         className={`mt-2 flex h-12 w-full items-center justify-center rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-          getNestedValue(errors, field) ? "border-red-500" : "border-default"
+          errors?.[field] ? "border-red-500" : "border-default"
         }`}
       >
         <option value="" disabled>Select ...</option>
@@ -38,8 +38,8 @@ const SelectField = ({ label, field, options, required = true, formData, errors,
         )}
       </select>
 
-      {getNestedValue(errors, field) && (
-        <p className="mt-1 text-xs text-red-600">{getNestedValue(errors, field)}</p>
+      {errors?.[field] && (
+        <p className="mt-1 text-xs text-red-600">{errors?.[field]}</p>
       )}
     </div>
   );

@@ -35,6 +35,18 @@ export default function ArrivalDateConfirmation({
 
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (formErrors[field]) setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
+  const validateDate = (): boolean => {
+    const val = formData.arrival_date;
+    if (!val) { setFormErrors({ arrival_date: "Arrival date is required" }); return false; }
+    const selected = new Date(val);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selected < today) { setFormErrors({ arrival_date: "Arrival date cannot be in the past" }); return false; }
+    setFormErrors({});
+    return true;
   };
 
   useEffect(() => {
@@ -46,6 +58,7 @@ export default function ArrivalDateConfirmation({
   }, [isOpen]);
 
   const handleConfirm = async () => {
+    if (!validateDate()) return;
     try {
       await submitArrivalDate(applicationId, formData.arrival_date, ticketFile, eVisaFile);
       handleClose();
@@ -124,6 +137,15 @@ export default function ArrivalDateConfirmation({
                 formData={formData}
                 errors={formErrors}
                 updateFormData={updateFormData}
+                onBlur={() => {
+                  const val = formData.arrival_date;
+                  if (!val) return;
+                  const selected = new Date(val);
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  if (selected < today)
+                    setFormErrors({ arrival_date: "Arrival date cannot be in the past" });
+                }}
               />
             </div>
 

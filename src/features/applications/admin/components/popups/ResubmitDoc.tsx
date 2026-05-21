@@ -39,13 +39,19 @@ export default function HoldPopup({
 
   const updateFormData = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors.reason) setErrors({});
+  };
+
+  const validateReason = (): boolean => {
+    const trimmed = formData.reason.trim();
+    if (!trimmed) { setErrors({ reason: "Reason is required" }); return false; }
+    if (trimmed.length < 10) { setErrors({ reason: "Reason must be at least 10 characters" }); return false; }
+    setErrors({});
+    return true;
   };
 
   const handleConfirm = async () => {
-    if (!formData.reason.trim()) {
-      setErrors({ reason: "Reason is required" });
-      return;
-    }
+    if (!validateReason()) return;
 
     try {
       await api.patch(
@@ -145,6 +151,11 @@ export default function HoldPopup({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => {
+                const trimmed = formData.reason.trim();
+                if (trimmed && trimmed.length < 10)
+                  setErrors({ reason: "Reason must be at least 10 characters" });
+              }}
             />
           </div>
 

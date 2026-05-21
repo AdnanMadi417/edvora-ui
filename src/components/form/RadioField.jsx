@@ -29,7 +29,7 @@ const RadioField = ({
           <label
             key={opt.label}
             className={`flex-1 cursor-pointer rounded-md border p-3 text-center text-p2 text-sm transition-colors focus-within:ring-1 focus-within:ring-blue-500 ${
-              getNestedValue(errors, field)
+              errors?.[field]
                 ? "border-red-500"
                 : "border-default"
             } ${value === opt.value ? "bg-blue-100 border-blue-500" : "bg-white"}`}
@@ -47,9 +47,9 @@ const RadioField = ({
         ))}
       </div>
 
-      {getNestedValue(errors, field) && (
+      {errors?.[field] && (
         <p className="mt-1 text-xs text-red-600">
-          {getNestedValue(errors, field)}
+          {errors?.[field]}
         </p>
       )}
     </div>

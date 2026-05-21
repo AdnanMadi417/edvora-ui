@@ -157,6 +157,7 @@ export default function UpdateStatusPopup({
     { id: string; label: string; description?: string }[]
   >([]);
   const [error, setError] = useState("");
+  const [reasonError, setReasonError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
   const selectedOption = statusOptions.find((opt) => opt.id === selectedStatus);
@@ -354,6 +355,11 @@ export default function UpdateStatusPopup({
 
     if (requiresReason && !reason.trim()) {
       setError("Reason is required for this status");
+      return false;
+    }
+
+    if (requiresReason && reason.trim().length < 10) {
+      setReasonError("Reason must be at least 10 characters");
       return false;
     }
 
@@ -643,11 +649,17 @@ export default function UpdateStatusPopup({
               </label>
               <textarea
                 value={reason}
-                onChange={(e) => setReason(e.target.value)}
+                onChange={(e) => { setReason(e.target.value); if (reasonError) setReasonError(""); }}
+                onBlur={() => {
+                  const trimmed = reason.trim();
+                  if (trimmed && trimmed.length < 10)
+                    setReasonError("Reason must be at least 10 characters");
+                }}
                 placeholder="Please provide a detailed reason..."
                 rows={4}
-                className="w-full rounded-md border border-default px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                className={`w-full rounded-md border px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 ${reasonError ? "border-red-500 bg-red-50" : "border-default"}`}
               />
+              {reasonError && <p className="mt-1 text-xs text-red-600">{reasonError}</p>}
             </div>
           )}
 
@@ -718,7 +730,10 @@ export default function UpdateStatusPopup({
               !selectedStatus ||
               isSubmitting ||
               !!error ||
-              (requiresReason && !reason.trim())
+              (requiresReason && !reason.trim()) ||
+              (isUniversityApproved && !offerLetterFile) ||
+              (isVisaIssued && !visaDocumentFile) ||
+              (isCommissionPaid && !commissionPaymentFile)
             }
             className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
           >

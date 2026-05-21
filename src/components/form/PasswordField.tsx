@@ -30,7 +30,7 @@ const PasswordField = ({
 }: PasswordFieldProps) => {
   const [show, setShow] = useState(false);
   const value = getNestedValue(formData, field) ?? "";
-  const error = getNestedValue(errors, field);
+  const error = errors?.[field];
 
   return (
     <div className="mb-4">

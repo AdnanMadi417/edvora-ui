@@ -14,7 +14,7 @@ import { useUnreadCount } from "hooks/chat/useUnreadCount";
 
 export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();
-  const { applications: applicationData, loading, error } = useApplicationDetails(applicationId);
+  const { applications: applicationData, loading, error, refetch } = useApplicationDetails(applicationId);
   const [chatOpen, setChatOpen] = useState(false);
 
   const { unreadCount } = useUnreadCount({

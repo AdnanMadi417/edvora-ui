@@ -18,7 +18,7 @@ import { useRemoveDocument } from "services/removeDocument";
 
 import { getCurrentDate } from "features/applications/partner/components/form/utility-functions/getCurrentDate";
 import { updateFormData as updateNestedFormData } from "features/applications/partner/components/form/utility-functions/updateFormData";
-import { validateFormData } from "features/applications/partner/components/form/utility-functions/validateFormData";
+import { validateFormData, isStageComplete } from "features/applications/partner/components/form/utility-functions/validateFormData";
 
 import StageReview from "./stages/StageReview";
 import StageProgramBasicInfo from "features/applications/partner/components/form/stages/StageProgramBasicInfo";
@@ -154,6 +154,23 @@ export default function StudentRegistrationForm() {
     [formData, requiredFieldKeys, safeDocumentTypes, documentTypesLoading]
   );
 
+  const validateField = React.useCallback(
+    (field: string) => {
+      const { errors: stageErrors } = validateFormData(
+        formData,
+        stage,
+        requiredFieldKeys,
+        safeDocumentTypes,
+        documentTypesLoading
+      );
+      setErrors((prev) => ({
+        ...prev,
+        [field]: stageErrors[field],
+      }));
+    },
+    [formData, stage, requiredFieldKeys, safeDocumentTypes, documentTypesLoading]
+  );
+
   const nextStage = async () => {
     if (!handleValidateStage(stage)) return;
 
@@ -282,8 +299,8 @@ export default function StudentRegistrationForm() {
   );
 
   const isStageValid = React.useMemo(() => {
-    return validateFormData(formData, stage, requiredFieldKeys, documentTypes, documentTypesLoading).isValid;
-  }, [stage, formData, requiredFieldKeys, documentTypes, documentTypesLoading]);
+    return isStageComplete(formData, stage, requiredFieldKeys, safeDocumentTypes, documentTypesLoading);
+  }, [stage, formData, requiredFieldKeys, safeDocumentTypes, documentTypesLoading]);
 
   const handleSubmit = async () => {
     for (const s of visibleStages) {
@@ -491,6 +508,7 @@ export default function StudentRegistrationForm() {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              validateField={validateField}
               universities={universities}
             />
           )}

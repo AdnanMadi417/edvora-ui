@@ -9,6 +9,7 @@ interface Props {
   formData: any;
   errors: Record<string, string | undefined>;
   updateFormData: (fieldPath: string, value: any) => void;
+  validateField: (field: string) => void;
   universities: any[];
 }
 
@@ -16,6 +17,7 @@ export default function StageBasicInfo({
                                          formData,
                                          errors,
                                          updateFormData,
+                                         validateField,
                                          universities,
                                        }: Props) {
   return (
@@ -41,6 +43,7 @@ export default function StageBasicInfo({
           formData={formData}
           errors={errors}
           updateFormData={updateFormData}
+          onBlur={() => validateField("student.name")}
         />
 
         <InputField
@@ -50,6 +53,7 @@ export default function StageBasicInfo({
           formData={formData}
           errors={errors}
           updateFormData={updateFormData}
+          onBlur={() => validateField("student.passport_number")}
         />
 
         <SearchableDropdown

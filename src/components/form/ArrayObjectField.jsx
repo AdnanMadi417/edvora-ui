@@ -114,7 +114,7 @@ const ArrayObjectField = ({
 
             {fields.map((f) => {
               const errorPath = `${field}[${index}].${f.key}`;
-              const errorMessage = getNestedValue(errors, errorPath);
+              const errorMessage = errors?.[errorPath];
 
               return (
                 <div key={f.key} className="space-y-1">

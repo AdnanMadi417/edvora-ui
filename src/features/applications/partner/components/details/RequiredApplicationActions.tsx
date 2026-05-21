@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { FaFileAlt } from "react-icons/fa";
 import { MdAssignment } from "react-icons/md";
 import api from "lib/useApi";
@@ -24,20 +24,20 @@ export default function RequiredApplicationActions({
 
   const id = params.id;
 
-  useEffect(() => {
-    const fetchApplication = async () => {
-      try {
-        const res = await api.get(`/applications/${id}`);
-        setAppDetails(res.data);
-      } catch (error) {
-        console.error("Error fetching application:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchApplication();
+  const fetchApplication = useCallback(async () => {
+    try {
+      const res = await api.get(`/applications/${id}`);
+      setAppDetails(res.data);
+    } catch (error) {
+      console.error("Error fetching application:", error);
+    } finally {
+      setLoading(false);
+    }
   }, [id]);
+
+  useEffect(() => {
+    fetchApplication();
+  }, [fetchApplication]);
 
   const handleConfirmUpload = async (file: File | null, documentTypeId: string) => {
     if (!file) return;
@@ -60,7 +60,7 @@ export default function RequiredApplicationActions({
       await api.post(`/applications/${id}/requested-documents/bulk`, payload);
       showToast("Document uploaded successfully.", "success");
       setShowResubmit(false);
-      setTimeout(() => window.location.reload(), 1500);
+      fetchApplication();
     } catch (err: any) {
       const message = err?.response?.data?.message || "Upload failed. Please try again.";
       showToast(message, "error");
