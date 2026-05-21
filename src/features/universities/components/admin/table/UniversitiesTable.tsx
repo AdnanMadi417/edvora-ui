@@ -31,7 +31,6 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import DeleteUniversityConfirmation from "../popups/DeleteUniversityConfirmation";
 import BatchAssignPaymentMethod from "../payment-methods/BatchAssignPaymentMethod";
-import CreateUniversity from "../popups/CreateUniversity";
 import AssignPaymentUniversity from "../popups/AssignPaymentMethods";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
@@ -41,7 +40,6 @@ const UniversitiesTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { showToast } = useToast();
 
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const { universities, loading, error, refetch } = useUniversities();
 
@@ -650,11 +648,6 @@ const UniversitiesTable = () => {
         onSuccess={refetch}
       />
 
-      <CreateUniversity
-        isOpen={isCreateOpen}
-        onClose={() => setIsCreateOpen(false)}
-        onSuccess={refetch}
-      />
 
       <AssignPaymentUniversity
         isOpen={isAssignPaymentOpen}

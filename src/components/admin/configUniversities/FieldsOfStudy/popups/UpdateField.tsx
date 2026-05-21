@@ -75,34 +75,44 @@ export default function UpdateFieldOfStudy({
     setInitialFormData(initial);
   }, [selectedField, isOpen]);
 
-  const updateFormData = (field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const validateName = (name: string): string => {
+    if (!name.trim()) return "Field of study name is required";
+    if (name.trim().length < 5) return "Name must be at least 5 characters";
+    if (name.trim().length > 100) return "Name must not exceed 100 characters";
+    return "";
+  };
 
+  const updateFormData = (field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
+      setErrors((prev) => { const n = { ...prev }; delete n[field]; return n; });
+    }
+  };
+
+  const validateField = (field: string) => {
+    if (field === "name") {
+      const err = validateName(formData.name);
+      setErrors((prev) => ({ ...prev, name: err }));
     }
   };
 
   const isFormChanged = React.useMemo(() => {
     if (!initialFormData) return false;
-
     return JSON.stringify(formData) !== JSON.stringify(initialFormData);
   }, [formData, initialFormData]);
 
   const handleUpdate = async () => {
+    const nameErr = validateName(formData.name);
+    if (nameErr) {
+      setErrors({ name: nameErr });
+      return;
+    }
+
     try {
-      const payload = {
+      await updateFieldOfStudy({
         name: formData.name.trim(),
         is_active: formData.is_active,
-      };
-
-      await updateFieldOfStudy(payload);
+      });
 
       showToast("Field of study updated successfully.", "success");
 
@@ -111,7 +121,9 @@ export default function UpdateFieldOfStudy({
 
     } catch (error: any) {
       const backendMessage =
-        error?.response?.data?.detail?.[0]?.msg || "Please try again.";
+        error?.response?.data?.detail?.[0]?.msg ||
+        error?.response?.data?.message ||
+        "Please try again.";
 
       showToast(`Update failed. ${backendMessage}`, "error");
     }
@@ -148,12 +160,13 @@ export default function UpdateFieldOfStudy({
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
 
             <InputField
-              label="Name"
+              label="Field Of Study Name"
               field="name"
-              type="text"
+              required
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => validateField("name")}
             />
 
             <ToggleInput
@@ -179,7 +192,7 @@ export default function UpdateFieldOfStudy({
 
             <Button
               onClick={handleUpdate}
-              disabled={!isFormChanged || fieldLoading}
+              disabled={!isFormChanged || fieldLoading || !formData.name.trim() || formData.name.trim().length < 5 || formData.name.trim().length > 100}
               icon={<Edit3 className="h-5 w-5" />}
               text={fieldLoading ? "Updating..." : "Update Field Details"}
               bgColor="bg-blue-50"

@@ -9,21 +9,21 @@ import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import InputField from "components/form/InputField";
 import { useToast } from "components/context/ToastContext";
-import { useRouter } from 'next/navigation';
 
 interface CreateFieldOfStudyProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export default function CreateFieldOfStudy({
   isOpen,
   onClose,
+  onSuccess,
 }: CreateFieldOfStudyProps) {
   const { CreateFieldOfStudy, fieldLoading } = useCreateFieldOfStudy();
 
   const { showToast } = useToast();
-  const router = useRouter();
 
   const [isVisible, setIsVisible] = useState(false);
 
@@ -43,31 +43,44 @@ export default function CreateFieldOfStudy({
     }
   }, [isOpen]);
 
-  const updateFormData = (field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const validateName = (name: string): string => {
+    if (!name.trim()) return "Field of study name is required";
+    if (name.trim().length < 5) return "Name must be at least 5 characters";
+    if (name.trim().length > 100) return "Name must not exceed 100 characters";
+    return "";
+  };
 
+  const updateFormData = (field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
+      setErrors((prev) => { const n = { ...prev }; delete n[field]; return n; });
+    }
+  };
+
+  const validateField = (field: string) => {
+    if (field === "name") {
+      const err = validateName(formData.name);
+      setErrors((prev) => ({ ...prev, name: err }));
     }
   };
 
   const handleCreate = async () => {
+    const nameErr = validateName(formData.name);
+    if (nameErr) {
+      setErrors({ name: nameErr });
+      return;
+    }
+
     try {
       await CreateFieldOfStudy({
-        name: formData.name,
+        name: formData.name.trim(),
         is_active: formData.is_active,
       });
 
-      showToast("Field Of Study created successfully." , "success");
+      showToast("Field Of Study created successfully.", "success");
 
       onClose();
-      setTimeout(() => router.refresh(), 1500);
+      onSuccess?.();
 
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
@@ -125,6 +138,7 @@ export default function CreateFieldOfStudy({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => validateField("name")}
             />
 
           </div>
@@ -144,7 +158,7 @@ export default function CreateFieldOfStudy({
 
             <Button
               onClick={handleCreate}
-              disabled={fieldLoading || !formData.name.trim()}
+              disabled={fieldLoading || !formData.name.trim() || formData.name.trim().length < 5 || formData.name.trim().length > 100}
               icon={<Tag className="h-5 w-5" />}
               text={fieldLoading ? "Creating..." : "Create Field of Study"}
               bgColor="bg-blue-50"

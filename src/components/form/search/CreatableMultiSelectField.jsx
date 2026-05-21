@@ -80,7 +80,7 @@ const CreatableMultiSelectField = ({
       <div
         onClick={() => setIsOpen(prev => !prev)}
         className={`mt-2 flex min-h-12 w-full items-center justify-between bg-white rounded-md border p-3 text-sm transition-colors focus:ring-1 focus:ring-blue-500 ${
-          getNestedValue(errors, field) ? "border-red-500" : "border-default"
+          errors?.[field] ? "border-red-500" : "border-default"
         }`}
       >
 
@@ -117,7 +117,7 @@ const CreatableMultiSelectField = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={`mt-2 flex h-10 w-full rounded-md border p-2 text-sm focus:ring-1 focus:ring-blue-500 ${
-              getNestedValue(errors, field)
+              errors?.[field]
                 ? "border-red-500"
                 : "border-default"
             }`}
@@ -183,9 +183,9 @@ const CreatableMultiSelectField = ({
 
       )}
 
-      {getNestedValue(errors, field) && (
+      {errors?.[field] && (
         <p className="mt-1 text-xs text-red-600">
-          {getNestedValue(errors, field)}
+          {errors?.[field]}
         </p>
       )}
 

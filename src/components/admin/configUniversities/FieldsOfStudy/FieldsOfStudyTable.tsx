@@ -36,7 +36,7 @@ const FieldsOfStudyTable = () => {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { fields, fieldsLoading, fieldsError } = useAllFields();
+  const { fields, fieldsLoading, fieldsError, refetch } = useAllFields();
 
   const { deleteField, isDeleting } = useDeleteField();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -129,13 +129,13 @@ const FieldsOfStudyTable = () => {
     try {
       await deleteField(selectedFieldId);
 
-      showToast(" Field of study deleted successfully.", "success");
+      showToast("Field of study deleted successfully.", "success");
 
       setIsDeleteOpen(false);
       setSelectedFieldId(null);
       setSelectedFieldName("");
 
-      setTimeout(() => location.reload(), 2000);
+      refetch();
     } catch (error: any) {
       const backendMessage =
         error?.response?.data?.message || "Please try again.";
@@ -380,11 +380,13 @@ const FieldsOfStudyTable = () => {
         isOpen={isUpdateOpen}
         onClose={() => setIsUpdateOpen(false)}
         selectedField={selectedField}
+        onSuccess={refetch}
       />
 
       <CreateFieldOfStudy
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
+        onSuccess={refetch}
       />
     </div>
   );

@@ -1,7 +1,7 @@
 
 'use client';
 
-import ProgramApplicationForm from "features/applications/components/partner/form/ProgramApplicationForm"
+import ProgramApplicationForm from "features/applications/partner/components/form/ProgramApplicationForm"
 
 export default function StudentApplicationForm() {
   return (

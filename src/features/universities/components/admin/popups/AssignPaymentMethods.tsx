@@ -12,7 +12,7 @@ import { CURRENCY } from 'constants/lists';
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import SelectField from "components/form/SelectField";
-import InputField from "components/form/InputField";
+import TextareaField from "components/form/TextareaField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 
 interface AssignPaymentUniversityProps {
@@ -29,7 +29,7 @@ export default function AssignPaymentUniversity({
   onSuccess,
 }: AssignPaymentUniversityProps) {
 
-  const { paymentMethods, loading } = useAllPaymentMethods();
+  const { paymentMethods } = useAllPaymentMethods();
   const { universityPaymentMethods } = useUniversityPaymentMethods(universityId);
   const { assignPaymentMethod, loading: assigning } = useAssignUniversityPaymentMethod();
 
@@ -46,42 +46,34 @@ export default function AssignPaymentUniversity({
 
   useEffect(() => {
     if (isOpen) {
-      setFormData({
-        payment_method_id: "",
-        instructions: "",
-        currency: "",
-        is_active: true,
-      });
+      setFormData({ payment_method_id: "", instructions: "", currency: "", is_active: true });
       setErrors({});
     }
   }, [isOpen]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        onClose();
-      }
+      if (e.key === "Escape" && isOpen) onClose();
     };
-
     window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  const isFormValid = () =>
-    formData.payment_method_id.trim() !== "" &&
-    formData.currency.trim() !== "" &&
-    !assigning;
+  const isFormValid = React.useMemo(
+    () => formData.payment_method_id.trim() !== "" && !assigning,
+    [formData.payment_method_id, assigning]
+  );
 
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
+    if (errors[field]) setErrors((prev) => { const n = { ...prev }; delete n[field]; return n; });
   };
 
   const handleAssign = async () => {
-    if (!formData.payment_method_id) return;
+    if (!formData.payment_method_id.trim()) {
+      setErrors({ payment_method_id: "Payment method is required" });
+      return;
+    }
 
     try {
       await assignPaymentMethod(universityId, {
@@ -92,7 +84,6 @@ export default function AssignPaymentUniversity({
       });
 
       showToast("Payment method assigned successfully.", "success");
-
       onClose();
       onSuccess?.();
 
@@ -101,15 +92,13 @@ export default function AssignPaymentUniversity({
 
       if (Array.isArray(apiErrors)) {
         const newErrors: Record<string, string> = {};
-
         apiErrors.forEach((e: any) => {
           if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
         });
-
         setErrors(newErrors);
+      } else {
+        showToast("Failed to assign payment method.", "error");
       }
-
-      showToast("Failed to assign payment method.", "error");
     }
   };
 
@@ -140,7 +129,7 @@ export default function AssignPaymentUniversity({
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
             title="Assign Payment Method"
-            description={`Assign a payment method to the selected university.`}
+            description="Assign a payment method to the selected university."
             icon={CreditCard}
             iconBg="bg-blue-50"
             iconColor="text-blue-600"
@@ -154,11 +143,8 @@ export default function AssignPaymentUniversity({
               label="Payment Method"
               field="payment_method_id"
               required
-              options={paymentMethods.map((p) => ({
-                value: String(p.id),
-                label: p.name,
-              }))}
-              disabledOptions={universityPaymentMethods.map(p => String(p.payment_method_id))}
+              options={paymentMethods.map((p) => ({ value: String(p.id), label: p.name }))}
+              disabledOptions={universityPaymentMethods.map((p) => String(p.payment_method_id))}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
@@ -167,19 +153,18 @@ export default function AssignPaymentUniversity({
             <SelectField
               label="Currency"
               field="currency"
-              options={(CURRENCY.map((c) => ({
-                value: c.value,
-                label: c.label,
-              })))}
+              required={false}
+              options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
             />
 
-            <InputField
+            <TextareaField
               label="Instructions"
               field="instructions"
               placeholder="Optional payment instructions..."
+              required={false}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
@@ -197,9 +182,9 @@ export default function AssignPaymentUniversity({
             />
             <Button
               onClick={handleAssign}
-              disabled={!isFormValid()}
+              disabled={!isFormValid}
               icon={<CreditCard className="h-5 w-5" />}
-              text={loading ? "Assigning..." : "Assign Payment Method"}
+              text={assigning ? "Assigning..." : "Assign Payment Method"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"
               borderColor="border-blue-600"

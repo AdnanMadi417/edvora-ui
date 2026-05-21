@@ -74,7 +74,7 @@ const CreatableSelectField = ({
       <div
         onClick={() => setIsOpen((prev) => !prev)}
         className={`mt-2 flex h-12 w-full items-center justify-between rounded-md border bg-white p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-          getNestedValue(errors, field) ? "border-red-500" : "border-default"
+          errors?.[field] ? "border-red-500" : "border-default"
         }`}
       >
         <span
@@ -106,7 +106,7 @@ const CreatableSelectField = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={`mt-2 flex h-10 w-full items-start justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1  focus:ring-blue-500 ${
-              getNestedValue(errors, field)
+              errors?.[field]
                 ? "border-red-500"
                 : "border-default"
             }`}
@@ -146,9 +146,9 @@ const CreatableSelectField = ({
         </div>
       )}
 
-      {getNestedValue(errors, field) && (
+      {errors?.[field] && (
         <p className="mt-1 text-xs text-red-600">
-          {getNestedValue(errors, field)}
+          {errors?.[field]}
         </p>
       )}
     </div>

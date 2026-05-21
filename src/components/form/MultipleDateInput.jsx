@@ -68,7 +68,7 @@ const MultipleDateInput = ({
               onChange={(e) => updateDate(i, e.target.value)}
               aria-label={`Intake date ${i + 1}`}
               className={`h-12 flex-1 rounded-md border px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500 ${
-                getNestedValue(errors, `${field}[${i}]`)
+                errors?.[`${field}[${i}]`]
                   ? "border-red-500 bg-red-50"
                   : "border-slate-200"
               }`}
@@ -88,8 +88,8 @@ const MultipleDateInput = ({
         ))}
       </div>
 
-      {getNestedValue(errors, field) && (
-        <p className="mt-1 text-xs text-red-600">{getNestedValue(errors, field)}</p>
+      {errors?.[field] && (
+        <p className="mt-1 text-xs text-red-600">{errors?.[field]}</p>
       )}
     </div>  );
 };

@@ -81,11 +81,6 @@ export default function BatchPrograms({
 
   const handleUpdate = async () => {
     try {
-      const amount =
-        formData.english_required_score !== ""
-          ? String(formData.english_required_score)
-          : undefined;
-
       const payload = {
         program_ids: selectedProgramIds,
         english_required_score: formData.english_required_score || undefined,

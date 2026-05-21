@@ -9,6 +9,7 @@ import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import SelectField from "components/form/SelectField";
 import InputField from "components/form/InputField";
+import TextareaField from "components/form/TextareaField";
 import MultiSelect from "components/form/search/MultiSelect";
 import { useToast } from "components/context/ToastContext";
 import { CURRENCY } from 'constants/lists';
@@ -63,12 +64,16 @@ export default function BatchUniversities({
 
   const updateFormData = (field: keyof FormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
+    if (errors[field]) setErrors((prev) => { const n = { ...prev }; delete n[field]; return n; });
   };
 
   const handleAssign = async () => {
-    if (!formData.payment_method_ids.length || !formData.university_ids.length)
+    if (!formData.payment_method_ids.length) {
+      setErrors({ payment_method_ids: "At least one payment method is required" });
       return;
+    }
+
+    if (!formData.university_ids.length) return;
 
     try {
       await batchAssignPaymentMethod({
@@ -83,8 +88,18 @@ export default function BatchUniversities({
       onClose();
       onSuccess?.();
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
-      showToast(`Failed to assign payment method. ${backendMessage}`, "error");
+      const apiErrors = error?.response?.data?.detail;
+
+      if (Array.isArray(apiErrors)) {
+        const newErrors: Record<string, string> = {};
+        apiErrors.forEach((e: any) => {
+          if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
+        });
+        setErrors(newErrors);
+      } else {
+        const backendMessage = error?.response?.data?.message || "Please try again.";
+        showToast(`Failed to assign payment method. ${backendMessage}`, "error");
+      }
     }
   };
 
@@ -118,10 +133,7 @@ export default function BatchUniversities({
               label="Payment Method"
               field="payment_method_ids"
               required
-              options={paymentMethods.map((p) => ({
-                value: String(p.id),
-                label: p.name,
-              }))}
+              options={paymentMethods.map((p) => ({ value: String(p.id), label: p.name }))}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
@@ -130,23 +142,21 @@ export default function BatchUniversities({
             <SelectField
               label="Currency"
               field="currency"
-              options={(CURRENCY.map((c) => ({
-                value: c.value,
-                label: c.label,
-              })))}
+              required={false}
+              options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
             />
 
-            <InputField
+            <TextareaField
               label="Instructions"
               field="instructions"
               placeholder="Optional payment instructions..."
+              required={false}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
-              required={false}
             />
           </div>
 

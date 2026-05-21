@@ -8,8 +8,9 @@ const getNestedValue = (obj, path) => {
     .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
-const InputField = ({ label, field, type = "text", required = true, placeholder = "", formData, errors, updateFormData }) => {
+const InputField = ({ label, field, type = "text", required = true, placeholder = "", formData, errors, updateFormData, onBlur = undefined }) => {
   const value = getNestedValue(formData, field) ?? "";
+  const error = errors?.[field];
 
   const dateProps = type === "date" ? { min: "1900-01-01", max: "2099-12-31" } : {};
 
@@ -23,15 +24,16 @@ const InputField = ({ label, field, type = "text", required = true, placeholder 
         type={type}
         value={value}
         onChange={(e) => updateFormData(field, type === "email" ? e.target.value.toLowerCase() : e.target.value)}
+        onBlur={onBlur}
         placeholder={placeholder}
         {...dateProps}
-        className={`mt-2 flex h-12 w-full items-center justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1  focus:ring-blue-500 ${
-          getNestedValue(errors, field) ? "border-red-500" : "border-default"
+        className={`mt-2 flex h-12 w-full items-center justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+          error ? "border-red-500 bg-red-50" : "border-default"
         }`}
       />
 
-      {getNestedValue(errors, field) && (
-        <p className="mt-1 text-xs text-red-600">{getNestedValue(errors, field)}</p>
+      {error && (
+        <p className="mt-1 text-xs text-red-600">{error}</p>
       )}
     </div>
   );

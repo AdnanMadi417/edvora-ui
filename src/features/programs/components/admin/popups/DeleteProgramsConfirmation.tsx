@@ -68,7 +68,7 @@ export default function DeleteProgramsConfirmation({
                   Confirm Deletion
                 </h3>
                 <p className="text-sm text-slate-500">
-                  Are you sure you want to remove this account manager from the system?
+                  Are you sure you want to permanently delete the selected program(s) from the system?
                 </p>
               </div>
 
