@@ -374,7 +374,6 @@ export default function RegisterUniversity() {
                       setErrors((prev) => { const n = { ...prev }; delete n[`branches[${index}].state_id`]; return n; });
                       updateBranch(index, field, value);
                     }}
-                    onSelect={() => validateField(`branches[${index}].state_id`)}
                   />
 
                 </div>

@@ -52,8 +52,14 @@ export const validateUniversity = (formData: UniversityFormData): UniversityVali
     formData.branches.forEach((b, i) => {
       if (!b.name?.trim())
         errors[`branches[${i}].name`] = "Branch name is required";
+      else if (b.name.trim().length < 5)
+        errors[`branches[${i}].name`] = "Branch name must be at least 5 characters";
+
       if (!b.location?.trim())
         errors[`branches[${i}].location`] = "Location is required";
+      else if (b.location.trim().length < 5)
+        errors[`branches[${i}].location`] = "Location must be at least 5 characters";
+
       if (!b.state_id)
         errors[`branches[${i}].state_id`] = "State is required";
     });
@@ -63,10 +69,14 @@ export const validateUniversity = (formData: UniversityFormData): UniversityVali
 };
 
 export const isUniversityComplete = (formData: UniversityFormData): boolean => {
-  if (!formData.name?.trim()) return false;
+  if (!formData.name?.trim() || formData.name.trim().length < 5) return false;
   if (formData.country !== undefined && !formData.country?.trim()) return false;
   if (!formData.university_type_id) return false;
   if (!formData.branches || formData.branches.length === 0) return false;
-  if (formData.branches.some((b) => !b.name?.trim() || !b.location?.trim() || !b.state_id)) return false;
+  if (formData.branches.some((b) =>
+    !b.name?.trim() || b.name.trim().length < 5 ||
+    !b.location?.trim() || b.location.trim().length < 5 ||
+    !b.state_id
+  )) return false;
   return true;
 };
