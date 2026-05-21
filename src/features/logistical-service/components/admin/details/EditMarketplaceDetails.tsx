@@ -45,7 +45,7 @@ interface FormData {
   selectedLocations: string[];
 }
 
-type FormErrors = Partial<Record<keyof FormData, string>>;
+type FormErrors = Record<string, string>;
 
 const EditMarketplaceDetails = ({ id }: Props) => {
   const router = useRouter();
@@ -123,9 +123,28 @@ const EditMarketplaceDetails = ({ id }: Props) => {
     logoFile !== null ||
     existingLogoKey !== initialLogoKey;
 
+  const validateField = (field: string, value: string) => {
+    let error = "";
+    if (field === "name") {
+      if (!value.trim()) error = "Name is required";
+      else if (value.trim().length < 5) error = "Name must be at least 5 characters";
+      else if (value.trim().length > 255) error = "Name must not exceed 255 characters";
+    } else if (field === "phone_number") {
+      if (!value.trim()) error = "Phone number is required";
+      else if (value.trim().length > 50) error = "Phone number must not exceed 50 characters";
+    } else if (field === "whatsapp") {
+      if (value.trim().length > 50) error = "WhatsApp number must not exceed 50 characters";
+    } else if (field.endsWith(".name")) {
+      if (!value.trim()) error = "Package name is required";
+      else if (value.trim().length < 5) error = "Package name must be at least 5 characters";
+      else if (value.trim().length > 255) error = "Package name must not exceed 255 characters";
+    }
+    setErrors((prev) => ({ ...prev, [field]: error }));
+  };
+
   const updateFormData = <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: undefined }));
+    setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const handleLogoSelect = async (file: File) => {
@@ -227,11 +246,41 @@ const EditMarketplaceDetails = ({ id }: Props) => {
       return;
     }
 
-    const newErrors: FormErrors = {};
-    if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.nationality) newErrors.nationality = "Nationality is required";
-    if (!formData.main_location) newErrors.main_location = "Location is required";
-    if (!formData.phone_number) newErrors.phone_number = "Phone number is required";
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    } else if (formData.name.trim().length < 5) {
+      newErrors.name = "Name must be at least 5 characters";
+    } else if (formData.name.trim().length > 255) {
+      newErrors.name = "Name must not exceed 255 characters";
+    }
+    if (!formData.nationality.trim()) {
+      newErrors.nationality = "Nationality is required";
+    } else if (formData.nationality.trim().length > 100) {
+      newErrors.nationality = "Nationality must not exceed 100 characters";
+    }
+    if (!formData.main_location.trim()) {
+      newErrors.main_location = "Location is required";
+    } else if (formData.main_location.trim().length > 255) {
+      newErrors.main_location = "Location must not exceed 255 characters";
+    }
+    if (!formData.phone_number.trim()) {
+      newErrors.phone_number = "Phone number is required";
+    } else if (formData.phone_number.trim().length > 50) {
+      newErrors.phone_number = "Phone number must not exceed 50 characters";
+    }
+    if (formData.whatsapp.trim().length > 50) {
+      newErrors.whatsapp = "WhatsApp number must not exceed 50 characters";
+    }
+    formData.packages_offered.forEach((pkg, i) => {
+      if (!pkg.name.trim()) {
+        newErrors[`packages_offered[${i}].name`] = "Package name is required";
+      } else if (pkg.name.trim().length < 5) {
+        newErrors[`packages_offered[${i}].name`] = "Package name must be at least 5 characters";
+      } else if (pkg.name.trim().length > 255) {
+        newErrors[`packages_offered[${i}].name`] = "Package name must not exceed 255 characters";
+      }
+    });
     if (!formData.selectedServices.length) newErrors.selectedServices = "Please select at least one service";
     if (!formData.selectedLanguages.length) newErrors.selectedLanguages = "Please select at least one language";
     if (!formData.selectedUniversities.length) newErrors.selectedUniversities = "Please select at least one university";
@@ -313,11 +362,11 @@ const EditMarketplaceDetails = ({ id }: Props) => {
 
         <div className="space-y-6 px-6 py-5">
           <div className="grid grid-cols-1 gap-x-3">
-            <InputField label="Provider Name" field="name" placeholder={service?.name} required formData={formData} errors={errors} updateFormData={updateFormData} />
+            <InputField label="Provider Name" field="name" placeholder={service?.name} required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("name", formData.name)} />
             <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITIES.map((c) => ({ label: c.name, value: c.name }))} formData={formData} errors={errors} updateFormData={updateFormData} />
             <SelectField label="Current Residence" field="main_location" options={states.map((u) => ({ value: u.name, label: u.name }))} formData={formData} errors={errors} updateFormData={updateFormData} />
-            <InputField label="Primary Contact Number" field="phone_number" placeholder="e.g. +60 12 345 6789" required formData={formData} errors={errors} updateFormData={updateFormData} />
-            <InputField label="WhatsApp Contact" field="whatsapp" placeholder="e.g. +60 12 345 6789" required formData={formData} errors={errors} updateFormData={updateFormData} />
+            <InputField label="Primary Contact Number" field="phone_number" placeholder="e.g. +60 12 345 6789" required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("phone_number", formData.phone_number)} />
+            <InputField label="WhatsApp Contact" field="whatsapp" placeholder="e.g. +60 12 345 6789" formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("whatsapp", formData.whatsapp)} />
 
             <label className={`group relative flex cursor-pointer items-center justify-between rounded-md border px-4 py-4 transition-all ${formData.is_active ? "border-blue-600 bg-blue-50 shadow-sm" : "border-slate-200 bg-white hover:border-slate-300"}`}>
               <div className="flex flex-col">
@@ -355,7 +404,7 @@ const EditMarketplaceDetails = ({ id }: Props) => {
                   </button>
                 </div>
                 <div className="grid grid-cols-1 gap-x-3 md:grid-cols-2">
-                  <InputField label="Package Name" field="name" required formData={{ name: pkg.name }} errors={{}} updateFormData={(_: string, value: string) => updatePackage(index, "name", value)} />
+                  <InputField label="Package Name" field="name" required formData={{ name: pkg.name }} errors={{ name: errors[`packages_offered[${index}].name`] || "" }} updateFormData={(_: string, value: string) => { updatePackage(index, "name", value); setErrors((prev) => ({ ...prev, [`packages_offered[${index}].name`]: "" })); }} onBlur={() => validateField(`packages_offered[${index}].name`, formData.packages_offered[index].name)} />
                   <InputField label="Price (RM)" field="price" type="number" formData={{ price: pkg.price }} errors={{}} updateFormData={(_: string, value: string) => updatePackage(index, "price", Number(value))} />
                 </div>
                 <InputField label="Description" field="description" formData={{ description: pkg.description }} errors={{}} updateFormData={(_: string, value: string) => updatePackage(index, "description", value)} />
