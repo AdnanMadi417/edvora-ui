@@ -234,7 +234,6 @@ export default function RegisterProgram() {
           ? (formData.scholarships || [])
               .filter((s) => s.name && s.description)
               .map((s) => ({
-                type: Number(s.type ?? 2),
                 coverage_percent: Number(s.coverage_percent || 0),
                 max_amount: Number(s.max_amount || 0),
                 name: s.name,

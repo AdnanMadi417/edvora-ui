@@ -39,9 +39,17 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { validateProgram } from "./validateProgram";
 import type { FormData as ProgramFormData } from "./RegisterProgram";
 
+const SCHOLARSHIP_TYPE_MAP: Record<string, number> = { full: 1, partial: 2, mixed: 3 };
+const toScholarshipTypeInt = (t: any): number | null => {
+  if (typeof t === "number" && [1, 2, 3].includes(t)) return t;
+  if (typeof t === "string") return SCHOLARSHIP_TYPE_MAP[t.toLowerCase()] ?? null;
+  return null;
+};
+
 interface Props {
   id: string;
 }
+
 
 const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -162,6 +170,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       one_time_fees: program.one_time_fees ?? [],
       scholarships: (program.scholarships ?? []).map((s: any) => ({
         ...s,
+        type: toScholarshipTypeInt(s.type),
         conditions: s.conditions ?? [],
       })),
     };
@@ -232,7 +241,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
         scholarships: formData.has_scholarship
           ? Array.isArray(formData.scholarships)
             ? formData.scholarships.map((s: any) => ({
-              type: Number(s.type) || 1,
+              type: toScholarshipTypeInt(s.type),
               coverage_percent: Number(s.coverage_percent) || 0,
               max_amount: Number(s.max_amount) || 0,
               name: String(s.name || ""),

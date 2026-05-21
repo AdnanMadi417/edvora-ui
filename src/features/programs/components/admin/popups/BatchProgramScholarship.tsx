@@ -76,7 +76,6 @@ export default function BatchProgramScholarships({
     if (isOpen) {
       setFormData({
         program_ids: selectedProgramIds || [],
-        has_scholarship: false,
         scholarships: [defaultScholarship()],
       });
       setErrors({});
@@ -124,7 +123,6 @@ export default function BatchProgramScholarships({
         scholarships: formData.scholarships
           .filter((s) => s.name && s.description)
           .map((s) => ({
-            type: Number(s.type ?? 1),
             coverage_percent: Number(s.coverage_percent || 0),
             max_amount: Number(s.max_amount || 0),
             name: s.name,
