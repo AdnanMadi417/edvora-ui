@@ -42,12 +42,16 @@ export default function BatchCommissionPrograms({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const isFormValid =
-    formData.commission_amount !== "" &&
-    Number(formData.commission_amount) <= 29999 &&
-    formData.expected_commission_from !== "" &&
-    formData.expected_commission_to !== "" &&
-    !loading;
+  const isFormValid = React.useMemo(
+    () =>
+      formData.commission_amount !== "" &&
+      Number(formData.commission_amount) > 0 &&
+      Number(formData.commission_amount) <= 29999 &&
+      formData.expected_commission_from !== "" &&
+      formData.expected_commission_to !== "" &&
+      !loading,
+    [formData.commission_amount, formData.expected_commission_from, formData.expected_commission_to, loading]
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -168,6 +172,7 @@ export default function BatchCommissionPrograms({
               <SelectField
                 label="Currency"
                 field="commission_currency"
+                required={false}
                 options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
                 formData={formData}
                 errors={errors}
@@ -179,6 +184,7 @@ export default function BatchCommissionPrograms({
               <SelectField
                 label="Expected From"
                 field="expected_commission_from"
+                required
                 options={MONTHS.map((m) => ({
                   value: m.value,
                   label: m.label,
@@ -191,6 +197,7 @@ export default function BatchCommissionPrograms({
               <SelectField
                 label="Expected To"
                 field="expected_commission_to"
+                required
                 options={MONTHS.map((m) => ({
                   value: m.value,
                   label: m.label,

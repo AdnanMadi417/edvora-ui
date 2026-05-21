@@ -51,18 +51,17 @@ export default function BatchProgramScholarships({
 
   const [formData, setFormData] = useState<{
     program_ids: string[];
-    has_scholarship: boolean;
     scholarships: Scholarship[];
   }>({
     program_ids: [],
-    has_scholarship: false,
     scholarships: [defaultScholarship()],
   });
 
   const isFormValid =
-    !formData.has_scholarship ||
-    (formData.scholarships.length > 0 &&
-      formData.scholarships.every((s) => s.name.trim() !== "" && s.description.trim() !== ""));
+    formData.scholarships.length > 0 &&
+    formData.scholarships.every(
+      (s) => s.name.trim().length >= 5 && s.description.trim().length >= 5
+    );
 
   useEffect(() => {
     if (isOpen) {
@@ -96,9 +95,6 @@ export default function BatchProgramScholarships({
         current = current[keys[i]];
       }
       current[keys[keys.length - 1]] = value;
-      if (field === "has_scholarship" && value === false) {
-        updated.scholarships = [];
-      }
       return updated;
     });
 

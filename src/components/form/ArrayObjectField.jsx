@@ -1,5 +1,5 @@
 // components/form/ArrayObjectField.jsx
-import React, { useEffect } from "react";
+import React from "react";
 import AddDate from "../ui/buttons/IconButton";
 import { CalendarPlus, Trash2 } from "lucide-react";
 import IconButton from "../ui/buttons/IconButton";
@@ -44,12 +44,6 @@ const ArrayObjectField = ({
     }, {});
   };
 
-  useEffect(() => {
-    if (!arrayValue || arrayValue.length === 0) {
-      updateFormData(field, [buildDefaultRow([])]);
-    }
-  }, []);
-
   const handleChange = (index, key, value) => {
     updateFormData(field, setArrayFieldValue(arrayValue, index, key, value));
   };
@@ -84,6 +78,10 @@ const ArrayObjectField = ({
           onClick={addRow}
         />
       </div>
+
+      {arrayValue.length === 0 && (
+        <p className="py-2 text-center text-sm text-slate-400">No entries yet. Click + to add one.</p>
+      )}
 
       {arrayValue.map((item, index) => (
         <div

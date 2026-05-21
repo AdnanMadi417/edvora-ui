@@ -13,6 +13,7 @@ export function useAllFields() {
   const [fields, setFields] = useState<FieldOfStudy[]>([]);
   const [fieldsLoading, setLoading] = useState<boolean>(false);
   const [fieldsError, setError] = useState<string>("");
+  const [refetchCounter, setRefetchCounter] = useState(0);
 
   useEffect(() => {
     const fetchFields = async () => {
@@ -36,11 +37,12 @@ export function useAllFields() {
     };
 
     fetchFields();
-  }, []);
+  }, [refetchCounter]);
 
   return {
     fields,
     fieldsLoading,
     fieldsError,
+    refetch: () => setRefetchCounter((c) => c + 1),
   };
 }

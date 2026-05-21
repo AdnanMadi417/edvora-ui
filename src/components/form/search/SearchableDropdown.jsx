@@ -64,7 +64,7 @@ const CreatableSelectField = ({
     updateFormData(field, option.value);
     setIsOpen(false);
     setSearch("");
-    onSelect?.();
+    onSelect?.(option.value);
   };
 
   return (
