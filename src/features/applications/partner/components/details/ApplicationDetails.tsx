@@ -60,9 +60,14 @@ export default function ApplicationDetails({
     return new Date(dateString).toLocaleDateString();
   }
 
-  const { actions, loading: actionsLoading } = useApplicationActions(
+  const { actions, loading: actionsLoading, refetch: refetchActions } = useApplicationActions(
     application?.id
   );
+
+  const handleRefetch = async () => {
+    await onRefetch?.();
+    refetchActions();
+  };
 
   const student = application.student || {};
   const program = application.program || {};
@@ -101,7 +106,7 @@ export default function ApplicationDetails({
         notes: "Partner commission confirmed successfully",
       });
       showToast("Commission confirmed successfully", "success");
-      onRefetch?.();
+      handleRefetch();
     } catch {
       showToast("Failed to confirm commission", "error");
     } finally {
@@ -544,7 +549,7 @@ export default function ApplicationDetails({
 
       <ApplicationTimeline application={application} />
       <ApplicationCommission application={application} actions={actions} />
-      <OfferLetterDecision application={application} visaCase={visaCase} onRefetch={onRefetch} />
+      <OfferLetterDecision application={application} visaCase={visaCase} onRefetch={handleRefetch} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
@@ -886,7 +891,7 @@ export default function ApplicationDetails({
           isOpen={showRequiredActionPopup}
           onClose={closeRequiredActionPopup}
           applicationId={application.id}
-          onRefetch={onRefetch}
+          onRefetch={handleRefetch}
         />
       )}
 
@@ -895,7 +900,7 @@ export default function ApplicationDetails({
           isOpen={showArrivalPopup}
           onClose={() => setShowArrivalPopup(false)}
           applicationId={application.id}
-          onRefetch={onRefetch}
+          onRefetch={handleRefetch}
         />
       )}
 
@@ -904,7 +909,7 @@ export default function ApplicationDetails({
           isOpen={showEmgsUploadPopup}
           onClose={() => setShowEmgsUploadPopup(false)}
           applicationId={application.id}
-          onRefetch={onRefetch}
+          onRefetch={handleRefetch}
         />
       )}
 
@@ -913,7 +918,7 @@ export default function ApplicationDetails({
           isOpen={showEVisaUploadPopup}
           onClose={() => setShowEVisaUploadPopup(false)}
           applicationId={application.id}
-          onRefetch={onRefetch}
+          onRefetch={handleRefetch}
         />
       )}
 
@@ -923,7 +928,7 @@ export default function ApplicationDetails({
           isOpen={showVisaPaymentPopup}
           onClose={() => setShowVisaPaymentPopup(false)}
           applicationId={application.id}
-          onRefetch={onRefetch}
+          onRefetch={handleRefetch}
         />
       )}
 
@@ -934,7 +939,7 @@ export default function ApplicationDetails({
           applicationId={application.id}
           universityId={application.program?.university?.id || ""}
           correctionReason={actions?.correction_reason ?? undefined}
-          onRefetch={onRefetch}
+          onRefetch={handleRefetch}
         />
       )}
 
