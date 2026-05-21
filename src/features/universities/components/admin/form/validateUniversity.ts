@@ -30,9 +30,12 @@ export const validateUniversity = (formData: UniversityFormData): UniversityVali
     errors.name = "University name must not exceed 255 characters";
   }
 
-  // country — required only when the field is present in the form (edit form)
-  if (formData.country !== undefined && !formData.country?.trim()) {
-    errors.country = "Country is required";
+  // country — required only when the field is present in the form (edit form), max 100 (String100)
+  if (formData.country !== undefined) {
+    if (!formData.country?.trim())
+      errors.country = "Country is required";
+    else if (formData.country.trim().length > 100)
+      errors.country = "Country must not exceed 100 characters";
   }
 
   // university_type_id — required
@@ -54,11 +57,15 @@ export const validateUniversity = (formData: UniversityFormData): UniversityVali
         errors[`branches[${i}].name`] = "Branch name is required";
       else if (b.name.trim().length < 5)
         errors[`branches[${i}].name`] = "Branch name must be at least 5 characters";
+      else if (b.name.trim().length > 255)
+        errors[`branches[${i}].name`] = "Branch name must not exceed 255 characters";
 
       if (!b.location?.trim())
         errors[`branches[${i}].location`] = "Location is required";
       else if (b.location.trim().length < 5)
         errors[`branches[${i}].location`] = "Location must be at least 5 characters";
+      else if (b.location.trim().length > 255)
+        errors[`branches[${i}].location`] = "Location must not exceed 255 characters";
 
       if (!b.state_id)
         errors[`branches[${i}].state_id`] = "State is required";

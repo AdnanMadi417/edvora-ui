@@ -60,7 +60,7 @@ export default function BatchProgramScholarships({
   const isFormValid =
     formData.scholarships.length > 0 &&
     formData.scholarships.every(
-      (s) => s.name.trim().length >= 5 && s.description.trim().length >= 5
+      (s) => s.name.trim().length >= 5 && s.description.trim().length >= 10
     );
 
   useEffect(() => {

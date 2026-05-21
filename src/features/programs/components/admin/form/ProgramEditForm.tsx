@@ -430,7 +430,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 Academic Details
               </h3>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <InputField
                   label="Duration (Years)"
                   field="duration"
@@ -467,8 +467,9 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                   updateFormData={updateFormData}
                   onSelect={(v) => validateField('qualification_id', v)}
                 />
+              </div>
 
-                <div className="md:col-span-2">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <TextareaField
                     label="Overview"
                     field="overview"
@@ -478,9 +479,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                     errors={errors}
                     updateFormData={updateFormData}
                   />
-                </div>
 
-                <div className="md:col-span-2">
                   <TextareaField
                     label="Curriculum"
                     field="curriculum"
@@ -491,7 +490,8 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                     updateFormData={updateFormData}
                   />
                 </div>
-              </div>
+
+
             </div>
 
             <div className="space-y-6 px-6 pb-5 border-b border-slate-200">
@@ -532,33 +532,32 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 Commission Structure
               </h3>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <InputField
-                      label="Commission Amount"
-                      field="commission_amount"
-                      type="number"
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                  <div className="w-32">
-                    <SelectField
-                      label="Currency"
-                      field="commission_currency"
-                      options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+
+                <InputField
+                  label="Commission Amount"
+                  field="commission_amount"
+                  type="number"
+                  required={false}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+
+                <SelectField
+                  label="Currency"
+                  field="commission_currency"
+                  required={false}
+                  options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
 
                 <SelectField
                   label="Expected From"
                   field="expected_commission_from"
+                  required={false}
                   options={MONTHS.map((m) => ({ value: m.value, label: m.label }))}
                   formData={formData}
                   errors={errors}
@@ -568,13 +567,14 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 <SelectField
                   label="Expected To"
                   field="expected_commission_to"
+                  required={false}
                   options={MONTHS.map((m) => ({ value: m.value, label: m.label }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
 
-                <div className="md:col-span-2">
+                <div className="md:col-span-4">
                   <TextareaField
                     label="Commission Notes"
                     field="commission_notes"
