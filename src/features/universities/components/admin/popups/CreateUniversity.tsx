@@ -16,6 +16,7 @@ import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import MultipleDatePickerModal from "components/form/MultipleDatePickerModal";
 import InputField from "components/form/InputField";
+import TextareaField from "components/form/TextareaField";
 
 import { useCreateUniversity } from "features/universities/hooks";
 import { useToast } from "components/context/ToastContext";
@@ -152,7 +153,7 @@ export default function CreateUniversity({
               updateFormData={updateFormData}
             />
 
-            <InputField
+            <TextareaField
               label="Description"
               field="description"
               placeholder="Brief university description..."

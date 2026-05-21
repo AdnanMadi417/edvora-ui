@@ -21,6 +21,7 @@ const CreatableSelectField = ({
                                 updateFormData,
                                 placeholder = "Select...",
                                 disabledOptions = [],
+                                onSelect = undefined,
                               }) => {
   const containerRef = useRef(null);
 
@@ -63,6 +64,7 @@ const CreatableSelectField = ({
     updateFormData(field, option.value);
     setIsOpen(false);
     setSearch("");
+    onSelect?.();
   };
 
   return (

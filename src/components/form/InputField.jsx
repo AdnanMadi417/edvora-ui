@@ -8,7 +8,7 @@ const getNestedValue = (obj, path) => {
     .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
-const InputField = ({ label, field, type = "text", required = true, placeholder = "", formData, errors, updateFormData, onBlur }) => {
+const InputField = ({ label, field, type = "text", required = true, placeholder = "", formData, errors, updateFormData, onBlur = undefined }) => {
   const value = getNestedValue(formData, field) ?? "";
   const error = errors?.[field];
 
