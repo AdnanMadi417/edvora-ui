@@ -98,7 +98,7 @@ const AccountManagersTable = () => {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -140,10 +140,10 @@ const AccountManagersTable = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-card">
+      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-white">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-slate-200 bg-card">
+            <tr className="border-b border-slate-200 bg-white">
               <th className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-slate-500" />
@@ -201,7 +201,7 @@ const AccountManagersTable = () => {
               paginatedAccountManagers.map((m) => (
                 <tr
                   key={m.id}
-                  className="group cursor-pointer transition-colors hover:bg-primary/10"
+                  className="group cursor-pointer transition-colors bg-white hover:bg-slate-50"
                   onClick={() => router.push(`/admin/account-managers/profile/${m.id}`)}
                 >
                   <td className="min-w-[200px] max-w-[250px] px-6 py-4">
@@ -290,7 +290,7 @@ const AccountManagersTable = () => {
         </table>
       </div>
 
-      <div className="sticky bottom-0 rounded-b-lg border border-slate-200 bg-card px-6 py-4">
+      <div className="sticky bottom-0 rounded-b-lg border border-slate-200 bg-white px-6 py-4">
         <div className="flex flex-col items-center justify-between gap-3 text-sm text-slate-500 md:flex-row">
           <div>
             Showing{" "}
