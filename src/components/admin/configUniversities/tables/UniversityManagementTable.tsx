@@ -43,7 +43,7 @@ const UniversityManagementTable = () => {
   const [selectedUniversityName, setSelectedUniversityName] =
     useState<string>('');
 
-  const { universities, loading, error } = useUniversityTypes();
+  const { universities, loading, error, refetchUniversityTypes } = useUniversityTypes();
 
   const [selectedState, setSelectedState] = useState<string>('all');
   const [selectedField, setSelectedField] = useState<string>('all');
@@ -76,7 +76,7 @@ const UniversityManagementTable = () => {
     });
   }, [universities, searchTerm, selectedState, selectedField]);
 
-  const [sortConfig, setSortConfig] = useState<{
+  const [sortConfig] = useState<{
     key: string;
     direction: 'asc' | 'desc';
   }>({
@@ -134,10 +134,7 @@ const UniversityManagementTable = () => {
       setIsDeleteOpen(false);
       setSelectedUniversityId(null);
       setSelectedUniversityName('');
-
-      setTimeout (() => {
-        router.push(`/admin/config-universities/`);
-      })
+      refetchUniversityTypes();
 
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || 'Please try again.';
@@ -162,7 +159,7 @@ const UniversityManagementTable = () => {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -215,13 +212,11 @@ const UniversityManagementTable = () => {
         </div>
       </div>
 
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
-        <div className="block">
-          <div className="overflow-x-auto rounded-lg rounded-b-none bg-card">
+      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-white">
             <table className="w-full">
 
               <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 ">
+              <tr className="border-b border-slate-200 bg-white ">
 
                 <th
                   className="group min-w-[220px] px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors">
@@ -276,7 +271,7 @@ const UniversityManagementTable = () => {
               </tr>
               </thead>
 
-              <tbody className="divide-border-slate-200 divide-y bg-white">
+              <tbody className="divide-y divide-slate-200 bg-white">
               {loading && (
                 <tr>
                   <td colSpan={8} className="px-6 py-8 text-center">
@@ -300,7 +295,7 @@ const UniversityManagementTable = () => {
                 currentUniversities.map((uni) => (
                   <tr
                     key={uni.id}
-                    className="group cursor-pointer transition-colors hover:bg-primary/10"
+                    className="group cursor-pointer bg-white transition-colors hover:bg-slate-50"
                     onClick={() => router.push(`/admin/config-universities/${uni.id}`)}
                   >
                     <td className="min-w-[200px] max-w-[300px] px-6 py-4">
@@ -413,59 +408,56 @@ const UniversityManagementTable = () => {
                 ))}
               </tbody>
             </table>
-          </div>
+      </div>
 
-          <div
-            className="grid grid-cols-1 items-center gap-4 border-t bg-slate-50 p-4 sm:p-6 md:flex  md:justify-between">
-            {universities.length > 0 && (
-              <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
-                Showing
-                <span className="font-medium">
+      <div className="rounded-b-lg border border-gray-200 bg-white px-6 py-4">
+        <div className="flex flex-col items-center justify-between gap-2 text-sm text-slate-500 md:flex-row">
+          <div>
+            {filteredUniversities.length === 0 ? (
+              <span>No results found</span>
+            ) : (
+              <>
+                Showing{' '}
+                <span className="font-medium text-slate-700">
                   {(currentPage - 1) * itemsPerPage + 1}
                 </span>
-                to
-                <span className="font-medium">
-                  {Math.min(
-                    currentPage * itemsPerPage,
-                    universities.length,
-                  )}
+                {' '}to{' '}
+                <span className="font-medium text-slate-700">
+                  {Math.min(currentPage * itemsPerPage, filteredUniversities.length)}
                 </span>
-                of
-                <span className="font-medium">{universities.length}</span>
-                Universities
-              </div>
+                {' '}of{' '}
+                <span className="font-medium text-slate-700">{filteredUniversities.length}</span>
+                {' '}Universities
+              </>
             )}
-
-            <div className="flex justify-end gap-2">
-              <PrevButton
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                text="Prev"
-                icon={<ArrowLeft className="h-4 w-4" />}
-              />
-
-              <span className="px-3 py-1 font-medium text-slate-500">
-                Page {currentPage} of{' '}
-                {Math.ceil(universities.length / itemsPerPage)}
-              </span>
-
-              <NextButton
-                onClick={() =>
-                  setCurrentPage((prev) =>
-                    Math.min(
-                      prev + 1,
-                      Math.ceil(universities.length / itemsPerPage),
-                    ),
-                  )
-                }
-                disabled={
-                  currentPage ===
-                  Math.ceil(universities.length / itemsPerPage)
-                }
-                text="Next"
-                icon={<ArrowRight className="h-4 w-4" />}
-              />
-            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <PrevButton
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              text="Prev"
+              icon={<ArrowLeft className="h-4 w-4" />}
+            />
+            <span className="px-2 text-slate-500">
+              Page {currentPage} of{' '}
+              {Math.max(Math.ceil(filteredUniversities.length / itemsPerPage), 1)}
+            </span>
+            <NextButton
+              onClick={() =>
+                setCurrentPage((prev) =>
+                  Math.min(
+                    prev + 1,
+                    Math.ceil(filteredUniversities.length / itemsPerPage),
+                  ),
+                )
+              }
+              disabled={
+                currentPage === Math.ceil(filteredUniversities.length / itemsPerPage) ||
+                filteredUniversities.length === 0
+              }
+              text="Next"
+              icon={<ArrowRight className="h-4 w-4" />}
+            />
           </div>
         </div>
       </div>

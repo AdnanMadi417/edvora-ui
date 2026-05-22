@@ -303,7 +303,7 @@ const PartnerApplications = () => {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-4 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-4 overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="relative p-6">
 
           <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -401,7 +401,7 @@ const PartnerApplications = () => {
         </div>
       </div>
 
-      <div className="md:hidden rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-card divide-y divide-gray-100">
+      <div className="md:hidden rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-white divide-y divide-gray-100">
         {loading ? (
           Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-3.5">
@@ -458,10 +458,10 @@ const PartnerApplications = () => {
         )}
       </div>
 
-      <div className="hidden md:block overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-card">
+      <div className="hidden md:block overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-white">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-200 bg-card">
+            <tr className="border-b border-gray-200 bg-white">
               <th
                 onClick={() => handleSort('student_name')}
                 className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
@@ -510,7 +510,7 @@ const PartnerApplications = () => {
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-gray-100 bg-card">
+          <tbody className="divide-y divide-gray-100 bg-white">
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
             ) : paginatedApplications.length === 0 ? (
@@ -585,7 +585,7 @@ const PartnerApplications = () => {
         </table>
       </div>
 
-      <div className="sticky bottom-0 rounded-b-lg border border-gray-200 bg-card px-6 py-4">
+      <div className="sticky bottom-0 rounded-b-lg border border-gray-200 bg-white hover:bg-slate-50 px-6 py-4">
         <div className="flex flex-col items-center justify-between gap-2 text-sm text-slate-500 md:flex-row">
           <div>
             {filteredAndSortedApplications.length === 0 ? (

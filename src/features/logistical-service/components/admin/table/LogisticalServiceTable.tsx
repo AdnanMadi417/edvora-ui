@@ -80,7 +80,7 @@ const LogisticalServiceTable = () => {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
@@ -116,8 +116,7 @@ const LogisticalServiceTable = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-card">
-        <div className="block">
+      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-white">
           {loading && <Loading text="Fetching service providers data..." />}
 
           {!error && !loading && filteredProviders.length === 0 && (
@@ -128,10 +127,9 @@ const LogisticalServiceTable = () => {
           )}
 
           {!error && filteredProviders.length > 0 && (
-            <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-card">
-              <table className="w-full">
+            <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-card">
+                  <tr className="border-b border-slate-200 bg-white">
                     <th className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-slate-500" />
@@ -177,7 +175,7 @@ const LogisticalServiceTable = () => {
                   </tr>
                 </thead>
 
-                <tbody className="divide-border-slate-200 divide-y bg-primary">
+                <tbody className="divide-y divide-slate-200 bg-white">
                   {loading ? (
                     <tr>
                       <td colSpan={8} className="px-6 py-4 text-center text-p1 text-slate-500">
@@ -194,7 +192,7 @@ const LogisticalServiceTable = () => {
                     currentServiceProviders.map((provider) => (
                       <tr
                         key={provider.id}
-                        className="group cursor-pointer transition-colors hover:bg-primary/10"
+                        className="group cursor-pointer transition-colors bg-white hover:bg-slate-50"
                         onClick={() => router.push(`/admin/logistical-service/${provider.id}`)}
                       >
                         <td className="min-w-[200px] max-w-[300px] px-6 py-4">
@@ -329,39 +327,43 @@ const LogisticalServiceTable = () => {
                   )}
                 </tbody>
               </table>
-            </div>
           )}
 
-          <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex md:items-center md:justify-between">
-            {filteredProviders.length > 0 && (
-              <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
-                Showing
-                <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span>
-                to
-                <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredProviders.length)}</span>
-                of
-                <span className="font-medium">{filteredProviders.length}</span>
-                Service Providers
-              </div>
-            )}
+      </div>
 
-            <div className="flex items-center justify-end gap-2">
-              <PrevButton
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                text="Prev"
-                icon={<ArrowLeft className="h-4 w-4" />}
-              />
-              <span className="px-3 py-1 font-medium text-slate-500">
-                Page {currentPage} of {Math.ceil(filteredProviders.length / itemsPerPage)}
-              </span>
-              <NextButton
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(filteredProviders.length / itemsPerPage)))}
-                disabled={currentPage === Math.ceil(filteredProviders.length / itemsPerPage)}
-                text="Next"
-                icon={<ArrowRight className="h-4 w-4" />}
-              />
-            </div>
+      <div className="rounded-b-lg border border-gray-200 bg-white px-6 py-4">
+        <div className="flex flex-col items-center justify-between gap-2 text-sm text-slate-500 md:flex-row">
+          <div>
+            {filteredProviders.length === 0 ? (
+              <span>No results found</span>
+            ) : (
+              <>
+                Showing{" "}
+                <span className="font-medium text-slate-700">{(currentPage - 1) * itemsPerPage + 1}</span>
+                {" "}to{" "}
+                <span className="font-medium text-slate-700">{Math.min(currentPage * itemsPerPage, filteredProviders.length)}</span>
+                {" "}of{" "}
+                <span className="font-medium text-slate-700">{filteredProviders.length}</span>
+                {" "}results
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <PrevButton
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              text="Prev"
+              icon={<ArrowLeft className="h-4 w-4" />}
+            />
+            <span className="px-2 text-slate-500">
+              Page {currentPage} of {Math.max(Math.ceil(filteredProviders.length / itemsPerPage), 1)}
+            </span>
+            <NextButton
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(filteredProviders.length / itemsPerPage)))}
+              disabled={currentPage === Math.ceil(filteredProviders.length / itemsPerPage) || filteredProviders.length === 0}
+              text="Next"
+              icon={<ArrowRight className="h-4 w-4" />}
+            />
           </div>
         </div>
       </div>

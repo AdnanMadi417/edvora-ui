@@ -7,6 +7,8 @@ export function useUniversityTypes() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [refetchCounter, setRefetchCounter] = useState(0);
+
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
@@ -21,7 +23,9 @@ export function useUniversityTypes() {
       }
     };
     fetch();
-  }, []);
+  }, [refetchCounter]);
 
-  return { universities, loading, error };
+  const refetchUniversityTypes = () => setRefetchCounter((c) => c + 1);
+
+  return { universities, loading, error, refetchUniversityTypes };
 }
