@@ -91,9 +91,9 @@ export default function RequiredApplicationActions({
           </span>
         </h3>
 
-        {appDetails.stage_statuses?.length > 0 ? (
+        {appDetails.manager_allowed_next_statuses?.length > 0 ? (
           <div className="space-y-4">
-            {appDetails.stage_statuses.map((status: any, index: number) => {
+            {appDetails.manager_allowed_next_statuses.map((status: any, index: number) => {
               const hasDocuments = appDetails.document_types?.length > 0;
               const hasStageInfo =
                 status.is_requires_reason ||

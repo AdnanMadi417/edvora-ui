@@ -220,7 +220,7 @@ export default function UpdateStatusPopup({
       }))
     );
 
-    const options: StatusOption[] = (actions.stage_statuses || []).map((s) => {
+    const options: StatusOption[] = (actions.manager_allowed_next_statuses || []).map((s) => {
       const matchingAction = actions.available_actions?.find(
         (a) => a.status === s.name
       );

@@ -38,7 +38,7 @@ export default function ApplicationDocuments({
         const response = await api.get(`/applications/${application.id}`);
         const appData = response.data;
 
-        const correctionStatus = appData.stage_statuses?.find(
+        const correctionStatus = appData.manager_allowed_next_statuses?.find(
           (s) => s.name === "Correction Requested by Admin"
         );
 
