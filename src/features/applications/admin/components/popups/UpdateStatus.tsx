@@ -17,6 +17,7 @@ import { useVisaSetup } from "hooks/applications/useVisaSetup";
 import { useStatusUpdate } from "hooks/applications/useStatusUpdate";
 import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 import { useCommissionPaymentUpload } from 'hooks/applications/files/useCommissionPaymentUpload';
+import { useApplicationVisaFee } from "hooks/applications/useApplicationVisaFee";
 
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
@@ -222,7 +223,7 @@ export default function UpdateStatusPopup({
       }))
     );
 
-    const options: StatusOption[] = (actions.stage_statuses || []).map((s) => {
+    const options: StatusOption[] = (actions.manager_allowed_next_statuses || []).map((s) => {
       const matchingAction = actions.available_actions?.find(
         (a) => a.status === s.name
       );
@@ -280,12 +281,13 @@ export default function UpdateStatusPopup({
   };
 
   const { submitVisaFee } = useVisaSetup();
+  const { visaFeeAmount } = useApplicationVisaFee(application?.id ?? "");
 
   const handleVisaSetup = async () => {
     if (!isVisaSetupSelected) return;
 
     const enteredAmount = Number(formData.visa_fee_amount);
-    const finalAmount = enteredAmount > 0 ? enteredAmount : Number(amount?.amount ?? 0);
+    const finalAmount = enteredAmount > 0 ? enteredAmount : Number(visaFeeAmount ?? 0);
     await submitVisaFee(application.id, finalAmount);
   };
 
@@ -673,11 +675,11 @@ export default function UpdateStatusPopup({
                 errors={formErrors}
                 updateFormData={updateFormData}
               />
-              {amount?.amount && (
+              {visaFeeAmount && (
                 <div className="flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <span>
-                    Default visa fee is <strong>{amount.amount}</strong>. You can enter a different amount if needed.
+                    Default visa fee is <strong>{visaFeeAmount}</strong>. You can enter a different amount if needed.
                   </span>
                 </div>
               )}

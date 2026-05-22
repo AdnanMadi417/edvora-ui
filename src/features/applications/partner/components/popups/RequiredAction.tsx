@@ -174,7 +174,7 @@ export default function RequiredAction({
   };
 
   const docTypes: DocumentType[] = actions?.document_types ?? [];
-  const freeUpload = docTypes.length === 0 && !!actions?.stage_statuses?.[0]?.is_requires_document_selection;
+  const freeUpload = docTypes.length === 0 && !!actions?.manager_allowed_next_statuses?.[0]?.is_requires_document_selection;
   const requiredDocTypes = docTypes.filter((d) => d.is_required_for_current_upload);
   const uploadedDocs = documents.filter((d) => d.file_url && !d.uploading);
   const allRequiredUploaded =
