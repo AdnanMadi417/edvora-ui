@@ -399,7 +399,8 @@ export default function StudentRegistrationForm() {
       }, 3000);
     } catch (err: any) {
       console.error("Error submitting application:", err);
-      showToast("Failed to submit application.", "error");
+      const backendMessage = err?.response?.data?.message || "Please try again.";
+      showToast(`Failed to submit application. ${backendMessage}`, "error");
     }
   };
 
