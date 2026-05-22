@@ -46,6 +46,7 @@ import BatchUpdatePrograms from "features/programs/components/admin/popups/Batch
 import BatchIELTSPrograms from "features/programs/components/admin/popups/BatchIELTSPrograms";
 import BatchProgramIntakes from "features/programs/components/admin/popups/BatchProgramIntakes";
 import BatchProgramScholarship from "features/programs/components/admin/popups/BatchProgramScholarship";
+import BatchDeleteScholarships from "features/programs/components/admin/popups/BatchDeleteScholarships";
 import BatchFeesPrograms from "features/programs/components/admin/popups/BatchFeesPrograms";
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
 
@@ -81,6 +82,7 @@ const ProgramsTable = () => {
   const [isBatchIeletsUpdateOpen, setIsBatchIeltsUpdateOpen] = useState(false);
   const [isBatchIntakesUpdateOpen, setIsBatchIntakesUpdateOpen] = useState(false);
   const [isBatchScholarshipsUpdateOpen, setIsBatchScholarshipsUpdateOpen] = useState(false);
+  const [isBatchDeleteScholarshipsOpen, setIsBatchDeleteScholarshipsOpen] = useState(false);
   const [isBatchFeesUpdateOpen, setIsBatchFeesUpdateOpen] = useState(false);
   const [isBulkMenuOpen, setIsBulkMenuOpen] = useState(false);
   const [isVisaFeeOpen, setIsVisaFeeOpen] = useState(false);
@@ -370,6 +372,7 @@ const ProgramsTable = () => {
                             { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setIsBatchIeltsUpdateOpen(true) },
                             { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setIsBatchIntakesUpdateOpen(true) },
                             { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setIsBatchScholarshipsUpdateOpen(true) },
+                            { label: "Delete Scholarships", icon: <Trash2 className="h-3.5 w-3.5 text-red-600" />, bg: "bg-red-50", onClick: () => setIsBatchDeleteScholarshipsOpen(true) },
                             { label: "Tution Fees", icon: <DollarSign className="h-3.5 w-3.5 text-green-600" />, bg: "bg-green-50", onClick: () => setIsBatchFeesUpdateOpen(true) },
                             { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setIsVisaFeeOpen(true) },
                           ].map(({ label, icon, bg, onClick }) => (
@@ -752,6 +755,13 @@ const ProgramsTable = () => {
       <BatchProgramScholarship
         isOpen={isBatchScholarshipsUpdateOpen}
         onClose={() => setIsBatchScholarshipsUpdateOpen(false)}
+        selectedProgramIds={selectedProgramIds}
+        onSuccess={refetch}
+      />
+
+      <BatchDeleteScholarships
+        isOpen={isBatchDeleteScholarshipsOpen}
+        onClose={() => setIsBatchDeleteScholarshipsOpen(false)}
         selectedProgramIds={selectedProgramIds}
         onSuccess={refetch}
       />
