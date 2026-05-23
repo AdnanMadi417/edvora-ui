@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import {
   Download,
-  CheckCircle,
   FileText,
   Calendar,
   XCircle,
@@ -12,8 +11,6 @@ import {
 import { useVisaCase } from "hooks/useVisaCase";
 import { useVisaPayments } from "hooks/useVisaPayments";
 import { getDocumentDownloadUrl } from "services/documentService";
-import api from "lib/useApi";
-import { useToast } from "components/context/ToastContext";
 
 interface VisaTrackingTimelineProps {
   application: any;
@@ -22,10 +19,7 @@ interface VisaTrackingTimelineProps {
 
 export default function VisaTrackingTimeline({
   application,
-  onRefetch,
 }: VisaTrackingTimelineProps) {
-  const [loading, setLoading] = useState(false);
-  const { showToast } = useToast();
   const {
     visaCase,
     loading: visaLoading,
@@ -60,28 +54,6 @@ export default function VisaTrackingTimeline({
     }
   };
 
-  const handleApprove = async (paymentId: string) => {
-    if (loading) return;
-
-    setLoading(true);
-    try {
-      const res = await api.post(
-        `/applications/${application.id}/visa-payments/${paymentId}/review`,
-        {
-          status: "approved",
-          review_notes: "Approved by manager",
-        }
-      );
-
-      showToast("Payment approved successfully!", "success");
-      onRefetch?.();
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to approve payment", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (!hasVisaCase && !hasVisaPayments) {
     return null;
@@ -240,15 +212,6 @@ export default function VisaTrackingTimeline({
                                 <Download className="h-4 w-4" />
                               </button>
 
-                              {payment.status !== "approved" && (
-                                <button
-                                  onClick={() => handleApprove(payment.id)}
-                                  disabled={loading}
-                                  className="rounded-md border border-blue-600 bg-blue-50 p-2 text-blue-700 hover:bg-blue-100 disabled:opacity-50"
-                                >
-                                  <CheckCircle className="h-4 w-4" />
-                                </button>
-                              )}
                             </div>
                           ))}
                         </div>
