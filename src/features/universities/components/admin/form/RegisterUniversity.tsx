@@ -19,6 +19,7 @@ import { useCreateUniversity, useUniversityTypes } from "features/universities/h
 import { useStates } from "features/programs/hooks";
 
 import InputField from "components/form/InputField";
+import TextareaField from "components/form/TextareaField";
 import MultipleDatePickerModal from "components/form/MultipleDatePickerModal";
 import SearchableDropdown from 'components/form/search/SearchableDropdown';
 import Button from "components/ui/buttons/Button";
@@ -26,6 +27,7 @@ import IconButton from 'components/ui/buttons/IconButton';
 import SelectField from 'components/form/SelectField';
 import ImageUploadField from 'components/form/images/ImageUploadField';
 import { getPresignedUploads, uploadFilesToSpaces } from 'services/uploadService';
+import { validateUniversity, isUniversityComplete } from './validateUniversity';
 
 
 export default function RegisterUniversity() {
@@ -60,16 +62,15 @@ export default function RegisterUniversity() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const isFormValid =
-    formData.name.trim() &&
-    formData.branches.length > 0 &&
-    formData.university_type_id.trim() &&
-    formData.branches.every(
-      (b) =>
-        b.name.trim() &&
-        b.location.trim() &&
-        b.state_id
-    );
+  const isFormValid = React.useMemo(() => isUniversityComplete(formData), [formData]);
+
+  const validateField = React.useCallback(
+    (field: string) => {
+      const { errors: allErrors } = validateUniversity(formData);
+      setErrors((prev) => ({ ...prev, [field]: allErrors[field] ?? "" }));
+    },
+    [formData]
+  );
 
   const stateOptions =
     states?.map((c) => ({
@@ -78,17 +79,13 @@ export default function RegisterUniversity() {
     })) || [];
 
   const updateFormData = (field: string, value: any) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
-    }
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const updateBranch = (
@@ -145,6 +142,12 @@ export default function RegisterUniversity() {
   const handleCreate = async () => {
     if (logoUploading) {
       showToast("Please wait for the logo to finish uploading.", "error");
+      return;
+    }
+
+    const { isValid, errors: validationErrors } = validateUniversity(formData);
+    if (!isValid) {
+      setErrors(validationErrors);
       return;
     }
 
@@ -255,9 +258,10 @@ export default function RegisterUniversity() {
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
+            onBlur={() => validateField('name')}
           />
 
-          <InputField
+          <TextareaField
             label="Description"
             field="description"
             placeholder="Brief university description..."
@@ -287,6 +291,7 @@ export default function RegisterUniversity() {
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
+            onBlur={() => validateField('university_type_id')}
           />
 
         </div>
@@ -338,10 +343,12 @@ export default function RegisterUniversity() {
                     placeholder="e.g Branch Name"
                     field="name"
                     formData={branch}
-                    errors={{}}
-                    updateFormData={(field, value) =>
-                      updateBranch(index, field, value)
-                    }
+                    errors={{ name: errors[`branches[${index}].name`] }}
+                    updateFormData={(field, value) => {
+                      setErrors((prev) => { const n = { ...prev }; delete n[`branches[${index}].name`]; return n; });
+                      updateBranch(index, field, value);
+                    }}
+                    onBlur={() => validateField(`branches[${index}].name`)}
                   />
 
                   <InputField
@@ -349,10 +356,12 @@ export default function RegisterUniversity() {
                     placeholder="e.g Location"
                     field="location"
                     formData={branch}
-                    errors={{}}
-                    updateFormData={(field, value) =>
-                      updateBranch(index, field, value)
-                    }
+                    errors={{ location: errors[`branches[${index}].location`] }}
+                    updateFormData={(field, value) => {
+                      setErrors((prev) => { const n = { ...prev }; delete n[`branches[${index}].location`]; return n; });
+                      updateBranch(index, field, value);
+                    }}
+                    onBlur={() => validateField(`branches[${index}].location`)}
                   />
 
                   <SearchableDropdown
@@ -360,10 +369,11 @@ export default function RegisterUniversity() {
                     field="state_id"
                     options={stateOptions}
                     formData={branch}
-                    errors={{}}
-                    updateFormData={(field, value) =>
-                      updateBranch(index, field, value)
-                    }
+                    errors={{ state_id: errors[`branches[${index}].state_id`] }}
+                    updateFormData={(field, value) => {
+                      setErrors((prev) => { const n = { ...prev }; delete n[`branches[${index}].state_id`]; return n; });
+                      updateBranch(index, field, value);
+                    }}
                   />
 
                 </div>

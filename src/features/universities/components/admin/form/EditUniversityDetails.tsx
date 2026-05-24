@@ -39,6 +39,7 @@ import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePay
 import { useStates } from "features/programs/hooks";
 
 import InputField from "components/form/InputField";
+import TextareaField from "components/form/TextareaField";
 import SelectField from "components/form/SelectField";
 import MultipleDatePickerModal from "components/form/MultipleDatePickerModal";
 import ToggleInput from "components/form/toggle/ToggleInput";
@@ -52,6 +53,7 @@ import Loading from "components/loading/Loading";
 import IconButton from "components/ui/buttons/IconButton";
 import EmptyData from "components/emptyData/EmptyTableData";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import { validateUniversity, isUniversityComplete } from "./validateUniversity";
 
 const normalizePayload = (formData: any) => {
   return {
@@ -85,7 +87,7 @@ const UniversityEdit = ({ id }: Props) => {
   const { paymentMethods } = useAllPaymentMethods();
   const { assignUniversityType } = useAssignUniversityType(id);
   const { universities: universityTypes } = useUniversityTypes();
-  const { updateUniversityPaymentMethod, loading } =
+  const { updateUniversityPaymentMethod } =
     useUpdateUniversityPaymentMethod();
 
   const [initialFormData, setInitialFormData] = React.useState<any>(null);
@@ -103,6 +105,7 @@ const UniversityEdit = ({ id }: Props) => {
   const [logoFileUrl, setLogoFileUrl] = useState("");
   const [existingLogoUrl, setExistingLogoUrl] = useState("");
   const [existingLogoKey, setExistingLogoKey] = useState("");
+  const [logoModified, setLogoModified] = useState(false);
 
   const [paymentFormData, setPaymentFormData] = useState<any[]>([]);
 
@@ -188,27 +191,31 @@ const UniversityEdit = ({ id }: Props) => {
     );
   }, [universityPaymentMethods]);
 
-  const updateFormData = (field: string, value: any) => {
-    setFormData((prev: any) => ({
-      ...prev,
-      [field]: value,
-    }));
+  const validateField = React.useCallback(
+    (field: string) => {
+      const { errors: allErrors } = validateUniversity(formData);
+      setErrors((prev) => ({ ...prev, [field]: allErrors[field] ?? "" }));
+    },
+    [formData]
+  );
 
-    if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }));
-    }
+  const updateFormData = (field: string, value: any) => {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+    setPaymentErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
-  const isFormValid = React.useMemo(() => {
-    return (
-      formData.name?.trim() !== "" &&
-      formData.country?.trim() !== "" &&
-      formData.university_type_id !== "" &&
-      formData.branches.every(
-        (b: any) => b.name?.trim() && b.location?.trim() && b.state_id
-      )
-    );
-  }, [formData]);
+  const isFormValid = React.useMemo(() => isUniversityComplete(formData), [formData]);
 
   const isFormChanged = React.useMemo(() => {
     if (!initialFormData) return false;
@@ -217,9 +224,7 @@ const UniversityEdit = ({ id }: Props) => {
       JSON.stringify(normalizePayload(formData)) !==
       JSON.stringify(normalizePayload(initialFormData));
 
-    const logoChanged =
-      logoFile !== null ||
-      existingLogoUrl !== (university?.logo_file_url || "");
+    const logoChanged = logoModified;
 
     const paymentChanged =
       paymentFormData.some((p, index) => {
@@ -234,7 +239,7 @@ const UniversityEdit = ({ id }: Props) => {
       }) ?? false;
 
     return universityChanged || logoChanged || paymentChanged;
-  }, [formData, initialFormData, logoFile, existingLogoUrl, university, paymentFormData, universityPaymentMethods]);
+  }, [formData, initialFormData, logoModified, paymentFormData, universityPaymentMethods]);
 
   const handleRemoveBranch = async (index: number) => {
     const branch = formData.branches[index];
@@ -277,6 +282,7 @@ const UniversityEdit = ({ id }: Props) => {
 
   const handleLogoSelect = async (file: File) => {
     setLogoFile(file);
+    setLogoModified(true);
     setLogoUploading(true);
     setLogoProgress(0);
     setLogoFileKey("");
@@ -347,20 +353,27 @@ const UniversityEdit = ({ id }: Props) => {
   };
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [paymentErrors, setPaymentErrors] = useState<Record<string, string>>({});
 
   const handleAssign = async () => {
-    if (!formData.payment_method_id) return;
+    if (!formData.payment_method_id) {
+      setPaymentErrors({ payment_method_id: "Payment method is required" });
+      return;
+    }
 
     try {
       await assignPaymentMethod(id, {
         payment_method_id: formData.payment_method_id,
         instructions: formData.instructions?.trim() || undefined,
         currency: formData.currency?.trim() || undefined,
-        is_active: formData.is_active,
+        is_active: true,
       });
 
       showToast("Payment method assigned successfully.", "success");
 
+      setPaymentErrors({});
+      setFormData((prev: any) => ({ ...prev, payment_method_id: "", currency: "", instructions: "" }));
+      setShowAddPayment(false);
       refetchPayments();
 
     } catch (err: any) {
@@ -368,22 +381,26 @@ const UniversityEdit = ({ id }: Props) => {
 
       if (Array.isArray(apiErrors)) {
         const newErrors: Record<string, string> = {};
-
         apiErrors.forEach((e: any) => {
           if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
         });
-
-        setErrors(newErrors);
+        setPaymentErrors(newErrors);
+      } else {
+        showToast("Failed to assign payment method.", "error");
       }
-
-      showToast("Failed to assign payment method.", "error");
     }
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async (): Promise<boolean> => {
     if (logoUploading) {
       showToast("Please wait for the logo to finish uploading.", "error");
-      return;
+      return false;
+    }
+
+    const { isValid, errors: validationErrors } = validateUniversity(formData);
+    if (!isValid) {
+      setErrors(validationErrors);
+      return false;
     }
 
     try {
@@ -418,9 +435,11 @@ const UniversityEdit = ({ id }: Props) => {
 
       showToast("University updated successfully.", "success");
 
+      setLogoModified(false);
       refetchUniversity();
       refetchPayments();
 
+      return true;
     } catch (error: any) {
       const details = error?.response?.data?.details;
 
@@ -442,6 +461,7 @@ const UniversityEdit = ({ id }: Props) => {
       }
 
       showToast(`Update failed. ${message}`, "error");
+      return false;
     }
   };
 
@@ -472,7 +492,7 @@ const UniversityEdit = ({ id }: Props) => {
               simpleUploading={logoUploading}
               simpleProgress={logoProgress}
               existingUrl={existingLogoUrl}
-              onExistingRemove={() => { setExistingLogoUrl(""); setExistingLogoKey(""); }}
+              onExistingRemove={() => { setExistingLogoUrl(""); setExistingLogoKey(""); setLogoModified(true); }}
               errors={errors}
             />
           </div>
@@ -517,6 +537,7 @@ const UniversityEdit = ({ id }: Props) => {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => validateField('name')}
             />
 
             <InputField
@@ -526,16 +547,20 @@ const UniversityEdit = ({ id }: Props) => {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => validateField('country')}
             />
 
-            <InputField
-              label="Description"
-              field="description"
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-              required={false}
-            />
+            <div className="md:col-span-2">
+              <TextareaField
+                label="Description"
+                field="description"
+                placeholder="Brief university description..."
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+                required={false}
+              />
+            </div>
 
           </div>
 
@@ -560,9 +585,8 @@ const UniversityEdit = ({ id }: Props) => {
               }))}
               formData={formData}
               errors={errors}
-              updateFormData={(field, value) => {
-                updateFormData(field, value);
-              }}
+              updateFormData={updateFormData}
+              onBlur={() => validateField('university_type_id')}
             />
 
           </div>
@@ -625,10 +649,12 @@ const UniversityEdit = ({ id }: Props) => {
                   placeholder="e.g Branch Name"
                   field="name"
                   formData={branch}
-                  errors={{}}
-                  updateFormData={(f: string, v: any) =>
-                    updateBranchField(index, f, v)
-                  }
+                  errors={{ name: errors[`branches[${index}].name`] }}
+                  updateFormData={(f: string, v: any) => {
+                    setErrors((prev) => { const n = { ...prev }; delete n[`branches[${index}].name`]; return n; });
+                    updateBranchField(index, f, v);
+                  }}
+                  onBlur={() => validateField(`branches[${index}].name`)}
                 />
 
                 <InputField
@@ -636,10 +662,12 @@ const UniversityEdit = ({ id }: Props) => {
                   placeholder="e.g Location"
                   field="location"
                   formData={branch}
-                  errors={{}}
-                  updateFormData={(f: string, v: any) =>
-                    updateBranchField(index, f, v)
-                  }
+                  errors={{ location: errors[`branches[${index}].location`] }}
+                  updateFormData={(f: string, v: any) => {
+                    setErrors((prev) => { const n = { ...prev }; delete n[`branches[${index}].location`]; return n; });
+                    updateBranchField(index, f, v);
+                  }}
+                  onBlur={() => validateField(`branches[${index}].location`)}
                 />
 
                 <SearchableDropdown
@@ -647,10 +675,12 @@ const UniversityEdit = ({ id }: Props) => {
                   field="state_id"
                   options={stateOptions}
                   formData={{ state_id: branch.state_id }}
-                  errors={{}}
-                  updateFormData={(f: string, v: any) =>
-                    updateBranchField(index, f, v)
-                  }
+                  errors={{ state_id: errors[`branches[${index}].state_id`] }}
+                  updateFormData={(f: string, v: any) => {
+                    setErrors((prev) => { const n = { ...prev }; delete n[`branches[${index}].state_id`]; return n; });
+                    updateBranchField(index, f, v);
+                  }}
+                  onSelect={() => validateField(`branches[${index}].state_id`)}
                 />
               </div>
             </div>
@@ -709,7 +739,7 @@ const UniversityEdit = ({ id }: Props) => {
                   }))}
                   formData={method}
                   errors={{}}
-                  updateFormData={(field, value) =>
+                  updateFormData={(field: string, value: any) =>
                     updatePaymentFormData(method.id, field, value)
                   }
                 />
@@ -723,22 +753,24 @@ const UniversityEdit = ({ id }: Props) => {
                     value: c.value,
                     label: c.label,
                   })))}
-                  updateFormData={(field, value) =>
+                  updateFormData={(field: string, value: any) =>
                     updatePaymentFormData(method.id, field, value)
                   }
                   required={false}
                 />
 
-                <InputField
-                  label="Instructions"
-                  field="instructions"
-                  formData={method}
-                  errors={{}}
-                  updateFormData={(field, value) =>
-                    updatePaymentFormData(method.id, field, value)
-                  }
-                  required={false}
-                />
+                <div className="md:col-span-2">
+                  <TextareaField
+                    label="Instructions"
+                    field="instructions"
+                    formData={method}
+                    errors={{}}
+                    updateFormData={(field: string, value: any) =>
+                      updatePaymentFormData(method.id, field, value)
+                    }
+                    required={false}
+                  />
+                </div>
 
               </div>
 
@@ -747,7 +779,7 @@ const UniversityEdit = ({ id }: Props) => {
                 field="is_active"
                 formData={method}
                 errors={{}}
-                updateFormData={(field, value) => {
+                updateFormData={(field: string, value: any) => {
                   updatePaymentFormData(method.id, field, value);
                 }}
               />
@@ -778,30 +810,31 @@ const UniversityEdit = ({ id }: Props) => {
                   String(p.payment_method_id)
                 )}
                 formData={formData}
-                errors={errors}
+                errors={paymentErrors}
                 updateFormData={updateFormData}
               />
 
               <SelectField
                 label="Currency"
                 field="currency"
-                options={(CURRENCY.map((c) => ({
-                  value: c.value,
-                  label: c.label,
-                })))}
+                options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
                 formData={formData}
-                errors={errors}
+                errors={paymentErrors}
+                required={false}
                 updateFormData={updateFormData}
               />
 
-              <InputField
-                label="Instructions"
-                field="instructions"
-                placeholder="Optional payment instructions..."
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
+              <div className="md:col-span-2">
+                <TextareaField
+                  label="Instructions"
+                  field="instructions"
+                  placeholder="Optional payment instructions..."
+                  formData={formData}
+                  errors={paymentErrors}
+                  required={false}
+                  updateFormData={updateFormData}
+                />
+              </div>
             </div>
           </div>
         )}
@@ -823,14 +856,20 @@ const UniversityEdit = ({ id }: Props) => {
         <Button
           onClick={async () => {
             if (isFormChanged) {
-              await handleUpdate();
+              const success = await handleUpdate();
+              if (!success) return;
             }
 
             if (formData.payment_method_id) {
               await handleAssign();
             }
           }}
-          disabled={logoUploading || updateLoading || !isFormValid || (!isFormChanged && !formData.payment_method_id)}
+          disabled={
+            logoUploading ||
+            updateLoading ||
+            (!isFormChanged && !formData.payment_method_id) ||
+            (isFormChanged && !isFormValid)
+          }
           icon={<Pencil className="h-5 w-5" />}
           text={updateLoading ? "Updating..." : "Save Changes"}
           bgColor="bg-blue-50"

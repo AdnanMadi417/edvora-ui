@@ -37,7 +37,13 @@ export default function CreateFees({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const isFormValid = !loading;
+  const isFormValid = React.useMemo(() => {
+    const hasAnyFees = formData.yearly_fees.length > 0 || formData.one_time_fees.length > 0;
+    if (!hasAnyFees) return false;
+    const yearlyValid = formData.yearly_fees.every((y) => Number(y.year) > 0 && Number(y.fee) > 0);
+    const oneTimeValid = formData.one_time_fees.every((f) => f.description.trim() !== "" && Number(f.fee) > 0);
+    return yearlyValid && oneTimeValid && !loading;
+  }, [formData.yearly_fees, formData.one_time_fees, loading]);
 
   useEffect(() => {
     if (isOpen) {

@@ -41,7 +41,7 @@ export interface ApplicationDetails {
   next_action: string;
   available_actions: AvailableAction[];
   document_types: DocumentType[];
-  stage_statuses: StageStatus[];
+  manager_allowed_next_statuses: StageStatus[];
   partner_actions: PartnerAction[];
 }
 

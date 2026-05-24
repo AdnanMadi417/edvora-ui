@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,7 @@ import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
 import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
 
 import InputField from "components/form/InputField";
+import TextareaField from "components/form/TextareaField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import MultipleDateInput from "components/form/MultipleDateInput";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
@@ -35,10 +36,20 @@ import SelectField from "components/form/SelectField";
 
 import IconButton from "components/ui/buttons/IconButton";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import { validateProgram } from "./validateProgram";
+import type { FormData as ProgramFormData } from "./RegisterProgram";
+
+const SCHOLARSHIP_TYPE_MAP: Record<string, number> = { full: 1, partial: 2, mixed: 3 };
+const toScholarshipTypeInt = (t: any): number | null => {
+  if (typeof t === "number" && [1, 2, 3].includes(t)) return t;
+  if (typeof t === "string") return SCHOLARSHIP_TYPE_MAP[t.toLowerCase()] ?? null;
+  return null;
+};
 
 interface Props {
   id: string;
 }
+
 
 const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -52,8 +63,8 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteMode, setDeleteMode] = useState<"single" | "batch" | null>(null);
-  const [isFormChanged, setIsFormChanged] = useState(false);
   const [initialFormData, setInitialFormData] = useState<any>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const router = useRouter();
   const { program, commission } = useProgram(id);
@@ -88,7 +99,27 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
     }));
   };
 
+  const isFormChanged = React.useMemo(() => {
+    if (!initialFormData || Object.keys(initialFormData).length === 0) return false;
+    return JSON.stringify(formData) !== JSON.stringify(initialFormData);
+  }, [formData, initialFormData]);
+
+  const validateField = React.useCallback(
+    (field: string, overrideValue?: any) => {
+      const data = overrideValue !== undefined ? { ...formData, [field]: overrideValue } : formData;
+      const { errors: allErrors } = validateProgram(data as ProgramFormData);
+      setErrors((prev) => ({ ...prev, [field]: allErrors[field] }));
+    },
+    [formData]
+  );
+
   const updateFormData = (field: string, value: any) => {
+    setErrors((prev) => {
+      if (!prev[field]) return prev;
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
     setFormData((prev: any) => {
       const clone = structuredClone(prev);
       const path = field.replace(/\[(\w+)\]/g, ".$1").split(".");
@@ -100,8 +131,12 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       }
       current[path[path.length - 1]] = value;
 
-      const changed = JSON.stringify(clone) !== JSON.stringify(initialFormData);
-      setIsFormChanged(changed);
+      if (field === "has_scholarship" && value === true && (!clone.scholarships || clone.scholarships.length === 0)) {
+        clone.scholarships = [{ type: 1, coverage_percent: 0, max_amount: 0, name: "", description: "", conditions: [] }];
+      }
+      if (field === "has_scholarship" && value === false) {
+        clone.scholarships = [];
+      }
 
       return clone;
     });
@@ -135,6 +170,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       one_time_fees: program.one_time_fees ?? [],
       scholarships: (program.scholarships ?? []).map((s: any) => ({
         ...s,
+        type: toScholarshipTypeInt(s.type),
         conditions: s.conditions ?? [],
       })),
     };
@@ -152,8 +188,9 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   }, [commissionTypes]);
 
   const handleUpdate = async () => {
-    if (Number(formData.commission_amount) > 29999) {
-      showToast('Commission amount cannot exceed RM 29,999', 'error');
+    const { isValid, errors: validationErrors } = validateProgram(formData as ProgramFormData);
+    if (!isValid) {
+      setErrors(validationErrors);
       return;
     }
     try {
@@ -204,7 +241,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
         scholarships: formData.has_scholarship
           ? Array.isArray(formData.scholarships)
             ? formData.scholarships.map((s: any) => ({
-              type: Number(s.type) || 1,
+              type: toScholarshipTypeInt(s.type),
               coverage_percent: Number(s.coverage_percent) || 0,
               max_amount: Number(s.max_amount) || 0,
               name: String(s.name || ""),
@@ -218,9 +255,6 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       await updateProgram(id, payload);
 
       showToast("Program updated successfully", "success");
-
-      setInitialFormData(structuredClone(formData));
-      setIsFormChanged(false);
 
       router.push("/admin/knowledge-hub/programs");
     } catch (error: any) {
@@ -338,6 +372,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 <SearchableDropdown
                   label="University"
                   field="uni_id"
+                  required
                   options={(universities ?? [])
                     .filter((u) => u.is_active)
                     .map((u) => ({
@@ -345,8 +380,9 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                       label: u.name,
                     }))}
                   formData={formData}
-                  errors={{}}
+                  errors={errors}
                   updateFormData={updateFormData}
+                  onSelect={(v) => validateField('uni_id', v)}
                 />
 
                 <SearchableDropdown
@@ -357,7 +393,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                     label: s.name,
                   }))}
                   formData={formData}
-                  errors={{}}
+                  errors={errors}
                   updateFormData={updateFormData}
                 />
 
@@ -367,20 +403,23 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                   placeholder="e.g. BSc Data Science"
                   required
                   formData={formData}
-                  errors={{}}
+                  errors={errors}
                   updateFormData={updateFormData}
+                  onBlur={() => validateField('name')}
                 />
 
                 <SearchableDropdown
                   label="Field of Study"
                   field="field_of_study_id"
+                  required
                   options={fields.map((f) => ({
                     value: String(f.id),
                     label: f.name,
                   }))}
                   formData={formData}
-                  errors={{}}
+                  errors={errors}
                   updateFormData={updateFormData}
+                  onSelect={(v) => validateField('field_of_study_id', v)}
                 />
 
                 <InputField
@@ -389,7 +428,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                   type="number"
                   required={false}
                   formData={formData}
-                  errors={{}}
+                  errors={errors}
                   updateFormData={updateFormData}
                 />
               </div>
@@ -400,48 +439,68 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 Academic Details
               </h3>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <InputField
                   label="Duration (Years)"
                   field="duration"
-                  required
+                  required={false}
                   formData={formData}
-                  errors={{}}
+                  errors={errors}
                   updateFormData={updateFormData}
+                  onBlur={() => validateField('duration')}
                 />
 
                 <SelectField
                   label="IELTS Required Score"
                   field="english_required_score"
+                  required={false}
                   options={IELTS_BANDS.map((s) => ({
                     label: s.label,
                     value: s.score,
                   }))}
                   formData={formData}
-                  errors={{}}
+                  errors={errors}
                   updateFormData={updateFormData}
                 />
 
-                <InputField
-                  label="Overview"
-                  field="overview"
-                  placeholder="Program overview..."
-                  required={false}
+                <SearchableDropdown
+                  label="Qualification Level"
+                  field="qualification_id"
+                  required
+                  options={qualifications.map((f) => ({
+                    value: String(f.id),
+                    label: f.name.charAt(0).toUpperCase() + f.name.slice(1),
+                  }))}
                   formData={formData}
-                  errors={{}}
+                  errors={errors}
                   updateFormData={updateFormData}
-                />
-
-                <InputField
-                  label="Curriculum"
-                  field="curriculum"
-                  placeholder="Program curriculum..."
-                  required={false}
-                  formData={formData}
-                  errors={{}}
-                  updateFormData={updateFormData}
+                  onSelect={(v) => validateField('qualification_id', v)}
                 />
               </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <TextareaField
+                    label="Overview"
+                    field="overview"
+                    required={false}
+                    placeholder="Program overview..."
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                  />
+
+                  <TextareaField
+                    label="Curriculum"
+                    field="curriculum"
+                    required={false}
+                    placeholder="Program curriculum..."
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                  />
+                </div>
+
+
             </div>
 
             <div className="space-y-6 px-6 pb-5 border-b border-slate-200">
@@ -453,7 +512,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 label="On Campus"
                 field="is_on_campus"
                 formData={formData}
-                errors={{}}
+                errors={errors}
                 updateFormData={(field, value) => {
                   updateFormData(field, value);
                   updateFormData("is_online", !value);
@@ -470,9 +529,9 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
               <MultipleDateInput
                 label="Intake Dates"
                 field="intake_dates"
-                required
+                required={false}
                 formData={formData}
-                errors={{}}
+                errors={errors}
                 updateFormData={updateFormData}
               />
             </div>
@@ -482,71 +541,60 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 Commission Structure
               </h3>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <InputField
-                      label="Commission Amount"
-                      field="commission_amount"
-                      type="number"
-                      formData={formData}
-                      errors={{}}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                  <div className="w-32">
-                    <SelectField
-                      label="Currency"
-                      field="commission_currency"
-                      options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
-                      formData={formData}
-                      errors={{}}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                </div>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+
+                <InputField
+                  label="Commission Amount"
+                  field="commission_amount"
+                  type="number"
+                  required={false}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+
+                <SelectField
+                  label="Currency"
+                  field="commission_currency"
+                  required={false}
+                  options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
 
                 <SelectField
                   label="Expected From"
                   field="expected_commission_from"
+                  required={false}
                   options={MONTHS.map((m) => ({ value: m.value, label: m.label }))}
                   formData={formData}
-                  errors={{}}
+                  errors={errors}
                   updateFormData={updateFormData}
                 />
 
                 <SelectField
                   label="Expected To"
                   field="expected_commission_to"
+                  required={false}
                   options={MONTHS.map((m) => ({ value: m.value, label: m.label }))}
                   formData={formData}
-                  errors={{}}
+                  errors={errors}
                   updateFormData={updateFormData}
                 />
 
-                <InputField
-                  label="Commission Notes"
-                  field="commission_notes"
-                  type="text"
-                  placeholder="e.g. Commission paid ..."
-                  required={false}
-                  formData={formData}
-                  errors={{}}
-                  updateFormData={updateFormData}
-                />
-
-                <SelectField
-                  label="Qualification Level"
-                  field="qualification_id"
-                  options={qualifications.map((f) => ({
-                    value: String(f.id),
-                    label: f.name.charAt(0).toUpperCase() + f.name.slice(1),
-                  }))}
-                  required
-                  formData={formData}
-                  errors={{}}
-                  updateFormData={updateFormData}
-                />
+                <div className="md:col-span-4">
+                  <TextareaField
+                    label="Commission Notes"
+                    field="commission_notes"
+                    required={false}
+                    placeholder="e.g. Commission paid ..."
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                    onBlur={() => validateField('commission_notes')}
+                  />
+                </div>
               </div>
             </div>
 
@@ -556,7 +604,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 subLabel="Year"
                 field="yearly_fees"
                 formData={formData}
-                errors={{}}
+                errors={errors}
                 updateFormData={updateFormData}
                 fields={[
                   {
@@ -580,7 +628,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 subLabel="Fees"
                 field="one_time_fees"
                 formData={formData}
-                errors={{}}
+                errors={errors}
                 updateFormData={updateFormData}
                 fields={[
                   {
@@ -604,15 +652,17 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 Scholarships
               </h3>
 
-              <IconButton
-                icon={<CalendarPlus className="h-4 w-4" />}
-                bgColor="bg-blue-50"
-                textColor="text-blue-700"
-                borderColor="border-blue-600"
-                hoverTextColor="hover:text-blue-800"
-                hoverBorderColor="hover:border-blue-700"
-                onClick={addScholarship}
-              />
+              {formData.has_scholarship && (
+                <IconButton
+                  icon={<CalendarPlus className="h-4 w-4" />}
+                  bgColor="bg-blue-50"
+                  textColor="text-blue-700"
+                  borderColor="border-blue-600"
+                  hoverTextColor="hover:text-blue-800"
+                  hoverBorderColor="hover:border-blue-700"
+                  onClick={addScholarship}
+                />
+              )}
             </div>
 
             <div className="block px-6 pb-5">
@@ -620,7 +670,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 label="Has Scholarship"
                 field="has_scholarship"
                 formData={formData}
-                errors={{}}
+                errors={errors}
                 updateFormData={updateFormData}
               />
             </div>
@@ -664,8 +714,9 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                         placeholder="e.g. Excellence Award"
                         type="text"
                         formData={formData}
-                        errors={{}}
+                        errors={errors}
                         updateFormData={updateFormData}
+                        onBlur={() => validateField(`scholarships[${index}].name`)}
                       />
                     </div>
 
@@ -674,7 +725,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                       field={`scholarships[${index}].coverage_percent`}
                       type="number"
                       formData={formData}
-                      errors={{}}
+                      errors={errors}
                       required={false}
                       updateFormData={updateFormData}
                     />
@@ -684,20 +735,20 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                       field={`scholarships[${index}].max_amount`}
                       type="number"
                       formData={formData}
-                      errors={{}}
+                      errors={errors}
                       required={false}
                       updateFormData={updateFormData}
                     />
 
                     <div className="md:col-span-2">
-                      <InputField
+                      <TextareaField
                         label="Description"
                         field={`scholarships[${index}].description`}
                         placeholder="Short description..."
-                        type="text"
                         formData={formData}
-                        errors={{}}
+                        errors={errors}
                         updateFormData={updateFormData}
+                        onBlur={() => validateField(`scholarships[${index}].description`)}
                       />
                     </div>
 
@@ -752,7 +803,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
               </div>
             ))}
 
-            {!(formData.scholarships ?? []).length && (
+            {formData.has_scholarship && !(formData.scholarships ?? []).length && (
               <NoMessagesFound
                 title="No scholarships found"
                 subtitle="There are currently no scholarships available."

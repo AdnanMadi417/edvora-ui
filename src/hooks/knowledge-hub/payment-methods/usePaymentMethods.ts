@@ -11,6 +11,7 @@ export function useAllPaymentMethods() {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refetchCounter, setRefetchCounter] = useState(0);
 
   useEffect(() => {
     const fetchPaymentMethods = async () => {
@@ -28,7 +29,7 @@ export function useAllPaymentMethods() {
     };
 
     fetchPaymentMethods();
-  }, []);
+  }, [refetchCounter]);
 
-  return { paymentMethods, loading, error };
+  return { paymentMethods, loading, error, refetch: () => setRefetchCounter((c) => c + 1) };
 }

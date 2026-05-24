@@ -1,14 +1,9 @@
 import {
-  MdPayments,
   MdNotifications,
   MdMenuBook,
   MdBusinessCenter,
-  MdSupervisorAccount,
-  MdDescription,
-  MdHandshake,
-  MdOutlineBusiness, MdAdminPanelSettings, MdSchool, MdManageAccounts, MdAssignment,
+  MdAssignment,
 } from 'react-icons/md';
-
 
 import type { IRoute } from "../types/navigation";
 
@@ -19,13 +14,6 @@ const partnerRoutes: IRoute[] = [
     path: "/applications",
     icon: MdAssignment,
   },
-
-  // {
-  //   name: "Commission",
-  //   layout: "/partner",
-  //   path: "/commission",
-  //   icon: MdPayments,
-  // },
 
   {
     name: "Knowledge Hub",

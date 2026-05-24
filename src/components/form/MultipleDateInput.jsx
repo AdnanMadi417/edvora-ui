@@ -19,11 +19,7 @@ const MultipleDateInput = ({
   updateFormData,
 }) => {
   const dates = getNestedValue(formData, field) || [];
-
-  // Ensure at least one date exists
-  React.useEffect(() => {
-    if (dates.length === 0) updateFormData(field, [""]);
-  }, [dates.length, field, updateFormData]);
+  const today = new Date().toISOString().split("T")[0];
 
   const addDate = () => updateFormData(field, [...dates, ""]);
 
@@ -34,10 +30,7 @@ const MultipleDateInput = ({
   };
 
   const removeDate = (index) => {
-    if (dates.length <= 1) return; // prevent removing last date
-    const newDates = [...dates];
-    newDates.splice(index, 1);
-    updateFormData(field, newDates);
+    updateFormData(field, dates.filter((_, i) => i !== index));
   };
 
   return (
@@ -60,15 +53,19 @@ const MultipleDateInput = ({
       </div>
 
       <div className="mt-2 flex flex-wrap gap-2">
+        {dates.length === 0 && (
+          <p className="w-full py-2 text-center text-sm text-slate-400">No intake dates added yet.</p>
+        )}
         {dates.map((date, i) => (
           <div key={i} className="flex items-center gap-2 rounded-md border p-2">
             <input
               type="date"
               value={date}
+              min={today}
               onChange={(e) => updateDate(i, e.target.value)}
               aria-label={`Intake date ${i + 1}`}
               className={`h-12 flex-1 rounded-md border px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500 ${
-                getNestedValue(errors, `${field}[${i}]`)
+                errors?.[`${field}[${i}]`]
                   ? "border-red-500 bg-red-50"
                   : "border-slate-200"
               }`}
@@ -77,9 +74,8 @@ const MultipleDateInput = ({
             <button
               type="button"
               onClick={() => removeDate(i)}
-              disabled={dates.length <= 1}
               aria-label={`Remove intake date ${i + 1}`}
-              className="flex h-8 w-8 items-center justify-center rounded-md border border-red-600 text-red-600 transition hover:border-red-700 hover:text-red-700 disabled:opacity-50"
+              className="flex h-8 w-8 items-center justify-center rounded-md border border-red-600 text-red-600 transition hover:border-red-700 hover:text-red-700"
               title="Remove this date"
             >
               <Trash2 className="h-4 w-4" />
@@ -88,8 +84,8 @@ const MultipleDateInput = ({
         ))}
       </div>
 
-      {getNestedValue(errors, field) && (
-        <p className="mt-1 text-xs text-red-600">{getNestedValue(errors, field)}</p>
+      {errors?.[field] && (
+        <p className="mt-1 text-xs text-red-600">{errors?.[field]}</p>
       )}
     </div>  );
 };

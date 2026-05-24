@@ -37,14 +37,22 @@ export default function CreateLogisticServicePopup({
     }
   }, [isOpen]);
 
+  const validateName = (value: string): string => {
+    if (!value.trim()) return "Service name is required";
+    if (value.trim().length < 5) return "Name must be at least 5 characters";
+    if (value.trim().length > 255) return "Name must not exceed 255 characters";
+    return "";
+  };
+
   const updateFormData = (_: string, value: string) => {
     setFormData({ name: value });
-    setErrors({});
+    if (errors.name) setErrors({});
   };
 
   const handleSubmit = async () => {
-    if (!formData.name.trim()) {
-      setErrors({ name: "Service name is required" });
+    const error = validateName(formData.name);
+    if (error) {
+      setErrors({ name: error });
       return;
     }
 
@@ -95,6 +103,7 @@ export default function CreateLogisticServicePopup({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => setErrors({ name: validateName(formData.name) })}
             />
           </div>
 
@@ -112,7 +121,7 @@ export default function CreateLogisticServicePopup({
             />
             <Button
               onClick={handleSubmit}
-              disabled={loadingCreateLogisticService || !formData.name.trim()}
+              disabled={loadingCreateLogisticService || formData.name.trim().length < 5}
               icon={<Plus className="h-5 w-5" />}
               text={loadingCreateLogisticService ? "Creating..." : "Create Service"}
               bgColor="bg-blue-50"

@@ -68,21 +68,26 @@ export default function DeleteProgramsConfirmation({
                   Confirm Deletion
                 </h3>
                 <p className="text-sm text-slate-500">
-                  Are you sure you want to remove this account manager from the system?
+                  Are you sure you want to permanently delete the selected program(s) from the system?
                 </p>
               </div>
 
               {programNames && programNames.length > 0 && (
-                <ul className="flex flex-wrap gap-2">
-                  {programNames.map((name, index) => (
-                    <li
-                      key={index}
-                      className="inline-flex max-w-md items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700"
-                    >
-                      <span className="truncate">{name}</span>
-                    </li>
-                  ))}
-                </ul>
+                <div>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    {programNames.length} program{programNames.length !== 1 ? "s" : ""} selected
+                  </p>
+                  <ul className="max-h-40 overflow-y-auto flex flex-wrap gap-2 pr-1">
+                    {programNames.map((name, index) => (
+                      <li
+                        key={index}
+                        className="inline-flex max-w-xs items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700"
+                      >
+                        <span className="truncate">{name}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
 
             </div>
