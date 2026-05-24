@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import UniversityDetails from "components/admin/configUniversities/details/UniversityDetails";
+import UniversityDetails from "features/universities/components/admin/details/UniversityConfigDetails";
 
 export default function UniversityPage() {
   const params = useParams();

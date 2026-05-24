@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import {
@@ -475,4 +475,3 @@ const UniversityManagementTable = () => {
 };
 
 export default UniversityManagementTable;
-

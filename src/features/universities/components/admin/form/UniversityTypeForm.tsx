@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 
 import { ArrowLeft, Layers, } from 'lucide-react';
 
@@ -183,4 +183,3 @@ export default function UniversityTypeForm() {
     </section>
   );
 }
-

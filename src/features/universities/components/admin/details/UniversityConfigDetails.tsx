@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -21,7 +21,7 @@ interface UniversityDetailsProps {
   id: string;
 }
 
-const UniversityDetails = ({ id }: UniversityDetailsProps) => {
+const UniversityConfigDetails = ({ id }: UniversityDetailsProps) => {
   const router = useRouter();
 
   const { university, loading, error } = useUniversityTypeDetails(id);
@@ -228,5 +228,4 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   );
 };
 
-export default UniversityDetails;
-
+export default UniversityConfigDetails;

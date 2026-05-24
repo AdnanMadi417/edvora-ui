@@ -1,6 +1,6 @@
 "use client";
 
-import FieldsOfStudyTable from "components/admin/configUniversities/FieldsOfStudy/FieldsOfStudyTable";
+import FieldsOfStudyTable from "features/universities/components/admin/fields-of-study/FieldsOfStudyTable";
 
 const FieldsOfStudyTableOverview = () => {
   return (

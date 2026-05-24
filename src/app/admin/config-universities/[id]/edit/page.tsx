@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EditUniversityForm from "components/admin/configUniversities/form/EditUniversityForm";
+import EditUniversityForm from "features/universities/components/admin/form/EditUniversityForm";
 
 export default function UniversityPage() {
   const params = useParams();
