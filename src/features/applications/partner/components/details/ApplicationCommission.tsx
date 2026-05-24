@@ -1,24 +1,32 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, Receipt } from "lucide-react";
+import { Download, Receipt, AlertCircle } from "lucide-react";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { useToast } from "components/context/ToastContext";
 import { ApplicationActionsResponse } from "hooks/applications/stages/useApplicationActions";
+import DisputeCommission from "features/applications/partner/components/popups/DisputeCommission";
 
 interface ApplicationCommissionProps {
   application: any;
   actions: ApplicationActionsResponse | null;
+  onRefetch?: () => void;
 }
 
 export default function ApplicationCommission({
   application,
   actions,
+  onRefetch,
 }: ApplicationCommissionProps) {
   const [downloading, setDownloading] = useState(false);
+  const [isDisputeOpen, setIsDisputeOpen] = useState(false);
   const { showToast } = useToast();
 
-  const { status: statusLabel } = actions || {};
+  const { status: statusLabel, partner_actions } = actions || {};
+
+  const canDispute = partner_actions?.some(
+    (a) => a.target_status_code === "COMMISSION_DISPUTED"
+  );
 
   const hasCommissions =
     Array.isArray(application?.commissions) &&
@@ -46,7 +54,7 @@ export default function ApplicationCommission({
   return (
     <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
       <div className="mb-6 rounded-lg border bg-white">
-        <div className="flex items-start gap-3 border-b border-gray-200 p-6">
+        <div className="flex items-center justify-between gap-3 border-b border-gray-200 p-6">
           <div className="flex flex-1 items-center gap-4">
             <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
               <Receipt className="text-xl text-blue-700" />
@@ -62,6 +70,16 @@ export default function ApplicationCommission({
               )}
             </div>
           </div>
+
+          {canDispute && (
+            <button
+              onClick={() => setIsDisputeOpen(true)}
+              className="flex shrink-0 items-center gap-2 rounded-md border border-red-500 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 transition hover:border-red-600 hover:bg-red-100"
+            >
+              <AlertCircle className="h-4 w-4" />
+              Dispute Commission
+            </button>
+          )}
         </div>
 
         <div className="space-y-4 p-6">
@@ -101,6 +119,13 @@ export default function ApplicationCommission({
 
         </div>
       </div>
+
+      <DisputeCommission
+        isOpen={isDisputeOpen}
+        onClose={() => setIsDisputeOpen(false)}
+        applicationId={application?.id}
+        onSuccess={onRefetch}
+      />
     </section>
   );
 }
