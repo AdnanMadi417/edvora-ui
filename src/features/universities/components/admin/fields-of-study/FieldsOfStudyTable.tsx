@@ -7,70 +7,62 @@ import {
   ArrowRight,
   ArrowLeft,
   Settings,
-  ChevronRight,
   Pencil,
   Trash2,
-  CreditCard,
+  Book,
 } from "lucide-react";
-import { MdOutlineCategory } from "react-icons/md";
+import { MdLabelOutline } from 'react-icons/md';
 
-import { useDeleteUniversity } from "hooks/knowledge-hub/payment-methods/useDeletePaymentMethod";
-import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
+import { useDeleteField } from "hooks/knowledge-hub/field-of-study/useDeleteField";
+import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
-import DeletePaymentConfirmation from "components/admin/configUniversities/paymentMethods/popups/DeletePaymentConfirmation";
-import CreatePayment from "components/admin/configUniversities/paymentMethods/popups/CreatePayment";
+import DeleteFieldConfirmation from "features/universities/components/admin/fields-of-study/popups/DeleteFieldConfirmation";
+import CreateFieldOfStudy from "features/universities/components/admin/fields-of-study/popups/CreateFieldOfStudy";
+import UpdateField from "features/universities/components/admin/fields-of-study/popups/UpdateField";
 
 import Loading from "components/loading/Loading";
 
-import { useRouter } from "next/navigation";
 import { useToast } from "components/context/ToastContext";
 import Button from "components/ui/buttons/Button";
 
-const PaymentMethodsTable = () => {
-  const router = useRouter();
+const FieldsOfStudyTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { showToast } = useToast();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  const { paymentMethods, loading, error } = useAllPaymentMethods();
+  const { fields, fieldsLoading, fieldsError, refetch } = useAllFields();
 
-  const { deletePayment, isDeleting } = useDeleteUniversity();
+  const { deleteField, isDeleting } = useDeleteField();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-
-  const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  const [selectedFieldId, setSelectedFieldId] = useState<string | null>(
     null
   );
-
-  const [selectedPaymentMethodName, setSelectedPaymentMethodName] =
+  const [selectedFieldName, setSelectedFieldName] =
     useState<string>("");
-
+  const [selectedField, setSelectedField] = useState<any | null>(null);
   const [selectedState, setSelectedState] = useState<string>("all");
-  const [selectedField, setSelectedField] = useState<string>("all");
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const filteredPaymentMethods = React.useMemo(() => {
+  const filteredFieldOfStudy = React.useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
 
-    return paymentMethods.filter((university) => {
+    return fields.filter((field) => {
       const matchSearch =
-        !term || university.name?.toLowerCase().includes(term);
+        !term || field.name?.toLowerCase().includes(term);
 
-      const matchField =
-        selectedField === "all" ||
-        (university as any).field_id === selectedField;
-
-      return matchSearch && matchField;
+      return matchSearch;
     });
-  }, [paymentMethods, searchTerm, selectedState, selectedField]);
+  }, [fields, searchTerm]);
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -80,10 +72,10 @@ const PaymentMethodsTable = () => {
     direction: "asc",
   });
 
-  const sortedPaymentMethods = React.useMemo(() => {
-    if (!sortConfig.key) return filteredPaymentMethods;
+  const sortedFieldOfStudy = React.useMemo(() => {
+    if (!sortConfig.key) return filteredFieldOfStudy;
 
-    return [...filteredPaymentMethods].sort((a, b) => {
+    return [...filteredFieldOfStudy].sort((a, b) => {
       const aValue = (a as any)[sortConfig.key];
       const bValue = (b as any)[sortConfig.key];
 
@@ -109,11 +101,12 @@ const PaymentMethodsTable = () => {
 
       return 0;
     });
-  }, [filteredPaymentMethods, sortConfig]);
-  const currentPaymentMethods = sortedPaymentMethods.slice(
+  }, [filteredFieldOfStudy, sortConfig]);
+  const currentFieldOfStudy = sortedFieldOfStudy.slice(
     indexOfFirstItem,
     indexOfLastItem
   );
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1);
@@ -124,43 +117,43 @@ const PaymentMethodsTable = () => {
   }, [searchTerm, selectedState, selectedField]);
 
   useEffect(() => {
-    const totalPages = Math.ceil(filteredPaymentMethods.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredFieldOfStudy.length / itemsPerPage);
     if (currentPage > totalPages && totalPages > 0) {
       setCurrentPage(totalPages);
     }
-  }, [filteredPaymentMethods, currentPage]);
+  }, [filteredFieldOfStudy, currentPage]);
 
   const handleDelete = async () => {
-    if (!selectedPaymentId) return;
+    if (!selectedFieldId) return;
 
     try {
-      await deletePayment(selectedPaymentId);
+      await deleteField(selectedFieldId);
 
-      showToast(" Payment Method deleted successfully.", "success");
+      showToast("Field of study deleted successfully.", "success");
 
       setIsDeleteOpen(false);
-      setSelectedPaymentId(null);
-      setSelectedPaymentMethodName("");
+      setSelectedFieldId(null);
+      setSelectedFieldName("");
 
-      setTimeout(() => location.reload(), 2000);
+      refetch();
     } catch (error: any) {
       const backendMessage =
         error?.response?.data?.message || "Please try again.";
-      showToast(`Failed to delete university. ${backendMessage}`, "error");
+      showToast(`Failed to Field of study university. ${backendMessage}`, "error");
     }
   };
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-slate-900">
-                Knowledge Hub
+                Field Of Study
               </h3>
               <p className="mt-1 text-sm text-slate-500">
-                Explore and manage all Payment Methods, and learning resources
+                Explore and manage all fields, and learning resources
               </p>
             </div>
           </div>
@@ -170,7 +163,7 @@ const PaymentMethodsTable = () => {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-400" />
               <input
                 type="text"
-                placeholder="Search by university name or level"
+                placeholder="Search by Field name..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 className="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 pl-10 pr-4 text-sm text-slate-600 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-100"
@@ -192,9 +185,9 @@ const PaymentMethodsTable = () => {
 
             <Button
               onClick={() => setIsCreateOpen(true)}
-              disabled={loading}
-              icon={<CreditCard className="h-5 w-5" />}
-              text="Create Payment"
+              disabled={fieldsLoading}
+              icon={<Book className="h-5 w-5" />}
+              text="Create new Field"
               bgColor="bg-blue-50"
               textColor="text-blue-700"
               borderColor="border-blue-600"
@@ -205,23 +198,23 @@ const PaymentMethodsTable = () => {
         </div>
       </div>
 
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="block">
-          <div className="overflow-x-auto rounded-lg rounded-b-none bg-card">
+          <div className="overflow-x-auto rounded-lg rounded-b-none bg-white">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-200 bg-card">
+                <tr className="border-b border-slate-200 bg-white">
                   <th className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors ">
                     <div className="flex items-center gap-2">
-                      <CreditCard className="h-4 w-4 text-slate-500" />
-                      <span>Payment Method</span>
+                      <Book className="h-4 w-4 text-slate-500" />
+                      <span>Field Of Study</span>
                     </div>
                   </th>
 
                   <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
                     <div className="flex min-w-[150px] items-center gap-2">
-                      <MdOutlineCategory className="h-4 w-4 text-slate-500" />
-                      <span>Description</span>
+                      <MdLabelOutline className="h-4 w-4 text-slate-500" />
+                      <span>Code</span>
                     </div>
                   </th>
 
@@ -234,32 +227,31 @@ const PaymentMethodsTable = () => {
                 </tr>
               </thead>
 
-              <tbody className="divide-border-slate-200 divide-y bg-primary">
-                {loading && (
+              <tbody className="divide-border-slate-200 divide-y">
+                {fieldsLoading && (
                   <tr>
                     <td colSpan={3} className="px-6 py-8 text-center">
-                      <Loading text="Fetching Payment Methods data..." />
+                      <Loading text="Fetching Fields of studies data..." />
                     </td>
                   </tr>
                 )}
 
-                {!error && !loading && currentPaymentMethods.length === 0 && (
+                {!fieldsError && !fieldsLoading && currentFieldOfStudy.length === 0 && (
                   <tr>
                     <td colSpan={3} className="px-6 py-8 text-center">
                       <NoMessagesFound
-                        title="No Payment Methods found"
-                        subtitle="There are currently no Payment Methods available."
+                        title="No Field found"
+                        subtitle="There are currently no Field of study available."
                       />
                     </td>
                   </tr>
                 )}
 
-                {!error &&
-                  currentPaymentMethods.map((payment) => (
+                {!fieldsError &&
+                  currentFieldOfStudy.map((field) => (
                     <tr
-                      key={payment.id}
-                      className="group cursor-pointer transition-colors hover:bg-primary/10"
-                      onClick={() => router.push(`/admin/config-universities/payment-methods/${payment.id}`)}
+                      key={field.id}
+                      className="bg-white hover:bg-slate-50 group transition-colors"
                     >
                       <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                         <div className="flex items-center gap-3">
@@ -267,12 +259,12 @@ const PaymentMethodsTable = () => {
                             className="flex h-10 w-10 shrink-0 items-center justify-center
                 rounded-md bg-accent-light text-h6 font-medium text-blue-700 "
                           >
-                            <CreditCard className="h-5 w-5 text-blue-700" />
+                            <Book className="h-5 w-5 text-blue-700" />
                           </div>
 
                           <div className="w-full min-w-0">
                             <h3 className="truncate text-sm font-semibold text-slate-900">
-                              {payment.name}
+                              {field.name}
                             </h3>
                           </div>
                         </div>
@@ -282,7 +274,7 @@ const PaymentMethodsTable = () => {
                         <div className="flex items-center gap-3">
                           <div className="w-full min-w-0">
                             <h3 className="truncate text-sm font-semibold text-slate-900">
-                              {payment.description}
+                              {field.code ?? "Not provided"}
                             </h3>
                           </div>
                         </div>
@@ -290,25 +282,27 @@ const PaymentMethodsTable = () => {
 
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
-                          <a
+
+                          <button
                             role="menuitem"
-                            aria-label="Edit Payment Method"
-                            href={`/admin/config-universities/payment-methods/${payment.id}/edit`}
-                            onClick={(e) => e.stopPropagation()}
+                            aria-label="Update Field of study"
+                            onClick={() => {
+                              setSelectedField(field);
+                              setIsUpdateOpen(true);
+                            }}
                             className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                           >
-                            <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                          </a>
+                            <Pencil className="h-4 w-4 text-slate-500 hover:text-red-600" />
+                          </button>
 
                           <div className="h-6 border-l border-slate-200" />
 
                           <button
                             role="menuitem"
-                            aria-label="Delete Payment Method"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedPaymentId(payment.id);
-                              setSelectedPaymentMethodName(payment.name);
+                            aria-label="Delete Field of study"
+                            onClick={() => {
+                              setSelectedFieldId(field.id);
+                              setSelectedFieldName(field.name);
                               setIsDeleteOpen(true);
                             }}
                             className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
@@ -317,9 +311,6 @@ const PaymentMethodsTable = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="px-4 py-4">
-                        <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
-                      </td>
                     </tr>
                   ))}
               </tbody>
@@ -327,7 +318,7 @@ const PaymentMethodsTable = () => {
           </div>
 
           <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex  md:justify-between">
-            {paymentMethods.length > 0 && (
+            {fields.length > 0 && (
               <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                 Showing
                 <span className="font-medium">
@@ -335,11 +326,11 @@ const PaymentMethodsTable = () => {
                 </span>
                 to
                 <span className="font-medium">
-                  {Math.min(currentPage * itemsPerPage, paymentMethods.length)}
+                  {Math.min(currentPage * itemsPerPage, fields.length)}
                 </span>
                 of
-                <span className="font-medium">{paymentMethods.length}</span>
-                Payment Methods
+                <span className="font-medium">{fields.length}</span>
+                Field of study
               </div>
             )}
 
@@ -353,7 +344,7 @@ const PaymentMethodsTable = () => {
 
               <span className="px-3 py-1 font-medium text-slate-500">
                 Page {currentPage} of{" "}
-                {Math.ceil(paymentMethods.length / itemsPerPage)}
+                {Math.ceil(fields.length / itemsPerPage)}
               </span>
 
               <NextButton
@@ -361,13 +352,13 @@ const PaymentMethodsTable = () => {
                   setCurrentPage((prev) =>
                     Math.min(
                       prev + 1,
-                      Math.ceil(paymentMethods.length / itemsPerPage)
+                      Math.ceil(fields.length / itemsPerPage)
                     )
                   )
                 }
                 disabled={
                   currentPage ===
-                  Math.ceil(paymentMethods.length / itemsPerPage)
+                  Math.ceil(fields.length / itemsPerPage)
                 }
                 text="Next"
                 icon={<ArrowRight className="h-4 w-4" />}
@@ -377,20 +368,28 @@ const PaymentMethodsTable = () => {
         </div>
       </div>
 
-      <DeletePaymentConfirmation
+      <DeleteFieldConfirmation
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
         isDeleting={isDeleting}
-        paymentMethodName={selectedPaymentMethodName}
+        FieldName={selectedFieldName}
       />
 
-      <CreatePayment
+      <UpdateField
+        isOpen={isUpdateOpen}
+        onClose={() => setIsUpdateOpen(false)}
+        selectedField={selectedField}
+        onSuccess={refetch}
+      />
+
+      <CreateFieldOfStudy
         isOpen={isCreateOpen}
         onClose={() => setIsCreateOpen(false)}
+        onSuccess={refetch}
       />
     </div>
   );
 };
 
-export default PaymentMethodsTable;
+export default FieldsOfStudyTable;

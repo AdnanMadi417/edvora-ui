@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 
 import { ArrowLeft, Layers, } from 'lucide-react';
 
@@ -26,10 +26,22 @@ export default function UniversityTypeForm() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const validateName = (value: string): string => {
+    if (!value.trim()) return "Name is required";
+    if (value.trim().length < 5) return "Name must be at least 5 characters";
+    if (value.trim().length > 100) return "Name must not exceed 100 characters";
+    return "";
+  };
+
+  const validateDescription = (value: string): string => {
+    if (!value.trim()) return "Description is required";
+    if (value.trim().length < 10) return "Description must be at least 10 characters";
+    return "";
+  };
+
   const isFormValid =
-    formData.name.trim() !== "" &&
-    formData.description.trim() !== "" &&
-    Object.keys(formData.required_fields_map || {}).length > 0;
+    !validateName(formData.name) &&
+    !validateDescription(formData.description);
 
   const updateFormData = (field: string, value: any) => {
     if (field.startsWith("required_fields_map.")) {
@@ -58,6 +70,16 @@ export default function UniversityTypeForm() {
   };
 
   const handleCreate = async () => {
+    const newErrors: Record<string, string> = {};
+    const nameErr = validateName(formData.name);
+    if (nameErr) newErrors.name = nameErr;
+    const descErr = validateDescription(formData.description);
+    if (descErr) newErrors.description = descErr;
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     try {
       const required_fields = Object.entries(formData.required_fields_map).map(
         ([id, is_required]) => ({
@@ -67,8 +89,8 @@ export default function UniversityTypeForm() {
       );
 
       await createUniversityType({
-        name: formData.name,
-        description: formData.description,
+        name: formData.name.trim(),
+        description: formData.description.trim(),
         required_fields,
       });
 
@@ -122,15 +144,24 @@ export default function UniversityTypeForm() {
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
+            onBlur={() => {
+              const err = validateName(formData.name);
+              if (err) setErrors((prev) => ({ ...prev, name: err }));
+            }}
           />
 
           <InputField
             label="Description"
             field="description"
             placeholder="Brief description..."
+            required
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
+            onBlur={() => {
+              const err = validateDescription(formData.description);
+              if (err) setErrors((prev) => ({ ...prev, description: err }));
+            }}
           />
         </div>
 
@@ -183,4 +214,3 @@ export default function UniversityTypeForm() {
     </section>
   );
 }
-

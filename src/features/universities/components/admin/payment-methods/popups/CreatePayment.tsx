@@ -9,16 +9,17 @@ import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import InputField from "components/form/InputField";
 import { useToast } from "components/context/ToastContext";
-import { useRouter } from 'next/navigation';
 
 interface CreatePaymentMethodProps {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export default function CreatePayment({
                                            isOpen,
                                            onClose,
+                                           onSuccess,
                                          }: CreatePaymentMethodProps) {
   const { createPayment, paymentLoading } = useCreatePayment();
   const { showToast } = useToast();
@@ -31,16 +32,29 @@ export default function CreatePayment({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const router = useRouter();
   const [apiError, setApiError] = useState<string | null>(null);
 
-  const isFormValid =
-    formData.name.trim() &&
-    formData.description.trim()
+  const validateName = (value: string): string => {
+    if (!value.trim()) return "Name is required";
+    if (value.trim().length < 5) return "Name must be at least 5 characters";
+    if (value.trim().length > 100) return "Name must not exceed 100 characters";
+    return "";
+  };
+
+  const validateDescription = (value: string): string => {
+    if (!value.trim()) return "";
+    if (value.trim().length < 10) return "Description must be at least 10 characters";
+    return "";
+  };
+
+  const isFormValid = !validateName(formData.name) && !validateDescription(formData.description);
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      setFormData({ name: "", description: "" });
+      setErrors({});
+      setApiError(null);
     } else {
       const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
@@ -54,33 +68,37 @@ export default function CreatePayment({
     }));
 
     if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
   const handleCreate = async () => {
+    const newErrors: Record<string, string> = {};
+    const nameErr = validateName(formData.name);
+    if (nameErr) newErrors.name = nameErr;
+    const descErr = validateDescription(formData.description);
+    if (descErr) newErrors.description = descErr;
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     try {
       setApiError(null);
 
-      await createPayment(formData);
+      await createPayment({ name: formData.name.trim(), description: formData.description.trim() });
 
       showToast("Payment Method created successfully.", "success");
 
       onClose();
-      setTimeout(() => router.refresh(), 1500);
+      setTimeout(() => onSuccess?.(), 1500);
     } catch (error: any) {
       const backendMessage =
         error?.response?.data?.message || "Please try again.";
 
       setApiError(backendMessage);
 
-      showToast(
-        `Failed to create Payment Method. ${backendMessage}`,
-        "error"
-      );
+      showToast(`Failed to create Payment Method. ${backendMessage}`, "error");
     }
   };
 
@@ -122,6 +140,10 @@ export default function CreatePayment({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => {
+                const err = validateName(formData.name);
+                if (err) setErrors((prev) => ({ ...prev, name: err }));
+              }}
             />
 
             <InputField
@@ -131,6 +153,10 @@ export default function CreatePayment({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => {
+                const err = validateDescription(formData.description);
+                if (err) setErrors((prev) => ({ ...prev, description: err }));
+              }}
             />
 
             {apiError && (

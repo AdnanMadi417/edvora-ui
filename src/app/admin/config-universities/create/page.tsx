@@ -1,6 +1,6 @@
 "use client";
 
-import UniversityTypeForm from "components/admin/configUniversities/form/UniversityTypeForm";
+import UniversityTypeForm from "features/universities/components/admin/form/UniversityTypeForm";
 
 const CreateNewUniversityType = () => {
   return (

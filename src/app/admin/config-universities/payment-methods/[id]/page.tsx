@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import PaymentMethodDetails from "components/admin/configUniversities/paymentMethods/PaymentMethodDetails";
+import PaymentMethodDetails from "features/universities/components/admin/payment-methods/PaymentMethodDetails";
 
 export default function UniversityPage() {
   const params = useParams();

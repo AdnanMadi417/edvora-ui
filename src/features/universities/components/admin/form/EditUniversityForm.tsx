@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -45,7 +45,28 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     required_fields_map: data?.required_fields_map || {},
   });
 
+  const validateName = (value: string): string => {
+    if (!value?.trim()) return "Name is required";
+    if (value.trim().length < 5) return "Name must be at least 5 characters";
+    if (value.trim().length > 100) return "Name must not exceed 100 characters";
+    return "";
+  };
+
+  const validateDescription = (value: string): string => {
+    if (!value?.trim()) return "Description is required";
+    if (value.trim().length < 10) return "Description must be at least 10 characters";
+    return "";
+  };
+
+  const isFormValid =
+    !validateName(formData.name) &&
+    !validateDescription(formData.description);
+
   const updateFormData = (field: string, value: any) => {
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+
     setFormData((prev: any) => {
       const clone = structuredClone(prev);
 
@@ -65,6 +86,16 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   };
 
   const handleUpdate = async () => {
+    const newErrors: Record<string, string> = {};
+    const nameErr = validateName(formData.name);
+    if (nameErr) newErrors.name = nameErr;
+    const descErr = validateDescription(formData.description);
+    if (descErr) newErrors.description = descErr;
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     try {
       const payload = {
         name: formData.name?.trim() || "",
@@ -117,7 +148,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     const initial = normalizePayload(initialFormData);
 
     return JSON.stringify(current) !== JSON.stringify(initial);
-  }, [formData, initialFormData, normalizePayload]);
+  }, [formData, initialFormData]);
 
   const handleBack = () => {
     router.push("/admin/config-universities");
@@ -213,8 +244,12 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 field="name"
                 required
                 formData={formData}
-                errors={{}}
+                errors={errors}
                 updateFormData={updateFormData}
+                onBlur={() => {
+                  const err = validateName(formData.name);
+                  if (err) setErrors((prev) => ({ ...prev, name: err }));
+                }}
               />
 
               <InputField
@@ -222,8 +257,12 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 field="description"
                 required
                 formData={formData}
-                errors={{}}
+                errors={errors}
                 updateFormData={updateFormData}
+                onBlur={() => {
+                  const err = validateDescription(formData.description);
+                  if (err) setErrors((prev) => ({ ...prev, description: err }));
+                }}
               />
             </div>
           </div>
@@ -281,7 +320,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               hoverTextColor="hover:text-blue-800"
               hoverBorderColor="hover:border-blue-700"
               onClick={handleUpdate}
-              disabled={loading || !isFormChanged}
+              disabled={loading || !isFormChanged || !isFormValid}
             />
           </div>
         </div>
@@ -291,4 +330,3 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 };
 
 export default UniversityDetails;
-
