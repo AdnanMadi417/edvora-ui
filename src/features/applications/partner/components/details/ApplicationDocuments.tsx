@@ -190,6 +190,7 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
           {allDocs.map((doc: any) => <DocRow key={doc.id} doc={doc} />)}
           <DocGroup label="Payment Documents" docs={paymentDocuments} />
           <DocGroup label="Arrival Documents" docs={arrivalDocuments} />
+          <DocGroup label="Offer Letter" docs={offerLetterDoc ? [offerLetterDoc] : []} />
           <DocGroup label="EMGS Eval Document" docs={emgsEvalDoc ? [emgsEvalDoc] : []} />
           <DocGroup label="Visa Document" docs={visaDoc ? [visaDoc] : []} />
           <DocGroup label="Commission Documents" docs={commissionDocuments} />
