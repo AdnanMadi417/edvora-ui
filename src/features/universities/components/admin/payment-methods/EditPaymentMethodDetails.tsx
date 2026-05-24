@@ -41,6 +41,8 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
     description: "",
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
   const { deletePayment, isDeleting } = useDeleteUniversity();
   const { updatePaymentMethods, loading } = useUpdatePaymentMethods();
 
@@ -64,7 +66,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
 
       } catch (err) {
         console.error(err);
-        showToast("Failed to load payment method");
+        showToast("Failed to load payment method.", "error");
       } finally {
         setLoadingPayment(false);
       }
@@ -73,8 +75,26 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
     if (id) fetchPaymentMethod();
   }, [id]);
 
+  const validateName = (value: string): string => {
+    if (!value.trim()) return "Name is required";
+    if (value.trim().length < 5) return "Name must be at least 5 characters";
+    if (value.trim().length > 100) return "Name must not exceed 100 characters";
+    return "";
+  };
+
+  const validateDescription = (value: string): string => {
+    if (!value.trim()) return "";
+    if (value.trim().length < 10) return "Description must be at least 10 characters";
+    return "";
+  };
+
+  const isFormValid = !validateName(formData.name) && !validateDescription(formData.description);
+
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
   };
 
   const isChanged =
@@ -84,6 +104,16 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
 
   const handleUpdate = async () => {
     if (!paymentMethod) return;
+
+    const newErrors: Record<string, string> = {};
+    const nameErr = validateName(formData.name);
+    if (nameErr) newErrors.name = nameErr;
+    const descErr = validateDescription(formData.description);
+    if (descErr) newErrors.description = descErr;
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
     try {
       const payload = {
@@ -96,8 +126,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
       showToast("Payment method updated successfully", "success");
       router.push("/admin/config-universities/payment-methods");
 
-    }
-    catch (error: any) {
+    } catch (error: any) {
       const backendMessage =
         error?.response?.data?.message || "Please try again.";
       showToast(`Failed to update payment method. ${backendMessage}`, "error");
@@ -138,7 +167,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
   return (
     <>
       <div className="mt-6 max-w-5xl mx-auto">
-        <div className="rounded-md border bg-card shadow-sm">
+        <div className="rounded-md border bg-white shadow-sm">
 
           <div className="flex justify-between border-b p-6">
 
@@ -205,8 +234,12 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
               field="name"
               required
               formData={formData}
-              errors={{}}
+              errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => {
+                const err = validateName(formData.name);
+                if (err) setErrors((prev) => ({ ...prev, name: err }));
+              }}
             />
 
             <InputField
@@ -214,8 +247,12 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
               field="description"
               placeholder="Brief description..."
               formData={formData}
-              errors={{}}
+              errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => {
+                const err = validateDescription(formData.description);
+                if (err) setErrors((prev) => ({ ...prev, description: err }));
+              }}
             />
 
           </div>
@@ -238,7 +275,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
               textColor="text-blue-700"
               borderColor="border-blue-600"
               onClick={handleUpdate}
-              disabled={loading || !isChanged}
+              disabled={loading || !isChanged || !isFormValid}
             />
 
           </div>

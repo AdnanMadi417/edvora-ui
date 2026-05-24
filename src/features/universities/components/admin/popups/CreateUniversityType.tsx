@@ -23,7 +23,7 @@ export default function CreateUniversityType({
   onSuccess,
 }: CreateUniversityProps) {
 
-  const { createUniversity, loading } = useCreateUniversityType();
+  const { createUniversityType, loading } = useCreateUniversityType();
   const { showToast } = useToast();
 
   const [isVisible, setIsVisible] = useState(false);
@@ -35,13 +35,28 @@ export default function CreateUniversityType({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const validateName = (value: string): string => {
+    if (!value.trim()) return "Name is required";
+    if (value.trim().length < 5) return "Name must be at least 5 characters";
+    if (value.trim().length > 100) return "Name must not exceed 100 characters";
+    return "";
+  };
+
+  const validateDescription = (value: string): string => {
+    if (!value.trim()) return "Description is required";
+    if (value.trim().length < 10) return "Description must be at least 10 characters";
+    return "";
+  };
+
   const isFormValid =
-    formData.name.trim() &&
-    formData.description.trim()
+    !validateName(formData.name) &&
+    !validateDescription(formData.description);
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
+      setFormData({ name: "", description: "" });
+      setErrors({});
     } else {
       const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
@@ -55,18 +70,25 @@ export default function CreateUniversityType({
     }));
 
     if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
   const handleCreate = async () => {
-    try {
-      await createUniversity(formData);
+    const newErrors: Record<string, string> = {};
+    const nameErr = validateName(formData.name);
+    if (nameErr) newErrors.name = nameErr;
+    const descErr = validateDescription(formData.description);
+    if (descErr) newErrors.description = descErr;
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
-      showToast("University created successfully.");
+    try {
+      await createUniversityType({ name: formData.name.trim(), description: formData.description.trim() });
+
+      showToast("University created successfully.", "success");
 
       onClose();
       setTimeout(() => onSuccess?.(), 1500);
@@ -75,16 +97,12 @@ export default function CreateUniversityType({
 
       if (Array.isArray(apiErrors)) {
         const newErrors: Record<string, string> = {};
-
         apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) {
-            newErrors[e.loc[1]] = e.msg;
-          }
+          if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
         });
-
         setErrors(newErrors);
       }
-      showToast("Failed to create university.");
+      showToast("Failed to create university.", "error");
     }
   };
   if (!isVisible) return null;
@@ -125,6 +143,10 @@ export default function CreateUniversityType({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => {
+                const err = validateName(formData.name);
+                if (err) setErrors((prev) => ({ ...prev, name: err }));
+              }}
             />
 
             <InputField
@@ -135,6 +157,10 @@ export default function CreateUniversityType({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => {
+                const err = validateDescription(formData.description);
+                if (err) setErrors((prev) => ({ ...prev, description: err }));
+              }}
             />
 
           </div>
@@ -154,8 +180,8 @@ export default function CreateUniversityType({
 
             <Button
               onClick={handleCreate}
-              disabled={loading || !isFormValid}
               icon={<GraduationCap  className="h-5 w-5" />}
+              disabled={loading || !isFormValid}
               text={loading ? "Creating..." : "Create University"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"
