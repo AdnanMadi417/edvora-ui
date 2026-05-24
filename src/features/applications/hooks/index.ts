@@ -10,6 +10,8 @@ export { useGetApplicationRequiredFields } from "hooks/applications/useApplicati
 export { useUniversityRequiredFields } from "hooks/applications/useUniversityRequiredFields";
 export { useVisaSetup } from "hooks/applications/useVisaSetup";
 
+export { useDisputeCommission } from "hooks/applications/useDisputeCommission";
+
 export { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
 export { useAllStages } from "hooks/applications/stages/useStages";
 export { useAllStageStatuses } from "hooks/applications/stages/useStageStatuses";
@@ -18,7 +20,7 @@ export { useChangeProgram } from "hooks/applications/stages/useChangeProgram";
 export { useArrivalDateUpload } from "hooks/applications/files/useArrivalDateUpload";
 export { useCommissionPaymentUpload } from "hooks/applications/files/useCommissionPaymentUpload";
 export { useEVisaUpload } from "hooks/applications/files/useEVisaUpload";
-export { useEmgsEvaluationUpload } from "hooks/applications/files/useEmgsEvaluationUpload";
+export { useEmgsEvalUpload } from "hooks/applications/files/useEmgsEvaluationUpload";
 export { useOfferLetterUpload } from "hooks/applications/files/useOfferLetterUpload";
 export { useRequiredDocumentsUpload } from "hooks/applications/files/useRequiredDocumentsUpload";
 export { useVisaDocumentUpload } from "hooks/applications/files/useVisaDocumentUpload";

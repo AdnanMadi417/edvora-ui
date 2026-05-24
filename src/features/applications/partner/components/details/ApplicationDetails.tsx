@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { GraduationCap, Building2,  Globe, Calendar, ArrowRight, Wallet } from "lucide-react";
+import { GraduationCap, Building2,  Globe, Calendar, ArrowRight, Wallet,AlertCircle } from "lucide-react";
 import {
   FaUser,
   FaBirthdayCake,
@@ -30,7 +30,7 @@ import EmgsEvalUpload from "features/applications/partner/components/popups/Emgs
 import EVisaUpload from "features/applications/partner/components/popups/EVisaUpload";
 import ApplicationCommission from './ApplicationCommission';
 import { useToast } from 'components/context/ToastContext';
-import Dispute from 'features/applications/partner/components/popups/UpdatedDispute';
+import DisputeCommission from 'features/applications/partner/components/popups/DisputeCommission';
 import api from 'lib/useApi';
 import ApplicationTimeline from 'features/applications/shared/ApplicationTimeline';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
@@ -514,7 +514,7 @@ export default function ApplicationDetails({
                       {confirmAction && (
                         <Button
                           icon={<CheckCircle className="h-4 w-4" />}
-                          text={confirmLoading ? "Processing..." : "Confirm"}
+                          text={confirmLoading ? "Processing..." : "Confirm Commission "}
                           bgColor="bg-green-50"
                           textColor="text-green-700"
                           borderColor="border-green-600"
@@ -527,8 +527,8 @@ export default function ApplicationDetails({
                       )}
                       {disputeAction && (
                         <Button
-                          icon={<XCircle className="h-4 w-4" />}
-                          text="Dispute"
+                          icon={<AlertCircle className="h-4 w-4" />}
+                          text="Dispute Commission "
                           bgColor="bg-red-50"
                           textColor="text-red-700"
                           borderColor="border-red-600"
@@ -548,7 +548,7 @@ export default function ApplicationDetails({
       </div>
 
       <ApplicationTimeline application={application} />
-      <ApplicationCommission application={application} actions={actions} />
+      <ApplicationCommission application={application} actions={actions} onRefetch={handleRefetch} />
       <OfferLetterDecision application={application} visaCase={visaCase} onRefetch={handleRefetch} />
 
       <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
@@ -944,11 +944,11 @@ export default function ApplicationDetails({
       )}
 
       {showDispute && disputeAction && (
-        <Dispute
+        <DisputeCommission
           isOpen={showDispute}
           onClose={() => setShowDispute(false)}
           applicationId={application.id}
-          statusId={disputeAction.target_status_id}
+          onSuccess={handleRefetch}
         />
       )}
     </section>
