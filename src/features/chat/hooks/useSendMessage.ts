@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import api from "lib/useApi";
-import type { ChatMessage } from "./useChatMessages";
+import type { ChatMessage } from "../types";
 
 interface UseSendMessageOptions {
   applicationId: string;
