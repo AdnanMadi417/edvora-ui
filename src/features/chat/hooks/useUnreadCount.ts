@@ -7,9 +7,9 @@ interface UseUnreadCountOptions {
 }
 
 export function useUnreadCount({
-                                 applicationId,
-                                 enabled = true,
-                               }: UseUnreadCountOptions) {
+  applicationId,
+  enabled = true,
+}: UseUnreadCountOptions) {
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +24,6 @@ export function useUnreadCount({
       const response = await api.get<{ count: number }>(
         `/applications/${applicationId}/unread-count`
       );
-
       setUnreadCount(response.data.count);
     } catch (err: any) {
       setError(err.message || "Failed to fetch unread count");
@@ -33,15 +32,9 @@ export function useUnreadCount({
     }
   }, [applicationId, enabled]);
 
-  // Auto-fetch when enabled & applicationId changes
   useEffect(() => {
     fetchUnreadCount();
   }, [fetchUnreadCount]);
 
-  return {
-    unreadCount,
-    loading,
-    error,
-    refetch: fetchUnreadCount,
-  };
+  return { unreadCount, loading, error, refetch: fetchUnreadCount };
 }

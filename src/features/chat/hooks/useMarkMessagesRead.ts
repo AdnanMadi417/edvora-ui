@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import api from "lib/useApi";
-import { useMe } from "../useMe";
+import { useMe } from "hooks/useMe";
 import type { ChatMessage } from "./useChatMessages";
 
 interface UseMarkMessagesReadOptions {

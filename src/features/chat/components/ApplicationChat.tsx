@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { useChatMessages } from "hooks/chat/useChatMessages";
-import { useSendMessage } from "hooks/chat/useSendMessage";
-import { useMarkMessagesRead } from "hooks/chat/useMarkMessagesRead";
-import { useChatPolling } from "hooks/chat/useChatPolling";
+import { useChatMessages } from "features/chat/hooks/useChatMessages";
+import { useSendMessage } from "features/chat/hooks/useSendMessage";
+import { useMarkMessagesRead } from "features/chat/hooks/useMarkMessagesRead";
+import { useChatPolling } from "features/chat/hooks/useChatPolling";
 import { useMe } from "hooks/useMe";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
 import { useAllNotifications } from "hooks/notifications/useNotifications";
 import api from "lib/useApi";
 import { Send, User } from "lucide-react";
-import Loading from "../loading/Loading";
-import NoMessagesFound from "../emptyData/NoMessagesFound";
+import Loading from "components/loading/Loading";
+import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 interface AgentPartnerChatProps {
   applicationId: string;
@@ -39,14 +39,10 @@ export default function AgentPartnerChat({
       await fetchInitialMessages();
       setLoading(false);
     };
-
     init();
   }, [fetchInitialMessages]);
 
-  useChatPolling({
-    enabled: !loading,
-    fetchNewMessages,
-  });
+  useChatPolling({ enabled: !loading, fetchNewMessages });
 
   useEffect(() => {
     if (messages.length === 0) return;
@@ -58,7 +54,6 @@ export default function AgentPartnerChat({
         prev.map((m) => (markedIds.includes(m.id) ? { ...m, read_at: now } : m))
       );
 
-      // Mark corresponding notifications as read
       const relatedNotifications = notifications.filter(
         (n) => n.read_at === null && n.data.message_id && markedIds.includes(n.data.message_id)
       );
@@ -78,10 +73,7 @@ export default function AgentPartnerChat({
   }, [messages]);
 
   const formatTime = (date: string) =>
-    new Date(date).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   if (error) {
     return <div className="p-4 text-sm text-red-500">{error}</div>;
@@ -94,11 +86,8 @@ export default function AgentPartnerChat({
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
             <User className="h-5 w-5 text-blue-600" />
           </div>
-
           <div className="min-w-0">
-            <h2 className="truncate text-sm font-semibold sm:text-base">
-              Application
-            </h2>
+            <h2 className="truncate text-sm font-semibold sm:text-base">Application</h2>
             <p className="text-xs text-blue-100">Active now</p>
           </div>
         </div>
@@ -118,7 +107,6 @@ export default function AgentPartnerChat({
           <div className="space-y-4">
             {messages.map((msg) => {
               const isMine = msg.sender_id === user?.id;
-
               return (
                 <div
                   key={msg.id}
@@ -131,12 +119,10 @@ export default function AgentPartnerChat({
                 >
                   {!isMine && (
                     <span className="mb-1 block text-xs font-medium text-slate-500">
-                      {msg.sender_name || "Unknown"}{" "}
+                      {msg.sender_name || "Unknown"}
                     </span>
                   )}
-
                   <span>{msg.message_text}</span>
-
                   <span className="mt-1 block text-right text-xs text-slate-600">
                     {formatTime(msg.created_at)}
                   </span>
@@ -145,7 +131,6 @@ export default function AgentPartnerChat({
             })}
           </div>
         )}
-
         <div ref={bottomRef} />
       </main>
 
@@ -155,20 +140,11 @@ export default function AgentPartnerChat({
 
       <style jsx>{`
         @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-
         @media (prefers-reduced-motion: reduce) {
-          * {
-            animation: none !important;
-          }
+          * { animation: none !important; }
         }
       `}</style>
     </div>
@@ -201,7 +177,6 @@ function ChatInput({
         disabled={sending}
         className="w-full rounded-full border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
       />
-
       <button
         onClick={handleSend}
         disabled={sending || !text.trim()}

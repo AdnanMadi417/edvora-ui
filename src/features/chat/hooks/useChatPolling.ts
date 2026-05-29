@@ -7,16 +7,15 @@ interface UseChatPollingOptions {
 }
 
 export function useChatPolling({
-                                 enabled,
-                                 fetchNewMessages,
-                                 pollIntervalMs = 5000, // 5 seconds default
-                               }: UseChatPollingOptions) {
+  enabled,
+  fetchNewMessages,
+  pollIntervalMs = 5000,
+}: UseChatPollingOptions) {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
 
-    // Immediately check for new messages once
     fetchNewMessages();
 
     intervalRef.current = setInterval(() => {
