@@ -41,7 +41,6 @@ export type ApplicationActionsResponse = {
   is_draft: boolean;
   correction_reason: string | null;
   next_action: string;
-
   available_actions: AvailableAction[];
   document_types: DocumentType[];
   manager_allowed_next_statuses: StageStatus[];
@@ -55,14 +54,9 @@ type HookReturn = {
   refetch: () => Promise<void>;
 };
 
-export const useApplicationActions = (
-  applicationId?: string
-): HookReturn => {
-  const [actions, setActions] =
-    useState<ApplicationActionsResponse | null>(null);
-
+export const useApplicationActions = (applicationId?: string): HookReturn => {
+  const [actions, setActions] = useState<ApplicationActionsResponse | null>(null);
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState<string | null>(null);
 
   const fetchActions = async () => {
@@ -71,18 +65,10 @@ export const useApplicationActions = (
     try {
       setLoading(true);
       setError(null);
-
       const token = Cookies.get("token");
-
-      const res = await api.get(
-        `/applications/${applicationId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const res = await api.get(`/applications/${applicationId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setActions(res.data);
     } catch (err: any) {
       setError(err.message);
@@ -95,10 +81,5 @@ export const useApplicationActions = (
     fetchActions();
   }, [applicationId]);
 
-  return {
-    actions,
-    loading,
-    error,
-    refetch: fetchActions,
-  };
+  return { actions, loading, error, refetch: fetchActions };
 };

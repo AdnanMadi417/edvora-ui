@@ -20,12 +20,12 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
   const { showToast } = useToast();
 
   const updateStatus = async ({
-                                applicationId,
-                                statusId,
-                                reason = "",
-                                notes = "",
-                                requiredDocumentTypeIds = [],
-                              }: {
+    applicationId,
+    statusId,
+    reason = "",
+    notes = "",
+    requiredDocumentTypeIds = [],
+  }: {
     applicationId: string;
     statusId: string;
     reason?: string;
@@ -34,14 +34,12 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
   }) => {
     try {
       setIsUpdating(true);
-
       await api.post(`/applications/${applicationId}/status`, {
         status_id: statusId,
         reason_text: reason.trim(),
         notes: notes.trim(),
         required_document_type_ids: requiredDocumentTypeIds,
       });
-
       showToast("Status updated successfully.", "success");
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message || "Failed to update status";

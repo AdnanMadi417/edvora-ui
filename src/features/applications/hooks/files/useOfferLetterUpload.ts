@@ -5,37 +5,31 @@ import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
-interface UseEmgsEvalUploadReturn {
-  uploadEmgsEval: (file: File, applicationId: string) => Promise<void>;
+interface UseOfferLetterUploadReturn {
+  uploadOfferLetter: (file: File, applicationId: string) => Promise<void>;
   isUploading: boolean;
 }
 
-export const useEmgsEvalUpload = (): UseEmgsEvalUploadReturn => {
+export const useOfferLetterUpload = (): UseOfferLetterUploadReturn => {
   const [isUploading, setIsUploading] = useState(false);
   const { showToast } = useToast();
 
-  const uploadEmgsEval = async (file: File, applicationId: string) => {
+  const uploadOfferLetter = async (file: File, applicationId: string) => {
     if (!file) return;
-
     try {
       setIsUploading(true);
-      showToast("Uploading EMGS eval document...", "info");
-
+      showToast("Uploading offer letter...", "info");
       const presigned = await getPresignedUploads([file], "documents");
-
       const results = await uploadFilesToSpaces([file], presigned);
       const uploaded = results?.[0];
+      if (!uploaded?.file_key || !uploaded?.public_url) throw new Error("Offer letter upload failed");
 
-      if (!uploaded?.file_key || !uploaded?.public_url) {
-        throw new Error("EMGS eval document upload failed");
-      }
-
-      await api.post(`/applications/${applicationId}/emgs-evaluation-document`, {
+      await api.post(`/applications/${applicationId}/offer-letter`, {
         file_key: uploaded.file_key,
         file_url: uploaded.public_url,
       });
 
-      showToast("EMGS eval document uploaded successfully.", "success");
+      showToast("Offer letter uploaded successfully.", "success");
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message || "Upload failed";
       showToast(msg, "error");
@@ -45,5 +39,5 @@ export const useEmgsEvalUpload = (): UseEmgsEvalUploadReturn => {
     }
   };
 
-  return { uploadEmgsEval, isUploading };
+  return { uploadOfferLetter, isUploading };
 };

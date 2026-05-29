@@ -16,13 +16,11 @@ export const useVisaSetup = (): UseVisaSetupReturn => {
   const submitVisaFee = async (applicationId: string, amount: number) => {
     try {
       setIsSubmitting(true);
-
       await api.patch(`/applications/${applicationId}/visa-case`, {
         visa_fee_amount: amount,
         visa_reference_number: "UB" + Date.now(),
         notes: "Visa fee amount updated by manager.",
       });
-
       showToast("Visa fee saved successfully", "success");
     } catch (err: any) {
       const msg = err.response?.data?.message || err.message || "Failed to save visa fee";

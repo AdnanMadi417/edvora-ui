@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import api from "../../../lib/useApi";
+import api from "lib/useApi";
 import Cookies from "js-cookie";
 
 export type Stages = {
@@ -18,18 +18,15 @@ export function useAllStages() {
     const fetchStages = async () => {
       setLoading(true);
       setError("");
-
       try {
         const token = Cookies.get("token");
-
         const res = await api.get("/applications/stages", {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
-
         setStages(res.data || []);
       } catch (err) {
         console.error(err);
-        setError("Failed to fetch Stages of study");
+        setError("Failed to fetch stages");
       } finally {
         setLoading(false);
       }
@@ -38,9 +35,5 @@ export function useAllStages() {
     fetchStages();
   }, []);
 
-  return {
-    stages,
-    stagesLoading,
-    stagesError,
-  };
+  return { stages, stagesLoading, stagesError };
 }

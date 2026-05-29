@@ -21,14 +21,10 @@ export const useVisaPaymentUpload = () => {
     try {
       setIsUploading(true);
       showToast("Uploading payment receipt...", "info");
-
       const presigned = await getPresignedUploads([file], "documents");
       const results = await uploadFilesToSpaces([file], presigned);
       const uploaded = results?.[0];
-
-      if (!uploaded?.file_key || !uploaded?.public_url) {
-        throw new Error("File upload failed");
-      }
+      if (!uploaded?.file_key || !uploaded?.public_url) throw new Error("File upload failed");
 
       const body: Record<string, any> = {
         payment_reference: `ref-${Date.now()}`,
@@ -45,10 +41,7 @@ export const useVisaPaymentUpload = () => {
       showToast("Visa payment submitted successfully!", "success");
       return uploaded;
     } catch (error: any) {
-      const message =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to submit visa payment";
+      const message = error.response?.data?.message || error.message || "Failed to submit visa payment";
       showToast(message, "error");
       throw error;
     } finally {

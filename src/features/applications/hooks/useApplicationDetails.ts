@@ -2,7 +2,6 @@ import { useEffect, useState, useCallback } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 
-
 export interface AvailableAction {
   status: string;
   next_action: string;
@@ -61,7 +60,6 @@ const useApplicationDetails = (applicationId?: string) => {
       const response = await api.get(`/admin/applications/${applicationId}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-
       setData(response.data);
     } catch (err) {
       console.error("API error:", err);
@@ -75,13 +73,7 @@ const useApplicationDetails = (applicationId?: string) => {
     fetchApplicationDetails();
   }, [fetchApplicationDetails]);
 
-  return {
-    applications: data,
-    loading,
-    error,
-    refetch: fetchApplicationDetails,
-  };
+  return { applications: data, loading, error, refetch: fetchApplicationDetails };
 };
 
 export default useApplicationDetails;
-

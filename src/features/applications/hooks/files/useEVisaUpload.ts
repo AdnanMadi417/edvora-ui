@@ -16,18 +16,13 @@ export const useEVisaUpload = (): UseEVisaUploadReturn => {
 
   const uploadEVisa = async (file: File, applicationId: string) => {
     if (!file) return;
-
     try {
       setIsUploading(true);
       showToast("Uploading e-visa document...", "info");
-
       const presigned = await getPresignedUploads([file], "documents");
       const results = await uploadFilesToSpaces([file], presigned);
       const uploaded = results?.[0];
-
-      if (!uploaded?.file_key || !uploaded?.public_url) {
-        throw new Error("E-visa document upload failed");
-      }
+      if (!uploaded?.file_key || !uploaded?.public_url) throw new Error("E-visa document upload failed");
 
       await api.post(`/applications/${applicationId}/e-visa-document`, {
         file_key: uploaded.file_key,
