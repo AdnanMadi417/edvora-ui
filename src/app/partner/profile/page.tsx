@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import ProfileDetails from "components/partner/profile/ProfileDetails";
+import ProfileDetails from "features/partners/components/PartnerProfile";
 import { useMe } from "hooks/useMe";
 
 const Profile: React.FC = () => {
