@@ -12,8 +12,7 @@ import Loading from "components/loading/Loading";
 
 import ApplicationDetails from "features/applications/partner/components/details/ApplicationDetails";
 import ApplicationDocuments from "features/applications/partner/components/details/ApplicationDocuments";
-import AgentPartnerChat from "components/chat/ApplicationChat";
-import { useUnreadCount } from 'hooks/chat/useUnreadCount';
+import { ApplicationChat as AgentPartnerChat, useUnreadCount } from "features/chat";
 
 export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();

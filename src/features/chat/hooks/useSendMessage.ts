@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import api from "lib/useApi";
-import type { ChatMessage } from "./useChatMessages";
+import type { ChatMessage } from "../types";
 
 interface UseSendMessageOptions {
   applicationId: string;
@@ -20,11 +20,8 @@ export function useSendMessage({ applicationId }: UseSendMessageOptions) {
       try {
         const response = await api.post<ChatMessage>(
           `/applications/${applicationId}/messages`,
-          {
-            message_text: messageText,
-          }
+          { message_text: messageText }
         );
-
         return response.data;
       } catch (err: any) {
         setError(err.message || "Failed to send message");
@@ -36,9 +33,5 @@ export function useSendMessage({ applicationId }: UseSendMessageOptions) {
     [applicationId]
   );
 
-  return {
-    sendMessage,
-    sending,
-    error,
-  };
+  return { sendMessage, sending, error };
 }

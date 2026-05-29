@@ -1,15 +1,6 @@
 import { useState, useCallback } from "react";
 import api from "lib/useApi";
-
-export interface ChatMessage {
-  id: string;
-  application_id: string;
-  sender_id: string;
-  sender_name: string;
-  message_text: string;
-  created_at: string;
-  read_at: string | null;
-}
+import type { ChatMessage } from "../types";
 
 interface UseChatMessagesOptions {
   applicationId: string;
@@ -17,9 +8,9 @@ interface UseChatMessagesOptions {
 }
 
 export function useChatMessages({
-                                  applicationId,
-                                  limit = 50,
-                                }: UseChatMessagesOptions) {
+  applicationId,
+  limit = 50,
+}: UseChatMessagesOptions) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,9 +18,6 @@ export function useChatMessages({
   const lastSeenCreatedAt =
     messages.length > 0 ? messages[messages.length - 1].created_at : null;
 
-  /**
-   * Initial load (open chat)
-   */
   const fetchInitialMessages = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -37,11 +25,8 @@ export function useChatMessages({
     try {
       const response = await api.get<ChatMessage[]>(
         `/applications/${applicationId}/messages`,
-        {
-          params: { limit },
-        }
+        { params: { limit } }
       );
-
       setMessages(response.data);
     } catch (err: any) {
       setError(err.message || "Failed to load chat messages");
@@ -50,21 +35,13 @@ export function useChatMessages({
     }
   }, [applicationId, limit]);
 
-  /**
-   * Fetch only new messages (polling)
-   */
   const fetchNewMessages = useCallback(async () => {
     if (!lastSeenCreatedAt) return;
 
     try {
       const response = await api.get<ChatMessage[]>(
         `/applications/${applicationId}/messages`,
-        {
-          params: {
-            since: lastSeenCreatedAt,
-            limit,
-          },
-        }
+        { params: { since: lastSeenCreatedAt, limit } }
       );
 
       if (response.data.length > 0) {
@@ -75,7 +52,6 @@ export function useChatMessages({
         });
       }
     } catch (err) {
-      // polling errors should NOT break UI
       console.error("Failed to fetch new messages", err);
     }
   }, [applicationId, lastSeenCreatedAt, limit]);
