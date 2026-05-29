@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAllPartners, useDeletePartner } from "../hooks";
-import { useAccountManagerList } from "hooks/account-managers/useAccountManagerList";
+import { useAccountManagers } from "features/account-managers/hooks";
 import AssignPartnerManager from "./AssignPartnerManager";
 import DeletePartner from "./DeletePartner";
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -29,7 +29,7 @@ export default function PartnersTable() {
   const { showToast } = useToast();
 
   const { partners, partnersLoading, partnersError } = useAllPartners();
-  const { accountManagers } = useAccountManagerList();
+  const { accountManagers } = useAccountManagers();
   const { deletePartner, loading: deleteLoading } = useDeletePartner();
 
   const [searchTerm, setSearchTerm] = useState("");

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { CreditCard, XCircle } from 'lucide-react';
 
-import { useCreatePayment } from "hooks/knowledge-hub/payment-methods/useCreatePayment";
+import { useCreatePayment } from "features/knowledge-hub/payment-methods/hooks";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";

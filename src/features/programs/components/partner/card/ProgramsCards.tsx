@@ -20,7 +20,7 @@ import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import { usePrograms, useStates } from "features/programs/hooks";
-import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
+import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useUniversities } from "features/universities/hooks";
 
 import FilterSelectField from "components/form/filter/FilterSelectField";

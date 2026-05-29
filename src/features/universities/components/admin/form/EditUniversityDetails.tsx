@@ -35,7 +35,7 @@ import {
   useUniversityTypes,
 } from "features/universities/hooks";
 
-import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
+import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 import { useStates } from "features/programs/hooks";
 
 import InputField from "components/form/InputField";

@@ -10,3 +10,4 @@ export { useDeleteScholarships } from "./useDeleteScholarships";
 export { useGetProgramScholarships } from "./useGetProgramScholarships";
 export { useStates } from "./useStates";
 export { usePartnerProgramIntakeDates } from "./usePartnerProgramIntakeDates";
+export { useAllPrograms } from "./useProgramsList";

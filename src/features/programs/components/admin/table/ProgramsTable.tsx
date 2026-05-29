@@ -29,8 +29,8 @@ import { AiOutlineBank } from "react-icons/ai";
 import { useToast } from "components/context/ToastContext";
 
 import { usePrograms, useStates, useDeletePrograms } from "features/programs/hooks";
-import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
-import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
+import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
+import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useUniversities } from "features/universities/hooks";
 
 import FilterSelectField from "components/form/filter/FilterSelectField";

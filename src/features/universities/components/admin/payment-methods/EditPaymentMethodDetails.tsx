@@ -6,8 +6,7 @@ import { ChevronLeft, CreditCard, MoreVertical, Pencil, Trash2 } from "lucide-re
 import Cookies from "js-cookie";
 import api from "lib/useApi";
 
-import { useDeleteUniversity } from "hooks/knowledge-hub/payment-methods/useDeletePaymentMethod";
-import { useUpdatePaymentMethods } from "hooks/knowledge-hub/payment-methods/useUpdatePaymentMethod";
+import { useDeleteUniversity, useUpdatePaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 
 import DeletePaymentConfirmation from "features/universities/components/admin/payment-methods/popups/DeletePaymentConfirmation";
 import InputField from "components/form/InputField";

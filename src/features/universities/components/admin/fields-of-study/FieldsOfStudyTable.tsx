@@ -13,8 +13,7 @@ import {
 } from "lucide-react";
 import { MdLabelOutline } from 'react-icons/md';
 
-import { useDeleteField } from "hooks/knowledge-hub/field-of-study/useDeleteField";
-import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
+import { useDeleteField, useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";

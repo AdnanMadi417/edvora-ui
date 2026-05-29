@@ -12,7 +12,7 @@ import {
   useEditLogisticProvider,
   useEditLogisticService,
 } from "features/logistical-service/hooks";
-import { useAllStates } from "hooks/knowledge-hub/programs/useStates";
+import { useStates as useAllStates } from "features/programs/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
 import type { PackageOffered, ServiceEntry } from "features/logistical-service/types";

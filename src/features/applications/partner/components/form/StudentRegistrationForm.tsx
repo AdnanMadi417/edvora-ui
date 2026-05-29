@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 import { useToast } from "components/context/ToastContext";
-import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
+import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useCreatePartnerApplication } from "features/applications/partner/hooks/useCreatePartnerApplication";
 import { useGetApplicationRequiredFields } from "features/applications/partner/hooks/useApplicationRequiredFields";
 import { useDocumentType } from "hooks/useDocumentType";
@@ -30,7 +30,7 @@ import {
   uploadFilesToSpaces,
 } from "services/uploadService";
 import { useMe } from "hooks/useMe";
-import { usePartnerProgramIntakeDates } from "hooks/knowledge-hub/programs/usePartnerProgramIntakeDates";
+import { usePartnerProgramIntakeDates } from "features/programs/hooks";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
 import PrevButton from "components/ui/buttons/PrevButton";
