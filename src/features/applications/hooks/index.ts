@@ -12,6 +12,7 @@ export { useVisaSetup } from "./useVisaSetup";
 export { useDisputeCommission } from "./useDisputeCommission";
 
 export { useApplicationActions } from "./stages/useApplicationActions";
+export type { ApplicationActionsResponse, PartnerAction, AvailableAction, StageStatus } from "./stages/useApplicationActions";
 export { useAllStages } from "./stages/useStages";
 export { useAllStageStatuses } from "./stages/useStageStatuses";
 export { useChangeProgram } from "./stages/useChangeProgram";

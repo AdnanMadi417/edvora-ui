@@ -33,8 +33,7 @@ import Button from 'components/ui/buttons/Button';
 import FilterSelectField from 'components/form/filter/FilterSelectField';
 
 import { useUniversities } from "features/universities/hooks";
-import { useAllStages } from 'hooks/applications/stages/useStages';
-import { useAllStageStatuses } from 'hooks/applications/stages/useStageStatuses';
+import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 
 
 const getRelativeTime = (dateStr: string) => {

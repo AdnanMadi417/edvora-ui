@@ -17,7 +17,7 @@ import {
 import { MdAssignmentTurnedIn } from "react-icons/md";
 import { Clock, Upload, ClipboardCheck, CreditCard, Plane, CheckCircle, XCircle, FileUp } from 'lucide-react';
 import Button from 'components/ui/buttons/Button';
-import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
+import { useApplicationActions } from "features/applications/hooks";
 
 import ApplicationPartnerTopBar from "features/applications/partner/components/topBar/PartnerTopBar";
 import RequiredAction from "features/applications/partner/components/popups/RequiredAction";

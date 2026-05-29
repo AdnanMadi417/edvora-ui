@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
-import { useEmgsEvalUpload } from "hooks/applications/files/useEmgsEvaluationUpload";
+import { useEmgsEvalUpload } from "features/applications/hooks";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
 
 interface EmgsEvalUploadProps {
