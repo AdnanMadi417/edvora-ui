@@ -9,6 +9,7 @@ import {
   CircleDollarSign,
   Award,
   GraduationCap,
+  Building2,
   FileText,
   CheckCircle,
   ChevronLeft,
@@ -16,7 +17,6 @@ import {
   Globe,
   MapPin,
   BookOpen,
-  Building2,
   Languages,
   Clock,
 } from "lucide-react";
@@ -25,6 +25,7 @@ import { useProgram } from "features/programs/hooks";
 
 import Link from "next/link";
 import Loading from "components/loading/Loading";
+import PresignedImage from "components/ui/PresignedImage";
 
 type RequiredDocument = {
   id: string;
@@ -197,8 +198,17 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
               </button>
 
               <div className="relative shrink-0">
-                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm sm:h-11 sm:w-11">
-                  <GraduationCap className="h-5 w-5 text-white" />
+                <div className="h-10 w-10 overflow-hidden rounded-full sm:h-11 sm:w-11">
+                  <PresignedImage
+                    fileKey={program.university?.logo_file_key}
+                    alt={program.university?.name}
+                    className="h-full w-full object-cover"
+                    fallback={
+                      <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
+                        {program.university?.name ? program.university.name.slice(0, 2).toUpperCase() : <Building2 className="h-5 w-5 text-blue-700" />}
+                      </div>
+                    }
+                  />
                 </div>
                 <span className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-md border-2 border-white ${program.field_of_study?.is_active ? "bg-emerald-500" : "bg-red-500"}`} />
               </div>
