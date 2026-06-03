@@ -199,6 +199,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
               </button>
 
               <div className="relative shrink-0">
+                
                 <div className="h-10 w-10 overflow-hidden rounded-full sm:h-11 sm:w-11">
                   <PresignedImage
                     fileKey={program.university?.logo_file_key}
@@ -211,6 +212,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
                     }
                   />
                 </div>
+                
                 <span className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${program.university?.is_active ? "bg-emerald-500" : "bg-red-500"}`} />
               </div>
 
