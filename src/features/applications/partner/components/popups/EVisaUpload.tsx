@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, ShieldCheck, CheckCircle, AlertCircle } from "lucide-react";
-import { useEVisaUpload } from "hooks/applications/files/useEVisaUpload";
+import { useEVisaUpload } from "features/applications/hooks";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
 
 interface EVisaUploadProps {

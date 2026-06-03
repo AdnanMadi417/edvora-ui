@@ -9,7 +9,7 @@ import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ApplicationChat as AgentPartnerChat, useUnreadCount } from "features/chat";
-import useApplicationDetails from "hooks/applications/useApplicationDetails";
+import { useApplicationDetails } from "features/applications/hooks";
 
 export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();

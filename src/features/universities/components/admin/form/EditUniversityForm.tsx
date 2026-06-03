@@ -111,9 +111,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
       showToast("University type updated successfully", "success");
 
-      setTimeout (() => {
-        router.push(`/admin/config-universities/`);
-      })
+      router.push("/admin/config-universities/");
 
     } catch (error: any) {
       const backendMessage =

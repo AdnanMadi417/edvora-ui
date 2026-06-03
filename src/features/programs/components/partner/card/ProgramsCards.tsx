@@ -20,7 +20,7 @@ import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import { usePrograms, useStates } from "features/programs/hooks";
-import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
+import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useUniversities } from "features/universities/hooks";
 
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -232,14 +232,14 @@ const ProgramsCards = () => {
                             alt={program.university.name}
                             className="h-full w-full object-cover"
                             fallback={
-                              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
-                                <GraduationCap className="h-7 w-7 text-white" />
+                              <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
+                                {program.university?.name?.slice(0, 2).toUpperCase()}
                               </div>
                             }
                           />
                         ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-600 to-indigo-700">
-                            <GraduationCap className="h-7 w-7 text-white" />
+                          <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
+                            {program.university?.name?.slice(0, 2).toUpperCase()}
                           </div>
                         )}
                       </div>

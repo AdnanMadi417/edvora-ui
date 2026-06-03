@@ -3,8 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
-import { useApplicationVisaFee } from "hooks/applications/useApplicationVisaFee";
-import { useVisaPaymentUpload } from "hooks/applications/files/useVisaPaymentUpload";
+import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
 
 interface VisaPaymentConfirmationProps {

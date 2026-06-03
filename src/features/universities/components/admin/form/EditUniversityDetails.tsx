@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   CalendarPlus,
@@ -11,18 +11,8 @@ import {
   Trash2,
 } from "lucide-react";
 
-const FIELD_LABELS: Record<string, string> = {
-  name: "University Name",
-  description: "Description",
-  intake_months: "Intake Dates",
-  country: "Country",
-  university_type_id: "University Type",
-  branches: "Branches",
-};
-
 import { useToast } from "components/context/ToastContext";
 import { CURRENCY } from "constants/lists";
-
 import {
   useAssignUniversityType,
   useUniversityDetails,
@@ -34,10 +24,8 @@ import {
   useDeleteUniversityPaymentMethod,
   useUniversityTypes,
 } from "features/universities/hooks";
-
-import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
+import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 import { useStates } from "features/programs/hooks";
-
 import InputField from "components/form/InputField";
 import TextareaField from "components/form/TextareaField";
 import SelectField from "components/form/SelectField";
@@ -47,7 +35,6 @@ import SearchableDropdown from "components/form/search/SearchableDropdown";
 import ImageUploadField from "components/form/images/ImageUploadField";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
-
 import Button from "components/ui/buttons/Button";
 import Loading from "components/loading/Loading";
 import IconButton from "components/ui/buttons/IconButton";
@@ -55,24 +42,109 @@ import EmptyData from "components/emptyData/EmptyTableData";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { validateUniversity, isUniversityComplete } from "./validateUniversity";
 
-const normalizePayload = (formData: any) => {
-  return {
-    name: formData.name?.trim() || "",
-    country: formData.country?.trim() || "",
-    description: formData.description || "",
-    intake_months: (formData.intake_months || []).filter((m: string) => m.trim() !== ""),
-    is_active: formData.is_active ?? true,
-    university_type_id: formData.university_type_id || "",
-    branches: (formData.branches || [])
-      .filter((b: any) => b.name && b.location && b.state_id)
-      .map((b: any) => ({
-        id: typeof b.id === "string" ? b.id : undefined,
-        name: b.name.trim(),
-        location: b.location.trim(),
-        state_id: b.state_id,
-      })),
-  };
+const FIELD_LABELS: Record<string, string> = {
+  name: "University Name",
+  description: "Description",
+  intake_months: "Intake Dates",
+  country: "Country",
+  university_type_id: "University Type",
+  branches: "Branches",
 };
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+type Branch = {
+  id?: string;
+  name: string;
+  location: string;
+  state_id: string;
+};
+
+type FormData = {
+  name: string;
+  country: string;
+  description: string;
+  intake_months: string[];
+  is_active: boolean;
+  university_type_id: string;
+  branches: Branch[];
+};
+
+type PaymentRow = {
+  id: string;
+  university_id: string;
+  payment_method_id: string;
+  instructions: string;
+  currency: string;
+  is_active: boolean;
+};
+
+type AddPaymentForm = {
+  payment_method_id: string;
+  currency: string;
+  instructions: string;
+};
+
+type LogoState = {
+  file: File | null;
+  uploading: boolean;
+  progress: number;
+  fileKey: string;
+  fileUrl: string;
+  existingUrl: string;
+  existingKey: string;
+  modified: boolean;
+};
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const INITIAL_FORM: FormData = {
+  name: "",
+  country: "",
+  description: "",
+  intake_months: [],
+  branches: [],
+  is_active: true,
+  university_type_id: "",
+};
+
+const INITIAL_LOGO: LogoState = {
+  file: null,
+  uploading: false,
+  progress: 0,
+  fileKey: "",
+  fileUrl: "",
+  existingUrl: "",
+  existingKey: "",
+  modified: false,
+};
+
+const INITIAL_ADD_PAYMENT: AddPaymentForm = {
+  payment_method_id: "",
+  currency: "",
+  instructions: "",
+};
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+const normalizePayload = (formData: FormData) => ({
+  name: formData.name.trim(),
+  country: formData.country.trim(),
+  description: formData.description,
+  intake_months: formData.intake_months.filter((m) => m.trim() !== ""),
+  is_active: formData.is_active,
+  university_type_id: formData.university_type_id,
+  branches: formData.branches
+    .filter((b) => b.name && b.location && b.state_id)
+    .map((b) => ({
+      id: b.id,
+      name: b.name.trim(),
+      location: b.location.trim(),
+      state_id: b.state_id,
+    })),
+});
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 interface Props {
   id: string;
@@ -87,80 +159,44 @@ const UniversityEdit = ({ id }: Props) => {
   const { paymentMethods } = useAllPaymentMethods();
   const { assignUniversityType } = useAssignUniversityType(id);
   const { universities: universityTypes } = useUniversityTypes();
-  const { updateUniversityPaymentMethod } =
-    useUpdateUniversityPaymentMethod();
-
-  const [initialFormData, setInitialFormData] = React.useState<any>(null);
+  const { updateUniversityPaymentMethod } = useUpdateUniversityPaymentMethod();
   const { assignPaymentMethod } = useAssignUniversityPaymentMethod();
   const { deleteUniversityPaymentMethod } = useDeleteUniversityPaymentMethod();
   const { deleteBranch } = useDeleteBranch();
   const { states } = useStates();
   const { updateUniversity, updateLoading } = useUpdateUniversity(id);
+
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
+  const [initialFormData, setInitialFormData] = useState<FormData | null>(null);
+  const [paymentRows, setPaymentRows] = useState<PaymentRow[]>([]);
+  const [addPaymentForm, setAddPaymentForm] = useState<AddPaymentForm>(INITIAL_ADD_PAYMENT);
   const [showAddPayment, setShowAddPayment] = useState(false);
+  const [logo, setLogo] = useState<LogoState>(INITIAL_LOGO);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [paymentErrors, setPaymentErrors] = useState<Record<string, string>>({});
 
-  const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoUploading, setLogoUploading] = useState(false);
-  const [logoProgress, setLogoProgress] = useState(0);
-  const [logoFileKey, setLogoFileKey] = useState("");
-  const [logoFileUrl, setLogoFileUrl] = useState("");
-  const [existingLogoUrl, setExistingLogoUrl] = useState("");
-  const [existingLogoKey, setExistingLogoKey] = useState("");
-  const [logoModified, setLogoModified] = useState(false);
+  const stateOptions = useMemo(
+    () => states?.map((c) => ({ value: String(c.id), label: c.name })) ?? [],
+    [states]
+  );
 
-  const [paymentFormData, setPaymentFormData] = useState<any[]>([]);
+  // ─── Seed form from API ────────────────────────────────────────────────────
 
-  const updatePaymentFormData = (id: string, field: string, value: any) => {
-    setPaymentFormData((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, [field]: value } : p))
-    );
-  };
-
-  const stateOptions =
-    states?.map((c) => ({
-      value: String(c.id),
-      label: c.name,
-    })) || [];
-
-  const handleAddBranch = () => {
-    setFormData((prev: any) => ({
-      ...prev,
-      branches: [
-        ...prev.branches,
-        {
-          name: "",
-          location: "",
-          state_id: "",
-        },
-      ],
-    }));
-  };
-
-  const [formData, setFormData] = React.useState<any>({
-    name: "",
-    country: "",
-    description: "",
-    intake_months: [],
-    branches: [],
-    is_active: true,
-    university_type_id: "",
-  });
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (!university) return;
 
-    const data = {
-      name: university.name || "",
-      country: university.country || "",
-      description: university.description || "",
-      intake_months: [...(university.intake_months || [])],
-      branches: (branches || []).map((b: any) => ({
+    const data: FormData = {
+      name: university.name ?? "",
+      country: university.country ?? "",
+      description: university.description ?? "",
+      intake_months: [...(university.intake_months ?? [])],
+      branches: (branches ?? []).map((b: any) => ({
         id: b.id,
-        name: b.name || "",
-        location: b.location || "",
+        name: b.name ?? "",
+        location: b.location ?? "",
         state_id: b.state_id ? String(b.state_id) : "",
       })),
       is_active: university.is_active ?? true,
-
       university_type_id: university.university_type_id
         ? String(university.university_type_id)
         : "",
@@ -168,32 +204,34 @@ const UniversityEdit = ({ id }: Props) => {
 
     setFormData(data);
     setInitialFormData(data);
-    setExistingLogoKey(university.logo_file_key || "");
+    setLogo((prev) => ({ ...prev, existingKey: university.logo_file_key ?? "" }));
+
     if (university.logo_file_key) {
       getDocumentDownloadUrl(university.logo_file_key)
-        .then(setExistingLogoUrl)
-        .catch(() => setExistingLogoUrl(""));
+        .then((url) => setLogo((prev) => ({ ...prev, existingUrl: url })))
+        .catch(() => setLogo((prev) => ({ ...prev, existingUrl: "" })));
     }
   }, [university, branches]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!universityPaymentMethods) return;
-
-    setPaymentFormData(
-      universityPaymentMethods.map((method) => ({
-        id: method.id,
-        university_id: method.university_id,
-        payment_method_id: method.payment_method_id,
-        instructions: method.instructions,
-        currency: method.currency,
-        is_active: method.is_active,
+    setPaymentRows(
+      universityPaymentMethods.map((m) => ({
+        id: m.id,
+        university_id: m.university_id,
+        payment_method_id: m.payment_method_id,
+        instructions: m.instructions,
+        currency: m.currency,
+        is_active: m.is_active,
       }))
     );
   }, [universityPaymentMethods]);
 
-  const validateField = React.useCallback(
+  // ─── Validation ───────────────────────────────────────────────────────────
+
+  const validateField = useCallback(
     (field: string) => {
-      const { errors: allErrors } = validateUniversity(formData);
+      const { errors: allErrors } = validateUniversity(formData as any);
       setErrors((prev) => ({ ...prev, [field]: allErrors[field] ?? "" }));
     },
     [formData]
@@ -206,129 +244,124 @@ const UniversityEdit = ({ id }: Props) => {
       delete next[field];
       return next;
     });
-    setPaymentErrors((prev) => {
-      if (!prev[field]) return prev;
-      const next = { ...prev };
-      delete next[field];
-      return next;
-    });
-    setFormData((prev: any) => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const isFormValid = React.useMemo(() => isUniversityComplete(formData), [formData]);
+  const isFormValid = useMemo(() => isUniversityComplete(formData as any), [formData]);
 
-  const isFormChanged = React.useMemo(() => {
+  // ID-based comparison so deletions don't corrupt the diff
+  const isFormChanged = useMemo(() => {
     if (!initialFormData) return false;
 
     const universityChanged =
       JSON.stringify(normalizePayload(formData)) !==
       JSON.stringify(normalizePayload(initialFormData));
 
-    const logoChanged = logoModified;
+    const paymentChanged = paymentRows.some((row) => {
+      const original = universityPaymentMethods?.find((m) => m.id === row.id);
+      if (!original) return true;
+      return (
+        row.payment_method_id !== original.payment_method_id ||
+        row.currency !== original.currency ||
+        row.instructions !== original.instructions ||
+        row.is_active !== original.is_active
+      );
+    });
 
-    const paymentChanged =
-      paymentFormData.some((p, index) => {
-        const initial = universityPaymentMethods?.[index];
-        if (!initial) return true;
-        return (
-          p.payment_method_id !== initial.payment_method_id ||
-          p.currency !== initial.currency ||
-          p.instructions !== initial.instructions ||
-          p.is_active !== initial.is_active
-        );
-      }) ?? false;
+    return universityChanged || logo.modified || paymentChanged;
+  }, [formData, initialFormData, logo.modified, paymentRows, universityPaymentMethods]);
 
-    return universityChanged || logoChanged || paymentChanged;
-  }, [formData, initialFormData, logoModified, paymentFormData, universityPaymentMethods]);
+  // ─── Branches ─────────────────────────────────────────────────────────────
 
-  const handleRemoveBranch = async (index: number) => {
-    const branch = formData.branches[index];
-
-    if (!branch) return;
-
-    try {
-      if (branch.id) {
-        await deleteBranch(id, branch.id);
-
-        showToast("Branch deleted successfully.", "success");
-      }
-
-      setFormData((prev: any) => ({
-        ...prev,
-        branches: prev.branches.filter((_: any, i: number) => i !== index),
-      }));
-
-      refetchUniversity();
-
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
-      showToast(`Failed to delete branch. ${backendMessage}`, "error");
-    }
+  const handleAddBranch = () => {
+    setFormData((prev) => ({
+      ...prev,
+      branches: [...prev.branches, { name: "", location: "", state_id: "" }],
+    }));
   };
 
   const updateBranchField = (index: number, field: string, value: any) => {
-    setFormData((prev: any) => {
-      const branchesCopy = JSON.parse(JSON.stringify(prev.branches));
-
-      branchesCopy[index][field] = value;
-
-      return {
-        ...prev,
-        branches: branchesCopy,
-      };
-    });
+    setFormData((prev) => ({
+      ...prev,
+      branches: prev.branches.map((b, i) => (i === index ? { ...b, [field]: value } : b)),
+    }));
   };
 
-  const handleLogoSelect = async (file: File) => {
-    setLogoFile(file);
-    setLogoModified(true);
-    setLogoUploading(true);
-    setLogoProgress(0);
-    setLogoFileKey("");
-    setLogoFileUrl("");
-
+  const handleRemoveBranch = async (index: number) => {
+    const branch = formData.branches[index];
+    if (!branch) return;
     try {
-      const presigned = await getPresignedUploads([file], "university-logos");
-      const results = await uploadFilesToSpaces([file], presigned, (_, pct) => {
-        setLogoProgress(pct);
-      });
-      const uploaded = results?.[0];
-
-      if (!uploaded?.file_key || !uploaded?.public_url) {
-        showToast("Logo upload failed. Please try again.", "error");
-        setLogoFile(null);
-        setLogoUploading(false);
-        return;
+      if (branch.id) {
+        await deleteBranch(id, branch.id);
+        showToast("Branch deleted successfully.", "success");
       }
-
-      setLogoFileKey(uploaded.file_key);
-      setLogoFileUrl(uploaded.public_url);
-      setLogoProgress(100);
-      showToast("Logo uploaded successfully.", "success");
-    } catch (err: any) {
-      showToast(err?.message || "Logo upload failed.", "error");
-      setLogoFile(null);
-    } finally {
-      setLogoUploading(false);
+      setFormData((prev) => ({
+        ...prev,
+        branches: prev.branches.filter((_, i) => i !== index),
+      }));
+      refetchUniversity();
+    } catch (error: any) {
+      showToast(
+        `Failed to delete branch. ${error?.response?.data?.message ?? "Please try again."}`,
+        "error"
+      );
     }
   };
 
-  const handleSavePaymentMethod = async (method: any) => {
+  // ─── Logo ─────────────────────────────────────────────────────────────────
+
+  const handleLogoSelect = async (file: File) => {
+    setLogo((prev) => ({
+      ...prev,
+      file,
+      modified: true,
+      uploading: true,
+      progress: 0,
+      fileKey: "",
+      fileUrl: "",
+    }));
     try {
-      const payload = {
+      const presigned = await getPresignedUploads([file], "university-logos");
+      const results = await uploadFilesToSpaces([file], presigned, (_, pct) => {
+        setLogo((prev) => ({ ...prev, progress: pct }));
+      });
+      const uploaded = results?.[0];
+      if (!uploaded?.file_key || !uploaded?.public_url) {
+        showToast("Logo upload failed. Please try again.", "error");
+        setLogo((prev) => ({ ...prev, file: null, uploading: false }));
+        return;
+      }
+      setLogo((prev) => ({
+        ...prev,
+        fileKey: uploaded.file_key,
+        fileUrl: uploaded.public_url,
+        progress: 100,
+      }));
+      showToast("Logo uploaded successfully.", "success");
+    } catch (err: any) {
+      showToast(err?.message ?? "Logo upload failed.", "error");
+      setLogo((prev) => ({ ...prev, file: null }));
+    } finally {
+      setLogo((prev) => ({ ...prev, uploading: false }));
+    }
+  };
+
+  // ─── Payment methods ──────────────────────────────────────────────────────
+
+  const updatePaymentRow = (methodId: string, field: string, value: any) => {
+    setPaymentRows((prev) =>
+      prev.map((p) => (p.id === methodId ? { ...p, [field]: value } : p))
+    );
+  };
+
+  const savePaymentRow = async (method: PaymentRow) => {
+    try {
+      await updateUniversityPaymentMethod(method.university_id, method.id, {
         payment_method_id: method.payment_method_id,
-        instructions: method.instructions || "",
-        currency: method.currency || "",
+        instructions: method.instructions ?? "",
+        currency: method.currency ?? "",
         is_active: method.is_active ?? true,
-      };
-
-      await updateUniversityPaymentMethod(method.university_id, method.id, payload);
-
-      setPaymentFormData((prev) =>
-        prev.map((p) => (p.id === method.id ? { ...p, ...payload } : p))
-      );
-
+      });
     } catch {
       // hook already shows the error toast
     }
@@ -337,48 +370,36 @@ const UniversityEdit = ({ id }: Props) => {
   const handleDeletePaymentMethod = async (methodId: string) => {
     try {
       await deleteUniversityPaymentMethod(id, methodId);
-
-      setPaymentFormData((prev) => prev.filter((p) => p.id !== methodId));
-
-      showToast("Payment method deleted successfully", "success");
-
+      setPaymentRows((prev) => prev.filter((p) => p.id !== methodId));
+      showToast("Payment method deleted successfully.", "success");
       refetchPayments();
-
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
-
-      showToast(`Failed to delete payment method. ${backendMessage}`, "error");
+      showToast(
+        `Failed to delete payment method. ${error?.response?.data?.message ?? "Please try again."}`,
+        "error"
+      );
     }
   };
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [paymentErrors, setPaymentErrors] = useState<Record<string, string>>({});
-
   const handleAssign = async () => {
-    if (!formData.payment_method_id) {
+    if (!addPaymentForm.payment_method_id) {
       setPaymentErrors({ payment_method_id: "Payment method is required" });
       return;
     }
-
     try {
       await assignPaymentMethod(id, {
-        payment_method_id: formData.payment_method_id,
-        instructions: formData.instructions?.trim() || undefined,
-        currency: formData.currency?.trim() || undefined,
+        payment_method_id: addPaymentForm.payment_method_id,
+        instructions: addPaymentForm.instructions.trim() || undefined,
+        currency: addPaymentForm.currency.trim() || undefined,
         is_active: true,
       });
-
       showToast("Payment method assigned successfully.", "success");
-
+      setAddPaymentForm(INITIAL_ADD_PAYMENT);
       setPaymentErrors({});
-      setFormData((prev: any) => ({ ...prev, payment_method_id: "", currency: "", instructions: "" }));
       setShowAddPayment(false);
       refetchPayments();
-
     } catch (err: any) {
       const apiErrors = err?.response?.data?.detail;
-
       if (Array.isArray(apiErrors)) {
         const newErrors: Record<string, string> = {};
         apiErrors.forEach((e: any) => {
@@ -391,68 +412,62 @@ const UniversityEdit = ({ id }: Props) => {
     }
   };
 
-  const handleUpdate = async (): Promise<boolean> => {
-    if (logoUploading) {
+  // ─── Main save ────────────────────────────────────────────────────────────
+
+  const handleSave = async () => {
+    if (logo.uploading) {
       showToast("Please wait for the logo to finish uploading.", "error");
-      return false;
+      return;
     }
 
-    const { isValid, errors: validationErrors } = validateUniversity(formData);
+    const { isValid, errors: validationErrors } = validateUniversity(formData as any);
     if (!isValid) {
       setErrors(validationErrors);
-      return false;
+      return;
     }
 
     try {
-      const logo_file_key = logoFile ? logoFileKey : existingLogoKey;
-      const logo_file_url = logoFile ? logoFileUrl : existingLogoUrl;
+      const logo_file_key = logo.file ? logo.fileKey : logo.existingKey;
+      const logo_file_url = logo.file ? logo.fileUrl : logo.existingUrl;
 
-      const payload = { ...normalizePayload(formData), logo_file_key, logo_file_url };
-
-      await updateUniversity(payload);
+      await updateUniversity({ ...normalizePayload(formData), logo_file_key, logo_file_url });
 
       if (formData.university_type_id) {
-        await assignUniversityType({
-          university_type_id: formData.university_type_id || null,
-        });
+        await assignUniversityType({ university_type_id: formData.university_type_id });
       }
 
-      if (paymentFormData.length && universityPaymentMethods) {
-        for (let i = 0; i < paymentFormData.length; i++) {
-          const method = paymentFormData[i];
-          const initial = universityPaymentMethods[i];
-          if (
-            !initial ||
-            method.payment_method_id !== initial.payment_method_id ||
-            method.currency !== initial.currency ||
-            method.instructions !== initial.instructions ||
-            method.is_active !== initial.is_active
-          ) {
-            await handleSavePaymentMethod(method);
-          }
-        }
+      // Save only rows that actually changed, in parallel
+      const changedRows = paymentRows.filter((row) => {
+        const original = universityPaymentMethods?.find((m) => m.id === row.id);
+        if (!original) return true;
+        return (
+          row.payment_method_id !== original.payment_method_id ||
+          row.currency !== original.currency ||
+          row.instructions !== original.instructions ||
+          row.is_active !== original.is_active
+        );
+      });
+
+      if (changedRows.length) {
+        await Promise.all(changedRows.map(savePaymentRow));
       }
 
       showToast("University updated successfully.", "success");
-
-      setLogoModified(false);
+      setLogo((prev) => ({ ...prev, modified: false }));
       refetchUniversity();
       refetchPayments();
-
-      return true;
     } catch (error: any) {
       const details = error?.response?.data?.details;
 
       if (Array.isArray(details)) {
         const newErrors: Record<string, string> = {};
         details.forEach((e: any) => {
-          const field = e?.loc?.[1];
-          if (field) newErrors[field] = e.msg;
+          if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
         });
         setErrors(newErrors);
       }
 
-      let message = error?.response?.data?.message || "Please try again.";
+      let message = error?.response?.data?.message ?? "Please try again.";
       if (Array.isArray(details) && details.length > 0) {
         const first = details[0];
         const field = first?.loc?.[1];
@@ -461,24 +476,20 @@ const UniversityEdit = ({ id }: Props) => {
       }
 
       showToast(`Update failed. ${message}`, "error");
-      return false;
     }
   };
 
-  const handleBack = () => {
-    router.push("/admin/universities");
-  };
+  const handleBack = () => router.push("/admin/universities");
 
-  if (universityLoading) {
-    return <Loading text="Loading university details..." />;
-  }
+  // ─── Render ───────────────────────────────────────────────────────────────
 
-  if (!university) {
-    return <EmptyData />;
-  }
+  if (universityLoading) return <Loading text="Loading university details..." />;
+  if (!university) return <EmptyData />;
 
   return (
     <div className="mt-6 max-w-5xl mx-auto rounded-md border bg-white">
+
+      {/* Header */}
       <div className="flex justify-between border-b p-6">
         <div className="flex items-center gap-4">
           <div className="shrink-0">
@@ -486,21 +497,24 @@ const UniversityEdit = ({ id }: Props) => {
               label=""
               field="logo"
               imageOnly
-              simpleFile={logoFile}
+              simpleFile={logo.file}
               onSimpleFileChange={handleLogoSelect}
-              onSimpleRemove={() => { setLogoFile(null); setLogoFileKey(""); setLogoFileUrl(""); }}
-              simpleUploading={logoUploading}
-              simpleProgress={logoProgress}
-              existingUrl={existingLogoUrl}
-              onExistingRemove={() => { setExistingLogoUrl(""); setExistingLogoKey(""); setLogoModified(true); }}
+              onSimpleRemove={() =>
+                setLogo((prev) => ({ ...prev, file: null, fileKey: "", fileUrl: "" }))
+              }
+              simpleUploading={logo.uploading}
+              simpleProgress={logo.progress}
+              existingUrl={logo.existingUrl}
+              onExistingRemove={() =>
+                setLogo((prev) => ({ ...prev, existingUrl: "", existingKey: "", modified: true }))
+              }
               errors={errors}
             />
           </div>
-
           <div>
             <h2 className="text-lg font-semibold">{university.name}</h2>
             <p className="text-sm text-slate-500">{university.country}</p>
-            {logoFile && !logoUploading && (
+            {logo.file && !logo.uploading && (
               <span className="mt-1 inline-block rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
                 Logo ready — click Save Changes
               </span>
@@ -509,7 +523,6 @@ const UniversityEdit = ({ id }: Props) => {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-6">
-
           <button
             onClick={handleBack}
             className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
@@ -518,18 +531,14 @@ const UniversityEdit = ({ id }: Props) => {
             <span className="hidden sm:inline">Back to universities</span>
           </button>
         </div>
-
       </div>
 
+      {/* University details */}
       <div className="space-y-5 px-6 py-6">
-        <h3 className="text-sm font-semibold uppercase text-slate-500">
-          Edit University
-        </h3>
+        <h3 className="text-sm font-semibold uppercase text-slate-500">Edit University</h3>
 
         <div className="block">
-
           <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
-
             <InputField
               label="University Name"
               field="name"
@@ -537,9 +546,8 @@ const UniversityEdit = ({ id }: Props) => {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
-              onBlur={() => validateField('name')}
+              onBlur={() => validateField("name")}
             />
-
             <InputField
               label="Country"
               field="country"
@@ -547,9 +555,8 @@ const UniversityEdit = ({ id }: Props) => {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
-              onBlur={() => validateField('country')}
+              onBlur={() => validateField("country")}
             />
-
             <div className="md:col-span-2">
               <TextareaField
                 label="Description"
@@ -561,7 +568,6 @@ const UniversityEdit = ({ id }: Props) => {
                 required={false}
               />
             </div>
-
           </div>
 
           <MultipleDatePickerModal
@@ -574,7 +580,6 @@ const UniversityEdit = ({ id }: Props) => {
           />
 
           <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
-
             <SelectField
               label="University Type"
               field="university_type_id"
@@ -586,9 +591,8 @@ const UniversityEdit = ({ id }: Props) => {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
-              onBlur={() => validateField('university_type_id')}
+              onBlur={() => validateField("university_type_id")}
             />
-
           </div>
 
           <ToggleInput
@@ -598,17 +602,13 @@ const UniversityEdit = ({ id }: Props) => {
             errors={{}}
             updateFormData={updateFormData}
           />
-
         </div>
-
       </div>
 
+      {/* Branches */}
       <div className="border-t px-6 py-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-semibold uppercase text-slate-500">
-            Branches
-          </h3>
-
+          <h3 className="text-sm font-semibold uppercase text-slate-500">Branches</h3>
           <IconButton
             icon={<CalendarPlus className="h-4 w-4" />}
             bgColor="bg-blue-50"
@@ -620,17 +620,18 @@ const UniversityEdit = ({ id }: Props) => {
           />
         </div>
 
+        {errors.branches && (
+          <p className="mb-3 text-xs text-red-600">{errors.branches}</p>
+        )}
+
         <div className="grid grid-cols-1 gap-4">
-          {formData.branches.map((branch: any, index: number) => (
+          {formData.branches.map((branch, index) => (
             <div
-              key={branch.id || index}
+              key={branch.id ?? index}
               className="space-y-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
             >
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h4 className="text-sm font-semibold text-slate-700">
-                  Branch {index + 1}
-                </h4>
-
+                <h4 className="text-sm font-semibold text-slate-700">Branch {index + 1}</h4>
                 <IconButton
                   icon={<Trash2 className="h-4 w-4" />}
                   disabled={formData.branches.length === 1}
@@ -650,37 +651,47 @@ const UniversityEdit = ({ id }: Props) => {
                   field="name"
                   formData={branch}
                   errors={{ name: errors[`branches[${index}].name`] }}
-                  updateFormData={(f: string, v: any) => {
-                    setErrors((prev) => { const n = { ...prev }; delete n[`branches[${index}].name`]; return n; });
+                  updateFormData={(f, v) => {
+                    setErrors((prev) => {
+                      const n = { ...prev };
+                      delete n[`branches[${index}].name`];
+                      return n;
+                    });
                     updateBranchField(index, f, v);
                   }}
                   onBlur={() => validateField(`branches[${index}].name`)}
                 />
-
                 <InputField
                   label="Location"
                   placeholder="e.g Location"
                   field="location"
                   formData={branch}
                   errors={{ location: errors[`branches[${index}].location`] }}
-                  updateFormData={(f: string, v: any) => {
-                    setErrors((prev) => { const n = { ...prev }; delete n[`branches[${index}].location`]; return n; });
+                  updateFormData={(f, v) => {
+                    setErrors((prev) => {
+                      const n = { ...prev };
+                      delete n[`branches[${index}].location`];
+                      return n;
+                    });
                     updateBranchField(index, f, v);
                   }}
                   onBlur={() => validateField(`branches[${index}].location`)}
                 />
-
                 <SearchableDropdown
                   label="State"
                   field="state_id"
                   options={stateOptions}
                   formData={{ state_id: branch.state_id }}
                   errors={{ state_id: errors[`branches[${index}].state_id`] }}
-                  updateFormData={(f: string, v: any) => {
-                    setErrors((prev) => { const n = { ...prev }; delete n[`branches[${index}].state_id`]; return n; });
+                  updateFormData={(f, v) => {
+                    setErrors((prev) => {
+                      const n = { ...prev };
+                      delete n[`branches[${index}].state_id`];
+                      return n;
+                    });
                     updateBranchField(index, f, v);
                   }}
-                  onSelect={() => validateField(`branches[${index}].state_id`)}
+
                 />
               </div>
             </div>
@@ -688,12 +699,10 @@ const UniversityEdit = ({ id }: Props) => {
         </div>
       </div>
 
-      <div className=" space-y-6 border-t px-6 py-6">
+      {/* Payment methods */}
+      <div className="space-y-6 border-t px-6 py-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="mb-4 text-sm font-semibold uppercase text-slate-500">
-            Payment Methods
-          </h3>
-
+          <h3 className="mb-4 text-sm font-semibold uppercase text-slate-500">Payment Methods</h3>
           <IconButton
             icon={<Landmark className="h-4 w-4" />}
             bgColor="bg-blue-50"
@@ -701,21 +710,24 @@ const UniversityEdit = ({ id }: Props) => {
             borderColor="border-blue-600"
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
-            onClick={() => setShowAddPayment((prev) => !prev)}
+            onClick={() => {
+              setAddPaymentForm(INITIAL_ADD_PAYMENT);
+              setPaymentErrors({});
+              setShowAddPayment((prev) => !prev);
+            }}
           />
         </div>
 
-        <div className="grid grid-cols-1 space-y-6 ">
-          {paymentFormData.map((method, index: number) => (
+        <div className="grid grid-cols-1 space-y-6">
+          {paymentRows.map((method, index) => (
             <div
-              key={method.id || index}
+              key={method.id}
               className="space-y-4 rounded-md border bg-white p-4 shadow-sm"
             >
               <div className="flex items-center justify-between border-b border-slate-100 pb-3">
                 <h4 className="text-sm font-semibold text-slate-700">
-                  {`Payment Method ${index + 1}`}
+                  Payment Method {index + 1}
                 </h4>
-
                 <IconButton
                   icon={<Trash2 className="h-4 w-4" />}
                   bgColor="bg-red-50"
@@ -728,7 +740,6 @@ const UniversityEdit = ({ id }: Props) => {
               </div>
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-
                 <SelectField
                   label="Payment Method"
                   field="payment_method_id"
@@ -739,39 +750,27 @@ const UniversityEdit = ({ id }: Props) => {
                   }))}
                   formData={method}
                   errors={{}}
-                  updateFormData={(field: string, value: any) =>
-                    updatePaymentFormData(method.id, field, value)
-                  }
+                  updateFormData={(field, value) => updatePaymentRow(method.id, field, value)}
                 />
-
                 <SelectField
                   label="Currency"
                   field="currency"
                   formData={method}
                   errors={{}}
-                  options={(CURRENCY.map((c) => ({
-                    value: c.value,
-                    label: c.label,
-                  })))}
-                  updateFormData={(field: string, value: any) =>
-                    updatePaymentFormData(method.id, field, value)
-                  }
+                  options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
+                  updateFormData={(field, value) => updatePaymentRow(method.id, field, value)}
                   required={false}
                 />
-
                 <div className="md:col-span-2">
                   <TextareaField
                     label="Instructions"
                     field="instructions"
                     formData={method}
                     errors={{}}
-                    updateFormData={(field: string, value: any) =>
-                      updatePaymentFormData(method.id, field, value)
-                    }
+                    updateFormData={(field, value) => updatePaymentRow(method.id, field, value)}
                     required={false}
                   />
                 </div>
-
               </div>
 
               <ToggleInput
@@ -779,15 +778,12 @@ const UniversityEdit = ({ id }: Props) => {
                 field="is_active"
                 formData={method}
                 errors={{}}
-                updateFormData={(field: string, value: any) => {
-                  updatePaymentFormData(method.id, field, value);
-                }}
+                updateFormData={(field, value) => updatePaymentRow(method.id, field, value)}
               />
-
             </div>
           ))}
 
-          {paymentFormData.length === 0 && (
+          {paymentRows.length === 0 && (
             <NoMessagesFound
               title="No payment methods assigned"
               subtitle="Assign a payment method to allow universities to accept payments."
@@ -809,67 +805,82 @@ const UniversityEdit = ({ id }: Props) => {
                 disabledOptions={universityPaymentMethods.map((p) =>
                   String(p.payment_method_id)
                 )}
-                formData={formData}
+                formData={addPaymentForm}
                 errors={paymentErrors}
-                updateFormData={updateFormData}
+                updateFormData={(field, value) =>
+                  setAddPaymentForm((prev) => ({ ...prev, [field]: value }))
+                }
               />
-
               <SelectField
                 label="Currency"
                 field="currency"
                 options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
-                formData={formData}
+                formData={addPaymentForm}
                 errors={paymentErrors}
                 required={false}
-                updateFormData={updateFormData}
+                updateFormData={(field, value) =>
+                  setAddPaymentForm((prev) => ({ ...prev, [field]: value }))
+                }
               />
-
               <div className="md:col-span-2">
                 <TextareaField
                   label="Instructions"
                   field="instructions"
                   placeholder="Optional payment instructions..."
-                  formData={formData}
+                  formData={addPaymentForm}
                   errors={paymentErrors}
                   required={false}
-                  updateFormData={updateFormData}
+                  updateFormData={(field, value) =>
+                    setAddPaymentForm((prev) => ({ ...prev, [field]: value }))
+                  }
                 />
               </div>
             </div>
+
+            <div className="flex justify-end gap-2">
+              <Button
+                onClick={() => {
+                  setShowAddPayment(false);
+                  setAddPaymentForm(INITIAL_ADD_PAYMENT);
+                  setPaymentErrors({});
+                }}
+                text="Cancel"
+                bgColor="bg-slate-50"
+                textColor="text-slate-700"
+                borderColor="border-slate-600"
+                hoverTextColor="hover:text-slate-800"
+                hoverBorderColor="hover:border-slate-700"
+              />
+              <Button
+                onClick={handleAssign}
+                icon={<Landmark className="h-4 w-4" />}
+                text="Assign"
+                bgColor="bg-blue-50"
+                textColor="text-blue-700"
+                borderColor="border-blue-600"
+                hoverTextColor="hover:text-blue-800"
+                hoverBorderColor="hover:border-blue-700"
+              />
+            </div>
           </div>
         )}
-
       </div>
 
+      {/* Footer */}
       <div className="flex justify-end gap-2 border-t p-6">
         <Button
           onClick={handleBack}
           icon={<ArrowLeft className="h-5 w-5" />}
-          text={"Back"}
+          text="Back"
           bgColor="bg-slate-50"
           textColor="text-slate-700"
           borderColor="border-slate-600"
           hoverTextColor="hover:text-slate-800"
           hoverBorderColor="hover:border-slate-700"
         />
-
         <Button
-          onClick={async () => {
-            if (isFormChanged) {
-              const success = await handleUpdate();
-              if (!success) return;
-            }
-
-            if (formData.payment_method_id) {
-              await handleAssign();
-            }
-          }}
-          disabled={
-            logoUploading ||
-            updateLoading ||
-            (!isFormChanged && !formData.payment_method_id) ||
-            (isFormChanged && !isFormValid)
-          }
+          onClick={handleSave}
+          disabled={logo.uploading || updateLoading || !isFormChanged || (isFormChanged && !isFormValid)}
           icon={<Pencil className="h-5 w-5" />}
           text={updateLoading ? "Updating..." : "Save Changes"}
           bgColor="bg-blue-50"

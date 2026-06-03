@@ -26,8 +26,7 @@ import api from "lib/useApi";
 
 import { useAccountManagerApplications } from "features/applications/account-manager/hooks/useAccountManagerApplications";
 import { useUniversities } from "features/universities/hooks";
-import { useAllStages } from "hooks/applications/stages/useStages";
-import { useAllStageStatuses } from "hooks/applications/stages/useStageStatuses";
+import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 
 import EmptyData from "components/emptyData/EmptyTableData";
 import PrevButton from "components/ui/buttons/PrevButton";

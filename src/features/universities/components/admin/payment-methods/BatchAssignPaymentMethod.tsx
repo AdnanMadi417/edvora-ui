@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard } from "lucide-react";
-import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
-import { useBatchAssignPaymentMethod } from "hooks/knowledge-hub/payment-methods/useBatchAssignPaymentMethod";
+import { useAllPaymentMethods, useBatchAssignPaymentMethod } from "features/knowledge-hub/payment-methods/hooks";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";

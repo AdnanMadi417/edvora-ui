@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard } from "lucide-react";
 
-import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
+import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 import { useUniversityPaymentMethods, useAssignUniversityPaymentMethod } from "features/universities/hooks";
 
 import { useToast } from "components/context/ToastContext";

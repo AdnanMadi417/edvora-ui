@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import EditPartnerDetails from "components/partner/profile/EditPartnerDetails";
+import EditPartnerDetails from "features/partners/components/PartnerProfileEdit";
 import { useMe } from "hooks/useMe";
 
 const EditProfile: React.FC = () => {

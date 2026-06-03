@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { CheckCircle, Pause, XCircle, AlertCircle } from "lucide-react";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import DocumentUploadList from "features/applications/partner/components/form/stages/DocumentUploadList";
-import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
+import { useApplicationActions } from "features/applications/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";

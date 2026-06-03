@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, Tag } from "lucide-react";
 
-import { useCreateFieldOfStudy } from "hooks/knowledge-hub/field-of-study/useCreateFieldOfStudy";
+import { useCreateFieldOfStudy } from "features/knowledge-hub/field-of-study/hooks";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";

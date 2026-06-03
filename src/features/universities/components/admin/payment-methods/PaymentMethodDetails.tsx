@@ -7,7 +7,7 @@ import {
   CreditCard,
 } from 'lucide-react';
 
-import { usePaymentMethod } from "hooks/knowledge-hub/payment-methods/usePaymentMethodId";
+import { usePaymentMethod } from "features/knowledge-hub/payment-methods/hooks";
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";

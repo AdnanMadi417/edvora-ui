@@ -11,12 +11,14 @@ import {
 } from "lucide-react";
 import { useToast } from "components/context/ToastContext";
 
-import { useOfferLetterUpload } from "hooks/applications/files/useOfferLetterUpload";
-import { useVisaDocumentUpload } from "hooks/applications/files/useVisaDocumentUpload";
-import { useVisaSetup } from "hooks/applications/useVisaSetup";
-import { useStatusUpdate } from "hooks/applications/useStatusUpdate";
-import { useCommissionPaymentUpload } from "hooks/applications/files/useCommissionPaymentUpload";
-import { useApplicationActions } from 'hooks/applications/stages/useApplicationActions';
+import {
+  useOfferLetterUpload,
+  useVisaDocumentUpload,
+  useVisaSetup,
+  useStatusUpdate,
+  useCommissionPaymentUpload,
+  useApplicationActions,
+} from "features/applications/hooks";
 
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";

@@ -5,7 +5,7 @@ import { XCircle, RefreshCcw, CheckCircle } from "lucide-react";
 import { useUniversities } from "hooks/useUniversities";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import { useToast } from "components/context/ToastContext";
-import { useChangeProgram } from "hooks/applications/stages/useChangeProgram";
+import { useChangeProgram } from "features/applications/hooks";
 
 interface ProgramDecisionModalProps {
   isOpen: boolean;
