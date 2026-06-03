@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, GitBranch } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useToast } from "components/context/ToastContext";
 import { useCreateBranch } from "features/universities/hooks";
-import { useAllStates } from "features/programs/hooks/useStates";
+import { useStates } from "features/programs/hooks/useStates";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import InputField from "components/form/InputField";
@@ -15,13 +14,13 @@ interface CreateBranchProps {
   isOpen: boolean;
   onClose: () => void;
   universityId: string;
+  onSuccess?: () => void;
 }
 
-export default function CreateBranch({ isOpen, onClose, universityId }: CreateBranchProps) {
+export default function CreateBranch({ isOpen, onClose, universityId, onSuccess }: CreateBranchProps) {
   const { createBranch, branchLoading } = useCreateBranch();
-  const { states } = useAllStates();
+  const { states } = useStates();
   const { showToast } = useToast();
-  const router = useRouter();
 
   const stateOptions = states?.map((c) => ({ value: String(c.id), label: c.name })) || [];
 
@@ -52,7 +51,7 @@ export default function CreateBranch({ isOpen, onClose, universityId }: CreateBr
       const newBranch = await createBranch(universityId, formData);
       showToast("Branch created successfully.", "success");
       onClose();
-      setTimeout(() => router.refresh(), 1500);
+      onSuccess?.();
       return newBranch;
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
