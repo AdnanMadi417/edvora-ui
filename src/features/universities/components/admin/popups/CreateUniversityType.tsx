@@ -88,10 +88,10 @@ export default function CreateUniversityType({
     try {
       await createUniversityType({ name: formData.name.trim(), description: formData.description.trim() });
 
-      showToast("University created successfully.", "success");
+      showToast("University type created successfully.", "success");
 
       onClose();
-      setTimeout(() => onSuccess?.(), 1500);
+      onSuccess?.();
     } catch (err: any) {
       const apiErrors = err?.response?.data?.detail;
 
