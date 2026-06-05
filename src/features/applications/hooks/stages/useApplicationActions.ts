@@ -14,7 +14,10 @@ export type DocumentType = {
   description: string;
   is_init_app_doc: boolean;
   is_required_init_app_doc: boolean;
+  is_required_for_init: boolean | null;
   is_required_for_current_upload: boolean;
+  template_file_key?: string | null;
+  template_file_url?: string | null;
 };
 
 export type StageStatus = {
@@ -33,18 +36,31 @@ export type PartnerAction = {
   is_requires_document_selection: boolean;
 };
 
+export type ArrivalDocument = {
+  id: string;
+  file_key: string;
+  file_url: string;
+  status: string;
+  approve_notes: string | null;
+  created_at: string;
+  document_type_id: string | null;
+  document_type: string;
+};
+
 export type ApplicationActionsResponse = {
   id: string;
   stage: string;
   status: string;
   status_code: string;
   is_draft: boolean;
+  is_arrival_extra_docs_required?: boolean;
   correction_reason: string | null;
   next_action: string;
   available_actions: AvailableAction[];
   document_types: DocumentType[];
   manager_allowed_next_statuses: StageStatus[];
   partner_actions: PartnerAction[];
+  arrival_documents?: ArrivalDocument[];
 };
 
 type HookReturn = {

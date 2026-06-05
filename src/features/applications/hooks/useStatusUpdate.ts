@@ -11,6 +11,8 @@ interface UseStatusUpdateReturn {
     reason?: string;
     notes?: string;
     requiredDocumentTypeIds?: string[];
+    arrivalFormTemplateFileKey?: string;
+    arrivalFormTemplateFileUrl?: string;
   }) => Promise<void>;
   isUpdating: boolean;
 }
@@ -25,12 +27,16 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
     reason = "",
     notes = "",
     requiredDocumentTypeIds = [],
+    arrivalFormTemplateFileKey,
+    arrivalFormTemplateFileUrl,
   }: {
     applicationId: string;
     statusId: string;
     reason?: string;
     notes?: string;
     requiredDocumentTypeIds?: string[];
+    arrivalFormTemplateFileKey?: string;
+    arrivalFormTemplateFileUrl?: string;
   }) => {
     try {
       setIsUpdating(true);
@@ -39,6 +45,8 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
         reason_text: reason.trim(),
         notes: notes.trim(),
         required_document_type_ids: requiredDocumentTypeIds,
+        ...(arrivalFormTemplateFileKey && { arrival_form_template_file_key: arrivalFormTemplateFileKey }),
+        ...(arrivalFormTemplateFileUrl && { arrival_form_template_file_url: arrivalFormTemplateFileUrl }),
       });
       showToast("Status updated successfully.", "success");
     } catch (err: any) {
