@@ -5,8 +5,13 @@ import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
+interface OfferLetterExtras {
+  visaInvoiceFile?: File | null;
+  applicationFormTemplateFile?: File | null;
+}
+
 interface UseOfferLetterUploadReturn {
-  uploadOfferLetter: (file: File, applicationId: string) => Promise<void>;
+  uploadOfferLetter: (file: File, applicationId: string, extras?: OfferLetterExtras) => Promise<void>;
   isUploading: boolean;
 }
 
@@ -14,20 +19,49 @@ export const useOfferLetterUpload = (): UseOfferLetterUploadReturn => {
   const [isUploading, setIsUploading] = useState(false);
   const { showToast } = useToast();
 
-  const uploadOfferLetter = async (file: File, applicationId: string) => {
+  const uploadOfferLetter = async (
+    file: File,
+    applicationId: string,
+    extras: OfferLetterExtras = {}
+  ) => {
     if (!file) return;
     try {
       setIsUploading(true);
       showToast("Uploading offer letter...", "info");
-      const presigned = await getPresignedUploads([file], "documents");
-      const results = await uploadFilesToSpaces([file], presigned);
+
+      const filesToUpload: File[] = [file];
+      if (extras.visaInvoiceFile) filesToUpload.push(extras.visaInvoiceFile);
+      if (extras.applicationFormTemplateFile) filesToUpload.push(extras.applicationFormTemplateFile);
+
+      const presigned = await getPresignedUploads(filesToUpload, "documents");
+      const results = await uploadFilesToSpaces(filesToUpload, presigned);
+
       const uploaded = results?.[0];
       if (!uploaded?.file_key || !uploaded?.public_url) throw new Error("Offer letter upload failed");
 
-      await api.post(`/applications/${applicationId}/offer-letter`, {
+      let resultIndex = 1;
+      const payload: Record<string, string> = {
         file_key: uploaded.file_key,
         file_url: uploaded.public_url,
-      });
+      };
+
+      if (extras.visaInvoiceFile) {
+        const r = results[resultIndex++];
+        if (r?.file_key && r?.public_url) {
+          payload.visa_invoice_file_key = r.file_key;
+          payload.visa_invoice_file_url = r.public_url;
+        }
+      }
+
+      if (extras.applicationFormTemplateFile) {
+        const r = results[resultIndex++];
+        if (r?.file_key && r?.public_url) {
+          payload.application_form_template_file_key = r.file_key;
+          payload.application_form_template_file_url = r.public_url;
+        }
+      }
+
+      await api.post(`/applications/${applicationId}/offer-letter`, payload);
 
       showToast("Offer letter uploaded successfully.", "success");
     } catch (err: any) {

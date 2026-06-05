@@ -23,6 +23,7 @@ import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService
 
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import { InputField } from "components/form";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
 
@@ -247,6 +248,8 @@ export default function UpdateStatusPopup({
 
   const isUniversityApproved = selectedOption?.label === "University Approved";
   const [offerLetterFile, setOfferLetterFile] = useState<File | null>(null);
+  const [offerLetterVisaInvoiceFile, setOfferLetterVisaInvoiceFile] = useState<File | null>(null);
+  const [offerLetterAppFormTemplateFile, setOfferLetterAppFormTemplateFile] = useState<File | null>(null);
 
   const isVisaSetupSelected = selectedOption?.label === "Visa Setup";
 
@@ -255,6 +258,8 @@ export default function UpdateStatusPopup({
 
   const [formData, setFormData] = useState({
     visa_fee_amount: "",
+    show_visa_invoice: false,
+    show_app_form_template: false,
   });
 
   const [formErrors, setFormErrors] = useState<any>({});
@@ -286,7 +291,10 @@ export default function UpdateStatusPopup({
   const handleOfferLetterUpload = async () => {
     if (!offerLetterFile || !isUniversityApproved) return;
 
-    await uploadOfferLetter(offerLetterFile, application.id);
+    await uploadOfferLetter(offerLetterFile, application.id, {
+      visaInvoiceFile: formData.show_visa_invoice ? (offerLetterVisaInvoiceFile ?? undefined) : undefined,
+      applicationFormTemplateFile: formData.show_app_form_template ? (offerLetterAppFormTemplateFile ?? undefined) : undefined,
+    });
   };
 
   const { submitVisaFee } = useVisaSetup();
@@ -495,6 +503,9 @@ export default function UpdateStatusPopup({
     setDocuments([{ id: "1", type: [], reason: "" }]);
     setError("");
     setArrivalFormTemplateFile(null);
+    setOfferLetterVisaInvoiceFile(null);
+    setOfferLetterAppFormTemplateFile(null);
+    setFormData({ visa_fee_amount: "", show_visa_invoice: false, show_app_form_template: false });
     onClose();
   };
 
@@ -656,17 +667,63 @@ export default function UpdateStatusPopup({
         )}
 
           {isUniversityApproved && (
-            <StatusFileUpload
-              label="Upload Offer Letter"
-              description="Upload the official offer letter issued by the university"
-              id="offer-letter"
-              file={offerLetterFile}
-              onFileChange={setOfferLetterFile}
-              onRemove={() => setOfferLetterFile(null)}
-              onError={setError}
-              disabled={isSubmitting}
-              required
-            />
+            <>
+              <StatusFileUpload
+                label="Upload Offer Letter"
+                description="Upload the official offer letter issued by the university"
+                id="offer-letter"
+                file={offerLetterFile}
+                onFileChange={setOfferLetterFile}
+                onRemove={() => setOfferLetterFile(null)}
+                onError={setError}
+                disabled={isSubmitting}
+                required
+              />
+              <SettingToggleInput
+                label="Attach Visa Invoice (optional)"
+                field="show_visa_invoice"
+                formData={formData}
+                updateFormData={(field, value) => {
+                  updateFormData(field, value);
+                  if (!value) setOfferLetterVisaInvoiceFile(null);
+                }}
+                errors={formErrors}
+              />
+              {formData.show_visa_invoice && (
+                <StatusFileUpload
+                  label="Upload Visa Invoice"
+                  description="Upload the visa invoice to attach with the offer letter"
+                  id="offer-letter-visa-invoice"
+                  file={offerLetterVisaInvoiceFile}
+                  onFileChange={setOfferLetterVisaInvoiceFile}
+                  onRemove={() => setOfferLetterVisaInvoiceFile(null)}
+                  onError={setError}
+                  disabled={isSubmitting}
+                />
+              )}
+              <SettingToggleInput
+                label="Attach Application Form Template (optional)"
+                field="show_app_form_template"
+                formData={formData}
+                updateFormData={(field, value) => {
+                  updateFormData(field, value);
+                  if (!value) setOfferLetterAppFormTemplateFile(null);
+                }}
+                errors={formErrors}
+              />
+              {formData.show_app_form_template && (
+                <StatusFileUpload
+                  label="Upload Application Form Template"
+                  description="Upload the application form template for the student"
+                  id="offer-letter-app-form-template"
+                  file={offerLetterAppFormTemplateFile}
+                  onFileChange={setOfferLetterAppFormTemplateFile}
+                  onRemove={() => setOfferLetterAppFormTemplateFile(null)}
+                  onError={setError}
+                  disabled={isSubmitting}
+                />
+              )}
+            </>
           )}
 
           {requiresReason && (
