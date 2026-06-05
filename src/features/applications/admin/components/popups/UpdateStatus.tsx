@@ -20,6 +20,7 @@ import {
   useCommissionPaymentUpload,
   useApplicationVisaFee,
 } from "features/applications/hooks";
+import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
@@ -266,6 +267,8 @@ export default function UpdateStatusPopup({
 
   const isCommissionPaid = selectedOption?.label === "Commission Paid";
 
+  const [arrivalFormTemplateFile, setArrivalFormTemplateFile] = useState<File | null>(null);
+
   const safeDocumentTypes = documentTypes ?? [];
   const shouldShowDocumentSection =
     requiresDocuments &&
@@ -273,6 +276,13 @@ export default function UpdateStatusPopup({
     !isUniversityApproved &&
     !isVisaIssued &&
     !isCommissionPaid;
+
+  const selectedDocTypeIds = documents.flatMap((doc) => doc.type);
+  const hasArrivalFormSelected =
+    shouldShowDocumentSection &&
+    selectedDocTypeIds.some((id) =>
+      safeDocumentTypes.find((d) => d.id === id)?.label.toLowerCase().includes("arrival")
+    );
 
   const { uploadOfferLetter } = useOfferLetterUpload();
 
@@ -304,6 +314,18 @@ export default function UpdateStatusPopup({
   const { updateStatus } = useStatusUpdate();
 
   const handleStatusUpdate = async () => {
+    let arrivalFormTemplateFileKey: string | undefined;
+    let arrivalFormTemplateFileUrl: string | undefined;
+
+    if (arrivalFormTemplateFile) {
+      const presigned = await getPresignedUploads([arrivalFormTemplateFile], "documents");
+      const results = await uploadFilesToSpaces([arrivalFormTemplateFile], presigned);
+      const uploaded = results?.[0];
+      if (!uploaded?.file_key || !uploaded?.public_url) throw new Error("Arrival form template upload failed");
+      arrivalFormTemplateFileKey = uploaded.file_key;
+      arrivalFormTemplateFileUrl = uploaded.public_url;
+    }
+
     await updateStatus({
       applicationId: application.id,
       statusId: selectedStatus,
@@ -312,6 +334,8 @@ export default function UpdateStatusPopup({
       requiredDocumentTypeIds: shouldShowDocumentSection
         ? documents.flatMap((doc) => doc.type)
         : [],
+      arrivalFormTemplateFileKey,
+      arrivalFormTemplateFileUrl,
     });
   };
 
@@ -470,6 +494,7 @@ export default function UpdateStatusPopup({
     setNotes("");
     setDocuments([{ id: "1", type: [], reason: "" }]);
     setError("");
+    setArrivalFormTemplateFile(null);
     onClose();
   };
 
@@ -715,6 +740,20 @@ export default function UpdateStatusPopup({
               required
             />
           )}
+
+          {hasArrivalFormSelected && (
+            <StatusFileUpload
+              label="Upload Arrival Form Template"
+              description="Upload a template for the student to complete their arrival form"
+              id="arrival-form-template"
+              file={arrivalFormTemplateFile}
+              onFileChange={setArrivalFormTemplateFile}
+              onRemove={() => setArrivalFormTemplateFile(null)}
+              onError={setError}
+              disabled={isSubmitting}
+              required
+            />
+          )}
         </div>
 
         <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
@@ -735,7 +774,8 @@ export default function UpdateStatusPopup({
               (requiresReason && !reason.trim()) ||
               (isUniversityApproved && !offerLetterFile) ||
               (isVisaIssued && !visaDocumentFile) ||
-              (isCommissionPaid && !commissionPaymentFile)
+              (isCommissionPaid && !commissionPaymentFile) ||
+              (hasArrivalFormSelected && !arrivalFormTemplateFile)
             }
             className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
           >

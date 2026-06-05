@@ -15,7 +15,8 @@ import {
   FaUsers,
 } from "react-icons/fa";
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { Clock, Upload, ClipboardCheck, CreditCard, Plane, CheckCircle, XCircle, FileUp } from 'lucide-react';
+import { Clock, Upload, ClipboardCheck, CreditCard, Plane, CheckCircle, XCircle, FileUp, Download } from 'lucide-react';
+import { getDocumentDownloadUrl } from 'services/documentService';
 import Button from 'components/ui/buttons/Button';
 import { useApplicationActions } from "features/applications/hooks";
 
@@ -131,6 +132,20 @@ export default function ApplicationDetails({
     currentStatusCode === "PAYMENT_REJECTED";
 
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
+  const [downloadingTemplate, setDownloadingTemplate] = useState(false);
+
+  const handleTemplateDownload = async (fileKey: string) => {
+    if (downloadingTemplate) return;
+    try {
+      setDownloadingTemplate(true);
+      const url = await getDocumentDownloadUrl(fileKey);
+      window.open(url, "_blank");
+    } catch {
+      showToast("Failed to download template", "error");
+    } finally {
+      setDownloadingTemplate(false);
+    }
+  };
   const [showEmgsUploadPopup, setShowEmgsUploadPopup] = useState(false);
   const [showEVisaUploadPopup, setShowEVisaUploadPopup] = useState(false);
 
@@ -140,6 +155,8 @@ export default function ApplicationDetails({
   const hasRequiredDocs = actions?.document_types?.some(
     (d: any) => d.is_required_for_current_upload
   );
+
+  const showArrivalExtraDocs = currentStatusCode === "ARRIVAL_EXTRA_DOCS_UPLOAD";
 
   const showEmgsUpload =
     !hasRequiredDocs &&
@@ -317,7 +334,7 @@ export default function ApplicationDetails({
           <div className="space-y-2">
                   {actions && (
                     <>
-                      {hasRequiredDocs && (
+                      {hasRequiredDocs && !showArrivalExtraDocs && (
                         <button
                           onClick={openRequiredActionPopup}
                           className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"
@@ -326,6 +343,55 @@ export default function ApplicationDetails({
                           Upload Required Documents
                         </button>
                       )}
+                      {showArrivalExtraDocs && (() => {
+                        const arrivalFormDoc = application?.arrival_documents?.find((d: any) => d.document_type === "Arrival Form Template");
+                        return (
+                          <div className="block space-y-3">
+                            <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 space-y-3">
+                              <div className="flex gap-3">
+                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100">
+                                  <FileUp className="h-4 w-4 text-blue-600" />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-sm font-semibold text-slate-800">Arrival Form Required</p>
+                                  <p className="mt-0.5 text-xs text-slate-500">
+                                    Download the template below, complete it, then upload the filled form.
+                                  </p>
+                                </div>
+                              </div>
+                              {arrivalFormDoc?.file_key && (
+                                <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-white px-4 py-3">
+                                  <div className="flex items-center gap-3 min-w-0">
+                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 border border-blue-200">
+                                      <Download className="h-4 w-4 text-blue-600" />
+                                    </div>
+                                    <div className="min-w-0">
+                                      <p className="text-sm font-semibold text-slate-800">Arrival Form Template</p>
+                                      <p className="text-xs text-slate-400">Provided by manager · Click to download</p>
+                                    </div>
+                                  </div>
+                                  <button
+                                    onClick={() => handleTemplateDownload(arrivalFormDoc.file_key)}
+                                    disabled={downloadingTemplate}
+                                    className="ml-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-transparent bg-blue-50 text-blue-600 transition hover:border-blue-200 hover:bg-blue-100 disabled:opacity-40"
+                                    title="Download template"
+                                  >
+                                    <Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={openRequiredActionPopup}
+                              className="flex w-full items-center justify-center gap-2 rounded-md bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"
+                            >
+                              <Upload className="h-4 w-4" />
+                              Upload Arrival Form
+                            </button>
+                          </div>
+                        );
+                      })()}
                       {currentStatusCode === "PROGRAM_CHANGE_SUGGESTED" && (
                         <button
                           onClick={openProgramDecisionPopup}
