@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { XCircle, Plane, CheckCircle, AlertCircle } from 'lucide-react';
 import { InputField } from "components/form";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
-import { useArrivalDateUpload } from "hooks/applications/files/useArrivalDateUpload";
+import { useArrivalDateUpload } from "features/applications/hooks";
 
 
 interface ArrivalDateConfirmationProps {

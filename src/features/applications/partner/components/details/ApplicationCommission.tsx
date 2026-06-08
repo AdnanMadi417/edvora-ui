@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Download, Receipt, AlertCircle } from "lucide-react";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { useToast } from "components/context/ToastContext";
-import { ApplicationActionsResponse } from "hooks/applications/stages/useApplicationActions";
+import type { ApplicationActionsResponse } from "features/applications/hooks";
 import DisputeCommission from "features/applications/partner/components/popups/DisputeCommission";
 
 interface ApplicationCommissionProps {

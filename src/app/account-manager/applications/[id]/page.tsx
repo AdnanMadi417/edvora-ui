@@ -8,8 +8,7 @@ import ApplicationDocuments from "features/applications/account-manager/componen
 import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import AgentPartnerChat from "components/chat/ApplicationChat";
-import { useUnreadCount } from 'hooks/chat/useUnreadCount';
+import { ApplicationChat as AgentPartnerChat, useUnreadCount } from "features/chat";
 import { useAccountManagerApplication } from 'features/applications/hooks';
 import { useMe } from 'hooks/useMe';
 

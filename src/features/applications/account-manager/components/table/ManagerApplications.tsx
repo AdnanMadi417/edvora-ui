@@ -26,8 +26,7 @@ import api from "lib/useApi";
 
 import { useAccountManagerApplications } from "features/applications/account-manager/hooks/useAccountManagerApplications";
 import { useUniversities } from "features/universities/hooks";
-import { useAllStages } from "hooks/applications/stages/useStages";
-import { useAllStageStatuses } from "hooks/applications/stages/useStageStatuses";
+import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 
 import EmptyData from "components/emptyData/EmptyTableData";
 import PrevButton from "components/ui/buttons/PrevButton";
@@ -111,7 +110,7 @@ const ModernApplicationsTable = () => {
     resolveManager();
   }, []);
 
-  const { items: applications, loading } = useAccountManagerApplications({
+  const { items: applications, total, loading } = useAccountManagerApplications({
     managerId,
     limit: itemsPerPage,
     offset: (currentPage - 1) * itemsPerPage,
@@ -205,11 +204,8 @@ const ModernApplicationsTable = () => {
   const needsAction = (status: string) =>
     actionRequiredStatuses.has(status?.toLowerCase().replace(/\s+/g, '_'));
 
-  const totalPages = Math.ceil(filteredAndSortedApplications.length / itemsPerPage);
-  const paginatedApplications = filteredAndSortedApplications.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  const totalPages = Math.ceil(total / itemsPerPage);
+  const paginatedApplications = filteredAndSortedApplications;
 
   const StatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<string, any> = {
@@ -591,11 +587,11 @@ const ModernApplicationsTable = () => {
                 </span>{" "}
                 to{" "}
                 <span className="font-medium text-slate-700">
-                  {Math.min(currentPage * itemsPerPage, filteredAndSortedApplications.length)}
+                  {Math.min(currentPage * itemsPerPage, total)}
                 </span>{" "}
                 of{" "}
                 <span className="font-medium text-slate-700">
-                  {filteredAndSortedApplications.length}
+                  {total}
                 </span>{" "}
                 results
               </>

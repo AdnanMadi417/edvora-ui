@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { CheckCircle, Pause, XCircle, AlertCircle } from "lucide-react";
+import { CheckCircle, Pause, XCircle, AlertCircle, Download } from "lucide-react";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import DocumentUploadList from "features/applications/partner/components/form/stages/DocumentUploadList";
-import { useApplicationActions } from "hooks/applications/stages/useApplicationActions";
+import { useApplicationActions } from "features/applications/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
@@ -174,6 +174,7 @@ export default function RequiredAction({
   };
 
   const docTypes: DocumentType[] = actions?.document_types ?? [];
+  const arrivalFormTemplate = (actions as any)?.arrival_documents?.find((d: any) => d.document_type === "Arrival Form Template");
   const freeUpload = docTypes.length === 0 && !!actions?.manager_allowed_next_statuses?.[0]?.is_requires_document_selection;
   const requiredDocTypes = docTypes.filter((d) => d.is_required_for_current_upload);
   const uploadedDocs = documents.filter((d) => d.file_url && !d.uploading);
@@ -236,6 +237,27 @@ export default function RequiredAction({
                   <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-2.5 text-amber-800">
                     <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
                     <span className="text-xs">{actions.correction_reason}</span>
+                  </div>
+                )}
+                {arrivalFormTemplate?.file_key && (
+                  <div className="flex items-center justify-between rounded-md border border-blue-200 bg-blue-50 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Download className="h-4 w-4 text-blue-600" />
+                      <div>
+                        <p className="text-sm font-medium text-blue-800">Arrival Form Template</p>
+                        <p className="text-xs text-blue-600">Download and complete this form before uploading</p>
+                      </div>
+                    </div>
+                    <a
+                      href={arrivalFormTemplate.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      download
+                      className="flex items-center gap-1.5 rounded-md border border-blue-600 bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-200"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      Download
+                    </a>
                   </div>
                 )}
                 <DocumentUploadList

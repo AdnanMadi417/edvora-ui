@@ -3,14 +3,15 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
-import { useApplicationVisaFee } from "hooks/applications/useApplicationVisaFee";
-import { useVisaPaymentUpload } from "hooks/applications/files/useVisaPaymentUpload";
+import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 
 interface VisaPaymentConfirmationProps {
   isOpen: boolean;
   onClose: () => void;
   applicationId: string;
+  application?: any;
   onRefetch?: () => void;
 }
 
@@ -18,18 +19,25 @@ export default function VisaPaymentConfirmation({
   isOpen,
   onClose,
   applicationId,
+  application,
   onRefetch,
 }: VisaPaymentConfirmationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [paymentReference, setPaymentReference] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
   const [uploadError, setUploadError] = useState("");
+  const [appFormToggle, setAppFormToggle] = useState({ show_app_form: false });
+  const [appFormFile, setAppFormFile] = useState<File | null>(null);
 
   const { methods, loading: paymentLoading, error: paymentError } = useVisaPaymentMethods(applicationId);
   const { visaFeeAmount } = useApplicationVisaFee(applicationId);
   const { uploadVisaPayment, isUploading } = useVisaPaymentUpload();
 
   const firstMethod = methods[0] ?? null;
+  const hasAppFormTemplate = !!application?.documents?.find(
+    (d: any) => d.document_type === "Application Form Template"
+  );
+  const showAppFormUpload = hasAppFormTemplate || appFormToggle.show_app_form;
 
   useEffect(() => {
     if (isOpen) setIsVisible(true);
@@ -41,6 +49,7 @@ export default function VisaPaymentConfirmation({
 
   const handleConfirmUpload = async () => {
     if (!paymentReference) return;
+    if (hasAppFormTemplate && !appFormFile) return;
 
     setUploadError("");
     try {
@@ -48,12 +57,13 @@ export default function VisaPaymentConfirmation({
         methodId: firstMethod?.id ?? null,
         amount: visaFeeAmount,
         currency: firstMethod?.currency ?? null,
+        applicationFormFile: showAppFormUpload ? appFormFile : null,
       });
 
       handleClose();
       onRefetch?.();
     } catch (error: any) {
-      const message = error?.response?.data?.message || error?.message || "Failed to submit visa payment";
+      const message = error?.response?.data?.message || error?.message || "Failed to submit";
       setUploadError(message);
     }
   };
@@ -62,6 +72,8 @@ export default function VisaPaymentConfirmation({
     setPaymentReference(null);
     setFileError("");
     setUploadError("");
+    setAppFormFile(null);
+    setAppFormToggle({ show_app_form: false });
     onClose();
   };
 
@@ -127,6 +139,45 @@ export default function VisaPaymentConfirmation({
               required
             />
 
+            {hasAppFormTemplate ? (
+              <StatusFileUpload
+                label="Upload Application Form"
+                description="Your manager has provided a template. Download it, complete it, and upload the filled form here."
+                id="app_form_document"
+                file={appFormFile}
+                onFileChange={setAppFormFile}
+                onRemove={() => setAppFormFile(null)}
+                onError={setFileError}
+                disabled={isUploading}
+                required
+              />
+            ) : (
+              <>
+                <SettingToggleInput
+                  label="Upload Application Form (optional)"
+                  field="show_app_form"
+                  formData={appFormToggle}
+                  updateFormData={(field: string, value: boolean) => {
+                    setAppFormToggle((prev) => ({ ...prev, [field]: value }));
+                    if (!value) setAppFormFile(null);
+                  }}
+                  errors={{}}
+                />
+                {appFormToggle.show_app_form && (
+                  <StatusFileUpload
+                    label="Upload Application Form"
+                    description="Upload your completed application form document"
+                    id="app_form_document"
+                    file={appFormFile}
+                    onFileChange={setAppFormFile}
+                    onRemove={() => setAppFormFile(null)}
+                    onError={setFileError}
+                    disabled={isUploading}
+                  />
+                )}
+              </>
+            )}
+
             {fileError && (
               <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
@@ -152,7 +203,14 @@ export default function VisaPaymentConfirmation({
                 Cancel
               </button>
               <button
-                disabled={!paymentReference || !!fileError || !!uploadError || isUploading || paymentLoading}
+                disabled={
+                  !paymentReference ||
+                  !!fileError ||
+                  !!uploadError ||
+                  isUploading ||
+                  paymentLoading ||
+                  (hasAppFormTemplate && !appFormFile)
+                }
                 onClick={handleConfirmUpload}
                 className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
               >

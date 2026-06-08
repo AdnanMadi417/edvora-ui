@@ -9,6 +9,7 @@ import {
   CircleDollarSign,
   Award,
   GraduationCap,
+  Building2,
   FileText,
   CheckCircle,
   ChevronLeft,
@@ -16,7 +17,6 @@ import {
   Globe,
   MapPin,
   BookOpen,
-  Building2,
   Languages,
   Clock,
 } from "lucide-react";
@@ -25,6 +25,7 @@ import { useProgram } from "features/programs/hooks";
 
 import Link from "next/link";
 import Loading from "components/loading/Loading";
+import PresignedImage from "components/ui/PresignedImage";
 
 type RequiredDocument = {
   id: string;
@@ -130,7 +131,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
     router.push("/partner/knowledge-hub/");
   };
 
-  const { program, requiredDocuments, commission } = useProgram(id);
+  const { program, requiredDocuments, commission, loading, error } = useProgram(id);
   const [copied, setCopied] = useState(false);
 
   const getOrdinal = (n: number) => {
@@ -179,7 +180,8 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  if (!program) return <Loading text="Loading program details..." />;
+  if (loading) return <Loading text="Loading program details..." />;
+  if (error || !program) return <div className="mt-10 text-center text-sm text-slate-500">{error ?? "Program not found."}</div>;
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -197,10 +199,21 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
               </button>
 
               <div className="relative shrink-0">
-                <div className="flex h-10 w-10 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-700 shadow-sm sm:h-11 sm:w-11">
-                  <GraduationCap className="h-5 w-5 text-white" />
+                
+                <div className="h-10 w-10 overflow-hidden rounded-full sm:h-11 sm:w-11">
+                  <PresignedImage
+                    fileKey={program.university?.logo_file_key}
+                    alt={program.university?.name}
+                    className="h-full w-full object-cover"
+                    fallback={
+                      <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
+                        {program.university?.name ? program.university.name.slice(0, 2).toUpperCase() : <Building2 className="h-5 w-5 text-blue-700" />}
+                      </div>
+                    }
+                  />
                 </div>
-                <span className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-md border-2 border-white ${program.field_of_study?.is_active ? "bg-emerald-500" : "bg-red-500"}`} />
+                
+                <span className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${program.university?.is_active ? "bg-emerald-500" : "bg-red-500"}`} />
               </div>
 
               <div className="min-w-0">
@@ -445,7 +458,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
                   <div className="flex items-start justify-between gap-2">
                     <h5 className="text-sm font-bold text-slate-900">{item.name}</h5>
                     {item.coverage_percent > 0 && (
-                      <span className="shrink-0 rounded-md bg-amber-500 px-2.5 py-0.5 text-xs font-bold text-white">
+                      <span className="shrink-0 rounded-full bg-amber-500 px-2.5 py-0.5 text-xs font-bold text-white">
                         {item.coverage_percent}%
                       </span>
                     )}
@@ -465,7 +478,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
                       <ul className="space-y-1.5">
                         {item.conditions.map((condition, i) => (
                           <li key={i} className="flex items-start gap-2 text-xs text-slate-600">
-                            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-md bg-amber-500" />
+                            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
                             {condition}
                           </li>
                         ))}
@@ -522,7 +535,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
                 intake_date:
                   program.intake_dates?.[0] ??
                   program.university.intake_months?.[0] ??
-                  new Date().toISOString().split("T")[0],
+                  "",
               },
             }}
             className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 active:scale-95"

@@ -11,15 +11,19 @@ import {
 } from "lucide-react";
 import { useToast } from "components/context/ToastContext";
 
-import { useOfferLetterUpload } from "hooks/applications/files/useOfferLetterUpload";
-import { useVisaDocumentUpload } from "hooks/applications/files/useVisaDocumentUpload";
-import { useVisaSetup } from "hooks/applications/useVisaSetup";
-import { useStatusUpdate } from "hooks/applications/useStatusUpdate";
-import { useCommissionPaymentUpload } from "hooks/applications/files/useCommissionPaymentUpload";
-import { useApplicationActions } from 'hooks/applications/stages/useApplicationActions';
+import {
+  useOfferLetterUpload,
+  useVisaDocumentUpload,
+  useVisaSetup,
+  useStatusUpdate,
+  useCommissionPaymentUpload,
+  useApplicationActions,
+} from "features/applications/hooks";
+import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import { InputField } from "components/form";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
 
@@ -244,6 +248,8 @@ export default function UpdateStatusPopup({
 
   const isUniversityApproved = selectedOption?.label === "University Approved";
   const [offerLetterFile, setOfferLetterFile] = useState<File | null>(null);
+  const [offerLetterVisaInvoiceFile, setOfferLetterVisaInvoiceFile] = useState<File | null>(null);
+  const [offerLetterAppFormTemplateFile, setOfferLetterAppFormTemplateFile] = useState<File | null>(null);
 
   const isVisaSetupSelected = selectedOption?.label === "Visa Setup";
 
@@ -252,6 +258,8 @@ export default function UpdateStatusPopup({
 
   const [formData, setFormData] = useState({
     visa_fee_amount: "",
+    show_visa_invoice: false,
+    show_app_form_template: false,
   });
 
   const [formErrors, setFormErrors] = useState<any>({});
@@ -261,6 +269,8 @@ export default function UpdateStatusPopup({
 
   const isCommissionPaid = selectedOption?.label === "Commission Paid";
 
+  const [arrivalFormTemplateFile, setArrivalFormTemplateFile] = useState<File | null>(null);
+
   const safeDocumentTypes = documentTypes ?? [];
   const shouldShowDocumentSection =
     requiresDocuments &&
@@ -269,12 +279,22 @@ export default function UpdateStatusPopup({
     !isVisaIssued &&
     !isCommissionPaid;
 
+  const selectedDocTypeIds = documents.flatMap((doc) => doc.type);
+  const hasArrivalFormSelected =
+    shouldShowDocumentSection &&
+    selectedDocTypeIds.some((id) =>
+      safeDocumentTypes.find((d) => d.id === id)?.label.toLowerCase().includes("arrival")
+    );
+
   const { uploadOfferLetter } = useOfferLetterUpload();
 
   const handleOfferLetterUpload = async () => {
     if (!offerLetterFile || !isUniversityApproved) return;
 
-    await uploadOfferLetter(offerLetterFile, application.id);
+    await uploadOfferLetter(offerLetterFile, application.id, {
+      visaInvoiceFile: formData.show_visa_invoice ? (offerLetterVisaInvoiceFile ?? undefined) : undefined,
+      applicationFormTemplateFile: formData.show_app_form_template ? (offerLetterAppFormTemplateFile ?? undefined) : undefined,
+    });
   };
 
   const { submitVisaFee } = useVisaSetup();
@@ -298,14 +318,28 @@ export default function UpdateStatusPopup({
   const { updateStatus } = useStatusUpdate();
 
   const handleStatusUpdate = async () => {
+    let arrivalFormTemplateFileKey: string | undefined;
+    let arrivalFormTemplateFileUrl: string | undefined;
+
+    if (arrivalFormTemplateFile) {
+      const presigned = await getPresignedUploads([arrivalFormTemplateFile], "documents");
+      const results = await uploadFilesToSpaces([arrivalFormTemplateFile], presigned);
+      const uploaded = results?.[0];
+      if (!uploaded?.file_key || !uploaded?.public_url) throw new Error("Arrival form template upload failed");
+      arrivalFormTemplateFileKey = uploaded.file_key;
+      arrivalFormTemplateFileUrl = uploaded.public_url;
+    }
+
     await updateStatus({
       applicationId: application.id,
       statusId: selectedStatus,
       reason,
       notes,
       requiredDocumentTypeIds: shouldShowDocumentSection
-      ? documents.flatMap((doc) => doc.type)
-      : [],
+        ? documents.flatMap((doc) => doc.type)
+        : [],
+      arrivalFormTemplateFileKey,
+      arrivalFormTemplateFileUrl,
     });
   };
 
@@ -468,6 +502,10 @@ export default function UpdateStatusPopup({
     setNotes("");
     setDocuments([{ id: "1", type: [], reason: "" }]);
     setError("");
+    setArrivalFormTemplateFile(null);
+    setOfferLetterVisaInvoiceFile(null);
+    setOfferLetterAppFormTemplateFile(null);
+    setFormData({ visa_fee_amount: "", show_visa_invoice: false, show_app_form_template: false });
     onClose();
   };
 
@@ -629,17 +667,63 @@ export default function UpdateStatusPopup({
         )}
 
           {isUniversityApproved && (
-            <StatusFileUpload
-              label="Upload Offer Letter"
-              description="Upload the official offer letter issued by the university"
-              id="offer-letter"
-              file={offerLetterFile}
-              onFileChange={setOfferLetterFile}
-              onRemove={() => setOfferLetterFile(null)}
-              onError={setError}
-              disabled={isSubmitting}
-              required
-            />
+            <>
+              <StatusFileUpload
+                label="Upload Offer Letter"
+                description="Upload the official offer letter issued by the university"
+                id="offer-letter"
+                file={offerLetterFile}
+                onFileChange={setOfferLetterFile}
+                onRemove={() => setOfferLetterFile(null)}
+                onError={setError}
+                disabled={isSubmitting}
+                required
+              />
+              <SettingToggleInput
+                label="Attach Visa Invoice (optional)"
+                field="show_visa_invoice"
+                formData={formData}
+                updateFormData={(field, value) => {
+                  updateFormData(field, value);
+                  if (!value) setOfferLetterVisaInvoiceFile(null);
+                }}
+                errors={formErrors}
+              />
+              {formData.show_visa_invoice && (
+                <StatusFileUpload
+                  label="Upload Visa Invoice"
+                  description="Upload the visa invoice to attach with the offer letter"
+                  id="offer-letter-visa-invoice"
+                  file={offerLetterVisaInvoiceFile}
+                  onFileChange={setOfferLetterVisaInvoiceFile}
+                  onRemove={() => setOfferLetterVisaInvoiceFile(null)}
+                  onError={setError}
+                  disabled={isSubmitting}
+                />
+              )}
+              <SettingToggleInput
+                label="Attach Application Form Template (optional)"
+                field="show_app_form_template"
+                formData={formData}
+                updateFormData={(field, value) => {
+                  updateFormData(field, value);
+                  if (!value) setOfferLetterAppFormTemplateFile(null);
+                }}
+                errors={formErrors}
+              />
+              {formData.show_app_form_template && (
+                <StatusFileUpload
+                  label="Upload Application Form Template"
+                  description="Upload the application form template for the student"
+                  id="offer-letter-app-form-template"
+                  file={offerLetterAppFormTemplateFile}
+                  onFileChange={setOfferLetterAppFormTemplateFile}
+                  onRemove={() => setOfferLetterAppFormTemplateFile(null)}
+                  onError={setError}
+                  disabled={isSubmitting}
+                />
+              )}
+            </>
           )}
 
           {requiresReason && (
@@ -713,6 +797,20 @@ export default function UpdateStatusPopup({
               required
             />
           )}
+
+          {hasArrivalFormSelected && (
+            <StatusFileUpload
+              label="Upload Arrival Form Template"
+              description="Upload a template for the student to complete their arrival form"
+              id="arrival-form-template"
+              file={arrivalFormTemplateFile}
+              onFileChange={setArrivalFormTemplateFile}
+              onRemove={() => setArrivalFormTemplateFile(null)}
+              onError={setError}
+              disabled={isSubmitting}
+              required
+            />
+          )}
         </div>
 
         <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
@@ -733,7 +831,8 @@ export default function UpdateStatusPopup({
               (requiresReason && !reason.trim()) ||
               (isUniversityApproved && !offerLetterFile) ||
               (isVisaIssued && !visaDocumentFile) ||
-              (isCommissionPaid && !commissionPaymentFile)
+              (isCommissionPaid && !commissionPaymentFile) ||
+              (hasArrivalFormSelected && !arrivalFormTemplateFile)
             }
             className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
           >

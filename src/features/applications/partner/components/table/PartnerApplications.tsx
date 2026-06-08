@@ -23,7 +23,6 @@ import { MdSchool } from 'react-icons/md';
 
 import { useRouter } from 'next/navigation';
 import api from 'lib/useApi';
-import Cookies from 'js-cookie';
 
 import EmptyData from 'components/emptyData/EmptyTableData';
 import NextButton from 'components/ui/buttons/NextButton';
@@ -33,8 +32,8 @@ import Button from 'components/ui/buttons/Button';
 import FilterSelectField from 'components/form/filter/FilterSelectField';
 
 import { useUniversities } from "features/universities/hooks";
-import { useAllStages } from 'hooks/applications/stages/useStages';
-import { useAllStageStatuses } from 'hooks/applications/stages/useStageStatuses';
+import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
+import { usePartnerApplications } from "features/applications/partner/hooks/usePartnerApplications";
 
 
 const getRelativeTime = (dateStr: string) => {
@@ -84,7 +83,13 @@ const SkeletonRow = () => (
 
 const PartnerApplications = () => {
 
-  const [applications, setApplications] = useState([]);
+  const router = useRouter();
+  const [partnerId, setPartnerId] = useState<string>('');
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
   const { universities } = useUniversities();
   const { stages } = useAllStages();
   const { stageStatuses, stageStatusesLoading } = useAllStageStatuses();
@@ -93,40 +98,26 @@ const PartnerApplications = () => {
   const [selectedStages, setSelectedStages] = useState<string>('all');
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>('all');
 
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
   const itemsPerPage = 10;
 
   useEffect(() => {
-    const fetchApplications = async () => {
-      try {
-        const token = Cookies.get('token');
-        const partnerId = localStorage.getItem('partnerId');
-
-        if (!token || !partnerId) {
-          console.error('Missing token or partnerId', { token, partnerId });
-          return;
-        }
-
-        const res = await api.get(`/partners/${partnerId}/applications`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setApplications(res.data.items.map((app: any) => ({ ...app })));
-      } catch (err: any) {
-        console.error('Error fetching partner applications:', err);
-      } finally {
-        setLoading(false);
+    const resolvePartner = async () => {
+      let id = localStorage.getItem('partnerId');
+      if (!id) {
+        const meRes = await api.get('/auth/me');
+        id = meRes.data.partner_id ?? meRes.data.id;
+        if (id) localStorage.setItem('partnerId', id);
       }
+      if (id) setPartnerId(id);
     };
-
-    fetchApplications();
+    resolvePartner();
   }, []);
+
+  const { items: applications, total, loading } = usePartnerApplications({
+    partnerId,
+    limit: itemsPerPage,
+    offset: (currentPage - 1) * itemsPerPage,
+  });
 
   useEffect(() => {
     setCurrentPage(1);
@@ -222,11 +213,8 @@ const PartnerApplications = () => {
     stageStatusesLoading,
   ]);
 
-  const totalPages = Math.ceil(filteredAndSortedApplications.length / itemsPerPage);
-  const paginatedApplications = filteredAndSortedApplications.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage,
-  );
+  const totalPages = Math.ceil(total / itemsPerPage);
+  const paginatedApplications = filteredAndSortedApplications;
 
   const StatusBadge = ({ status }: { status: string }) => {
     const statusConfig: Record<string, any> = {
@@ -598,11 +586,11 @@ const PartnerApplications = () => {
                 </span>{' '}
                 to{' '}
                 <span className="font-medium text-slate-700">
-                  {Math.min(currentPage * itemsPerPage, filteredAndSortedApplications.length)}
+                  {Math.min(currentPage * itemsPerPage, total)}
                 </span>{' '}
                 of{' '}
                 <span className="font-medium text-slate-700">
-                  {filteredAndSortedApplications.length}
+                  {total}
                 </span>{' '}
                 results
               </>

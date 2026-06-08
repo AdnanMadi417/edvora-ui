@@ -9,9 +9,9 @@ import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
 
 import { useCreateProgram } from 'features/programs/hooks';
 import { useUniversities, useBranches } from "features/universities/hooks";
-import { useAllFields } from 'hooks/knowledge-hub/field-of-study/useFieldsList';
-import { useCommissionTypes } from 'hooks/knowledge-hub/commission/useCommissionTypes';
-import { useAllQualifications } from 'hooks/knowledge-hub/qualifications/useQualificationsList';
+import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
+import { useCommissionTypes } from "features/knowledge-hub/commission/hooks";
+import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 
 import ToggleInput from 'components/form/toggle/ToggleInput';
 import InputField from 'components/form/InputField';

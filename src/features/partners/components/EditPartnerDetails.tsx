@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Pencil } from "lucide-react";
 import { usePartnerDetails, useUpdatePartner, useAssignPartnerManager } from "../hooks";
-import { useAccountManagerList } from "hooks/account-managers/useAccountManagerList";
+import { useAccountManagers } from "features/account-managers/hooks";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import InputField from "components/form/InputField";
@@ -30,7 +30,7 @@ export default function EditPartnerDetails({ id }: Props) {
   const { partner, isPartnerLoading } = usePartnerDetails(id);
   const { updatePartner, isUpdatingPartner } = useUpdatePartner();
   const { assignManager, loading: assignLoading, error: assignError } = useAssignPartnerManager();
-  const { accountManagers } = useAccountManagerList();
+  const { accountManagers } = useAccountManagers();
 
   const [formData, setFormData] = useState<any>({
     name: "", country: "", email: "", type: "", phone: "",

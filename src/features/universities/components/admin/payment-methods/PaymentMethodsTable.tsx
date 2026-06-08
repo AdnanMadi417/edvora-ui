@@ -14,8 +14,7 @@ import {
 } from "lucide-react";
 import { MdOutlineCategory } from "react-icons/md";
 
-import { useDeleteUniversity } from "hooks/knowledge-hub/payment-methods/useDeletePaymentMethod";
-import { useAllPaymentMethods } from "hooks/knowledge-hub/payment-methods/usePaymentMethods";
+import { useDeleteUniversity, useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";

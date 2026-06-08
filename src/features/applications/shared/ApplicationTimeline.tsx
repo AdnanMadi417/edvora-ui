@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Check, Clock } from "lucide-react";
-import { useAllStages } from "hooks/applications/stages/useStages";
+import { useAllStages } from "features/applications/hooks";
 
 interface ApplicationTimelineProps {
   application: any;

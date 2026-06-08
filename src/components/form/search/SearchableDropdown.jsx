@@ -124,7 +124,10 @@ const CreatableSelectField = ({
               return (
                 <li
                   key={opt.value}
-                  onClick={() => !isDisabled && handleSelect(opt)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    if (!isDisabled) handleSelect(opt);
+                  }}
                   className={`mt-2 flex h-10 w-full items-center justify-start rounded-md border p-3 px-3 py-2 text-sm transition-colors
         ${isDisabled
                     ? "bg-slate-100 text-slate-400 cursor-not-allowed"

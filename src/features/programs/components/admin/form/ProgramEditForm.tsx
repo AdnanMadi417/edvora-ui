@@ -21,10 +21,10 @@ import DeleteProgramsConfirmation from "features/programs/components/admin/popup
 
 import { useProgram, useDeletePrograms, useUpdateProgram } from "features/programs/hooks";
 import type { UpdateProgramPayload } from "features/programs/types";
-import { useCommissionTypes } from "hooks/knowledge-hub/commission/useCommissionTypes";
+import { useCommissionTypes } from "features/knowledge-hub/commission/hooks";
 import { useUniversities, useBranches } from "features/universities/hooks";
-import { useAllFields } from "hooks/knowledge-hub/field-of-study/useFieldsList";
-import { useAllQualifications } from "hooks/knowledge-hub/qualifications/useQualificationsList";
+import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
+import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 
 import InputField from "components/form/InputField";
 import TextareaField from "components/form/TextareaField";
