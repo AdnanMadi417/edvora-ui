@@ -9,18 +9,12 @@ import Footer from "components/footer/Footer";
 import partnerRoutes from '../../routes/partnerRoutes';
 import RoleGuard from "components/guard/RoleGuard";
 import { ToastProvider } from "components/context/ToastContext";
-import { usePartnerHasStage4 } from "features/applications/partner/hooks/usePartnerHasStage4";
 
 const PARTNER_ROLES = ["partner"];
 
 export default function PartnerLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const { hasStage4, loading: stage4Loading } = usePartnerHasStage4();
-
-  const visibleRoutes = stage4Loading || !hasStage4
-    ? partnerRoutes.filter((r) => r.path !== "/logistical-partners")
-    : partnerRoutes;
 
   return (
     <RoleGuard allowedRoles={PARTNER_ROLES}>
@@ -29,7 +23,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
         <div className="relative flex min-h-screen w-full bg-background-100 dark:bg-background-900">
           <div className="z-[60]">
             <Sidebar
-              routes={visibleRoutes}
+              routes={partnerRoutes}
               open={open}
               setOpen={setOpen}
               variant="admin"
@@ -40,8 +34,8 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
             <main className="mx-2.5 flex-none transition-all md:pr-2 xl:ml-[300px]">
               <Navbar
                 onOpenSidenav={() => setOpen(!open)}
-                brandText={getActiveRoute(visibleRoutes, pathname)}
-                secondary={getActiveNavbar(visibleRoutes, pathname)}
+                brandText={getActiveRoute(partnerRoutes, pathname)}
+                secondary={getActiveNavbar(partnerRoutes, pathname)}
               />
               <div className="mx-auto min-h-screen p-2 !pt-[10px] md:p-2">
                 {children}
