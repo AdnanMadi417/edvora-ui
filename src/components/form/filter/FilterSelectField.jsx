@@ -22,7 +22,7 @@ export default function FilterSelectField({
           {defaultOption}
         </option>
 
-        {options.map((opt) =>
+        {(Array.isArray(options) ? options : []).map((opt) =>
           typeof opt === "object" && opt !== null ? (
             <option
               key={opt.value ?? opt.id}

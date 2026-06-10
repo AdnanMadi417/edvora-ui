@@ -11,7 +11,7 @@ export function usePrograms(params?: GetProgramsParams) {
     setLoading(true);
     try {
       const res = await programApi.programs.list(params);
-      setPrograms(res.data || []);
+      setPrograms(res.data?.items ?? res.data ?? []);
     } catch {
       setError("Failed to fetch programs");
     } finally {

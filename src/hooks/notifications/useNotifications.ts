@@ -46,7 +46,7 @@ export function useAllNotifications() {
       const res = await api.get("/me/notifications", {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      setNotifications(res.data);
+      setNotifications(res.data?.items ?? res.data ?? []);
     } catch (err) {
       setError("Failed to fetch notifications");
       console.error(err);

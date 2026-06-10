@@ -12,7 +12,7 @@ export function useUniversities() {
     setError(null);
     try {
       const res = await universityApi.universities.list();
-      setUniversities(res.data);
+      setUniversities(res.data?.items ?? res.data ?? []);
     } catch (err: any) {
       setError(err.message || "Failed to fetch universities");
     } finally {

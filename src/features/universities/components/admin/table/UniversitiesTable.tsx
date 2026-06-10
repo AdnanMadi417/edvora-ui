@@ -248,7 +248,7 @@ const UniversitiesTable = () => {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -322,16 +322,16 @@ const UniversitiesTable = () => {
         </div>
       </div>
 
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
 
         <div className="block">
 
-          <div className="overflow-x-auto rounded-lg rounded-b-none bg-card">
+          <div className="overflow-x-auto rounded-lg rounded-b-none bg-white">
             <table className="w-full">
 
               <thead>
 
-              <tr className="border-b border-slate-200 bg-card">
+              <tr className="border-b border-slate-200 bg-white">
 
                 <th
                   onClick={() => handleSort("name")}
@@ -374,7 +374,7 @@ const UniversitiesTable = () => {
               </tr>
               </thead>
 
-              <tbody className="divide-border-slate-200 divide-y bg-primary">
+              <tbody className="divide-border-slate-200 divide-y bg-white">
 
               {loading && (
                 <tr>
@@ -398,7 +398,7 @@ const UniversitiesTable = () => {
               {!error && currentUniversities.map((uni) => (
                 <tr
                   key={uni.id}
-                  className="group cursor-pointer transition-colors hover:bg-primary/10"
+                  className="group cursor-pointer transition-colors hover:bg-slate-50"
                   onClick={() => router.push(`/admin/universities/${uni.id}`)}
                 >
 

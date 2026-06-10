@@ -68,7 +68,7 @@ export function useAllPrograms(params?: GetProgramsParams) {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         params,
       });
-      setPrograms(res.data || []);
+      setPrograms(res.data?.items ?? res.data ?? []);
     } catch (err) {
       setError("Failed to fetch programs");
       console.error(err);

@@ -13,7 +13,7 @@ const authHeader = () => {
 
 export const accountManagersApi = {
   list: () =>
-    api.get<AccountManager[]>("/admin/account-managers", {
+    api.get<{ items: AccountManager[] }>("/admin/account-managers", {
       headers: authHeader(),
     }),
 
