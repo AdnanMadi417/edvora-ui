@@ -192,7 +192,7 @@ const LogisticalPartnersTable = () => {
                     currentServiceProviders.map((provider) => (
                       <tr
                         key={provider.id}
-                        className="group cursor-pointer transition-colors bg-white hover:bg-slate-50"
+                        className="group cursor-pointer transition-colors hover:bg-slate-50"
                         onClick={() => router.push(`/admin/logistical-partners/${provider.id}`)}
                       >
                         <td className="min-w-[200px] max-w-[300px] px-6 py-4">

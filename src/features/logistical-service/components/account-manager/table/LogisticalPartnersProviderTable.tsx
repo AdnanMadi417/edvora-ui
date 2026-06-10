@@ -62,7 +62,7 @@ const LogisticalPartnersProviderTable = () => {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
@@ -98,7 +98,7 @@ const LogisticalPartnersProviderTable = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-card">
+      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-white">
         <div className="block">
           {loading && <Loading text="Fetching service providers data..." />}
 
@@ -110,10 +110,10 @@ const LogisticalPartnersProviderTable = () => {
           )}
 
           {!error && filteredProviders.length > 0 && (
-            <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-card">
+            <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-white">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-slate-200 bg-card">
+                  <tr className="border-b border-slate-200 bg-white">
                     <th className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-slate-500" />
@@ -159,7 +159,7 @@ const LogisticalPartnersProviderTable = () => {
                   </tr>
                 </thead>
 
-                <tbody className="divide-border-slate-200 divide-y bg-primary">
+                <tbody className="divide-border-slate-200 divide-y bg-white">
                   {loading ? (
                     <tr>
                       <td colSpan={8} className="px-6 py-4 text-center text-p1 text-slate-500">
@@ -176,7 +176,7 @@ const LogisticalPartnersProviderTable = () => {
                     currentServiceProviders.map((provider) => (
                       <tr
                         key={provider.id}
-                        className="group cursor-pointer transition-colors hover:bg-primary/10"
+                        className="group cursor-pointer transition-colors hover:bg-slate-50"
                         onClick={() => { setSelectedProvider(provider); setViewModal(true); }}
                       >
                         <td className="min-w-[200px] max-w-[300px] px-6 py-4">

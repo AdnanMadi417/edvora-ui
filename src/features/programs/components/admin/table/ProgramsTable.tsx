@@ -234,7 +234,7 @@ const ProgramsTable = () => {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 rounded-lg border border-gray-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -408,15 +408,15 @@ const ProgramsTable = () => {
         </div>
       </div>
 
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
 
         <div className="block">
 
-          <div className="overflow-x-auto rounded-lg rounded-b-none bg-card">
+          <div className="overflow-x-auto rounded-lg rounded-b-none bg-white">
             <table className="w-full">
 
               <thead>
-              <tr className="border-b border-slate-200 bg-card">
+              <tr className="border-b border-slate-200 bg-white">
                 <td className="pl-6">
                   <input
                     type="checkbox"
@@ -473,7 +473,7 @@ const ProgramsTable = () => {
               </tr>
               </thead>
 
-              <tbody className="divide-y divide-slate-200 bg-primary">
+              <tbody className="divide-y divide-slate-200 bg-white">
 
               {loading && (
                 <tr>

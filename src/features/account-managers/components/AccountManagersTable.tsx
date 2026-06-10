@@ -181,7 +181,7 @@ const AccountManagersTable = () => {
             </tr>
           </thead>
 
-          <tbody className="divide-border-slate-200 divide-y bg-primary">
+          <tbody className="divide-border-slate-200 divide-y bg-white">
             {loading ? (
               <tr>
                 <td colSpan={6} className="px-6 py-4 text-center text-p1 text-slate-500">
