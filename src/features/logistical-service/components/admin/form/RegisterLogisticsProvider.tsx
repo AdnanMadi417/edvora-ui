@@ -247,7 +247,7 @@ export default function RegisterLogisticsProvider() {
       setLogoFileKey("");
       setLogoFileUrl("");
       setErrors({});
-      setTimeout(() => { router.push("/admin/logistical-service"); }, 1500);
+      setTimeout(() => { router.push("/admin/logistical-partners"); }, 1500);
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
       showToast(`Failed to create logistics provider. ${backendMessage}`, "error");
