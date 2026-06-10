@@ -1,11 +1,11 @@
 "use client";
 
-import LogisticServicesConfig from "features/logistical-service/components/admin/config/LogisticServicesConfig";
+import LogisticalPartnersServicesConfig from "features/logistical-service/components/admin/config/LogisticServicesConfig";
 
 const LogisticServicesPage = () => {
   return (
     <div>
-      <LogisticServicesConfig />
+      <LogisticalPartnersServicesConfig />
     </div>
   );
 };

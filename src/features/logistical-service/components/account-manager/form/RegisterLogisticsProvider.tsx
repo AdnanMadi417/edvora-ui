@@ -38,7 +38,7 @@ interface FormData {
 
 type FormErrors = Partial<Record<keyof FormData, string>>;
 
-export default function RegisterLogisticsProvider() {
+export default function RegisterLogisticalPartner() {
   const { showToast } = useToast();
   const router = useRouter();
   const [errors, setErrors] = useState<FormErrors>({});

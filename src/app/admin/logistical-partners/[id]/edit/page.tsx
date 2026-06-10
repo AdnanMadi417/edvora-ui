@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EditMarketplaceDetails from "features/logistical-service/components/admin/details/EditMarketplaceDetails";
+import EditLogisticalPartnersDetails from "features/logistical-service/components/admin/details/EditLogisticalPartnersDetails";
 
 export default function UniversityDetailsPage() {
   const params = useParams();
@@ -9,7 +9,7 @@ export default function UniversityDetailsPage() {
 
   return (
     <div>
-      <EditMarketplaceDetails id={id} />
+      <EditLogisticalPartnersDetails id={id} />
     </div>
   );
 }

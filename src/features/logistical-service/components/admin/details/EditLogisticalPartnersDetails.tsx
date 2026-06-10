@@ -47,7 +47,7 @@ interface FormData {
 
 type FormErrors = Record<string, string>;
 
-const EditMarketplaceDetails = ({ id }: Props) => {
+const EditLogisticalPartnersDetails = ({ id }: Props) => {
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -491,4 +491,4 @@ const EditMarketplaceDetails = ({ id }: Props) => {
   );
 };
 
-export default EditMarketplaceDetails;
+export default EditLogisticalPartnersDetails;

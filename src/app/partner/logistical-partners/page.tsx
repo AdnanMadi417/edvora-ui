@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import LogisticalPartnersMarketplace from "features/logistical-service/components/partner/LogisticalServiceMarketplace";
+import LogisticalPartnersList from "features/logistical-service/components/partner/LogisticalPartnersMarketplace";
 import { usePartnerHasStage4 } from "features/applications/partner/hooks/usePartnerHasStage4";
 
 const Dashboard = () => {
@@ -19,7 +19,7 @@ const Dashboard = () => {
 
   return (
     <div>
-      <LogisticalPartnersMarketplace />
+      <LogisticalPartnersList />
     </div>
   );
 };
