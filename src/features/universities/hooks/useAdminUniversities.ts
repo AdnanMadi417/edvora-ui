@@ -12,8 +12,9 @@ export function useAdminUniversities() {
     setError("");
     try {
       const res = await universityApi.adminUniversities.list();
-      setData(res.data || []);
-      return res.data;
+      const items = res.data?.items ?? res.data ?? [];
+      setData(items);
+      return items;
     } catch (err: any) {
       setError(err?.response?.data?.detail?.[0]?.msg || "Failed to fetch universities");
       throw err;

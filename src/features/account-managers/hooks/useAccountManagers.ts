@@ -13,7 +13,7 @@ export function useAccountManagers() {
 
     accountManagersApi
       .list()
-      .then((res) => setAccountManagers(res.data))
+      .then((res) => setAccountManagers(res.data.items ?? []))
       .catch(() => setError("Failed to fetch account managers"))
       .finally(() => setLoading(false));
   }, []);
