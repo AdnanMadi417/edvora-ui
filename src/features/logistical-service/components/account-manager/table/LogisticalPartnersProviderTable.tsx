@@ -29,7 +29,7 @@ import { useLogisticProviders } from "features/logistical-service/hooks";
 import ViewDetailsModal from "../popup/ViewDetailsModal";
 import EditDetailsModal from "../popup/EditDetailsModal";
 
-const LogisticalServiceProviderTable = () => {
+const LogisticalPartnersProviderTable = () => {
   const { serviceProviders, loading, error } = useLogisticProviders();
 
   const [selectedProviders, setSelectedProviders] = useState<Record<string, boolean>>({});
@@ -67,7 +67,7 @@ const LogisticalServiceProviderTable = () => {
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-slate-900">
-                Logistical Service Providers
+                Logistical Partners
               </h3>
               <p className="mt-1 text-sm text-slate-500">
                 Manage, review, and maintain all registered logistics partners and services
@@ -89,7 +89,7 @@ const LogisticalServiceProviderTable = () => {
 
             <Link
               className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href="/account-manager/logistical-service/create"
+              href="/account-manager/logistical-partners/create"
             >
               <MdAddBusiness className="h-4 w-4" />
               Create Service
@@ -338,4 +338,4 @@ const LogisticalServiceProviderTable = () => {
   );
 };
 
-export default LogisticalServiceProviderTable;
+export default LogisticalPartnersProviderTable;

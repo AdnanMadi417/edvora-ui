@@ -8,17 +8,17 @@ import InputField from "components/form/InputField";
 import { useCreateLogisticService } from "features/logistical-service/hooks";
 import { useToast } from "components/context/ToastContext";
 
-interface CreateLogisticServicePopupProps {
+interface CreateLogisticalPartnersPopupProps {
   isOpen: boolean;
   onClose: () => void;
   onCreated: () => void;
 }
 
-export default function CreateLogisticServicePopup({
+export default function CreateLogisticalPartnersPopup({
   isOpen,
   onClose,
   onCreated,
-}: CreateLogisticServicePopupProps) {
+}: CreateLogisticalPartnersPopupProps) {
   const { showToast } = useToast();
   const { createLogisticService, loadingCreateLogisticService } = useCreateLogisticService();
 

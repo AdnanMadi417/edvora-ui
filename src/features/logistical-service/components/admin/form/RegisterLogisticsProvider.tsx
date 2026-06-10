@@ -22,7 +22,7 @@ import ImageUploadField from "components/form/images/ImageUploadField";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
-import CreateLogisticServicePopup from "../CreateLogisticServicePopup";
+import CreateLogisticalPartnersPopup from "../CreateLogisticalPartnersPopup";
 import type { PackageOffered, ServiceEntry } from "features/logistical-service/types";
 
 interface FormData {
@@ -41,7 +41,7 @@ interface FormData {
 
 type FormErrors = Record<string, string>;
 
-export default function RegisterLogisticsProvider() {
+export default function RegisterLogisticalPartner() {
   const { showToast } = useToast();
   const router = useRouter();
   const [errors, setErrors] = useState<FormErrors>({});
@@ -247,7 +247,7 @@ export default function RegisterLogisticsProvider() {
       setLogoFileKey("");
       setLogoFileUrl("");
       setErrors({});
-      setTimeout(() => { router.push("/admin/logistical-service"); }, 1500);
+      setTimeout(() => { router.push("/admin/logistical-partners"); }, 1500);
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
       showToast(`Failed to create logistics provider. ${backendMessage}`, "error");
@@ -552,7 +552,7 @@ export default function RegisterLogisticsProvider() {
         </div>
       </div>
 
-      <CreateLogisticServicePopup
+      <CreateLogisticalPartnersPopup
         isOpen={isCreateServiceOpen}
         onClose={() => setIsCreateServiceOpen(false)}
         onCreated={refetchLogisticServices}

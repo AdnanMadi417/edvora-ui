@@ -201,7 +201,7 @@ export default function EditDetailsModal({
       >
         <div className="relative overflow-hidden rounded-2xl bg-white text-sm shadow-2xl ring-1 ring-black/5">
           <ModalHeader
-            title="Edit Logistical Service Provider"
+            title="Edit Logistical Partner"
             description="Modify provider information and service coverage"
             icon={Edit2}
             iconBg="bg-amber-50"
