@@ -92,7 +92,7 @@ export default function PartnersTable() {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -146,11 +146,11 @@ export default function PartnersTable() {
         </div>
       </div>
 
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
-        <div className="overflow-x-auto rounded-lg rounded-b-none bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
+        <div className="overflow-x-auto rounded-lg rounded-b-none bg-white">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-200 bg-card">
+              <tr className="border-b border-slate-200 bg-white">
                 {[
                   { icon: User, label: "Partner Name", minW: "min-w-[250px]" },
                   { icon: PhoneCall, label: "Contact Info", minW: "min-w-[220px]" },
@@ -168,7 +168,7 @@ export default function PartnersTable() {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-200 bg-primary">
+            <tbody className="divide-y divide-slate-200 bg-white">
               {partnersLoading && (
                 <tr><td colSpan={5} className="px-6 py-8 text-center"><Loading text="Fetching Partners data..." /></td></tr>
               )}
@@ -180,7 +180,7 @@ export default function PartnersTable() {
               {!partnersError && currentPartners.map((partner) => (
                 <tr
                   key={partner.id}
-                  className="group cursor-pointer transition-colors hover:bg-primary/10"
+                  className="group cursor-pointer transition-colors hover:bg-slate-50"
                   onClick={() => router.push(`/admin/partners/${partner.id}`)}
                 >
                   <td className="min-w-[220px] px-6 py-4">

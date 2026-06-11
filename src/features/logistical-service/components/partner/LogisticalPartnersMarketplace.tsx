@@ -21,7 +21,7 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 
-const LogisticalServiceMarketplace = () => {
+const LogisticalPartnersList = () => {
   const { serviceProviders, loading, error } = useLogisticProviders();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +44,7 @@ const LogisticalServiceMarketplace = () => {
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-slate-900">
-                Partner Marketplace
+                Logistical Partners
               </h3>
               <p className="mt-1 text-sm text-slate-500">
                 Browse and connect with verified logistics partners and service providers
@@ -80,7 +80,7 @@ const LogisticalServiceMarketplace = () => {
             <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
               {currentServiceProviders.map((m) => (
                 <a
-                  href={`/partner/marketplace/${m.id}`}
+                  href={`/partner/logistical-partners/${m.id}`}
                   key={m.id}
                   className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
                 >
@@ -233,4 +233,4 @@ const LogisticalServiceMarketplace = () => {
   );
 };
 
-export default LogisticalServiceMarketplace;
+export default LogisticalPartnersList;

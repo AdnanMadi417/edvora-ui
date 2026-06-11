@@ -19,13 +19,13 @@ import { useLogisticProviderDetails } from "features/logistical-service/hooks";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyData";
 
-interface LogisticalServiceMarketplaceDetailsProps {
+interface LogisticalPartnersProviderDetailsProps {
   id: string;
 }
 
-const LogisticalServiceMarketplaceDetails = ({ id }: LogisticalServiceMarketplaceDetailsProps) => {
+const LogisticalPartnersProviderDetails = ({ id }: LogisticalPartnersProviderDetailsProps) => {
   const router = useRouter();
-  const handleBack = () => { router.push("/partner/marketplace"); };
+  const handleBack = () => { router.push("/partner/logistical-partners"); };
 
   const { service, loadingService, errorService } = useLogisticProviderDetails(id);
 
@@ -257,4 +257,4 @@ const LogisticalServiceMarketplaceDetails = ({ id }: LogisticalServiceMarketplac
   );
 };
 
-export default LogisticalServiceMarketplaceDetails;
+export default LogisticalPartnersProviderDetails;

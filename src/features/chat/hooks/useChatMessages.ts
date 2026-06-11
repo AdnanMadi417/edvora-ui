@@ -23,11 +23,11 @@ export function useChatMessages({
     setError(null);
 
     try {
-      const response = await api.get<ChatMessage[]>(
+      const response = await api.get<{ items: ChatMessage[] }>(
         `/applications/${applicationId}/messages`,
         { params: { limit } }
       );
-      setMessages(response.data);
+      setMessages(response.data.items ?? []);
     } catch (err: any) {
       setError(err.message || "Failed to load chat messages");
     } finally {
@@ -39,15 +39,16 @@ export function useChatMessages({
     if (!lastSeenCreatedAt) return;
 
     try {
-      const response = await api.get<ChatMessage[]>(
+      const response = await api.get<{ items: ChatMessage[] }>(
         `/applications/${applicationId}/messages`,
         { params: { since: lastSeenCreatedAt, limit } }
       );
 
-      if (response.data.length > 0) {
+      const newData: ChatMessage[] = response.data.items ?? [];
+      if (newData.length > 0) {
         setMessages((prev) => {
           const existingIds = new Set(prev.map((m) => m.id));
-          const newOnly = response.data.filter((m) => !existingIds.has(m.id));
+          const newOnly = newData.filter((m) => !existingIds.has(m.id));
           return newOnly.length > 0 ? [...prev, ...newOnly] : prev;
         });
       }

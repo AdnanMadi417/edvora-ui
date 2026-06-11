@@ -13,7 +13,7 @@ export function useAllPartners() {
       setError('');
       try {
         const res = await partnersApi.list();
-        setPartners(res.data || []);
+        setPartners(res.data?.items ?? res.data ?? []);
       } catch {
         setError('Failed to fetch partners');
       } finally {

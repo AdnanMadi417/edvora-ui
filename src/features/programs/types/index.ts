@@ -107,9 +107,13 @@ export interface Program {
 }
 
 export interface GetProgramsParams {
-  level?: "undergraduate" | "graduate";
   field_of_study_id?: string;
+  qualification_id?: string;
+  state_id?: string;
+  university_id?: string;
   search?: string;
+  page?: number;
+  page_size?: number;
 }
 
 // ── State ─────────────────────────────────────────────────────────────────────

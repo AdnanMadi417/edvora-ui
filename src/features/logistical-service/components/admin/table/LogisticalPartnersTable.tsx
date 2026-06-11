@@ -32,7 +32,7 @@ import Link from "next/link";
 import { useLogisticProviders, useDeleteLogisticProvider } from "features/logistical-service/hooks";
 import DeleteServiceConfirmation from "../DeleteServiceConfirmation";
 
-const LogisticalServiceTable = () => {
+const LogisticalPartnersTable = () => {
   const router = useRouter();
   const { serviceProviders, loading, error } = useLogisticProviders();
   const { showToast } = useToast();
@@ -85,7 +85,7 @@ const LogisticalServiceTable = () => {
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-slate-900">
-                Logistical Service Providers
+                Logistical Partners
               </h3>
               <p className="mt-1 text-sm text-slate-500">
                 Manage, review, and maintain all registered logistics partners and services
@@ -107,7 +107,7 @@ const LogisticalServiceTable = () => {
 
             <Link
               className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href="/admin/logistical-service/create"
+              href="/admin/logistical-partners/create"
             >
               <MdAddBusiness className="h-4 w-4" />
               Create Service
@@ -192,8 +192,8 @@ const LogisticalServiceTable = () => {
                     currentServiceProviders.map((provider) => (
                       <tr
                         key={provider.id}
-                        className="group cursor-pointer transition-colors bg-white hover:bg-slate-50"
-                        onClick={() => router.push(`/admin/logistical-service/${provider.id}`)}
+                        className="group cursor-pointer transition-colors hover:bg-slate-50"
+                        onClick={() => router.push(`/admin/logistical-partners/${provider.id}`)}
                       >
                         <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -295,7 +295,7 @@ const LogisticalServiceTable = () => {
                             <a
                               role="menuitem"
                               aria-label="Edit Provider"
-                              href={`/admin/logistical-service/${provider.id}/edit`}
+                              href={`/admin/logistical-partners/${provider.id}/edit`}
                               onClick={(e) => e.stopPropagation()}
                               className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                             >
@@ -379,4 +379,4 @@ const LogisticalServiceTable = () => {
   );
 };
 
-export default LogisticalServiceTable;
+export default LogisticalPartnersTable;

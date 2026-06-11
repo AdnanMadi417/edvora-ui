@@ -38,7 +38,7 @@ interface FormData {
 
 type FormErrors = Partial<Record<keyof FormData, string>>;
 
-export default function RegisterLogisticsProvider() {
+export default function RegisterLogisticalPartner() {
   const { showToast } = useToast();
   const router = useRouter();
   const [errors, setErrors] = useState<FormErrors>({});
@@ -132,7 +132,7 @@ export default function RegisterLogisticsProvider() {
         selectedLocations: [],
       });
       setErrors({});
-      setTimeout(() => router.push("/account-manager/logistical-service"), 1500);
+      setTimeout(() => router.push("/account-manager/logistical-partners"), 1500);
     } catch (error) {
       showToast("Failed to create logistics provider", "error");
     }

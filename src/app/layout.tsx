@@ -10,7 +10,7 @@ const jakarta = Plus_Jakarta_Sans({
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={jakarta.variable}>
+    <html lang="en" className={jakarta.variable} suppressHydrationWarning>
     <body id="root" className="font-sans">
     <AppWrappers>{children}</AppWrappers>
     </body>
