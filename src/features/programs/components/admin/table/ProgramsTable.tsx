@@ -51,16 +51,12 @@ import BatchFeesPrograms from "features/programs/components/admin/popups/BatchFe
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
 
 
+const ITEMS_PER_PAGE = 10;
+
 const ProgramsTable = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-
-  const {
-    programs,
-    loading,
-    error,
-    refetch,
-  } = usePrograms({});
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { states } = useStates();
   const { fields } = useAllFields();
@@ -90,47 +86,34 @@ const ProgramsTable = () => {
 
   const { showToast } = useToast();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const fieldOptions = useMemo(() => fields.map((f) => ({ label: f.name, value: f.id })), [fields]);
+  const universityOptions = useMemo(() => universities.map((u) => ({ label: u.name, value: u.id })), [universities]);
+  const stateOptions = useMemo(() => states.map((s) => ({ label: s.name, value: s.id })), [states]);
+  const qualificationOptions = useMemo(() => qualifications.map((q) => ({ label: q.name, value: q.id })), [qualifications]);
+
+  const {
+    programs,
+    total,
+    loading,
+    isFetching,
+    error,
+    refetch,
+  } = usePrograms({
+    search: searchTerm || undefined,
+    field_of_study_id: selectedField !== "all" ? selectedField : undefined,
+    qualification_id: selectedLevel !== "all" ? selectedLevel : undefined,
+    state_id: selectedState !== "all" ? selectedState : undefined,
+    university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
+    page: currentPage,
+    page_size: ITEMS_PER_PAGE,
+  });
+
   const filteredPrograms = useMemo(() => {
-    if (!Array.isArray(programs) || programs.length === 0) return [];
+    if (!Array.isArray(programs)) return [];
+    return programs;
+  }, [programs]);
 
-    const normalizedSearch = searchTerm.trim().toLowerCase();
-    const hasSearch = normalizedSearch.length > 0;
-    const hasStateFilter = selectedState !== "all";
-    const hasFieldFilter = selectedField !== "all";
-    const hasUniversityFilter = selectedUniversity !== "all";
-    const hasLevelFilter = selectedLevel !== "all";
-
-    return programs.filter((program) => {
-      const matchesSearch = !hasSearch || [
-        program.name,
-        program.university?.name,
-        program.qualification_level,
-        program.field_of_study?.name,
-      ]
-        .filter(Boolean)
-        .some((value) => value!.toLowerCase().includes(normalizedSearch));
-
-      const matchesState = !hasStateFilter || program.branch?.state === selectedState;
-      const matchesField = !hasFieldFilter || program.field_of_study?.name === selectedField;
-      const matchesUniversity = !hasUniversityFilter || program.university?.name === selectedUniversity;
-      const matchesLevel = !hasLevelFilter || program.qualification_level === selectedLevel;
-
-      return matchesSearch && matchesState && matchesField && matchesUniversity && matchesLevel;
-    });
-  }, [programs, searchTerm, selectedState, selectedField, selectedUniversity, selectedLevel]);
-
-  const currentPrograms = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    return filteredPrograms.slice(start, end);
-  }, [filteredPrograms, currentPage]);
-
-  const totalItems = filteredPrograms.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
   const activeFiltersCount = [
     selectedState !== "all",
@@ -280,7 +263,7 @@ const ProgramsTable = () => {
                 <FilterSelectField
                   value={selectedState}
                   onChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
-                  options={states}
+                  options={stateOptions}
                   icon={Globe}
                   defaultOption="All Locations"
                 />
@@ -290,7 +273,7 @@ const ProgramsTable = () => {
                 <FilterSelectField
                   value={selectedField}
                   onChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
-                  options={fields}
+                  options={fieldOptions}
                   icon={MdSchool}
                   defaultOption="All Fields"
                 />
@@ -300,7 +283,7 @@ const ProgramsTable = () => {
                 <FilterSelectField
                   value={selectedUniversity}
                   onChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
-                  options={universities}
+                  options={universityOptions}
                   icon={MdSchool}
                   defaultOption="All Universities"
                 />
@@ -310,7 +293,7 @@ const ProgramsTable = () => {
                 <FilterSelectField
                   value={selectedLevel}
                   onChange={(val) => { setSelectedLevel(val); setCurrentPage(1); }}
-                  options={qualifications}
+                  options={qualificationOptions}
                   icon={MdVerified}
                   defaultOption="All Qualifications"
                 />
@@ -410,6 +393,16 @@ const ProgramsTable = () => {
 
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
 
+        {isFetching && !loading && (
+          <div className="absolute right-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 shadow-sm">
+            <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            Updating...
+          </div>
+        )}
+
         <div className="block">
 
           <div className="overflow-x-auto rounded-lg rounded-b-none bg-white">
@@ -473,7 +466,7 @@ const ProgramsTable = () => {
               </tr>
               </thead>
 
-              <tbody className="divide-y divide-slate-200 bg-white">
+              <tbody className={`divide-y divide-slate-200 bg-white transition-opacity duration-150 ${isFetching && !loading ? "opacity-50 pointer-events-none" : ""}`}>
 
               {loading && (
                 <tr>
@@ -483,7 +476,7 @@ const ProgramsTable = () => {
                 </tr>
               )}
 
-              {!error && !loading && currentPrograms.length === 0 && (
+              {!error && !loading && filteredPrograms.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center">
                     <NoMessagesFound
@@ -494,7 +487,7 @@ const ProgramsTable = () => {
                 </tr>
               )}
 
-              {!error && currentPrograms.map((Program) => (
+              {!error && filteredPrograms.map((Program) => (
                 <tr
                   key={Program.id}
                   className={`group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 ${selectedPrograms[Program.id] ? "bg-blue-50/60 dark:bg-blue-900/20" : ""}`}
@@ -678,14 +671,14 @@ const ProgramsTable = () => {
           </div>
 
           <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex md:justify-between">
-            {totalItems > 0 && (
+            {total > 0 && (
               <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                 Showing
-                <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span>
+                <span className="font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span>
                 to
-                <span className="font-medium">{Math.min(currentPage * itemsPerPage, totalItems)}</span>
+                <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, total)}</span>
                 of
-                <span className="font-medium">{totalItems}</span>
+                <span className="font-medium">{total}</span>
                 programs
               </div>
             )}
