@@ -103,15 +103,15 @@ const ProgramsTable = () => {
     field_of_study_id: selectedField !== "all" ? selectedField : undefined,
     qualification_id: selectedLevel !== "all" ? selectedLevel : undefined,
     state_id: selectedState !== "all" ? selectedState : undefined,
+    university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
 
   const filteredPrograms = useMemo(() => {
-    if (!Array.isArray(programs) || programs.length === 0) return [];
-    if (selectedUniversity === "all") return programs;
-    return programs.filter((p) => p.university?.id === selectedUniversity);
-  }, [programs, selectedUniversity]);
+    if (!Array.isArray(programs)) return [];
+    return programs;
+  }, [programs]);
 
   const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
 
