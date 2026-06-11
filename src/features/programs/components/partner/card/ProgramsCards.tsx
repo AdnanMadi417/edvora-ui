@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Search,
   RefreshCw,
@@ -21,6 +21,7 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import { usePrograms, useStates } from "features/programs/hooks";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
+import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useUniversities } from "features/universities/hooks";
 
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -28,17 +29,11 @@ import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "next/link";
 
+const ITEMS_PER_PAGE = 9;
+
 const ProgramsCards = () => {
   const [searchTerm, setSearchTerm] = useState("");
-
-  const {
-    programs,
-    loading: programsLoading,
-    error: programsError,
-  } = usePrograms({});
-  const { states, stateLoading, stateError } = useStates();
-  const { fields, fieldsLoading, fieldsError } = useAllFields();
-  const { universities } = useUniversities();
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
@@ -46,41 +41,36 @@ const ProgramsCards = () => {
   const [selectedLevel, setSelectedLevel] = useState<string>("all");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  const levels = Array.from(
-    new Set(programs.map((p) => p.qualification_level).filter(Boolean))
-  ).map((level) => ({ value: level, label: level }));
+  const { states } = useStates();
+  const { fields } = useAllFields();
+  const { qualifications } = useAllQualifications();
+  const { universities } = useUniversities();
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const filteredPrograms = programs.filter((program) => {
-    const term = searchTerm.toLowerCase();
+  const fieldOptions = useMemo(() => fields.map((f) => ({ label: f.name, value: f.id })), [fields]);
+  const universityOptions = useMemo(() => universities.map((u) => ({ label: u.name, value: u.id })), [universities]);
+  const stateOptions = useMemo(() => states.map((s) => ({ label: s.name, value: s.id })), [states]);
+  const qualificationOptions = useMemo(() => qualifications.map((q) => ({ label: q.name, value: q.id })), [qualifications]);
 
-    const matchesSearch =
-      program.university?.name?.toLowerCase().includes(term) ||
-      program.name?.toLowerCase().includes(term) ||
-      program.qualification_level?.toLowerCase().includes(term);
-
-    const matchesLocation =
-      selectedState === "all" || (program.branch?.state?.toLowerCase() === selectedState.toLowerCase());
-
-    const matchesField =
-      selectedField === "all" || (program.field_of_study?.name?.toLowerCase() === selectedField.toLowerCase());
-
-    const matchesUniversity =
-      selectedUniversity === "all" || (program.university?.name?.toLowerCase() === selectedUniversity.toLowerCase());
-
-    const matchesLevel =
-      selectedLevel === "all" || (program.qualification_level?.toLowerCase() === selectedLevel.toLowerCase());
-
-    return matchesSearch && matchesLocation && matchesField && matchesUniversity && matchesLevel;
+  const {
+    programs,
+    total,
+    loading: programsLoading,
+    isFetching: programsFetching,
+    error: programsError,
+  } = usePrograms({
+    search: searchTerm || undefined,
+    field_of_study_id: selectedField !== "all" ? selectedField : undefined,
+    qualification_id: selectedLevel !== "all" ? selectedLevel : undefined,
+    state_id: selectedState !== "all" ? selectedState : undefined,
+    page: currentPage,
+    page_size: ITEMS_PER_PAGE,
   });
 
-  const currentPrograms = filteredPrograms.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const filteredPrograms = useMemo(() => {
+    if (!Array.isArray(programs) || programs.length === 0) return [];
+    if (selectedUniversity === "all") return programs;
+    return programs.filter((p) => p.university?.id === selectedUniversity);
+  }, [programs, selectedUniversity]);
 
   const activeFiltersCount = [
     selectedState !== "all",
@@ -98,6 +88,17 @@ const ProgramsCards = () => {
   return (
     <div className="mt-6 overflow-hidden text-p2 max-w-5xl mx-auto">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+
+        {programsFetching && !programsLoading && (
+          <div className="absolute right-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600 shadow-sm">
+            <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            Updating...
+          </div>
+        )}
+
         <div className="relative border-b border-gray-200 p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -144,7 +145,7 @@ const ProgramsCards = () => {
                 <FilterSelectField
                   value={selectedState}
                   onChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
-                  options={states}
+                  options={stateOptions}
                   icon={MapPin}
                   defaultOption="All Locations"
                 />
@@ -154,7 +155,7 @@ const ProgramsCards = () => {
                 <FilterSelectField
                   value={selectedField}
                   onChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
-                  options={fields}
+                  options={fieldOptions}
                   icon={GraduationCap}
                   defaultOption="All Fields"
                 />
@@ -164,7 +165,7 @@ const ProgramsCards = () => {
                 <FilterSelectField
                   value={selectedUniversity}
                   onChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
-                  options={universities}
+                  options={universityOptions}
                   icon={MdSchool}
                   defaultOption="All Universities"
                 />
@@ -174,7 +175,7 @@ const ProgramsCards = () => {
                 <FilterSelectField
                   value={selectedLevel}
                   onChange={(val) => { setSelectedLevel(val); setCurrentPage(1); }}
-                  options={levels}
+                  options={qualificationOptions}
                   icon={BookOpen}
                   defaultOption="All Levels"
                 />
@@ -206,7 +207,7 @@ const ProgramsCards = () => {
 
           {!programsError &&
             !programsLoading &&
-            currentPrograms.length === 0 && (
+            filteredPrograms.length === 0 && (
               <NoMessagesFound
                 title="No programs found"
                 subtitle="Try adjusting your search or filters."
@@ -215,8 +216,8 @@ const ProgramsCards = () => {
 
           {!programsError && programs.length > 0 && (
             <div className="block">
-              <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
-                {currentPrograms.map((program) => (
+              <div className={`grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3 transition-opacity duration-150 ${programsFetching && !programsLoading ? "opacity-50 pointer-events-none" : ""}`}>
+                {filteredPrograms.map((program) => (
                   <a
                     href={`/partner/knowledge-hub/${program.id}`}
                     key={program.id}
@@ -337,18 +338,18 @@ const ProgramsCards = () => {
               </div>
 
               <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex md:justify-between">
-                {filteredPrograms.length > 0 && (
+                {total > 0 && (
                   <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                     Showing
                     <span className="font-medium">
-                      {(currentPage - 1) * itemsPerPage + 1}
+                      {(currentPage - 1) * ITEMS_PER_PAGE + 1}
                     </span>
                     to
                     <span className="font-medium">
-                      {Math.min(currentPage * itemsPerPage, filteredPrograms.length)}
+                      {Math.min(currentPage * ITEMS_PER_PAGE, total)}
                     </span>
                     of
-                    <span className="font-medium">{filteredPrograms.length}</span>
+                    <span className="font-medium">{total}</span>
                     programs
                   </div>
                 )}
@@ -365,7 +366,7 @@ const ProgramsCards = () => {
 
                   <span className="px-3 py-1 font-medium text-slate-500">
                     Page {currentPage} of{" "}
-                    {Math.ceil(filteredPrograms.length / itemsPerPage)}
+                    {Math.ceil(total / ITEMS_PER_PAGE)}
                   </span>
 
                   <NextButton
@@ -373,12 +374,12 @@ const ProgramsCards = () => {
                       setCurrentPage((prev) =>
                         Math.min(
                           prev + 1,
-                          Math.ceil(filteredPrograms.length / itemsPerPage)
+                          Math.ceil(total / ITEMS_PER_PAGE)
                         )
                       )
                     }
                     disabled={
-                      currentPage === Math.ceil(filteredPrograms.length / itemsPerPage)
+                      currentPage === Math.ceil(total / ITEMS_PER_PAGE)
                     }
                     text="Next"
                     icon={<ArrowRight className="h-4 w-4" />}
