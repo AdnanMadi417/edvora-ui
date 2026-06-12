@@ -30,7 +30,6 @@ import Link from "components/ui/links/LinkBtn";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import DeleteUniversityConfirmation from "../popups/DeleteUniversityConfirmation";
-import BatchAssignPaymentMethod from "../payment-methods/BatchAssignPaymentMethod";
 import AssignPaymentUniversity from "../popups/AssignPaymentMethods";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
@@ -46,7 +45,6 @@ const UniversitiesTable = () => {
   const { deleteUniversity, isDeleting } = useDeleteUniversity();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  const [isBatchAssignOpen, setIsBatchAssignOpen] = useState(false);
   const [isAssignPaymentOpen, setIsAssignPaymentOpen] = useState(false);
   const [assignPaymentUniversityId, setAssignPaymentUniversityId] = useState<string>("");
 
@@ -56,33 +54,19 @@ const UniversitiesTable = () => {
   const [selectedUniversityName, setSelectedUniversityName] =
     useState<string>("");
 
-  const [selectedState, setSelectedState] = useState<string>("all");
-  const [selectedField, setSelectedField] = useState<string>("all");
-
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const filteredUniversities = React.useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-
-    return universities.filter((university) => {
-      const matchSearch =
-        !term ||
+    if (!term) return universities;
+    return universities.filter(
+      (university) =>
         university.name?.toLowerCase().includes(term) ||
-        university.country?.toLowerCase().includes(term);
-
-      const matchState =
-        selectedState === "all" ||
-        university.country === selectedState;
-
-      const matchField =
-        selectedField === "all" ||
-        (university as any).field_id === selectedField;
-
-      return matchSearch && matchState && matchField;
-    });
-  }, [universities, searchTerm, selectedState, selectedField]);
+        university.country?.toLowerCase().includes(term)
+    );
+  }, [universities, searchTerm]);
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -173,7 +157,7 @@ const UniversitiesTable = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedState, selectedField]);
+  }, [searchTerm]);
 
   useEffect(() => {
     const totalPages = Math.ceil(filteredUniversities.length / itemsPerPage);
@@ -181,50 +165,6 @@ const UniversitiesTable = () => {
       setCurrentPage(totalPages);
     }
   }, [filteredUniversities, currentPage]);
-
-  const [selectedUniversities, setSelectedUniversities] = useState<
-    Record<string, boolean>
-  >({});
-
-  const handleSelectUniversity = (id: string) => {
-    setSelectedUniversities((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
-  };
-
-  const selectedUniversityIds = useMemo(() => {
-    return Object.keys(selectedUniversities).filter(
-      (id) => selectedUniversities[id]
-    );
-  }, [selectedUniversities]);
-
-  const selectedCount = Object.values(selectedUniversities).filter(Boolean).length;
-
-  useEffect(() => {
-    setSelectedUniversities((prev) => {
-      const updated: Record<string, boolean> = { ...prev };
-      filteredUniversities.forEach((p) => {
-        if (!(p.id in updated)) {
-          updated[p.id] = false;
-        }
-      });
-      return updated;
-    });
-  }, [filteredUniversities]);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, selectedState, selectedField]);
-
-  const handleSelectAll = () => {
-    const allSelected = Object.values(selectedUniversities).every(Boolean);
-    const newSelection: Record<string, boolean> = {};
-    Object.keys(selectedUniversities).forEach((id) => {
-      newSelection[id] = !allSelected;
-    });
-    setSelectedUniversities(newSelection);
-  };
 
   const handleDelete = async () => {
     if (!selectedUniversityId) return;
@@ -248,7 +188,7 @@ const UniversitiesTable = () => {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -271,15 +211,13 @@ const UniversitiesTable = () => {
                 placeholder="Search by university, University, or level..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-slate-500"
               />
             </div>
 
             <button
               onClick={() => {
                 setSearchTerm("");
-                setSelectedState("all");
-                setSelectedField("all");
                 setCurrentPage(1);
               }}
               className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
@@ -299,30 +237,13 @@ const UniversitiesTable = () => {
               hoverBorderColor="hover:border-slate-700"
             />
 
-            {selectedCount > 0 && (
-              <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
-
-                <button
-                  onClick={() => {
-                    setIsBatchAssignOpen(true);
-                  }}
-                  className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto">
-                  <Wallet className="h-4 w-4" />
-                  Assign Payment Methods
-                </button>
-
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                  {selectedCount} selected
-                </div>
-              </div>
-            )}
 
           </div>
 
         </div>
       </div>
 
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
 
         <div className="block">
 
@@ -335,7 +256,7 @@ const UniversitiesTable = () => {
 
                 <th
                   onClick={() => handleSort("name")}
-                  className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-secondary"
+                  className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
                 >
                   <div className="flex items-center gap-2">
                     <MdSchool className="h-4 w-4 text-slate-500" />
@@ -374,7 +295,7 @@ const UniversitiesTable = () => {
               </tr>
               </thead>
 
-              <tbody className="divide-border-slate-200 divide-y bg-white">
+              <tbody className="divide-slate-200 divide-y bg-white">
 
               {loading && (
                 <tr>
@@ -407,7 +328,7 @@ const UniversitiesTable = () => {
                       <PresignedImage
                         fileKey={uni?.logo_file_key}
                         alt={uni.name}
-                        className="h-10 w-10 shrink-0 rounded-full object-cover ring-1 ring-blue-500 ring-offset-2 shadow-md"
+                        className="h-10 w-10 shrink-0 rounded-full object-cover"
                         fallback={
                             <div
                         className="flex h-10 w-10 shrink-0 items-center justify-center
@@ -463,7 +384,7 @@ const UniversitiesTable = () => {
                           .replace(/\s+/g, "_");
 
                         const config = typeConfig[normalizedType] || {
-                          bg: "bg-gray-100 border-gray-200",
+                          bg: "bg-gray-100 border-slate-200",
                           text: "text-gray-700",
                           dot: "bg-gray-400",
                           label: type || "Not Provided",
@@ -579,7 +500,7 @@ const UniversitiesTable = () => {
 
           </div>
 
-          <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex  md:justify-between">
+          <div className="grid grid-cols-1 items-center gap-4 border-t border-slate-200 p-4 sm:p-6 md:flex  md:justify-between">
             {universities.length > 0 && (
               <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                 Showing
@@ -640,14 +561,6 @@ const UniversitiesTable = () => {
         isDeleting={isDeleting}
         universityName={selectedUniversityName}
       />
-
-      <BatchAssignPaymentMethod
-        isOpen={isBatchAssignOpen}
-        onClose={() => setIsBatchAssignOpen(false)}
-        selectedUniversityIds={selectedUniversityIds}
-        onSuccess={refetch}
-      />
-
 
       <AssignPaymentUniversity
         isOpen={isAssignPaymentOpen}
