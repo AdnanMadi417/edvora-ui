@@ -328,7 +328,7 @@ const UniversitiesTable = () => {
                       <PresignedImage
                         fileKey={uni?.logo_file_key}
                         alt={uni.name}
-                        className="h-10 w-10 shrink-0 rounded-full object-cover"
+                        className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-slate-200 ring-offset-2 shadow-sm"
                         fallback={
                             <div
                         className="flex h-10 w-10 shrink-0 items-center justify-center
