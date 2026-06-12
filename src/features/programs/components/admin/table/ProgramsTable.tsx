@@ -21,6 +21,7 @@ import {
   Sliders,
   SlidersHorizontal,
   Plus,
+  GitBranch,
 } from 'lucide-react';
 import { MdSchool, MdVerified } from 'react-icons/md';
 import PresignedImage from "components/ui/PresignedImage";
@@ -29,6 +30,8 @@ import { AiOutlineBank } from "react-icons/ai";
 import { useToast } from "components/context/ToastContext";
 
 import { usePrograms, useStates, useDeletePrograms } from "features/programs/hooks";
+import { programApi } from "features/programs/services";
+import type { Program } from "features/programs/types";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useUniversities } from "features/universities/hooks";
@@ -48,8 +51,60 @@ import BatchProgramIntakes from "features/programs/components/admin/popups/Batch
 import BatchProgramScholarship from "features/programs/components/admin/popups/BatchProgramScholarship";
 import BatchDeleteScholarships from "features/programs/components/admin/popups/BatchDeleteScholarships";
 import BatchFeesPrograms from "features/programs/components/admin/popups/BatchFeesPrograms";
+import BatchBranchPrograms from "features/programs/components/admin/popups/BatchBranchPrograms";
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
 
+
+type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "deleteScholarships" | "fees" | "visaFee" | "branch";
+
+function ProgramUniversityCell({ program }: { program: Program }) {
+  const tags: { label: string; color: "green" | "blue" | "gray" }[] = [];
+
+  if (program.university?.name) {
+    tags.push({ label: program.university.name, color: "green" });
+  }
+  if (program.branch?.name) {
+    tags.push({ label: program.branch.name, color: "blue" });
+  }
+  if (program.branch?.location || program.branch?.state) {
+    tags.push({
+      label: [program.branch.location, program.branch.state].filter(Boolean).join(" | "),
+      color: "gray",
+    });
+  }
+
+  if (tags.length === 0) {
+    return <span className="italic text-slate-400">Not provided</span>;
+  }
+
+  const visibleTags = tags.slice(0, 2);
+  const hiddenCount = tags.length - visibleTags.length;
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-xs">
+      {visibleTags.map((tag, index) => (
+        <span
+          key={index}
+          title={tag.label}
+          className={`truncate rounded-md px-2 py-0.5 font-medium transition ${
+            tag.color === "green"
+              ? "bg-green-50 text-green-700"
+              : tag.color === "blue"
+                ? "bg-blue-50 text-blue-700"
+                : "bg-slate-100 text-slate-600"
+          }`}
+        >
+          {tag.label}
+        </span>
+      ))}
+      {hiddenCount > 0 && (
+        <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+          +{hiddenCount} more
+        </span>
+      )}
+    </div>
+  );
+}
 
 const ITEMS_PER_PAGE = 10;
 
@@ -74,14 +129,8 @@ const ProgramsTable = () => {
   const [deleteMode, setDeleteMode] = useState<"single" | "batch" | null>(null);
   const { deletePrograms } = useDeletePrograms();
 
-  const [isBatchUpdateOpen, setIsBatchUpdateOpen] = useState(false);
-  const [isBatchIeletsUpdateOpen, setIsBatchIeltsUpdateOpen] = useState(false);
-  const [isBatchIntakesUpdateOpen, setIsBatchIntakesUpdateOpen] = useState(false);
-  const [isBatchScholarshipsUpdateOpen, setIsBatchScholarshipsUpdateOpen] = useState(false);
-  const [isBatchDeleteScholarshipsOpen, setIsBatchDeleteScholarshipsOpen] = useState(false);
-  const [isBatchFeesUpdateOpen, setIsBatchFeesUpdateOpen] = useState(false);
+  const [activeModal, setActiveModal] = useState<BatchModal | null>(null);
   const [isBulkMenuOpen, setIsBulkMenuOpen] = useState(false);
-  const [isVisaFeeOpen, setIsVisaFeeOpen] = useState(false);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const { showToast } = useToast();
@@ -108,12 +157,7 @@ const ProgramsTable = () => {
     page_size: ITEMS_PER_PAGE,
   });
 
-  const filteredPrograms = useMemo(() => {
-    if (!Array.isArray(programs)) return [];
-    return programs;
-  }, [programs]);
-
-  const totalPages = Math.ceil(total / ITEMS_PER_PAGE);
+  const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
 
   const activeFiltersCount = [
     selectedState !== "all",
@@ -174,7 +218,39 @@ const ProgramsTable = () => {
     }
   };
 
-  const selectedCount = filteredPrograms.filter((p) => selectedPrograms[p.id]).length;
+  const selectedCount = Object.values(selectedPrograms).filter(Boolean).length;
+  const [isSelectingAll, setIsSelectingAll] = useState(false);
+
+  const selectAllPrograms = async () => {
+    setIsSelectingAll(true);
+    try {
+      const baseParams = {
+        search: searchTerm || undefined,
+        field_of_study_id: selectedField !== "all" ? selectedField : undefined,
+        qualification_id: selectedLevel !== "all" ? selectedLevel : undefined,
+        state_id: selectedState !== "all" ? selectedState : undefined,
+        university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
+      };
+
+      const allIds: string[] = [];
+      let page = 1;
+
+      while (true) {
+        const res = await programApi.programs.list({ ...baseParams, page, page_size: 100 });
+        const data = res.data;
+        const items: Program[] = data?.items ?? [];
+        items.forEach((p) => allIds.push(p.id));
+        if (items.length === 0 || allIds.length >= (data?.total ?? 0)) break;
+        page++;
+      }
+
+      const next: Record<string, boolean> = {};
+      allIds.forEach((id) => { next[id] = true; });
+      setSelectedPrograms(next);
+    } finally {
+      setIsSelectingAll(false);
+    }
+  };
 
   const handleSelectProgram = (id: string) => {
     setSelectedPrograms((prev) => ({
@@ -184,40 +260,31 @@ const ProgramsTable = () => {
   };
 
   useEffect(() => {
-    setSelectedPrograms((prev) => {
-      const updated: Record<string, boolean> = { ...prev };
-      filteredPrograms.forEach((p) => {
-        if (!(p.id in updated)) {
-          updated[p.id] = false;
-        }
-      });
-      return updated;
-    });
-  }, [filteredPrograms]);
-
-  useEffect(() => {
-    setCurrentPage(1);
+    setSelectedPrograms({});
   }, [searchTerm, selectedState, selectedField, selectedUniversity, selectedLevel]);
 
   const selectedProgramIds = useMemo(() => {
-    return filteredPrograms
-      .filter((p) => selectedPrograms[p.id])
-      .map((p) => p.id);
-  }, [filteredPrograms, selectedPrograms]);
+    return Object.keys(selectedPrograms).filter((id) => selectedPrograms[id]);
+  }, [selectedPrograms]);
 
-  const handleSelectAll = () => {
-    const filteredIds = filteredPrograms.map((p) => p.id);
-    const allSelected = filteredIds.every((id) => selectedPrograms[id]);
-    const newSelection = { ...selectedPrograms };
-    filteredIds.forEach((id) => {
-      newSelection[id] = !allSelected;
-    });
-    setSelectedPrograms(newSelection);
+  const sharedUniversityId = useMemo(() => {
+    const selected = programs.filter((p) => selectedPrograms[p.id]);
+    if (selected.length === 0) return null;
+    const uniIds = [...new Set(selected.map((p) => p.university?.id).filter(Boolean))];
+    return uniIds.length === 1 ? uniIds[0] : null;
+  }, [programs, selectedPrograms]);
+
+  const handleSelectAll = async () => {
+    if (selectedCount >= total) {
+      setSelectedPrograms({});
+      return;
+    }
+    await selectAllPrograms();
   };
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 rounded-lg border border-gray-200 bg-white">
+      <div className="relative mb-8 rounded-lg border border-slate-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -225,7 +292,7 @@ const ProgramsTable = () => {
                 Knowledge Hub
               </h3>
               <p className="mt-1 text-sm text-slate-500">
-                Explore and manage all programs, programs, and learning resources
+                Explore and manage all programs, universities, and learning resources
               </p>
             </div>
           </div>
@@ -241,11 +308,11 @@ const ProgramsTable = () => {
                   placeholder="Search by university, program, or level..."
                   value={searchTerm}
                   onChange={handleSearchChange}
-                  className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                  className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
                 />
               </div>
               <button
-                className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-background text-slate-500 hover:bg-slate-50"
+                className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-background text-slate-500 hover:bg-slate-50"
                 onClick={() => setShowMobileFilters((v) => !v)}
               >
                 <SlidersHorizontal className="h-4 w-4" />
@@ -320,7 +387,7 @@ const ProgramsTable = () => {
             <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
 
               <Link
-                className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
+                className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-slate-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
                 href="/admin/knowledge-hub/programs/create"
               >
                 <Plus className="h-4 w-4" />
@@ -351,13 +418,14 @@ const ProgramsTable = () => {
                         <div className="fixed inset-0 z-[90]" onClick={() => setIsBulkMenuOpen(false)} />
                         <div className="absolute left-0 top-full z-[100] mt-2 w-52 rounded-2xl border border-slate-100 bg-white p-1.5 shadow-xl shadow-slate-200/60">
                           {[
-                            { label: "Commission", icon: <Pencil className="h-3.5 w-3.5 text-blue-600" />, bg: "bg-blue-50", onClick: () => setIsBatchUpdateOpen(true) },
-                            { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setIsBatchIeltsUpdateOpen(true) },
-                            { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setIsBatchIntakesUpdateOpen(true) },
-                            { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setIsBatchScholarshipsUpdateOpen(true) },
-                            { label: "Delete Scholarships", icon: <Trash2 className="h-3.5 w-3.5 text-red-600" />, bg: "bg-red-50", onClick: () => setIsBatchDeleteScholarshipsOpen(true) },
-                            { label: "Tution Fees", icon: <DollarSign className="h-3.5 w-3.5 text-green-600" />, bg: "bg-green-50", onClick: () => setIsBatchFeesUpdateOpen(true) },
-                            { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setIsVisaFeeOpen(true) },
+                            { label: "Commission", icon: <Pencil className="h-3.5 w-3.5 text-blue-600" />, bg: "bg-blue-50", onClick: () => setActiveModal("commission") },
+                            { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("ielts") },
+                            { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setActiveModal("intakes") },
+                            { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setActiveModal("scholarship") },
+                            { label: "Delete Scholarships", icon: <Trash2 className="h-3.5 w-3.5 text-red-600" />, bg: "bg-red-50", onClick: () => setActiveModal("deleteScholarships") },
+                            { label: "Tuition Fees", icon: <DollarSign className="h-3.5 w-3.5 text-green-600" />, bg: "bg-green-50", onClick: () => setActiveModal("fees") },
+                            { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setActiveModal("visaFee") },
+                            ...(sharedUniversityId ? [{ label: "Branch", icon: <GitBranch className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("branch") }] : []),
                           ].map(({ label, icon, bg, onClick }) => (
                             <button
                               key={label}
@@ -391,9 +459,8 @@ const ProgramsTable = () => {
         </div>
       </div>
 
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
-
-<div className="block">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
+        <div className="block">
 
           <div className="overflow-x-auto rounded-lg rounded-b-none bg-white">
             <table className="w-full">
@@ -403,12 +470,13 @@ const ProgramsTable = () => {
                 <td className="pl-6">
                   <input
                     type="checkbox"
-                    className="h-4 w-4 rounded border-slate-300 text-blue-600"
-                    checked={
-                      filteredPrograms.length > 0 &&
-                      filteredPrograms.every((p) => selectedPrograms[p.id])
-                    }
-                    onChange={handleSelectAll}
+                    ref={(el) => {
+                      if (el) el.indeterminate = selectedCount > 0 && selectedCount < total;
+                    }}
+                    checked={total > 0 && selectedCount >= total}
+                    disabled={isSelectingAll}
+                    onChange={() => handleSelectAll()}
+                    className="h-4 w-4 cursor-pointer rounded border-slate-300 text-blue-600 disabled:cursor-wait"
                   />
                 </td>
 
@@ -466,7 +534,7 @@ const ProgramsTable = () => {
                 </tr>
               )}
 
-              {!error && !loading && filteredPrograms.length === 0 && (
+              {!error && !loading && programs.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center">
                     <NoMessagesFound
@@ -477,54 +545,54 @@ const ProgramsTable = () => {
                 </tr>
               )}
 
-              {!error && filteredPrograms.map((Program) => (
+              {!error && programs.map((program) => (
                 <tr
-                  key={Program.id}
-                  className={`group cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 ${selectedPrograms[Program.id] ? "bg-blue-50/60 dark:bg-blue-900/20" : ""}`}
-                  onClick={() => router.push(`/admin/knowledge-hub/programs/${Program.id}`)}
+                  key={program.id}
+                  className={`group cursor-pointer hover:bg-slate-50 ${selectedPrograms[program.id] ? "bg-slate-50" : ""}`}
+                  onClick={() => router.push(`/admin/knowledge-hub/programs/${program.id}`)}
                 >
                   <td className="pl-6" onClick={(e) => e.stopPropagation()}>
                     <input
                       type="checkbox"
-                      aria-label={`Select ${Program.name}`}
-                      checked={selectedPrograms[Program.id] || false}
-                      onChange={() => handleSelectProgram(Program.id)}
+                      aria-label={`Select ${program.name}`}
+                      checked={selectedPrograms[program.id] || false}
+                      onChange={() => handleSelectProgram(program.id)}
                       className="h-4 w-4 rounded border-slate-300 text-blue-600"
                     />
                   </td>
 
                   <td className="min-w-[280px] max-w-[420px] px-6 py-4">
                     <div className="flex items-start gap-3">
-                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                        {Program.university?.logo_file_key ? (
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-slate-200 ring-offset-2 shadow-sm">
+                        {program.university?.logo_file_key ? (
                           <PresignedImage
-                            fileKey={Program.university.logo_file_key}
-                            alt={Program.university.name}
+                            fileKey={program.university.logo_file_key}
+                            alt={program.university.name}
                             className="h-full w-full object-cover"
                             fallback={
                               <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
-                                {Program.name?.slice(0, 2).toUpperCase()}
+                                {program.name?.slice(0, 2).toUpperCase()}
                               </div>
                             }
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
-                            {Program.name?.slice(0, 2).toUpperCase()}
+                            {program.name?.slice(0, 2).toUpperCase()}
                           </div>
                         )}
                       </div>
 
                       <div className="w-full min-w-0">
-                        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900" title={Program.name}>
-                          {Program.name}
+                        <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900" title={program.name}>
+                          {program.name}
                         </h3>
                         <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
                           <span className="font-medium capitalize text-slate-700">
-                            {Program.qualification_level}
+                            {program.qualification_level}
                           </span>
                           <span className="text-slate-300">•</span>
                           <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-                            {Program.duration} Years
+                            {program.duration} Years
                           </span>
                         </div>
                       </div>
@@ -532,69 +600,20 @@ const ProgramsTable = () => {
                   </td>
 
                   <td className="min-w-[280px] max-w-[420px] px-6 py-4">
-                    {(() => {
-                      const tags: { label: string; color: string }[] = [];
-
-                      if (Program.university?.name) {
-                        tags.push({ label: Program.university.name, color: "green" });
-                      }
-
-                      if (Program.branch?.name) {
-                        tags.push({ label: Program.branch.name, color: "blue" });
-                      }
-
-                      if (Program.branch?.location || Program.branch?.state) {
-                        tags.push({
-                          label: `${Program.branch?.location || ""}${Program.branch?.location && Program.branch?.state ? " | " : ""}${Program.branch?.state || ""}`,
-                          color: "gray",
-                        });
-                      }
-
-                      if (tags.length === 0) {
-                        return <span className="italic text-slate-400">Not provided</span>;
-                      }
-
-                      const visibleTags = tags.slice(0, 2);
-                      const hiddenCount = tags.length - visibleTags.length;
-
-                      return (
-                        <div className="flex flex-wrap items-center gap-2 text-xs">
-                          {visibleTags.map((tag, index) => (
-                            <span
-                              key={index}
-                              title={tag.label}
-                              className={`truncate rounded-md px-2 py-0.5 font-medium transition ${
-                                tag.color === "green"
-                                  ? "bg-green-50 text-green-700"
-                                  : tag.color === "blue"
-                                    ? "bg-blue-50 text-blue-700"
-                                    : "bg-slate-100 text-slate-600"
-                              }`}
-                            >
-                              {tag.label}
-                            </span>
-                          ))}
-                          {hiddenCount > 0 && (
-                            <span className="rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
-                              +{hiddenCount} more
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })()}
+                    <ProgramUniversityCell program={program} />
                   </td>
 
                   <td className="min-w-[220px] max-w-[350px] px-6 py-4 text-xs text-slate-500">
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1">
                         <span className="font-semibold text-slate-700">First Year Tuition:</span>
-                        <span>{Program.yearly_fees?.[0]?.fee ?? "—"} RM</span>
+                        <span>{program.yearly_fees?.[0]?.fee ?? "—"} RM</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <span className="font-semibold text-slate-700">Commission:</span>
                         <span>
-                          {Program.commission_amount != null
-                            ? `${(Program.commission_currency || "RM").toUpperCase()} ${Program.commission_amount.toLocaleString()}`
+                          {program.commission_amount != null
+                            ? `${(program.commission_currency || "RM").toUpperCase()} ${program.commission_amount.toLocaleString()}`
                             : "—"}
                         </span>
                       </div>
@@ -603,12 +622,12 @@ const ProgramsTable = () => {
 
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2 text-sm">
-                      {Program.has_scholarship ? (
-                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
+                      {program.has_scholarship ? (
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
                           <CheckCircle className="h-4 w-4" /> Available
                         </span>
                       ) : (
-                        <span className="bg inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
+                        <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-red-600 bg-red-50 px-3 py-1 text-xs text-red-600">
                           <XCircle className="h-4 w-4" /> Not Available
                         </span>
                       )}
@@ -617,7 +636,7 @@ const ProgramsTable = () => {
 
                   <td className="px-6 py-4">
                     <span className="text-sm text-slate-700">
-                      {Program.next_intake ? formatDate(Program.next_intake) : "TBA"}
+                      {program.next_intake ? formatDate(program.next_intake) : "TBA"}
                     </span>
                   </td>
 
@@ -626,9 +645,9 @@ const ProgramsTable = () => {
                       <a
                         role="menuitem"
                         aria-label="Edit Program"
-                        href={`/admin/knowledge-hub/programs/${Program.id}/edit`}
+                        href={`/admin/knowledge-hub/programs/${program.id}/edit`}
                         onClick={(e) => e.stopPropagation()}
-                        className="group/edit flex items-center justify-center rounded-md p-2 text-sm hover:bg-blue-50 focus:outline-none"
+                        className="group/edit flex items-center justify-center rounded-md p-2 text-sm hover:bg-slate-50 focus:outline-none"
                       >
                         <Pencil className="h-4 w-4 text-slate-400 group-hover/edit:text-blue-600" />
                       </a>
@@ -640,7 +659,7 @@ const ProgramsTable = () => {
                         aria-label="Delete Program"
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedProgramId(Program.id);
+                          setSelectedProgramId(program.id);
                           setDeleteMode("single");
                           setIsDeleteOpen(true);
                         }}
@@ -660,7 +679,7 @@ const ProgramsTable = () => {
 
           </div>
 
-          <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex md:justify-between">
+          <div className="grid grid-cols-1 items-center gap-4 border-t border-slate-200 p-4 sm:p-6 md:flex md:justify-between">
             {total > 0 && (
               <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                 Showing
@@ -715,53 +734,63 @@ const ProgramsTable = () => {
       />
 
       <BatchUpdatePrograms
-        isOpen={isBatchUpdateOpen}
-        onClose={() => setIsBatchUpdateOpen(false)}
+        isOpen={activeModal === "commission"}
+        onClose={() => setActiveModal(null)}
         selectedProgramIds={selectedProgramIds}
         onSuccess={refetch}
       />
 
       <BatchIELTSPrograms
-        isOpen={isBatchIeletsUpdateOpen}
-        onClose={() => setIsBatchIeltsUpdateOpen(false)}
+        isOpen={activeModal === "ielts"}
+        onClose={() => setActiveModal(null)}
         selectedProgramIds={selectedProgramIds}
         onSuccess={refetch}
       />
 
       <BatchProgramIntakes
-        isOpen={isBatchIntakesUpdateOpen}
-        onClose={() => setIsBatchIntakesUpdateOpen(false)}
+        isOpen={activeModal === "intakes"}
+        onClose={() => setActiveModal(null)}
         selectedProgramIds={selectedProgramIds}
         onSuccess={refetch}
       />
 
       <BatchProgramScholarship
-        isOpen={isBatchScholarshipsUpdateOpen}
-        onClose={() => setIsBatchScholarshipsUpdateOpen(false)}
+        isOpen={activeModal === "scholarship"}
+        onClose={() => setActiveModal(null)}
         selectedProgramIds={selectedProgramIds}
         onSuccess={refetch}
       />
 
       <BatchDeleteScholarships
-        isOpen={isBatchDeleteScholarshipsOpen}
-        onClose={() => setIsBatchDeleteScholarshipsOpen(false)}
+        isOpen={activeModal === "deleteScholarships"}
+        onClose={() => setActiveModal(null)}
         selectedProgramIds={selectedProgramIds}
         onSuccess={refetch}
       />
 
       <BatchFeesPrograms
-        isOpen={isBatchFeesUpdateOpen}
-        onClose={() => setIsBatchFeesUpdateOpen(false)}
+        isOpen={activeModal === "fees"}
+        onClose={() => setActiveModal(null)}
         selectedProgramIds={selectedProgramIds}
         onSuccess={refetch}
       />
 
       <DefaultVisaFee
-        isOpen={isVisaFeeOpen}
-        onClose={() => setIsVisaFeeOpen(false)}
+        isOpen={activeModal === "visaFee"}
+        onClose={() => setActiveModal(null)}
         selectedProgramIds={selectedProgramIds}
         onSuccess={refetch}
       />
+
+      {sharedUniversityId && (
+        <BatchBranchPrograms
+          isOpen={activeModal === "branch"}
+          onClose={() => setActiveModal(null)}
+          selectedProgramIds={selectedProgramIds}
+          universityId={sharedUniversityId}
+          onSuccess={refetch}
+        />
+      )}
 
     </div>
   );
