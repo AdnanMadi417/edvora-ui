@@ -174,7 +174,7 @@ const ProgramDetails = ({ id }: Props) => {
               </button>
 
               <div className="relative shrink-0">
-                <div className="h-10 w-10 overflow-hidden rounded-full sm:h-11 sm:w-11">
+                <div className="h-10 w-10 overflow-hidden rounded-full ring-2 ring-slate-200 ring-offset-2 shadow-sm sm:h-11 sm:w-11">
                   <PresignedImage
                     fileKey={program.university?.logo_file_key}
                     alt={program.university?.name}

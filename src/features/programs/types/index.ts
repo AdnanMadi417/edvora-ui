@@ -226,6 +226,8 @@ export interface BatchUpdateProgramPayload {
     description: string;
     conditions: string[];
   }>;
+
+  branch_id?: string | null;
 }
 
 export interface UpdateDefaultVisaFeePayload {
