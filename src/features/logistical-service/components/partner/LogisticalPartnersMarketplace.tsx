@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import PresignedImage from "components/ui/PresignedImage";
 import {
   ArrowRight,
   ArrowLeft,
   CheckCircle,
   Search,
+  Lock,
+  Info,
 } from 'lucide-react';
 import {
   MdOutlineTranslate,
@@ -21,21 +23,30 @@ import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 
-const LogisticalPartnersList = () => {
+const ITEMS_PER_PAGE = 9;
+
+const LogisticalPartnersList = ({ locked = false }: { locked?: boolean }) => {
   const { serviceProviders, loading, error } = useLogisticProviders();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-
   const [searchTerm, setSearchTerm] = useState("");
-  const filteredProviders = serviceProviders.filter(
-    (provider) =>
-      provider.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      provider.nationality?.toLowerCase().includes(searchTerm.toLowerCase())
+
+  const filteredProviders = useMemo(
+    () =>
+      serviceProviders.filter(
+        (p) =>
+          p.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.nationality?.toLowerCase().includes(searchTerm.toLowerCase())
+      ),
+    [serviceProviders, searchTerm]
   );
-  const currentServiceProviders = filteredProviders.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.max(1, Math.ceil(filteredProviders.length / ITEMS_PER_PAGE));
+
+  const currentServiceProviders = useMemo(
+    () => filteredProviders.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE),
+    [filteredProviders, currentPage]
+  );
 
   return (
     <div className="mt-6 overflow-hidden text-p2 max-w-5xl mx-auto">
@@ -59,32 +70,64 @@ const LogisticalPartnersList = () => {
                 type="text"
                 placeholder="Search logistic partner by name..."
                 value={searchTerm}
+                disabled={locked}
                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
           </div>
         </div>
 
-        <div className="block">
-          {loading && <Loading text="Fetching service providers data..." />}
+        {loading && <Loading text="Fetching service providers data..." />}
 
-          {!error && !loading && filteredProviders.length === 0 && (
-            <NoMessagesFound
-              title="No service providers found"
-              subtitle="Try adjusting your search or filters."
-            />
-          )}
+        {!error && !loading && filteredProviders.length === 0 && (
+          <NoMessagesFound
+            title="No service providers found"
+            subtitle="Try adjusting your search or filters."
+          />
+        )}
 
-          {!error && filteredProviders.length > 0 && (
-            <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
-              {currentServiceProviders.map((m) => (
+        {locked && (
+          <div className="mx-6 mt-6 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-blue-900">How to unlock this marketplace</p>
+              <p className="mt-1 text-xs text-blue-700">
+                Your access unlocks automatically once any of your applications reaches one of these stages:
+              </p>
+              <div className="mt-2.5 flex flex-wrap gap-2">
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800">
+                  Student Arrival &amp; Enrollment
+                </span>
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800">
+                  Partner Commission Invoicing
+                </span>
+              </div>
+              <a
+                href="/partner/applications"
+                className="mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+              >
+                Check my applications <ArrowRight className="h-3 w-3" />
+              </a>
+            </div>
+          </div>
+        )}
+
+        {!error && filteredProviders.length > 0 && (
+          <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3">
+            {currentServiceProviders.map((m) => (
+              <div key={m.id} className="relative">
+                {locked && (
+                  <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-slate-900/75 px-2.5 py-1 backdrop-blur-sm">
+                    <Lock className="h-3 w-3 text-white" />
+                    <span className="text-[10px] font-semibold text-white">Stage Required</span>
+                  </div>
+                )}
                 <a
-                  href={`/partner/logistical-partners/${m.id}`}
-                  key={m.id}
-                  className="flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md"
+                  href={locked ? undefined : `/partner/logistical-partners/${m.id}`}
+                  className={`flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md ${locked ? "cursor-default" : ""}`}
                 >
-                  <div className="flex items-center gap-4 px-5 py-5">
+                  <div className={`flex items-center gap-4 px-5 py-5 ${locked ? "blur-sm select-none pointer-events-none" : ""}`}>
                     <div className="relative flex-shrink-0">
                       <PresignedImage
                         fileKey={m.picture_file_key}
@@ -176,56 +219,81 @@ const LogisticalPartnersList = () => {
                   </div>
 
                   <div className="mt-auto border-t border-slate-100 px-4 pb-4 pt-4">
-                    <button
-                      aria-label="Contact via WhatsApp"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (!m?.whatsapp) return;
-                        const number = m.whatsapp.replace("+", "");
-                        window.open(`https://wa.me/${number}`, "_blank");
-                      }}
-                      className="flex w-full items-center justify-center gap-2 rounded-md bg-green-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                    >
-                      <MdWhatsapp className="h-5 w-5" />
-                      Contact on WhatsApp
-                    </button>
+                    {locked ? (
+                      <div className="group/btn relative">
+                        <div className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-400">
+                          <Lock className="h-4 w-4" />
+                          Contact Locked
+                        </div>
+                        <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-64 -translate-x-1/2 rounded-xl bg-white/95 p-4 text-center opacity-0 shadow-xl ring-1 ring-slate-200 backdrop-blur-sm transition-opacity group-hover/btn:opacity-100">
+                          <p className="text-[10px] font-semibold uppercase tracking-widest text-blue-600">Stage Required</p>
+                          <h4 className="mt-1 text-sm font-bold text-slate-900">Unlock this partner</h4>
+                          <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                            Available once your application reaches{" "}
+                            <span className="font-medium text-slate-700">Student Arrival &amp; Enrollment</span>{" "}
+                            or{" "}
+                            <span className="font-medium text-slate-700">Partner Commission Invoicing</span>.
+                          </p>
+                          <a
+                            href="/partner/applications"
+                            className="pointer-events-auto mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+                          >
+                            View my applications <ArrowRight className="h-3 w-3" />
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        aria-label="Contact via WhatsApp"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (!m?.whatsapp) return;
+                          const number = m.whatsapp.replace("+", "");
+                          window.open(`https://wa.me/${number}`, "_blank");
+                        }}
+                        className="flex w-full items-center justify-center gap-2 rounded-md bg-green-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                      >
+                        <MdWhatsapp className="h-5 w-5" />
+                        Contact on WhatsApp
+                      </button>
+                    )}
                   </div>
                 </a>
-              ))}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 items-center gap-3 border-t border-slate-200 p-4 sm:p-6 md:flex md:items-center md:justify-between">
+          {filteredProviders.length > 0 && (
+            <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
+              Showing
+              <span className="font-medium">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span>
+              to
+              <span className="font-medium">{Math.min(currentPage * ITEMS_PER_PAGE, filteredProviders.length)}</span>
+              of
+              <span className="font-medium">{filteredProviders.length}</span>
+              Service Providers
             </div>
           )}
 
-          <div className="grid grid-cols-1 items-center gap-3 border-t border-slate-200 p-4 sm:p-6 md:flex md:items-center md:justify-between">
-            {filteredProviders.length > 0 && (
-              <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
-                Showing
-                <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span>
-                to
-                <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredProviders.length)}</span>
-                of
-                <span className="font-medium">{filteredProviders.length}</span>
-                Service Providers
-              </div>
-            )}
-
-            <div className="flex items-center justify-end gap-2">
-              <PrevButton
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                text="Prev"
-                icon={<ArrowLeft className="h-4 w-4" />}
-              />
-              <span className="px-3 py-1 font-medium text-slate-500">
-                Page {currentPage} of {Math.ceil(filteredProviders.length / itemsPerPage)}
-              </span>
-              <NextButton
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, Math.ceil(filteredProviders.length / itemsPerPage)))}
-                disabled={currentPage === Math.ceil(filteredProviders.length / itemsPerPage)}
-                text="Next"
-                icon={<ArrowRight className="h-4 w-4" />}
-              />
-            </div>
+          <div className="flex items-center justify-end gap-2">
+            <PrevButton
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              text="Prev"
+              icon={<ArrowLeft className="h-4 w-4" />}
+            />
+            <span className="px-3 py-1 font-medium text-slate-500">
+              Page {currentPage} of {totalPages}
+            </span>
+            <NextButton
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              text="Next"
+              icon={<ArrowRight className="h-4 w-4" />}
+            />
           </div>
         </div>
       </div>
