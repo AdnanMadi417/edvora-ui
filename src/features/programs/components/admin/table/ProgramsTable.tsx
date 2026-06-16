@@ -607,7 +607,7 @@ const ProgramsTable = () => {
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center gap-1">
                         <span className="font-semibold text-slate-700">First Year Tuition:</span>
-                        <span>{program.yearly_fees?.[0]?.fee ?? "—"} RM</span>
+                        <span>{program.first_year_tuition != null ? `RM ${program.first_year_tuition.toLocaleString()}` : "—"}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <span className="font-semibold text-slate-700">Commission:</span>
