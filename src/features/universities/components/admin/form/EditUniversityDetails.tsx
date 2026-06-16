@@ -453,9 +453,7 @@ const UniversityEdit = ({ id }: Props) => {
       }
 
       showToast("University updated successfully.", "success");
-      setLogo((prev) => ({ ...prev, modified: false }));
-      refetchUniversity();
-      refetchPayments();
+      router.push(`/admin/universities/${id}`);
     } catch (error: any) {
       const details = error?.response?.data?.details;
 
@@ -479,7 +477,7 @@ const UniversityEdit = ({ id }: Props) => {
     }
   };
 
-  const handleBack = () => router.push("/admin/universities");
+  const handleBack = () => router.push(`/admin/universities/${id}`);
 
   // ─── Render ───────────────────────────────────────────────────────────────
 

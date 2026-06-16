@@ -123,7 +123,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
       await updatePaymentMethods(paymentMethod.id, payload);
 
       showToast("Payment method updated successfully", "success");
-      router.push("/admin/config-universities/payment-methods");
+      router.push(`/admin/config-universities/payment-methods/${id}`);
 
     } catch (error: any) {
       const backendMessage =
@@ -152,7 +152,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
   };
 
   const handleBack = () => {
-    router.push("/admin/config-universities/payment-methods");
+    router.push(`/admin/config-universities/payment-methods/${id}`);
   };
 
   if (loadingPayment) {

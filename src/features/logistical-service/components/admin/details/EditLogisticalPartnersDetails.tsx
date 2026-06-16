@@ -309,7 +309,7 @@ const EditLogisticalPartnersDetails = ({ id }: Props) => {
     try {
       await editLogisticsProvider(service.id, payload);
       showToast("Logistics provider updated successfully", "success");
-      setTimeout(() => { router.push("/admin/logistical-partners/"); }, 1500);
+      router.push(`/admin/logistical-partners/${id}`);
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
       showToast(`Update failed. ${backendMessage}`, "error");
@@ -351,7 +351,7 @@ const EditLogisticalPartnersDetails = ({ id }: Props) => {
 
           <div className="flex items-center gap-2 sm:gap-6">
             <button
-              onClick={() => router.push("/admin/logistical-partners/")}
+              onClick={() => router.push(`/admin/logistical-partners/${id}`)}
               className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
             >
               <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -483,7 +483,7 @@ const EditLogisticalPartnersDetails = ({ id }: Props) => {
         </div>
 
         <div className="flex justify-end gap-2 border-t border-gray-200 px-6 py-5">
-          <Button onClick={() => router.push("/admin/logistical-partners/")} icon={<X className="h-5 w-5" />} text="Cancel" bgColor="bg-slate-50" textColor="text-slate-700" borderColor="border-slate-600" hoverTextColor="hover:text-slate-800" hoverBorderColor="hover:border-slate-700" />
+          <Button onClick={() => router.push(`/admin/logistical-partners/${id}`)} icon={<X className="h-5 w-5" />} text="Cancel" bgColor="bg-slate-50" textColor="text-slate-700" borderColor="border-slate-600" hoverTextColor="hover:text-slate-800" hoverBorderColor="hover:border-slate-700" />
           <Button icon={<Edit2 className="h-5 w-5" />} text={loadingEditLogisticsProvider ? "Updating..." : "Update Service"} bgColor="bg-amber-50" textColor="text-amber-700" borderColor="border-amber-600" hoverTextColor="hover:text-amber-800" hoverBorderColor="hover:border-amber-700" onClick={handleSubmit} disabled={loadingEditLogisticsProvider || logoUploading || !isChanged} />
         </div>
       </div>

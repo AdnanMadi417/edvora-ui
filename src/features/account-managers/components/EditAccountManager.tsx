@@ -91,9 +91,7 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
     try {
       await editAccountManager(payload);
       showToast("Account Manager updated successfully", "success");
-      setTimeout(() => {
-        router.back();
-      }, 3000);
+      router.push(`/admin/account-managers/profile/${manager.id}`);
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
       showToast(`Failed to update Account Manager. ${backendMessage}`, "error");
@@ -108,7 +106,7 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
   };
 
   const handleCancel = () => {
-    router.back();
+    router.push(`/admin/account-managers/profile/${manager.id}`);
   };
 
   return (

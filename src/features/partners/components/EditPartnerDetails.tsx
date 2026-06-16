@@ -103,7 +103,7 @@ export default function EditPartnerDetails({ id }: Props) {
         await assignManager(id, { manager_id: formData.manager_id });
       }
       showToast("Partner updated successfully", "success");
-      setTimeout(() => router.push("/admin/partners"), 3000);
+      router.push(`/admin/partners/${id}`);
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
       showToast(`Update failed. ${backendMessage}`, "error");
@@ -131,7 +131,7 @@ export default function EditPartnerDetails({ id }: Props) {
           </div>
 
           <button
-            onClick={() => router.push("/admin/partners")}
+            onClick={() => router.push(`/admin/partners/${id}`)}
             className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
           >
             <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -157,7 +157,7 @@ export default function EditPartnerDetails({ id }: Props) {
         </div>
 
         <div className="flex justify-end gap-2 border-t px-6 py-5">
-          <Button onClick={() => router.push("/admin/partners")} icon={<ChevronLeft className="h-5 w-5" />} text="Back" bgColor="bg-slate-50" textColor="text-slate-700" borderColor="border-slate-600" hoverTextColor="hover:text-slate-800" hoverBorderColor="hover:border-slate-700" />
+          <Button onClick={() => router.push(`/admin/partners/${id}`)} icon={<ChevronLeft className="h-5 w-5" />} text="Back" bgColor="bg-slate-50" textColor="text-slate-700" borderColor="border-slate-600" hoverTextColor="hover:text-slate-800" hoverBorderColor="hover:border-slate-700" />
           <Button icon={<Pencil className="h-5 w-5" />} text={isUpdatingPartner ? "Saving..." : "Save Changes"} bgColor="bg-blue-50" textColor="text-blue-700" borderColor="border-blue-600" hoverTextColor="hover:text-blue-800" hoverBorderColor="hover:border-blue-700" onClick={handleUpdate} disabled={isUpdatingPartner || !isFormChanged() || !isFormValid} />
         </div>
       </div>

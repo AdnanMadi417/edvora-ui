@@ -2,15 +2,12 @@ import { useState, useEffect } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 
-const QUALIFYING_STAGES = [
-  "Student Arrival & Enrollment",
-  "Partner Commission Invoicing",
-];
-
+const QUALIFYING_STAGE = "Visa Processing";
 const PAGE_SIZE = 20;
 
 export function usePartnerHasLogisticalAccess() {
   const [hasAccess, setHasAccess] = useState(false);
+  const [visaProcessingCount, setVisaProcessingCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,25 +26,22 @@ export function usePartnerHasLogisticalAccess() {
 
         let offset = 0;
         let total = Infinity;
-        let found = false;
+        let count = 0;
 
-        while (!found && offset < total) {
+        while (offset < total) {
           const res = await api.get(`/partners/${partnerId}/applications`, {
             headers,
             params: { limit: PAGE_SIZE, offset },
           });
           total = res.data?.total ?? 0;
           const items: { stage: string }[] = res.data?.items ?? [];
-
-          if (items.some((app) => QUALIFYING_STAGES.includes(app.stage))) {
-            found = true;
-            break;
-          }
-
+          count += items.filter((app) => app.stage === QUALIFYING_STAGE).length;
           offset += PAGE_SIZE;
+          if (items.length === 0) break;
         }
 
-        setHasAccess(found);
+        setVisaProcessingCount(count);
+        setHasAccess(count > 0);
       } catch {
         // silently fail — page stays restricted
       } finally {
@@ -58,5 +52,5 @@ export function usePartnerHasLogisticalAccess() {
     check();
   }, []);
 
-  return { hasAccess, loading };
+  return { hasAccess, loading, visaProcessingCount };
 }
