@@ -8,7 +8,6 @@ import {
   CheckCircle,
   Search,
   Lock,
-  Info,
 } from 'lucide-react';
 import {
   MdOutlineTranslate,
@@ -25,7 +24,7 @@ import PrevButton from "components/ui/buttons/PrevButton";
 
 const ITEMS_PER_PAGE = 9;
 
-const LogisticalPartnersList = ({ locked = false }: { locked?: boolean }) => {
+const LogisticalPartnersList = ({ locked = false, visaProcessingCount = 0 }: { locked?: boolean; visaProcessingCount?: number }) => {
   const { serviceProviders, loading, error } = useLogisticProviders();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,7 +57,14 @@ const LogisticalPartnersList = ({ locked = false }: { locked?: boolean }) => {
                 Logistical Partners
               </h3>
               <p className="mt-1 text-sm text-slate-500">
-                Browse and connect with verified logistics partners and service providers
+                {!loading && serviceProviders.length > 0 ? (
+                  locked
+                    ? <><span className="font-medium text-slate-700">{serviceProviders.length}</span> partners available · <span className="font-medium text-amber-600">Requires Visa Processing stage</span></>
+                    : <><span className="font-medium text-slate-700">{serviceProviders.length}</span> partners available</>
+
+                ) : (
+                  "Browse and connect with verified logistics partners and service providers"
+                )}
               </p>
             </div>
           </div>
@@ -88,27 +94,55 @@ const LogisticalPartnersList = ({ locked = false }: { locked?: boolean }) => {
         )}
 
         {locked && (
-          <div className="mx-6 mt-6 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-blue-900">How to unlock this marketplace</p>
-              <p className="mt-1 text-xs text-blue-700">
-                Your access unlocks automatically once any of your applications reaches one of these stages:
-              </p>
-              <div className="mt-2.5 flex flex-wrap gap-2">
-                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800">
-                  Student Arrival &amp; Enrollment
-                </span>
-                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800">
-                  Partner Commission Invoicing
-                </span>
+          <div className="mx-6 mt-6 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div className="h-1 w-full bg-blue-500" />
+            <div className="p-5">
+
+              <div className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-blue-50">
+                  <Lock className="h-4 w-4 text-blue-600" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-bold text-slate-900">Unlock Logistics Marketplace</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                    The Logistics Marketplace becomes available once you have at least 1 student in{" "}
+                    <span className="font-semibold text-slate-700">Visa Processing</span>.
+                    This ensures logistics support is used at the right stage — when students are
+                    preparing for arrival, accommodation, airport pickup, and local assistance.
+                  </p>
+                </div>
               </div>
-              <a
-                href="/partner/applications"
-                className="mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
-              >
-                Check my applications <ArrowRight className="h-3 w-3" />
-              </a>
+
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Requirement</p>
+                  <p className="mt-1 text-sm font-bold text-slate-900">1 student</p>
+                  <p className="text-xs text-slate-500">in Visa Processing</p>
+                </div>
+                <div className="rounded-xl bg-slate-50 p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Current Status</p>
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span className={`h-2 w-2 shrink-0 rounded-full ${visaProcessingCount > 0 ? "bg-emerald-500" : "bg-red-400"}`} />
+                    <p className={`text-sm font-bold ${visaProcessingCount > 0 ? "text-emerald-600" : "text-red-500"}`}>
+                      {visaProcessingCount} student{visaProcessingCount !== 1 ? "s" : ""}
+                    </p>
+                  </div>
+                  <p className="text-xs text-slate-500">in Visa Processing</p>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-center justify-between gap-4">
+                <p className="text-[11px] text-slate-400">
+                  Once unlocked, this feature will remain available permanently.
+                </p>
+                <a
+                  href="/partner/applications"
+                  className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-blue-600 hover:underline"
+                >
+                  View My Applications <ArrowRight className="h-3 w-3" />
+                </a>
+              </div>
+
             </div>
           </div>
         )}
@@ -220,27 +254,9 @@ const LogisticalPartnersList = ({ locked = false }: { locked?: boolean }) => {
 
                   <div className="mt-auto border-t border-slate-100 px-4 pb-4 pt-4">
                     {locked ? (
-                      <div className="group/btn relative">
-                        <div className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-400">
-                          <Lock className="h-4 w-4" />
-                          Contact Locked
-                        </div>
-                        <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-64 -translate-x-1/2 rounded-xl bg-white/95 p-4 text-center opacity-0 shadow-xl ring-1 ring-slate-200 backdrop-blur-sm transition-opacity group-hover/btn:opacity-100">
-                          <p className="text-[10px] font-semibold uppercase tracking-widest text-blue-600">Stage Required</p>
-                          <h4 className="mt-1 text-sm font-bold text-slate-900">Unlock this partner</h4>
-                          <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
-                            Available once your application reaches{" "}
-                            <span className="font-medium text-slate-700">Student Arrival &amp; Enrollment</span>{" "}
-                            or{" "}
-                            <span className="font-medium text-slate-700">Partner Commission Invoicing</span>.
-                          </p>
-                          <a
-                            href="/partner/applications"
-                            className="pointer-events-auto mt-2.5 inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
-                          >
-                            View my applications <ArrowRight className="h-3 w-3" />
-                          </a>
-                        </div>
+                      <div className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-400">
+                        <Lock className="h-4 w-4" />
+                        Contact Locked
                       </div>
                     ) : (
                       <button

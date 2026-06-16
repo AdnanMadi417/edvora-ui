@@ -256,7 +256,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
       showToast("Program updated successfully", "success");
 
-      router.push("/admin/knowledge-hub/programs");
+      router.push(`/admin/knowledge-hub/programs/${id}`);
     } catch (error: any) {
       const backendMessage =
         error?.response?.data?.message || "Please try again.";
@@ -283,7 +283,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   };
 
   const handleBack = () => {
-    router.push("/admin/knowledge-hub/programs");
+    router.push(`/admin/knowledge-hub/programs/${id}`);
   };
 
   if (!program) return <Loading text="Loading program..." />;
