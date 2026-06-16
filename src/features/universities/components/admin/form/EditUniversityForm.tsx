@@ -111,7 +111,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
       showToast("University type updated successfully", "success");
 
-      router.push("/admin/config-universities/");
+      router.push(`/admin/config-universities/${id}`);
 
     } catch (error: any) {
       const backendMessage =
@@ -149,7 +149,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   }, [formData, initialFormData]);
 
   const handleBack = () => {
-    router.push("/admin/config-universities");
+    router.push(`/admin/config-universities/${id}`);
   };
 
   const handleUpdateLink = () => {
