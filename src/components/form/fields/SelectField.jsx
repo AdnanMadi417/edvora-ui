@@ -8,7 +8,7 @@ const getNestedValue = (obj, path) => {
     .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
-const SelectField = ({ label, field, options, required = true, formData, errors, updateFormData, onBlur = undefined }) => {
+const SelectField = ({ label, field, options, required = true, formData, errors, updateFormData, onBlur = undefined, disabled = false }) => {
   const value = getNestedValue(formData, field) ?? "";
 
   return (

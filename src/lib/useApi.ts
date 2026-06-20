@@ -17,7 +17,7 @@ let authRedirectScheduled = false;
 
 api.interceptors.request.use((config) => {
   const token = Cookies.get("token");
-  if (token) config.headers = { Authorization: `Bearer ${token}` };
+  if (token) config.headers = { Authorization: `Bearer ${token}` } as any;
   return config;
 });
 
