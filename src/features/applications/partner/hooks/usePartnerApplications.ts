@@ -16,6 +16,8 @@ export type PartnerApplication = {
   status: string;
   next_action: string;
   lifecycle_status: "active" | "hold" | "cancel";
+  partner_name?: string;
+  account_manager_name?: string;
 };
 
 export type PartnerApplicationsResponse = {

@@ -84,8 +84,8 @@ export default function CreateFees({
     try {
       const payload = {
         program_ids: selectedProgramIds,
-        yearly_fees: formData.yearly_fees.length > 0 ? formData.yearly_fees : undefined,
-        one_time_fees: formData.one_time_fees.length > 0 ? formData.one_time_fees : undefined,
+        yearly_fees: formData.yearly_fees.length > 0 ? formData.yearly_fees.map((y) => ({ ...y, fee: Number(y.fee) })) : undefined,
+        one_time_fees: formData.one_time_fees.length > 0 ? formData.one_time_fees.map((f) => ({ ...f, fee: Number(f.fee) })) : undefined,
       };
 
       await batchUpdatePrograms(payload);

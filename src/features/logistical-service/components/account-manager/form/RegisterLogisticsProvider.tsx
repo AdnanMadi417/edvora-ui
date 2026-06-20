@@ -116,7 +116,7 @@ export default function RegisterLogisticalPartner() {
     };
 
     try {
-      await createLogisticsProvider(payload);
+      await createLogisticsProvider(payload as any);
       showToast("Logistics provider created successfully", "success");
       setFormData({
         name: "",

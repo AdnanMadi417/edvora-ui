@@ -6,7 +6,7 @@ import InputField from "components/form/fields/InputField";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
 import CardHeader from '../card/CardHeader';
-import ModalHeader from '../card/CardHeader';
+import ModalHeader from './ModalHeader';
 
 interface HoldPopupProps {
   isOpen: boolean;
