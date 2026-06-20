@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { ArrowLeft, ArrowRight, BookOpen, CalendarPlus, DollarSign, Plus, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -14,11 +14,11 @@ import { useCommissionTypes } from "features/knowledge-hub/commission/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 
 import ToggleInput from 'components/form/toggle/ToggleInput';
-import InputField from 'components/form/InputField';
-import TextareaField from 'components/form/TextareaField';
-import ArrayObjectField from 'components/form/ArrayObjectField';
-import SelectField from 'components/form/SelectField';
-import MultipleDateInput from 'components/form/MultipleDateInput';
+import InputField from 'components/form/fields/InputField';
+import TextareaField from 'components/form/fields/TextareaField';
+import ArrayObjectField from 'components/form/fields/ArrayObjectField';
+import SelectField from 'components/form/fields/SelectField';
+import MultipleDateInput from 'components/form/date/MultipleDateInput';
 import SearchableDropdown from 'components/form/search/SearchableDropdown';
 
 import Button from 'components/ui/buttons/Button';

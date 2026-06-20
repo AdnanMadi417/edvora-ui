@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -9,7 +9,8 @@ import api from "lib/useApi";
 import { useDeleteUniversity, useUpdatePaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 
 import DeletePaymentConfirmation from "features/universities/components/admin/payment-methods/popups/DeletePaymentConfirmation";
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
+import RichTextEditor from "components/form/fields/RichTextEditor";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 
@@ -82,8 +83,9 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
   };
 
   const validateDescription = (value: string): string => {
-    if (!value.trim()) return "";
-    if (value.trim().length < 10) return "Description must be at least 10 characters";
+    const text = value.replace(/<[^>]*>/g, "").trim();
+    if (!text) return "";
+    if (text.length < 10) return "Description must be at least 10 characters";
     return "";
   };
 
@@ -241,17 +243,13 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
               }}
             />
 
-            <InputField
+            <RichTextEditor
               label="Description"
               field="description"
               placeholder="Brief description..."
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
-              onBlur={() => {
-                const err = validateDescription(formData.description);
-                if (err) setErrors((prev) => ({ ...prev, description: err }));
-              }}
             />
 
           </div>

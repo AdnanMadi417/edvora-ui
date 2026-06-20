@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { Layers, GraduationCap, XCircle } from "lucide-react";
@@ -8,7 +8,7 @@ import { useAssignUniversityType, useUniversityTypes } from "features/universiti
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
-import SelectField from "components/form/SelectField";
+import SelectField from "components/form/fields/SelectField";
 
 interface Props {
   isOpen: boolean;

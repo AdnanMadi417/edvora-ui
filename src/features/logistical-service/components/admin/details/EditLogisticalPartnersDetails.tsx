@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -18,11 +18,11 @@ import { getDocumentDownloadUrl } from "services/documentService";
 import type { PackageOffered, ServiceEntry } from "features/logistical-service/types";
 
 import EmptyData from "components/emptyData/EmptyData";
-import CheckSimpleBoxGroup from "components/form/CheckSimpleBoxGroup";
-import InputField from "components/form/InputField";
-import SelectField from "components/form/SelectField";
+import CheckSimpleBoxGroup from "components/form/fields/CheckSimpleBoxGroup";
+import InputField from "components/form/fields/InputField";
+import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
-import ImageUploadField from "components/form/images/ImageUploadField";
+import ImageUploadField from "components/form/upload/ImageUploadField";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { NATIONALITIES } from "constants/lists";

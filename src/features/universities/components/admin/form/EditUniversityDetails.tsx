@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -26,13 +26,13 @@ import {
 } from "features/universities/hooks";
 import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 import { useStates } from "features/programs/hooks";
-import InputField from "components/form/InputField";
-import TextareaField from "components/form/TextareaField";
-import SelectField from "components/form/SelectField";
-import MultipleDatePickerModal from "components/form/MultipleDatePickerModal";
+import InputField from "components/form/fields/InputField";
+import TextareaField from "components/form/fields/TextareaField";
+import SelectField from "components/form/fields/SelectField";
+import MultipleDatePickerModal from "components/form/date/MultipleDatePickerModal";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
-import ImageUploadField from "components/form/images/ImageUploadField";
+import ImageUploadField from "components/form/upload/ImageUploadField";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
 import Button from "components/ui/buttons/Button";

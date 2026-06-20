@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -7,10 +7,10 @@ import { usePartnerDetails, useUpdatePartner, useAssignPartnerManager } from "..
 import { useAccountManagers } from "features/account-managers/hooks";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
-import InputField from "components/form/InputField";
-import PasswordField from "components/form/PasswordField";
+import InputField from "components/form/fields/InputField";
+import PasswordField from "components/form/fields/PasswordField";
 import ToggleInput from "components/form/toggle/ToggleInput";
-import SelectField from "components/form/SelectField";
+import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";

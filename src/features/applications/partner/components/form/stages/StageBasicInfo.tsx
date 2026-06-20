@@ -1,6 +1,6 @@
-import React from "react";
+﻿import React from "react";
 import { InputField } from "components/form";
-import SearchableSelect from "components/form/SearchableSelect";
+import SearchableSelect from "components/form/search/SearchableSelect";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import { NATIONALITIES } from "constants/lists";
 

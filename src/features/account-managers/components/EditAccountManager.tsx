@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import { Pencil, XCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-import InputField from "components/form/InputField";
-import PasswordField from "components/form/PasswordField";
+import InputField from "components/form/fields/InputField";
+import PasswordField from "components/form/fields/PasswordField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";

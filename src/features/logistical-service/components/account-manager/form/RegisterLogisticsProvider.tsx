@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Trash2, Truck, Plus, PlusCircle } from "lucide-react";
 import React, { useState } from "react";
@@ -12,10 +12,10 @@ import {
 } from "features/logistical-service/hooks";
 
 import Loading from "components/loading/Loading";
-import CheckBoxGroup from "components/form/CheckBoxGroup";
-import CheckSimpleBoxGroup from "components/form/CheckSimpleBoxGroup";
-import InputField from "components/form/InputField";
-import SelectField from "components/form/SelectField";
+import CheckBoxGroup from "components/form/fields/CheckBoxGroup";
+import CheckSimpleBoxGroup from "components/form/fields/CheckSimpleBoxGroup";
+import InputField from "components/form/fields/InputField";
+import SelectField from "components/form/fields/SelectField";
 import Button from "components/ui/buttons/Button";
 import { COUNTRIES } from "constants/lists";
 import { useToast } from "components/context/ToastContext";

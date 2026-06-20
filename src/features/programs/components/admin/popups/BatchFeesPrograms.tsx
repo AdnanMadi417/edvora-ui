@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, DollarSign } from "lucide-react";
@@ -7,7 +7,7 @@ import { useBatchUpdatePrograms } from "features/programs/hooks";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import ArrayObjectField from "components/form/ArrayObjectField";
+import ArrayObjectField from "components/form/fields/ArrayObjectField";
 
 import { useToast } from "components/context/ToastContext";
 

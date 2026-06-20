@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 
 import { ArrowLeft, Layers, } from 'lucide-react';
 
 import { useApplicationSubmissionFields, useCreateUniversityType } from "features/universities/hooks";
 
 import { useToast } from "components/context/ToastContext";
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";

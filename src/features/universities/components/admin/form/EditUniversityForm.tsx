@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -6,7 +6,7 @@ import { ChevronLeft, Clock, MoreVertical, Pencil } from "lucide-react";
 
 import { useUniversityTypeDetails, useUpdateUniversityType, useApplicationSubmissionFields } from "features/universities/hooks";
 
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";

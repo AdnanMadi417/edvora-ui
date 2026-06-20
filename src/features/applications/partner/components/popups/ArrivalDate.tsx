@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, Plane, CheckCircle, AlertCircle } from 'lucide-react';
 import { InputField } from "components/form";
-import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import { useArrivalDateUpload } from "features/applications/hooks";
 
 

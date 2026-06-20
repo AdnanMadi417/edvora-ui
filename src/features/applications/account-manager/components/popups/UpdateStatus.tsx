@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -22,7 +22,7 @@ import {
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
-import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import { InputField } from "components/form";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
