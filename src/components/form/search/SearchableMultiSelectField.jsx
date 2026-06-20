@@ -79,10 +79,10 @@ const SearchableMultiSelectField = ({
       {/* Select Box */}
       <div
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`mt-2 flex min-h-12 w-full items-center justify-between rounded-md border bg-white p-3 text-sm transition-colors focus:ring-1 focus:ring-blue-500 ${
+        className={`mt-2 flex min-h-12 w-full items-center justify-between rounded-md border p-3 text-sm transition-colors focus:ring-1 focus:ring-blue-500 ${
           errors?.[field]
-            ? "border-red-500"
-            : "border-default"
+            ? "border-red-500 bg-red-50"
+            : "border-default bg-white hover:bg-slate-50"
         }`}
       >
         <span
@@ -117,7 +117,7 @@ const SearchableMultiSelectField = ({
             autoFocus
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className={`mb-2 flex h-10 w-full rounded-md border p-2 text-sm focus:ring-1 focus:ring-blue-500 ${
+            className={`mb-2 flex h-10 w-full rounded-md border p-2 text-sm focus:ring-1 focus:ring-blue-500 bg-white hover:bg-slate-50 ${
               errors?.[field]
                 ? "border-red-500"
                 : "border-default"

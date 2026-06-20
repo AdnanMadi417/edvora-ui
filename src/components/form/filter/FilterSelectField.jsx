@@ -16,7 +16,7 @@ export default function FilterSelectField({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="bg-white w-full cursor-pointer rounded-md border border-gray-200 py-2.5 pl-10 pr-8 text-sm text-slate-700 outline-none focus:ring-1 focus:ring-blue-500"
+        className="bg-white hover:bg-slate-50 w-full cursor-pointer rounded-md border border-gray-200 py-2.5 pl-10 pr-8 text-sm text-slate-700 outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
       >
         <option value="all" className="bg-white text-slate-700">
           {defaultOption}
