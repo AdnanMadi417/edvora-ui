@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { InputField } from "components/form";
-import SearchableSelect from "components/form/SearchableSelect";
+import SearchableSelect from "components/form/search/SearchableSelect";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import { NATIONALITIES } from "constants/lists";

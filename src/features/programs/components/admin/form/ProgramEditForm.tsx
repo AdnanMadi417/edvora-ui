@@ -26,13 +26,13 @@ import { useUniversities, useBranches } from "features/universities/hooks";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 
-import InputField from "components/form/InputField";
-import TextareaField from "components/form/TextareaField";
+import InputField from "components/form/fields/InputField";
+import TextareaField from "components/form/fields/TextareaField";
 import ToggleInput from "components/form/toggle/ToggleInput";
-import MultipleDateInput from "components/form/MultipleDateInput";
+import MultipleDateInput from "components/form/date/MultipleDateInput";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
-import ArrayObjectField from "components/form/ArrayObjectField";
-import SelectField from "components/form/SelectField";
+import ArrayObjectField from "components/form/fields/ArrayObjectField";
+import SelectField from "components/form/fields/SelectField";
 
 import IconButton from "components/ui/buttons/IconButton";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -10,7 +10,7 @@ import type { PartnerDetails } from "features/partners";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
 
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";

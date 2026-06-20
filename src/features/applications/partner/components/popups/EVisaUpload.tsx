@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, ShieldCheck, CheckCircle, AlertCircle } from "lucide-react";
 import { useEVisaUpload } from "features/applications/hooks";
-import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import StatusFileUpload from "components/form/upload/StatusFileUpload";
 
 interface EVisaUploadProps {
   isOpen: boolean;

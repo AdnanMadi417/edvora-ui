@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, BadgePercent } from "lucide-react";
@@ -7,7 +7,7 @@ import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
 
 interface CreateCommissionTypeProps {
   isOpen: boolean;

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, Edit3 } from "lucide-react";
@@ -7,7 +7,7 @@ import { useUpdateFieldOfStudy } from "features/knowledge-hub/field-of-study/hoo
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 
 import { useToast } from "components/context/ToastContext";

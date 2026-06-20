@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, GraduationCap, CalendarPlus, Plus, Trash2 } from "lucide-react";
@@ -8,7 +8,7 @@ import { useBatchUpdatePrograms } from "features/programs/hooks";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
 
 import { useToast } from "components/context/ToastContext";
 

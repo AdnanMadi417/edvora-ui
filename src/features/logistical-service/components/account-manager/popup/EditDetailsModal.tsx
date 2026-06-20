@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { Plus, PlusCircle, Trash2, Edit2 } from "lucide-react";
@@ -12,11 +12,11 @@ import {
   useEditLogisticProvider,
 } from "features/logistical-service/hooks";
 
-import CheckSimpleBoxGroup from "components/form/CheckSimpleBoxGroup";
-import InputField from "components/form/InputField";
+import CheckSimpleBoxGroup from "components/form/fields/CheckSimpleBoxGroup";
+import InputField from "components/form/fields/InputField";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
-import SelectField from "components/form/SelectField";
+import SelectField from "components/form/fields/SelectField";
 import { COUNTRIES } from "constants/lists";
 import type { PackageOffered, ServiceEntry } from "features/logistical-service/types";
 

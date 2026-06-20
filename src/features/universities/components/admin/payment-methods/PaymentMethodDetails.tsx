@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   CreditCard,
+  Pencil,
 } from 'lucide-react';
 
 import { usePaymentMethod } from "features/knowledge-hub/payment-methods/hooks";
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
+import RichTextDisplay from "components/ui/RichTextDisplay";
 
 interface PaymentMethodDetailsProps {
   id: string;
@@ -48,13 +50,21 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-6">
+            <div className="flex items-center gap-2">
               <button
                 onClick={handleBack}
                 className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="hidden sm:inline">Back to Payments</span>
+                <span className="hidden sm:inline">Back</span>
+              </button>
+
+              <button
+                onClick={() => router.push(`/admin/config-universities/payment-methods/${id}/edit`)}
+                className="flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 transition-all hover:bg-blue-100 hover:text-blue-800"
+              >
+                <Pencil className="h-4 w-4" />
+                <span className="hidden sm:inline">Edit</span>
               </button>
             </div>
 
@@ -65,9 +75,10 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
               Description
             </h3>
 
-            <p className="text-sm leading-relaxed text-slate-700">
-              {paymentMethod.description || "No description provided."}
-            </p>
+            {paymentMethod.description
+              ? <RichTextDisplay html={paymentMethod.description} />
+              : <p className="text-sm text-slate-400">No description provided.</p>
+            }
           </div>
 
         </div>

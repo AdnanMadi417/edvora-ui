@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, AlertCircle } from "lucide-react";
@@ -6,7 +6,7 @@ import { XCircle, AlertCircle } from "lucide-react";
 import { useDisputeCommission } from "features/applications/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
-import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import StatusFileUpload from "components/form/upload/StatusFileUpload";
 
 interface DisputeCommissionProps {
   isOpen: boolean;

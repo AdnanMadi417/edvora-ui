@@ -45,7 +45,7 @@ const PasswordField = ({
           onChange={(e) => updateFormData(field, e.target.value)}
           placeholder={placeholder}
           className={`flex h-12 w-full items-center rounded-md border p-3 pr-10 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-            error ? "border-red-500" : "border-default"
+            error ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"
           }`}
         />
         <button

@@ -281,7 +281,9 @@ const PaymentMethodsTable = () => {
                         <div className="flex items-center gap-3">
                           <div className="w-full min-w-0">
                             <h3 className="truncate text-sm font-semibold text-slate-900">
-                              {payment.description}
+                              {payment.description
+                                ? payment.description.replace(/<[^>]*>/g, "")
+                                : "—"}
                             </h3>
                           </div>
                         </div>

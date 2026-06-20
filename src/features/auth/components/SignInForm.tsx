@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
-import InputField from "components/form/InputField";
-import PasswordField from "components/form/PasswordField";
+import InputField from "components/form/fields/InputField";
+import PasswordField from "components/form/fields/PasswordField";
 
 interface SignInFormProps {
   onSubmit: (email: string, password: string, keepLoggedIn: boolean) => Promise<void> | void;

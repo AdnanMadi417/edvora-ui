@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { CreditCard, XCircle } from 'lucide-react';
@@ -7,7 +7,8 @@ import { useCreatePayment } from "features/knowledge-hub/payment-methods/hooks";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
+import RichTextEditor from "components/form/fields/RichTextEditor";
 import { useToast } from "components/context/ToastContext";
 
 interface CreatePaymentMethodProps {
@@ -42,8 +43,9 @@ export default function CreatePayment({
   };
 
   const validateDescription = (value: string): string => {
-    if (!value.trim()) return "";
-    if (value.trim().length < 10) return "Description must be at least 10 characters";
+    const text = value.replace(/<[^>]*>/g, "").trim();
+    if (!text) return "";
+    if (text.length < 10) return "Description must be at least 10 characters";
     return "";
   };
 
@@ -146,17 +148,13 @@ export default function CreatePayment({
               }}
             />
 
-            <InputField
+            <RichTextEditor
               label="Description"
               field="description"
               placeholder="Brief description of the payment method (optional)"
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
-              onBlur={() => {
-                const err = validateDescription(formData.description);
-                if (err) setErrors((prev) => ({ ...prev, description: err }));
-              }}
             />
 
             {apiError && (

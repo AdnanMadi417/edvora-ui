@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { GraduationCap, ChevronLeft, CalendarPlus, Trash2 } from 'lucide-react';
@@ -18,14 +18,14 @@ import { useRouter } from "next/navigation";
 import { useCreateUniversity, useUniversityTypes } from "features/universities/hooks";
 import { useStates } from "features/programs/hooks";
 
-import InputField from "components/form/InputField";
-import TextareaField from "components/form/TextareaField";
-import MultipleDatePickerModal from "components/form/MultipleDatePickerModal";
+import InputField from "components/form/fields/InputField";
+import TextareaField from "components/form/fields/TextareaField";
+import MultipleDatePickerModal from "components/form/date/MultipleDatePickerModal";
 import SearchableDropdown from 'components/form/search/SearchableDropdown';
 import Button from "components/ui/buttons/Button";
 import IconButton from 'components/ui/buttons/IconButton';
-import SelectField from 'components/form/SelectField';
-import ImageUploadField from 'components/form/images/ImageUploadField';
+import SelectField from 'components/form/fields/SelectField';
+import ImageUploadField from 'components/form/upload/ImageUploadField';
 import { getPresignedUploads, uploadFilesToSpaces } from 'services/uploadService';
 import { validateUniversity, isUniversityComplete } from './validateUniversity';
 
