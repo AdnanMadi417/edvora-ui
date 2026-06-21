@@ -159,7 +159,7 @@ const UniversityManagementTable = () => {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -181,7 +181,7 @@ const UniversityManagementTable = () => {
                 placeholder="Search by university, University, or level..."
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+                className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
 
@@ -212,7 +212,7 @@ const UniversityManagementTable = () => {
         </div>
       </div>
 
-      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-white">
+      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-white">
             <table className="w-full">
 
               <thead>
@@ -410,7 +410,7 @@ const UniversityManagementTable = () => {
             </table>
       </div>
 
-      <div className="rounded-b-lg border border-gray-200 bg-white px-6 py-4">
+      <div className="rounded-b-lg border border-slate-200 bg-white px-6 py-4">
         <div className="flex flex-col items-center justify-between gap-2 text-sm text-slate-500 md:flex-row">
           <div>
             {filteredUniversities.length === 0 ? (

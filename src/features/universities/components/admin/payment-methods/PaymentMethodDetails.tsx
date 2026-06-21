@@ -70,7 +70,7 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
 
           </div>
 
-          <div className="border-t border-gray-200 px-6 py-6">
+          <div className="border-t border-slate-200 px-6 py-6">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
               Description
             </h3>

@@ -151,7 +151,7 @@ const PaymentMethodsTable = () => {
 
   return (
     <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
@@ -172,7 +172,7 @@ const PaymentMethodsTable = () => {
                 placeholder="Search by university name or level"
                 value={searchTerm}
                 onChange={handleSearchChange}
-                className="w-full rounded-md border border-gray-300 bg-white px-4 py-2.5 pl-10 pr-4 text-sm text-slate-600 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-100"
+                className="w-full rounded-md border border-slate-300 bg-white px-4 py-2.5 pl-10 pr-4 text-sm text-slate-600 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-100"
               />
             </div>
 
@@ -204,7 +204,7 @@ const PaymentMethodsTable = () => {
         </div>
       </div>
 
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
         <div className="block">
           <div className="overflow-x-auto rounded-lg rounded-b-none bg-white">
             <table className="w-full">

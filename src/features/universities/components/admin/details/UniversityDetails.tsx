@@ -82,7 +82,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </h3>
 
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex items-start gap-3 rounded-md border border-slate-200 bg-slate-50 p-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
                   <MdPublic className="h-4 w-4" />
                 </div>
@@ -94,7 +94,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 rounded-md border border-gray-200 bg-gray-50 p-3">
+              <div className="flex items-start gap-3 rounded-md border border-slate-200 bg-slate-50 p-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white text-slate-500 shadow-sm">
                   <MdEvent className="h-4 w-4" />
                 </div>
@@ -107,7 +107,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                       university.intake_months.map((date, index) => (
                         <span
                           key={`${date}-${index}`}
-                          className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 transition"
+                          className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 transition"
                         >
                           <span className="h-2 w-2 rounded-md border-2 border-green-600" />
                           <span className="text-xs font-medium text-slate-900">
@@ -126,7 +126,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             </div>
           </div>
 
-          <div className="border-t border-gray-200 px-6 py-6">
+          <div className="border-t border-slate-200 px-6 py-6">
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
               Branches
             </h3>
@@ -138,7 +138,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 {branches.map((branch) => (
                   <div
                     key={branch.id}
-                    className="rounded-md border border-gray-200 bg-gray-50 p-4 transition hover:shadow-sm"
+                    className="rounded-md border border-slate-200 bg-slate-50 p-4 transition hover:shadow-sm"
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex h-9 w-9 items-center justify-center rounded-md bg-white">
@@ -160,7 +160,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             )}
           </div>
 
-          <div className="border-t border-gray-200 px-6 py-6">
+          <div className="border-t border-slate-200 px-6 py-6">
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
               Payment Methods
             </h3>
@@ -172,7 +172,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 {universityPaymentMethods.map((payment) => (
                   <div
                     key={payment.id}
-                    className="group relative cursor-pointer rounded-xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
+                    className="group relative cursor-pointer rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
