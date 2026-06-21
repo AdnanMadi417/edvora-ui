@@ -1,21 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
-  Clock,
   FileText,
   GraduationCap,
-  MoreVertical,
   FileCheck,
+  Pencil,
 } from "lucide-react";
 
 import { useUniversityTypeDetails } from "features/universities/hooks";
 
 import Loading from "components/loading/Loading";
-
 import EmptyData from "components/emptyData/EmptyTableData";
+import Button from "components/ui/buttons/Button";
 
 interface UniversityDetailsProps {
   id: string;
@@ -26,25 +25,15 @@ const UniversityConfigDetails = ({ id }: UniversityDetailsProps) => {
 
   const { university, loading, error } = useUniversityTypeDetails(id);
 
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-
   const handleBack = () => {
     router.push("/admin/config-universities");
-  };
-
-  const handleUpdate = () => {
-    router.push(`/admin/config-universities/${id}/edit`);
   };
 
   if (loading) {
     return <Loading text="Loading university details..." />;
   }
 
-  if (error) {
-    return <EmptyData />;
-  }
-
-  if (!university) {
+  if (error || !university) {
     return <EmptyData />;
   }
 
@@ -52,113 +41,42 @@ const UniversityConfigDetails = ({ id }: UniversityDetailsProps) => {
     <>
       <div className="mt-6 max-w-5xl mx-auto">
         <div className="rounded-md border bg-card shadow-sm">
-          <div className="flex justify-between border-b p-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-700">
-                <GraduationCap className="h-6 w-6 text-white" />
-              </div>
 
-              <div>
-                <h2 className="text-lg font-semibold">
-                  {university?.name || "Not provided"}
-                </h2>
-              </div>
+          <div className="flex items-center gap-4 border-b p-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700">
+              <GraduationCap className="h-6 w-6 text-white" />
             </div>
-
-            <div className="flex items-center gap-2 sm:gap-6">
-              <div className="relative">
-                <button
-                  onClick={() =>
-                    setOpenDropdownId(
-                      openDropdownId === university.id ? null : university.id
-                    )
-                  }
-                  className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  Actions
-                  <MoreVertical className="h-4 w-4" />
-                </button>
-
-                {openDropdownId === university.id && (
-                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
-                    <div className="space-y-2 p-2">
-                      <button
-                        aria-label="Update Program Details"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:shadow-sm"
-                        onClick={handleUpdate}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
-                          <Clock className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-slate-900">
-                          Update Details
-                        </span>
-                      </button>
-
-                      <button
-                        aria-label="Back to Programs"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
-                        onClick={handleBack}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
-                          <ChevronLeft className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-slate-900">
-                          Back to Programs
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+            <div>
+              <h2 className="text-lg font-semibold">{university?.name || "Not provided"}</h2>
             </div>
           </div>
 
           <div className="px-6 py-6">
-            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
-              Overview
-            </h3>
-
-            <div className="grid grid-cols-1 ">
-              <p className="text-xs text-slate-500">
-                {university.description
-                  ? university.description
-                  : "Not Provided"}
-              </p>
-            </div>
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">Overview</h3>
+            <p className="text-xs text-slate-500">
+              {university.description ? university.description : "Not Provided"}
+            </p>
           </div>
 
-          <div className="border-t border-gray-200 px-6 py-6">
+          <div className="border-t border-slate-200 px-6 py-6">
             <div className="mb-6 flex items-center justify-between">
               <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
                 Required Fields Configuration
               </h3>
-
               <div className="text-xs text-slate-500">
-                {university?.required_fields?.filter((f) => f.is_required)
-                  .length || 0}{" "}
-                Required •{" "}
-                {university?.required_fields?.filter((f) => !f.is_required)
-                  .length || 0}{" "}
-                Optional
+                {university?.required_fields?.filter((f) => f.is_required).length || 0} Required •{" "}
+                {university?.required_fields?.filter((f) => !f.is_required).length || 0} Optional
               </div>
             </div>
 
             {!university || university.required_fields.length === 0 ? (
-              <p className="text-sm text-slate-500">
-                No field configuration available.
-              </p>
+              <p className="text-sm text-slate-500">No field configuration available.</p>
             ) : (
               <>
-                {/* REQUIRED SECTION */}
-
                 <div className="mb-8">
                   <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-900">
                     Required Fields
                   </h4>
-
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {university.required_fields
                       ?.filter((field) => field.is_required)
@@ -172,12 +90,8 @@ const UniversityConfigDetails = ({ id }: UniversityDetailsProps) => {
                               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 text-blue-500 transition group-hover:bg-blue-100">
                                 <FileCheck className="h-4 w-4" />
                               </span>
-
-                              <p className="truncate text-sm font-semibold text-slate-900">
-                                {field.field_name}
-                              </p>
+                              <p className="truncate text-sm font-semibold text-slate-900">{field.field_name}</p>
                             </div>
-
                             <span className="shrink-0 rounded-lg border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-blue-600">
                               Required
                             </span>
@@ -191,28 +105,23 @@ const UniversityConfigDetails = ({ id }: UniversityDetailsProps) => {
                   <h4 className="mb-4 text-xs font-semibold uppercase tracking-wider text-slate-400">
                     Optional Fields
                   </h4>
-
                   <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
                     {university.required_fields
                       .filter((field) => !field.is_required)
                       .map((field) => (
                         <div
                           key={field.id}
-                          className="group relative rounded-md border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-slate-300 hover:shadow-sm"
+                          className="group relative rounded-lg border border-slate-200 bg-white p-5 transition-all duration-300 hover:border-slate-300 hover:shadow-sm"
                         >
                           <div className="flex items-start justify-between gap-4">
                             <div className="flex min-w-0 items-center gap-3">
-                              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-slate-50 text-slate-500">
+                              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-slate-50 text-slate-500">
                                 <FileText className="h-4 w-4" />
                               </span>
-
-                              <p className="truncate text-sm font-semibold text-slate-900">
-                                {field.field_name}
-                              </p>
+                              <p className="truncate text-sm font-semibold text-slate-900">{field.field_name}</p>
                             </div>
-
                             <span className="shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-slate-600">
-                              Required
+                              Optional
                             </span>
                           </div>
                         </div>
@@ -222,6 +131,32 @@ const UniversityConfigDetails = ({ id }: UniversityDetailsProps) => {
               </>
             )}
           </div>
+
+          <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
+            <Button
+              onClick={handleBack}
+              icon={<ChevronLeft className="h-5 w-5" />}
+              text="Back"
+              bgColor="bg-white"
+              textColor="text-slate-600"
+              borderColor="border-slate-300"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-400"
+              className="flex-1 hover:bg-slate-50"
+            />
+            <Button
+              onClick={() => router.push(`/admin/config-universities/${id}/edit`)}
+              icon={<Pencil className="h-5 w-5" />}
+              text="Edit Type"
+              bgColor="bg-blue-600"
+              textColor="text-white"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
+              className="flex-1 hover:bg-blue-700"
+            />
+          </div>
+
         </div>
       </div>
     </>

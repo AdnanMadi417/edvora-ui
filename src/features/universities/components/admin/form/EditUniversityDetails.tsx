@@ -521,15 +521,6 @@ const UniversityEdit = ({ id }: Props) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 sm:gap-6">
-          <button
-            onClick={handleBack}
-            className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
-          >
-            <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            <span className="hidden sm:inline">Back to universities</span>
-          </button>
-        </div>
       </div>
 
       {/* University details */}
@@ -866,27 +857,29 @@ const UniversityEdit = ({ id }: Props) => {
       </div>
 
       {/* Footer */}
-      <div className="flex justify-end gap-2 border-t p-6">
+      <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
         <Button
           onClick={handleBack}
           icon={<ArrowLeft className="h-5 w-5" />}
           text="Back"
-          bgColor="bg-slate-50"
-          textColor="text-slate-700"
-          borderColor="border-slate-600"
+          bgColor="bg-white"
+          textColor="text-slate-600"
+          borderColor="border-slate-300"
           hoverTextColor="hover:text-slate-800"
-          hoverBorderColor="hover:border-slate-700"
+          hoverBorderColor="hover:border-slate-400"
+          className="flex-1 hover:bg-slate-50"
         />
         <Button
           onClick={handleSave}
           disabled={logo.uploading || updateLoading || !isFormChanged || (isFormChanged && !isFormValid)}
           icon={<Pencil className="h-5 w-5" />}
           text={updateLoading ? "Updating..." : "Save Changes"}
-          bgColor="bg-blue-50"
-          textColor="text-blue-700"
+          bgColor="bg-blue-600"
+          textColor="text-white"
           borderColor="border-blue-600"
-          hoverTextColor="hover:text-blue-800"
+          hoverTextColor="hover:text-white"
           hoverBorderColor="hover:border-blue-700"
+          className="flex-1 hover:bg-blue-700"
         />
       </div>
 
