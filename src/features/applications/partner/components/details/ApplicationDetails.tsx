@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import RichTextDisplay from "components/ui/RichTextDisplay";
 
 import { GraduationCap, Building2,  Globe, Calendar, ArrowRight, Wallet,AlertCircle } from "lucide-react";
 import {
@@ -453,10 +454,7 @@ export default function ApplicationDetails({
                                   )}
                                 </div>
                                 {method.instructions && (
-                                  <div
-                                    className="prose prose-xs mt-1 max-w-none text-xs leading-relaxed text-slate-600"
-                                    dangerouslySetInnerHTML={{ __html: method.instructions }}
-                                  />
+                                  <RichTextDisplay html={method.instructions} className="mt-1 text-xs" />
                                 )}
                               </div>
                             ))}

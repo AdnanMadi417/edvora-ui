@@ -187,14 +187,14 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
                 onClick={() =>
                   setOpenDropdownId(openDropdownId === paymentMethod?.id ? null : paymentMethod?.id)
                 }
-                className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+                className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
               >
                 Actions
                 <MoreVertical className="h-4 w-4" />
               </button>
 
               {openDropdownId === paymentMethod?.id && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
+                <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white ring-1 ring-black/5">
                   <div className="space-y-2 p-2">
 
                     <button

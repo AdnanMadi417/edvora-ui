@@ -7,6 +7,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import PresignedImage from "components/ui/PresignedImage";
+import RichTextDisplay from "components/ui/RichTextDisplay";
 import { FaTimesCircle } from "react-icons/fa";
 import { MdEvent, MdLocationCity, MdPublic } from "react-icons/md";
 import { HiOutlineCheckCircle } from "react-icons/hi";
@@ -209,10 +210,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                           Instructions
                         </p>
 
-                        <div
-                          className="prose prose-xs mt-1 max-w-none text-xs leading-relaxed text-slate-600"
-                          dangerouslySetInnerHTML={{ __html: payment.instructions }}
-                        />
+                        <RichTextDisplay html={payment.instructions} className="mt-1 text-xs" />
                       </div>
                     )}
                   </div>
