@@ -27,7 +27,7 @@ const InputField = ({ label, field, type = "text", required = true, placeholder 
         onBlur={onBlur}
         placeholder={placeholder}
         {...dateProps}
-        className={`mt-2 flex h-12 w-full items-center justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+        className={`mt-2 flex h-12 w-full items-center justify-start rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
           error ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"
         }`}
       />

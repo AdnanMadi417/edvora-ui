@@ -30,7 +30,7 @@ const LinkBtn = ({
     <Link
       href={href}
       title={title || label}
-      className={`flex items-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition justify-center p-2
+      className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition justify-center p-2
         ${bgColor} ${textColor} ${borderColor} ${hoverTextColor} ${hoverBorderColor} disabled:opacity-50 transition-transform
         ${className || ''}`}
     >

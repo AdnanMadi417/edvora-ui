@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   GraduationCap,
+  Pencil,
 } from "lucide-react";
+import Button from "components/ui/buttons/Button";
 import PresignedImage from "components/ui/PresignedImage";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 import { FaTimesCircle } from "react-icons/fa";
@@ -65,15 +67,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-6">
-              <button
-                onClick={handleBack}
-                className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
-              >
-                <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="hidden sm:inline">Back to universities</span>
-              </button>
-            </div>
 
           </div>
 
@@ -173,7 +166,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 {universityPaymentMethods.map((payment) => (
                   <div
                     key={payment.id}
-                    className="group relative cursor-pointer rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                    className="group relative cursor-pointer rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
@@ -217,6 +210,31 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
+            <Button
+              onClick={handleBack}
+              icon={<ChevronLeft className="h-5 w-5" />}
+              text="Back"
+              bgColor="bg-white"
+              textColor="text-slate-600"
+              borderColor="border-slate-300"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-400"
+              className="flex-1 hover:bg-slate-50"
+            />
+            <Button
+              onClick={() => router.push(`/admin/universities/${id}/edit`)}
+              icon={<Pencil className="h-5 w-5" />}
+              text="Edit University"
+              bgColor="bg-blue-600"
+              textColor="text-white"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
+              className="flex-1 hover:bg-blue-700"
+            />
           </div>
         </div>
       </div>
