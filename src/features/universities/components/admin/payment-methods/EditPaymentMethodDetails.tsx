@@ -187,14 +187,14 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
                 onClick={() =>
                   setOpenDropdownId(openDropdownId === paymentMethod?.id ? null : paymentMethod?.id)
                 }
-                className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+                className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
               >
                 Actions
                 <MoreVertical className="h-4 w-4" />
               </button>
 
               {openDropdownId === paymentMethod?.id && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
+                <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white ring-1 ring-black/5">
                   <div className="space-y-2 p-2">
 
                     <button
@@ -254,25 +254,31 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
 
           </div>
 
-          <div className="flex justify-end gap-2 border-t px-6 py-5">
+          <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
 
             <Button
               onClick={handleBack}
               icon={<ChevronLeft className="h-5 w-5" />}
               text="Back"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
+              bgColor="bg-white"
+              textColor="text-slate-600"
+              borderColor="border-slate-300"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-400"
+              className="flex-1 hover:bg-slate-50"
             />
 
             <Button
               icon={<Pencil className="h-5 w-5" />}
               text={loading ? "Updating..." : "Update Payment"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
+              bgColor="bg-blue-600"
+              textColor="text-white"
               borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
               onClick={handleUpdate}
               disabled={loading || !isChanged || !isFormValid}
+              className="flex-1 hover:bg-blue-700"
             />
 
           </div>

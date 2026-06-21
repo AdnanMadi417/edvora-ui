@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Clock, MoreVertical, Pencil } from "lucide-react";
+import { ChevronLeft, Pencil } from "lucide-react";
 
 import { useUniversityTypeDetails, useUpdateUniversityType, useApplicationSubmissionFields } from "features/universities/hooks";
 
@@ -20,8 +20,6 @@ interface UniversityDetailsProps {
 const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const router = useRouter();
   const { showToast } = useToast();
-  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
-
   const { university, error } = useUniversityTypeDetails(id);
   const { submissionFields } = useApplicationSubmissionFields();
 
@@ -180,55 +178,6 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               </p>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-6">
-              <div className="relative">
-                <button
-                  onClick={() =>
-                    setOpenDropdownId(
-                      openDropdownId === university.id ? null : university.id
-                    )
-                  }
-                  className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  Actions
-                  <MoreVertical className="h-4 w-4" />
-                </button>
-
-                {openDropdownId === university.id && (
-                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white ring-1 ring-black/5">
-                    <div className="space-y-2 p-2">
-                      <button
-                        aria-label="Update Program Details"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm"
-                        onClick={handleUpdateLink}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
-                          <Clock className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-slate-900">
-                          View Details
-                        </span>
-                      </button>
-
-                      <button
-                        aria-label="Back to Programs"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
-                        onClick={handleBack}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
-                          <ChevronLeft className="h-4 w-4" />
-                        </div>
-
-                        <span className="font-semibold text-slate-900">
-                          Back to Programs
-                        </span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
 
           <div className="px-6 py-6">
@@ -296,29 +245,29 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
             )}
           </div>
 
-          <div className="flex justify-end gap-2 rounded-b-md border-t px-6 py-5">
+          <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
             <Button
               onClick={handleBack}
-              disabled={loading}
               icon={<ChevronLeft className="h-5 w-5" />}
-              text={"Back"}
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
+              text="Back"
+              bgColor="bg-white"
+              textColor="text-slate-600"
+              borderColor="border-slate-300"
               hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              hoverBorderColor="hover:border-slate-400"
+              className="flex-1 hover:bg-slate-50"
             />
-
             <Button
               icon={<Pencil className="h-5 w-5" />}
               text={loading ? "Updating..." : "Save Changes"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
+              bgColor="bg-blue-600"
+              textColor="text-white"
               borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
+              hoverTextColor="hover:text-white"
               hoverBorderColor="hover:border-blue-700"
               onClick={handleUpdate}
               disabled={loading || !isFormChanged || !isFormValid}
+              className="flex-1 hover:bg-blue-700"
             />
           </div>
         </div>
