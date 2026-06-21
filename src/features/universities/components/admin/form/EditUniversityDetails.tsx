@@ -28,6 +28,7 @@ import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hoo
 import { useStates } from "features/programs/hooks";
 import InputField from "components/form/fields/InputField";
 import TextareaField from "components/form/fields/TextareaField";
+import RichTextEditor from "components/form/fields/RichTextEditor";
 import SelectField from "components/form/fields/SelectField";
 import MultipleDatePickerModal from "components/form/date/MultipleDatePickerModal";
 import ToggleInput from "components/form/toggle/ToggleInput";
@@ -760,7 +761,7 @@ const UniversityEdit = ({ id }: Props) => {
                   required={false}
                 />
                 <div className="md:col-span-2">
-                  <TextareaField
+                  <RichTextEditor
                     label="Instructions"
                     field="instructions"
                     formData={method}
@@ -821,7 +822,7 @@ const UniversityEdit = ({ id }: Props) => {
                 }
               />
               <div className="md:col-span-2">
-                <TextareaField
+                <RichTextEditor
                   label="Instructions"
                   field="instructions"
                   placeholder="Optional payment instructions..."

@@ -209,9 +209,10 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
                           Instructions
                         </p>
 
-                        <p className="mt-1 text-xs leading-relaxed text-slate-600">
-                          {payment.instructions}
-                        </p>
+                        <div
+                          className="prose prose-xs mt-1 max-w-none text-xs leading-relaxed text-slate-600"
+                          dangerouslySetInnerHTML={{ __html: payment.instructions }}
+                        />
                       </div>
                     )}
                   </div>

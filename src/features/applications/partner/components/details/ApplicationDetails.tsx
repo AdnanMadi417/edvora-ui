@@ -453,9 +453,10 @@ export default function ApplicationDetails({
                                   )}
                                 </div>
                                 {method.instructions && (
-                                  <pre className="whitespace-pre-wrap text-xs leading-relaxed text-slate-600">
-                                    {method.instructions}
-                                  </pre>
+                                  <div
+                                    className="prose prose-xs mt-1 max-w-none text-xs leading-relaxed text-slate-600"
+                                    dangerouslySetInnerHTML={{ __html: method.instructions }}
+                                  />
                                 )}
                               </div>
                             ))}

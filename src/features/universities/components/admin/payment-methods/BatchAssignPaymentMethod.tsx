@@ -7,8 +7,7 @@ import { useAllPaymentMethods, useBatchAssignPaymentMethod } from "features/know
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import SelectField from "components/form/fields/SelectField";
-import InputField from "components/form/fields/InputField";
-import TextareaField from "components/form/fields/TextareaField";
+import RichTextEditor from "components/form/fields/RichTextEditor";
 import MultiSelect from "components/form/search/MultiSelect";
 import { useToast } from "components/context/ToastContext";
 import { CURRENCY } from 'constants/lists';
@@ -148,7 +147,7 @@ export default function BatchUniversities({
               updateFormData={updateFormData}
             />
 
-            <TextareaField
+            <RichTextEditor
               label="Instructions"
               field="instructions"
               placeholder="Optional payment instructions..."

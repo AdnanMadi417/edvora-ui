@@ -12,7 +12,7 @@ import { CURRENCY } from 'constants/lists';
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import SelectField from "components/form/fields/SelectField";
-import TextareaField from "components/form/fields/TextareaField";
+import RichTextEditor from "components/form/fields/RichTextEditor";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 
 interface AssignPaymentUniversityProps {
@@ -160,7 +160,7 @@ export default function AssignPaymentUniversity({
               updateFormData={updateFormData}
             />
 
-            <TextareaField
+            <RichTextEditor
               label="Instructions"
               field="instructions"
               placeholder="Optional payment instructions..."
