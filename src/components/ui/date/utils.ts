@@ -45,6 +45,7 @@ export function formatRelative(date: Date, locale: string): string {
 
 /** Intl option sets keyed by format name. */
 const FORMAT_OPTIONS: Record<Exclude<DateFormat, "relative">, Intl.DateTimeFormatOptions> = {
+  month:        { month: "short" },
   "month-year": { month: "short", year: "numeric" },
   short:        { day: "numeric", month: "short",  year: "numeric" },
   long:         { day: "numeric", month: "long",   year: "numeric" },

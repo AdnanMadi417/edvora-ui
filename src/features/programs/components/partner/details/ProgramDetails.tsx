@@ -27,6 +27,7 @@ import Loading from "components/loading/Loading";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import RichTextDisplay from "components/ui/RichTextDisplay";
+import { AppDate } from "components/ui/date";
 
 type RequiredDocument = {
   id: string;
@@ -268,7 +269,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
             <Calendar className="h-5 w-5 text-slate-400" />
             <p className="text-xs text-slate-500">Next Intake</p>
             <p className="text-xl font-bold text-slate-800">
-              {program?.intake_dates?.[0] ?? "—"}
+              <AppDate value={program?.intake_dates?.[0]} format="month" fallback="—" />
             </p>
           </div>
         </div>
