@@ -32,6 +32,7 @@ export type UseAccountManagerApplicationsParams = {
   limit?: number;
   offset?: number;
   status?: "active" | "hold" | "cancel" | "all";
+  stage?: string;
 };
 
 export function useAccountManagerApplications({
@@ -39,6 +40,7 @@ export function useAccountManagerApplications({
   limit = 20,
   offset = 0,
   status = "active",
+  stage,
 }: UseAccountManagerApplicationsParams) {
   const [data, setData] = useState<AccountManagerApplicationsResponse | null>(null);
   const [loading, setLoading] = useState(false);

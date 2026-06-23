@@ -12,7 +12,6 @@ import {
   GraduationCap,
   ArrowRight,
   ArrowLeft,
-  GitBranch,
   FilePlus,
 } from 'lucide-react';
 
@@ -23,7 +22,6 @@ import EmptyData from 'components/emptyData/EmptyTableData';
 import NextButton from 'components/ui/buttons/NextButton';
 import PrevButton from 'components/ui/buttons/PrevButton';
 import Button from 'components/ui/buttons/Button';
-import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from 'components/filters/StatsFilterCards';
 import ApplicationFilterBar from 'components/filters/ApplicationFilterBar';
 
 import { useUniversities } from "features/universities/hooks";
@@ -31,7 +29,6 @@ import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 import { usePartnerApplications } from "features/applications/partner/hooks/usePartnerApplications";
 import { AppDate } from "components/ui/date";
 
-const STAGE_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose"];
 
 const SkeletonRow = () => (
   <tr className="border-b border-gray-100">
@@ -102,29 +99,6 @@ const PartnerApplications = () => {
     stage: selectedStages !== 'all' ? selectedStages : undefined,
   });
 
-  const [stageCounts, setStageCounts] = useState<Record<string, number>>({});
-  useEffect(() => {
-    if (!stages.length || !partnerId) return;
-    let cancelled = false;
-    Promise.all(
-      stages.map((stage) =>
-        api.get(`/partners/${partnerId}/applications`, {
-          params: { limit: 1, offset: 0, status: 'active', stage: stage.name },
-        })
-        .then((res: any) => ({ name: stage.name, count: res.data?.total ?? 0 }))
-        .catch(() => ({ name: stage.name, count: 0 }))
-      )
-    ).then((results) => {
-      if (!cancelled) {
-        const map: Record<string, number> = {};
-        results.forEach((r) => { map[r.name] = r.count; });
-        setStageCounts(map);
-      }
-    });
-    return () => { cancelled = true; };
-  }, [stages, partnerId]);
-
-
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedUniversity, selectedStages, selectedStageStatus]);
@@ -163,16 +137,6 @@ const PartnerApplications = () => {
     selectedStageStatus !== 'all',
     searchTerm !== '',
   ].filter(Boolean).length;
-
-  const stageCards = useMemo<FilterCardItem[]>(() =>
-    stages.map((stage, i) => ({
-      id: stage.name,
-      label: stage.name,
-      count: stageCounts[stage.name] ?? 0,
-      icon: GitBranch,
-      colorScheme: STAGE_COLORS[i % STAGE_COLORS.length],
-    })),
-  [stages, stageCounts]);
 
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = [...applications];
@@ -320,12 +284,6 @@ const PartnerApplications = () => {
               className="shrink-0 !bg-blue-600 hover:!bg-blue-700"
             />
           </div>
-
-          <StatsFilterCards
-            cards={stageCards}
-            selectedId={selectedStages === 'all' ? null : selectedStages}
-            onSelect={(id) => setSelectedStages(id ?? 'all')}
-          />
 
           <ApplicationFilterBar
             searchTerm={searchTerm}
