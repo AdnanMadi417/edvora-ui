@@ -56,6 +56,14 @@ const ToolbarButton = ({
   </button>
 );
 
+const getNestedValue = (obj: Record<string, any>, path: string): any => {
+  if (!path) return undefined;
+  return path
+    .split(/[.[\]]/)
+    .filter(Boolean)
+    .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
+};
+
 const RichTextEditor = ({
   label,
   field,
@@ -65,7 +73,7 @@ const RichTextEditor = ({
   errors,
   updateFormData,
 }: RichTextEditorProps) => {
-  const value = formData?.[field] ?? "";
+  const value = getNestedValue(formData, field) ?? "";
   const error = errors?.[field];
 
   const [linkPopover, setLinkPopover] = useState(false);

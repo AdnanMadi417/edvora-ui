@@ -12,7 +12,7 @@ export interface ProgramBranch {
   name: string;
   location: string;
   state: string;
-  state_id?: string;
+  state_id: string;
 }
 
 export interface ProgramUniversity {
@@ -20,11 +20,12 @@ export interface ProgramUniversity {
   name: string;
   country: string;
   is_active: boolean;
-  description?: string | null;
-  state?: string | null;
-  intake_months?: string[] | null;
-  logo_file_key?: string;
-  logo_file_url?: string;
+  description: string;
+  logo_file_key: string;
+  logo_file_url: string;
+  intake_months: string[];
+  university_type_id: string;
+  university_type_name: string;
 }
 
 export interface Scholarship {
@@ -63,6 +64,7 @@ export interface Program {
   name: string;
 
   tuition_fee: number | null;
+  visa_fee_amount: number | null;
   first_year_tuition: number | null;
 
   intake_dates: string[] | null;
@@ -90,6 +92,7 @@ export interface Program {
   commission_amount?: number | null;
   commission_currency?: string | null;
 
+  qualification_id: string;
   qualification_level: "bachelor" | "master" | "phd" | string;
 
   field_of_study: FieldOfStudy;
@@ -107,9 +110,9 @@ export interface Program {
 }
 
 export interface GetProgramsParams {
+  include_inactive_universities?: boolean;
   field_of_study_id?: string;
   qualification_id?: string;
-  qualification_level?: string;
   state_id?: string;
   university_id?: string;
   search?: string;

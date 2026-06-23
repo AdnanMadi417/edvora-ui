@@ -26,6 +26,7 @@ import Link from "next/link";
 import Loading from "components/loading/Loading";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
+import RichTextDisplay from "components/ui/RichTextDisplay";
 
 type RequiredDocument = {
   id: string;
@@ -438,7 +439,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
                           </span>
                         )}
                       </div>
-                      {item.description && <p className="text-xs text-slate-500">{item.description}</p>}
+                      {item.description && <RichTextDisplay html={item.description} />}
                       {item.max_amount > 0 && (
                         <p className="text-base font-bold text-amber-600">Up to RM {item.max_amount.toLocaleString()}</p>
                       )}

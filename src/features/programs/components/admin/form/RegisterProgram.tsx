@@ -16,6 +16,7 @@ import { useAllQualifications } from "features/knowledge-hub/qualifications/hook
 import ToggleInput from 'components/form/toggle/ToggleInput';
 import InputField from 'components/form/fields/InputField';
 import TextareaField from 'components/form/fields/TextareaField';
+import RichTextEditor from 'components/form/fields/RichTextEditor';
 import ArrayObjectField from 'components/form/fields/ArrayObjectField';
 import SelectField from 'components/form/fields/SelectField';
 import MultipleDateInput from 'components/form/date/MultipleDateInput';
@@ -314,13 +315,13 @@ export default function RegisterProgram() {
           </div>
 
           {/* Stage content */}
-          <div className="mb-6 min-h-[400px] rounded-md border bg-slate-50 p-6">
+          <div className="mb-6 min-h-[400px] rounded-lg border border-slate-200">
 
             {/* Step 1 — Program Details */}
             {stage === 1 && (
               <div className="space-y-6">
 
-                <div className="space-y-4">
+                <div className="space-y-4 border-b border-slate-200 p-6">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Program Information</h3>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <SearchableDropdown
@@ -379,7 +380,7 @@ export default function RegisterProgram() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 border-b border-slate-200 p-6">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Academic Details</h3>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                     <InputField
@@ -443,12 +444,12 @@ export default function RegisterProgram() {
 
               </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 border-b border-slate-200 p-6">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Delivery Mode</h3>
                   <ToggleInput label="On Campus" field="is_on_campus" formData={formData} errors={errors} updateFormData={updateFormData} />
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 p-6">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Intake Schedule</h3>
                   <MultipleDateInput label="Intake Dates" field="intake_dates" required={false} formData={formData} errors={errors} updateFormData={updateFormData} />
                 </div>
@@ -460,7 +461,7 @@ export default function RegisterProgram() {
             {stage === 2 && (
               <div className="space-y-6">
 
-                <div className="space-y-4">
+                <div className="space-y-4 border-b border-slate-200 p-6">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Commission Structure</h3>
                   <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                     
@@ -528,7 +529,7 @@ export default function RegisterProgram() {
                   </div>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 border-b border-slate-200 p-6">
                   <ArrayObjectField
                     label="Yearly Fees"
                     subLabel="Year"
@@ -557,7 +558,7 @@ export default function RegisterProgram() {
                   />
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 p-6">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Scholarship</h3>
                     {formData.has_scholarship && (
@@ -639,14 +640,13 @@ export default function RegisterProgram() {
                             />
 
                             <div className="md:col-span-2">
-                              <TextareaField
+                              <RichTextEditor
                                 label="Description"
                                 field={`scholarships[${index}].description`}
                                 placeholder="Short description..."
                                 formData={formData}
                                 errors={errors}
                                 updateFormData={updateFormData}
-                                onBlur={() => validateField(`scholarships[${index}].description`)}
                               />
                             </div>
 
