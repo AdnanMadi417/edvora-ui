@@ -109,6 +109,7 @@ export interface Program {
 export interface GetProgramsParams {
   field_of_study_id?: string;
   qualification_id?: string;
+  qualification_level?: string;
   state_id?: string;
   university_id?: string;
   search?: string;
