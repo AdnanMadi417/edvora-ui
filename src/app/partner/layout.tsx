@@ -21,7 +21,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
     <RoleGuard allowedRoles={PARTNER_ROLES}>
 
       <ToastProvider>
-        <div className="relative flex min-h-screen w-full bg-background-100 dark:bg-background-900">
+        <div className="relative flex min-h-screen w-full bg-slate-50">
           <div className="z-[60]">
             <Sidebar
               routes={partnerRoutes}
