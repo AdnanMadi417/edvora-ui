@@ -21,7 +21,7 @@ const ToggleInput = ({
       </label>
 
       <label
-        className={`group relative flex cursor-pointer items-center justify-between rounded-md border px-4 py-4 transition-all
+        className={`group relative flex cursor-pointer items-center justify-between rounded-lg border px-4 py-4 transition-all
         ${
           selected
             ? "border-blue-600 bg-blue-50 shadow-sm"

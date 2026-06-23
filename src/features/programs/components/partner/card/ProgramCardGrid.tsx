@@ -1,30 +1,20 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import {
-  Search,
-  RefreshCw,
-  ArrowRight,
-  ArrowLeft,
-  GraduationCap,
-  MapPin,
-  Award,
-  Send,
-  SlidersHorizontal,
-  BookOpen,
-} from 'lucide-react';
-import { MdSchool } from 'react-icons/md';
+import React, { useState, useMemo, useEffect } from "react";
+import { ArrowRight, ArrowLeft, Award, Send, BookOpen, GraduationCap } from 'lucide-react';
 import PresignedImage from "components/ui/PresignedImage";
 
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import { usePrograms, useStates } from "features/programs/hooks";
+import { programApi } from "features/programs/services";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useUniversities } from "features/universities/hooks";
 
-import FilterSelectField from "components/form/filter/FilterSelectField";
+import ProgramFilterBar from "components/filters/ProgramFilterBar";
+import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "next/link";
@@ -38,13 +28,34 @@ const ProgramsCards = () => {
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
-  const [selectedLevel, setSelectedLevel] = useState<string>("all");
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [selectedQualId, setSelectedQualId] = useState<string | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
 
   const { states } = useStates();
   const { fields } = useAllFields();
   const { qualifications } = useAllQualifications();
   const { universities } = useUniversities();
+
+  const [qualCounts, setQualCounts] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (qualifications.length === 0) return;
+    let cancelled = false;
+    Promise.all(
+      qualifications.map((q) =>
+        programApi.programs
+          .list({ qualification_id: q.id, page: 1, page_size: 1 })
+          .then((res) => ({ id: q.id, count: (res.data as any)?.total ?? 0 }))
+          .catch(() => ({ id: q.id, count: 0 }))
+      )
+    ).then((results) => {
+      if (cancelled) return;
+      const map: Record<string, number> = {};
+      results.forEach((r) => { map[r.id] = r.count; });
+      setQualCounts(map);
+    });
+    return () => { cancelled = true; };
+  }, [qualifications.length]);
 
   const fieldOptions = useMemo(() => fields.map((f) => ({ label: f.name, value: f.id })), [fields]);
   const universityOptions = useMemo(() => universities.map((u) => ({ label: u.name, value: u.id })), [universities]);
@@ -60,12 +71,25 @@ const ProgramsCards = () => {
   } = usePrograms({
     search: searchTerm || undefined,
     field_of_study_id: selectedField !== "all" ? selectedField : undefined,
-    qualification_id: selectedLevel !== "all" ? selectedLevel : undefined,
+    qualification_id: selectedQualId ?? undefined,
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
+
+  const { total: grandTotal } = usePrograms({ page: 1, page_size: 1 });
+
+  const bachelorQual = useMemo(() => qualifications.find((q) => q.name.toLowerCase().includes("bachelor")), [qualifications]);
+  const masterQual = useMemo(() => qualifications.find((q) => q.name.toLowerCase().includes("master")), [qualifications]);
+  const phdQual = useMemo(() => qualifications.find((q) => q.name.toLowerCase().includes("phd") || q.name.toLowerCase().includes("doctoral")), [qualifications]);
+
+  const fixedCards = useMemo<FilterCardItem[]>(() => [
+    { id: null, label: "All Programs", count: grandTotal, icon: BookOpen, colorScheme: "slate" },
+    { id: bachelorQual?.id ?? "__bachelor", label: "Bachelor's Degree", count: bachelorQual ? ((qualCounts as Record<string, number | undefined>)[bachelorQual.id] ?? "—") : "—", icon: GraduationCap, colorScheme: "blue", disabled: !bachelorQual },
+    { id: masterQual?.id ?? "__master", label: "Master's Degree", count: masterQual ? ((qualCounts as Record<string, number | undefined>)[masterQual.id] ?? "—") : "—", icon: GraduationCap, colorScheme: "violet", disabled: !masterQual },
+    { id: phdQual?.id ?? "__phd", label: "PhD Degree", count: phdQual ? ((qualCounts as Record<string, number | undefined>)[phdQual.id] ?? "—") : "—", icon: GraduationCap, colorScheme: "emerald", disabled: !phdQual },
+  ], [grandTotal, bachelorQual, masterQual, phdQual, qualCounts]);
 
   const filteredPrograms = useMemo(() => {
     if (!Array.isArray(programs)) return [];
@@ -76,7 +100,7 @@ const ProgramsCards = () => {
     selectedState !== "all",
     selectedField !== "all",
     selectedUniversity !== "all",
-    selectedLevel !== "all",
+    selectedQualId !== null,
     searchTerm !== "",
   ].filter(Boolean).length;
 
@@ -85,11 +109,20 @@ const ProgramsCards = () => {
     setCurrentPage(1);
   };
 
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedState("all");
+    setSelectedField("all");
+    setSelectedUniversity("all");
+    setSelectedQualId(null);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="mt-6 overflow-hidden text-p2 max-w-5xl mx-auto">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-card">
 
-<div className="relative border-b border-gray-200 p-6">
+<div className="relative border-b border-slate-200 p-6">
           <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-slate-900">
@@ -102,93 +135,33 @@ const ProgramsCards = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
+          <StatsFilterCards
+            cards={fixedCards}
+            selectedId={selectedQualId}
+            onSelect={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
+          />
 
-            {/* Search + mobile filter toggle */}
-            <div className="flex items-center gap-2 sm:contents">
-              <div className="relative flex-1 sm:w-64 sm:flex-none flex-shrink-0">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
-                <input
-                  type="text"
-                  placeholder="Search by university, program, or level..."
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-none placeholder:text-slate-400 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
-                />
-              </div>
-              <button
-                className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-background text-slate-500 hover:bg-slate-50"
-                onClick={() => setShowMobileFilters((v) => !v)}
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                {activeFiltersCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
-                    {activeFiltersCount}
-                  </span>
-                )}
-              </button>
-            </div>
-
-            {/* Filter selects — collapsible on mobile, always visible on sm+ */}
-            <div className={`flex-col gap-3 sm:contents ${showMobileFilters ? 'flex' : 'hidden sm:contents'}`}>
-              <div className="w-full sm:w-48 flex-shrink-0">
-                <FilterSelectField
-                  value={selectedState}
-                  onChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
-                  options={stateOptions}
-                  icon={MapPin}
-                  defaultOption="All Locations"
-                />
-              </div>
-
-              <div className="w-full sm:w-48 flex-shrink-0">
-                <FilterSelectField
-                  value={selectedField}
-                  onChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
-                  options={fieldOptions}
-                  icon={GraduationCap}
-                  defaultOption="All Fields"
-                />
-              </div>
-
-              <div className="w-full sm:w-48 flex-shrink-0">
-                <FilterSelectField
-                  value={selectedUniversity}
-                  onChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
-                  options={universityOptions}
-                  icon={MdSchool}
-                  defaultOption="All Universities"
-                />
-              </div>
-
-              <div className="w-full sm:w-48 flex-shrink-0">
-                <FilterSelectField
-                  value={selectedLevel}
-                  onChange={(val) => { setSelectedLevel(val); setCurrentPage(1); }}
-                  options={qualificationOptions}
-                  icon={BookOpen}
-                  defaultOption="All Levels"
-                />
-              </div>
-
-              <div className="w-full sm:w-auto flex-shrink-0">
-                <button
-                  onClick={() => {
-                    setSearchTerm("");
-                    setSelectedState("all");
-                    setSelectedField("all");
-                    setSelectedUniversity("all");
-                    setSelectedLevel("all");
-                    setCurrentPage(1);
-                  }}
-                  className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  Clear
-                </button>
-              </div>
-            </div>
-          </div>
+          <ProgramFilterBar
+            searchTerm={searchTerm}
+            onSearchChange={handleSearchChange}
+            searchPlaceholder="Search by university, program, or level..."
+            selectedState={selectedState}
+            onStateChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
+            stateOptions={stateOptions}
+            selectedField={selectedField}
+            onFieldChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
+            fieldOptions={fieldOptions}
+            selectedUniversity={selectedUniversity}
+            onUniversityChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
+            universityOptions={universityOptions}
+            selectedQualId={selectedQualId}
+            onQualChange={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
+            qualificationOptions={qualificationOptions}
+            activeFiltersCount={activeFiltersCount}
+            onClearFilters={clearFilters}
+            showFilters={showFilters}
+            onToggleFilters={() => setShowFilters((v) => !v)}
+          />
 
         </div>
 
@@ -327,7 +300,7 @@ const ProgramsCards = () => {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 items-center gap-4 border-t border-gray-200 p-4 sm:p-6 md:flex md:justify-between">
+              <div className="grid grid-cols-1 items-center gap-4 border-t border-slate-200 p-4 sm:p-6 md:flex md:justify-between">
                 {total > 0 && (
                   <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
                     Showing

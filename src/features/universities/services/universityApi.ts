@@ -19,7 +19,7 @@ const authHeader = () => {
 
 export const universityApi = {
   universities: {
-    list: () => api.get("/knowledge-hub/universities"),
+    list: (params?: Record<string, unknown>) => api.get("/knowledge-hub/universities", { params }),
     get: (id: string) => api.get(`/knowledge-hub/universities/${id}`),
     create: (data: CreateUniversityPayload) =>
       api.post("/knowledge-hub/universities", data, { headers: authHeader() }),

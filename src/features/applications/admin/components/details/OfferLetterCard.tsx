@@ -4,6 +4,7 @@ import { Download, CreditCard } from "lucide-react";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { useVisaCase } from "hooks/useVisaCase";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
+import { AppDate } from "components/ui/date";
 
 interface OfferLetterDecisionProps {
   application: any;
@@ -64,9 +65,7 @@ export default function OfferLetterDecision({
               <div>
                 <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">Created At</p>
                 <p className="text-sm text-slate-700">
-                  {visaCase.created_at
-                    ? new Date(visaCase.created_at).toLocaleString()
-                    : "—"}
+                  <AppDate value={visaCase.created_at} format="datetime" />
                 </p>
               </div>
               <div>
@@ -108,7 +107,7 @@ export default function OfferLetterDecision({
               <p className="truncate font-medium text-gray-900">Offer Letter</p>
               <p className="text-xs text-gray-500">
                 PDF • Uploaded on{" "}
-                {new Date(offerLetter.created_at).toLocaleDateString()}
+                <AppDate value={offerLetter.created_at} format="short" />
               </p>
             </div>
           </div>

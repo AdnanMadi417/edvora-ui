@@ -8,16 +8,11 @@ import {
   User,
   Building,
   GraduationCap,
-  BadgeCheck,
   ArrowLeft,
   ArrowRight,
-  UserSearch,
   GitBranch,
-  RotateCcw,
   Flag,
-  SlidersHorizontal,
 } from "lucide-react";
-import { MdSchool } from "react-icons/md";
 
 import { useAdminApplications } from "features/applications/admin/hooks/useAdminApplications";
 import { useUniversities } from "features/universities/hooks";
@@ -26,24 +21,13 @@ import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 import EmptyData from "components/emptyData/EmptyTableData";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
-import ClearButton from "components/ui/buttons/DangerButton";
-import FilterSelectField from "components/form/filter/FilterSelectField";
+import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from "components/filters/StatsFilterCards";
+import ApplicationFilterBar from "components/filters/ApplicationFilterBar";
 import { useRouter } from "next/navigation";
+import api from "lib/useApi";
+import { AppDate } from "components/ui/date";
 
-const getRelativeTime = (dateStr: string) => {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  if (diffMins < 60) return `${diffMins}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays}d ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)}w ago`;
-  return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "2-digit" });
-};
+const STAGE_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose"];
 
 const SkeletonRow = () => (
   <tr className="border-b border-gray-100">
@@ -87,16 +71,6 @@ const ModernApplicationsTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
-  const {
-    items: adminApplications,
-    loading,
-    total,
-  } = useAdminApplications({
-    limit: itemsPerPage,
-    offset: (currentPage - 1) * itemsPerPage,
-    status: "active",
-  });
-
   const { universities } = useUniversities();
   const { stages } = useAllStages();
   const { stageStatuses, stageStatusesLoading } = useAllStageStatuses();
@@ -107,6 +81,35 @@ const ModernApplicationsTable = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [searchTerm, setSearchTerm] = useState("");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  const { items: adminApplications, loading, total } = useAdminApplications({
+    limit: itemsPerPage,
+    offset: (currentPage - 1) * itemsPerPage,
+    status: "active",
+    stage: selectedStages !== "all" ? selectedStages : undefined,
+  });
+
+  const [stageCounts, setStageCounts] = useState<Record<string, number>>({});
+  useEffect(() => {
+    if (!stages.length) return;
+    let cancelled = false;
+    Promise.all(
+      stages.map((stage) =>
+        api.get("/admin/applications", {
+          params: { limit: 1, offset: 0, status: "active", stage: stage.name },
+        })
+        .then((res: any) => ({ name: stage.name, count: res.data?.total ?? 0 }))
+        .catch(() => ({ name: stage.name, count: 0 }))
+      )
+    ).then((results) => {
+      if (!cancelled) {
+        const map: Record<string, number> = {};
+        results.forEach((r) => { map[r.name] = r.count; });
+        setStageCounts(map);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [stages]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -125,6 +128,16 @@ const ModernApplicationsTable = () => {
     selectedStageStatus !== "all",
     searchTerm !== "",
   ].filter(Boolean).length;
+
+  const stageCards = useMemo<FilterCardItem[]>(() =>
+    stages.map((stage, i) => ({
+      id: stage.name,
+      label: stage.name,
+      count: stageCounts[stage.name] ?? 0,
+      icon: GitBranch,
+      colorScheme: STAGE_COLORS[i % STAGE_COLORS.length],
+    })),
+  [stages, stageCounts]);
 
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = [...adminApplications];
@@ -145,12 +158,6 @@ const ModernApplicationsTable = () => {
     if (selectedStageStatus !== "all" && !stageStatusesLoading) {
       filtered = filtered.filter(
         (app) => app.status?.toLowerCase().replace(/\s+/g, "_") === selectedStageStatus,
-      );
-    }
-
-    if (selectedStages !== "all") {
-      filtered = filtered.filter(
-        (app) => app.stage?.toLowerCase() === selectedStages.toLowerCase(),
       );
     }
 
@@ -175,7 +182,6 @@ const ModernApplicationsTable = () => {
     adminApplications,
     searchTerm,
     selectedUniversity,
-    selectedStages,
     selectedStageStatus,
     sortConfig,
     stageStatusesLoading,
@@ -285,82 +291,33 @@ const ModernApplicationsTable = () => {
             </div>
           </div>
 
-          {/* Filter bar */}
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-3">
-            {/* Search + mobile filter toggle */}
-            <div className="flex items-center gap-2 sm:contents">
-              <div className="relative flex-1 sm:w-64 sm:flex-none flex-shrink-0">
-                <UserSearch className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search applications..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 text-sm text-slate-700 outline-0 placeholder:text-slate-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-              <button
-                className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-background text-slate-500 hover:bg-slate-50"
-                onClick={() => setShowMobileFilters((v) => !v)}
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                {activeFiltersCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
-                    {activeFiltersCount}
-                  </span>
-                )}
-              </button>
-            </div>
+          <StatsFilterCards
+            cards={stageCards}
+            selectedId={selectedStages === "all" ? null : selectedStages}
+            onSelect={(id) => setSelectedStages(id ?? "all")}
+          />
 
-            {/* Filter selects — collapsible on mobile, always visible on sm+ */}
-            <div className={`flex-col gap-3 sm:contents ${showMobileFilters ? "flex" : "hidden sm:contents"}`}>
-              <div className="w-full sm:w-44 flex-shrink-0">
-                <FilterSelectField
-                  value={selectedStages}
-                  onChange={(val: string) => setSelectedStages(val)}
-                  options={stages}
-                  icon={GitBranch}
-                  defaultOption="All Stages"
-                />
-              </div>
-
-              <div className="w-full sm:w-48 flex-shrink-0">
-                <FilterSelectField
-                  value={selectedUniversity}
-                  onChange={(val: string) => setSelectedUniversity(val)}
-                  options={universities}
-                  icon={MdSchool}
-                  defaultOption="All Universities"
-                />
-              </div>
-
-              <div className="w-full sm:w-48 flex-shrink-0">
-                <FilterSelectField
-                  value={selectedStageStatus}
-                  onChange={(val: string) => setSelectedStageStatus(val)}
-                  options={stageStatuses.map((s) => ({
-                    label: s.name,
-                    value: s.name.toLowerCase().replace(/\s+/g, "_"),
-                  }))}
-                  icon={BadgeCheck}
-                  defaultOption={stageStatusesLoading ? "Loading..." : "All Statuses"}
-                />
-              </div>
-
-              {activeFiltersCount > 0 && (
-                <div className="relative flex-shrink-0">
-                  <ClearButton
-                    onClick={handleClearFilters}
-                    text="Clear"
-                    icon={<RotateCcw className="h-4 w-4" />}
-                  />
-                  <span className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-md bg-red-500 text-[10px] font-bold text-white">
-                    {activeFiltersCount}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
+          <ApplicationFilterBar
+            searchTerm={searchTerm}
+            onSearchChange={(e) => setSearchTerm(e.target.value)}
+            selectedStages={selectedStages}
+            onStagesChange={setSelectedStages}
+            stageOptions={stages.map((s) => ({ label: s.name, value: s.name }))}
+            selectedUniversity={selectedUniversity}
+            onUniversityChange={setSelectedUniversity}
+            universityOptions={universities.map((u) => ({ label: u.name, value: u.name }))}
+            selectedStageStatus={selectedStageStatus}
+            onStageStatusChange={setSelectedStageStatus}
+            stageStatusOptions={stageStatuses.map((s) => ({
+              label: s.name,
+              value: s.name.toLowerCase().replace(/\s+/g, "_"),
+            }))}
+            stageStatusLoading={stageStatusesLoading}
+            activeFiltersCount={activeFiltersCount}
+            onClearFilters={handleClearFilters}
+            showFilters={showMobileFilters}
+            onToggleFilters={() => setShowMobileFilters((v) => !v)}
+          />
 
         </div>
       </div>
@@ -412,7 +369,7 @@ const ModernApplicationsTable = () => {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
                   <span className="truncate text-sm font-semibold text-slate-900">{app.student_name}</span>
-                  <span className="shrink-0 text-xs text-slate-400">{getRelativeTime(app.updated_at)}</span>
+                  <span className="shrink-0 text-xs text-slate-400"><AppDate value={app.updated_at} format="relative" /></span>
                 </div>
                 <div className="mt-0.5 truncate text-xs text-slate-500">{app.program_name}</div>
                 <div className="mt-1.5"><StatusBadge status={app.status} /></div>
@@ -549,7 +506,7 @@ const ModernApplicationsTable = () => {
 
                   <td className="px-6 py-4">
                     <div className="text-sm text-slate-500">
-                      {getRelativeTime(app.updated_at)}
+                      <AppDate value={app.updated_at} format="relative" />
                     </div>
                   </td>
 

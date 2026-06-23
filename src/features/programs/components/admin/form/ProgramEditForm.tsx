@@ -28,6 +28,7 @@ import { useAllQualifications } from "features/knowledge-hub/qualifications/hook
 
 import InputField from "components/form/fields/InputField";
 import TextareaField from "components/form/fields/TextareaField";
+import RichTextEditor from "components/form/fields/RichTextEditor";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import MultipleDateInput from "components/form/date/MultipleDateInput";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
@@ -741,14 +742,13 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                     />
 
                     <div className="md:col-span-2">
-                      <TextareaField
+                      <RichTextEditor
                         label="Description"
                         field={`scholarships[${index}].description`}
                         placeholder="Short description..."
                         formData={formData}
                         errors={errors}
                         updateFormData={updateFormData}
-                        onBlur={() => validateField(`scholarships[${index}].description`)}
                       />
                     </div>
 

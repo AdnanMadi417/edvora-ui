@@ -5,6 +5,7 @@ import { FolderOpen, ChevronDown, Clock, CheckCircle, XCircle, Download } from '
 import EmptyData from 'components/emptyData/EmptyData';
 import { getDocumentDownloadUrl } from 'services/documentService';
 import { useToast } from 'components/context/ToastContext';
+import { AppDate } from "components/ui/date";
 
 interface ApplicationDocumentsProps {
   application: any;
@@ -70,10 +71,6 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
     }
   };
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'Not provided';
-    return new Date(dateString).toLocaleDateString();
-  };
 
   if (totalDocuments === 0) return <EmptyData />;
 
@@ -100,7 +97,7 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
                 {label}
               </span>
             </div>
-            <p className="mt-0.5 text-xs text-slate-400">{formatDate(doc.created_at)}</p>
+            <p className="mt-0.5 text-xs text-slate-400"><AppDate value={doc.created_at} format="short" fallback="Not provided" /></p>
             {doc.approve_notes && (
               <p className="mt-1 text-xs text-slate-500">
                 Note: <span className="font-medium text-slate-700">{doc.approve_notes}</span>
