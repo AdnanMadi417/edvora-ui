@@ -11,6 +11,7 @@ import {
 import { useVisaCase } from "hooks/useVisaCase";
 import { useVisaPayments } from "hooks/useVisaPayments";
 import { getDocumentDownloadUrl } from "services/documentService";
+import { AppDate } from "components/ui/date";
 
 interface VisaTrackingTimelineProps {
   application: any;
@@ -63,7 +64,7 @@ export default function VisaTrackingTimeline({
                 </p>
                 <p className="text-xs text-slate-500">
                   Uploaded on{" "}
-                  {new Date(application.emgs_evaluation_document.created_at).toLocaleDateString()}
+                  <AppDate value={application.emgs_evaluation_document.created_at} format="short" />
                 </p>
               </div>
             </div>
@@ -91,7 +92,7 @@ export default function VisaTrackingTimeline({
               <div>
                 <p className="font-medium text-gray-900">{application.visa_document.document_type}</p>
                 <p className="text-xs text-slate-500">
-                  Uploaded on {new Date(application.visa_document.created_at).toLocaleDateString()}
+                  Uploaded on <AppDate value={application.visa_document.created_at} format="short" />
                 </p>
               </div>
             </div>
@@ -144,9 +145,7 @@ export default function VisaTrackingTimeline({
                         <div className="flex items-center gap-2 text-sm text-slate-500">
                           <Calendar className="h-4 w-4" />
                           <span>
-                            {payment.submitted_at
-                              ? new Date(payment.submitted_at).toLocaleString()
-                              : "—"}
+                            <AppDate value={payment.submitted_at} format="datetime" />
                           </span>
                         </div>
                       </div>
@@ -199,7 +198,7 @@ export default function VisaTrackingTimeline({
                   <div>
                     <p className="font-medium text-gray-900">{doc.document_type}</p>
                     <p className="text-xs text-slate-500">
-                      Uploaded on {new Date(doc.created_at).toLocaleDateString()}
+                      Uploaded on <AppDate value={doc.created_at} format="short" />
                     </p>
                   </div>
                 </div>

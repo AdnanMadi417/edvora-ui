@@ -37,6 +37,7 @@ import DeleteUniversityConfirmation from "../popups/DeleteUniversityConfirmation
 import AssignPaymentUniversity from "../popups/AssignPaymentMethods";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
+import { AppDate } from "components/ui/date";
 
 const UniversitiesTable = () => {
   const router = useRouter();
@@ -170,17 +171,6 @@ const UniversitiesTable = () => {
     setCurrentPage(1);
   };
 
-  const formatDate = (date: string) => {
-    const d = new Date(date);
-
-    if (isNaN(d.getTime())) return "Invalid date";
-
-    return d.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -503,7 +493,7 @@ const UniversitiesTable = () => {
                               key={index}
                               className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
                             >
-                                      {formatDate(date)}
+                                      <AppDate value={date} format="short" />
                                     </span>
                           )
                         )

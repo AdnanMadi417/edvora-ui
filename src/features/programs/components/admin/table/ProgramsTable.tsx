@@ -47,6 +47,7 @@ import BatchIELTSPrograms from "features/programs/components/admin/popups/BatchI
 import BatchProgramIntakes from "features/programs/components/admin/popups/BatchProgramIntakes";
 import BatchProgramScholarship from "features/programs/components/admin/popups/BatchProgramScholarship";
 import BatchDeleteScholarships from "features/programs/components/admin/popups/BatchDeleteScholarships";
+import { AppDate } from "components/ui/date";
 import BatchFeesPrograms from "features/programs/components/admin/popups/BatchFeesPrograms";
 import BatchBranchPrograms from "features/programs/components/admin/popups/BatchBranchPrograms";
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
@@ -195,8 +196,6 @@ const ProgramsTable = () => {
     setCurrentPage(1);
   };
 
-  const formatDate = (date: string) =>
-    new Date(date).toLocaleDateString("en-US", { day: "2-digit", month: "short", year: "numeric" });
 
   const [selectedPrograms, setSelectedPrograms] = useState<Record<string, boolean>>({});
 
@@ -585,7 +584,7 @@ const ProgramsTable = () => {
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1 text-xs text-slate-600">
                       <span className="font-medium text-slate-700">
-                        {program.next_intake ? formatDate(program.next_intake) : "TBA"}
+                        <AppDate value={program.next_intake} format="short" fallback="TBA" />
                       </span>
                       {program.intake_dates && program.intake_dates.length > 0 && (
                         <span className="text-slate-400">
