@@ -13,8 +13,8 @@ const authHeader = () => {
 };
 
 export const partnersApi = {
-  list: () =>
-    api.get('/admin/partners', { headers: authHeader() }),
+  list: (params?: { page?: number; page_size?: number }) =>
+    api.get('/admin/partners', { params, headers: authHeader() }),
 
   get: (id: string) =>
     api.get(`/admin/partners/${id}`, { headers: authHeader() }),
