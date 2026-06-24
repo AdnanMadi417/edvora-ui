@@ -2,8 +2,10 @@ import type { IconType } from "react-icons";
 
 export interface IRoute {
   name: string;
-  layout: string;
+  layout?: string;
   path: string;
-  icon: IconType;
+  icon?: IconType;
   children?: IRoute[];
+  items?: IRoute[];
+  secondary?: boolean;
 }

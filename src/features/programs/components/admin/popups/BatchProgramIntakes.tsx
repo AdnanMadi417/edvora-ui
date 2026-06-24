@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, CalendarDays } from "lucide-react";
@@ -7,7 +7,7 @@ import { useBatchUpdatePrograms } from "features/programs/hooks";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import MultipleDateInput from "components/form/MultipleDateInput";
+import MultipleDateInput from "components/form/date/MultipleDateInput";
 
 import { useToast } from "components/context/ToastContext";
 

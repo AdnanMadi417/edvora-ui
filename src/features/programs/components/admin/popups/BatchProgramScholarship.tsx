@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, GraduationCap, CalendarPlus, Plus, Trash2 } from "lucide-react";
@@ -8,7 +8,8 @@ import { useBatchUpdatePrograms } from "features/programs/hooks";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
+import RichTextEditor from "components/form/fields/RichTextEditor";
 
 import { useToast } from "components/context/ToastContext";
 
@@ -284,15 +285,13 @@ export default function BatchProgramScholarships({
                     />
 
                     <div className="md:col-span-2">
-                      <InputField
+                      <RichTextEditor
                         label="Description"
                         field={`scholarships[${index}].description`}
                         placeholder="Short description..."
-                        type="text"
                         formData={formData}
                         errors={errors}
                         updateFormData={updateFormData}
-                        onBlur={() => validateField(`scholarships[${index}].description`, formData.scholarships[index].description)}
                       />
                     </div>
 

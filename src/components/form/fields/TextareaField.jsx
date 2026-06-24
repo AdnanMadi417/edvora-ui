@@ -22,8 +22,8 @@ const TextareaField = ({ label, field, required = true, placeholder = "", formDa
         onChange={(e) => updateFormData(field, e.target.value)}
         onBlur={onBlur}
         placeholder={placeholder}
-        className={`mt-2 min-h-[96px] w-full rounded-md border p-3 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 resize-y ${
-          errors?.[field] ? "border-red-500" : "border-default"
+        className={`mt-2 min-h-[96px] w-full rounded-lg border p-3 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 resize-y ${
+          errors?.[field] ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"
         }`}
       />
 

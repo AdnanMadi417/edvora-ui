@@ -133,7 +133,7 @@ const ImageUploadField = ({
       {showDropzone && isSimpleMode && (
         <div className="flex flex-col items-center gap-2">
           <label className="group relative cursor-pointer">
-            <div className="flex h-24 w-24 items-center justify-center rounded-md border-2 border-dashed border-slate-300 bg-slate-50 transition-all duration-200 group-hover:border-blue-400 group-hover:bg-blue-50">
+            <div className="flex h-24 w-24 items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 transition-all duration-200 group-hover:border-blue-400 group-hover:bg-blue-50">
               <div className="flex flex-col items-center gap-1">
                 <Camera className="h-6 w-6 text-slate-400 transition-colors group-hover:text-blue-500" />
                 <span className="text-[10px] font-medium text-slate-400 transition-colors group-hover:text-blue-500">Upload</span>
@@ -154,7 +154,7 @@ const ImageUploadField = ({
 
       {/* ── document-management mode dropzone ── */}
       {showDropzone && !isSimpleMode && (
-        <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center transition-all duration-300 hover:border-blue-400 hover:bg-blue-50">
+        <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center transition-all duration-300 hover:border-blue-400 hover:bg-blue-50">
           <Upload className="mb-3 h-8 w-8 text-slate-400" />
           <p className="text-sm text-slate-600">
             Drag & drop or{" "}
@@ -176,7 +176,7 @@ const ImageUploadField = ({
         <div className="flex flex-col items-center gap-2">
           <div className="group relative">
             {imgError ? (
-              <label className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-blue-400 bg-gradient-to-br from-blue-600 to-indigo-700 shadow-sm">
+              <label className="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-blue-400 bg-gradient-to-br from-blue-600 to-indigo-700 shadow-sm">
                 <Camera className="h-5 w-5 text-white" />
                 <span className="mt-0.5 text-[10px] font-medium text-white">Upload</span>
                 <input type="file" accept={resolvedAccept} className="hidden" onChange={handleSimpleUpload} />
@@ -186,10 +186,10 @@ const ImageUploadField = ({
                 <img
                   src={existingUrl}
                   alt="Current logo"
-                  className="h-24 w-24 rounded-md object-cover ring-2 ring-blue-500 ring-offset-2 shadow-md"
+                  className="h-24 w-24 rounded-lg object-cover ring-2 ring-blue-500 ring-offset-2 shadow-md"
                   onError={() => setImgError(true)}
                 />
-                <label className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center rounded-md bg-black/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                <label className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center rounded-lg bg-black/50 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                   <Camera className="h-5 w-5 text-white" />
                   <span className="mt-0.5 text-[10px] font-medium text-white">Replace</span>
                   <input type="file" accept={resolvedAccept} className="hidden" onChange={handleSimpleUpload} />
@@ -200,7 +200,7 @@ const ImageUploadField = ({
           <button
             type="button"
             onClick={handleExistingRemove}
-            className="flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
+            className="flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100"
           >
             <Trash2 className="h-3 w-3" />
             Remove
@@ -212,7 +212,7 @@ const ImageUploadField = ({
       {showSimpleFile && (
         <div className="flex flex-col items-center gap-2">
           <div className="relative">
-            <div className={`flex h-24 w-24 overflow-hidden rounded-md shadow-md ring-2 ring-offset-2 ${simpleUploading ? "ring-blue-400" : "ring-green-400"}`}>
+            <div className={`flex h-24 w-24 overflow-hidden rounded-lg shadow-md ring-2 ring-offset-2 ${simpleUploading ? "ring-blue-400" : "ring-green-400"}`}>
               {simpleFile.type?.startsWith("image/") ? (
                 <img
                   src={previewUrl}
@@ -226,7 +226,7 @@ const ImageUploadField = ({
               )}
             </div>
             {simpleUploading && (
-              <div className="absolute inset-0 flex items-center justify-center rounded-md bg-black/30">
+              <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-black/30">
                 <span className="text-xs font-bold text-white">{simpleProgress}%</span>
               </div>
             )}
@@ -238,9 +238,9 @@ const ImageUploadField = ({
           </p>
 
           {simpleUploading && (
-            <div className="h-1 w-24 rounded-md bg-blue-100">
+            <div className="h-1 w-24 rounded-lg bg-blue-100">
               <div
-                className="h-full rounded-md bg-blue-500 transition-all duration-300"
+                className="h-full rounded-lg bg-blue-500 transition-all duration-300"
                 style={{ width: `${simpleProgress}%` }}
               />
             </div>
@@ -250,7 +250,7 @@ const ImageUploadField = ({
             type="button"
             onClick={handleSimpleRemove}
             disabled={simpleUploading}
-            className="flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+            className="flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-3 py-1 text-xs font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
           >
             <Trash2 className="h-3 w-3" />
             Remove
@@ -260,10 +260,10 @@ const ImageUploadField = ({
 
       {/* ── document-management mode: file preview ── */}
       {showDocFile && (
-        <div className={`mt-4 rounded-md border p-4 transition ${docFile.file_key ? "border-slate-200 bg-white" : "border-red-400 bg-red-50"}`}>
+        <div className={`mt-4 rounded-lg border p-4 transition ${docFile.file_key ? "border-slate-200 bg-white" : "border-red-400 bg-red-50"}`}>
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 truncate">
-              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md ${docFile.file_key ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}>
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${docFile.file_key ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}>
                 <FileCheck className="h-5 w-5" />
               </div>
               <div className="min-w-0">
@@ -279,7 +279,7 @@ const ImageUploadField = ({
               <button
                 type="button"
                 onClick={handleDocRemove}
-                className="flex shrink-0 items-center gap-2 rounded-md border border-red-600 bg-red-100 px-4 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-200"
+                className="flex shrink-0 items-center gap-2 rounded-lg border border-red-600 bg-red-100 px-4 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-200"
               >
                 <Trash2 className="h-3 w-3" />
                 Remove
@@ -287,9 +287,9 @@ const ImageUploadField = ({
             )}
           </div>
           {docFile.uploading && (
-            <div className={`mt-4 h-1.5 w-full rounded-md ${docFile.file_key ? "bg-green-200" : "bg-red-200"}`}>
+            <div className={`mt-4 h-1.5 w-full rounded-lg ${docFile.file_key ? "bg-green-200" : "bg-red-200"}`}>
               <div
-                className={`h-full rounded-md ${docFile.file_key ? "bg-green-600" : "bg-red-600"} transition-all duration-300`}
+                className={`h-full rounded-lg ${docFile.file_key ? "bg-green-600" : "bg-red-600"} transition-all duration-300`}
                 style={{ width: `${docFile.progress || 0}%` }}
               />
             </div>
@@ -298,7 +298,7 @@ const ImageUploadField = ({
       )}
 
       {fileError && (
-        <div className="mt-2 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-2">
+        <div className="mt-2 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-2">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
           <p className="text-xs font-medium text-red-700">{fileError}</p>
         </div>

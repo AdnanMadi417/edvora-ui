@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, DollarSign } from "lucide-react";
@@ -7,7 +7,7 @@ import { useBatchUpdatePrograms } from "features/programs/hooks";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import ArrayObjectField from "components/form/ArrayObjectField";
+import ArrayObjectField from "components/form/fields/ArrayObjectField";
 
 import { useToast } from "components/context/ToastContext";
 
@@ -84,8 +84,8 @@ export default function CreateFees({
     try {
       const payload = {
         program_ids: selectedProgramIds,
-        yearly_fees: formData.yearly_fees.length > 0 ? formData.yearly_fees : undefined,
-        one_time_fees: formData.one_time_fees.length > 0 ? formData.one_time_fees : undefined,
+        yearly_fees: formData.yearly_fees.length > 0 ? formData.yearly_fees.map((y) => ({ ...y, fee: Number(y.fee) })) : undefined,
+        one_time_fees: formData.one_time_fees.length > 0 ? formData.one_time_fees.map((f) => ({ ...f, fee: Number(f.fee) })) : undefined,
       };
 
       await batchUpdatePrograms(payload);

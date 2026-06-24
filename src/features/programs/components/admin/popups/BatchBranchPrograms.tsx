@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, GitBranch } from "lucide-react";
@@ -8,7 +8,7 @@ import { useBranches } from "features/universities/hooks";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import SelectField from "components/form/SelectField";
+import SelectField from "components/form/fields/SelectField";
 
 import { useToast } from "components/context/ToastContext";
 

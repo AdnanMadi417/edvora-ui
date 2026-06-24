@@ -1,1 +1,1 @@
-// Partner management pure helper functions
+export {};

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import {
@@ -22,7 +22,7 @@ import {
 } from "features/applications/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
-import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 
@@ -741,7 +741,7 @@ export default function UpdateStatusPopup({
                 }}
                 placeholder="Please provide a detailed reason..."
                 rows={4}
-                className={`w-full rounded-md border px-4 py-3 text-p2 outline-none transition-all duration-200 placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 ${reasonError ? "border-red-500 bg-red-50" : "border-default"}`}
+                className={`w-full rounded-md border px-4 py-3 text-p2 outline-none transition-colors resize-y placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${reasonError ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"}`}
               />
               {reasonError && <p className="mt-1 text-xs text-red-600">{reasonError}</p>}
             </div>

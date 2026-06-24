@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard } from "lucide-react";
@@ -6,9 +6,8 @@ import { useAllPaymentMethods, useBatchAssignPaymentMethod } from "features/know
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import SelectField from "components/form/SelectField";
-import InputField from "components/form/InputField";
-import TextareaField from "components/form/TextareaField";
+import SelectField from "components/form/fields/SelectField";
+import RichTextEditor from "components/form/fields/RichTextEditor";
 import MultiSelect from "components/form/search/MultiSelect";
 import { useToast } from "components/context/ToastContext";
 import { CURRENCY } from 'constants/lists';
@@ -148,7 +147,7 @@ export default function BatchUniversities({
               updateFormData={updateFormData}
             />
 
-            <TextareaField
+            <RichTextEditor
               label="Instructions"
               field="instructions"
               placeholder="Optional payment instructions..."

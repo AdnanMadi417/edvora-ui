@@ -32,6 +32,8 @@ export type UseAdminApplicationsParams = {
   limit?: number;
   offset?: number;
   status?: "active" | "hold" | "cancel" | "all";
+  stage?: string;
+  search?: string;
 };
 
 
@@ -39,6 +41,8 @@ export function useAdminApplications({
                                        limit = 20,
                                        offset = 0,
                                        status = "active",
+                                       stage,
+                                       search,
                                      }: UseAdminApplicationsParams = {}) {
   const [data, setData] = useState<AdminApplicationsResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -54,7 +58,7 @@ export function useAdminApplications({
       const res = await api.get<AdminApplicationsResponse>(
         "/admin/applications",
         {
-          params: { limit, offset, status },
+          params: { limit, offset, status, ...(stage ? { stage } : {}), ...(search ? { search } : {}) },
           headers: token
             ? { Authorization: `Bearer ${token}` }
             : {},
@@ -72,7 +76,7 @@ export function useAdminApplications({
 
   useEffect(() => {
     fetchApplications();
-  }, [limit, offset, status]);
+  }, [limit, offset, status, stage, search]);
 
   return {
     items: data?.items ?? [],

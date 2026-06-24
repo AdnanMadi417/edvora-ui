@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import PresignedImage from "components/ui/PresignedImage";
 import {
-  Search,
   RefreshCw,
   ArrowRight,
   ArrowLeft,
@@ -15,7 +14,10 @@ import {
   Trash2,
   ChevronUp,
   ChevronDown,
-  GraduationCap, Wallet,
+  GraduationCap,
+  Wallet,
+  XCircle,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
@@ -28,15 +30,21 @@ import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "components/ui/links/LinkBtn";
 
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import FilterSelectField from "components/form/filter/FilterSelectField";
+import SearchInput from "components/form/filter/SearchInput";
 
 import DeleteUniversityConfirmation from "../popups/DeleteUniversityConfirmation";
 import AssignPaymentUniversity from "../popups/AssignPaymentMethods";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
+import { AppDate } from "components/ui/date";
 
 const UniversitiesTable = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<"all" | "active" | "inactive">("all");
+  const [selectedType, setSelectedType] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
   const { showToast } = useToast();
 
 
@@ -58,15 +66,35 @@ const UniversitiesTable = () => {
   const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const activeFiltersCount = (selectedStatus !== "all" ? 1 : 0) + (selectedType !== "all" ? 1 : 0);
+
+  const stats = React.useMemo(() => ({
+    total: universities.length,
+    active: universities.filter((u) => u.is_active).length,
+    inactive: universities.filter((u) => !u.is_active).length,
+  }), [universities]);
+
+  const universityTypes = React.useMemo(() => {
+    const types = universities.map((u) => u.university_type_name).filter(Boolean);
+    return [...new Set(types)] as string[];
+  }, [universities]);
+
   const filteredUniversities = React.useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
-    if (!term) return universities;
-    return universities.filter(
-      (university) =>
+    return universities.filter((university) => {
+      const matchesSearch = !term ||
         university.name?.toLowerCase().includes(term) ||
-        university.country?.toLowerCase().includes(term)
-    );
-  }, [universities, searchTerm]);
+        university.country?.toLowerCase().includes(term);
+      const matchesStatus =
+        selectedStatus === "all" ||
+        (selectedStatus === "active" && university.is_active) ||
+        (selectedStatus === "inactive" && !university.is_active);
+      const matchesType =
+        selectedType === "all" ||
+        university.university_type_name?.toLowerCase().trim() === selectedType;
+      return matchesSearch && matchesStatus && matchesType;
+    });
+  }, [universities, searchTerm, selectedStatus, selectedType]);
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -143,17 +171,6 @@ const UniversitiesTable = () => {
     setCurrentPage(1);
   };
 
-  const formatDate = (date: string) => {
-    const d = new Date(date);
-
-    if (isNaN(d.getTime())) return "Invalid date";
-
-    return d.toLocaleDateString("en-US", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  };
 
   useEffect(() => {
     setCurrentPage(1);
@@ -187,59 +204,120 @@ const UniversitiesTable = () => {
   };
 
   return (
-    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
-        <div className="relative p-6">
-          <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-slate-900">
-                Knowledge Hub
-              </h3>
-              <p className="mt-1 text-sm text-slate-500">
-                Explore and manage all Universities, universities, and learning
-                resources
-              </p>
-            </div>
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white p-6">
+      {/* Header */}
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h3 className="text-xl font-semibold text-slate-900">Universities</h3>
+          <p className="mt-1 text-sm text-slate-500">Manage university listings and their payment methods</p>
+        </div>
+        <Link
+          href="/admin/universities/create"
+          icon={<GraduationCap className="h-5 w-5" />}
+          label="Create University"
+          bgColor="bg-blue-50"
+          textColor="text-blue-700"
+          borderColor="border-blue-600"
+          hoverTextColor="hover:text-blue-800"
+          hoverBorderColor="hover:border-blue-700"
+        />
+      </div>
+
+      {/* Stats Cards */}
+      <div className="mb-6 border-t border-slate-200 pt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <button
+          onClick={() => { setSelectedStatus("all"); setCurrentPage(1); }}
+          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
+            selectedStatus === "all"
+              ? "border-slate-400 bg-slate-100 shadow-sm"
+              : "border-slate-200 bg-white hover:bg-slate-50"
+          }`}
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+            <GraduationCap className="h-5 w-5 text-slate-600" />
           </div>
+          <div>
+            <p className="text-xl font-bold text-slate-900">{stats.total}</p>
+            <p className="text-xs text-slate-500">Total Universities</p>
+          </div>
+        </button>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:gap-4 w-full">
+        <button
+          onClick={() => { setSelectedStatus("active"); setCurrentPage(1); }}
+          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
+            selectedStatus === "active"
+              ? "border-green-300 bg-green-50 shadow-sm"
+              : "border-slate-200 bg-white hover:bg-slate-50"
+          }`}
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+          </div>
+          <div>
+            <p className="text-xl font-bold text-slate-900">{stats.active}</p>
+            <p className="text-xs text-slate-500">Active</p>
+          </div>
+        </button>
 
-            <div className="relative w-full sm:w-64 flex-shrink-0">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search by university, University, or level..."
-                value={searchTerm}
-                onChange={handleSearchChange}
-                className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-slate-500"
-              />
-            </div>
+        <button
+          onClick={() => { setSelectedStatus("inactive"); setCurrentPage(1); }}
+          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
+            selectedStatus === "inactive"
+              ? "border-slate-400 bg-slate-100 shadow-sm"
+              : "border-slate-200 bg-white hover:bg-slate-50"
+          }`}
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+            <XCircle className="h-5 w-5 text-slate-500" />
+          </div>
+          <div>
+            <p className="text-xl font-bold text-slate-900">{stats.inactive}</p>
+            <p className="text-xs text-slate-500">Inactive</p>
+          </div>
+        </button>
+      </div>
 
-            <button
-              onClick={() => {
-                setSearchTerm("");
-                setCurrentPage(1);
-              }}
-              className="flex items-center justify-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:opacity-50"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Clear
-            </button>
+      {/* Search & Filters */}
+      <div className="mb-4 border-t border-slate-200 pt-6 flex flex-wrap items-center gap-3">
+        <SearchInput
+          value={searchTerm}
+          onChange={handleSearchChange}
+          placeholder="Search by name or country..."
+        />
 
-            <Link
-              href={`/admin/universities/create`}
-              icon={<GraduationCap  className="h-5 w-5" />}
-              label={loading ? "Creating..." : "Create University"}
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+        <button
+          className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-background text-slate-500 hover:bg-slate-50"
+          onClick={() => setShowFilters((v) => !v)}
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          {activeFiltersCount > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+              {activeFiltersCount}
+            </span>
+          )}
+        </button>
+
+        <div className={`${showFilters ? "flex" : "hidden"} w-full items-center gap-3 sm:contents`}>
+          <div className="flex-1 sm:flex-none">
+            <FilterSelectField
+              value={selectedType}
+              onChange={(val: string) => { setSelectedType(val); setCurrentPage(1); }}
+              icon={MdOutlineCategory}
+              defaultOption="All Types"
+              options={universityTypes.map((type) => ({
+                value: type.toLowerCase().trim(),
+                label: type,
+              }))}
             />
-
-
           </div>
 
+          <button
+            onClick={() => { setSearchTerm(""); setSelectedStatus("all"); setSelectedType("all"); setCurrentPage(1); setShowFilters(false); }}
+            className="flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span className="hidden sm:inline">Clear</span>
+          </button>
         </div>
       </div>
 
@@ -252,11 +330,11 @@ const UniversitiesTable = () => {
 
               <thead>
 
-              <tr className="border-b border-slate-200 bg-white">
+              <tr className="border-b border-slate-200 bg-slate-50">
 
                 <th
                   onClick={() => handleSort("name")}
-                  className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
+                  className="group min-w-[250px] cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors hover:bg-slate-100"
                 >
                   <div className="flex items-center gap-2">
                     <MdSchool className="h-4 w-4 text-slate-500" />
@@ -272,8 +350,8 @@ const UniversitiesTable = () => {
                   </div>
                 </th>
 
-                <th className="group px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
-                  <div className="flex min-w-[120px] items-center gap-2">
+                <th className="group min-w-[250px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
+                  <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-slate-500" />
                     <span>Next Intake</span>
                   </div>
@@ -295,11 +373,11 @@ const UniversitiesTable = () => {
               </tr>
               </thead>
 
-              <tbody className="divide-slate-200 divide-y bg-white">
+              <tbody className="divide-y divide-slate-200 bg-white">
 
               {loading && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center">
+                  <td colSpan={6} className="px-6 py-8 text-center">
                     <Loading text="Fetching Universities data..." />
                   </td>
                 </tr>
@@ -307,7 +385,7 @@ const UniversitiesTable = () => {
 
               {!error && !loading && currentUniversities.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center">
+                  <td colSpan={6} className="px-6 py-8 text-center">
                     <NoMessagesFound
                       title="No universities found"
                       subtitle="There are currently no universities available."
@@ -319,7 +397,7 @@ const UniversitiesTable = () => {
               {!error && currentUniversities.map((uni) => (
                 <tr
                   key={uni.id}
-                  className="group cursor-pointer transition-colors hover:bg-slate-50"
+                  className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                   onClick={() => router.push(`/admin/universities/${uni.id}`)}
                 >
 
@@ -405,7 +483,7 @@ const UniversitiesTable = () => {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4 min-w-[250px]">
+                  <td className="px-6 py-4">
                     <div className="flex flex-wrap gap-2">
                       {uni.intake_months &&
                       uni.intake_months.length > 0 ? (
@@ -415,7 +493,7 @@ const UniversitiesTable = () => {
                               key={index}
                               className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
                             >
-                                      {formatDate(date)}
+                                      <AppDate value={date} format="short" />
                                     </span>
                           )
                         )
@@ -489,7 +567,7 @@ const UniversitiesTable = () => {
                       </button>
                     </div>
                   </td>
-                  <td className="px-4 py-4">
+                  <td className="w-8 pr-4 py-4">
                     <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
                 </tr>

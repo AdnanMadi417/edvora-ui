@@ -1,5 +1,5 @@
 export { default as UniversitiesTable } from "./admin/table/UniversitiesTable";
-export { default as UniversityDetails } from "./admin/details/UniversityDetails";
+export { default as UniversityDetailsView } from "./admin/details/UniversityDetails";
 export { default as DeleteUniversityConfirmation } from "./admin/popups/DeleteUniversityConfirmation";
 export { default as AssignPaymentUniversity } from "./admin/popups/AssignPaymentMethods";
 export { default as AssignUniversityTypeModal } from "./admin/popups/UpdateUniversityType";

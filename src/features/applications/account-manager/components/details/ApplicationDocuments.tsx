@@ -13,6 +13,7 @@ import {
 import ViewPopup from "features/applications/shared/ViewDoc";
 import HoldPopup from "features/applications/account-manager/components/popups/ResubmitDoc";
 import EmptyData from "components/emptyData/EmptyData";
+import { AppDate } from "components/ui/date";
 import { getDocumentDownloadUrl } from "services/documentService";
 import api from "lib/useApi"
 
@@ -90,11 +91,6 @@ export default function ApplicationDocuments({
       default:
         return <Clock className="h-5 w-5 text-yellow-500" />;
     }
-  };
-
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return "Not provided";
-    return new Date(dateString).toLocaleDateString();
   };
 
   const getFileName = (fileUrl: string | null) => {
@@ -213,7 +209,7 @@ export default function ApplicationDocuments({
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{formatDate(doc.created_at)}</span>
+                        <span><AppDate value={doc.created_at} format="short" fallback="Not provided" /></span>
                       </div>
                     </div>
 
@@ -306,7 +302,7 @@ export default function ApplicationDocuments({
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{formatDate(doc.created_at)}</span>
+                        <span><AppDate value={doc.created_at} format="short" fallback="Not provided" /></span>
                       </div>
                     </div>
 
@@ -400,7 +396,7 @@ export default function ApplicationDocuments({
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{formatDate(doc.created_at)}</span>
+                        <span><AppDate value={doc.created_at} format="short" fallback="Not provided" /></span>
                       </div>
                     </div>
 
@@ -468,7 +464,7 @@ export default function ApplicationDocuments({
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{formatDate(offerLetterDoc.created_at)}</span>
+                        <span><AppDate value={offerLetterDoc.created_at} format="short" fallback="Not provided" /></span>
                       </div>
                     </div>
                     {offerLetterDoc.approve_notes && (
@@ -517,7 +513,7 @@ export default function ApplicationDocuments({
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{formatDate(emgsEvalDoc.created_at)}</span>
+                        <span><AppDate value={emgsEvalDoc.created_at} format="short" fallback="Not provided" /></span>
                       </div>
                     </div>
                     {emgsEvalDoc.approve_notes && (
@@ -569,7 +565,7 @@ export default function ApplicationDocuments({
                       </div>
                       <div className="flex items-center gap-1.5">
                         <Clock className="h-3.5 w-3.5 text-slate-400" />
-                        <span>{formatDate(visaDoc.created_at)}</span>
+                        <span><AppDate value={visaDoc.created_at} format="short" fallback="Not provided" /></span>
                       </div>
                     </div>
                     {visaDoc.approve_notes && (
@@ -611,7 +607,7 @@ export default function ApplicationDocuments({
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
                         <div className="flex items-center gap-1.5">
                           <Clock className="h-3.5 w-3.5 text-slate-400" />
-                          <span>{formatDate(doc.created_at)}</span>
+                          <span><AppDate value={doc.created_at} format="short" fallback="Not provided" /></span>
                         </div>
                       </div>
                       {doc.approve_notes && (

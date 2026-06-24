@@ -50,7 +50,7 @@ const FileUploadField = ({
       </label>
 
       <div className="relative">
-        <label className="flex cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center transition-all duration-300 hover:border-blue-400 hover:bg-blue-50">
+        <label className="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center transition-all duration-300 hover:border-blue-400 hover:bg-blue-50">
 
           <Upload className="mb-3 h-8 w-8 text-slate-400 group-hover:text-blue-500" />
 
@@ -77,14 +77,14 @@ const FileUploadField = ({
 
       {file && (
         <div
-          className={`mt-4 rounded-md border p-4 transition ${
+          className={`mt-4 rounded-lg border p-4 transition ${
             file.file_key ? "border-slate-200 bg-white" : "border-red-400 bg-red-50"
           }`}
         >
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-3 truncate">
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-md ${
+                className={`flex h-10 w-10 items-center justify-center rounded-lg ${
                   file.file_key ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
                 }`}
               >
@@ -110,7 +110,7 @@ const FileUploadField = ({
               <button
                 type="button"
                 onClick={handleRemove}
-                className="flex items-center justify-center gap-2 rounded-md border border-red-600 bg-red-100 px-4 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-200"
+                className="flex items-center justify-center gap-2 rounded-lg border border-red-600 bg-red-100 px-4 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-200"
               >
                 <Trash2 className="h-3 w-3" />
                 Remove
@@ -119,9 +119,9 @@ const FileUploadField = ({
           </div>
 
           {file.uploading && (
-            <div className={`mt-4 h-1.5 w-full rounded-md ${file.file_key ? "bg-green-200" : "bg-red-200"}`}>
+            <div className={`mt-4 h-1.5 w-full rounded-lg ${file.file_key ? "bg-green-200" : "bg-red-200"}`}>
               <div
-                className={`h-full rounded-md ${file.file_key ? "bg-green-600" : "bg-red-600"} transition-all duration-300`}
+                className={`h-full rounded-lg ${file.file_key ? "bg-green-600" : "bg-red-600"} transition-all duration-300`}
                 style={{ width: `${file.progress || 0}%` }}
               />
             </div>
@@ -130,7 +130,7 @@ const FileUploadField = ({
       )}
 
       {fileError && (
-        <div className="mt-2 flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-2">
+        <div className="mt-2 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-2">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
           <p className="text-xs font-medium text-red-700">{fileError}</p>
         </div>

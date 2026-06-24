@@ -2,15 +2,14 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import {
-  ChevronLeft,
-  CreditCard,
-} from 'lucide-react';
+import { ChevronLeft, CreditCard, Pencil } from "lucide-react";
 
 import { usePaymentMethod } from "features/knowledge-hub/payment-methods/hooks";
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
+import RichTextDisplay from "components/ui/RichTextDisplay";
+import Button from "components/ui/buttons/Button";
 
 interface PaymentMethodDetailsProps {
   id: string;
@@ -19,17 +18,17 @@ interface PaymentMethodDetailsProps {
 const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
   const router = useRouter();
 
-  const { paymentMethod,error, loading } = usePaymentMethod(id);
+  const { paymentMethod, error, loading } = usePaymentMethod(id);
 
   const handleBack = () => {
     router.push("/admin/config-universities/payment-methods");
   };
 
   if (loading) {
-    return <Loading text="Loading payment methods details..." />;
+    return <Loading text="Loading payment method details..." />;
   }
 
-  if (!paymentMethod ) {
+  if (!paymentMethod) {
     return <EmptyData />;
   }
 
@@ -37,42 +36,53 @@ const PaymentMethodDetails = ({ id }: PaymentMethodDetailsProps) => {
     <>
       <div className="mt-6 max-w-5xl mx-auto">
         <div className="rounded-md border bg-card shadow-sm">
-          <div className="flex justify-between border-b p-6">
-            <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-700">
-                <CreditCard className="h-6 w-6 text-white" />
-              </div>
 
-              <div>
-                <h2 className="text-lg font-semibold">{paymentMethod.name}</h2>
-              </div>
+          <div className="flex items-center gap-4 border-b p-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700">
+              <CreditCard className="h-6 w-6 text-white" />
             </div>
-
-            <div className="flex items-center gap-2 sm:gap-6">
-              <button
-                onClick={handleBack}
-                className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
-              >
-                <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="hidden sm:inline">Back to Payments</span>
-              </button>
+            <div>
+              <h2 className="text-lg font-semibold">{paymentMethod.name}</h2>
             </div>
-
           </div>
 
-          <div className="border-t border-gray-200 px-6 py-6">
+          <div className="border-t border-slate-200 px-6 py-6">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
               Description
             </h3>
+            {paymentMethod.description
+              ? <RichTextDisplay html={paymentMethod.description} />
+              : <p className="text-sm text-slate-400">No description provided.</p>
+            }
+          </div>
 
-            <p className="text-sm leading-relaxed text-slate-700">
-              {paymentMethod.description || "No description provided."}
-            </p>
+          <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
+            <Button
+              onClick={handleBack}
+              icon={<ChevronLeft className="h-5 w-5" />}
+              text="Back"
+              bgColor="bg-white"
+              textColor="text-slate-600"
+              borderColor="border-slate-300"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-400"
+              className="flex-1 hover:bg-slate-50"
+            />
+            <Button
+              onClick={() => router.push(`/admin/config-universities/payment-methods/${id}/edit`)}
+              icon={<Pencil className="h-5 w-5" />}
+              text="Edit Payment Method"
+              bgColor="bg-blue-600"
+              textColor="text-white"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
+              className="flex-1 hover:bg-blue-700"
+            />
           </div>
 
         </div>
       </div>
-
     </>
   );
 };

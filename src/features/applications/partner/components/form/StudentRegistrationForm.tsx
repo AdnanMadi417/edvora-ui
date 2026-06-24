@@ -489,7 +489,7 @@ export default function StudentRegistrationForm() {
           </div>
         </div>
 
-        <div className="mb-6 min-h-[400px] rounded-md border bg-slate-50 p-6">
+        <div className="mb-6 min-h-[400px] rounded-md border p-6">
 
           {stage === 1 && (
             <StageBasicInfo

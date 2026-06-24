@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { Plus, XCircle, Truck } from 'lucide-react';
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
 import { useCreateLogisticService } from "features/logistical-service/hooks";
 import { useToast } from "components/context/ToastContext";
 

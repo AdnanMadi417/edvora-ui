@@ -278,6 +278,7 @@ export default function RequiredAction({
                   description: "Upload payment proof if available",
                   is_init_app_doc: false,
                   is_required_for_init: false,
+                  is_required_init_app_doc: false,
                   is_required_for_current_upload: true,
                 }]}
                 formData={formData}

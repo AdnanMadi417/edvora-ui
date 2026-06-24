@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { GraduationCap, Building2, XCircle } from 'lucide-react';
@@ -6,7 +6,7 @@ import { GraduationCap, Building2, XCircle } from 'lucide-react';
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 
-import InputField from "components/form/InputField";
+import InputField from "components/form/fields/InputField";
 
 import { useCreateUniversityType } from "features/universities/hooks";
 import { useToast } from "components/context/ToastContext";

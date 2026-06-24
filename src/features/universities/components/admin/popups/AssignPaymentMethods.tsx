@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard } from "lucide-react";
@@ -11,8 +11,8 @@ import { CURRENCY } from 'constants/lists';
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import SelectField from "components/form/SelectField";
-import TextareaField from "components/form/TextareaField";
+import SelectField from "components/form/fields/SelectField";
+import RichTextEditor from "components/form/fields/RichTextEditor";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 
 interface AssignPaymentUniversityProps {
@@ -160,7 +160,7 @@ export default function AssignPaymentUniversity({
               updateFormData={updateFormData}
             />
 
-            <TextareaField
+            <RichTextEditor
               label="Instructions"
               field="instructions"
               placeholder="Optional payment instructions..."

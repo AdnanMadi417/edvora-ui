@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { MdPersonAdd } from "react-icons/md";
 
-import InputField from "components/form/InputField";
-import PasswordField from "components/form/PasswordField";
+import InputField from "components/form/fields/InputField";
+import PasswordField from "components/form/fields/PasswordField";
 import Button from "components/ui/buttons/Button";
 
 import { useCreateAccountManager } from "../hooks/useCreateAccountManager";

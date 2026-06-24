@@ -16,6 +16,8 @@ export type PartnerApplication = {
   status: string;
   next_action: string;
   lifecycle_status: "active" | "hold" | "cancel";
+  partner_name?: string;
+  account_manager_name?: string;
 };
 
 export type PartnerApplicationsResponse = {
@@ -30,6 +32,7 @@ export type UsePartnerApplicationsParams = {
   limit?: number;
   offset?: number;
   status?: "active" | "hold" | "cancel" | "all";
+  stage?: string;
 };
 
 export function usePartnerApplications({
@@ -37,6 +40,7 @@ export function usePartnerApplications({
                                          limit = 20,
                                          offset = 0,
                                          status = "active",
+                                         stage,
                                        }: UsePartnerApplicationsParams) {
   const [data, setData] = useState<PartnerApplicationsResponse | null>(null);
   const [loading, setLoading] = useState(false);

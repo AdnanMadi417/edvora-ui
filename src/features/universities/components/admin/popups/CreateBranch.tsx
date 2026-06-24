@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, GitBranch } from "lucide-react";
@@ -7,8 +7,8 @@ import { useCreateBranch } from "features/universities/hooks";
 import { useStates } from "features/programs/hooks/useStates";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import InputField from "components/form/InputField";
-import SelectField from "components/form/SelectField";
+import InputField from "components/form/fields/InputField";
+import SelectField from "components/form/fields/SelectField";
 
 interface CreateBranchProps {
   isOpen: boolean;

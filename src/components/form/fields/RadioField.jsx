@@ -28,11 +28,11 @@ const RadioField = ({
         {options.map((opt) => (
           <label
             key={opt.label}
-            className={`flex-1 cursor-pointer rounded-md border p-3 text-center text-p2 text-sm transition-colors focus-within:ring-1 focus-within:ring-blue-500 ${
+            className={`mt-2 flex h-12 w-full items-center justify-start rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
               errors?.[field]
-                ? "border-red-500"
+                ? "border-red-500 bg-red-50"
                 : "border-default"
-            } ${value === opt.value ? "bg-blue-100 border-blue-500" : "bg-white"}`}
+            } ${value === opt.value ? "bg-blue-100 border-blue-500" : "bg-white hover:bg-slate-50"}`}
           >
             <input
               type="radio"

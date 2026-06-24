@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Trash2, Truck, Plus } from 'lucide-react';
 import React, { useState } from "react";
@@ -15,10 +15,10 @@ import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService
 import { NATIONALITIES } from "constants/lists";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import Loading from "components/loading/Loading";
-import CheckBoxGroup from "components/form/CheckBoxGroup";
-import CheckSimpleBoxGroup from "components/form/CheckSimpleBoxGroup";
-import InputField from "components/form/InputField";
-import ImageUploadField from "components/form/images/ImageUploadField";
+import CheckBoxGroup from "components/form/fields/CheckBoxGroup";
+import CheckSimpleBoxGroup from "components/form/fields/CheckSimpleBoxGroup";
+import InputField from "components/form/fields/InputField";
+import ImageUploadField from "components/form/upload/ImageUploadField";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { useRouter } from "next/navigation";

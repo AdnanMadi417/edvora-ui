@@ -8,7 +8,7 @@ const getNestedValue = (obj, path) => {
     .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
-const SelectField = ({ label, field, options, required = true, formData, errors, updateFormData, onBlur = undefined }) => {
+const SelectField = ({ label, field, options, required = true, formData, errors, updateFormData, onBlur = undefined, disabled = false }) => {
   const value = getNestedValue(formData, field) ?? "";
 
   return (
@@ -21,8 +21,8 @@ const SelectField = ({ label, field, options, required = true, formData, errors,
         value={value}
         onChange={(e) => updateFormData(field, e.target.value)}
         onBlur={onBlur}
-        className={`mt-2 flex h-12 w-full items-center justify-center rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-          errors?.[field] ? "border-red-500" : "border-default"
+        className={`mt-2 flex h-12 w-full items-center justify-start rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+          errors?.[field] ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"
         }`}
       >
         <option value="" disabled>Select ...</option>

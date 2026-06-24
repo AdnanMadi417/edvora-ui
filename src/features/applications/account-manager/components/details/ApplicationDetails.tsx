@@ -21,6 +21,7 @@ import OfferLetterCard from './OfferLetterCard';
 import AccountManagerTopBar from "features/applications/account-manager/components/topBar/AccountManagerTopBar";
 import ApplicationTimeline from 'features/applications/shared/ApplicationTimeline';
 import ApplicationCommission from './ApplicationCommission';
+import { AppDate } from "components/ui/date";
 
 
 
@@ -42,11 +43,6 @@ export default function ApplicationDetails({
     const diffTime = today.getTime() - updatedDate.getTime();
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     return diffDays;
-  }
-
-  function formatDate(dateString: string | null) {
-    if (!dateString) return "Not provided";
-    return new Date(dateString).toLocaleDateString();
   }
 
   const student = application.student || {};
@@ -113,7 +109,7 @@ export default function ApplicationDetails({
               {application.intake_date && (
                 <div className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 sm:hidden">
                   <Clock className="h-3 w-3" />
-                  <span>Intake: {formatDate(application.intake_date)}</span>
+                  <span>Intake: <AppDate value={application.intake_date} format="short" fallback="Not provided" /></span>
                 </div>
               )}
               <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
@@ -177,7 +173,7 @@ export default function ApplicationDetails({
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Intake Date</p>
             <p className="mt-1 flex items-center justify-start gap-2 text-lg font-bold text-slate-900">
               <Calendar className="h-4 w-4 text-blue-400" />
-              {formatDate(application.intake_date)}
+              <AppDate value={application.intake_date} format="short" fallback="Not provided" />
             </p>
           </div>
         </div>
@@ -297,7 +293,7 @@ export default function ApplicationDetails({
               Intake Date
             </span>
             <span className="text-p2 text-slate-500">
-              {formatDate(application.intake_date)}
+              <AppDate value={application.intake_date} format="short" fallback="Not provided" />
             </span>
           </div>
 
@@ -350,7 +346,7 @@ export default function ApplicationDetails({
                   <dt className="text-sm font-medium text-slate-900">Date of Birth</dt>
                   <dd className="mt-1 flex items-center gap-2 text-sm text-slate-500">
                     <FaBirthdayCake className="text-slate-500" />
-                    {formatDate(student.birthday)}
+                    <AppDate value={student.birthday} format="short" fallback="Not provided" />
                   </dd>
                 </div>
               )}
@@ -423,7 +419,7 @@ export default function ApplicationDetails({
                 {englishProficiency.test_date && (
                   <div className="flex justify-between">
                     <dt className="text-sm font-medium text-slate-900">Test Date</dt>
-                    <dd className="text-sm text-slate-500">{formatDate(englishProficiency.test_date)}</dd>
+                    <dd className="text-sm text-slate-500"><AppDate value={englishProficiency.test_date} format="short" fallback="Not provided" /></dd>
                   </div>
                 )}
               </dl>
@@ -454,7 +450,7 @@ export default function ApplicationDetails({
                   <div className="flex justify-between">
                     <dt className="text-sm font-medium text-slate-900">Study Period</dt>
                     <dd className="text-sm text-slate-500">
-                      {`${formatDate(previousEducation.start_date)} - ${formatDate(previousEducation.end_date)}`}
+                      <AppDate value={previousEducation.start_date} format="short" fallback="Not provided" /> – <AppDate value={previousEducation.end_date} format="short" fallback="Not provided" />
                     </dd>
                   </div>
                 )}

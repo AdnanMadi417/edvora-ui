@@ -1,13 +1,13 @@
-"use client";
+﻿"use client";
 
 import { AxiosError } from "axios";
 import React, { useState } from "react";
 import { ChevronLeft, Handshake } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCreatePartner } from "../hooks";
-import InputField from "components/form/InputField";
-import PasswordField from "components/form/PasswordField";
-import SelectField from "components/form/SelectField";
+import InputField from "components/form/fields/InputField";
+import PasswordField from "components/form/fields/PasswordField";
+import SelectField from "components/form/fields/SelectField";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { PARTNER_TYPE } from "constants/lists";

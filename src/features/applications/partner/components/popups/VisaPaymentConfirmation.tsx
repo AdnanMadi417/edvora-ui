@@ -1,11 +1,12 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
-import StatusFileUpload from "components/form/filesUpload/StatusFileUpload";
+import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
+import RichTextDisplay from "components/ui/RichTextDisplay";
 
 interface VisaPaymentConfirmationProps {
   isOpen: boolean;
@@ -120,6 +121,15 @@ export default function VisaPaymentConfirmation({
           </div>
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
+            {firstMethod?.instructions && (
+              <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Payment Instructions
+                </p>
+                <RichTextDisplay html={firstMethod.instructions} />
+              </div>
+            )}
+
             {paymentError && (
               <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
@@ -193,7 +203,7 @@ export default function VisaPaymentConfirmation({
             )}
           </div>
 
-          <div className="border-t border-gray-200 px-6 py-4">
+          <div className="border-t border-slate-200 px-6 py-4">
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleClose}

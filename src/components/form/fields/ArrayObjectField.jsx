@@ -1,8 +1,8 @@
 // components/form/ArrayObjectField.jsx
 import React from "react";
-import AddDate from "../ui/buttons/IconButton";
+import AddDate from "../../ui/buttons/IconButton";
 import { CalendarPlus, Trash2 } from "lucide-react";
-import IconButton from "../ui/buttons/IconButton";
+import IconButton from "../../ui/buttons/IconButton";
 
 const getNestedValue = (obj, path) => {
   if (!path) return undefined;
@@ -60,7 +60,7 @@ const ArrayObjectField = ({
   };
 
   return (
-    <div className="space-y-4 rounded-md border border-default p-4">
+    <div className="space-y-4 rounded-lg border border-default p-4">
 
       <div className="flex items-center justify-between">
         <label className="text-sm font-semibold text-slate-900">
@@ -86,7 +86,7 @@ const ArrayObjectField = ({
       {arrayValue.map((item, index) => (
         <div
           key={index}
-          className="space-y-4 rounded-md border border-slate-200 bg-white p-4"
+          className="space-y-4 rounded-lg border border-slate-200 bg-white p-4"
         >
 
           <div className="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -128,7 +128,7 @@ const ArrayObjectField = ({
                     onChange={(e) =>
                       handleChange(index, f.key, e.target.value)
                     }
-                    className="h-11 w-full rounded-md border border-default px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                    className="h-11 w-full rounded-lg border border-default px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
                   />
 
                   {errorMessage && (
