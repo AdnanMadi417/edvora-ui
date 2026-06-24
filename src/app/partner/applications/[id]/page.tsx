@@ -10,10 +10,9 @@ import Cookies from "js-cookie";
 import EmptyData from "components/emptyData/EmptyData";
 import Loading from "components/loading/Loading";
 
-import ApplicationDetails from "components/applications/details/partner/ApplicationDetails";
-import ApplicationDocuments from "components/applications/details/partner/ApplicationDocuments";
-import AgentPartnerChat from "components/chat/ApplicationChat";
-import { useUnreadCount } from 'hooks/chat/useUnreadCount';
+import ApplicationDetails from "features/applications/partner/components/details/ApplicationDetails";
+import ApplicationDocuments from "features/applications/partner/components/details/ApplicationDocuments";
+import { ApplicationChat as AgentPartnerChat, useUnreadCount } from "features/chat";
 
 export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();
@@ -56,7 +55,7 @@ export default function ApplicationPage() {
   return (
     <>
       <ApplicationDetails application={application} onRefetch={fetchApplication} />
-      <ApplicationDocuments application={application} />
+      <ApplicationDocuments application={application} onRefetch={fetchApplication} />
       <button
         onClick={() => setChatOpen((v) => !v)}
         aria-label={chatOpen ? "Close chat" : "Open chat"}

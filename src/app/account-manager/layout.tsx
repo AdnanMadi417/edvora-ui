@@ -20,7 +20,7 @@ export default function AccountManagerLayout({ children }: { children: React.Rea
     <RoleGuard allowedRoles={ACCOUNT_MANAGER_ROLES}>
 
       <ToastProvider>
-        <div className="relative flex min-h-screen w-full bg-background-100 dark:bg-background-900">
+        <div className="relative flex min-h-screen w-full bg-slate-50">
 
           <div className="z-[60]">
             <Sidebar

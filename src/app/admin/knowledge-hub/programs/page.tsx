@@ -1,6 +1,6 @@
 "use client";
 
-import ProgramsTable from "../../../../components/admin/KnowledgeHub/program/tables/ProgramsTable";
+import ProgramsTable from "features/programs/components/admin/table/ProgramsTable";
 
 const KnowledgeHubOverview = () => {
   return (

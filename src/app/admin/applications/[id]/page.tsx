@@ -3,18 +3,17 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import EmptyData from "components/emptyData/EmptyData";
-import ApplicationDetails from "components/applications/details/admin/ApplicationDetails";
-import ApplicationDocuments from "components/applications/details/admin/ApplicationDocuments";
+import ApplicationDetails from "features/applications/admin/components/details/ApplicationDetails";
+import ApplicationDocuments from "features/applications/admin/components/details/ApplicationDocuments";
 import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import AgentPartnerChat from "components/chat/ApplicationChat";
-import useApplicationDetails from "hooks/applications/useApplicationDetails";
-import { useUnreadCount } from "hooks/chat/useUnreadCount";
+import { ApplicationChat as AgentPartnerChat, useUnreadCount } from "features/chat";
+import { useApplicationDetails } from "features/applications/hooks";
 
 export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();
-  const { applications: applicationData, loading, error } = useApplicationDetails(applicationId);
+  const { applications: applicationData, loading, error, refetch } = useApplicationDetails(applicationId);
   const [chatOpen, setChatOpen] = useState(false);
 
   const { unreadCount } = useUnreadCount({
@@ -27,8 +26,8 @@ export default function ApplicationPage() {
 
   return (
     <>
-      <ApplicationDetails application={applicationData} />
-      <ApplicationDocuments application={applicationData} />
+      <ApplicationDetails application={applicationData} onRefetch={refetch} />
+      <ApplicationDocuments application={applicationData} onRefetch={refetch} />
 
       <button
         onClick={() => setChatOpen((v) => !v)}

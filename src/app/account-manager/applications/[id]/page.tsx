@@ -3,14 +3,13 @@
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import EmptyData from "components/emptyData/EmptyData";
-import ApplicationDetails from "components/applications/details/account-manager/ApplicationDetails";
-import ApplicationDocuments from "components/applications/details/account-manager/ApplicationDocuments";
+import ApplicationDetails from "features/applications/account-manager/components/details/ApplicationDetails";
+import ApplicationDocuments from "features/applications/account-manager/components/details/ApplicationDocuments";
 import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import AgentPartnerChat from "components/chat/ApplicationChat";
-import { useUnreadCount } from 'hooks/chat/useUnreadCount';
-import { useAccountManagerApplication } from 'hooks/applications/useAccountManagerApplication';
+import { ApplicationChat as AgentPartnerChat, useUnreadCount } from "features/chat";
+import { useAccountManagerApplication } from 'features/applications/hooks';
 import { useMe } from 'hooks/useMe';
 
 export default function ApplicationPage() {
@@ -35,8 +34,8 @@ export default function ApplicationPage() {
 
   return (
     <>
-      <ApplicationDetails application={application} />
-      <ApplicationDocuments application={application} />
+      <ApplicationDetails application={application} onRefetch={refetch} />
+      <ApplicationDocuments application={application} onRefetch={refetch} />
 
       <button
         onClick={() => setChatOpen((v) => !v)}

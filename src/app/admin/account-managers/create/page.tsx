@@ -1,11 +1,7 @@
 "use client";
 
-import CreateAccountManager from "../../../../components/admin/accountManager/create/CreateAccountManager"
+import { CreateAccountManager } from "features/account-managers";
 
-const CreateAccountManagers = () => {
-  return (
-    <CreateAccountManager/>
-  );
-};
-
-export default CreateAccountManagers;
+export default function CreateAccountManagerPage() {
+  return <CreateAccountManager />;
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EditUniversityDetails from "../../../../../components/admin/KnowledgeHub/university/Form/EditUniversityDetails";
+import EditUniversityDetails from "features/universities/components/admin/form/EditUniversityDetails";
 
 export default function UniversityPage() {
   const params = useParams();

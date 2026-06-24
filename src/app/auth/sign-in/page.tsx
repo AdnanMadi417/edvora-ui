@@ -4,8 +4,7 @@ import { useState } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import axios, { isAxiosError } from "axios";
-import AuthLayout from "components/auth/AuthLayout";
-import SignInForm from "components/auth/SignInForm";
+import { AuthLayout, SignInForm } from "features/auth";
 import api from "lib/useApi";
 
 const authApi = axios.create({ baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api` });

@@ -2,13 +2,14 @@
 
 import { HiX } from "react-icons/hi";
 import { MdLogout } from "react-icons/md";
+import { MessageSquarePlus, FlaskConical } from "lucide-react";
 import Links from "./components/Links";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import { IRoute } from "types/navigation";
 import Image from "next/image";
 
 import { useEffect, useState, useCallback } from "react";
-import api, { setLoggingOut, SIGN_IN_URL } from "lib/useApi";
+import api, { SIGN_IN_URL, LOGOUT_URL } from "lib/useApi";
 
 interface User {
   id: string;
@@ -63,41 +64,15 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
     setOpen(false);
   }, [setOpen]);
 
-  const deleteAllCookies = () => {
-    const cookies = document.cookie.split(";");
-
-    for (let i = 0; i < cookies.length; i++) {
-      const cookie = cookies[i];
-      const eqPos = cookie.indexOf("=");
-      const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
-
-      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-
-      const domain = window.location.hostname;
-      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${domain}`;
-
-      const parts = domain.split(".");
-      if (parts.length > 2) {
-        const parentDomain = parts.slice(-2).join(".");
-        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${parentDomain}`;
-      }
-    }
-  };
-
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    setLoggingOut(true);
-
     try {
-      await api.post("/auth/logout").catch(() => {});
-    } catch (err) {
-      console.error("Logout API error:", err);
+      await fetch(LOGOUT_URL, { method: "POST" });
+    } catch {
+      // non-fatal
     }
-
     localStorage.clear();
     sessionStorage.clear();
-    deleteAllCookies();
-
     window.location.replace(SIGN_IN_URL);
   };
 
@@ -130,7 +105,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           <HiX className="text-icon-b" />
         </button>
 
-        <header className="mb-3 mt-3 flex items-center justify-center px-6 py-6">
+        <header className="mb-3 mt-3 flex items-center justify-center gap-2 px-6 py-6">
           <Image
             src={logoImg}
             alt="Your Business Logo"
@@ -139,6 +114,12 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             className="object-contain"
             priority
           />
+          {user?.role === "partner" && (
+            <span className="flex shrink-0 items-center gap-1 rounded-md border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700">
+              <FlaskConical className="h-3 w-3" />
+              Beta
+            </span>
+          )}
         </header>
 
         <div className="border-y-thin border-gray-200 px-6 py-4">
@@ -199,6 +180,17 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
         </div>
 
         <footer className="border-t border-gray-200 px-6 py-4">
+          {user?.role === "partner" && (
+            <a
+              href="https://docs.google.com/forms/d/e/1FAIpQLScbdcaLfK0utkj8DaMVEJdBUW82swRrWWZODNcFq1DNaRLLTQ/viewform"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mb-1 flex w-full items-center gap-3 rounded-md border border-transparent px-4 py-3 text-left font-medium text-slate-600 transition-all duration-200 hover:border-slate-100 hover:bg-slate-50"
+            >
+              <MessageSquarePlus className="h-5 w-5" />
+              <span className="text-sm">Send feedback</span>
+            </a>
+          )}
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}

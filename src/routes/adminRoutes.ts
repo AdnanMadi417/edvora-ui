@@ -81,26 +81,26 @@ const AdminRoutes: IRoute[] = [
     ],
   },
   {
-    name: "Logistical Service",
+    name: "Logistical Partners",
     layout: "/admin",
-    path: "/logistical-service",
+    path: "/logistical-partners",
     icon: MdBusinessCenter,
     children: [
       {
         name: "logistical service",
-        layout: "/admin/logistical-service",
+        layout: "/admin/logistical-partners",
         path: "",
         icon: MdLocalShipping,
       },
       {
         name: "Service Types",
-        layout: "/admin/logistical-service",
+        layout: "/admin/logistical-partners",
         path: "/services",
         icon: MdCategory, 
       },
       {
         name: "Create Service",
-        layout: "/admin/logistical-service",
+        layout: "/admin/logistical-partners",
         path: "/create",
         icon: MdAddCircle,
       },

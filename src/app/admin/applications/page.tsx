@@ -1,6 +1,6 @@
 "use client";
 
-import AdminApplications from "../../../components/applications/tables/AdminApplications";
+import AdminApplications from "features/applications/admin/components/table/AdminApplications";
 
 const Applications = () => {
   return (

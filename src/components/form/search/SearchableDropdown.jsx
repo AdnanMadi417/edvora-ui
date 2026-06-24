@@ -21,6 +21,7 @@ const CreatableSelectField = ({
                                 updateFormData,
                                 placeholder = "Select...",
                                 disabledOptions = [],
+                                onSelect = undefined,
                               }) => {
   const containerRef = useRef(null);
 
@@ -63,6 +64,7 @@ const CreatableSelectField = ({
     updateFormData(field, option.value);
     setIsOpen(false);
     setSearch("");
+    onSelect?.(option.value);
   };
 
   return (
@@ -75,8 +77,8 @@ const CreatableSelectField = ({
       <div
         onClick={() => setIsOpen((prev) => !prev)}
 
-        className={`mt-2 flex h-12 w-full items-center justify-between bg-white rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-          getNestedValue(errors, field) ? "border-red-500" : "border-default"
+        className={`mt-2 flex h-12 w-full items-center justify-between rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+          errors?.[field] ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"
         }`}
 
       >
@@ -109,8 +111,8 @@ const CreatableSelectField = ({
             autoFocus
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className={`mt-2 flex h-10 w-full items-start justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1  focus:ring-blue-500 ${
-              getNestedValue(errors, field) ? "border-red-500" : "border-default"
+            className={`mt-2 flex h-10 w-full items-start justify-start rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:bg-slate-50 ${
+              errors?.[field] ? "border-red-500" : "border-default"
             }`}
           />
 
@@ -122,7 +124,10 @@ const CreatableSelectField = ({
               return (
                 <li
                   key={opt.value}
-                  onClick={() => !isDisabled && handleSelect(opt)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    if (!isDisabled) handleSelect(opt);
+                  }}
                   className={`mt-2 flex h-10 w-full items-center justify-start rounded-md border p-3 px-3 py-2 text-sm transition-colors
         ${isDisabled
                     ? "bg-slate-100 text-slate-400 cursor-not-allowed"
@@ -149,9 +154,9 @@ const CreatableSelectField = ({
         </div>
       )}
 
-      {getNestedValue(errors, field) && (
+      {errors?.[field] && (
         <p className="mt-1 text-xs text-red-600">
-          {getNestedValue(errors, field)}
+          {errors?.[field]}
         </p>
       )}
     </div>
