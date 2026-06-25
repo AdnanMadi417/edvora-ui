@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useParams } from "next/navigation";
 import EmptyData from "components/emptyData/EmptyData";
 import ApplicationDetails from "features/applications/account-manager/components/details/ApplicationDetails";
-import ApplicationDocuments from "features/applications/account-manager/components/details/ApplicationDocuments";
 import Loading from "components/loading/Loading";
 import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -35,7 +34,6 @@ export default function ApplicationPage() {
   return (
     <>
       <ApplicationDetails application={application} onRefetch={refetch} />
-      <ApplicationDocuments application={application} onRefetch={refetch} />
 
       <button
         onClick={() => setChatOpen((v) => !v)}

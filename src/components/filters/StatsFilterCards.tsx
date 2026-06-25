@@ -34,7 +34,7 @@ interface StatsFilterCardsProps {
 
 export default function StatsFilterCards({ cards, selectedId, onSelect }: StatsFilterCardsProps) {
   return (
-    <div className="border-t border-slate-200 py-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {cards.map((card) => {
         const isActive = selectedId === card.id;
         const colors = COLOR_MAP[card.colorScheme];
