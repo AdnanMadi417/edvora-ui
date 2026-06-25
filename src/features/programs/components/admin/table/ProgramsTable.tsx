@@ -308,7 +308,7 @@ const ProgramsTable = () => {
         </Link>
       </div>
 
-      <div className="p-6 border-b border-slate-200 ">
+      <div className="p-6 border-b border-slate-200">
           <StatsFilterCards
           cards={fixedCards}
           selectedId={selectedQualId}
@@ -316,7 +316,7 @@ const ProgramsTable = () => {
         />
       </div>
 
-      <div className="p-6 border-b border-slate-200 ">
+      <div className="p-6 border-b border-slate-200">
 
         {/* Filters */}
         <ProgramFilterBar
@@ -365,7 +365,7 @@ const ProgramsTable = () => {
                 {isBulkMenuOpen && (
                   <>
                     <div className="fixed inset-0 z-[90]" onClick={() => setIsBulkMenuOpen(false)} />
-                    <div className="absolute left-0 top-full z-[100] mt-2 w-52 rounded-2xl border border-slate-100 bg-white p-1.5 shadow-xl shadow-slate-200/60">
+                    <div className="absolute left-0 top-full z-[100] mt-2 w-52 rounded-lg border border-slate-100 bg-white p-1.5 shadow-xl shadow-slate-200/60">
                       {[
                         { label: "Commission", icon: <Pencil className="h-3.5 w-3.5 text-blue-600" />, bg: "bg-blue-50", onClick: () => setActiveModal("commission") },
                         { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("ielts") },
@@ -407,7 +407,7 @@ const ProgramsTable = () => {
 
       <div>
 
-        <div className="p-6 ">
+        <div className="p-6">
 
              {/* Table */}
       <div className="overflow-hidden rounded-lg border border-slate-200">
@@ -513,7 +513,7 @@ const ProgramsTable = () => {
                   {/* Program Info */}
                   <td className="min-w-[260px] max-w-[380px] px-6 py-4">
                     <div className="flex items-start gap-3">
-                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-slate-200 ring-offset-2 shadow-sm">
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-slate-200 ring-offset-2">
                         {program.university?.logo_file_key ? (
                           <PresignedImage
                             fileKey={program.university.logo_file_key}
