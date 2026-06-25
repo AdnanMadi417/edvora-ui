@@ -120,10 +120,10 @@ const ProgramsCards = () => {
 
   return (
     <div className="mt-6 overflow-hidden text-p2 max-w-5xl mx-auto">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-card">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white ">
 
-<div className="relative border-b border-slate-200 p-6">
-          <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
+      <div className="relative border-b border-slate-200">
+          <div className="flex flex-col gap-6 rounded-t-xl md:flex-row md:items-center md:justify-between p-6 border-b border-slate-200">
             <div>
               <h3 className="text-xl font-semibold text-slate-900">
                 Knowledge Hub
@@ -135,13 +135,19 @@ const ProgramsCards = () => {
             </div>
           </div>
 
-          <StatsFilterCards
-            cards={fixedCards}
-            selectedId={selectedQualId}
-            onSelect={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
-          />
+          <div className="p-6 border-b border-slate-200">
 
-          <ProgramFilterBar
+            <StatsFilterCards
+              cards={fixedCards}
+              selectedId={selectedQualId}
+              onSelect={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
+            />
+
+          </div>
+
+          <div className="p-6 border-b border-slate-200">
+
+            <ProgramFilterBar
             searchTerm={searchTerm}
             onSearchChange={handleSearchChange}
             searchPlaceholder="Search by university, program, or level..."
@@ -162,6 +168,8 @@ const ProgramsCards = () => {
             showFilters={showFilters}
             onToggleFilters={() => setShowFilters((v) => !v)}
           />
+
+          </div>
 
         </div>
 

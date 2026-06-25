@@ -17,6 +17,7 @@ interface ApplicationFilterBarProps {
   selectedStages: string;
   onStagesChange: (val: string) => void;
   stageOptions: Option[];
+  showStageFilter?: boolean;
 
   selectedUniversity: string;
   onUniversityChange: (val: string) => void;
@@ -38,6 +39,7 @@ export default function ApplicationFilterBar({
   selectedStages,
   onStagesChange,
   stageOptions,
+  showStageFilter = true,
   selectedUniversity,
   onUniversityChange,
   universityOptions,
@@ -77,15 +79,17 @@ export default function ApplicationFilterBar({
         {/* Collapsible dropdowns */}
         <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showFilters ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
 
-          <div className="w-full sm:w-44 flex-shrink-0">
-            <FilterSelectField
-              value={selectedStages}
-              onChange={onStagesChange}
-              options={stageOptions}
-              icon={GitBranch}
-              defaultOption="All Stages"
-            />
-          </div>
+          {showStageFilter && (
+            <div className="w-full sm:w-44 flex-shrink-0">
+              <FilterSelectField
+                value={selectedStages}
+                onChange={onStagesChange}
+                options={stageOptions}
+                icon={GitBranch}
+                defaultOption="All Stages"
+              />
+            </div>
+          )}
 
           <div className="w-full sm:w-44 flex-shrink-0">
             <FilterSelectField

@@ -21,6 +21,7 @@ import PresignedImage from "components/ui/PresignedImage";
 import OfferLetterCard from './OfferLetterCard';
 import ApplicationTimeline from 'features/applications/shared/ApplicationTimeline';
 import ApplicationCommission from './ApplicationCommission';
+import ApplicationDocuments from './ApplicationDocuments';
 import { AppDate } from "components/ui/date";
 
 interface ApplicationDetailsProps {
@@ -80,11 +81,15 @@ export default function ApplicationDetails({
   return (
     <section className="max-w-5xl mx-auto">
 
-      <div className="mb-5 mt-5 block space-y-2">
+      <div className="mt-4 bg-white rounded-lg border border-slate-200">
 
-        <AdminTopBar application={application} onRefetch={onRefetch} />
+        {/* Admin actions */}
+        <div className="border-b border-slate-200">
+          <AdminTopBar application={application} onRefetch={onRefetch} />
+        </div>
 
-          <div className="block space-y-4 rounded-lg border border-slate-200 bg-card p-4 shadow-sm sm:p-6">
+        {/* Hero section */}
+        <div className="p-6 border-b border-slate-200">
 
         {/* Top row: avatar + info | intake date */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -166,7 +171,7 @@ export default function ApplicationDetails({
               </div>
 
 
-          <div className="hidden sm:block shrink-0 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4 text-start shadow-sm">
+          <div className="hidden sm:block shrink-0 rounded-lg border border-slate-200 bg-slate-50 px-5 py-4 text-start">
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Intake Date</p>
             <p className="mt-1 flex items-center justify-start gap-2 text-lg font-bold text-slate-900">
               <Calendar className="h-4 w-4 text-blue-400" />
@@ -176,9 +181,8 @@ export default function ApplicationDetails({
         </div>
 
         {/* Bottom row: current status | next action */}
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="rounded-xl bg-slate-50 border border-slate-200 p-5 shadow-sm">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="rounded-lg bg-slate-50 border border-slate-200 p-5">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Current Status</p>
             <div className="flex flex-wrap gap-2">
               {currentStatus.name && (
@@ -198,7 +202,7 @@ export default function ApplicationDetails({
             </div>
           </div>
 
-          <div className="rounded-xl border-[2px] border-blue-200 bg-blue-50 p-5 shadow-sm">
+          <div className="rounded-lg border-[2px] border-blue-200 bg-blue-50 p-5">
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100">
                 <ArrowRight className="h-4 w-4 text-blue-700" />
@@ -216,15 +220,10 @@ export default function ApplicationDetails({
           </div>
         </div>
 
-      </div>
+        </div>
 
-      </div>
-
-      <ApplicationTimeline application={application} />
-      <ApplicationCommission application={application}/>
-      <OfferLetterCard application={application} onRefetch={onRefetch} />
-
-      <div className="mb-5 mt-5 block space-y-4 rounded-lg border border-gray-200 bg-card p-6 shadow-sm">
+        {/* Application Information */}
+        <div className="p-6 border-b border-slate-200">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
           <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <MdAssignmentTurnedIn className="text-xl text-blue-700" />
@@ -305,9 +304,10 @@ export default function ApplicationDetails({
             </span>
           </div>
         </div>
-      </div>
+        </div>
 
-      <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
+        {/* Student Information */}
+        <div className="p-6 border-b border-slate-200">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
           <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FaUser className="text-xl text-blue-700" />
@@ -465,7 +465,7 @@ export default function ApplicationDetails({
 
           {hasEmergencyContact && (
             <div>
-              <div className="rounded-lg border border-red-200 bg-red-50 p-4 shadow-sm">
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4">
                 <div className="mb-3 flex items-center gap-2">
                   <FaPhoneAlt className="text-xs text-red-600" />
                   <h4 className="text-p2 font-semibold tracking-wide text-red-700">Emergency Contact</h4>
@@ -509,7 +509,28 @@ export default function ApplicationDetails({
           )}
         </div>
 
+        </div>
+
+        {/* Application Timeline */}
+        <div className="p-6 border-b border-slate-200">
+          <ApplicationTimeline application={application} />
+        </div>
+
+        {/* Commission Details */}
+        <div className="border-b border-slate-200">
+          <ApplicationCommission application={application} />
+        </div>
+
+        {/* Offer Letter + Visa Payment */}
+        <div className="border-b border-slate-200">
+          <OfferLetterCard application={application} onRefetch={onRefetch} />
+        </div>
+
+        {/* Documents */}
+        <ApplicationDocuments application={application} onRefetch={onRefetch} />
+
       </div>
+
     </section>
   );
 }

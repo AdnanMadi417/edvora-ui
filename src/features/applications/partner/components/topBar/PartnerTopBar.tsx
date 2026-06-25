@@ -1,36 +1,32 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {ChevronLeft } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface Props {
-  application: { id: string | number };
+  application: any;
 }
 
 export default function ApplicationAccountManagerTopBar({ application }: Props) {
   const router = useRouter();
 
-  const handleBack = () => router.push("/partner/applications");
+  const studentName = application?.student?.name ?? "Application";
 
   return (
-    <section className="w-full">
-
-      <div className="mx-auto max-w-7xl">
-        <div className="flex flex-wrap items-center justify-between gap-3 sm:h-10 sm:gap-6">
-          <div className="flex items-center gap-2 sm:gap-6">
-            <button
-              onClick={handleBack}
-              className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-200 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
-            >
-              <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span className="hidden sm:inline">Back to Applications</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3"></div>
-        </div>
+    <div className="flex items-center justify-between gap-4 px-6 py-3.5">
+      <div className="flex items-center gap-1.5 text-sm">
+        <button
+          onClick={() => router.push("/partner/applications")}
+          className="flex items-center gap-1 text-slate-500 transition-colors hover:text-slate-800"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          <span className="hidden sm:inline">Applications</span>
+        </button>
+        <ChevronRight className="hidden h-3.5 w-3.5 text-slate-300 sm:block" />
+        <span className="hidden max-w-[200px] truncate font-medium text-slate-800 sm:block">
+          {studentName}
+        </span>
       </div>
-
-    </section>
+    </div>
   );
 }

@@ -32,7 +32,9 @@ export type UsePartnerApplicationsParams = {
   limit?: number;
   offset?: number;
   status?: "active" | "hold" | "cancel" | "all";
-  stage?: string;
+  stage_id?: string;
+  stage_status_id?: string;
+  search?: string;
 };
 
 export function usePartnerApplications({
@@ -40,7 +42,9 @@ export function usePartnerApplications({
                                          limit = 20,
                                          offset = 0,
                                          status = "active",
-                                         stage,
+                                         stage_id,
+                                         stage_status_id,
+                                         search,
                                        }: UsePartnerApplicationsParams) {
   const [data, setData] = useState<PartnerApplicationsResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,7 +62,12 @@ export function usePartnerApplications({
       const res = await api.get<PartnerApplicationsResponse>(
         `/partners/${partnerId}/applications`,
         {
-          params: { limit, offset, status },
+          params: {
+            limit, offset, status,
+            ...(stage_id ? { stage_id } : {}),
+            ...(stage_status_id ? { stage_status_id } : {}),
+            ...(search ? { search } : {}),
+          },
           headers: token
             ? { Authorization: `Bearer ${token}` }
             : {},
@@ -76,7 +85,7 @@ export function usePartnerApplications({
 
   useEffect(() => {
     fetchApplications();
-  }, [partnerId, limit, offset, status]);
+  }, [partnerId, limit, offset, status, stage_id, stage_status_id, search]);
 
   return {
     items: data?.items ?? [],

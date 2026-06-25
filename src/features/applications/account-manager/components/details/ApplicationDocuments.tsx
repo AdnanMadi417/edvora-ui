@@ -103,11 +103,9 @@ export default function ApplicationDocuments({
   }
 
   return (
-    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card transition-all duration-300">
+    <>
       <div
-        className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80 ${
-          showDocs ? "rounded-t-lg" : "rounded-lg"
-        }`}
+        className="group flex cursor-pointer items-center justify-between p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80"
         onClick={() => setShowDocs(!showDocs)}
       >
         {/* Left: icon + info */}
@@ -162,13 +160,13 @@ export default function ApplicationDocuments({
             : "max-h-0 overflow-hidden opacity-0"
         }`}
       >
-        <div className="space-y-4 rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
+        <div className="space-y-4 border-t border-slate-200 p-6">
 
           <div className="space-y-4">
             {allDocs.map((doc: any, index: number) => (
               <div
                 key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
+                className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300"
                 style={{
                   animation: showDocs
                     ? `slideIn 0.3s ease-out ${index * 0.08}s both`
@@ -231,7 +229,7 @@ export default function ApplicationDocuments({
                       if (!doc.file_key) return;
                       handleDownload(doc.file_key);
                     }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     aria-label="Download Document"
                     disabled={!doc.file_key}
@@ -245,7 +243,7 @@ export default function ApplicationDocuments({
                       setSelectedDoc(doc);
                       setShowResubmitPopup(true);
                     }}
-                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="group rounded-lg border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
                     title="Resubmit Document"
                     aria-label="Resubmit Document"
                   >
@@ -260,7 +258,7 @@ export default function ApplicationDocuments({
             {paymentDocuments.map((doc: any, index: number) => (
               <div
                 key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
+                className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300"
                 style={{
                   animation: showDocs
                     ? `slideIn 0.3s ease-out ${index * 0.08}s both`
@@ -325,7 +323,7 @@ export default function ApplicationDocuments({
                       if (!doc.file_key) return;
                       handleDownload(doc.file_key);
                     }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     aria-label="Download Document"
                     disabled={!doc.file_key}
@@ -339,7 +337,7 @@ export default function ApplicationDocuments({
                       setSelectedDoc(doc);
                       setShowResubmitPopup(true);
                     }}
-                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="group rounded-lg border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
                     title="Resubmit Document"
                     aria-label="Resubmit Document"
                   >
@@ -355,7 +353,7 @@ export default function ApplicationDocuments({
             {arrivalDocuments.map((doc: any, index: number) => (
               <div
                 key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
+                className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300"
                 style={{
                   animation: showDocs
                     ? `slideIn 0.3s ease-out ${index * 0.08}s both`
@@ -419,7 +417,7 @@ export default function ApplicationDocuments({
                       if (!doc.file_key) return;
                       handleDownload(doc.file_key);
                     }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     aria-label="Download Document"
                     disabled={!doc.file_key}
@@ -433,7 +431,7 @@ export default function ApplicationDocuments({
                       setSelectedDoc(doc);
                       setShowResubmitPopup(true);
                     }}
-                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="group rounded-lg border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
                     title="Resubmit Document"
                     aria-label="Resubmit Document"
                   >
@@ -448,7 +446,7 @@ export default function ApplicationDocuments({
           {offerLetterDoc && (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Offer Letter</p>
-              <div className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
+              <div className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
                     <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
@@ -477,7 +475,7 @@ export default function ApplicationDocuments({
                 <div className="ml-4 flex flex-wrap gap-2">
                   <button
                     onClick={(e) => { e.stopPropagation(); if (!offerLetterDoc.file_key) return; handleDownload(offerLetterDoc.file_key); }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     disabled={!offerLetterDoc.file_key}
                   >
@@ -491,7 +489,7 @@ export default function ApplicationDocuments({
           {emgsEvalDoc && (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">EMGS Eval Document</p>
-              <div className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
+              <div className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
                     <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
@@ -530,7 +528,7 @@ export default function ApplicationDocuments({
                       if (!emgsEvalDoc.file_key) return;
                       handleDownload(emgsEvalDoc.file_key);
                     }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     aria-label="Download Document"
                     disabled={!emgsEvalDoc.file_key}
@@ -545,7 +543,7 @@ export default function ApplicationDocuments({
           {visaDoc && (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Visa Document</p>
-              <div className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
+              <div className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
                     <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
@@ -578,7 +576,7 @@ export default function ApplicationDocuments({
                 <div className="ml-4 flex flex-wrap gap-2">
                   <button
                     onClick={(e) => { e.stopPropagation(); if (!visaDoc.file_key) return; handleDownload(visaDoc.file_key); }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                     title="Download Document"
                     disabled={!visaDoc.file_key}
                   >
@@ -593,7 +591,7 @@ export default function ApplicationDocuments({
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Commission Documents</p>
               {commissionDocuments.map((doc: any) => (
-                <div key={doc.id} className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
+                <div key={doc.id} className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                   <div className="flex min-w-0 flex-1 items-start gap-4">
                     <div className="flex-shrink-0">
                       <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
@@ -620,7 +618,7 @@ export default function ApplicationDocuments({
                   <div className="ml-4 flex flex-wrap gap-2">
                     <button
                       onClick={(e) => { e.stopPropagation(); if (!doc.file_key) return; handleDownload(doc.file_key); }}
-                      className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
+                      className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
                       title="Download Document"
                       disabled={!doc.file_key}
                     >
@@ -663,6 +661,6 @@ export default function ApplicationDocuments({
               }
           }
       `}</style>
-    </section>
+    </>
   );
 }
