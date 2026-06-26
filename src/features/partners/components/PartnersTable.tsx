@@ -26,7 +26,7 @@ import { PARTNER_TYPE } from "constants/lists";
 
 const ITEMS_PER_PAGE = 10;
 
-type StatusFilter = "active" | "inactive" | "verified" | "unverified" | "individual" | "company" | null;
+type StatusFilter = "active" | "inactive" | "verified" | "unverified" | "individual" | "agency" | null;
 
 export default function PartnersTable() {
   const router = useRouter();
@@ -58,7 +58,7 @@ export default function PartnersTable() {
     { id: "verified",     label: "Verified",      count: partners.filter((p) => p.is_verified).length,         icon: BadgeCheck,  colorScheme: "blue" },
     { id: "unverified",   label: "Not Verified",  count: partners.filter((p) => !p.is_verified).length,        icon: BadgeX,      colorScheme: "amber" },
     { id: "individual",   label: "Individual",    count: partners.filter((p) => p.type === "individual").length,icon: User,        colorScheme: "violet" },
-    { id: "company",      label: "Company",       count: partners.filter((p) => p.type === "company").length,  icon: Building2,   colorScheme: "cyan" },
+    { id: "agency",       label: "Company",       count: partners.filter((p) => p.type === "agency").length,   icon: Building2,   colorScheme: "cyan" },
   ], [partners]);
 
   const filteredPartners = useMemo(() =>
@@ -76,7 +76,7 @@ export default function PartnersTable() {
         if (selectedStatus === "verified") return p.is_verified;
         if (selectedStatus === "unverified") return !p.is_verified;
         if (selectedStatus === "individual") return p.type === "individual";
-        if (selectedStatus === "company") return p.type === "company";
+        if (selectedStatus === "agency") return p.type === "agency";
         return true;
       }),
     [partners, searchTerm, selectedManager, selectedType, selectedStatus]

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -109,7 +109,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
   if (!partner) return <EmptyData />;
 
   const isIndividual = partner.type === "individual";
-  const isCompany = partner.type === "company";
+  const isCompany = partner.type === "agency";
 
   return (
     <>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -72,7 +72,7 @@ function DocUploadField({
       {doc.uploading ? (
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
           <div className="flex items-center justify-between text-sm text-slate-600">
-            <span>Uploading…</span>
+            <span>Uploadingâ€¦</span>
             <span className="font-medium text-blue-600">{doc.progress}%</span>
           </div>
           <div className="mt-2 h-1.5 w-full rounded-full bg-slate-200">
@@ -183,7 +183,7 @@ export default function EditPartnerDetails({ id }: Props) {
           linkedin_url: partner?.individual_details?.linkedin_url ?? "",
           social_media_url: partner?.individual_details?.social_media_url ?? "",
         }));
-      } else if (value === "company") {
+      } else if (value === "agency") {
         setCompanyRegDoc((p) => ({ ...p, file_key: partner?.company_details?.company_registration_doc_file_key ?? "", file_url: partner?.company_details?.company_registration_doc_file_url ?? "" }));
         setContactIdDoc((p) => ({ ...p, file_key: partner?.company_details?.contact_id_document_file_key ?? "", file_url: partner?.company_details?.contact_id_document_file_url ?? "" }));
         setFormData((prev: any) => ({
@@ -262,7 +262,7 @@ export default function EditPartnerDetails({ id }: Props) {
     if (Object.keys(newErrors).length > 0) return;
 
     const isIndividual = formData.type === "individual";
-    const isCompany = formData.type === "company";
+    const isCompany = formData.type === "agency";
 
     try {
       await updatePartner(id, {
@@ -316,7 +316,7 @@ export default function EditPartnerDetails({ id }: Props) {
   if (!partner || assignError) return <EmptyData />;
 
   const isIndividual = formData.type === "individual";
-  const isCompany = formData.type === "company";
+  const isCompany = formData.type === "agency";
 
   return (
     <div className="mt-6 max-w-5xl mx-auto">
