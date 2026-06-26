@@ -421,7 +421,7 @@ export const SCHOLARSHIP_TYPE = [
 
 export const PARTNER_TYPE = [
   { value: "individual", label: "Individual" },
-  { value: "company", label: "Company" },
+  { value: "agency", label: "Company" },
 ];
 
 export const CURRENCY = [

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
@@ -18,7 +18,7 @@ import crosshairIconImg from "/public/img/icons/crosshair-icon.png";
 import PublicNavbar from "components/navbar/PublicNavbar";
 
 type Step = "form" | "otp" | "success";
-type PartnerType = "individual" | "company";
+type PartnerType = "individual" | "agency";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 
@@ -125,7 +125,7 @@ export default function PartnerRegisterPage() {
         indForm.country && indForm.background &&
         indIdDoc && indForm.agreed,
       )
-    : partnerType === "company"
+    : partnerType === "agency"
     ? Boolean(
         compForm.company_name.trim() && compForm.country &&
         compForm.website_url.trim() && compRegDoc &&
@@ -186,7 +186,7 @@ export default function PartnerRegisterPage() {
     } catch { /* error shown via hook */ }
   };
 
-  // ── Success ──────────────────────────────────────────────────────────────
+  // â”€â”€ Success â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   if (step === "success") {
     return (
@@ -211,7 +211,7 @@ export default function PartnerRegisterPage() {
     );
   }
 
-  // ── OTP ──────────────────────────────────────────────────────────────────
+  // â”€â”€ OTP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   if (step === "otp") {
     return (
@@ -231,7 +231,7 @@ export default function PartnerRegisterPage() {
               inputMode="numeric"
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              placeholder="• • • • • •"
+              placeholder="â€¢ â€¢ â€¢ â€¢ â€¢ â€¢"
               className={`w-full rounded-lg border px-4 py-3 text-center text-lg font-semibold tracking-widest outline-none transition focus:ring-1 focus:ring-blue-500 ${
                 otpError ? "border-red-400 bg-red-50" : "border-slate-200"
               }`}
@@ -251,7 +251,7 @@ export default function PartnerRegisterPage() {
           />
           <div className="mt-4 space-y-2 text-center">
             {resendSuccess && (
-              <p className="text-sm text-green-600">Code resent — check your inbox.</p>
+              <p className="text-sm text-green-600">Code resent â€” check your inbox.</p>
             )}
             {resendError && (
               <p className="text-sm text-red-600">{resendError}</p>
@@ -276,7 +276,7 @@ export default function PartnerRegisterPage() {
     );
   }
 
-  // ── Form ─────────────────────────────────────────────────────────────────
+  // â”€â”€ Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
     <div className="min-h-screen bg-slate-50 pb-16">
@@ -305,7 +305,7 @@ export default function PartnerRegisterPage() {
         <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
           {([
             { type: "individual" as const, icon: User,     title: "Individual Advisor", desc: "Apply as an independent education advisor" },
-            { type: "company"    as const, icon: Building2, title: "Company / Agency",  desc: "Apply as an education agency or company" },
+            { type: "agency"    as const, icon: Building2, title: "Company / Agency",  desc: "Apply as an education agency or company" },
           ]).map(({ type, icon: Icon, title, desc }) => (
             <button key={type} type="button"
               onClick={() => { setPartnerType(type); setErrors({}); }}

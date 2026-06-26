@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -119,7 +119,7 @@ export default function PartnerDetails({ id }: Props) {
   if (!partner) return <EmptyData />;
 
   const isIndividual = partner.type === "individual";
-  const isCompany = partner.type === "company";
+  const isCompany = partner.type === "agency";
 
   return (
     <>

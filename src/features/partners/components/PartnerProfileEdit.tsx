@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -63,7 +63,7 @@ function DocUploadField({
       {doc.uploading ? (
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
           <div className="flex items-center justify-between text-sm text-slate-600">
-            <span>Uploading…</span>
+            <span>Uploadingâ€¦</span>
             <span className="font-medium text-blue-600">{doc.progress}%</span>
           </div>
           <div className="mt-2 h-1.5 w-full rounded-full bg-slate-200">
@@ -227,7 +227,7 @@ export default function EditPartnerProfile() {
   if (partnerError || !partner) return <EmptyData />;
 
   const isIndividual = partner.type === "individual";
-  const isCompany = partner.type === "company";
+  const isCompany = partner.type === "agency";
 
   return (
     <div className="mx-auto mt-6 max-w-5xl">
@@ -377,7 +377,7 @@ export default function EditPartnerProfile() {
             className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
-            {isUpdating ? "Saving…" : "Save Changes"}
+            {isUpdating ? "Savingâ€¦" : "Save Changes"}
           </button>
         </div>
       </div>
