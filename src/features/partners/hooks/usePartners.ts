@@ -8,6 +8,9 @@ export function useAllPartners() {
   const [partners, setPartners] = useState<Partner[]>([]);
   const [partnersLoading, setLoading] = useState(false);
   const [partnersError, setError] = useState('');
+  const [refetchCounter, setRefetchCounter] = useState(0);
+
+  const refetch = () => setRefetchCounter((c) => c + 1);
 
   useEffect(() => {
     const fetch = async () => {
@@ -38,7 +41,7 @@ export function useAllPartners() {
       }
     };
     fetch();
-  }, []);
+  }, [refetchCounter]);
 
-  return { partners, partnersLoading, partnersError };
+  return { partners, partnersLoading, partnersError, refetch };
 }
