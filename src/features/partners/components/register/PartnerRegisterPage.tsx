@@ -151,7 +151,7 @@ export default function PartnerRegisterPage() {
           ...(indForm.linkedin_url && { linkedin_url: indForm.linkedin_url }),
         }
       : {
-          partner_type: "company",
+          partner_type: "agency",
           full_name: compForm.contact_full_name.trim(),
           email: compForm.contact_email,
           phone: `${compForm.contact_phone_code} ${compForm.contact_phone_number}`,
