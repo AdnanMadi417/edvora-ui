@@ -49,6 +49,9 @@ export const partnersApi = {
       headers: authHeader(),
     }),
 
+  review: (id: string, payload: { decision: "approved" | "rejected"; rejection_reason?: string }) =>
+    api.patch(`/admin/partners/${id}/review`, payload, { headers: authHeader() }),
+
   getProfile: () =>
     api.get('/partners/profile', { headers: authHeader() }),
 

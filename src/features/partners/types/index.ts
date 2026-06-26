@@ -27,6 +27,8 @@ export type Partner = {
   is_active: boolean;
   assigned_manager_id: string;
   assigned_manager_name: string;
+  individual_details: IndividualDetails | null;
+  company_details: CompanyDetails | null;
 };
 
 export interface PartnerDetails {
@@ -63,6 +65,8 @@ export interface UpdatePartnerPayload {
   phone: string;
   is_verified: boolean;
   assigned_manager_id: string;
+  individual_details?: Partial<IndividualDetails>;
+  company_details?: Partial<CompanyDetails>;
 }
 
 export type AssignManagerPayload = {
@@ -70,6 +74,7 @@ export type AssignManagerPayload = {
 };
 
 export interface UpdatePartnerProfilePayload {
+  name?: string;
   type?: string;
   country?: string;
   phone?: string;
