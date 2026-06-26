@@ -109,6 +109,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
   if (!partner) return <EmptyData />;
 
   const isIndividual = partner.type === "individual";
+  const isCompany = partner.type === "company";
 
   return (
     <>
@@ -155,37 +156,37 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
           </div>
 
           {/* Individual Details */}
-          {isIndividual && partner.individual_details && (
+          {isIndividual && (
             <div className="border-b border-slate-200 p-6">
               <div className="mb-4 flex items-center gap-2">
                 <User className="h-4 w-4 text-slate-500" />
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Individual Details</p>
               </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <InfoRow icon={<Briefcase className="h-4 w-4" />} label="Background" value={partner.individual_details.background} />
-                <InfoRow icon={<Link2 className="h-4 w-4" />} label="LinkedIn" value={partner.individual_details.linkedin_url} href={partner.individual_details.linkedin_url || undefined} />
-                <InfoRow icon={<Link2 className="h-4 w-4" />} label="Social Media" value={partner.individual_details.social_media_url} href={partner.individual_details.social_media_url || undefined} />
+                <InfoRow icon={<Briefcase className="h-4 w-4" />} label="Background" value={partner.individual_details?.background} />
+                <InfoRow icon={<Link2 className="h-4 w-4" />} label="LinkedIn" value={partner.individual_details?.linkedin_url} href={partner.individual_details?.linkedin_url || undefined} />
+                <InfoRow icon={<Link2 className="h-4 w-4" />} label="Social Media" value={partner.individual_details?.social_media_url} href={partner.individual_details?.social_media_url || undefined} />
               </div>
               <div className="mt-3">
-                <DocRow label="Identity Document" fileKey={partner.individual_details.id_document_file_key} />
+                <DocRow label="Identity Document" fileKey={partner.individual_details?.id_document_file_key} />
               </div>
             </div>
           )}
 
           {/* Company Details */}
-          {!isIndividual && partner.company_details && (
+          {isCompany && (
             <div className="border-b border-slate-200 p-6">
               <div className="mb-4 flex items-center gap-2">
                 <Briefcase className="h-4 w-4 text-slate-500" />
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Company Details</p>
               </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <InfoRow icon={<Briefcase className="h-4 w-4" />} label="Company Name" value={partner.company_details.company_name} />
-                <InfoRow icon={<Link2 className="h-4 w-4" />} label="Website" value={partner.company_details.website_url} href={partner.company_details.website_url || undefined} />
+                <InfoRow icon={<Briefcase className="h-4 w-4" />} label="Company Name" value={partner.company_details?.company_name} />
+                <InfoRow icon={<Link2 className="h-4 w-4" />} label="Website" value={partner.company_details?.website_url} href={partner.company_details?.website_url || undefined} />
               </div>
               <div className="mt-3 space-y-2">
-                <DocRow label="Company Registration Document" fileKey={partner.company_details.company_registration_doc_file_key} />
-                <DocRow label="Contact Identity Document" fileKey={partner.company_details.contact_id_document_file_key} />
+                <DocRow label="Company Registration Document" fileKey={partner.company_details?.company_registration_doc_file_key} />
+                <DocRow label="Contact Identity Document" fileKey={partner.company_details?.contact_id_document_file_key} />
               </div>
             </div>
           )}

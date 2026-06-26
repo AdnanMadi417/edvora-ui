@@ -7,3 +7,6 @@ export { useAssignPartnerManager } from './useAssignPartnerManager';
 export { usePartnerProfile } from './usePartnerProfile';
 export { useUpdatePartnerProfile } from './useUpdatePartnerProfile';
 export { useReviewPartner } from './useReviewPartner';
+export { usePartnerRegistration } from './usePartnerRegistration';
+export { useResendRegistrationOtp } from './useResendRegistrationOtp';
+export { useVerifyRegistrationOtp } from './useVerifyRegistrationOtp';

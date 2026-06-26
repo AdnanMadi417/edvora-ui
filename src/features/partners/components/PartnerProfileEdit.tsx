@@ -112,6 +112,7 @@ export default function EditPartnerProfile() {
   const { updateProfile, loading: isUpdating } = useUpdatePartnerProfile();
 
   const [formData, setFormData] = useState({
+    name: "",
     country: "",
     phone_code: "+60",
     phone_number: "",
@@ -133,6 +134,7 @@ export default function EditPartnerProfile() {
     const rawPhone = (partner.phone ?? "").replace(/^undefined/, "").trim();
     const phoneMatch = rawPhone.match(/^(\+\d{1,3})\s+(.*)/);
     setFormData({
+      name: partner.name ?? "",
       country: partner.country ?? "",
       phone_code: phoneMatch ? phoneMatch[1] : "+60",
       phone_number: phoneMatch ? phoneMatch[2] : rawPhone,
@@ -177,6 +179,8 @@ export default function EditPartnerProfile() {
 
   const validate = () => {
     const e: Record<string, string> = {};
+    if (!formData.name.trim()) e.name = "Name is required";
+    else if (formData.name.trim().length < 5) e.name = "Name must be at least 5 characters";
     if (!formData.country) e.country = "Country is required";
     if (!formData.phone_number.trim()) e.phone_number = "Phone number is required";
     setErrors(e);
@@ -187,6 +191,7 @@ export default function EditPartnerProfile() {
     if (!validate() || !partner) return;
     try {
       const payload: any = {
+        name: formData.name.trim(),
         type: partner.type,
         country: formData.country,
         phone: `${formData.phone_code || "+60"} ${formData.phone_number}`,
@@ -222,6 +227,7 @@ export default function EditPartnerProfile() {
   if (partnerError || !partner) return <EmptyData />;
 
   const isIndividual = partner.type === "individual";
+  const isCompany = partner.type === "company";
 
   return (
     <div className="mx-auto mt-6 max-w-5xl">
@@ -245,6 +251,15 @@ export default function EditPartnerProfile() {
         <div className="border-b border-slate-200 p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Account Details</p>
           <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+            <InputField
+              label="Full Name"
+              field="name"
+              required
+              placeholder="Enter your full name"
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+            />
             <SelectField
               label="Country"
               field="country"
@@ -306,7 +321,7 @@ export default function EditPartnerProfile() {
         )}
 
         {/* Company details */}
-        {!isIndividual && (
+        {isCompany && (
           <div className="border-b border-slate-200 p-6">
             <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Company Details</p>
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { partnersApi } from '../services';
+import { parseApiError } from 'utils/parseApiError';
 
 export function useReviewPartner() {
   const [loading, setLoading] = useState(false);
@@ -18,12 +19,8 @@ export function useReviewPartner() {
         ...(rejectionReason ? { rejection_reason: rejectionReason } : {}),
       });
       return res.data;
-    } catch (err: any) {
-      const data = err?.response?.data;
-      const message =
-        (typeof data?.message === 'string' ? data.message : null) ||
-        (typeof data?.detail === 'string' ? data.detail : null) ||
-        'Failed to submit review';
+    } catch (err: unknown) {
+      const message = parseApiError(err, 'Failed to submit review');
       setError(message);
       throw err;
     } finally {

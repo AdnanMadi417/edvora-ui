@@ -1,4 +1,4 @@
-import api from 'lib/useApi';
+import api, { publicApi } from 'lib/useApi';
 import Cookies from 'js-cookie';
 import type {
   CreatePartnerPayload,
@@ -57,4 +57,14 @@ export const partnersApi = {
 
   updateProfile: (payload: UpdatePartnerProfilePayload) =>
     api.put('/partners/profile', payload),
+
+  // Public registration endpoints — use publicApi so a logged-in user's token is never sent
+  registerInitiate: (payload: Record<string, unknown>) =>
+    publicApi.post('/partners/register/initiate', payload),
+
+  registerResendOtp: (email: string) =>
+    publicApi.post<{ message: string }>('/partners/register/resend-otp', { email }),
+
+  registerVerifyOtp: (email: string, otp: string) =>
+    publicApi.post<{ message: string; reference_id: string }>('/partners/register/verify-otp', { email, otp }),
 };
