@@ -263,7 +263,7 @@ const ModernApplicationsTable = () => {
         />
       </div>
 
-      <div className="border-t border-slate-200 p-6 border-b border-slate-200">
+      <div className="border-b border-slate-200 p-6">
         <ApplicationFilterBar
           searchTerm={searchTerm}
           onSearchChange={(e) => setSearchTerm(e.target.value)}
@@ -491,47 +491,45 @@ const ModernApplicationsTable = () => {
         </table>
       </div>
 
-      <div className="p-6">
-        <div className="flex flex-col items-center justify-between gap-2 text-sm text-slate-500 md:flex-row">
-          <div>
-            {total === 0 ? (
-              <span>No results found</span>
-            ) : (
-              <>
-                Showing{" "}
-                <span className="font-medium text-slate-700">
-                  {(currentPage - 1) * itemsPerPage + 1}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium text-slate-700">
-                  {Math.min(currentPage * itemsPerPage, total)}
-                </span>{" "}
-                of{" "}
-                <span className="font-medium text-slate-700">
-                  {total}
-                </span>{" "}
-                results
-              </>
-            )}
-          </div>
+      <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 p-6 text-sm text-slate-500 md:flex-row">
+        <div>
+          {total === 0 ? (
+            <span>No results found</span>
+          ) : (
+            <>
+              Showing{" "}
+              <span className="font-medium text-slate-700">
+                {(currentPage - 1) * itemsPerPage + 1}
+              </span>{" "}
+              to{" "}
+              <span className="font-medium text-slate-700">
+                {Math.min(currentPage * itemsPerPage, total)}
+              </span>{" "}
+              of{" "}
+              <span className="font-medium text-slate-700">
+                {total}
+              </span>{" "}
+              results
+            </>
+          )}
+        </div>
 
-          <div className="flex items-center gap-2">
-            <PrevButton
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              text="Prev"
-              icon={<ArrowLeft className="h-4 w-4" />}
-            />
-            <span className="px-2 text-slate-500">
-              Page {currentPage} of {Math.max(totalPages, 1)}
-            </span>
-            <NextButton
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages || totalPages === 0}
-              text="Next"
-              icon={<ArrowRight className="h-4 w-4" />}
-            />
-          </div>
+        <div className="flex items-center gap-2">
+          <PrevButton
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            text="Prev"
+            icon={<ArrowLeft className="h-4 w-4" />}
+          />
+          <span className="px-2 text-slate-500">
+            Page {currentPage} of {Math.max(totalPages, 1)}
+          </span>
+          <NextButton
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === totalPages || totalPages === 0}
+            text="Next"
+            icon={<ArrowRight className="h-4 w-4" />}
+          />
         </div>
       </div>
 
