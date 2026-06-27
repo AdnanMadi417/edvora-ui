@@ -96,6 +96,7 @@ export default function PartnerRegisterPage() {
     if (!indForm.country) e.country = "Country is required";
     if (!indForm.background) e.background = "Please select your background";
     if (!indIdDoc) e.ind_id_doc = "Please upload your passport or national ID";
+    if (!indForm.social_media_url.trim()) e.social_media_url = "Instagram account is required";
     if (!indForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -123,7 +124,7 @@ export default function PartnerRegisterPage() {
         indForm.first_name.trim() && indForm.last_name.trim() &&
         indForm.email && indForm.phone_number.trim() &&
         indForm.country && indForm.background &&
-        indIdDoc && indForm.agreed,
+        indIdDoc && indForm.social_media_url.trim() && indForm.agreed,
       )
     : partnerType === "agency"
     ? Boolean(
@@ -404,7 +405,7 @@ export default function PartnerRegisterPage() {
                       error={errors.ind_id_doc}
                     />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="Social Media Profile" field="social_media_url" required={false}
+                      <InputField label="Instagram Account" field="social_media_url"
                         placeholder="instagram.com/username"
                         formData={indForm} errors={errors} updateFormData={updateInd} />
                       <InputField label="LinkedIn Profile" field="linkedin_url" required={false}

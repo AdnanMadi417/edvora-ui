@@ -52,13 +52,12 @@ export default function PartnersTable() {
 
   // Stats
   const statsCards = useMemo<FilterCardItem[]>(() => [
-    { id: null,           label: "All Partners", count: partners.length,                                       icon: LayoutGrid,  colorScheme: "slate" },
-    { id: "active",       label: "Active",        count: partners.filter((p) => p.is_active).length,           icon: CheckCircle, colorScheme: "emerald" },
-    { id: "inactive",     label: "Inactive",      count: partners.filter((p) => !p.is_active).length,          icon: XCircle,     colorScheme: "rose" },
-    { id: "verified",     label: "Verified",      count: partners.filter((p) => p.is_verified).length,         icon: BadgeCheck,  colorScheme: "blue" },
-    { id: "unverified",   label: "Not Verified",  count: partners.filter((p) => !p.is_verified).length,        icon: BadgeX,      colorScheme: "amber" },
-    { id: "individual",   label: "Individual",    count: partners.filter((p) => p.type === "individual").length,icon: User,        colorScheme: "violet" },
-    { id: "agency",       label: "Company",       count: partners.filter((p) => p.type === "agency").length,   icon: Building2,   colorScheme: "cyan" },
+    { id: "unverified",   label: "Pending Review", count: partners.filter((p) => !p.is_verified).length,        icon: BadgeX,      colorScheme: "amber" },
+    { id: "active",       label: "Active",          count: partners.filter((p) => p.is_active).length,           icon: CheckCircle, colorScheme: "emerald" },
+    { id: "inactive",     label: "Suspended",       count: partners.filter((p) => !p.is_active).length,          icon: XCircle,     colorScheme: "rose" },
+    { id: "verified",     label: "Verified",        count: partners.filter((p) => p.is_verified).length,         icon: BadgeCheck,  colorScheme: "blue" },
+    { id: "individual",   label: "Individual",      count: partners.filter((p) => p.type === "individual").length,icon: User,        colorScheme: "violet" },
+    { id: "agency",       label: "Company",         count: partners.filter((p) => p.type === "agency").length,   icon: Building2,   colorScheme: "cyan" },
   ], [partners]);
 
   const filteredPartners = useMemo(() =>
