@@ -3,7 +3,7 @@
 import { AxiosError } from "axios";
 import React, { useMemo, useState } from "react";
 import {
-  ArrowLeft, ArrowRight, ChevronRight, Handshake, LayoutGrid,
+  ArrowLeft, ArrowRight, ChevronRight, Handshake,
   Pencil, RefreshCw, SlidersHorizontal, Trash2, Building2,
   UserCog, Users, CheckCircle, XCircle, BadgeCheck, BadgeX, User, ShieldCheck,
 } from "lucide-react";
@@ -39,7 +39,7 @@ export default function PartnersTable() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedManager, setSelectedManager] = useState("all");
   const [selectedType, setSelectedType] = useState("all");
-  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>(null);
+  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>("unverified");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
