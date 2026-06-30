@@ -19,7 +19,10 @@ async function startOtel() {
   const ingestionKey = process.env.SIGNOZ_INGESTION_KEY ?? '';
   const serviceName = process.env.SIGNOZ_SERVICE_NAME ?? 'unibexs-frontend';
   const environment =
-    process.env.NEXT_PUBLIC_ENVIRONMENT ?? process.env.NODE_ENV ?? 'development';
+    process.env.ENVIRONMENT ??
+    process.env.NEXT_PUBLIC_ENVIRONMENT ??
+    process.env.NODE_ENV ??
+    'development';
 
   if (!ingestionKey) {
     console.warn('[OTel] SIGNOZ_INGESTION_KEY is missing. Exports will likely be rejected.');
