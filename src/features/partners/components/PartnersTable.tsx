@@ -21,7 +21,6 @@ import PrevButton from "components/ui/buttons/PrevButton";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
-import { PARTNER_TYPE } from "constants/lists";
 
 const ITEMS_PER_PAGE = 10;
 
