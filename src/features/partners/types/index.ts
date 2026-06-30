@@ -63,7 +63,6 @@ export interface UpdatePartnerPayload {
   type: string;
   country: string;
   phone: string;
-  is_verified: boolean;
   assigned_manager_id: string;
   individual_details?: Partial<IndividualDetails>;
   company_details?: Partial<CompanyDetails>;

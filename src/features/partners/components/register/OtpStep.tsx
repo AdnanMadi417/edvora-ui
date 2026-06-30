@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useVerifyRegistrationOtp, useResendRegistrationOtp } from "features/partners/hooks";
-import InputField from "components/form/fields/InputField";
+import OtpInputField from "components/form/fields/OtpInputField";
 import Button from "components/ui/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 
@@ -57,14 +57,12 @@ export default function OtpStep({ email, onSuccess }: Props) {
         </p>
 
         <div className="mt-6">
-          <InputField
+          <OtpInputField
             label="Verification Code"
             field="otp"
-            placeholder="Enter 6-digit code"
-            required={false}
             formData={{ otp }}
             errors={{ otp: otpError || "" }}
-            updateFormData={(_: string, val: string) => setOtp(val.replace(/\D/g, "").slice(0, 6))}
+            updateFormData={(_: string, val: string) => setOtp(val)}
           />
         </div>
 

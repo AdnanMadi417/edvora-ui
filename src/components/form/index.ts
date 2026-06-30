@@ -7,6 +7,7 @@ export { default as ArrayObjectField } from "./fields/ArrayObjectField";
 export { default as CheckBoxGroup } from "./fields/CheckBoxGroup";
 export { default as CheckSimpleBoxGroup } from "./fields/CheckSimpleBoxGroup";
 export { default as PasswordField } from "./fields/PasswordField";
+export { default as OtpInputField } from "./fields/OtpInputField";
 export { default as SearchableDropdown } from "./search/SearchableDropdown";
 export { default as SearchableMultiSelectField } from "./search/SearchableMultiSelectField";
 export { default as MultiSelect } from "./search/MultiSelect";
