@@ -11,7 +11,7 @@ import api, { setLoggingOut, SIGN_IN_URL } from "../../lib/useApi";
 import { useMe } from "hooks/useMe";
 import { profileRouteMap, notificationsRouteMap } from "components/navbar/config/navigation";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
-import ChangePasswordPopup from "features/partners/components/ChangePasswordPopup";
+import ChangePasswordPopup from "features/partners/components/popups/ChangePasswordPopup";
 
 const Navbar = ({
                   onOpenSidenav,

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ExternalLink, FileText, Pencil, Upload } from "lucide-react";
-import { usePartnerDetails, useUpdatePartner, useAssignPartnerManager } from "../hooks";
+import { usePartnerDetails, useUpdatePartner, useAssignPartnerManager } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";

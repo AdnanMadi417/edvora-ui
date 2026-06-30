@@ -1,10 +1,11 @@
 ﻿"use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { User, Building2, AlertCircle, CheckCircle2, ChevronRight } from "lucide-react";
-import { usePartnerRegistration, useVerifyRegistrationOtp, useResendRegistrationOtp } from "features/partners/hooks";
+import { usePartnerRegistration } from "features/partners/hooks";
+import OtpStep from "./OtpStep";
 import { AnimatePresence, motion } from "framer-motion";
 import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
 import InputField from "components/form/fields/InputField";
@@ -17,7 +18,7 @@ import registrationIconImg from "/public/img/icons/registration-icon.png";
 import crosshairIconImg from "/public/img/icons/crosshair-icon.png";
 import PublicNavbar from "components/navbar/PublicNavbar";
 
-type Step = "form" | "otp" | "success";
+type Step = "form" | "otp" | "success"; // "otp" rendered by OtpStep
 type PartnerType = "individual" | "agency";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
@@ -34,23 +35,12 @@ function SectionCard({ title, subtitle, children }: { title: string; subtitle?: 
 
 export default function PartnerRegisterPage() {
   const { initiateRegistration, loading: submitting, error: apiError } = usePartnerRegistration();
-  const { verifyOtp, loading: verifyLoading, error: otpError } = useVerifyRegistrationOtp();
-  const { resendOtp, loading: resendLoading, error: resendError } = useResendRegistrationOtp();
 
   const [step, setStep] = useState<Step>("form");
   const [partnerType, setPartnerType] = useState<PartnerType | null>(null);
   const [registrationEmail, setRegistrationEmail] = useState("");
 
-  const [otp, setOtp] = useState("");
-  const [resendSuccess, setResendSuccess] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
   const [errors, setErrors] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    if (resendCooldown <= 0) return;
-    const t = setTimeout(() => setResendCooldown((s) => s - 1), 1000);
-    return () => clearTimeout(t);
-  }, [resendCooldown]);
 
   // Individual form
   const [indForm, setIndForm] = useState({
@@ -165,29 +155,13 @@ export default function PartnerRegisterPage() {
     try {
       await initiateRegistration(payload);
       setRegistrationEmail(partnerType === "individual" ? indForm.email : compForm.contact_email);
-      setResendCooldown(60);
       setStep("otp");
     } catch { /* error shown via hook */ }
   };
 
-  const handleVerifyOtp = async () => {
-    if (otp.length < 6) return;
-    try {
-      await verifyOtp(registrationEmail, otp);
-      setStep("success");
-    } catch { /* error shown via hook */ }
-  };
-
-  const handleResendOtp = async () => {
-    setResendSuccess(false);
-    try {
-      await resendOtp(registrationEmail);
-      setResendSuccess(true);
-      setResendCooldown(60);
-    } catch { /* error shown via hook */ }
-  };
-
-  // â”€â”€ Success â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  if (step === "otp") {
+    return <OtpStep email={registrationEmail} onSuccess={() => setStep("success")} />;
+  }
 
   if (step === "success") {
     return (
@@ -211,73 +185,6 @@ export default function PartnerRegisterPage() {
       </div>
     );
   }
-
-  // â”€â”€ OTP â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-  if (step === "otp") {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
-        <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white px-7 py-10 shadow-sm">
-          <div className="mb-6 flex justify-center">
-            <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
-          </div>
-          <h2 className="text-center text-xl font-bold text-slate-900">Verify your email</h2>
-          <p className="mt-2 text-center text-sm text-slate-500">
-            We sent a 6-digit verification code to{" "}
-            <span className="font-medium text-slate-700">{registrationEmail}</span>
-          </p>
-          <div className="mt-6">
-            <input
-              type="text"
-              inputMode="numeric"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              placeholder="â€¢ â€¢ â€¢ â€¢ â€¢ â€¢"
-              className={`w-full rounded-lg border px-4 py-3 text-center text-lg font-semibold tracking-widest outline-none transition focus:ring-1 focus:ring-blue-500 ${
-                otpError ? "border-red-400 bg-red-50" : "border-slate-200"
-              }`}
-            />
-            {otpError && <p className="mt-1.5 text-center text-sm text-red-600">{otpError}</p>}
-          </div>
-          <Button
-            onClick={handleVerifyOtp}
-            disabled={verifyLoading || otp.length < 6}
-            text={verifyLoading ? "Verifying..." : "Verify OTP"}
-            bgColor="bg-blue-600"
-            textColor="text-white"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-white"
-            hoverBorderColor="hover:border-blue-700"
-            className="mt-4 w-full py-3 hover:bg-blue-700"
-          />
-          <div className="mt-4 space-y-2 text-center">
-            {resendSuccess && (
-              <p className="text-sm text-green-600">Code resent â€” check your inbox.</p>
-            )}
-            {resendError && (
-              <p className="text-sm text-red-600">{resendError}</p>
-            )}
-            {resendCooldown > 0 ? (
-              <p className="text-sm text-slate-400">
-                Resend available in <span className="font-medium text-slate-600">{resendCooldown}s</span>
-              </p>
-            ) : (
-              <button
-                type="button"
-                onClick={handleResendOtp}
-                disabled={resendLoading}
-                className="text-sm text-slate-500 transition hover:text-blue-600 disabled:opacity-50"
-              >
-                {resendLoading ? "Sending..." : "Didn't receive it? Resend code"}
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // â”€â”€ Form â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
   return (
     <div className="min-h-screen bg-slate-50 pb-16">
@@ -405,8 +312,9 @@ export default function PartnerRegisterPage() {
                       error={errors.ind_id_doc}
                     />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="Instagram Account" field="social_media_url"
+                      <InputField label="Social Media Account" field="social_media_url"
                         placeholder="instagram.com/username"
+                        type="url"
                         formData={indForm} errors={errors} updateFormData={updateInd} />
                       <InputField label="LinkedIn Profile" field="linkedin_url" required={false}
                         placeholder="linkedin.com/in/yourprofile"

@@ -8,11 +8,11 @@ import {
   UserCog, Users, CheckCircle, XCircle, BadgeCheck, BadgeX, User, ShieldCheck,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useAllPartners, useDeletePartner } from "../hooks";
+import { useAllPartners, useDeletePartner } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
-import AssignPartnerManager from "./AssignPartnerManager";
-import DeletePartner from "./DeletePartner";
-import ReviewPartnerPopup from "./ReviewPartnerPopup";
+import AssignPartnerManager from "../popups/AssignPartnerManager";
+import DeletePartner from "../popups/DeletePartner";
+import ReviewPartnerPopup from "../popups/ReviewPartnerPopup";
 import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";

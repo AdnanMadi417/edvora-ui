@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { CheckCircle, ShieldCheck, XCircle } from "lucide-react";
-import { useReviewPartner } from "../hooks";
+import { useReviewPartner } from "features/partners/hooks";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import ApproveRejectToggle from "components/ui/buttons/ApproveRejectToggle";

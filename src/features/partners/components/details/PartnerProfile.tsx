@@ -23,7 +23,7 @@ import {
 import { usePartnerProfile } from "features/partners";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
-import ChangePasswordPopup from "features/partners/components/ChangePasswordPopup";
+import ChangePasswordPopup from "../popups/ChangePasswordPopup";
 import ActionsDropdown from "components/ui/buttons/ActionsDropdown";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
