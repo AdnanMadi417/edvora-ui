@@ -14,9 +14,9 @@ export interface PresignedUpload {
  * Check if a file is allowed (PDF or PNG)
  */
 export const ALLOWED_FILE_TYPES = {
-  mimeTypes: ["application/pdf", "image/png", "image/jpeg"],
-  extensions: [".pdf", ".png", ".jpg", ".jpeg"],
-  label: "PDF, PNG, or JPG",
+  mimeTypes: ["application/pdf", "image/png", "image/jpeg", "image/webp"],
+  extensions: [".pdf", ".png", ".jpg", ".jpeg", ".webp"],
+  label: "PDF, PNG, JPG, or WebP",
 };
 
 function isAllowedFile(file: File): boolean {

@@ -43,10 +43,9 @@ export default function ApplicationCommissions({
   };
 
   return (
-    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
-      <div className="mb-6 rounded-lg border bg-white">
-        <div className="flex items-start gap-3 border-b border-gray-200 p-6">
-          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
+    <>
+      <div className="flex items-start gap-3 border-b border-slate-200 p-6">
+          <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
             <Receipt className="text-xl text-blue-700" />
           </span>
           <div>
@@ -66,15 +65,15 @@ export default function ApplicationCommissions({
             commissionDocs.map((doc: any) => (
               <div
                 key={doc.id}
-                className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm"
+                className="rounded-lg border border-slate-200 bg-white p-4"
               >
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-md bg-green-50">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-50">
                       <Receipt className="h-5 w-5 text-green-600" />
                     </div>
 
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-slate-900">
                       {formatLabel(doc.document_type)}
                     </p>
 
@@ -84,7 +83,7 @@ export default function ApplicationCommissions({
                     title={doc.document_type}
                     onClick={() => handleDownload(doc)}
                     disabled={downloadingId === doc.id}
-                    className="flex h-9 w-9 items-center justify-center rounded-md border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
+                    className="flex h-9 w-9 items-center justify-center rounded-lg border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
                   >
                     <Download className="h-4 w-4" />
                   </button>
@@ -99,7 +98,6 @@ export default function ApplicationCommissions({
         </div>
 
 
-      </div>
-    </section>
+    </>
   );
 }

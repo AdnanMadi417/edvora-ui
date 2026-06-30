@@ -11,6 +11,7 @@ import { useToast } from "components/context/ToastContext";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
   partnerId: string;
   managerOptions: { label: string; value: string }[];
   currentManagerId?: string;
@@ -19,6 +20,7 @@ interface Props {
 export default function AssignPartnerManager({
   isOpen,
   onClose,
+  onSuccess,
   partnerId,
   managerOptions,
   currentManagerId,
@@ -61,7 +63,7 @@ export default function AssignPartnerManager({
       await assignManager(partnerId, { manager_id: formData.manager_id });
       showToast("Manager assigned successfully", "success");
       onClose();
-      setTimeout(() => location.reload(), 300);
+      onSuccess?.();
     } catch (err: any) {
       const backendMessage =
         err?.response?.data?.message || "Failed to assign manager. Please try again.";

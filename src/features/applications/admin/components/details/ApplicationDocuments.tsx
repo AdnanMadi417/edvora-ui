@@ -103,17 +103,15 @@ export default function ApplicationDocuments({
   }
 
   return (
-    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card transition-all duration-300">
+    <>
       <div
-        className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80 ${
-          showDocs ? "rounded-t-lg" : "rounded-lg"
-        }`}
+        className="group flex cursor-pointer items-center justify-between p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80"
         onClick={() => setShowDocs(!showDocs)}
       >
         {/* Left: icon + info */}
         <div className="flex items-center gap-3 sm:gap-4">
           <div className="relative shrink-0">
-            <div className="flex h-11 w-11 items-center justify-center rounded-md bg-blue-50">
+            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-50">
               <FolderOpen className="h-5 w-5 text-blue-600" />
             </div>
             {pendingDocuments > 0 && (
@@ -162,13 +160,13 @@ export default function ApplicationDocuments({
             : "max-h-0 overflow-hidden opacity-0"
         }`}
       >
-        <div className="space-y-4 rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
+        <div className="space-y-4 border-t border-slate-200 p-6">
 
           <div className="space-y-4">
             {allDocs.map((doc: any, index: number) => (
               <div
                 key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
+                className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300"
                 style={{
                   animation: showDocs
                     ? `slideIn 0.3s ease-out ${index * 0.08}s both`
@@ -260,7 +258,7 @@ export default function ApplicationDocuments({
             {paymentDocuments.map((doc: any, index: number) => (
               <div
                 key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
+                className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300"
                 style={{
                   animation: showDocs
                     ? `slideIn 0.3s ease-out ${index * 0.08}s both`
@@ -353,7 +351,7 @@ export default function ApplicationDocuments({
             {arrivalDocuments.map((doc: any, index: number) => (
               <div
                 key={doc.id}
-                className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300"
+                className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300"
                 style={{
                   animation: showDocs
                     ? `slideIn 0.3s ease-out ${index * 0.08}s both`
@@ -444,7 +442,7 @@ export default function ApplicationDocuments({
           {offerLetterDoc && (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Offer Letter</p>
-              <div className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
+              <div className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
                     <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
@@ -487,7 +485,7 @@ export default function ApplicationDocuments({
           {emgsEvalDoc && (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">EMGS Eval Document</p>
-              <div className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
+              <div className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
                     <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
@@ -541,7 +539,7 @@ export default function ApplicationDocuments({
           {visaDoc && (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Visa Document</p>
-              <div className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
+              <div className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
                     <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
@@ -589,7 +587,7 @@ export default function ApplicationDocuments({
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Commission Documents</p>
               {commissionDocuments.map((doc: any) => (
-                <div key={doc.id} className="relative flex items-center justify-between rounded-lg border border-gray-200 p-5 backdrop-blur transition-all duration-300">
+                <div key={doc.id} className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                   <div className="flex min-w-0 flex-1 items-start gap-4">
                     <div className="flex-shrink-0">
                       <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
@@ -659,6 +657,6 @@ export default function ApplicationDocuments({
           }
         }
       `}</style>
-    </section>
+    </>
   );
 }

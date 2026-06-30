@@ -13,7 +13,9 @@ import {
   GraduationCap,
   ArrowLeft,
   ArrowRight,
+  LayoutGrid,
 } from "lucide-react";
+import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from "components/filters/StatsFilterCards";
 
 import { useRouter } from "next/navigation";
 import api from "lib/useApi";
@@ -29,8 +31,19 @@ import ApplicationFilterBar from "components/filters/ApplicationFilterBar";
 import { AppDate } from "components/ui/date";
 
 
+const STAGE_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose", "cyan"];
+
+const getStatusColors = (code: string) => {
+  if (!code) return { bg: "bg-gray-100 border-slate-200", text: "text-gray-700" };
+  if (code.includes("reject") || code.includes("expired")) return { bg: "bg-red-50 border-red-200", text: "text-red-700" };
+  if (code.includes("approv") || code.includes("confirm") || code.includes("accepted") || code.includes("completed")) return { bg: "bg-green-50 border-green-200", text: "text-green-700" };
+  if (code.includes("correction") || code.includes("re_upload") || code.includes("re-upload") || code.includes("disputed")) return { bg: "bg-orange-50 border-orange-200", text: "text-orange-700" };
+  if (code.includes("review") || code.includes("waiting") || code.includes("processing") || code.includes("pending")) return { bg: "bg-yellow-50 border-yellow-200", text: "text-yellow-700" };
+  return { bg: "bg-blue-50 border-blue-200", text: "text-blue-700" };
+};
+
 const SkeletonRow = () => (
-  <tr className="border-b border-gray-100">
+  <tr className="border-b border-slate-100">
     <td className="px-6 py-4">
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 shrink-0 animate-pulse rounded-md bg-gray-200" />
@@ -72,10 +85,18 @@ const ModernApplicationsTable = () => {
   const { stageStatuses, stageStatusesLoading } = useAllStageStatuses();
 
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
-  const [selectedStages, setSelectedStages] = useState<string>("all");
+  const [selectedStages, setSelectedStages] = useState<string | null>(null);
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [stageCounts, setStageCounts] = useState<Record<string, number>>({});
+  const [selectedLifecycle, setSelectedLifecycle] = useState<"active" | "hold" | "cancel" | "all">("active");
 
   const itemsPerPage = 10;
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 400);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   useEffect(() => {
     const resolveManager = async () => {
@@ -90,16 +111,50 @@ const ModernApplicationsTable = () => {
     resolveManager();
   }, []);
 
+  useEffect(() => {
+    if (stages.length === 0 || !managerId) return;
+    let cancelled = false;
+    Promise.all(
+      stages.map((s) =>
+        api.get(`/account-managers/${managerId}/applications`, { params: { stage_id: s.id, limit: 1, status: selectedLifecycle } })
+          .then((res) => ({ id: s.id, count: (res.data as any)?.total ?? 0 }))
+          .catch(() => ({ id: s.id, count: 0 }))
+      )
+    ).then((results) => {
+      if (cancelled) return;
+      const map: Record<string, number> = {};
+      results.forEach((r) => { map[r.id] = r.count; });
+      setStageCounts(map);
+    });
+    return () => { cancelled = true; };
+  }, [stages.length, managerId, selectedLifecycle]);
+
+  const { total: grandTotal } = useAccountManagerApplications({ managerId, limit: 1, status: selectedLifecycle });
+
   const { items: applications, total, loading } = useAccountManagerApplications({
     managerId,
     limit: itemsPerPage,
     offset: (currentPage - 1) * itemsPerPage,
-    stage: selectedStages !== "all" ? selectedStages : undefined,
+    status: selectedLifecycle,
+    stage_id: selectedStages ?? undefined,
+    stage_status_id: selectedStageStatus !== "all" ? selectedStageStatus : undefined,
+    search: debouncedSearch || undefined,
   });
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedUniversity, selectedStages, selectedStageStatus]);
+  }, [debouncedSearch, selectedUniversity, selectedStages, selectedStageStatus]);
+
+  const stageCards = useMemo<FilterCardItem[]>(() => [
+    { id: null, label: "All Applications", count: grandTotal, icon: LayoutGrid, colorScheme: "slate" },
+    ...stages.map((s, i) => ({
+      id: s.id,
+      label: s.name,
+      count: stageCounts[s.id] ?? "—",
+      icon: Flag,
+      colorScheme: STAGE_COLORS[i % STAGE_COLORS.length],
+    })),
+  ], [stages, stageCounts, grandTotal]);
 
   const handleSort = (key: string) => {
     setSortConfig((prev) => ({
@@ -110,32 +165,13 @@ const ModernApplicationsTable = () => {
 
   const activeFiltersCount = [
     selectedUniversity !== "all",
-    selectedStages !== "all",
+    selectedStages !== null,
     selectedStageStatus !== "all",
     searchTerm !== "",
   ].filter(Boolean).length;
 
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = [...applications];
-
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (app) =>
-          (app.student_name?.toLowerCase() ?? "").includes(term) ||
-          (app.passport_number?.toLowerCase() ?? "").includes(term) ||
-          (app.partner_name?.toLowerCase() ?? "").includes(term) ||
-          (app.account_manager_name?.toLowerCase() ?? "").includes(term) ||
-          (app.program_name?.toLowerCase() ?? "").includes(term) ||
-          (app.university_name?.toLowerCase() ?? "").includes(term),
-      );
-    }
-
-    if (selectedStageStatus !== "all" && !stageStatusesLoading) {
-      filtered = filtered.filter(
-        (app) => app.status?.toLowerCase().replace(/\s+/g, "_") === selectedStageStatus,
-      );
-    }
 
     if (selectedUniversity !== "all") {
       filtered = filtered.filter(
@@ -154,14 +190,7 @@ const ModernApplicationsTable = () => {
     }
 
     return filtered;
-  }, [
-    applications,
-    searchTerm,
-    selectedUniversity,
-    selectedStageStatus,
-    sortConfig,
-    stageStatusesLoading,
-  ]);
+  }, [applications, selectedUniversity, sortConfig]);
 
   const actionRequiredStatuses = useMemo(() => new Set([
     'new_application',
@@ -182,53 +211,13 @@ const ModernApplicationsTable = () => {
   const paginatedApplications = filteredAndSortedApplications;
 
   const StatusBadge = ({ status }: { status: string }) => {
-    const statusConfig: Record<string, any> = {
-      new_application: {
-        bg: "bg-blue-50 border-blue-200",
-        text: "text-blue-700",
-        dot: "bg-blue-500",
-        label: "New Application",
-      },
-      under_review_by_account_manager: {
-        bg: "bg-yellow-50 border-yellow-200",
-        text: "text-yellow-700",
-        dot: "bg-yellow-500",
-        label: "Under Review",
-      },
-      correction_requested_by_account_manager: {
-        bg: "bg-orange-50 border-orange-200",
-        text: "text-orange-700",
-        dot: "bg-orange-500",
-        label: "Correction Requested",
-      },
-      approved_from_stage_1: {
-        bg: "bg-green-50 border-green-200",
-        text: "text-green-700",
-        dot: "bg-green-500",
-        label: "Approved",
-      },
-      rejected: {
-        bg: "bg-red-50 border-red-200",
-        text: "text-red-700",
-        dot: "bg-red-500",
-        label: "Rejected",
-      },
-    };
-
-    const normalizedStatus = status?.toLowerCase().replace(/\s+/g, "_");
-    const config = statusConfig[normalizedStatus] || {
-      bg: "bg-gray-100 border-gray-200",
-      text: "text-gray-700",
-      dot: "bg-gray-400",
-      label: status || "Unknown",
-    };
-
+    const normalized = status?.toLowerCase().replace(/\s+/g, "_") ?? "";
+    const match = stageStatuses.find((s) => s.name.toLowerCase().replace(/\s+/g, "_") === normalized);
+    const label = match?.name ?? (normalized.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Unknown");
+    const { bg, text } = getStatusColors(normalized);
     return (
-      <span
-        className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium ${config.bg} ${config.text}`}
-        title={config.label}
-      >
-        <span className="truncate max-w-[160px]">{config.label}</span>
+      <span className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium ${bg} ${text}`} title={label}>
+        <span className="truncate max-w-[160px]">{label}</span>
       </span>
     );
   };
@@ -249,51 +238,60 @@ const ModernApplicationsTable = () => {
   const handleClearFilters = () => {
     setSearchTerm("");
     setSelectedUniversity("all");
-    setSelectedStages("all");
+    setSelectedStages(null);
     setSelectedStageStatus("all");
+    setSelectedLifecycle("active");
     setSortConfig({ key: null, direction: "asc" });
   };
 
   return (
-    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-4 overflow-hidden rounded-lg border border-gray-200 bg-white">
-        <div className="relative p-6">
+    <div className="mt-6 max-w-5xl mx-auto text-p2 bg-white rounded-lg border border-slate-200">
 
-          {/* Header */}
-          <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-slate-900">Applications Dashboard</h3>
-              <p className="mt-0.5 text-sm text-slate-500">Manage and track student applications</p>
-            </div>
-          </div>
-
-          <ApplicationFilterBar
-            searchTerm={searchTerm}
-            onSearchChange={(e) => setSearchTerm(e.target.value)}
-            selectedStages={selectedStages}
-            onStagesChange={setSelectedStages}
-            stageOptions={stages.map((s) => ({ label: s.name, value: s.name }))}
-            selectedUniversity={selectedUniversity}
-            onUniversityChange={setSelectedUniversity}
-            universityOptions={universities.map((u) => ({ label: u.name, value: u.name }))}
-            selectedStageStatus={selectedStageStatus}
-            onStageStatusChange={setSelectedStageStatus}
-            stageStatusOptions={stageStatuses.map((s) => ({
-              label: s.name,
-              value: s.name.toLowerCase().replace(/\s+/g, "_"),
-            }))}
-            stageStatusLoading={stageStatusesLoading}
-            activeFiltersCount={activeFiltersCount}
-            onClearFilters={handleClearFilters}
-            showFilters={showMobileFilters}
-            onToggleFilters={() => setShowMobileFilters((v) => !v)}
-          />
-
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
+        <div>
+          <h3 className="text-xl font-semibold text-slate-900">Applications Dashboard</h3>
+          <p className="mt-0.5 text-sm text-slate-500">Manage and track student applications</p>
         </div>
       </div>
 
+      <div className="hidden sm:block p-6 border-b border-slate-200">
+        <StatsFilterCards
+          cards={stageCards}
+          selectedId={selectedStages}
+          onSelect={(id) => { setSelectedStages(id); setCurrentPage(1); }}
+        />
+      </div>
+
+      <div className="border-b border-slate-200 p-6">
+        <ApplicationFilterBar
+          searchTerm={searchTerm}
+          onSearchChange={(e) => setSearchTerm(e.target.value)}
+          selectedStages={selectedStages ?? "all"}
+          onStagesChange={(val) => {
+            setSelectedStages(val === "all" ? null : val);
+            setCurrentPage(1);
+          }}
+          stageOptions={stages.map((s) => ({ label: s.name, value: s.id }))}
+          selectedUniversity={selectedUniversity}
+          onUniversityChange={setSelectedUniversity}
+          universityOptions={universities.map((u) => ({ label: u.name, value: u.name }))}
+          selectedStageStatus={selectedStageStatus}
+          onStageStatusChange={setSelectedStageStatus}
+          stageStatusOptions={stageStatuses.map((s) => ({ label: s.name, value: s.id }))}
+          stageStatusLoading={stageStatusesLoading}
+          activeFiltersCount={activeFiltersCount}
+          onClearFilters={handleClearFilters}
+          showFilters={showMobileFilters}
+          onToggleFilters={() => setShowMobileFilters((v) => !v)}
+        />
+      </div>
+
+      <div className="border-t border-slate-200 p-6">
+      <div className="overflow-hidden rounded-lg border border-slate-200">
+
       {/* Mobile card list */}
-      <div className="md:hidden rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-white divide-y divide-gray-100">
+      <div className="md:hidden divide-y divide-slate-100">
         {loading ? (
           Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-3.5">
@@ -314,7 +312,7 @@ const ModernApplicationsTable = () => {
           paginatedApplications.map((app) => (
             <div
               key={app.id}
-              className={`flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors bg-white hover:bg-slate-50 ${
+              className={`flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors bg-white hover:bg-slate-100/50 ${
                 needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
               }`}
               onClick={() => router.push(`/account-manager/applications/${app.id}`)}
@@ -351,13 +349,13 @@ const ModernApplicationsTable = () => {
       </div>
 
       {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-gray-200 bg-white">
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-gray-200 bg-white">
+            <tr className="border-b border-slate-200 bg-slate-50">
               <th
                 onClick={() => handleSort("student_name")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100/50"
               >
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4 text-slate-400" />
@@ -368,7 +366,7 @@ const ModernApplicationsTable = () => {
 
               <th
                 onClick={() => handleSort("program_name")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100/50"
               >
                 <div className="flex min-w-[250px] items-center gap-2">
                   <GraduationCap className="h-4 w-4 text-slate-400" />
@@ -379,7 +377,7 @@ const ModernApplicationsTable = () => {
 
               <th
                 onClick={() => handleSort("partner_name")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100/50"
               >
                 <div className="flex items-center gap-2">
                   <Building className="h-4 w-4 text-slate-400" />
@@ -390,7 +388,7 @@ const ModernApplicationsTable = () => {
 
               <th
                 onClick={() => handleSort("stage")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100/50"
               >
                 <div className="flex min-w-[200px] items-center gap-2">
                   <Flag className="h-4 w-4 text-slate-400" />
@@ -401,7 +399,7 @@ const ModernApplicationsTable = () => {
 
               <th
                 onClick={() => handleSort("updated_at")}
-                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-50"
+                className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100/50"
               >
                 <div className="flex min-w-[100px] items-center gap-2">
                   <Clock className="h-4 w-4 text-slate-400" />
@@ -414,7 +412,7 @@ const ModernApplicationsTable = () => {
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-gray-100 bg-white">
+          <tbody className="divide-y divide-slate-100 bg-white">
             {loading ? (
               Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
             ) : paginatedApplications.length === 0 ? (
@@ -427,7 +425,7 @@ const ModernApplicationsTable = () => {
               paginatedApplications.map((app) => (
                 <tr
                   key={app.id}
-                  className={`group cursor-pointer transition-colors hover:bg-slate-50 ${
+                  className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${
                     needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
                   }`}
                   onClick={() => router.push(`/account-manager/applications/${app.id}`)}
@@ -493,48 +491,49 @@ const ModernApplicationsTable = () => {
         </table>
       </div>
 
-      <div className="sticky bottom-0 rounded-b-lg border border-gray-200 bg-white px-6 py-4">
-        <div className="flex flex-col items-center justify-between gap-2 text-sm text-slate-500 md:flex-row">
-          <div>
-            {total === 0 ? (
-              <span>No results found</span>
-            ) : (
-              <>
-                Showing{" "}
-                <span className="font-medium text-slate-700">
-                  {(currentPage - 1) * itemsPerPage + 1}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium text-slate-700">
-                  {Math.min(currentPage * itemsPerPage, total)}
-                </span>{" "}
-                of{" "}
-                <span className="font-medium text-slate-700">
-                  {total}
-                </span>{" "}
-                results
-              </>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <PrevButton
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              text="Prev"
-              icon={<ArrowLeft className="h-4 w-4" />}
-            />
-            <span className="px-2 text-slate-500">
-              Page {currentPage} of {Math.max(totalPages, 1)}
-            </span>
-            <NextButton
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages || totalPages === 0}
-              text="Next"
-              icon={<ArrowRight className="h-4 w-4" />}
-            />
-          </div>
+      <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 p-6 text-sm text-slate-500 md:flex-row">
+        <div>
+          {total === 0 ? (
+            <span>No results found</span>
+          ) : (
+            <>
+              Showing{" "}
+              <span className="font-medium text-slate-700">
+                {(currentPage - 1) * itemsPerPage + 1}
+              </span>{" "}
+              to{" "}
+              <span className="font-medium text-slate-700">
+                {Math.min(currentPage * itemsPerPage, total)}
+              </span>{" "}
+              of{" "}
+              <span className="font-medium text-slate-700">
+                {total}
+              </span>{" "}
+              results
+            </>
+          )}
         </div>
+
+        <div className="flex items-center gap-2">
+          <PrevButton
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            text="Prev"
+            icon={<ArrowLeft className="h-4 w-4" />}
+          />
+          <span className="px-2 text-slate-500">
+            Page {currentPage} of {Math.max(totalPages, 1)}
+          </span>
+          <NextButton
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === totalPages || totalPages === 0}
+            text="Next"
+            icon={<ArrowRight className="h-4 w-4" />}
+          />
+        </div>
+      </div>
+
+      </div>
       </div>
     </div>
   );

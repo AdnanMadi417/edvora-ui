@@ -471,6 +471,53 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
 
         <DocumentsSection requiredDocuments={requiredDocuments} />
 
+
+          {/* Commission */}
+        {commission && commission.amount != null && (
+          <div className="p-6 border-b border-slate-200">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-green-50">
+                <CircleDollarSign className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <h4 className="text-base font-bold text-slate-900">Your Commission</h4>
+                
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-green-200 bg-green-50 p-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <p className="text-xs font-medium text-green-600">Commission Amount</p>
+                  <p className="mt-1 text-2xl font-bold text-green-700">
+                    {(commission.currency || "RM").toUpperCase()} {commission.amount.toLocaleString()}
+                  </p>
+                </div>
+
+                {(commission.expected_commission_from || commission.expected_commission_to) && (
+                  <div>
+                    <p className="text-xs font-medium text-green-600">Payment Timeline</p>
+                    <p className="mt-1 text-sm font-semibold text-green-700">
+                      {commission.expected_commission_from && commission.expected_commission_to
+                        ? `Within ${commission.expected_commission_from} – ${commission.expected_commission_to} months after enrollment`
+                        : commission.expected_commission_from
+                        ? `From ${commission.expected_commission_from} months after enrollment`
+                        : `Up to ${commission.expected_commission_to} months after enrollment`}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {commission.notes && (
+                <div className="mt-4 border-t border-green-200 pt-4">
+                  <p className="text-xs font-medium text-green-600">Notes</p>
+                  <p className="mt-1 text-sm text-green-800">{commission.notes}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Footer */}
         <div className="p-6 border-t border-slate-200 flex gap-3">
           <Button

@@ -32,7 +32,9 @@ export type UseAccountManagerApplicationsParams = {
   limit?: number;
   offset?: number;
   status?: "active" | "hold" | "cancel" | "all";
-  stage?: string;
+  stage_id?: string;
+  stage_status_id?: string;
+  search?: string;
 };
 
 export function useAccountManagerApplications({
@@ -40,7 +42,9 @@ export function useAccountManagerApplications({
   limit = 20,
   offset = 0,
   status = "active",
-  stage,
+  stage_id,
+  stage_status_id,
+  search,
 }: UseAccountManagerApplicationsParams) {
   const [data, setData] = useState<AccountManagerApplicationsResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -55,7 +59,14 @@ export function useAccountManagerApplications({
     try {
       const res = await api.get<AccountManagerApplicationsResponse>(
         `/account-managers/${managerId}/applications`,
-        { params: { limit, offset, status } }
+        {
+          params: {
+            limit, offset, status,
+            ...(stage_id ? { stage_id } : {}),
+            ...(stage_status_id ? { stage_status_id } : {}),
+            ...(search ? { search } : {}),
+          },
+        }
       );
 
       setData(res.data);
@@ -69,7 +80,7 @@ export function useAccountManagerApplications({
 
   useEffect(() => {
     fetchApplications();
-  }, [managerId, limit, offset, status]);
+  }, [managerId, limit, offset, status, stage_id, stage_status_id, search]);
 
   return {
     items: data?.items ?? [],
