@@ -3,7 +3,7 @@
 import { AxiosError } from "axios";
 import React, { useMemo, useState } from "react";
 import {
-  ArrowLeft, ArrowRight, ChevronRight, Handshake,
+  ArrowLeft, ArrowRight, ChevronRight,
   Pencil, RefreshCw, SlidersHorizontal, Trash2, Building2,
   UserCog, Users, CheckCircle, XCircle, BadgeCheck, BadgeX, User, ShieldCheck,
 } from "lucide-react";
@@ -20,7 +20,6 @@ import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import Loading from "components/loading/Loading";
-import Link from "components/ui/links/LinkBtn";
 import { useToast } from "components/context/ToastContext";
 import { PARTNER_TYPE } from "constants/lists";
 
@@ -131,16 +130,7 @@ export default function PartnersTable() {
           <h3 className="text-xl font-semibold text-slate-900">Partners</h3>
           <p className="mt-0.5 text-sm text-slate-500">Manage and view all partner organizations</p>
         </div>
-        <Link
-          href="/admin/partners/register-partner"
-          icon={<Handshake className="h-5 w-5" />}
-          label="Register Partner"
-          bgColor="bg-blue-50"
-          textColor="text-blue-700"
-          borderColor="border-blue-600"
-          hoverTextColor="hover:text-blue-800"
-          hoverBorderColor="hover:border-blue-700"
-        />
+
       </div>
 
       {/* Stats Cards */}
@@ -185,15 +175,7 @@ export default function PartnersTable() {
                 defaultOption="All Managers"
               />
             </div>
-            <div className="w-full sm:w-44 flex-shrink-0">
-              <FilterSelectField
-                value={selectedType}
-                onChange={(v: string) => { setSelectedType(v); setCurrentPage(1); }}
-                options={PARTNER_TYPE.map((t) => ({ label: t.label, value: t.value }))}
-                icon={Users}
-                defaultOption="All Types"
-              />
-            </div>
+            
             {activeFiltersCount > 0 && (
               <button
                 onClick={clearFilters}
