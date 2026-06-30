@@ -21,13 +21,13 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import { usePartnerDetails } from "../hooks";
+import { usePartnerDetails } from "features/partners/hooks";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import Button from "components/ui/buttons/Button";
-import ReviewPartnerPopup from "./ReviewPartnerPopup";
+import ReviewPartnerPopup from "../popups/ReviewPartnerPopup";
 
 interface Props {
   id: string;

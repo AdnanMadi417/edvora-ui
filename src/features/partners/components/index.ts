@@ -1,6 +1,6 @@
-export { default as PartnersTable } from './PartnersTable';
-export { default as PartnerDetails } from './PartnerDetails';
-export { default as RegisterPartner } from './RegisterPartner';
-export { default as EditPartnerDetails } from './EditPartnerDetails';
-export { default as AssignPartnerManager } from './AssignPartnerManager';
-export { default as DeletePartner } from './DeletePartner';
+export { default as PartnersTable } from './table/PartnersTable';
+export { default as PartnerDetails } from './details/PartnerDetails';
+export { default as RegisterPartner } from './register/PartnerRegisterPage';
+export { default as EditPartnerDetails } from './popups/EditPartnerDetails';
+export { default as AssignPartnerManager } from './popups/AssignPartnerManager';
+export { default as DeletePartner } from './popups/DeletePartner';
