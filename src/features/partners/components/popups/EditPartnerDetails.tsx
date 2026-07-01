@@ -3,12 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ExternalLink, FileText, Pencil, Upload } from "lucide-react";
-import { usePartnerDetails, useUpdatePartner, useAssignPartnerManager } from "../hooks";
+import { usePartnerDetails, useUpdatePartner, useAssignPartnerManager, useReviewPartner } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import InputField from "components/form/fields/InputField";
-import PasswordField from "components/form/fields/PasswordField";
 import PhoneInputField from "components/form/fields/PhoneInputField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import SelectField from "components/form/fields/SelectField";
@@ -18,8 +17,6 @@ import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { COUNTRIES, PARTNER_TYPE, BACKGROUND_OPTIONS } from "constants/lists";
-
-const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
 interface Props {
   id: string;
@@ -123,6 +120,7 @@ export default function EditPartnerDetails({ id }: Props) {
 
   const { partner, isPartnerLoading } = usePartnerDetails(id);
   const { updatePartner, isUpdatingPartner } = useUpdatePartner();
+  const { reviewPartner, loading: reviewLoading } = useReviewPartner();
   const { assignManager, loading: assignLoading, error: assignError } = useAssignPartnerManager();
   const { accountManagers } = useAccountManagers();
 
@@ -225,7 +223,6 @@ export default function EditPartnerDetails({ id }: Props) {
       `${formData.phone_code} ${formData.phone_number}`.trim() !== partner.phone?.trim() ||
       formData.is_active !== partner.is_active ||
       formData.is_verified !== partner.is_verified ||
-      (formData.password?.trim() ?? "") !== "" ||
       idDoc.file_key !== (partner.individual_details?.id_document_file_key ?? "") ||
       formData.background !== (partner.individual_details?.background ?? "") ||
       formData.linkedin_url !== (partner.individual_details?.linkedin_url ?? "") ||
@@ -242,10 +239,6 @@ export default function EditPartnerDetails({ id }: Props) {
     if (!formData.name.trim()) newErrors.name = "Name is required";
     if (!formData.type.trim()) newErrors.type = "Partner type is required";
     if (!formData.phone_number.trim()) newErrors.phone_number = "Phone number is required";
-    if (formData.password && !PASSWORD_REGEX.test(formData.password))
-      newErrors.password = "Password must be at least 8 characters with 1 letter and 1 number";
-    if (formData.password && formData.confirm_password && formData.password !== formData.confirm_password)
-      newErrors.confirm_password = "Passwords do not match";
     return newErrors;
   };
 
@@ -254,7 +247,7 @@ export default function EditPartnerDetails({ id }: Props) {
     formData.country.trim() !== "" &&
     formData.type.trim() !== "" &&
     formData.phone_number.trim() !== "" &&
-    (!formData.password?.trim() || (!errors.password && !errors.confirm_password));
+    true;
 
   const handleUpdate = async () => {
     const newErrors = validateForm();
@@ -272,9 +265,7 @@ export default function EditPartnerDetails({ id }: Props) {
         country: formData.country,
         phone: `${formData.phone_code || "+60"} ${formData.phone_number}`,
         is_active: formData.is_active,
-        is_verified: formData.is_verified,
         assigned_manager_id: formData.manager_id,
-        ...(formData.password ? { password: formData.password } : {}),
         ...(isIndividual
           ? {
               individual_details: {
@@ -303,6 +294,9 @@ export default function EditPartnerDetails({ id }: Props) {
       });
       if (formData.manager_id) {
         await assignManager(id, { manager_id: formData.manager_id });
+      }
+      if (formData.is_verified !== partner?.is_verified) {
+        await reviewPartner(id, formData.is_verified ? "approved" : "rejected");
       }
       showToast("Partner updated successfully", "success");
       router.push(`/admin/partners/${id}`);
@@ -347,7 +341,7 @@ export default function EditPartnerDetails({ id }: Props) {
             <SearchableDropdown label="Country" field="country" options={COUNTRIES.map((c) => ({ value: c.code, label: c.name }))} formData={formData} errors={errors} updateFormData={updateFormData} />
             <SelectField label="Partner Type" field="type" options={PARTNER_TYPE.map((p) => ({ value: p.value, label: p.label }))} formData={formData} errors={errors} updateFormData={updateFormData} />
             <PhoneInputField dialCodeField="phone_code" numberField="phone_number" formData={formData} errors={errors} updateFormData={updateFormData} required />
-            <SelectField label="Assigned Manager" field="manager_id" options={accountManagers.map((m) => ({ label: m.name, value: m.id }))} formData={formData} errors={errors} updateFormData={updateFormData} />
+            <SelectField label="Assigned Manager" field="manager_id" required={false} options={accountManagers.map((m) => ({ label: m.name, value: m.id }))} formData={formData} errors={errors} updateFormData={updateFormData} />
           </div>
         </div>
 
@@ -357,7 +351,6 @@ export default function EditPartnerDetails({ id }: Props) {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <ToggleInput label="Verified" field="is_verified" formData={formData} errors={{}} updateFormData={updateFormData} />
             <ToggleInput label="Account Active" field="is_active" formData={formData} errors={{}} updateFormData={updateFormData} />
-            <PasswordField label="Reset Password" field="password" placeholder="At least 8 characters, letters & numbers" required formData={formData} errors={errors} updateFormData={updateFormData} />
           </div>
         </div>
 
@@ -455,7 +448,7 @@ export default function EditPartnerDetails({ id }: Props) {
           />
           <Button
             icon={<Pencil className="h-4 w-4" />}
-            text={isUpdatingPartner ? "Saving..." : "Save Changes"}
+            text={isUpdatingPartner || reviewLoading ? "Saving..." : "Save Changes"}
             bgColor="bg-blue-600"
             textColor="text-white"
             borderColor="border-blue-600"
@@ -463,7 +456,7 @@ export default function EditPartnerDetails({ id }: Props) {
             hoverBorderColor="hover:border-blue-700"
             className="hover:bg-blue-700"
             onClick={handleUpdate}
-            disabled={isUpdatingPartner || isUploading || !isFormChanged() || !isFormValid}
+            disabled={isUpdatingPartner || reviewLoading || isUploading || !isFormChanged() || !isFormValid}
           />
         </div>
       </div>

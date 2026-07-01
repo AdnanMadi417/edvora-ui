@@ -38,7 +38,7 @@ import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
+import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from "components/filters/StatsFilterCards";
 import ProgramFilterBar from "components/filters/ProgramFilterBar";
 
 import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
@@ -53,6 +53,8 @@ import BatchBranchPrograms from "features/programs/components/admin/popups/Batch
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
 
 type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "deleteScholarships" | "fees" | "visaFee" | "branch";
+
+const QUAL_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose", "cyan"];
 
 
 function ProgramUniversityCell({ program }: { program: Program }) {
@@ -170,16 +172,16 @@ const ProgramsTable = () => {
   // Unfiltered grand total for the "All Programs" card
   const { total: grandTotal } = usePrograms({ page: 1, page_size: 1 });
 
-  const bachelorQual = useMemo(() => qualifications.find((q) => q.name.toLowerCase().includes("bachelor")), [qualifications]);
-  const masterQual = useMemo(() => qualifications.find((q) => q.name.toLowerCase().includes("master")), [qualifications]);
-  const phdQual = useMemo(() => qualifications.find((q) => q.name.toLowerCase().includes("phd") || q.name.toLowerCase().includes("doctoral")), [qualifications]);
-
   const fixedCards = useMemo<FilterCardItem[]>(() => [
     { id: null, label: "All Programs", count: grandTotal, icon: BookOpen, colorScheme: "slate" },
-    { id: bachelorQual?.id ?? "__bachelor", label: "Bachelor's Degree", count: bachelorQual ? ((qualCounts as Record<string, number | undefined>)[bachelorQual.id] ?? "—") : "—", icon: GraduationCap, colorScheme: "blue", disabled: !bachelorQual },
-    { id: masterQual?.id ?? "__master", label: "Master's Degree", count: masterQual ? ((qualCounts as Record<string, number | undefined>)[masterQual.id] ?? "—") : "—", icon: GraduationCap, colorScheme: "violet", disabled: !masterQual },
-    { id: phdQual?.id ?? "__phd", label: "PhD Degree", count: phdQual ? ((qualCounts as Record<string, number | undefined>)[phdQual.id] ?? "—") : "—", icon: GraduationCap, colorScheme: "emerald", disabled: !phdQual },
-  ], [grandTotal, bachelorQual, masterQual, phdQual, qualCounts]);
+    ...qualifications.map((q, i) => ({
+      id: q.id,
+      label: q.name,
+      count: (qualCounts as Record<string, number | undefined>)[q.id] ?? "—",
+      icon: GraduationCap,
+      colorScheme: QUAL_COLORS[i % QUAL_COLORS.length],
+    })),
+  ], [grandTotal, qualifications, qualCounts]);
 
   const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
 
@@ -308,7 +310,7 @@ const ProgramsTable = () => {
         </Link>
       </div>
 
-      <div className="p-6 border-b border-slate-200">
+      <div className="hidden sm:block p-6 border-b border-slate-200">
           <StatsFilterCards
           cards={fixedCards}
           selectedId={selectedQualId}
