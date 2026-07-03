@@ -167,7 +167,12 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
     if (program?.english_required_score) lines.push(`English requirement: IELTS ${program.english_required_score}`);
     lines.push("");
 
-    if (nextIntakeDate) lines.push(`Intake: ${nextIntakeDate.toLocaleString("en-US", { month: "short" })}`);
+    if (program?.intake_dates && program.intake_dates.length > 0) {
+      const months = [...program.intake_dates]
+        .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+        .map((d) => new Date(d).toLocaleString("en-US", { month: "short" }));
+      lines.push(`Intake: ${months.join(" / ")}`);
+    }
     lines.push("");
 
     lines.push("Course fee for international students");
