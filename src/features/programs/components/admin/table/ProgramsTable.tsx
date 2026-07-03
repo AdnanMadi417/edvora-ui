@@ -595,7 +595,7 @@ const ProgramsTable = () => {
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1 text-xs text-slate-600">
                       <span className="font-medium text-slate-700">
-                        <AppDate value={program.next_intake} format="short" fallback="TBA" />
+                        <AppDate value={program.next_intake} format="month" fallback="TBA" />
                       </span>
                       {program.intake_dates && program.intake_dates.length > 0 && (
                         <span className="text-slate-400">

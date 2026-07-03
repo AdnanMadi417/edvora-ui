@@ -19,6 +19,7 @@ import {
   BookOpen,
   Building2,
   Languages,
+  Copy,
 } from 'lucide-react';
 
 import { useProgram, useDeletePrograms } from 'features/programs/hooks';
@@ -129,8 +130,20 @@ interface Props {
   id: string;
 }
 
+const formatMonth = (dateStr: string) => {
+  try { return new Date(dateStr).toLocaleString('en-US', { month: 'short' }); }
+  catch { return dateStr; }
+};
+
+const getOrdinal = (n: number) => {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+};
+
 const ProgramDetails = ({ id }: Props) => {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const { deletePrograms } = useDeletePrograms();
 
   const [isDeleting, setIsDeleting] = useState(false);
@@ -157,6 +170,50 @@ const ProgramDetails = ({ id }: Props) => {
   };
 
   const { program, requiredDocuments, commission } = useProgram(id);
+
+  const nextIntakeDate = (() => {
+    const today = new Date();
+    return program?.intake_dates
+      ?.map((d) => new Date(d))
+      .filter((d) => d >= today)
+      .sort((a, b) => a.getTime() - b.getTime())[0] ?? null;
+  })();
+
+  const handleCopyAll = async () => {
+    const lines: string[] = [];
+    lines.push(program?.university?.name ?? '');
+    lines.push(program?.name ?? '');
+    lines.push('');
+    if (program?.duration) lines.push(`Duration: ${program.duration} year(s)`);
+    if (program?.english_required_score) lines.push(`English requirement: IELTS ${program.english_required_score}`);
+    lines.push('');
+    if (program?.intake_dates && program.intake_dates.length > 0) {
+      const months = [...program.intake_dates]
+        .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+        .map((d) => new Date(d).toLocaleString('en-US', { month: 'short' }));
+      lines.push(`Intake: ${months.join(' / ')}`);
+    }
+    lines.push('');
+    lines.push('Course fee for international students');
+    lines.push('');
+    lines.push('Yearly Tuition fees');
+    lines.push('');
+    (program?.yearly_fees ?? []).forEach((item) => {
+      lines.push(`${getOrdinal(item.year)} year: MYR ${Number(item.fee).toLocaleString()}`);
+    });
+    lines.push('');
+    lines.push('');
+    lines.push('Other fees');
+    lines.push('');
+    (program?.one_time_fees ?? []).forEach((item) => {
+      lines.push(`${item.description ?? 'Fee'} : MYR ${Number(item.fee).toLocaleString()}`);
+    });
+    lines.push('');
+    lines.push('University fees for this course include 6% tax (SST)');
+    await navigator.clipboard.writeText(lines.join('\n'));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (!program) return <Loading text="Loading program details..." />;
 
@@ -194,7 +251,21 @@ const ProgramDetails = ({ id }: Props) => {
             </div>
           </div>
 
-          <div className="relative shrink-0">
+          <div className="flex shrink-0 items-center gap-2">
+            <button
+              onClick={handleCopyAll}
+              title={copied ? 'Copied!' : 'Copy program info'}
+              className={`flex h-9 items-center justify-center gap-1.5 rounded-md border px-3 text-xs font-medium transition ${
+                copied
+                  ? 'border-green-300 bg-green-50 text-green-700'
+                  : 'border-slate-200 text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              <Copy className="h-3.5 w-3.5" />
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+
+            <div className="relative">
             <button
               onClick={() => setOpenDropdownId(openDropdownId === program.id ? null : program.id)}
               className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
@@ -246,6 +317,7 @@ const ProgramDetails = ({ id }: Props) => {
                 </div>
               </div>
             )}
+            </div>
           </div>
 
         </div>
@@ -279,7 +351,7 @@ const ProgramDetails = ({ id }: Props) => {
           <Calendar className="h-5 w-5 text-slate-400" />
           <p className="text-xs text-slate-500">Next Intake</p>
           <p className="text-xl font-bold text-slate-800">
-            <AppDate value={program?.intake_dates?.[0]} format="month" fallback="—" />
+            {nextIntakeDate ? nextIntakeDate.toLocaleString("en-US", { month: "short" }) : "—"}
           </p>
         </div>
       </div>
