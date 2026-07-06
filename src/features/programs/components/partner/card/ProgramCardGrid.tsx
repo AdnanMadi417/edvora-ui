@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { ArrowRight, ArrowLeft, Award, Send, BookOpen, GraduationCap } from 'lucide-react';
+import { useRouter } from "next/navigation";
 import PresignedImage from "components/ui/PresignedImage";
 
 import Loading from "components/loading/Loading";
@@ -24,6 +25,7 @@ const ITEMS_PER_PAGE = 9;
 const QUAL_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose", "cyan"];
 
 const ProgramsCards = () => {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -213,9 +215,9 @@ const ProgramsCards = () => {
             <div className="block">
               <div className={`grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3 transition-opacity duration-150 ${programsFetching && !programsLoading ? "opacity-50 pointer-events-none" : ""}`}>
                 {filteredPrograms.map((program) => (
-                  <a
-                    href={`/partner/knowledge-hub/${program.id}`}
+                  <div
                     key={program.id}
+                    onClick={() => router.push(`/partner/knowledge-hub/${program.id}`)}
                     className="group relative cursor-pointer flex flex-col overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50/40 hover:shadow-md"
                   >
                     {/* Header */}
@@ -328,7 +330,7 @@ const ProgramsCards = () => {
                         Apply Now
                       </Link>
                     </div>
-                  </a>
+                  </div>
                 ))}
               </div>
 
