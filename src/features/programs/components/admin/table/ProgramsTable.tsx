@@ -122,6 +122,7 @@ const ProgramsTable = () => {
   const [selectedQualId, setSelectedQualId] = useState<string | null>(null);
   const [hasScholarship, setHasScholarship] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("all");
+  const [includeInactive, setIncludeInactive] = useState(false);
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -178,6 +179,7 @@ const ProgramsTable = () => {
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
     has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
     sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
+    include_inactive_universities: includeInactive || undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
@@ -205,6 +207,7 @@ const ProgramsTable = () => {
     selectedQualId !== null,
     hasScholarship !== "all",
     sortBy !== "all",
+    includeInactive,
     searchTerm !== "",
   ].filter(Boolean).length;
 
@@ -257,6 +260,7 @@ const ProgramsTable = () => {
         university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
         has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
         sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
+        include_inactive_universities: includeInactive || undefined,
       };
       const allIds: string[] = [];
       let page = 1;
@@ -280,7 +284,7 @@ const ProgramsTable = () => {
     setSelectedPrograms((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, sortBy]);
+  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, sortBy, includeInactive]);
 
   const selectedProgramIds = useMemo(
     () => Object.keys(selectedPrograms).filter((id) => selectedPrograms[id]),
@@ -308,6 +312,7 @@ const ProgramsTable = () => {
     setSelectedQualId(null);
     setHasScholarship("all");
     setSortBy("all");
+    setIncludeInactive(false);
     setCurrentPage(1);
   };
 
@@ -360,6 +365,8 @@ const ProgramsTable = () => {
           onScholarshipChange={(val) => { setHasScholarship(val); setCurrentPage(1); }}
           sortBy={sortBy}
           onSortChange={(val) => { setSortBy(val); setCurrentPage(1); }}
+          includeInactive={includeInactive}
+          onIncludeInactiveChange={(val) => { setIncludeInactive(val); setCurrentPage(1); }}
           resultsCount={total}
           activeFiltersCount={activeFiltersCount}
           onClearFilters={clearFilters}

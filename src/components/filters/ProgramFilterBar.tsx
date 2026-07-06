@@ -51,6 +51,9 @@ interface ProgramFilterBarProps {
   sortBy?: string;
   onSortChange?: (val: string) => void;
 
+  includeInactive?: boolean;
+  onIncludeInactiveChange?: (val: boolean) => void;
+
   resultsCount?: number;
 
   activeFiltersCount: number;
@@ -81,6 +84,8 @@ export default function ProgramFilterBar({
   onScholarshipChange,
   sortBy = "all",
   onSortChange,
+  includeInactive = false,
+  onIncludeInactiveChange,
   resultsCount,
   activeFiltersCount,
   onClearFilters,
@@ -185,6 +190,20 @@ export default function ProgramFilterBar({
                 defaultOption="Default Sort"
               />
             </div>
+          )}
+
+          {onIncludeInactiveChange && (
+            <button
+              onClick={() => onIncludeInactiveChange(!includeInactive)}
+              className={`hidden sm:flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition ${
+                includeInactive
+                  ? "border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100"
+                  : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+              }`}
+            >
+              <span className={`h-2 w-2 rounded-full ${includeInactive ? "bg-amber-500" : "bg-slate-300"}`} />
+              Inactive Unis
+            </button>
           )}
 
           {resultsCount !== undefined && (activeFiltersCount > 0 || searchTerm !== "") && (
