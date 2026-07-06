@@ -25,13 +25,24 @@ const QUAL_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "r
 
 const ProgramsCards = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedQualId, setSelectedQualId] = useState<string | null>(null);
+  const [hasScholarship, setHasScholarship] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   const { states } = useStates();
   const { fields } = useAllFields();
@@ -71,11 +82,13 @@ const ProgramsCards = () => {
     isFetching: programsFetching,
     error: programsError,
   } = usePrograms({
-    search: searchTerm || undefined,
+    search: debouncedSearch || undefined,
     field_of_study_id: selectedField !== "all" ? selectedField : undefined,
     qualification_id: selectedQualId ?? undefined,
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
+    has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+    sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
@@ -103,20 +116,24 @@ const ProgramsCards = () => {
     selectedField !== "all",
     selectedUniversity !== "all",
     selectedQualId !== null,
+    hasScholarship !== "all",
+    sortBy !== "all",
     searchTerm !== "",
   ].filter(Boolean).length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1);
   };
 
   const clearFilters = () => {
     setSearchTerm("");
+    setDebouncedSearch("");
     setSelectedState("all");
     setSelectedField("all");
     setSelectedUniversity("all");
     setSelectedQualId(null);
+    setHasScholarship("all");
+    setSortBy("all");
     setCurrentPage(1);
   };
 
@@ -165,6 +182,11 @@ const ProgramsCards = () => {
             selectedQualId={selectedQualId}
             onQualChange={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
             qualificationOptions={qualificationOptions}
+            hasScholarship={hasScholarship}
+            onScholarshipChange={(val) => { setHasScholarship(val); setCurrentPage(1); }}
+            sortBy={sortBy}
+            onSortChange={(val) => { setSortBy(val); setCurrentPage(1); }}
+            resultsCount={total}
             activeFiltersCount={activeFiltersCount}
             onClearFilters={clearFilters}
             showFilters={showFilters}

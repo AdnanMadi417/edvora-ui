@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { SlidersHorizontal, Globe, GraduationCap, RefreshCw } from "lucide-react";
+import { SlidersHorizontal, Globe, GraduationCap, RefreshCw, Award, ArrowUpDown } from "lucide-react";
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -11,6 +11,18 @@ interface Option {
   label: string;
   value: string;
 }
+
+const SCHOLARSHIP_OPTIONS: Option[] = [
+  { label: "Has Scholarship", value: "true" },
+  { label: "No Scholarship", value: "false" },
+];
+
+const SORT_OPTIONS: Option[] = [
+  { label: "Commission: High → Low", value: "commission_desc" },
+  { label: "Commission: Low → High", value: "commission_asc" },
+  { label: "Tuition: Low → High", value: "tuition_asc" },
+  { label: "Tuition: High → Low", value: "tuition_desc" },
+];
 
 interface ProgramFilterBarProps {
   searchTerm: string;
@@ -32,6 +44,14 @@ interface ProgramFilterBarProps {
   selectedQualId: string | null;
   onQualChange: (id: string | null) => void;
   qualificationOptions: Option[];
+
+  hasScholarship?: string;
+  onScholarshipChange?: (val: string) => void;
+
+  sortBy?: string;
+  onSortChange?: (val: string) => void;
+
+  resultsCount?: number;
 
   activeFiltersCount: number;
   onClearFilters: () => void;
@@ -57,6 +77,11 @@ export default function ProgramFilterBar({
   selectedQualId,
   onQualChange,
   qualificationOptions,
+  hasScholarship = "all",
+  onScholarshipChange,
+  sortBy = "all",
+  onSortChange,
+  resultsCount,
   activeFiltersCount,
   onClearFilters,
   showFilters,
@@ -86,11 +111,19 @@ export default function ProgramFilterBar({
               </span>
             )}
           </button>
+          {activeFiltersCount > 0 && (
+            <button
+              onClick={onClearFilters}
+              className="sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-red-200 bg-white text-red-500 hover:bg-red-50"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
         {/* Collapsible dropdowns */}
-        <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showFilters ? "max-h-[400px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
-          <div className="w-full sm:w-44 flex-shrink-0">
+        <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showFilters ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
+          <div className="w-full sm:w-40 flex-shrink-0">
             <FilterSelectField
               value={selectedState}
               onChange={onStateChange}
@@ -110,7 +143,7 @@ export default function ProgramFilterBar({
             />
           </div>
 
-          <div className="w-full sm:w-44 flex-shrink-0">
+          <div className="w-full sm:w-40 flex-shrink-0">
             <FilterSelectField
               value={selectedUniversity}
               onChange={onUniversityChange}
@@ -120,7 +153,7 @@ export default function ProgramFilterBar({
             />
           </div>
 
-          <div className="w-full sm:w-44 flex-shrink-0">
+          <div className="w-full sm:w-40 flex-shrink-0">
             <FilterSelectField
               value={selectedQualId ?? "all"}
               onChange={(val) => onQualChange(val === "all" ? null : val)}
@@ -130,13 +163,44 @@ export default function ProgramFilterBar({
             />
           </div>
 
+          {onScholarshipChange && (
+            <div className="w-full sm:w-40 flex-shrink-0">
+              <FilterSelectField
+                value={hasScholarship}
+                onChange={onScholarshipChange}
+                options={SCHOLARSHIP_OPTIONS}
+                icon={Award}
+                defaultOption="All Scholarships"
+              />
+            </div>
+          )}
+
+          {onSortChange && (
+            <div className="w-full sm:w-44 flex-shrink-0">
+              <FilterSelectField
+                value={sortBy}
+                onChange={onSortChange}
+                options={SORT_OPTIONS}
+                icon={ArrowUpDown}
+                defaultOption="Default Sort"
+              />
+            </div>
+          )}
+
+          {resultsCount !== undefined && (activeFiltersCount > 0 || searchTerm !== "") && (
+            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
+              {resultsCount.toLocaleString()}
+              <span className="font-normal text-blue-500">results</span>
+            </span>
+          )}
+
           {activeFiltersCount > 0 && (
             <button
               onClick={onClearFilters}
-              className="flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+              className="hidden sm:flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
             >
               <RefreshCw className="h-4 w-4" />
-              <span className="hidden sm:inline">Clear</span>
+              Clear
             </button>
           )}
         </div>
