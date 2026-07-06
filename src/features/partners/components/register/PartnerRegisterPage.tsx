@@ -33,6 +33,8 @@ function SectionCard({ title, subtitle, children }: { title: string; subtitle?: 
   );
 }
 
+const URL_REGEX = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w\-./?%&=#]*)?$/;
+
 export default function PartnerRegisterPage() {
   const { initiateRegistration, loading: submitting, error: apiError } = usePartnerRegistration();
 
@@ -86,7 +88,9 @@ export default function PartnerRegisterPage() {
     if (!indForm.country) e.country = "Country is required";
     if (!indForm.background) e.background = "Please select your background";
     if (!indIdDoc) e.ind_id_doc = "Please upload your passport or national ID";
-    if (!indForm.social_media_url.trim()) e.social_media_url = "Instagram account is required";
+    if (!indForm.social_media_url.trim()) e.social_media_url = "Social media URL is required";
+    else if (!URL_REGEX.test(indForm.social_media_url.trim())) e.social_media_url = "Enter a valid URL (e.g. https://instagram.com/yourprofile)";
+    if (indForm.linkedin_url.trim() && !URL_REGEX.test(indForm.linkedin_url.trim())) e.linkedin_url = "Enter a valid URL (e.g. https://linkedin.com/in/yourprofile)";
     if (!indForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -94,11 +98,12 @@ export default function PartnerRegisterPage() {
 
   const validateComp = () => {
     const e: Record<string, string> = {};
-    if (!compForm.company_name.trim()) e.company_name = "Company name is required";
-    else if (compForm.company_name.trim().length < 5) e.company_name = "Company name must be at least 5 characters";
+    if (!compForm.company_name.trim()) e.company_name = "Agency name is required";
+    else if (compForm.company_name.trim().length < 5) e.company_name = "Agency name must be at least 5 characters";
     if (!compForm.country) e.country = "Country is required";
     if (!compForm.website_url.trim()) e.website_url = "Website or social media URL is required";
-    if (!compRegDoc) e.comp_reg_doc = "Please upload your company registration document";
+    else if (!URL_REGEX.test(compForm.website_url.trim())) e.website_url = "Enter a valid URL (e.g. https://youragency.com)";
+    if (!compRegDoc) e.comp_reg_doc = "Please upload your agency registration document";
     if (!compForm.contact_full_name.trim()) e.contact_full_name = "Full name is required";
     else if (compForm.contact_full_name.trim().length < 5) e.contact_full_name = "Full name must be at least 5 characters";
     if (!compForm.contact_email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(compForm.contact_email)) e.contact_email = "Enter a valid email";
@@ -114,13 +119,16 @@ export default function PartnerRegisterPage() {
         indForm.first_name.trim() && indForm.last_name.trim() &&
         indForm.email && indForm.phone_number.trim() &&
         indForm.country && indForm.background &&
-        indIdDoc && indForm.social_media_url.trim() && indForm.agreed,
+        indIdDoc && indForm.social_media_url.trim() &&
+        URL_REGEX.test(indForm.social_media_url.trim()) &&
+        (!indForm.linkedin_url.trim() || URL_REGEX.test(indForm.linkedin_url.trim())) &&
+        indForm.agreed,
       )
     : partnerType === "agency"
     ? Boolean(
         compForm.company_name.trim() && compForm.country &&
-        compForm.website_url.trim() && compRegDoc &&
-        compForm.contact_full_name.trim() && compForm.contact_email &&
+        compForm.website_url.trim() && URL_REGEX.test(compForm.website_url.trim()) &&
+        compRegDoc && compForm.contact_full_name.trim() && compForm.contact_email &&
         compForm.contact_phone_number.trim() && compContactIdDoc &&
         compForm.agreed,
       )
@@ -213,7 +221,7 @@ export default function PartnerRegisterPage() {
         <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
           {([
             { type: "individual" as const, icon: User,     title: "Individual Advisor", desc: "Apply as an independent education advisor" },
-            { type: "agency"    as const, icon: Building2, title: "Company / Agency",  desc: "Apply as an education agency or company" },
+            { type: "agency"    as const, icon: Building2, title: "Company / Agency",  desc: "Apply as an education agency" },
           ]).map(({ type, icon: Icon, title, desc }) => (
             <button key={type} type="button"
               onClick={() => { setPartnerType(type); setErrors({}); }}
@@ -313,30 +321,44 @@ export default function PartnerRegisterPage() {
                     />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <InputField label="Social Media Account" field="social_media_url"
-                        placeholder="instagram.com/username"
+                        placeholder="https://instagram.com/username"
                         type="url"
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                        formData={indForm} errors={errors} updateFormData={updateInd}
+                        onBlur={() => {
+                          const val = indForm.social_media_url.trim();
+                          if (!val) setErrors((p) => ({ ...p, social_media_url: "Social media URL is required" }));
+                          else if (!URL_REGEX.test(val)) setErrors((p) => ({ ...p, social_media_url: "Enter a valid URL (e.g. https://instagram.com/yourprofile)" }));
+                        }} />
                       <InputField label="LinkedIn Profile" field="linkedin_url" required={false}
-                        placeholder="linkedin.com/in/yourprofile"
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                        placeholder="https://linkedin.com/in/yourprofile"
+                        formData={indForm} errors={errors} updateFormData={updateInd}
+                        onBlur={() => {
+                          const val = indForm.linkedin_url.trim();
+                          if (val && !URL_REGEX.test(val)) setErrors((p) => ({ ...p, linkedin_url: "Enter a valid URL (e.g. https://linkedin.com/in/yourprofile)" }));
+                        }} />
                     </div>
                   </SectionCard>
                 </>
               ) : (
                 <>
-                  <SectionCard title="Company Information">
-                    <InputField label="Company Name" field="company_name" placeholder="Enter company name."
+                  <SectionCard title="Agency Information">
+                    <InputField label="Agency Name" field="company_name" placeholder="Enter agency name."
                       formData={compForm} errors={errors} updateFormData={updateComp} />
                     <SelectField label="Country of Registration" field="country" options={COUNTRY_OPTIONS}
                       formData={compForm} errors={errors} updateFormData={updateComp} />
                     <InputField label="Website or Social Media Page" field="website_url"
-                      placeholder="https://yourcompany.com"
-                      formData={compForm} errors={errors} updateFormData={updateComp} />
+                      placeholder="https://youragency.com"
+                      formData={compForm} errors={errors} updateFormData={updateComp}
+                      onBlur={() => {
+                        const val = compForm.website_url.trim();
+                        if (!val) setErrors((p) => ({ ...p, website_url: "Website or social media URL is required" }));
+                        else if (!URL_REGEX.test(val)) setErrors((p) => ({ ...p, website_url: "Enter a valid URL (e.g. https://youragency.com)" }));
+                      }} />
                   </SectionCard>
 
-                  <SectionCard title="Company Documents">
+                  <SectionCard title="Agency Documents">
                     <PublicFileUploadField
-                      label="Company Registration Document"
+                      label="Agency Registration Document"
                       fieldId="comp-reg-doc"
                       required
                       result={compRegDoc}
@@ -352,7 +374,7 @@ export default function PartnerRegisterPage() {
                       <InputField label="Full Name" field="contact_full_name" placeholder="Enter full name."
                         formData={compForm} errors={errors} updateFormData={updateComp} />
                       <InputField label="Email Address" field="contact_email" type="email"
-                        placeholder="contact@company.com"
+                        placeholder="contact@agency.com"
                         formData={compForm} errors={errors} updateFormData={updateComp} />
                     </div>
                     <PhoneInputField dialCodeField="contact_phone_code" numberField="contact_phone_number"

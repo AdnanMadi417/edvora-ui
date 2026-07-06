@@ -134,24 +134,45 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
   const { program, requiredDocuments, commission, loading, error } = useProgram(id);
   const [copied, setCopied] = useState(false);
 
+  const nextIntakeDate = (() => {
+    const today = new Date();
+    return program?.intake_dates
+      ?.map((d) => new Date(d))
+      .filter((d) => d >= today)
+      .sort((a, b) => a.getTime() - b.getTime())[0] ?? null;
+  })();
+
   const getOrdinal = (n: number) => {
     const s = ["th", "st", "nd", "rd"];
     const v = n % 100;
     return n + (s[(v - 20) % 10] || s[v] || s[0]);
   };
 
+  const formatMonth = (dateStr: string) => {
+    try {
+      return new Date(dateStr).toLocaleString("en-US", { month: "short" });
+    } catch {
+      return dateStr;
+    }
+  };
+
   const handleCopyAll = async () => {
     const lines: string[] = [];
 
     lines.push(program?.university?.name ?? "");
-    lines.push(`  ${program?.name ?? ""}`);
+    lines.push(program?.name ?? "");
     lines.push("");
 
     if (program?.duration) lines.push(`Duration: ${program.duration} year(s)`);
     if (program?.english_required_score) lines.push(`English requirement: IELTS ${program.english_required_score}`);
     lines.push("");
 
-    if (program?.intake_dates?.length) lines.push(`Intake: ${program.intake_dates.join(",")}`);
+    if (program?.intake_dates && program.intake_dates.length > 0) {
+      const months = [...program.intake_dates]
+        .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+        .map((d) => new Date(d).toLocaleString("en-US", { month: "short" }));
+      lines.push(`Intake: ${months.join(" / ")}`);
+    }
     lines.push("");
 
     lines.push("Course fee for international students");
@@ -169,11 +190,11 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
     lines.push("");
 
     (program?.one_time_fees ?? []).forEach((item) => {
-      lines.push(` ${item.description ?? "Fee"}: MYR ${item.fee.toLocaleString()}`);
+      lines.push(`${item.description ?? "Fee"} : MYR ${item.fee.toLocaleString()}`);
     });
 
     lines.push("");
-    lines.push("University fees for this course do not include 6% tax (SST)");
+    lines.push("University fees for this course include 6% tax (SST)");
 
     await navigator.clipboard.writeText(lines.join("\n"));
     setCopied(true);
@@ -192,48 +213,43 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
         <div className="flex flex-wrap items-center justify-between gap-3 p-6 border-b border-slate-200">
           <div className="flex min-w-0 items-center gap-3">
             <div className="relative shrink-0">
-              <div className="h-10 w-10 overflow-hidden rounded-full ring-2 ring-slate-200 ring-offset-2 shadow-sm sm:h-11 sm:w-11">
+              <div className="h-11 w-11 overflow-hidden rounded-full ring-2 ring-slate-200 ring-offset-2 shadow-sm">
                 <PresignedImage
                   fileKey={program.university?.logo_file_key}
                   alt={program.university?.name}
                   className="h-full w-full object-cover"
                   fallback={
-                    <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
+                    <div className="flex h-full w-full items-center justify-center bg-blue-50 text-sm font-bold text-blue-700">
                       {program.university?.name ? program.university.name.slice(0, 2).toUpperCase() : <Building2 className="h-5 w-5 text-blue-700" />}
                     </div>
                   }
                 />
               </div>
-              <span className={`absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white ${program.university?.is_active ? "bg-emerald-500" : "bg-red-500"}`} />
+              <span className={`absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white ${program.university?.is_active ? "bg-emerald-500" : "bg-red-500"}`} />
             </div>
 
             <div className="min-w-0">
               <h3 className="truncate text-sm font-semibold text-slate-900 sm:text-base">
                 {program?.name ?? "Not Provided"}
               </h3>
-              <p className="truncate text-xs text-slate-500 sm:text-sm">
+              <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 sm:text-sm">
+                <Building2 className="h-3.5 w-3.5 shrink-0" />
                 {program?.university?.name ?? "Not Provided"}
               </p>
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-            {commission?.amount != null && (
-              <div className="rounded-md border border-green-200 bg-green-50 px-3 py-1.5 text-right sm:px-4 sm:py-2">
-                <p className="hidden text-xs font-semibold uppercase tracking-wider text-green-600 sm:block">Your Earnings</p>
-                <p className="text-sm font-bold text-green-700 sm:text-base">{(commission.currency || "RM").toUpperCase()} {commission.amount.toLocaleString()}</p>
-              </div>
-            )}
+          <div className="flex shrink-0 items-center gap-2.5">
             <button
               onClick={handleCopyAll}
               title={copied ? "Copied!" : "Copy program info"}
-              className={`flex h-9 items-center justify-center gap-1.5 rounded-md border px-3 text-xs font-medium transition ${
+              className={`flex h-10 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition ${
                 copied
                   ? "border-green-300 bg-green-50 text-green-700"
-                  : "border-slate-200 text-slate-600 hover:bg-slate-100"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
               }`}
             >
-              <Copy className="h-3.5 w-3.5" />
+              <Copy className="h-4 w-4" />
               {copied ? "Copied!" : "Copy"}
             </button>
           </div>
@@ -269,7 +285,7 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
             <Calendar className="h-5 w-5 text-slate-400" />
             <p className="text-xs text-slate-500">Next Intake</p>
             <p className="text-xl font-bold text-slate-800">
-              <AppDate value={program?.intake_dates?.[0]} format="month" fallback="—" />
+              {nextIntakeDate ? nextIntakeDate.toLocaleString("en-US", { month: "short" }) : "—"}
             </p>
           </div>
         </div>
@@ -340,6 +356,38 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
                 </p>
               </div>
             </div>
+
+            {program?.intake_dates && program.intake_dates.length > 0 && (
+              <div className="col-span-1 flex items-start gap-3 md:col-span-2">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                  <Calendar className="h-5 w-5 text-slate-500" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-slate-500">Intake Dates</p>
+                  <div className="mt-1.5 flex flex-wrap gap-2">
+                    {[...program.intake_dates]
+                      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+                      .map((dateStr) => {
+                        const d = new Date(dateStr);
+                        const isPast = d < new Date();
+                        return (
+                          <span
+                            key={dateStr}
+                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border ${
+                              isPast
+                                ? "border-slate-200 bg-slate-100 text-slate-400 line-through"
+                                : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                            }`}
+                          >
+                            {!isPast && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />}
+                            {d.toLocaleString("en-US", { month: "short" })}
+                          </span>
+                        );
+                      })}
+                  </div>
+                </div>
+              </div>
+            )}
 
           </div>
         </div>
