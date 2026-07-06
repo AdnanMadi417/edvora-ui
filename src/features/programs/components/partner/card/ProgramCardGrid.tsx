@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { ArrowRight, ArrowLeft, Award, Send, BookOpen, GraduationCap } from 'lucide-react';
-import { useRouter } from "next/navigation";
 import PresignedImage from "components/ui/PresignedImage";
 
 import Loading from "components/loading/Loading";
@@ -25,7 +24,6 @@ const ITEMS_PER_PAGE = 9;
 const QUAL_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose", "cyan"];
 
 const ProgramsCards = () => {
-  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -107,11 +105,6 @@ const ProgramsCards = () => {
       colorScheme: QUAL_COLORS[i % QUAL_COLORS.length],
     })),
   ], [grandTotal, qualifications, qualCounts]);
-
-  const filteredPrograms = useMemo(() => {
-    if (!Array.isArray(programs)) return [];
-    return programs;
-  }, [programs]);
 
   const activeFiltersCount = [
     selectedState !== "all",
@@ -204,7 +197,7 @@ const ProgramsCards = () => {
 
           {!programsError &&
             !programsLoading &&
-            filteredPrograms.length === 0 && (
+            programs.length === 0 && (
               <NoMessagesFound
                 title="No programs found"
                 subtitle="Try adjusting your search or filters."
@@ -214,7 +207,7 @@ const ProgramsCards = () => {
           {!programsError && programs.length > 0 && (
             <div className="block">
               <div className={`grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3 transition-opacity duration-150 ${programsFetching && !programsLoading ? "opacity-50 pointer-events-none" : ""}`}>
-                {filteredPrograms.map((program) => (
+                {programs.map((program) => (
                   <div
                     key={program.id}
                     onClick={() => window.open(`/partner/knowledge-hub/${program.id}`, "_blank")}
