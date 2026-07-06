@@ -1,4 +1,4 @@
-export { useAllPartners } from './usePartners';
+export { usePartners, useAllPartners } from './usePartners';
 export { usePartnerDetails } from './usePartnerDetails';
 export { useCreatePartner } from './useCreatePartner';
 export { useUpdatePartner } from './useUpdatePartner';
