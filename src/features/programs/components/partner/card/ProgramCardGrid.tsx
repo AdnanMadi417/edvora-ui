@@ -217,7 +217,7 @@ const ProgramsCards = () => {
                 {filteredPrograms.map((program) => (
                   <div
                     key={program.id}
-                    onClick={() => router.push(`/partner/knowledge-hub/${program.id}`)}
+                    onClick={() => window.open(`/partner/knowledge-hub/${program.id}`, "_blank")}
                     className="group relative cursor-pointer flex flex-col overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50/40 hover:shadow-md"
                   >
                     {/* Header */}

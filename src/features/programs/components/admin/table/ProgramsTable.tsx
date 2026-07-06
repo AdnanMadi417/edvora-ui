@@ -523,7 +523,7 @@ const ProgramsTable = () => {
                 <tr
                   key={program.id}
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${selectedPrograms[program.id] ? "bg-slate-50" : ""}`}
-                  onClick={() => router.push(`/admin/knowledge-hub/programs/${program.id}`)}
+                  onClick={() => window.open(`/admin/knowledge-hub/programs/${program.id}`, "_blank")}
                 >
                   {/* Checkbox */}
                   <td className="pl-6" onClick={(e) => e.stopPropagation()}>
