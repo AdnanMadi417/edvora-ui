@@ -1,20 +1,10 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Search,
-  ChevronRight,
-  User,
-  Mail,
-  CheckCircle,
-  Settings,
-  RefreshCw,
-  ArrowLeft,
-  ArrowRight,
-  Pencil,
-  Users,
-  AlertCircle,
-  Trash2,
+  ChevronRight, User, Mail, CheckCircle, Settings,
+  RefreshCw, ArrowLeft, ArrowRight, Pencil, Users,
+  AlertCircle, Trash2, SlidersHorizontal, Activity,
 } from "lucide-react";
 import { MdPersonAdd } from "react-icons/md";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
@@ -24,63 +14,64 @@ import { useDeleteAccountManager } from "../hooks/useDeleteAccountManager";
 import DeleteAccountManagerModal from "./DeleteAccountManagerModal";
 
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
-import ClearButton from "components/ui/buttons/DangerButton";
+import SearchInput from "components/form/filter/SearchInput";
+import FilterSelectField from "components/form/filter/FilterSelectField";
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const ITEMS_PER_PAGE = 10;
+
+const STATUS_OPTIONS = [
+  { label: "Active",   value: "true" },
+  { label: "Inactive", value: "false" },
+];
+
 const AccountManagersTable = () => {
   const router = useRouter();
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { accountManagers, loading } = useAccountManagers();
-  const { showToast } = useToast();
-  const { deleteAccountManager } = useDeleteAccountManager();
-
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-  const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
   const [selectedManagerName, setSelectedManagerName] = useState<string>("");
 
+  const { showToast } = useToast();
+  const { deleteAccountManager, loading: deleteLoading } = useDeleteAccountManager();
+
   useEffect(() => {
-    setCurrentPage(1);
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(t);
   }, [searchTerm]);
 
-  const filteredAndSortedAccountManagers = useMemo(() => {
-    let filtered = [...accountManagers];
+  const isActive = selectedStatus === "true" ? true : selectedStatus === "false" ? false : undefined;
 
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter((m) =>
-        (m.name?.toLowerCase() ?? "").includes(term)
-      );
-    }
+  const { accountManagers, total, loading, refetch } = useAccountManagers({
+    page: currentPage,
+    page_size: ITEMS_PER_PAGE,
+    search: debouncedSearch || undefined,
+    is_active: isActive,
+  });
 
-    if (sortConfig.key) {
-      filtered.sort((a, b) => {
-        const aVal = a[sortConfig.key]?.toString().toLowerCase() ?? "";
-        const bVal = b[sortConfig.key]?.toString().toLowerCase() ?? "";
-        if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-        if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-        return 0;
-      });
-    }
+  const displayTotal = accountManagers.length < ITEMS_PER_PAGE
+    ? (currentPage - 1) * ITEMS_PER_PAGE + accountManagers.length
+    : total;
 
-    return filtered;
-  }, [accountManagers, searchTerm, sortConfig]);
-
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(filteredAndSortedAccountManagers.length / itemsPerPage);
-
-  const paginatedAccountManagers = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredAndSortedAccountManagers.slice(start, start + itemsPerPage);
-  }, [filteredAndSortedAccountManagers, currentPage]);
+  const activeFiltersCount = [
+    selectedStatus !== "all",
+    searchTerm !== "",
+  ].filter(Boolean).length;
 
   const handleDelete = async () => {
     if (!selectedManagerId) return;
@@ -90,247 +81,249 @@ const AccountManagersTable = () => {
       setIsDeleteOpen(false);
       setSelectedManagerId(null);
       setSelectedManagerName("");
-      router.refresh();
+      refetch();
     } catch {
       showToast("Failed to delete Account Manager. Please try again.", "error");
     }
   };
 
+  const clearFilters = () => {
+    setSearchTerm("");
+    setDebouncedSearch("");
+    setSelectedStatus("all");
+    setCurrentPage(1);
+  };
+
   return (
-    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
-        <div className="relative p-6">
-          <div className="mb-6 flex flex-col gap-6 rounded-xl md:flex-row md:items-center md:justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-slate-900">
-                Account Managers Dashboard
-              </h3>
-              <p className="mt-1 text-sm text-slate-500">
-                View, manage, and track all account managers
-              </p>
-            </div>
+    <div className="mt-6 max-w-5xl mx-auto text-p2 bg-white rounded-lg border border-slate-200">
+
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
+        <div>
+          <h3 className="text-xl font-semibold text-slate-900">Account Managers</h3>
+          <p className="mt-0.5 text-sm text-slate-500">View, manage, and track all account managers</p>
+        </div>
+        <Link
+          href="/admin/account-managers/create"
+          className="flex items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:text-blue-800"
+        >
+          <MdPersonAdd className="h-4 w-4" />
+          Create Manager
+        </Link>
+      </div>
+
+      {/* Filter Bar */}
+      <div className="p-6 border-b border-slate-200">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+
+          {/* Search + mobile toggle */}
+          <div className="flex items-center gap-2 sm:contents">
+            <SearchInput
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by name or email..."
+              className="sm:w-64 sm:flex-none"
+            />
+            <button
+              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+              onClick={() => setShowMobileFilters((v) => !v)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {activeFiltersCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
+            {activeFiltersCount > 0 && (
+              <button
+                onClick={clearFilters}
+                className="sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-red-200 bg-white text-red-500 hover:bg-red-50"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
-          <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search Account Managers by name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-background w-full rounded-md border border-slate-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
+          {/* Collapsible dropdowns */}
+          <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
+            <div className="w-full sm:w-36 flex-shrink-0">
+              <FilterSelectField
+                value={selectedStatus}
+                onChange={(v) => { setSelectedStatus(v); setCurrentPage(1); }}
+                options={STATUS_OPTIONS}
+                icon={Activity}
+                defaultOption="All Status"
               />
             </div>
 
-            <ClearButton
-              onClick={() => setSearchTerm("")}
-              text="Clear"
-              icon={<RefreshCw className="h-4 w-4" />}
-            />
-
-            <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href="/admin/account-managers/create"
-            >
-              <MdPersonAdd className="h-4 w-4" />
-              Create Manager
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <div className="overflow-x-auto rounded-lg rounded-b-none border border-b-0 border-slate-200 bg-white">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-200 bg-white">
-              <th className="group cursor-pointer px-6 py-4 text-start font-bold tracking-wider text-slate-900 transition-colors">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-slate-500" />
-                  Name
-                </div>
-              </th>
-
-              <th className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-slate-500" />
-                  Email
-                </div>
-              </th>
-
-              <th className="group px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
-                <div className="flex min-w-[200px] items-center gap-2">
-                  <Users className="h-4 w-4 text-slate-500" />
-                  Assigned Partners
-                </div>
-              </th>
-
-              <th className="group px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
-                <div className="flex min-w-[120px] items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-slate-500" />
-                  Status
-                </div>
-              </th>
-
-              <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
-                <div className="flex items-center gap-2">
-                  <Settings className="h-4 w-4 text-slate-500" />
-                  Actions
-                </div>
-              </th>
-            </tr>
-          </thead>
-
-          <tbody className="divide-border-slate-200 divide-y bg-white">
-            {loading ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-4 text-center text-p1 text-slate-500">
-                  Loading Account Managers...
-                </td>
-              </tr>
-            ) : paginatedAccountManagers.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
-                  <NoMessagesFound
-                    title="No account managers found"
-                    subtitle="There are currently no account managers available."
-                  />
-                </td>
-              </tr>
-            ) : (
-              paginatedAccountManagers.map((m) => (
-                <tr
-                  key={m.id}
-                  className="group cursor-pointer transition-colors bg-white hover:bg-slate-50"
-                  onClick={() => router.push(`/admin/account-managers/profile/${m.id}`)}
-                >
-                  <td className="min-w-[200px] max-w-[250px] px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-light text-h6 font-medium text-slate-700">
-                        {m.name?.charAt(0).toUpperCase() ?? "?"}
-                      </div>
-                      <div className="w-full overflow-hidden">
-                        <div className="truncate text-slate-900">{m.name}</div>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td className="min-w-[200px] max-w-[250px] px-6 py-4">
-                    <div className="truncate text-slate-500">{m.email}</div>
-                  </td>
-
-                  <td className="px-6 py-4">
-                    {Number(m.assigned_partners_count) > 0 ? (
-                      <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                        <Users className="h-3 w-3" />
-                        {Number(m.assigned_partners_count)} Partner
-                        {Number(m.assigned_partners_count) !== 1 && "s"}
-                      </div>
-                    ) : (
-                      <div className="inline-flex items-center gap-2 whitespace-nowrap rounded-md border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
-                        <AlertCircle className="h-3 w-3" />
-                        Needs Partner
-                      </div>
-                    )}
-                  </td>
-
-                  <td className="px-6 py-4">
-                    <div
-                      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-3 py-1 text-xs font-semibold ${
-                        m.is_active
-                          ? "border-green-600 bg-green-100 text-green-700"
-                          : "border-slate-300 bg-slate-100 text-slate-500"
-                      }`}
-                    >
-                      {m.is_active ? (
-                        <FaCheckCircle className="text-[10px]" />
-                      ) : (
-                        <FaTimesCircle className="text-[10px]" />
-                      )}
-                      {m.is_active ? "Active" : "Inactive"}
-                    </div>
-                  </td>
-
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/admin/account-managers/profile/${m.id}/edit`}
-                        aria-label="Edit Manager"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 transition-all hover:bg-slate-100 hover:text-slate-900 focus:bg-slate-100 focus:outline-none"
-                      >
-                        <Pencil className="h-4 w-4 text-slate-500 transition-colors hover:text-slate-700" />
-                      </Link>
-
-                      <div className="h-6 border-l border-slate-200" />
-
-                      <button
-                        role="menuitem"
-                        aria-label="Delete Account Manager"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedManagerId(m.id);
-                          setSelectedManagerName(m.name);
-                          setIsDeleteOpen(true);
-                        }}
-                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                      >
-                        <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
-                      </button>
-                    </div>
-                  </td>
-
-                  <td className="px-4 py-4">
-                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
-                  </td>
-                </tr>
-              ))
+            {(activeFiltersCount > 0 || debouncedSearch !== "") && (
+              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
+                {displayTotal.toLocaleString()}
+                <span className="font-normal text-blue-500">results</span>
+              </span>
             )}
-          </tbody>
-        </table>
-      </div>
 
-      <div className="sticky bottom-0 rounded-b-lg border border-slate-200 bg-white px-6 py-4">
-        <div className="flex flex-col items-center justify-between gap-3 text-sm text-slate-500 md:flex-row">
-          <div>
-            Showing{" "}
-            <span className="font-medium">
-              {(currentPage - 1) * itemsPerPage + 1}
-            </span>{" "}
-            to{" "}
-            <span className="font-normal">
-              {Math.min(currentPage * itemsPerPage, filteredAndSortedAccountManagers.length)}
-            </span>{" "}
-            of{" "}
-            <span className="font-normal">{filteredAndSortedAccountManagers.length}</span>{" "}
-            results
-          </div>
-
-          <div className="flex items-center gap-2">
-            <PrevButton
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={currentPage === 1}
-              text="Prev"
-              icon={<ArrowLeft className="h-4 w-4" />}
-            />
-            <span className="px-2 text-slate-500">
-              Page {currentPage} of {totalPages}
-            </span>
-            <NextButton
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              text="Next"
-              icon={<ArrowRight className="h-4 w-4" />}
-            />
+            {activeFiltersCount > 0 && (
+              <button
+                onClick={clearFilters}
+                className="hidden sm:flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Clear
+              </button>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Table */}
+
+      <div className="p-6">
+      
+        <div className="overflow-hidden rounded-lg border border-slate-200">
+
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-50">
+                  {[
+                    { icon: User,         label: "Name",              minW: "min-w-[200px]" },
+                    { icon: Mail,         label: "Email",             minW: "min-w-[200px]" },
+                    { icon: Users,        label: "Assigned Partners", minW: "min-w-[180px]" },
+                    { icon: CheckCircle,  label: "Status",            minW: "min-w-[120px]" },
+                    { icon: Settings,     label: "Actions" },
+                  ].map(({ icon: Icon, label, minW }) => (
+                    <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-4 w-4 text-slate-400" />
+                        {label}
+                      </div>
+                    </th>
+                  ))}
+                  <th className="w-10 px-4 py-4" />
+                </tr>
+              </thead>
+
+              <tbody className="divide-y divide-slate-100 bg-white">
+                {loading && (
+                  <tr><td colSpan={6} className="px-6 py-10 text-center"><Loading text="Fetching account managers..." /></td></tr>
+                )}
+
+                {!loading && accountManagers.length === 0 && (
+                  <tr><td colSpan={6} className="px-6 py-10 text-center">
+                    <NoMessagesFound title="No account managers found" subtitle="Try adjusting your filters." />
+                  </td></tr>
+                )}
+
+                {!loading && accountManagers.map((m) => (
+                  <tr
+                    key={m.id}
+                    className="group cursor-pointer transition-colors hover:bg-slate-100/50"
+                    onClick={() => router.push(`/admin/account-managers/profile/${m.id}`)}
+                  >
+                    <td className="min-w-[200px] px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                          {m.name?.slice(0, 2).toUpperCase() ?? "?"}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="truncate text-sm font-medium text-slate-900">{m.name}</div>
+                        </div>
+                      </div>
+                    </td>
+
+                    <td className="min-w-[200px] px-6 py-4">
+                      <div className="truncate text-sm text-slate-500">{m.email}</div>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      {Number(m.assigned_partners_count) > 0 ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                          <Users className="h-3 w-3" />
+                          {Number(m.assigned_partners_count)} Partner{Number(m.assigned_partners_count) !== 1 && "s"}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">
+                          <AlertCircle className="h-3 w-3" />
+                          Needs Partner
+                        </span>
+                      )}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold ${
+                        m.is_active
+                          ? "border-green-200 bg-green-50 text-green-700"
+                          : "border-slate-200 bg-slate-100 text-slate-500"
+                      }`}>
+                        {m.is_active ? <FaCheckCircle className="text-[10px]" /> : <FaTimesCircle className="text-[10px]" />}
+                        {m.is_active ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+
+                    <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/admin/account-managers/profile/${m.id}/edit`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                        <div className="h-5 border-l border-slate-200" />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedManagerId(m.id);
+                            setSelectedManagerName(m.name);
+                            setIsDeleteOpen(true);
+                          }}
+                          className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+
+                    <td className="px-4 py-4">
+                      <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+            {/* Pagination */}
+        <div className="flex flex-col items-center justify-between gap-2 border-t border-slate-200 p-6 text-sm text-slate-500 sm:flex-row">
+          {accountManagers.length === 0 && !loading ? (
+            <span />
+          ) : (
+            <span>
+              Showing{" "}
+              <span className="font-medium text-slate-700">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to{" "}
+              <span className="font-medium text-slate-700">{(currentPage - 1) * ITEMS_PER_PAGE + accountManagers.length}</span> of{" "}
+              <span className="font-medium text-slate-700">{displayTotal}</span> results
+            </span>
+          )}
+          <div className="flex items-center gap-2">
+            <PrevButton onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage === 1} text="Prev" icon={<ArrowLeft className="h-4 w-4" />} />
+            <span className="px-2">Page {currentPage} of {Math.max(Math.ceil(displayTotal / ITEMS_PER_PAGE), 1)}</span>
+            <NextButton onClick={() => setCurrentPage((p) => p + 1)} disabled={accountManagers.length < ITEMS_PER_PAGE} text="Next" icon={<ArrowRight className="h-4 w-4" />} />
+          </div>
+        </div>
+
+        </div>
+
+      </div>
+
 
       <DeleteAccountManagerModal
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDelete}
-        isDeleting={loading}
+        isDeleting={deleteLoading}
         AccountManager={selectedManagerName}
       />
     </div>

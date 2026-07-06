@@ -94,7 +94,10 @@ const ModernApplicationsTable = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(searchTerm), 400);
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 400);
     return () => clearTimeout(t);
   }, [searchTerm]);
 
@@ -110,6 +113,7 @@ const ModernApplicationsTable = () => {
     };
     resolveManager();
   }, []);
+
 
   useEffect(() => {
     if (stages.length === 0 || !managerId) return;
@@ -139,11 +143,9 @@ const ModernApplicationsTable = () => {
     stage_id: selectedStages ?? undefined,
     stage_status_id: selectedStageStatus !== "all" ? selectedStageStatus : undefined,
     search: debouncedSearch || undefined,
+    university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
   });
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch, selectedUniversity, selectedStages, selectedStageStatus]);
 
   const stageCards = useMemo<FilterCardItem[]>(() => [
     { id: null, label: "All Applications", count: grandTotal, icon: LayoutGrid, colorScheme: "slate" },
@@ -167,17 +169,12 @@ const ModernApplicationsTable = () => {
     selectedUniversity !== "all",
     selectedStages !== null,
     selectedStageStatus !== "all",
+    selectedLifecycle !== "active",
     searchTerm !== "",
   ].filter(Boolean).length;
 
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = [...applications];
-
-    if (selectedUniversity !== "all") {
-      filtered = filtered.filter(
-        (app) => app.university_name?.toLowerCase() === selectedUniversity.toLowerCase(),
-      );
-    }
 
     if (sortConfig.key) {
       filtered.sort((a, b) => {
@@ -209,6 +206,9 @@ const ModernApplicationsTable = () => {
 
   const totalPages = Math.ceil(total / itemsPerPage);
   const paginatedApplications = filteredAndSortedApplications;
+  const displayTotal = paginatedApplications.length < itemsPerPage
+    ? (currentPage - 1) * itemsPerPage + paginatedApplications.length
+    : grandTotal;
 
   const StatusBadge = ({ status }: { status: string }) => {
     const normalized = status?.toLowerCase().replace(/\s+/g, "_") ?? "";
@@ -242,6 +242,7 @@ const ModernApplicationsTable = () => {
     setSelectedStageStatus("all");
     setSelectedLifecycle("active");
     setSortConfig({ key: null, direction: "asc" });
+    setCurrentPage(1);
   };
 
   return (
@@ -266,7 +267,7 @@ const ModernApplicationsTable = () => {
       <div className="border-b border-slate-200 p-6">
         <ApplicationFilterBar
           searchTerm={searchTerm}
-          onSearchChange={(e) => setSearchTerm(e.target.value)}
+          onSearchChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
           selectedStages={selectedStages ?? "all"}
           onStagesChange={(val) => {
             setSelectedStages(val === "all" ? null : val);
@@ -274,12 +275,16 @@ const ModernApplicationsTable = () => {
           }}
           stageOptions={stages.map((s) => ({ label: s.name, value: s.id }))}
           selectedUniversity={selectedUniversity}
-          onUniversityChange={setSelectedUniversity}
-          universityOptions={universities.map((u) => ({ label: u.name, value: u.name }))}
+          onUniversityChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
+          universityOptions={universities.map((u) => ({ label: u.name, value: u.id }))}
           selectedStageStatus={selectedStageStatus}
-          onStageStatusChange={setSelectedStageStatus}
+          onStageStatusChange={(val) => { setSelectedStageStatus(val); setCurrentPage(1); }}
           stageStatusOptions={stageStatuses.map((s) => ({ label: s.name, value: s.id }))}
           stageStatusLoading={stageStatusesLoading}
+          showLifecycleFilter
+          selectedLifecycle={selectedLifecycle}
+          onLifecycleChange={(val) => { setSelectedLifecycle(val as "active" | "hold" | "cancel" | "all"); setCurrentPage(1); }}
+          resultsCount={displayTotal}
           activeFiltersCount={activeFiltersCount}
           onClearFilters={handleClearFilters}
           showFilters={showMobileFilters}
@@ -493,7 +498,7 @@ const ModernApplicationsTable = () => {
 
       <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 p-6 text-sm text-slate-500 md:flex-row">
         <div>
-          {total === 0 ? (
+          {paginatedApplications.length === 0 && !loading ? (
             <span>No results found</span>
           ) : (
             <>
@@ -503,11 +508,11 @@ const ModernApplicationsTable = () => {
               </span>{" "}
               to{" "}
               <span className="font-medium text-slate-700">
-                {Math.min(currentPage * itemsPerPage, total)}
+                {(currentPage - 1) * itemsPerPage + paginatedApplications.length}
               </span>{" "}
               of{" "}
               <span className="font-medium text-slate-700">
-                {total}
+                {displayTotal}
               </span>{" "}
               results
             </>
@@ -522,11 +527,11 @@ const ModernApplicationsTable = () => {
             icon={<ArrowLeft className="h-4 w-4" />}
           />
           <span className="px-2 text-slate-500">
-            Page {currentPage} of {Math.max(totalPages, 1)}
+            Page {currentPage} of {Math.max(Math.ceil(displayTotal / itemsPerPage), 1)}
           </span>
           <NextButton
             onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages || totalPages === 0}
+            disabled={paginatedApplications.length < itemsPerPage}
             text="Next"
             icon={<ArrowRight className="h-4 w-4" />}
           />

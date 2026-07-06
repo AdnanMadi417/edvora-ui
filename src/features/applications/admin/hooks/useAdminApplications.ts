@@ -18,7 +18,7 @@ export type AdminApplication = {
   stage: string;
   status: string;
   next_action: string;
-  lifecycle_status: "active" | "hold" | "cancel";
+  lifecycle_status: string;
 };
 
 export type AdminApplicationsResponse = {

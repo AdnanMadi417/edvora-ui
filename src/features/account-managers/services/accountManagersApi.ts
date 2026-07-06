@@ -12,10 +12,16 @@ const authHeader = () => {
 };
 
 export const accountManagersApi = {
-  list: () =>
-    api.get<{ items: AccountManager[] }>("/admin/account-managers", {
-      headers: authHeader(),
-    }),
+  list: (params?: {
+    page?: number;
+    page_size?: number;
+    search?: string;
+    is_active?: boolean;
+  }) =>
+    api.get<{ items: AccountManager[]; total: number; page: number; page_size: number }>(
+      "/admin/account-managers",
+      { params, headers: authHeader() }
+    ),
 
   get: (id: string) =>
     api.get<AccountManager>(`/admin/account-managers/${id}`, {
