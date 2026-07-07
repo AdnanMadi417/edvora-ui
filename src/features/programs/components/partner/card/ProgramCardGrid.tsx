@@ -33,7 +33,7 @@ const ProgramsCards = () => {
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedQualId, setSelectedQualId] = useState<string | null>(null);
   const [hasScholarship, setHasScholarship] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
@@ -88,7 +88,7 @@ const ProgramsCards = () => {
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
     has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
-    sort_by: sortBy.length > 0 ? (sortBy[sortBy.length - 1] as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
+    sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
@@ -112,7 +112,7 @@ const ProgramsCards = () => {
     selectedUniversity !== "all",
     selectedQualId !== null,
     hasScholarship !== "all",
-    sortBy.length > 0,
+    sortBy !== "all",
     searchTerm !== "",
   ].filter(Boolean).length;
 
@@ -128,7 +128,7 @@ const ProgramsCards = () => {
     setSelectedUniversity("all");
     setSelectedQualId(null);
     setHasScholarship("all");
-    setSortBy([]);
+    setSortBy("all");
     setCurrentPage(1);
   };
 
@@ -149,7 +149,14 @@ const ProgramsCards = () => {
             </div>
           </div>
 
-          
+          <div className="hidden sm:block p-6 border-b border-slate-200">
+            <StatsFilterCards
+              cards={fixedCards}
+              selectedId={selectedQualId}
+              onSelect={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
+            />
+          </div>
+
           <div className="p-6 border-b border-slate-200">
 
             <ProgramFilterBar

@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { SlidersHorizontal, Globe, GraduationCap, RefreshCw, Award, ArrowUpDown } from "lucide-react";
+import { SlidersHorizontal, Globe, GraduationCap, RefreshCw, Award } from "lucide-react";
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 import FilterSelectField from "components/form/filter/FilterSelectField";
-import MultiSelectFilterField from "components/form/filter/MultiSelectFilterField";
+import SortControl from "components/form/filter/SortControl";
 import SearchInput from "components/form/filter/SearchInput";
 
 interface Option {
@@ -16,13 +16,6 @@ interface Option {
 const SCHOLARSHIP_OPTIONS: Option[] = [
   { label: "Has Scholarship", value: "true" },
   { label: "No Scholarship", value: "false" },
-];
-
-const SORT_OPTIONS: Option[] = [
-  { label: "Commission: High → Low", value: "commission_desc" },
-  { label: "Commission: Low → High", value: "commission_asc" },
-  { label: "Tuition: Low → High", value: "tuition_asc" },
-  { label: "Tuition: High → Low", value: "tuition_desc" },
 ];
 
 interface ProgramFilterBarProps {
@@ -49,8 +42,8 @@ interface ProgramFilterBarProps {
   hasScholarship?: string;
   onScholarshipChange?: (val: string) => void;
 
-  sortBy?: string[];
-  onSortChange?: (vals: string[]) => void;
+  sortBy?: string;
+  onSortChange?: (val: string) => void;
 
   resultsCount?: number;
 
@@ -80,7 +73,7 @@ export default function ProgramFilterBar({
   qualificationOptions,
   hasScholarship = "all",
   onScholarshipChange,
-  sortBy = [],
+  sortBy = "all",
   onSortChange,
   resultsCount,
   activeFiltersCount,
@@ -90,41 +83,41 @@ export default function ProgramFilterBar({
   children,
 }: ProgramFilterBarProps) {
   return (
-    <div className="">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+    <div className="flex flex-col gap-3">
 
-        {/* Search + mobile toggle */}
-        <div className="flex items-center gap-2 sm:contents">
-          <SearchInput
-            value={searchTerm}
-            onChange={onSearchChange}
-            placeholder={searchPlaceholder}
-            className="sm:w-64 sm:flex-none"
-          />
-          <button
-            className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
-            onClick={onToggleFilters}
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-            {activeFiltersCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
-                {activeFiltersCount}
-              </span>
-            )}
-          </button>
+      {/* Row 1: Search + mobile toggle + 3 dropdowns (desktop only) */}
+      <div className="flex items-center gap-3">
+        <SearchInput
+          value={searchTerm}
+          onChange={onSearchChange}
+          placeholder={searchPlaceholder}
+          className="flex-1"
+        />
+
+        {/* Mobile: toggle + clear */}
+        <button
+          className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+          onClick={onToggleFilters}
+        >
+          <SlidersHorizontal className="h-4 w-4" />
           {activeFiltersCount > 0 && (
-            <button
-              onClick={onClearFilters}
-              className="sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-red-200 bg-white text-red-500 hover:bg-red-50"
-            >
-              <RefreshCw className="h-4 w-4" />
-            </button>
+            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+              {activeFiltersCount}
+            </span>
           )}
-        </div>
+        </button>
+        {activeFiltersCount > 0 && (
+          <button
+            onClick={onClearFilters}
+            className="sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-red-200 bg-white text-red-500 hover:bg-red-50"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </button>
+        )}
 
-        {/* Collapsible dropdowns */}
-        <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showFilters ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
-          <div className="w-full sm:w-40 flex-shrink-0">
+        {/* Desktop: 3 dropdowns inline in row 1 */}
+        <div className="hidden sm:flex flex-[3] gap-3">
+          <div className="flex-1">
             <FilterSelectField
               value={selectedState}
               onChange={onStateChange}
@@ -133,8 +126,7 @@ export default function ProgramFilterBar({
               defaultOption="All Locations"
             />
           </div>
-
-          <div className="w-full sm:w-36 flex-shrink-0">
+          <div className="flex-1">
             <FilterSelectField
               value={selectedField}
               onChange={onFieldChange}
@@ -143,8 +135,7 @@ export default function ProgramFilterBar({
               defaultOption="All Fields"
             />
           </div>
-
-          <div className="w-full sm:w-40 flex-shrink-0">
+          <div className="flex-1">
             <FilterSelectField
               value={selectedUniversity}
               onChange={onUniversityChange}
@@ -153,8 +144,40 @@ export default function ProgramFilterBar({
               defaultOption="All Universities"
             />
           </div>
+        </div>
+      </div>
 
-          <div className="w-full sm:w-40 flex-shrink-0">
+      {/* Rows 2+: collapsible on mobile, always visible on desktop */}
+      <div className={showFilters ? "flex flex-col gap-3" : "hidden sm:flex sm:flex-col sm:gap-3"}>
+
+        {/* Mobile only: state / field / university */}
+        <div className="flex flex-col gap-3 sm:hidden">
+          <FilterSelectField
+            value={selectedState}
+            onChange={onStateChange}
+            options={stateOptions}
+            icon={Globe}
+            defaultOption="All Locations"
+          />
+          <FilterSelectField
+            value={selectedField}
+            onChange={onFieldChange}
+            options={fieldOptions}
+            icon={MdSchool}
+            defaultOption="All Fields"
+          />
+          <FilterSelectField
+            value={selectedUniversity}
+            onChange={onUniversityChange}
+            options={universityOptions}
+            icon={AiOutlineBank}
+            defaultOption="All Universities"
+          />
+        </div>
+
+        {/* Row 2: Qualification + Scholarship + results + clear (desktop) */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="flex-1">
             <FilterSelectField
               value={selectedQualId ?? "all"}
               onChange={(val) => onQualChange(val === "all" ? null : val)}
@@ -163,9 +186,8 @@ export default function ProgramFilterBar({
               defaultOption="All Qualifications"
             />
           </div>
-
           {onScholarshipChange && (
-            <div className="w-full sm:w-40 flex-shrink-0">
+            <div className="flex-1">
               <FilterSelectField
                 value={hasScholarship}
                 onChange={onScholarshipChange}
@@ -175,39 +197,30 @@ export default function ProgramFilterBar({
               />
             </div>
           )}
-
-          {onSortChange && (
-            <div className="w-full sm:w-48 flex-shrink-0">
-              <MultiSelectFilterField
-                value={sortBy}
-                onChange={onSortChange}
-                options={SORT_OPTIONS}
-                icon={ArrowUpDown}
-                placeholder="Default Sort"
-              />
-            </div>
-          )}
-
-          {resultsCount !== undefined && (activeFiltersCount > 0 || searchTerm !== "") && (
-            <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
-              {resultsCount.toLocaleString()}
-              <span className="font-normal text-blue-500">results</span>
-            </span>
-          )}
-
-          {activeFiltersCount > 0 && (
-            <button
-              onClick={onClearFilters}
-              className="hidden sm:flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Clear
-            </button>
-          )}
+          <div className="hidden sm:flex items-center gap-3">
+            {resultsCount !== undefined && (activeFiltersCount > 0 || searchTerm !== "") && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
+                {resultsCount.toLocaleString()}
+                <span className="font-normal text-blue-500">results</span>
+              </span>
+            )}
+            {activeFiltersCount > 0 && (
+              <button
+                onClick={onClearFilters}
+                className="flex shrink-0 items-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Clear
+              </button>
+            )}
+          </div>
         </div>
 
-        {children}
+        {/* Row 3: Sort */}
+        {onSortChange && <SortControl value={sortBy} onChange={onSortChange} />}
       </div>
+
+      {children}
     </div>
   );
 }
