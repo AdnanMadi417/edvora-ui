@@ -5,7 +5,6 @@ import { SlidersHorizontal, Globe, GraduationCap, RefreshCw, Award, ArrowUpDown 
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 import FilterSelectField from "components/form/filter/FilterSelectField";
-import MultiSelectFilterField from "components/form/filter/MultiSelectFilterField";
 import SearchInput from "components/form/filter/SearchInput";
 
 interface Option {
@@ -89,8 +88,13 @@ export default function ProgramFilterBar({
   onToggleFilters,
   children,
 }: ProgramFilterBarProps) {
+  const toggleSort = (val: string) => {
+    if (!onSortChange) return;
+    onSortChange(sortBy.includes(val) ? sortBy.filter((v) => v !== val) : [...sortBy, val]);
+  };
+
   return (
-    <div className="">
+    <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
 
         {/* Search + mobile toggle */}
@@ -176,18 +180,6 @@ export default function ProgramFilterBar({
             </div>
           )}
 
-          {onSortChange && (
-            <div className="w-full sm:w-44 flex-shrink-0">
-              <MultiSelectFilterField
-                value={sortBy}
-                onChange={onSortChange}
-                options={SORT_OPTIONS}
-                icon={ArrowUpDown}
-                placeholder="Default Sort"
-              />
-            </div>
-          )}
-
           {resultsCount !== undefined && (activeFiltersCount > 0 || searchTerm !== "") && (
             <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
               {resultsCount.toLocaleString()}
@@ -208,6 +200,33 @@ export default function ProgramFilterBar({
 
         {children}
       </div>
+
+      {/* Sort chips row */}
+      {onSortChange && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+            <ArrowUpDown className="h-3.5 w-3.5" />
+            Sort
+          </span>
+          {SORT_OPTIONS.map((opt) => {
+            const active = sortBy.includes(opt.value);
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => toggleSort(opt.value)}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                  active
+                    ? "border-blue-300 bg-blue-50 text-blue-700"
+                    : "border-slate-200 bg-white text-slate-500 hover:border-slate-300 hover:bg-slate-50"
+                }`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
