@@ -13,9 +13,8 @@ import {
   ArrowRight,
   ArrowLeft,
   FilePlus,
-  LayoutGrid,
 } from 'lucide-react';
-import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from 'components/filters/StatsFilterCards';
+import PipelineCard from 'features/applications/partner/components/PipelineCard';
 
 import { useRouter } from 'next/navigation';
 import api from 'lib/useApi';
@@ -32,7 +31,23 @@ import { usePartnerApplications } from "features/applications/partner/hooks/useP
 import { AppDate } from "components/ui/date";
 
 
-const STAGE_COLORS: CardColorScheme[] = ['blue', 'violet', 'emerald', 'amber', 'rose', 'cyan'];
+const ACTION_REQUIRED_STATUSES = new Set([
+  'correction_requested_by_account_manager',
+  'university_requested_corrections',
+  'program_change_suggested',
+  'waiting_for_payment',
+  'payment_rejected',
+  'waiting_partner_to_confirm_arrival_date',
+  'upload_emgs_eval',
+  'eval_re-upload_required',
+  'upload_e-visa',
+  'e-visa_re-upload_required',
+  'upload_visa_stage_documents',
+  'visa_documents_re-upload_required',
+  'upload_extra_arrival_documents',
+  'extra_arrival_documents_re-upload_required',
+  'commission_ready',
+]);
 
 const getStatusColors = (code: string) => {
   if (!code) return { bg: 'bg-gray-100 border-slate-200', text: 'text-gray-700' };
@@ -91,6 +106,7 @@ const PartnerApplications = () => {
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>('all');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [stageCounts, setStageCounts] = useState<Record<string, number>>({});
+  const [stageActionRequired, setStageActionRequired] = useState<Record<string, boolean>>({});
   const [selectedLifecycle, setSelectedLifecycle] = useState<'active' | 'hold' | 'cancel' | 'all'>('active');
 
   const itemsPerPage = 10;
@@ -121,15 +137,23 @@ const PartnerApplications = () => {
     let cancelled = false;
     Promise.all(
       stages.map((s) =>
-        api.get(`/partners/${partnerId}/applications`, { params: { stage_id: s.id, limit: 1, status: selectedLifecycle } })
-          .then((res) => ({ id: s.id, count: (res.data as any)?.total ?? 0 }))
-          .catch(() => ({ id: s.id, count: 0 }))
+        api.get(`/partners/${partnerId}/applications`, { params: { stage_id: s.id, limit: 10, status: selectedLifecycle } })
+          .then((res) => ({
+            id: s.id,
+            count: (res.data as any)?.total ?? 0,
+            hasAction: ((res.data as any)?.items ?? []).some((app: any) =>
+              ACTION_REQUIRED_STATUSES.has(app.status?.toLowerCase().replace(/\s+/g, '_'))
+            ),
+          }))
+          .catch(() => ({ id: s.id, count: 0, hasAction: false }))
       )
     ).then((results) => {
       if (cancelled) return;
-      const map: Record<string, number> = {};
-      results.forEach((r) => { map[r.id] = r.count; });
-      setStageCounts(map);
+      const counts: Record<string, number> = {};
+      const actionMap: Record<string, boolean> = {};
+      results.forEach((r) => { counts[r.id] = r.count; actionMap[r.id] = r.hasAction; });
+      setStageCounts(counts);
+      setStageActionRequired(actionMap);
     });
     return () => { cancelled = true; };
   }, [stages.length, partnerId, selectedLifecycle]);
@@ -148,16 +172,12 @@ const PartnerApplications = () => {
   });
 
 
-  const stageCards = useMemo<FilterCardItem[]>(() => [
-    { id: null, label: 'All Applications', count: grandTotal, icon: LayoutGrid, colorScheme: 'slate' },
-    ...stages.map((s, i) => ({
-      id: s.id,
-      label: s.name,
-      count: stageCounts[s.id] ?? '—',
-      icon: Flag,
-      colorScheme: STAGE_COLORS[i % STAGE_COLORS.length],
-    })),
-  ], [stages, stageCounts, grandTotal]);
+  const totalActionRequired = useMemo(
+    () => stages
+      .filter((s) => stageActionRequired[s.id])
+      .reduce((sum, s) => sum + (stageCounts[s.id] ?? 0), 0),
+    [stages, stageActionRequired, stageCounts]
+  );
 
   const handleSort = (key: string) => {
     setSortConfig((prev) => ({
@@ -166,26 +186,8 @@ const PartnerApplications = () => {
     }));
   };
 
-  const actionRequiredStatuses = useMemo(() => new Set([
-    'correction_requested_by_account_manager',
-    'university_requested_corrections',
-    'program_change_suggested',
-    'waiting_for_payment',
-    'payment_rejected',
-    'waiting_partner_to_confirm_arrival_date',
-    'upload_emgs_eval',
-    'eval_re-upload_required',
-    'upload_e-visa',
-    'e-visa_re-upload_required',
-    'upload_visa_stage_documents',
-    'visa_documents_re-upload_required',
-    'upload_extra_arrival_documents',
-    'extra_arrival_documents_re-upload_required',
-    'commission_ready',
-  ]), []);
-
   const needsPartnerAction = (status: string) =>
-    actionRequiredStatuses.has(status?.toLowerCase().replace(/\s+/g, '_'));
+    ACTION_REQUIRED_STATUSES.has(status?.toLowerCase().replace(/\s+/g, '_'));
 
   const activeFiltersCount = [
     selectedUniversity !== 'all',
@@ -273,11 +275,19 @@ const PartnerApplications = () => {
         />
       </div>
 
-      <div className="hidden sm:block p-6 border-b border-slate-200">
-        <StatsFilterCards
-          cards={stageCards}
+      <div className="p-6 border-b border-slate-200">
+        <PipelineCard
+          stages={stages}
+          stageCounts={stageCounts}
+          stageActionRequired={stageActionRequired}
           selectedId={selectedStages}
           onSelect={(id) => { setSelectedStages(id); setCurrentPage(1); }}
+          totalCount={grandTotal}
+          totalActionRequired={totalActionRequired}
+          onViewCommission={() => {
+            const commStage = stages.find((s) => s.name.toLowerCase().includes('commission'));
+            if (commStage) { setSelectedStages(commStage.id); setCurrentPage(1); }
+          }}
         />
       </div>
 
