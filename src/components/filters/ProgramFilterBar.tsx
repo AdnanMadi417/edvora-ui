@@ -5,6 +5,7 @@ import { SlidersHorizontal, Globe, GraduationCap, RefreshCw, Award, ArrowUpDown 
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 import FilterSelectField from "components/form/filter/FilterSelectField";
+import MultiSelectFilterField from "components/form/filter/MultiSelectFilterField";
 import SearchInput from "components/form/filter/SearchInput";
 
 interface Option {
@@ -48,11 +49,8 @@ interface ProgramFilterBarProps {
   hasScholarship?: string;
   onScholarshipChange?: (val: string) => void;
 
-  sortBy?: string;
-  onSortChange?: (val: string) => void;
-
-  includeInactive?: boolean;
-  onIncludeInactiveChange?: (val: boolean) => void;
+  sortBy?: string[];
+  onSortChange?: (vals: string[]) => void;
 
   resultsCount?: number;
 
@@ -82,10 +80,8 @@ export default function ProgramFilterBar({
   qualificationOptions,
   hasScholarship = "all",
   onScholarshipChange,
-  sortBy = "all",
+  sortBy = [],
   onSortChange,
-  includeInactive = false,
-  onIncludeInactiveChange,
   resultsCount,
   activeFiltersCount,
   onClearFilters,
@@ -182,28 +178,14 @@ export default function ProgramFilterBar({
 
           {onSortChange && (
             <div className="w-full sm:w-44 flex-shrink-0">
-              <FilterSelectField
+              <MultiSelectFilterField
                 value={sortBy}
                 onChange={onSortChange}
                 options={SORT_OPTIONS}
                 icon={ArrowUpDown}
-                defaultOption="Default Sort"
+                placeholder="Default Sort"
               />
             </div>
-          )}
-
-          {onIncludeInactiveChange && (
-            <button
-              onClick={() => onIncludeInactiveChange(!includeInactive)}
-              className={`hidden sm:flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition ${
-                includeInactive
-                  ? "border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100"
-                  : "border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
-              }`}
-            >
-              <span className={`h-2 w-2 rounded-full ${includeInactive ? "bg-amber-500" : "bg-slate-300"}`} />
-              Inactive Unis
-            </button>
           )}
 
           {resultsCount !== undefined && (activeFiltersCount > 0 || searchTerm !== "") && (
