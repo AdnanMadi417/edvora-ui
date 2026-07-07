@@ -11,9 +11,8 @@ import {
   ArrowLeft,
   ArrowRight,
   Flag,
-  LayoutGrid,
 } from "lucide-react";
-import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from "components/filters/StatsFilterCards";
+import PipelineCard from "features/applications/partner/components/PipelineCard";
 
 import { useAdminApplications } from "features/applications/admin/hooks/useAdminApplications";
 import { useUniversities } from "features/universities/hooks";
@@ -28,7 +27,17 @@ import api from "lib/useApi";
 import { AppDate } from "components/ui/date";
 
 
-const STAGE_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose", "cyan"];
+const ACTION_REQUIRED_STATUSES = new Set([
+  'new_application',
+  'payment_submitted',
+  'eval_under_review',
+  'e-visa_under_review',
+  'visa_documents_under_review',
+  'arrival_confirmed',
+  'extra_arrival_documents_under_review',
+  'issue_response_received',
+  'commission_disputed',
+]);
 
 const getStatusColors = (code: string) => {
   if (!code) return { bg: "bg-gray-100 border-slate-200", text: "text-gray-700" };
@@ -93,6 +102,7 @@ const ModernApplicationsTable = () => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [stageCounts, setStageCounts] = useState<Record<string, number>>({});
+  const [stageActionRequired, setStageActionRequired] = useState<Record<string, boolean>>({});
   const [selectedLifecycle, setSelectedLifecycle] = useState<"active" | "hold" | "cancel" | "all">("active");
 
   useEffect(() => {
@@ -108,15 +118,23 @@ const ModernApplicationsTable = () => {
     let cancelled = false;
     Promise.all(
       stages.map((s) =>
-        api.get("/admin/applications", { params: { stage_id: s.id, limit: 1, status: selectedLifecycle } })
-          .then((res) => ({ id: s.id, count: (res.data as any)?.total ?? 0 }))
-          .catch(() => ({ id: s.id, count: 0 }))
+        api.get("/admin/applications", { params: { stage_id: s.id, limit: 10, status: selectedLifecycle } })
+          .then((res) => ({
+            id: s.id,
+            count: (res.data as any)?.total ?? 0,
+            hasAction: ((res.data as any)?.items ?? []).some((app: any) =>
+              ACTION_REQUIRED_STATUSES.has(app.status?.toLowerCase().replace(/\s+/g, '_'))
+            ),
+          }))
+          .catch(() => ({ id: s.id, count: 0, hasAction: false }))
       )
     ).then((results) => {
       if (cancelled) return;
-      const map: Record<string, number> = {};
-      results.forEach((r) => { map[r.id] = r.count; });
-      setStageCounts(map);
+      const counts: Record<string, number> = {};
+      const actionMap: Record<string, boolean> = {};
+      results.forEach((r) => { counts[r.id] = r.count; actionMap[r.id] = r.hasAction; });
+      setStageCounts(counts);
+      setStageActionRequired(actionMap);
     });
     return () => { cancelled = true; };
   }, [stages.length, selectedLifecycle]);
@@ -133,16 +151,12 @@ const ModernApplicationsTable = () => {
   });
 
 
-  const stageCards = useMemo<FilterCardItem[]>(() => [
-    { id: null, label: "All Applications", count: grandTotal, icon: LayoutGrid, colorScheme: "slate" },
-    ...stages.map((s, i) => ({
-      id: s.id,
-      label: s.name,
-      count: stageCounts[s.id] ?? "—",
-      icon: Flag,
-      colorScheme: STAGE_COLORS[i % STAGE_COLORS.length],
-    })),
-  ], [stages, stageCounts, grandTotal]);
+  const totalActionRequired = useMemo(
+    () => stages
+      .filter((s) => stageActionRequired[s.id])
+      .reduce((sum, s) => sum + (stageCounts[s.id] ?? 0), 0),
+    [stages, stageActionRequired, stageCounts]
+  );
 
   const handleSort = (key: string) => {
     setSortConfig((prev) => ({
@@ -184,20 +198,8 @@ const ModernApplicationsTable = () => {
   const totalPages = Math.ceil(total / itemsPerPage);
   const paginatedApplications = filteredAndSortedApplications;
 
-  const actionRequiredStatuses = useMemo(() => new Set([
-    'new_application',
-    'payment_submitted',
-    'eval_under_review',
-    'e-visa_under_review',
-    'visa_documents_under_review',
-    'arrival_confirmed',
-    'extra_arrival_documents_under_review',
-    'issue_response_received',
-    'commission_disputed',
-  ]), []);
-
   const needsAction = (status: string) =>
-    actionRequiredStatuses.has(status?.toLowerCase().replace(/\s+/g, '_'));
+    ACTION_REQUIRED_STATUSES.has(status?.toLowerCase().replace(/\s+/g, '_'));
 
   const StatusBadge = ({ status }: { status: string }) => {
     const normalized = status?.toLowerCase().replace(/\s+/g, "_") ?? "";
@@ -245,11 +247,20 @@ const ModernApplicationsTable = () => {
         </div>
       </div>
 
-      <div className="hidden sm:block p-6 border-b border-slate-200">
-        <StatsFilterCards
-          cards={stageCards}
+      <div className="p-6 border-b border-slate-200">
+        <PipelineCard
+          stages={stages}
+          stageCounts={stageCounts}
+          stageActionRequired={stageActionRequired}
           selectedId={selectedStages}
           onSelect={(id) => { setSelectedStages(id); setCurrentPage(1); }}
+          totalCount={grandTotal}
+          totalActionRequired={totalActionRequired}
+          title="Applications Pipeline"
+          onViewCommission={() => {
+            const commStage = stages.find((s) => s.name.toLowerCase().includes('commission'));
+            if (commStage) { setSelectedStages(commStage.id); setCurrentPage(1); }
+          }}
         />
       </div>
 

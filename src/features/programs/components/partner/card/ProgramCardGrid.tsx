@@ -1,27 +1,23 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { ArrowRight, ArrowLeft, Award, Send, BookOpen, GraduationCap } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Award, Send } from 'lucide-react';
 import PresignedImage from "components/ui/PresignedImage";
 
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import { usePrograms, useStates } from "features/programs/hooks";
-import { programApi } from "features/programs/services";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useUniversities } from "features/universities/hooks";
 
 import ProgramFilterBar from "components/filters/ProgramFilterBar";
-import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from "components/filters/StatsFilterCards";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "next/link";
 
 const ITEMS_PER_PAGE = 9;
-
-const QUAL_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose", "cyan"];
 
 const ProgramsCards = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -49,27 +45,6 @@ const ProgramsCards = () => {
   const { qualifications } = useAllQualifications();
   const { universities } = useUniversities();
 
-  const [qualCounts, setQualCounts] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    if (qualifications.length === 0) return;
-    let cancelled = false;
-    Promise.all(
-      qualifications.map((q) =>
-        programApi.programs
-          .list({ qualification_id: q.id, page: 1, page_size: 1 })
-          .then((res) => ({ id: q.id, count: (res.data as any)?.total ?? 0 }))
-          .catch(() => ({ id: q.id, count: 0 }))
-      )
-    ).then((results) => {
-      if (cancelled) return;
-      const map: Record<string, number> = {};
-      results.forEach((r) => { map[r.id] = r.count; });
-      setQualCounts(map);
-    });
-    return () => { cancelled = true; };
-  }, [qualifications.length]);
-
   const fieldOptions = useMemo(() => fields.map((f) => ({ label: f.name, value: f.id })), [fields]);
   const universityOptions = useMemo(() => universities.map((u) => ({ label: u.name, value: u.id })), [universities]);
   const stateOptions = useMemo(() => states.map((s) => ({ label: s.name, value: s.id })), [states]);
@@ -92,19 +67,6 @@ const ProgramsCards = () => {
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
-
-  const { total: grandTotal } = usePrograms({ page: 1, page_size: 1 });
-
-  const fixedCards = useMemo<FilterCardItem[]>(() => [
-    { id: null, label: "All Programs", count: grandTotal, icon: BookOpen, colorScheme: "slate" },
-    ...qualifications.map((q, i) => ({
-      id: q.id,
-      label: q.name,
-      count: (qualCounts as Record<string, number | undefined>)[q.id] ?? "—",
-      icon: GraduationCap,
-      colorScheme: QUAL_COLORS[i % QUAL_COLORS.length],
-    })),
-  ], [grandTotal, qualifications, qualCounts]);
 
   const activeFiltersCount = [
     selectedState !== "all",
@@ -147,14 +109,6 @@ const ProgramsCards = () => {
                 resources
               </p>
             </div>
-          </div>
-
-          <div className="hidden sm:block p-6 border-b border-slate-200">
-            <StatsFilterCards
-              cards={fixedCards}
-              selectedId={selectedQualId}
-              onSelect={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
-            />
           </div>
 
           <div className="p-6 border-b border-slate-200">
