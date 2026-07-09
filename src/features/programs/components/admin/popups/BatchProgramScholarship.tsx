@@ -87,7 +87,7 @@ export default function BatchProgramScholarships({
     let error = "";
     if (field.endsWith(".name")) {
       if (!value.trim()) error = "Scholarship name is required";
-      else if (value.trim().length < 5) error = "Name must be at least 5 characters";
+      else if (value.trim().length < 3) error = "Name must be at least 3 characters";
       else if (value.trim().length > 255) error = "Name must not exceed 255 characters";
     } else if (field.endsWith(".description")) {
       if (!value.trim()) error = "Description is required";

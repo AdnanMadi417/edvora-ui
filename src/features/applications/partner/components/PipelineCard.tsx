@@ -123,7 +123,7 @@ export default function PipelineCard({
               </div>
 
               {/* Count + label */}
-              <p className="text-xl font-bold text-slate-900">{count === 0 ? "—" : count}</p>
+              <p className={`text-xl font-bold ${count === 0 ? "text-slate-300" : "text-slate-900"}`}>{count}</p>
               <p className="truncate text-xs text-slate-500">{stage.name}</p>
 
               {/* Progress bar */}

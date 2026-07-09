@@ -154,7 +154,7 @@ export default function PartnerDetails({ id }: Props) {
           </div>
 
           <div className="flex items-center gap-2">
-            {!partner.is_verified && (
+            {!partner.is_verified && !partner.is_active && (
               <Button
                 onClick={() => setShowReview(true)}
                 icon={<ShieldCheck className="h-4 w-4" />}

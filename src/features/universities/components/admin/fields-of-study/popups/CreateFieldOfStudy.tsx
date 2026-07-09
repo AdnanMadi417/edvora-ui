@@ -45,7 +45,7 @@ export default function CreateFieldOfStudy({
 
   const validateName = (name: string): string => {
     if (!name.trim()) return "Field of study name is required";
-    if (name.trim().length < 5) return "Name must be at least 5 characters";
+    if (name.trim().length < 3) return "Name must be at least 3 characters";
     if (name.trim().length > 100) return "Name must not exceed 100 characters";
     return "";
   };

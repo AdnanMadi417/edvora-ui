@@ -19,4 +19,10 @@ export const authService = {
       current_password: currentPassword,
       new_password: newPassword,
     }),
+
+  forgotPassword: (email: string) =>
+    loginApi.post("/auth/forgot-password", { email }),
+
+  resetPassword: (token: string, newPassword: string) =>
+    loginApi.post("/auth/reset-password", { token, new_password: newPassword }),
 };

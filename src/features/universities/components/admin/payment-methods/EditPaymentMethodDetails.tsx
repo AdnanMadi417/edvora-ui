@@ -77,7 +77,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
 
   const validateName = (value: string): string => {
     if (!value.trim()) return "Name is required";
-    if (value.trim().length < 5) return "Name must be at least 5 characters";
+    if (value.trim().length < 3) return "Name must be at least 3 characters";
     if (value.trim().length > 100) return "Name must not exceed 100 characters";
     return "";
   };

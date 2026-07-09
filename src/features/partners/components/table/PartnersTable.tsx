@@ -1,17 +1,15 @@
 "use client";
 
-import { AxiosError } from "axios";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft, ArrowRight, ChevronRight,
-  Pencil, RefreshCw, SlidersHorizontal, Trash2, Building2,
+  Pencil, RefreshCw, SlidersHorizontal, Building2,
   UserCog, Users, CheckCircle, XCircle, BadgeCheck, BadgeX, User, ShieldCheck,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePartners, useDeletePartner } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import AssignPartnerManager from "../popups/AssignPartnerManager";
-import DeletePartner from "../popups/DeletePartner";
 import ReviewPartnerPopup from "../popups/ReviewPartnerPopup";
 import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -20,7 +18,6 @@ import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import Loading from "components/loading/Loading";
-import { useToast } from "components/context/ToastContext";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -38,7 +35,6 @@ function statusToParams(status: StatusFilter): { is_active?: boolean; is_verifie
 
 export default function PartnersTable() {
   const router = useRouter();
-  const { showToast } = useToast();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -48,12 +44,9 @@ export default function PartnersTable() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { accountManagers } = useAccountManagers();
-  const { deletePartner, loading: deleteLoading } = useDeletePartner();
 
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<any>(null);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [selectedPartnerId, setSelectedPartnerId] = useState<string | null>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewPartner, setReviewPartner] = useState<{ id: string; name: string } | null>(null);
 
@@ -92,20 +85,6 @@ export default function PartnersTable() {
   ].filter(Boolean).length;
 
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
-
-  const handleDelete = async () => {
-    if (!selectedPartnerId) return;
-    try {
-      await deletePartner(selectedPartnerId);
-      showToast("Partner deleted successfully.", "success");
-      setIsDeleteOpen(false);
-      setSelectedPartnerId(null);
-      refetch();
-    } catch (err) {
-      const axiosError = err as AxiosError<{ message: string }>;
-      showToast(axiosError.response?.data?.message || "Failed to delete partner.", "error");
-    }
-  };
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -285,7 +264,8 @@ export default function PartnersTable() {
 
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
-                        {!partner.is_verified && (
+                        
+                        {!partner.is_verified && !partner.is_active && (
                           <>
                             <button
                               onClick={() => { setReviewPartner({ id: partner.id, name: partner.name || "" }); setIsReviewOpen(true); }}
@@ -297,6 +277,7 @@ export default function PartnersTable() {
                             <div className="h-5 border-l border-slate-200" />
                           </>
                         )}
+
                         <a
                           href={`/admin/partners/${partner.id}/edit`}
                           onClick={(e) => e.stopPropagation()}
@@ -310,13 +291,6 @@ export default function PartnersTable() {
                           className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
                         >
                           <UserCog className="h-4 w-4" />
-                        </button>
-                        <div className="h-5 border-l border-slate-200" />
-                        <button
-                          onClick={() => { setSelectedPartnerId(partner.id); setIsDeleteOpen(true); }}
-                          className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
@@ -351,8 +325,6 @@ export default function PartnersTable() {
         </div>
 
       </div>
-
-      <DeletePartner isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleDelete} isDeleting={deleteLoading} />
 
       {reviewPartner && (
         <ReviewPartnerPopup
