@@ -258,22 +258,24 @@ const ModernApplicationsTable = () => {
         </div>
       </div>
 
-      <div className="p-6 border-b border-slate-200">
-        <PipelineCard
-          stages={stages}
-          stageCounts={stageCounts}
-          stageActionRequired={stageActionRequired}
-          selectedId={selectedStages}
-          onSelect={(id) => { setSelectedStages(id); setCurrentPage(1); }}
-          totalCount={grandTotal}
-          totalActionRequired={totalActionRequired}
-          title="Applications Pipeline"
-          onViewCommission={() => {
-            const commStage = stages.find((s) => s.name.toLowerCase().includes('commission'));
-            if (commStage) { setSelectedStages(commStage.id); setCurrentPage(1); }
-          }}
-        />
-      </div>
+      {grandTotal > 0 && (
+        <div className="p-6 border-b border-slate-200">
+          <PipelineCard
+            stages={stages}
+            stageCounts={stageCounts}
+            stageActionRequired={stageActionRequired}
+            selectedId={selectedStages}
+            onSelect={(id) => { setSelectedStages(id); setCurrentPage(1); }}
+            totalCount={grandTotal}
+            totalActionRequired={totalActionRequired}
+            title="Applications Pipeline"
+            onViewCommission={() => {
+              const commStage = stages.find((s) => s.name.toLowerCase().includes('commission'));
+              if (commStage) { setSelectedStages(commStage.id); setCurrentPage(1); }
+            }}
+          />
+        </div>
+      )}
 
       <div className="border-b border-slate-200 p-6">
         <ApplicationFilterBar

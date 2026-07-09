@@ -1,4 +1,4 @@
-export type UniversityFormData = {
+﻿export type UniversityFormData = {
   name: string;
   country?: string;
   code?: string;
@@ -24,8 +24,8 @@ export const validateUniversity = (formData: UniversityFormData): UniversityVali
   // name — required, 3–255 chars
   if (!formData.name?.trim()) {
     errors.name = "University name is required";
-  } else if (formData.name.trim().length < 5) {
-    errors.name = "University name must be at least 5 characters";
+  } else if (formData.name.trim().length < 3) {
+    errors.name = "University name must be at least 3 characters";
   } else if (formData.name.trim().length > 255) {
     errors.name = "University name must not exceed 255 characters";
   }
@@ -55,15 +55,15 @@ export const validateUniversity = (formData: UniversityFormData): UniversityVali
     formData.branches.forEach((b, i) => {
       if (!b.name?.trim())
         errors[`branches[${i}].name`] = "Branch name is required";
-      else if (b.name.trim().length < 5)
-        errors[`branches[${i}].name`] = "Branch name must be at least 5 characters";
+      else if (b.name.trim().length < 3)
+        errors[`branches[${i}].name`] = "Branch name must be at least 3 characters";
       else if (b.name.trim().length > 255)
         errors[`branches[${i}].name`] = "Branch name must not exceed 255 characters";
 
       if (!b.location?.trim())
         errors[`branches[${i}].location`] = "Location is required";
-      else if (b.location.trim().length < 5)
-        errors[`branches[${i}].location`] = "Location must be at least 5 characters";
+      else if (b.location.trim().length < 3)
+        errors[`branches[${i}].location`] = "Location must be at least 3 characters";
       else if (b.location.trim().length > 255)
         errors[`branches[${i}].location`] = "Location must not exceed 255 characters";
 
@@ -76,13 +76,13 @@ export const validateUniversity = (formData: UniversityFormData): UniversityVali
 };
 
 export const isUniversityComplete = (formData: UniversityFormData): boolean => {
-  if (!formData.name?.trim() || formData.name.trim().length < 5) return false;
+  if (!formData.name?.trim() || formData.name.trim().length < 3) return false;
   if (formData.country !== undefined && !formData.country?.trim()) return false;
   if (!formData.university_type_id) return false;
   if (!formData.branches || formData.branches.length === 0) return false;
   if (formData.branches.some((b) =>
-    !b.name?.trim() || b.name.trim().length < 5 ||
-    !b.location?.trim() || b.location.trim().length < 5 ||
+    !b.name?.trim() || b.name.trim().length < 3 ||
+    !b.location?.trim() || b.location.trim().length < 3 ||
     !b.state_id
   )) return false;
   return true;

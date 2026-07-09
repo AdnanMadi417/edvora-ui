@@ -69,7 +69,7 @@ function DocUploadField({
       {doc.uploading ? (
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
           <div className="flex items-center justify-between text-sm text-slate-600">
-            <span>Uploadingâ€¦</span>
+            <span>Uploading…</span>
             <span className="font-medium text-blue-600">{doc.progress}%</span>
           </div>
           <div className="mt-2 h-1.5 w-full rounded-full bg-slate-200">
@@ -234,11 +234,49 @@ export default function EditPartnerDetails({ id }: Props) {
     );
   };
 
+  const isValidUrl = (val: string) => {
+    try {
+      const url = new URL(val);
+      return url.protocol === "https:" || url.protocol === "http:";
+    } catch { return false; }
+  };
+
+  const isLinkedInUrl = (val: string) => {
+    try {
+      const url = new URL(val);
+      return (url.protocol === "https:" || url.protocol === "http:") && url.hostname.includes("linkedin.com");
+    } catch { return false; }
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
+
     if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.type.trim()) newErrors.type = "Partner type is required";
+    else if (formData.name.trim().length < 3) newErrors.name = "Name must be at least 3 characters";
+
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Enter a valid email address";
+
+    if (!formData.country) newErrors.country = "Country is required";
+    if (!formData.type) newErrors.type = "Partner type is required";
+
     if (!formData.phone_number.trim()) newErrors.phone_number = "Phone number is required";
+    else if (formData.phone_number.trim().length < 5) newErrors.phone_number = "Enter a valid phone number";
+
+    if (formData.type === "individual") {
+      if (formData.linkedin_url && !isLinkedInUrl(formData.linkedin_url))
+        newErrors.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://linkedin.com/in/yourname)";
+      if (formData.social_media_url && !isValidUrl(formData.social_media_url))
+        newErrors.social_media_url = "Enter a valid URL starting with https://";
+    }
+
+    if (formData.type === "agency") {
+      if (!formData.company_name.trim()) newErrors.company_name = "Company name is required";
+      else if (formData.company_name.trim().length < 3) newErrors.company_name = "Company name must be at least 3 characters";
+      if (formData.website_url && !isValidUrl(formData.website_url))
+        newErrors.website_url = "Enter a valid URL starting with https://";
+    }
+
     return newErrors;
   };
 

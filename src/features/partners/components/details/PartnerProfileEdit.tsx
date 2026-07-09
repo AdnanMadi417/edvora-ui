@@ -63,7 +63,7 @@ function DocUploadField({
       {doc.uploading ? (
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
           <div className="flex items-center justify-between text-sm text-slate-600">
-            <span>Uploadingâ€¦</span>
+            <span>Uploading…</span>
             <span className="font-medium text-blue-600">{doc.progress}%</span>
           </div>
           <div className="mt-2 h-1.5 w-full rounded-full bg-slate-200">
@@ -177,12 +177,46 @@ export default function EditPartnerProfile() {
 
   const isUploading = idDoc.uploading || companyRegDoc.uploading || contactIdDoc.uploading;
 
+  const isValidUrl = (val: string) => {
+    try {
+      const url = new URL(val);
+      return url.protocol === "https:" || url.protocol === "http:";
+    } catch { return false; }
+  };
+
+  const isLinkedInUrl = (val: string) => {
+    try {
+      const url = new URL(val);
+      return (url.protocol === "https:" || url.protocol === "http:") && url.hostname.includes("linkedin.com");
+    } catch { return false; }
+  };
+
   const validate = () => {
     const e: Record<string, string> = {};
+    const type = partner?.type;
+
     if (!formData.name.trim()) e.name = "Name is required";
-    else if (formData.name.trim().length < 5) e.name = "Name must be at least 5 characters";
+    else if (formData.name.trim().length < 3) e.name = "Name must be at least 3 characters";
+
     if (!formData.country) e.country = "Country is required";
+
     if (!formData.phone_number.trim()) e.phone_number = "Phone number is required";
+    else if (formData.phone_number.trim().length < 5) e.phone_number = "Enter a valid phone number";
+
+    if (type === "individual") {
+      if (formData.linkedin_url && !isLinkedInUrl(formData.linkedin_url))
+        e.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://linkedin.com/in/yourname)";
+      if (formData.social_media_url && !isValidUrl(formData.social_media_url))
+        e.social_media_url = "Enter a valid URL starting with https://";
+    }
+
+    if (type === "agency") {
+      if (!formData.company_name.trim()) e.company_name = "Company name is required";
+      else if (formData.company_name.trim().length < 3) e.company_name = "Company name must be at least 3 characters";
+      if (formData.website_url && !isValidUrl(formData.website_url))
+        e.website_url = "Enter a valid URL starting with https://";
+    }
+
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -377,7 +411,7 @@ export default function EditPartnerProfile() {
             className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Save className="h-4 w-4" />
-            {isUpdating ? "Savingâ€¦" : "Save Changes"}
+            {isUpdating ? "Saving…" : "Save Changes"}
           </button>
         </div>
       </div>

@@ -80,9 +80,9 @@ export default function PartnerRegisterPage() {
   const validateInd = () => {
     const e: Record<string, string> = {};
     if (!indForm.first_name.trim()) e.first_name = "First name is required";
-    else if (indForm.first_name.trim().length < 5) e.first_name = "First name must be at least 5 characters";
+    else if (indForm.first_name.trim().length < 3) e.first_name = "First name must be at least 3 characters";
     if (!indForm.last_name.trim()) e.last_name = "Last name is required";
-    else if (indForm.last_name.trim().length < 5) e.last_name = "Last name must be at least 5 characters";
+    else if (indForm.last_name.trim().length < 3) e.last_name = "Last name must be at least 3 characters";
     if (!indForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(indForm.email)) e.email = "Enter a valid email";
     if (!indForm.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!indForm.country) e.country = "Country is required";
@@ -99,13 +99,13 @@ export default function PartnerRegisterPage() {
   const validateComp = () => {
     const e: Record<string, string> = {};
     if (!compForm.company_name.trim()) e.company_name = "Agency name is required";
-    else if (compForm.company_name.trim().length < 5) e.company_name = "Agency name must be at least 5 characters";
+    else if (compForm.company_name.trim().length < 3) e.company_name = "Agency name must be at least 3 characters";
     if (!compForm.country) e.country = "Country is required";
     if (!compForm.website_url.trim()) e.website_url = "Website or social media URL is required";
     else if (!URL_REGEX.test(compForm.website_url.trim())) e.website_url = "Enter a valid URL (e.g. https://youragency.com)";
     if (!compRegDoc) e.comp_reg_doc = "Please upload your agency registration document";
     if (!compForm.contact_full_name.trim()) e.contact_full_name = "Full name is required";
-    else if (compForm.contact_full_name.trim().length < 5) e.contact_full_name = "Full name must be at least 5 characters";
+    else if (compForm.contact_full_name.trim().length < 3) e.contact_full_name = "Full name must be at least 3 characters";
     if (!compForm.contact_email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(compForm.contact_email)) e.contact_email = "Enter a valid email";
     if (!compForm.contact_phone_number.trim()) e.contact_phone_number = "Phone number is required";
     if (!compContactIdDoc) e.comp_contact_id_doc = "Please upload a passport or national ID";
