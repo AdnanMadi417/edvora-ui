@@ -1,63 +1,49 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { ArrowRight, ArrowLeft, Award, Send, BookOpen, GraduationCap } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Award, Send } from 'lucide-react';
 import PresignedImage from "components/ui/PresignedImage";
 
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 
 import { usePrograms, useStates } from "features/programs/hooks";
-import { programApi } from "features/programs/services";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useUniversities } from "features/universities/hooks";
 
 import ProgramFilterBar from "components/filters/ProgramFilterBar";
-import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from "components/filters/StatsFilterCards";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "next/link";
 
 const ITEMS_PER_PAGE = 9;
 
-const QUAL_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose", "cyan"];
-
 const ProgramsCards = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const [selectedState, setSelectedState] = useState<string>("all");
   const [selectedField, setSelectedField] = useState<string>("all");
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedQualId, setSelectedQualId] = useState<string | null>(null);
+  const [hasScholarship, setHasScholarship] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   const { states } = useStates();
   const { fields } = useAllFields();
   const { qualifications } = useAllQualifications();
   const { universities } = useUniversities();
-
-  const [qualCounts, setQualCounts] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    if (qualifications.length === 0) return;
-    let cancelled = false;
-    Promise.all(
-      qualifications.map((q) =>
-        programApi.programs
-          .list({ qualification_id: q.id, page: 1, page_size: 1 })
-          .then((res) => ({ id: q.id, count: (res.data as any)?.total ?? 0 }))
-          .catch(() => ({ id: q.id, count: 0 }))
-      )
-    ).then((results) => {
-      if (cancelled) return;
-      const map: Record<string, number> = {};
-      results.forEach((r) => { map[r.id] = r.count; });
-      setQualCounts(map);
-    });
-    return () => { cancelled = true; };
-  }, [qualifications.length]);
 
   const fieldOptions = useMemo(() => fields.map((f) => ({ label: f.name, value: f.id })), [fields]);
   const universityOptions = useMemo(() => universities.map((u) => ({ label: u.name, value: u.id })), [universities]);
@@ -71,52 +57,40 @@ const ProgramsCards = () => {
     isFetching: programsFetching,
     error: programsError,
   } = usePrograms({
-    search: searchTerm || undefined,
+    search: debouncedSearch || undefined,
     field_of_study_id: selectedField !== "all" ? selectedField : undefined,
     qualification_id: selectedQualId ?? undefined,
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
+    has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+    sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
-
-  const { total: grandTotal } = usePrograms({ page: 1, page_size: 1 });
-
-  const fixedCards = useMemo<FilterCardItem[]>(() => [
-    { id: null, label: "All Programs", count: grandTotal, icon: BookOpen, colorScheme: "slate" },
-    ...qualifications.map((q, i) => ({
-      id: q.id,
-      label: q.name,
-      count: (qualCounts as Record<string, number | undefined>)[q.id] ?? "—",
-      icon: GraduationCap,
-      colorScheme: QUAL_COLORS[i % QUAL_COLORS.length],
-    })),
-  ], [grandTotal, qualifications, qualCounts]);
-
-  const filteredPrograms = useMemo(() => {
-    if (!Array.isArray(programs)) return [];
-    return programs;
-  }, [programs]);
 
   const activeFiltersCount = [
     selectedState !== "all",
     selectedField !== "all",
     selectedUniversity !== "all",
     selectedQualId !== null,
+    hasScholarship !== "all",
+    sortBy !== "all",
     searchTerm !== "",
   ].filter(Boolean).length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1);
   };
 
   const clearFilters = () => {
     setSearchTerm("");
+    setDebouncedSearch("");
     setSelectedState("all");
     setSelectedField("all");
     setSelectedUniversity("all");
     setSelectedQualId(null);
+    setHasScholarship("all");
+    setSortBy("all");
     setCurrentPage(1);
   };
 
@@ -137,16 +111,6 @@ const ProgramsCards = () => {
             </div>
           </div>
 
-          <div className="hidden sm:block p-6 border-b border-slate-200">
-
-            <StatsFilterCards
-              cards={fixedCards}
-              selectedId={selectedQualId}
-              onSelect={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
-            />
-
-          </div>
-
           <div className="p-6 border-b border-slate-200">
 
             <ProgramFilterBar
@@ -165,6 +129,11 @@ const ProgramsCards = () => {
             selectedQualId={selectedQualId}
             onQualChange={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
             qualificationOptions={qualificationOptions}
+            hasScholarship={hasScholarship}
+            onScholarshipChange={(val) => { setHasScholarship(val); setCurrentPage(1); }}
+            sortBy={sortBy}
+            onSortChange={(val) => { setSortBy(val); setCurrentPage(1); }}
+            resultsCount={total}
             activeFiltersCount={activeFiltersCount}
             onClearFilters={clearFilters}
             showFilters={showFilters}
@@ -180,7 +149,7 @@ const ProgramsCards = () => {
 
           {!programsError &&
             !programsLoading &&
-            filteredPrograms.length === 0 && (
+            programs.length === 0 && (
               <NoMessagesFound
                 title="No programs found"
                 subtitle="Try adjusting your search or filters."
@@ -190,10 +159,10 @@ const ProgramsCards = () => {
           {!programsError && programs.length > 0 && (
             <div className="block">
               <div className={`grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3 transition-opacity duration-150 ${programsFetching && !programsLoading ? "opacity-50 pointer-events-none" : ""}`}>
-                {filteredPrograms.map((program) => (
-                  <a
-                    href={`/partner/knowledge-hub/${program.id}`}
+                {programs.map((program) => (
+                  <div
                     key={program.id}
+                    onClick={() => window.open(`/partner/knowledge-hub/${program.id}`, "_blank")}
                     className="group relative cursor-pointer flex flex-col overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50/40 hover:shadow-md"
                   >
                     {/* Header */}
@@ -306,7 +275,7 @@ const ProgramsCards = () => {
                         Apply Now
                       </Link>
                     </div>
-                  </a>
+                  </div>
                 ))}
               </div>
 

@@ -108,6 +108,7 @@ const ITEMS_PER_PAGE = 10;
 const ProgramsTable = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const { states } = useStates();
@@ -119,7 +120,17 @@ const ProgramsTable = () => {
   const [selectedField, setSelectedField] = useState<string>("all");
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedQualId, setSelectedQualId] = useState<string | null>(null);
+  const [hasScholarship, setHasScholarship] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("all");
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   // Per-qualification counts fetched once in parallel via qualification_id (the proven backend filter)
   const [qualCounts, setQualCounts] = useState<Record<string, number>>({});
@@ -160,11 +171,13 @@ const ProgramsTable = () => {
   const qualificationOptions = useMemo(() => qualifications.map((q) => ({ label: q.name, value: q.id })), [qualifications]);
 
   const { programs, total, loading, isFetching, error, refetch } = usePrograms({
-    search: searchTerm || undefined,
+    search: debouncedSearch || undefined,
     field_of_study_id: selectedField !== "all" ? selectedField : undefined,
     qualification_id: selectedQualId ?? undefined,
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
+    has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+    sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
@@ -190,12 +203,13 @@ const ProgramsTable = () => {
     selectedField !== "all",
     selectedUniversity !== "all",
     selectedQualId !== null,
+    hasScholarship !== "all",
+    sortBy !== "all",
     searchTerm !== "",
   ].filter(Boolean).length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1);
   };
 
 
@@ -236,11 +250,13 @@ const ProgramsTable = () => {
     setIsSelectingAll(true);
     try {
       const baseParams = {
-        search: searchTerm || undefined,
+        search: debouncedSearch || undefined,
         field_of_study_id: selectedField !== "all" ? selectedField : undefined,
         qualification_id: selectedQualId ?? undefined,
         state_id: selectedState !== "all" ? selectedState : undefined,
         university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
+        has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+        sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
       };
       const allIds: string[] = [];
       let page = 1;
@@ -264,7 +280,7 @@ const ProgramsTable = () => {
     setSelectedPrograms((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  useEffect(() => { setSelectedPrograms({}); }, [searchTerm, selectedState, selectedField, selectedUniversity, selectedQualId]);
+  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, sortBy]);
 
   const selectedProgramIds = useMemo(
     () => Object.keys(selectedPrograms).filter((id) => selectedPrograms[id]),
@@ -285,10 +301,13 @@ const ProgramsTable = () => {
 
   const clearFilters = () => {
     setSearchTerm("");
+    setDebouncedSearch("");
     setSelectedState("all");
     setSelectedField("all");
     setSelectedUniversity("all");
     setSelectedQualId(null);
+    setHasScholarship("all");
+    setSortBy("all");
     setCurrentPage(1);
   };
 
@@ -310,14 +329,6 @@ const ProgramsTable = () => {
         </Link>
       </div>
 
-      <div className="hidden sm:block p-6 border-b border-slate-200">
-          <StatsFilterCards
-          cards={fixedCards}
-          selectedId={selectedQualId}
-          onSelect={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
-        />
-      </div>
-
       <div className="p-6 border-b border-slate-200">
 
         {/* Filters */}
@@ -337,6 +348,11 @@ const ProgramsTable = () => {
           selectedQualId={selectedQualId}
           onQualChange={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
           qualificationOptions={qualificationOptions}
+          hasScholarship={hasScholarship}
+          onScholarshipChange={(val) => { setHasScholarship(val); setCurrentPage(1); }}
+          sortBy={sortBy}
+          onSortChange={(val) => { setSortBy(val); setCurrentPage(1); }}
+          resultsCount={total}
           activeFiltersCount={activeFiltersCount}
           onClearFilters={clearFilters}
           showFilters={showPanel}
@@ -499,7 +515,7 @@ const ProgramsTable = () => {
                 <tr
                   key={program.id}
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${selectedPrograms[program.id] ? "bg-slate-50" : ""}`}
-                  onClick={() => router.push(`/admin/knowledge-hub/programs/${program.id}`)}
+                  onClick={() => window.open(`/admin/knowledge-hub/programs/${program.id}`, "_blank")}
                 >
                   {/* Checkbox */}
                   <td className="pl-6" onClick={(e) => e.stopPropagation()}>

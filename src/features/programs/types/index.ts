@@ -116,6 +116,8 @@ export interface GetProgramsParams {
   state_id?: string;
   university_id?: string;
   search?: string;
+  has_scholarship?: boolean;
+  sort_by?: "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc";
   page?: number;
   page_size?: number;
 }

@@ -13,9 +13,8 @@ import {
   GraduationCap,
   ArrowLeft,
   ArrowRight,
-  LayoutGrid,
 } from "lucide-react";
-import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from "components/filters/StatsFilterCards";
+import PipelineCard from "features/applications/partner/components/PipelineCard";
 
 import { useRouter } from "next/navigation";
 import api from "lib/useApi";
@@ -31,7 +30,17 @@ import ApplicationFilterBar from "components/filters/ApplicationFilterBar";
 import { AppDate } from "components/ui/date";
 
 
-const STAGE_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose", "cyan"];
+const ACTION_REQUIRED_STATUSES = new Set([
+  'new_application',
+  'payment_submitted',
+  'eval_under_review',
+  'e-visa_under_review',
+  'visa_documents_under_review',
+  'arrival_confirmed',
+  'extra_arrival_documents_under_review',
+  'issue_response_received',
+  'commission_disputed',
+]);
 
 const getStatusColors = (code: string) => {
   if (!code) return { bg: "bg-gray-100 border-slate-200", text: "text-gray-700" };
@@ -89,12 +98,16 @@ const ModernApplicationsTable = () => {
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [stageCounts, setStageCounts] = useState<Record<string, number>>({});
+  const [stageActionRequired, setStageActionRequired] = useState<Record<string, boolean>>({});
   const [selectedLifecycle, setSelectedLifecycle] = useState<"active" | "hold" | "cancel" | "all">("active");
 
   const itemsPerPage = 10;
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(searchTerm), 400);
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 400);
     return () => clearTimeout(t);
   }, [searchTerm]);
 
@@ -111,20 +124,29 @@ const ModernApplicationsTable = () => {
     resolveManager();
   }, []);
 
+
   useEffect(() => {
     if (stages.length === 0 || !managerId) return;
     let cancelled = false;
     Promise.all(
       stages.map((s) =>
-        api.get(`/account-managers/${managerId}/applications`, { params: { stage_id: s.id, limit: 1, status: selectedLifecycle } })
-          .then((res) => ({ id: s.id, count: (res.data as any)?.total ?? 0 }))
-          .catch(() => ({ id: s.id, count: 0 }))
+        api.get(`/account-managers/${managerId}/applications`, { params: { stage_id: s.id, limit: 10, status: selectedLifecycle } })
+          .then((res) => ({
+            id: s.id,
+            count: (res.data as any)?.total ?? 0,
+            hasAction: ((res.data as any)?.items ?? []).some((app: any) =>
+              ACTION_REQUIRED_STATUSES.has(app.status?.toLowerCase().replace(/\s+/g, '_'))
+            ),
+          }))
+          .catch(() => ({ id: s.id, count: 0, hasAction: false }))
       )
     ).then((results) => {
       if (cancelled) return;
-      const map: Record<string, number> = {};
-      results.forEach((r) => { map[r.id] = r.count; });
-      setStageCounts(map);
+      const counts: Record<string, number> = {};
+      const actionMap: Record<string, boolean> = {};
+      results.forEach((r) => { counts[r.id] = r.count; actionMap[r.id] = r.hasAction; });
+      setStageCounts(counts);
+      setStageActionRequired(actionMap);
     });
     return () => { cancelled = true; };
   }, [stages.length, managerId, selectedLifecycle]);
@@ -139,22 +161,16 @@ const ModernApplicationsTable = () => {
     stage_id: selectedStages ?? undefined,
     stage_status_id: selectedStageStatus !== "all" ? selectedStageStatus : undefined,
     search: debouncedSearch || undefined,
+    university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
   });
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearch, selectedUniversity, selectedStages, selectedStageStatus]);
 
-  const stageCards = useMemo<FilterCardItem[]>(() => [
-    { id: null, label: "All Applications", count: grandTotal, icon: LayoutGrid, colorScheme: "slate" },
-    ...stages.map((s, i) => ({
-      id: s.id,
-      label: s.name,
-      count: stageCounts[s.id] ?? "—",
-      icon: Flag,
-      colorScheme: STAGE_COLORS[i % STAGE_COLORS.length],
-    })),
-  ], [stages, stageCounts, grandTotal]);
+  const totalActionRequired = useMemo(
+    () => stages
+      .filter((s) => stageActionRequired[s.id])
+      .reduce((sum, s) => sum + (stageCounts[s.id] ?? 0), 0),
+    [stages, stageActionRequired, stageCounts]
+  );
 
   const handleSort = (key: string) => {
     setSortConfig((prev) => ({
@@ -167,17 +183,12 @@ const ModernApplicationsTable = () => {
     selectedUniversity !== "all",
     selectedStages !== null,
     selectedStageStatus !== "all",
+    selectedLifecycle !== "active",
     searchTerm !== "",
   ].filter(Boolean).length;
 
   const filteredAndSortedApplications = useMemo(() => {
     let filtered = [...applications];
-
-    if (selectedUniversity !== "all") {
-      filtered = filtered.filter(
-        (app) => app.university_name?.toLowerCase() === selectedUniversity.toLowerCase(),
-      );
-    }
 
     if (sortConfig.key) {
       filtered.sort((a, b) => {
@@ -192,23 +203,14 @@ const ModernApplicationsTable = () => {
     return filtered;
   }, [applications, selectedUniversity, sortConfig]);
 
-  const actionRequiredStatuses = useMemo(() => new Set([
-    'new_application',
-    'payment_submitted',
-    'eval_under_review',
-    'e-visa_under_review',
-    'visa_documents_under_review',
-    'arrival_confirmed',
-    'extra_arrival_documents_under_review',
-    'issue_response_received',
-    'commission_disputed',
-  ]), []);
-
   const needsAction = (status: string) =>
-    actionRequiredStatuses.has(status?.toLowerCase().replace(/\s+/g, '_'));
+    ACTION_REQUIRED_STATUSES.has(status?.toLowerCase().replace(/\s+/g, '_'));
 
   const totalPages = Math.ceil(total / itemsPerPage);
   const paginatedApplications = filteredAndSortedApplications;
+  const displayTotal = paginatedApplications.length < itemsPerPage
+    ? (currentPage - 1) * itemsPerPage + paginatedApplications.length
+    : grandTotal;
 
   const StatusBadge = ({ status }: { status: string }) => {
     const normalized = status?.toLowerCase().replace(/\s+/g, "_") ?? "";
@@ -242,6 +244,7 @@ const ModernApplicationsTable = () => {
     setSelectedStageStatus("all");
     setSelectedLifecycle("active");
     setSortConfig({ key: null, direction: "asc" });
+    setCurrentPage(1);
   };
 
   return (
@@ -255,18 +258,29 @@ const ModernApplicationsTable = () => {
         </div>
       </div>
 
-      <div className="hidden sm:block p-6 border-b border-slate-200">
-        <StatsFilterCards
-          cards={stageCards}
-          selectedId={selectedStages}
-          onSelect={(id) => { setSelectedStages(id); setCurrentPage(1); }}
-        />
-      </div>
+      {grandTotal > 0 && (
+        <div className="p-6 border-b border-slate-200">
+          <PipelineCard
+            stages={stages}
+            stageCounts={stageCounts}
+            stageActionRequired={stageActionRequired}
+            selectedId={selectedStages}
+            onSelect={(id) => { setSelectedStages(id); setCurrentPage(1); }}
+            totalCount={grandTotal}
+            totalActionRequired={totalActionRequired}
+            title="Applications Pipeline"
+            onViewCommission={() => {
+              const commStage = stages.find((s) => s.name.toLowerCase().includes('commission'));
+              if (commStage) { setSelectedStages(commStage.id); setCurrentPage(1); }
+            }}
+          />
+        </div>
+      )}
 
       <div className="border-b border-slate-200 p-6">
         <ApplicationFilterBar
           searchTerm={searchTerm}
-          onSearchChange={(e) => setSearchTerm(e.target.value)}
+          onSearchChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
           selectedStages={selectedStages ?? "all"}
           onStagesChange={(val) => {
             setSelectedStages(val === "all" ? null : val);
@@ -274,12 +288,16 @@ const ModernApplicationsTable = () => {
           }}
           stageOptions={stages.map((s) => ({ label: s.name, value: s.id }))}
           selectedUniversity={selectedUniversity}
-          onUniversityChange={setSelectedUniversity}
-          universityOptions={universities.map((u) => ({ label: u.name, value: u.name }))}
+          onUniversityChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
+          universityOptions={universities.map((u) => ({ label: u.name, value: u.id }))}
           selectedStageStatus={selectedStageStatus}
-          onStageStatusChange={setSelectedStageStatus}
+          onStageStatusChange={(val) => { setSelectedStageStatus(val); setCurrentPage(1); }}
           stageStatusOptions={stageStatuses.map((s) => ({ label: s.name, value: s.id }))}
           stageStatusLoading={stageStatusesLoading}
+          showLifecycleFilter
+          selectedLifecycle={selectedLifecycle}
+          onLifecycleChange={(val) => { setSelectedLifecycle(val as "active" | "hold" | "cancel" | "all"); setCurrentPage(1); }}
+          resultsCount={displayTotal}
           activeFiltersCount={activeFiltersCount}
           onClearFilters={handleClearFilters}
           showFilters={showMobileFilters}
@@ -493,7 +511,7 @@ const ModernApplicationsTable = () => {
 
       <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 p-6 text-sm text-slate-500 md:flex-row">
         <div>
-          {total === 0 ? (
+          {paginatedApplications.length === 0 && !loading ? (
             <span>No results found</span>
           ) : (
             <>
@@ -503,11 +521,11 @@ const ModernApplicationsTable = () => {
               </span>{" "}
               to{" "}
               <span className="font-medium text-slate-700">
-                {Math.min(currentPage * itemsPerPage, total)}
+                {(currentPage - 1) * itemsPerPage + paginatedApplications.length}
               </span>{" "}
               of{" "}
               <span className="font-medium text-slate-700">
-                {total}
+                {displayTotal}
               </span>{" "}
               results
             </>
@@ -522,11 +540,11 @@ const ModernApplicationsTable = () => {
             icon={<ArrowLeft className="h-4 w-4" />}
           />
           <span className="px-2 text-slate-500">
-            Page {currentPage} of {Math.max(totalPages, 1)}
+            Page {currentPage} of {Math.max(Math.ceil(displayTotal / itemsPerPage), 1)}
           </span>
           <NextButton
             onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={currentPage === totalPages || totalPages === 0}
+            disabled={paginatedApplications.length < itemsPerPage}
             text="Next"
             icon={<ArrowRight className="h-4 w-4" />}
           />

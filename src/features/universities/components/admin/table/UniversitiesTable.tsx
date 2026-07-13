@@ -48,7 +48,7 @@ const UniversitiesTable = () => {
   const { showToast } = useToast();
 
 
-  const { universities, loading, error, refetch } = useUniversities();
+  const { universities, loading, error, refetch } = useUniversities({ includeInactive: true });
 
   const { deleteUniversity, isDeleting } = useDeleteUniversity();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);

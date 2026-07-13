@@ -151,7 +151,7 @@ export default function RegisterLogisticalPartner() {
     let error = "";
     if (field === "name") {
       if (!value.trim()) error = "Name is required";
-      else if (value.trim().length < 5) error = "Name must be at least 5 characters";
+      else if (value.trim().length < 3) error = "Name must be at least 3 characters";
       else if (value.trim().length > 255) error = "Name must not exceed 255 characters";
     } else if (field === "phone_number") {
       if (!value.trim()) error = "Phone number is required";
@@ -160,7 +160,7 @@ export default function RegisterLogisticalPartner() {
       if (value.trim().length > 50) error = "WhatsApp number must not exceed 50 characters";
     } else if (field.endsWith(".name")) {
       if (!value.trim()) error = "Package name is required";
-      else if (value.trim().length < 5) error = "Package name must be at least 5 characters";
+      else if (value.trim().length < 3) error = "Package name must be at least 3 characters";
       else if (value.trim().length > 255) error = "Package name must not exceed 255 characters";
     }
     setErrors((prev) => ({ ...prev, [field]: error }));
@@ -181,8 +181,8 @@ export default function RegisterLogisticalPartner() {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) {
       newErrors.name = "Name is required";
-    } else if (formData.name.trim().length < 5) {
-      newErrors.name = "Name must be at least 5 characters";
+    } else if (formData.name.trim().length < 3) {
+      newErrors.name = "Name must be at least 3 characters";
     } else if (formData.name.trim().length > 255) {
       newErrors.name = "Name must not exceed 255 characters";
     }
@@ -207,8 +207,8 @@ export default function RegisterLogisticalPartner() {
     formData.packages_offered.forEach((pkg, i) => {
       if (!pkg.name.trim()) {
         newErrors[`packages_offered[${i}].name`] = "Package name is required";
-      } else if (pkg.name.trim().length < 5) {
-        newErrors[`packages_offered[${i}].name`] = "Package name must be at least 5 characters";
+      } else if (pkg.name.trim().length < 3) {
+        newErrors[`packages_offered[${i}].name`] = "Package name must be at least 3 characters";
       } else if (pkg.name.trim().length > 255) {
         newErrors[`packages_offered[${i}].name`] = "Package name must not exceed 255 characters";
       }
