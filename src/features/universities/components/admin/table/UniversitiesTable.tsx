@@ -48,7 +48,7 @@ const UniversitiesTable = () => {
   const { showToast } = useToast();
 
 
-  const { universities, loading, error, refetch } = useUniversities();
+  const { universities, loading, error, refetch } = useUniversities({ includeInactive: true });
 
   const { deleteUniversity, isDeleting } = useDeleteUniversity();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -493,7 +493,7 @@ const UniversitiesTable = () => {
                               key={index}
                               className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
                             >
-                                      <AppDate value={date} format="short" />
+                                      <AppDate value={date} format="month" />
                                     </span>
                           )
                         )

@@ -15,9 +15,8 @@ export type PartnerApplication = {
   stage: string;
   status: string;
   next_action: string;
-  lifecycle_status: "active" | "hold" | "cancel";
-  partner_name?: string;
-  account_manager_name?: string;
+  lifecycle_status: string;
+  new_notifications_count: number;
 };
 
 export type PartnerApplicationsResponse = {
@@ -32,16 +31,22 @@ export type UsePartnerApplicationsParams = {
   limit?: number;
   offset?: number;
   status?: "active" | "hold" | "cancel" | "all";
-  stage?: string;
+  stage_id?: string;
+  stage_status_id?: string;
+  search?: string;
+  university_id?: string;
 };
 
 export function usePartnerApplications({
-                                         partnerId,
-                                         limit = 20,
-                                         offset = 0,
-                                         status = "active",
-                                         stage,
-                                       }: UsePartnerApplicationsParams) {
+  partnerId,
+  limit = 20,
+  offset = 0,
+  status = "active",
+  stage_id,
+  stage_status_id,
+  search,
+  university_id,
+}: UsePartnerApplicationsParams) {
   const [data, setData] = useState<PartnerApplicationsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +63,13 @@ export function usePartnerApplications({
       const res = await api.get<PartnerApplicationsResponse>(
         `/partners/${partnerId}/applications`,
         {
-          params: { limit, offset, status },
+          params: {
+            limit, offset, status,
+            ...(stage_id ? { stage_id } : {}),
+            ...(stage_status_id ? { stage_status_id } : {}),
+            ...(search ? { search } : {}),
+            ...(university_id ? { university_id } : {}),
+          },
           headers: token
             ? { Authorization: `Bearer ${token}` }
             : {},
@@ -76,7 +87,7 @@ export function usePartnerApplications({
 
   useEffect(() => {
     fetchApplications();
-  }, [partnerId, limit, offset, status]);
+  }, [partnerId, limit, offset, status, stage_id, stage_status_id, search, university_id]);
 
   return {
     items: data?.items ?? [],

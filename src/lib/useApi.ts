@@ -34,3 +34,8 @@ api.interceptors.response.use(
 );
 
 export default api;
+
+// No interceptors — safe for public endpoints where a logged-in user's token must NOT be sent
+export const publicApi = axios.create({
+  baseURL: `${API_URL}/api`,
+});

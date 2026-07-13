@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicRoutes = ["/auth/sign-in", "/unauthorized", "/", "/api/health", "/api/auth/logout"];
+const publicRoutes = ["/auth/sign-in", "/auth/register", "/auth/forgot-password", "/auth/partner-reset-password", "/reset-password", "/unauthorized", "/", "/api/health", "/api/auth/logout"];
 
 const protectedPrefixes: Record<string, string[]> = {
   "/admin": ["admin"],

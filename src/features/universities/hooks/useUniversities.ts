@@ -4,7 +4,7 @@ import type { University } from "../types";
 
 const PAGE_SIZE = 100; // API maximum
 
-export function useUniversities() {
+export function useUniversities({ includeInactive = false }: { includeInactive?: boolean } = {}) {
   const [universities, setUniversities] = useState<University[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -13,7 +13,10 @@ export function useUniversities() {
     setLoading(true);
     setError(null);
     try {
-      const first = await universityApi.universities.list({ page: 1, page_size: PAGE_SIZE });
+      const baseParams: Record<string, unknown> = { page: 1, page_size: PAGE_SIZE };
+      if (includeInactive) baseParams.include_inactive_universities = true;
+
+      const first = await universityApi.universities.list(baseParams);
       const { items: firstItems = [], total = 0 } = first.data ?? {};
 
       const totalPages = Math.ceil(total / PAGE_SIZE);
@@ -26,7 +29,7 @@ export function useUniversities() {
       // Only reached if total > 100 — fetch remaining pages concurrently
       const rest = await Promise.all(
         Array.from({ length: totalPages - 1 }, (_, i) =>
-          universityApi.universities.list({ page: i + 2, page_size: PAGE_SIZE })
+          universityApi.universities.list({ ...baseParams, page: i + 2 })
         )
       );
 
@@ -41,7 +44,7 @@ export function useUniversities() {
     }
   };
 
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => { fetch(); }, [includeInactive]);
 
   return { universities, loading, error, refetch: fetch };
 }

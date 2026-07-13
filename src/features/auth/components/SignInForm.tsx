@@ -1,18 +1,16 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useSignIn } from "../hooks";
+
 import InputField from "components/form/fields/InputField";
 import PasswordField from "components/form/fields/PasswordField";
 
-interface SignInFormProps {
-  onSubmit: (email: string, password: string, keepLoggedIn: boolean) => Promise<void> | void;
-}
-
-export default function SignInForm({ onSubmit }: SignInFormProps) {
+export default function SignInForm() {
+  const { signIn, loading, error } = useSignIn();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
 
   const isDisabled = loading || !formData.email || !formData.password;
 
@@ -40,25 +38,15 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    setLoading(true);
-    try {
-      await onSubmit(formData.email, formData.password, false);
-    } finally {
-      setLoading(false);
-    }
+    await signIn(formData.email, formData.password);
   };
 
   return (
     <div>
-      <form
-        className="flex w-full max-w-[400px] flex-col gap-4"
-        onSubmit={handleSubmit}
-      >
+      <form className="flex w-full max-w-[400px] flex-col gap-4" onSubmit={handleSubmit}>
         <div className="mb-4 text-center">
           <h1 className="text-2xl font-bold text-slate-900">Sign In</h1>
-          <p className="mt-1.5 text-sm text-slate-500">
-            Welcome back! Sign in to get started
-          </p>
+          <p className="mt-1.5 text-sm text-slate-500">Welcome back! Sign in to get started</p>
         </div>
 
         <div className="block">
@@ -72,25 +60,29 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
             updateFormData={updateFormData}
           />
 
-          <div>
-            <PasswordField
-              label="Password"
-              field="password"
-              placeholder="Enter your password"
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-            />
-            <div className="mt-1 text-right">
-              <Link
-                href="/auth/forgot-password"
-                className="text-sm text-slate-500 hover:text-blue-600 transition-colors"
-              >
-                Forgot Password?
-              </Link>
-            </div>
+          <PasswordField
+            label="Password"
+            field="password"
+            placeholder="Enter your password"
+            formData={formData}
+            errors={errors}
+            updateFormData={updateFormData}
+          />
+          <div className="mt-1 flex justify-end">
+            <Link
+              href="/auth/forgot-password"
+              className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
+            >
+              Forgot password?
+            </Link>
           </div>
         </div>
+
+        {error && (
+          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+            {error}
+          </p>
+        )}
 
         <button
           type="submit"
@@ -101,9 +93,9 @@ export default function SignInForm({ onSubmit }: SignInFormProps) {
         </button>
 
         <p className="text-center text-sm text-slate-500">
-          Not registered yet?{" "}
-          <Link href="/auth/sign-up" className="font-medium text-blue-600 hover:underline">
-            Sign Up
+          Want to become a partner?{" "}
+          <Link href="/auth/register" className="font-medium text-blue-600 hover:underline">
+            Join Now
           </Link>
         </p>
       </form>

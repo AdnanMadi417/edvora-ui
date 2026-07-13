@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState } from "react";
 import { Pencil, Check, X, Settings, Plus } from "lucide-react";
@@ -32,8 +32,8 @@ const LogisticalPartnersServicesConfig = () => {
 
   const handleSave = async (serviceId: string) => {
     if (!editingName.trim()) return;
-    if (editingName.trim().length < 5) {
-      showToast("Name must be at least 5 characters.", "error");
+    if (editingName.trim().length < 3) {
+      showToast("Name must be at least 3 characters.", "error");
       return;
     }
     if (editingName.trim().length > 255) {

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
-import { LogOut, Settings, Bell } from "lucide-react";
+import { KeyRound, LogOut, Settings, Bell } from "lucide-react";
 import NavLink from "components/link/NavLink";
 import Link from "next/link";
 import api, { setLoggingOut, SIGN_IN_URL } from "../../lib/useApi";
@@ -11,6 +11,8 @@ import api, { setLoggingOut, SIGN_IN_URL } from "../../lib/useApi";
 import { useMe } from "hooks/useMe";
 import { profileRouteMap, notificationsRouteMap } from "components/navbar/config/navigation";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
+import { useToast } from "components/context/ToastContext";
+import ChangePasswordPopup from "features/partners/components/popups/ChangePasswordPopup";
 
 const Navbar = ({
                   onOpenSidenav,
@@ -27,7 +29,23 @@ const Navbar = ({
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
   const { user, loading } = useMe();
+  const { showToast } = useToast();
+
+  const handleSendResetLink = async () => {
+    if (!user?.email || isSendingReset) return;
+    setIsSendingReset(true);
+    try {
+      await api.post("/auth/forgot-password", { email: user.email });
+    } catch {
+      // always show success to prevent enumeration
+    } finally {
+      setIsSendingReset(false);
+      showToast("Password reset link sent to your email.", "success");
+    }
+  };
   const { unreadCount, refetch: refetchUnreadCount } = useUnreadCount({ pollIntervalMs: 30000 });
 
   useEffect(() => {
@@ -86,6 +104,10 @@ const Navbar = ({
   };
 
   return (
+    <>
+    {user?.role === "partner" && (
+      <ChangePasswordPopup isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
+    )}
     <nav
       className={`sticky z-40 flex flex-wrap items-center justify-between rounded-md bg-brand-50/10 p-2 backdrop-blur-xl transition-all duration-300 ${
         isScrolled ? "top-0" : "top-4"
@@ -169,6 +191,29 @@ const Navbar = ({
                 <span>Profile Settings</span>
               </Link>
 
+              {user?.role === "partner" && (
+                <button
+                  type="button"
+                  onClick={() => setShowChangePassword(true)}
+                  className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-slate-900"
+                >
+                  <KeyRound className="h-4 w-4 text-text-secondary group-hover:text-slate-900" />
+                  <span>Change Password</span>
+                </button>
+              )}
+
+              {(user?.role === "admin" || user?.role === "account_manager") && (
+                <button
+                  type="button"
+                  onClick={handleSendResetLink}
+                  disabled={isSendingReset}
+                  className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <KeyRound className="h-4 w-4 text-text-secondary group-hover:text-slate-900" />
+                  <span>{isSendingReset ? "Sending…" : "Reset Password"}</span>
+                </button>
+              )}
+
               <button
                 onClick={handleLogout}
                 disabled={isLoggingOut}
@@ -184,6 +229,7 @@ const Navbar = ({
         </Dropdown>
       </div>
     </nav>
+    </>
   );
 };
 

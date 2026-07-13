@@ -6,7 +6,6 @@ export type AccountManagerApplication = {
   updated_at: string;
   partner_id: string;
   partner_name: string;
-  account_manager_name: string;
   program_name: string;
   university_name: string;
   student_name: string;
@@ -18,6 +17,7 @@ export type AccountManagerApplication = {
   status: string;
   next_action: string;
   lifecycle_status: "active" | "hold" | "cancel";
+  new_notifications_count: number;
 };
 
 export type AccountManagerApplicationsResponse = {
@@ -32,7 +32,10 @@ export type UseAccountManagerApplicationsParams = {
   limit?: number;
   offset?: number;
   status?: "active" | "hold" | "cancel" | "all";
-  stage?: string;
+  stage_id?: string;
+  stage_status_id?: string;
+  search?: string;
+  university_id?: string;
 };
 
 export function useAccountManagerApplications({
@@ -40,7 +43,10 @@ export function useAccountManagerApplications({
   limit = 20,
   offset = 0,
   status = "active",
-  stage,
+  stage_id,
+  stage_status_id,
+  search,
+  university_id,
 }: UseAccountManagerApplicationsParams) {
   const [data, setData] = useState<AccountManagerApplicationsResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -55,7 +61,15 @@ export function useAccountManagerApplications({
     try {
       const res = await api.get<AccountManagerApplicationsResponse>(
         `/account-managers/${managerId}/applications`,
-        { params: { limit, offset, status } }
+        {
+          params: {
+            limit, offset, status,
+            ...(stage_id ? { stage_id } : {}),
+            ...(stage_status_id ? { stage_status_id } : {}),
+            ...(search ? { search } : {}),
+            ...(university_id ? { university_id } : {}),
+          },
+        }
       );
 
       setData(res.data);
@@ -69,7 +83,7 @@ export function useAccountManagerApplications({
 
   useEffect(() => {
     fetchApplications();
-  }, [managerId, limit, offset, status]);
+  }, [managerId, limit, offset, status, stage_id, stage_status_id, search, university_id]);
 
   return {
     items: data?.items ?? [],

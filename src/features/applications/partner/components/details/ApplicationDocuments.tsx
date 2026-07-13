@@ -81,7 +81,7 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
     const isDownloading = downloading === doc.id;
 
     return (
-      <div className="flex items-center justify-between rounded-lg border border-gray-200 p-4 transition-colors hover:bg-slate-50">
+      <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50">
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary">
             {icon}
@@ -108,7 +108,7 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
         <button
           onClick={() => doc.file_key && handleDownload(doc.file_key, doc.id)}
           disabled={!doc.file_key || !!downloading}
-          className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-40"
+          className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-40"
           title="Download"
         >
           <Download className={`h-4 w-4 ${isDownloading ? 'animate-pulse' : ''}`} />
@@ -132,11 +132,9 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
   };
 
   return (
-    <section className="mb-6 mt-6 max-w-5xl mx-auto rounded-lg bg-card">
+    <>
       <div
-        className={`group flex cursor-pointer items-center justify-between border border-gray-200 p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80 ${
-          showDocs ? 'rounded-t-lg' : 'rounded-lg'
-        }`}
+        className="group flex cursor-pointer items-center justify-between p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80"
         onClick={() => setShowDocs(!showDocs)}
       >
         <div className="flex items-center gap-3 sm:gap-4">
@@ -183,7 +181,7 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
       </div>
 
       {showDocs && (
-        <div className="space-y-6 rounded-b-lg border border-t-0 border-gray-200 bg-card p-6">
+        <div className="space-y-6 border-t border-slate-200 p-6">
           {allDocs.map((doc: any) => <DocRow key={doc.id} doc={doc} />)}
           <DocGroup label="Payment Documents" docs={paymentDocuments} />
           <DocGroup label="Arrival Documents" docs={arrivalDocuments} />
@@ -193,6 +191,6 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
           <DocGroup label="Commission Documents" docs={commissionDocuments} />
         </div>
       )}
-    </section>
+    </>
   );
 }

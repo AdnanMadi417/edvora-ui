@@ -38,7 +38,7 @@ import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
+import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from "components/filters/StatsFilterCards";
 import ProgramFilterBar from "components/filters/ProgramFilterBar";
 
 import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
@@ -53,6 +53,8 @@ import BatchBranchPrograms from "features/programs/components/admin/popups/Batch
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
 
 type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "deleteScholarships" | "fees" | "visaFee" | "branch";
+
+const QUAL_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose", "cyan"];
 
 
 function ProgramUniversityCell({ program }: { program: Program }) {
@@ -106,6 +108,7 @@ const ITEMS_PER_PAGE = 10;
 const ProgramsTable = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const { states } = useStates();
@@ -117,7 +120,17 @@ const ProgramsTable = () => {
   const [selectedField, setSelectedField] = useState<string>("all");
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
   const [selectedQualId, setSelectedQualId] = useState<string | null>(null);
+  const [hasScholarship, setHasScholarship] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("all");
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   // Per-qualification counts fetched once in parallel via qualification_id (the proven backend filter)
   const [qualCounts, setQualCounts] = useState<Record<string, number>>({});
@@ -158,11 +171,13 @@ const ProgramsTable = () => {
   const qualificationOptions = useMemo(() => qualifications.map((q) => ({ label: q.name, value: q.id })), [qualifications]);
 
   const { programs, total, loading, isFetching, error, refetch } = usePrograms({
-    search: searchTerm || undefined,
+    search: debouncedSearch || undefined,
     field_of_study_id: selectedField !== "all" ? selectedField : undefined,
     qualification_id: selectedQualId ?? undefined,
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
+    has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+    sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
@@ -170,16 +185,16 @@ const ProgramsTable = () => {
   // Unfiltered grand total for the "All Programs" card
   const { total: grandTotal } = usePrograms({ page: 1, page_size: 1 });
 
-  const bachelorQual = useMemo(() => qualifications.find((q) => q.name.toLowerCase().includes("bachelor")), [qualifications]);
-  const masterQual = useMemo(() => qualifications.find((q) => q.name.toLowerCase().includes("master")), [qualifications]);
-  const phdQual = useMemo(() => qualifications.find((q) => q.name.toLowerCase().includes("phd") || q.name.toLowerCase().includes("doctoral")), [qualifications]);
-
   const fixedCards = useMemo<FilterCardItem[]>(() => [
     { id: null, label: "All Programs", count: grandTotal, icon: BookOpen, colorScheme: "slate" },
-    { id: bachelorQual?.id ?? "__bachelor", label: "Bachelor's Degree", count: bachelorQual ? ((qualCounts as Record<string, number | undefined>)[bachelorQual.id] ?? "—") : "—", icon: GraduationCap, colorScheme: "blue", disabled: !bachelorQual },
-    { id: masterQual?.id ?? "__master", label: "Master's Degree", count: masterQual ? ((qualCounts as Record<string, number | undefined>)[masterQual.id] ?? "—") : "—", icon: GraduationCap, colorScheme: "violet", disabled: !masterQual },
-    { id: phdQual?.id ?? "__phd", label: "PhD Degree", count: phdQual ? ((qualCounts as Record<string, number | undefined>)[phdQual.id] ?? "—") : "—", icon: GraduationCap, colorScheme: "emerald", disabled: !phdQual },
-  ], [grandTotal, bachelorQual, masterQual, phdQual, qualCounts]);
+    ...qualifications.map((q, i) => ({
+      id: q.id,
+      label: q.name,
+      count: (qualCounts as Record<string, number | undefined>)[q.id] ?? "—",
+      icon: GraduationCap,
+      colorScheme: QUAL_COLORS[i % QUAL_COLORS.length],
+    })),
+  ], [grandTotal, qualifications, qualCounts]);
 
   const totalPages = Math.max(1, Math.ceil(total / ITEMS_PER_PAGE));
 
@@ -188,12 +203,13 @@ const ProgramsTable = () => {
     selectedField !== "all",
     selectedUniversity !== "all",
     selectedQualId !== null,
+    hasScholarship !== "all",
+    sortBy !== "all",
     searchTerm !== "",
   ].filter(Boolean).length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    setCurrentPage(1);
   };
 
 
@@ -234,11 +250,13 @@ const ProgramsTable = () => {
     setIsSelectingAll(true);
     try {
       const baseParams = {
-        search: searchTerm || undefined,
+        search: debouncedSearch || undefined,
         field_of_study_id: selectedField !== "all" ? selectedField : undefined,
         qualification_id: selectedQualId ?? undefined,
         state_id: selectedState !== "all" ? selectedState : undefined,
         university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
+        has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+        sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
       };
       const allIds: string[] = [];
       let page = 1;
@@ -262,7 +280,7 @@ const ProgramsTable = () => {
     setSelectedPrograms((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  useEffect(() => { setSelectedPrograms({}); }, [searchTerm, selectedState, selectedField, selectedUniversity, selectedQualId]);
+  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, sortBy]);
 
   const selectedProgramIds = useMemo(
     () => Object.keys(selectedPrograms).filter((id) => selectedPrograms[id]),
@@ -283,18 +301,21 @@ const ProgramsTable = () => {
 
   const clearFilters = () => {
     setSearchTerm("");
+    setDebouncedSearch("");
     setSelectedState("all");
     setSelectedField("all");
     setSelectedUniversity("all");
     setSelectedQualId(null);
+    setHasScholarship("all");
+    setSortBy("all");
     setCurrentPage(1);
   };
 
   return (
-    <div className="mt-6 max-w-5xl mx-auto text-p2 rounded-lg border border-slate-200 bg-white p-6">
+    <div className="mt-6 max-w-5xl mx-auto text-p2 rounded-lg border border-slate-200 bg-white">
 
       {/* Header */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
         <div>
           <h3 className="text-xl font-semibold text-slate-900">Knowledge Hub</h3>
           <p className="mt-1 text-sm text-slate-500">Explore and manage all programs, universities, and learning resources</p>
@@ -308,84 +329,84 @@ const ProgramsTable = () => {
         </Link>
       </div>
 
-      {/* Stats Cards */}
-      <StatsFilterCards
-        cards={fixedCards}
-        selectedId={selectedQualId}
-        onSelect={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
-      />
+      <div className="p-6 border-b border-slate-200">
 
-      {/* Filters */}
-      <ProgramFilterBar
-        searchTerm={searchTerm}
-        onSearchChange={handleSearchChange}
-        searchPlaceholder="Search by university, program, or level..."
-        selectedState={selectedState}
-        onStateChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
-        stateOptions={stateOptions}
-        selectedField={selectedField}
-        onFieldChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
-        fieldOptions={fieldOptions}
-        selectedUniversity={selectedUniversity}
-        onUniversityChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
-        universityOptions={universityOptions}
-        selectedQualId={selectedQualId}
-        onQualChange={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
-        qualificationOptions={qualificationOptions}
-        activeFiltersCount={activeFiltersCount}
-        onClearFilters={clearFilters}
-        showFilters={showPanel}
-        onToggleFilters={() => setShowPanel((v) => !v)}
-      >
-        {/* Bulk operations */}
-        {selectedCount > 0 && (
-          <div className="flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50/60 px-3 py-1.5">
-            <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
-              <CheckCircle className="h-4 w-4" />
-              {selectedCount} selected
-            </span>
+        {/* Filters */}
+        <ProgramFilterBar
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+          searchPlaceholder="Search by university, program, or level..."
+          selectedState={selectedState}
+          onStateChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
+          stateOptions={stateOptions}
+          selectedField={selectedField}
+          onFieldChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
+          fieldOptions={fieldOptions}
+          selectedUniversity={selectedUniversity}
+          onUniversityChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
+          universityOptions={universityOptions}
+          selectedQualId={selectedQualId}
+          onQualChange={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
+          qualificationOptions={qualificationOptions}
+          hasScholarship={hasScholarship}
+          onScholarshipChange={(val) => { setHasScholarship(val); setCurrentPage(1); }}
+          sortBy={sortBy}
+          onSortChange={(val) => { setSortBy(val); setCurrentPage(1); }}
+          resultsCount={total}
+          activeFiltersCount={activeFiltersCount}
+          onClearFilters={clearFilters}
+          showFilters={showPanel}
+          onToggleFilters={() => setShowPanel((v) => !v)}
+        >
+          {/* Bulk operations */}
+          {selectedCount > 0 && (
+            <div className="flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50/60 px-3 py-1.5">
+              <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
+                <CheckCircle className="h-4 w-4" />
+                {selectedCount} selected
+              </span>
 
-            <div className="mx-1 h-4 w-px bg-slate-200" />
+              <div className="mx-1 h-4 w-px bg-slate-200" />
 
-            <div className="relative">
-              <button
-                onClick={() => setIsBulkMenuOpen((prev) => !prev)}
-                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${isBulkMenuOpen ? "bg-white text-blue-700 shadow-sm" : "text-slate-600 hover:bg-white hover:text-blue-700 hover:shadow-sm"}`}
-              >
-                <Settings className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Bulk Update</span>
-                <svg className={`h-3 w-3 transition-transform ${isBulkMenuOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setIsBulkMenuOpen((prev) => !prev)}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${isBulkMenuOpen ? "bg-white text-blue-700 shadow-sm" : "text-slate-600 hover:bg-white hover:text-blue-700 hover:shadow-sm"}`}
+                >
+                  <Settings className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Bulk Update</span>
+                  <svg className={`h-3 w-3 transition-transform ${isBulkMenuOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
-              {isBulkMenuOpen && (
-                <>
-                  <div className="fixed inset-0 z-[90]" onClick={() => setIsBulkMenuOpen(false)} />
-                  <div className="absolute left-0 top-full z-[100] mt-2 w-52 rounded-2xl border border-slate-100 bg-white p-1.5 shadow-xl shadow-slate-200/60">
-                    {[
-                      { label: "Commission", icon: <Pencil className="h-3.5 w-3.5 text-blue-600" />, bg: "bg-blue-50", onClick: () => setActiveModal("commission") },
-                      { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("ielts") },
-                      { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setActiveModal("intakes") },
-                      { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setActiveModal("scholarship") },
-                      { label: "Delete Scholarships", icon: <Trash2 className="h-3.5 w-3.5 text-red-600" />, bg: "bg-red-50", onClick: () => setActiveModal("deleteScholarships") },
-                      { label: "Tuition Fees", icon: <DollarSign className="h-3.5 w-3.5 text-green-600" />, bg: "bg-green-50", onClick: () => setActiveModal("fees") },
-                      { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setActiveModal("visaFee") },
-                      ...(sharedUniversityId ? [{ label: "Branch", icon: <GitBranch className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("branch") }] : []),
-                    ].map(({ label, icon, bg, onClick }) => (
-                      <button
-                        key={label}
-                        onClick={() => { onClick(); setIsBulkMenuOpen(false); }}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50"
-                      >
-                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${bg}`}>{icon}</span>
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
+                {isBulkMenuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-[90]" onClick={() => setIsBulkMenuOpen(false)} />
+                    <div className="absolute left-0 top-full z-[100] mt-2 w-52 rounded-lg border border-slate-100 bg-white p-1.5 shadow-xl shadow-slate-200/60">
+                      {[
+                        { label: "Commission", icon: <Pencil className="h-3.5 w-3.5 text-blue-600" />, bg: "bg-blue-50", onClick: () => setActiveModal("commission") },
+                        { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("ielts") },
+                        { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setActiveModal("intakes") },
+                        { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setActiveModal("scholarship") },
+                        { label: "Delete Scholarships", icon: <Trash2 className="h-3.5 w-3.5 text-red-600" />, bg: "bg-red-50", onClick: () => setActiveModal("deleteScholarships") },
+                        { label: "Tuition Fees", icon: <DollarSign className="h-3.5 w-3.5 text-green-600" />, bg: "bg-green-50", onClick: () => setActiveModal("fees") },
+                        { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setActiveModal("visaFee") },
+                        ...(sharedUniversityId ? [{ label: "Branch", icon: <GitBranch className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("branch") }] : []),
+                      ].map(({ label, icon, bg, onClick }) => (
+                        <button
+                          key={label}
+                          onClick={() => { onClick(); setIsBulkMenuOpen(false); }}
+                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50"
+                        >
+                          <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${bg}`}>{icon}</span>
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
 
             <div className="mx-1 h-4 w-px bg-slate-200" />
 
@@ -400,8 +421,14 @@ const ProgramsTable = () => {
         )}
       </ProgramFilterBar>
 
-      {/* Table */}
-      <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
+      </div>
+
+      <div>
+
+        <div className="p-6">
+
+             {/* Table */}
+      <div className="overflow-hidden rounded-lg border border-slate-200">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -488,7 +515,7 @@ const ProgramsTable = () => {
                 <tr
                   key={program.id}
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${selectedPrograms[program.id] ? "bg-slate-50" : ""}`}
-                  onClick={() => router.push(`/admin/knowledge-hub/programs/${program.id}`)}
+                  onClick={() => window.open(`/admin/knowledge-hub/programs/${program.id}`, "_blank")}
                 >
                   {/* Checkbox */}
                   <td className="pl-6" onClick={(e) => e.stopPropagation()}>
@@ -504,7 +531,7 @@ const ProgramsTable = () => {
                   {/* Program Info */}
                   <td className="min-w-[260px] max-w-[380px] px-6 py-4">
                     <div className="flex items-start gap-3">
-                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-slate-200 ring-offset-2 shadow-sm">
+                      <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-slate-200 ring-offset-2">
                         {program.university?.logo_file_key ? (
                           <PresignedImage
                             fileKey={program.university.logo_file_key}
@@ -584,7 +611,7 @@ const ProgramsTable = () => {
                   <td className="px-6 py-4">
                     <div className="flex flex-col gap-1 text-xs text-slate-600">
                       <span className="font-medium text-slate-700">
-                        <AppDate value={program.next_intake} format="short" fallback="TBA" />
+                        <AppDate value={program.next_intake} format="month" fallback="TBA" />
                       </span>
                       {program.intake_dates && program.intake_dates.length > 0 && (
                         <span className="text-slate-400">
@@ -682,6 +709,10 @@ const ProgramsTable = () => {
         </div>
       </div>
 
+        </div>
+
+      </div>
+    
       <DeleteProgramsConfirmation
         isOpen={isDeleteOpen}
         onClose={() => { setIsDeleteOpen(false); setSelectedProgramId(null); setDeleteMode(null); }}

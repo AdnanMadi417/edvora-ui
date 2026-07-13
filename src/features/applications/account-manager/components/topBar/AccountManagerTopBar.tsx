@@ -1,13 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ChevronLeft,
-  MoreVertical,
-  Clock,
-  ExternalLink,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, RefreshCw } from "lucide-react";
 import HoldPopup from "features/applications/account-manager/components/popups/Hold";
 import UpdateStatus from "features/applications/account-manager/components/popups/UpdateStatus";
 
@@ -17,50 +12,12 @@ interface Props {
 }
 
 export default function AccountManagerTopBar({ application, onRefetch }: Props) {
-
   const router = useRouter();
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showHoldPopup, setShowHoldPopup] = useState(false);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsDropdownOpen(false);
-      }
-    }
-
-    if (isDropdownOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isDropdownOpen]);
-
-  const handleBack = () => {
-    setIsDropdownOpen(false);
-    router.push("/account-manager/applications");
-  };
-
-  const handleHold = () => {
-    setIsDropdownOpen(false);
-    setShowHoldPopup(true);
-  };
-
-  const handleConfirmHold = (_reason: string) => {
-    setShowHoldPopup(false);
-  };
-
-  const handleUpdateStatus = () => {
-    setShowUpdatePopup(true);
-  };
+  const studentName = application?.student?.name ?? "Application";
 
   const handleConfirmUpdate = () => {
     setShowUpdatePopup(false);
@@ -68,87 +25,49 @@ export default function AccountManagerTopBar({ application, onRefetch }: Props) 
   };
 
   return (
-    <section className="w-full">
-      <div className="mx-auto max-w-7xl">
-          <div className="flex flex-wrap items-center justify-between gap-3 py-3 sm:h-16 sm:gap-6">
-            <div className="flex items-center gap-2 sm:gap-6">
-              <button
-                onClick={handleBack}
-                className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
-              >
-                <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="hidden sm:inline">Back to Applications</span>
-              </button>
-              <div className="hidden h-8 border-l border-gray-200 sm:block" />
-            </div>
+    <>
+      <div className="flex items-center justify-between gap-4 px-6 py-3.5">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-1.5 text-sm">
+          <button
+            onClick={() => router.push("/account-manager/applications")}
+            className="flex items-center gap-1 text-slate-500 transition-colors hover:text-slate-800"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Applications</span>
+          </button>
+          <ChevronRight className="hidden h-3.5 w-3.5 text-slate-300 sm:block" />
+          <span className="hidden max-w-[200px] truncate font-medium text-slate-800 sm:block">
+            {studentName}
+          </span>
+        </div>
 
-            <div className="flex items-center gap-2 sm:gap-3">
-              <button
-                onClick={handleUpdateStatus}
-                className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-              >
-                Update Status
-              </button>
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowHoldPopup(true)}
+            className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 transition-all hover:border-amber-300 hover:bg-amber-100"
+          >
+            <Clock className="h-4 w-4" />
+            <span className="hidden sm:inline">Hold</span>
+          </button>
 
-              <div className="relative" ref={dropdownRef}>
-                <button
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  Actions
-                  <MoreVertical className="h-4 w-4" />
-                </button>
-
-                {isDropdownOpen && (
-                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
-                    <div className="p-2">
-                      <button
-                        onClick={handleHold}
-                        className="group flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-amber-50 hover:text-amber-900"
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-100 text-amber-600 group-hover:bg-amber-200">
-                          <Clock className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium">Update Application Status</div>
-                          <div className="text-xs text-slate-500">
-                            Manage the application's status
-                          </div>
-                        </div>
-                      </button>
-
-                      <div className="my-1 h-px bg-slate-100" />
-
-                      <div className="my-1 h-px bg-slate-100" />
-
-                      <button
-                        onClick={handleBack}
-                        className="group flex w-full items-center gap-3 rounded-md px-4 py-3 text-left text-sm font-medium text-slate-700 transition-all hover:bg-blue-50 hover:text-blue-900"
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 text-blue-600 group-hover:bg-blue-200">
-                          <ExternalLink className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="font-medium">Open Applications</div>
-                          <div className="text-xs text-slate-500">
-                            View all applications
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          <button
+            onClick={() => setShowUpdatePopup(true)}
+            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700"
+          >
+            <RefreshCw className="h-4 w-4" />
+            <span>Update Status</span>
+          </button>
+        </div>
       </div>
 
       <HoldPopup
         isOpen={showHoldPopup}
         onClose={() => setShowHoldPopup(false)}
-        onConfirm={handleConfirmHold}
+        onConfirm={() => setShowHoldPopup(false)}
         applicationId={application?.id}
-        currentStatus={application.lifecycle_status}
+        currentStatus={application?.lifecycle_status}
         onRefetch={onRefetch}
       />
 
@@ -160,7 +79,6 @@ export default function AccountManagerTopBar({ application, onRefetch }: Props) 
           application={application}
         />
       )}
-
-    </section>
+    </>
   );
 }

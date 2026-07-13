@@ -2,35 +2,45 @@ import { useState, useEffect } from 'react';
 import { partnersApi } from '../services';
 import type { Partner } from '../types';
 
-const PAGE_SIZE = 100;
+export type PartnersStats = {
+  total: number;
+  verified: number;
+  unverified: number;
+  active: number;
+  inactive: number;
+  individual: number;
+  agency: number;
+};
 
-export function useAllPartners() {
+export type GetPartnersParams = {
+  page?: number;
+  page_size?: number;
+  search?: string;
+  is_verified?: boolean;
+  is_active?: boolean;
+  type?: string;
+  assigned_manager_id?: string;
+};
+
+export function usePartners(params: GetPartnersParams = {}) {
   const [partners, setPartners] = useState<Partner[]>([]);
-  const [partnersLoading, setLoading] = useState(false);
-  const [partnersError, setError] = useState('');
+  const [total, setTotal] = useState(0);
+  const [stats, setStats] = useState<PartnersStats | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [refetchCounter, setRefetchCounter] = useState(0);
+
+  const refetch = () => setRefetchCounter((c) => c + 1);
 
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
       setError('');
       try {
-        const first = await partnersApi.list({ page: 1, page_size: PAGE_SIZE });
-        const firstItems: Partner[] = first.data?.items ?? [];
-        const total: number = first.data?.total ?? 0;
-        const totalPages = Math.ceil(total / PAGE_SIZE);
-
-        if (totalPages <= 1) {
-          setPartners(firstItems);
-          return;
-        }
-
-        const rest = await Promise.all(
-          Array.from({ length: totalPages - 1 }, (_, i) =>
-            partnersApi.list({ page: i + 2, page_size: PAGE_SIZE })
-          )
-        );
-
-        setPartners([...firstItems, ...rest.flatMap((r) => r.data?.items ?? [])]);
+        const res = await partnersApi.list(params);
+        setPartners(res.data?.items ?? []);
+        setTotal(res.data?.total ?? 0);
+        setStats(res.data?.stats ?? null);
       } catch {
         setError('Failed to fetch partners');
       } finally {
@@ -38,7 +48,13 @@ export function useAllPartners() {
       }
     };
     fetch();
-  }, []);
+  }, [JSON.stringify(params), refetchCounter]);
 
-  return { partners, partnersLoading, partnersError };
+  return { partners, total, stats, loading, error, refetch };
+}
+
+/** @deprecated Use usePartners instead */
+export function useAllPartners() {
+  const { partners, loading: partnersLoading, error: partnersError, refetch } = usePartners({ page: 1, page_size: 100 });
+  return { partners, partnersLoading, partnersError, refetch };
 }

@@ -1,4 +1,4 @@
-import { FormData } from "./RegisterProgram";
+﻿import { FormData } from "./RegisterProgram";
 
 export type ProgramValidationResult = {
   isValid: boolean;
@@ -14,8 +14,8 @@ export const validateProgram = (formData: FormData): ProgramValidationResult => 
   // name — required, min 5, max 255
   if (!formData.name.trim()) {
     errors.name = "Program name is required";
-  } else if (formData.name.trim().length < 5) {
-    errors.name = "Program name must be at least 5 characters";
+  } else if (formData.name.trim().length < 3) {
+    errors.name = "Program name must be at least 3 characters";
   } else if (formData.name.trim().length > 255) {
     errors.name = "Program name must not exceed 255 characters";
   }
@@ -101,8 +101,8 @@ export const validateProgram = (formData: FormData): ProgramValidationResult => 
     (formData.scholarships || []).forEach((s, i) => {
       if (!s.name?.trim()) {
         errors[`scholarships[${i}].name`] = "Scholarship name is required";
-      } else if (s.name.trim().length < 5) {
-        errors[`scholarships[${i}].name`] = "Name must be at least 5 characters";
+      } else if (s.name.trim().length < 3) {
+        errors[`scholarships[${i}].name`] = "Name must be at least 3 characters";
       } else if (s.name.trim().length > 255) {
         errors[`scholarships[${i}].name`] = "Name must not exceed 255 characters";
       }
@@ -133,7 +133,7 @@ export const validateProgram = (formData: FormData): ProgramValidationResult => 
 
 // Empty-only check — controls button disable state
 export const isProgramComplete = (formData: FormData): boolean => {
-  if (!formData.name.trim() || formData.name.trim().length < 5) return false;
+  if (!formData.name.trim() || formData.name.trim().length < 3) return false;
   if (!formData.uni_id) return false;
   if (!formData.qualification_id) return false;
   if (!formData.field_of_study_id) return false;
@@ -144,7 +144,7 @@ export const isProgramComplete = (formData: FormData): boolean => {
   if ((formData.yearly_fees || []).some((y) => !y.year || Number(y.year) <= 0 || !y.fee || Number(y.fee) <= 0)) return false;
   if ((formData.one_time_fees || []).some((f) => !f.description?.trim() || !f.fee || Number(f.fee) <= 0)) return false;
   if (formData.has_scholarship) {
-    if ((formData.scholarships || []).some((s) => !s.name?.trim() || s.name.trim().length < 5 || !s.description?.trim() || s.description.trim().length < 10)) return false;
+    if ((formData.scholarships || []).some((s) => !s.name?.trim() || s.name.trim().length < 3 || !s.description?.trim() || s.description.trim().length < 10)) return false;
   }
   return true;
 };

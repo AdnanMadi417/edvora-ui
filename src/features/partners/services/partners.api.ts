@@ -1,4 +1,4 @@
-import api from 'lib/useApi';
+import api, { publicApi } from 'lib/useApi';
 import Cookies from 'js-cookie';
 import type {
   CreatePartnerPayload,
@@ -13,8 +13,15 @@ const authHeader = () => {
 };
 
 export const partnersApi = {
-  list: (params?: { page?: number; page_size?: number }) =>
-    api.get('/admin/partners', { params, headers: authHeader() }),
+  list: (params?: {
+    page?: number;
+    page_size?: number;
+    search?: string;
+    is_verified?: boolean;
+    is_active?: boolean;
+    type?: string;
+    assigned_manager_id?: string;
+  }) => api.get('/admin/partners', { params, headers: authHeader() }),
 
   get: (id: string) =>
     api.get(`/admin/partners/${id}`, { headers: authHeader() }),
@@ -49,9 +56,22 @@ export const partnersApi = {
       headers: authHeader(),
     }),
 
+  review: (id: string, payload: { decision: "approved" | "rejected"; rejection_reason?: string }) =>
+    api.patch(`/admin/partners/${id}/review`, payload, { headers: authHeader() }),
+
   getProfile: () =>
     api.get('/partners/profile', { headers: authHeader() }),
 
   updateProfile: (payload: UpdatePartnerProfilePayload) =>
     api.put('/partners/profile', payload),
+
+  // Public registration endpoints — use publicApi so a logged-in user's token is never sent
+  registerInitiate: (payload: Record<string, unknown>) =>
+    publicApi.post('/partners/register/initiate', payload),
+
+  registerResendOtp: (email: string) =>
+    publicApi.post<{ message: string }>('/partners/register/resend-otp', { email }),
+
+  registerVerifyOtp: (email: string, otp: string) =>
+    publicApi.post<{ message: string; reference_id: string }>('/partners/register/verify-otp', { email, otp }),
 };
