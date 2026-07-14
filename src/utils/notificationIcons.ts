@@ -19,6 +19,7 @@ import {
   DollarSign,
   Trophy,
   Info,
+  UploadCloud,
   type LucideIcon,
 } from "lucide-react";
 
@@ -113,6 +114,11 @@ export function getNotificationIconConfig(notification: any): NotificationIconCo
   // New application submitted by a partner
   if (notification.type === "new_application") {
     return { icon: FilePlus, bg: "bg-blue-100", iconColor: "text-blue-600", badgeBg: "bg-blue-500" };
+  }
+
+  // Account manager re-uploaded a document on behalf of the partner
+  if (notification.type === "manager_file_reuploaded") {
+    return { icon: UploadCloud, bg: "bg-violet-100", iconColor: "text-violet-600", badgeBg: "bg-violet-500" };
   }
 
   // Stage changes → look up the destination status UUID

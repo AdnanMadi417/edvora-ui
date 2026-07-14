@@ -22,6 +22,7 @@ export { useArrivalDateUpload } from "./files/useArrivalDateUpload";
 export { useCommissionPaymentUpload } from "./files/useCommissionPaymentUpload";
 export { useEVisaUpload } from "./files/useEVisaUpload";
 export { useEmgsEvalUpload } from "./files/useEmgsEvaluationUpload";
+export { useManagerReuploadDocument } from "./files/useManagerReuploadDocument";
 export { useOfferLetterUpload } from "./files/useOfferLetterUpload";
 export { useRequiredDocumentsUpload } from "./files/useRequiredDocumentsUpload";
 export { useVisaDocumentUpload } from "./files/useVisaDocumentUpload";
