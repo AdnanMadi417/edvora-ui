@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   FolderOpen,
   ChevronDown,
@@ -9,12 +9,14 @@ import {
   XCircle,
   Download,
   RotateCcw,
+  UploadCloud,
 } from "lucide-react";
 import ViewPopup from "features/applications/shared/ViewDoc";
 import HoldPopup from "features/applications/account-manager/components/popups/ResubmitDoc";
 import EmptyData from "components/emptyData/EmptyData";
 import { AppDate } from "components/ui/date";
 import { getDocumentDownloadUrl } from "services/documentService";
+import { useManagerReuploadDocument } from "features/applications/hooks";
 import api from "lib/useApi"
 
 interface ApplicationDocumentsProps {
@@ -31,7 +33,47 @@ export default function ApplicationDocuments({
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
   const [showResubmitPopup, setShowResubmitPopup] = useState(false);
   const [correctionStatusId, setCorrectionStatusId] = useState<string | null>(null);
+  const [reuploadTargetDocId, setReuploadTargetDocId] = useState<string | null>(null);
+  const reuploadInputRef = useRef<HTMLInputElement>(null);
+  const { reuploadDocument, isUploading: isReuploading } = useManagerReuploadDocument();
 
+  const triggerReupload = (docId: string) => {
+    setReuploadTargetDocId(docId);
+    reuploadInputRef.current?.click();
+  };
+
+  const handleReuploadFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !reuploadTargetDocId) return;
+
+    try {
+      await reuploadDocument(file, application.id, reuploadTargetDocId);
+      onRefetch?.();
+    } catch (err) {
+      console.error("Re-upload failed:", err);
+    } finally {
+      setReuploadTargetDocId(null);
+    }
+  };
+
+  const renderReuploadButton = (doc: any) => {
+    if (!doc?.can_manager_reupload) return null;
+    return (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          triggerReupload(doc.id);
+        }}
+        disabled={isReuploading}
+        className="group rounded-lg cursor-pointer border border-transparent bg-violet-50 p-2 text-violet-600 transition-all duration-200 hover:border-violet-200 hover:bg-violet-100 hover:text-violet-700 focus-visible:ring-2 focus-visible:ring-violet-400 disabled:opacity-50"
+        title="Re-upload Document"
+        aria-label="Re-upload Document"
+      >
+        <UploadCloud className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+      </button>
+    );
+  };
 
   useEffect(() => {
     const fetchApplicationDetails = async () => {
@@ -104,6 +146,13 @@ export default function ApplicationDocuments({
 
   return (
     <>
+      <input
+        ref={reuploadInputRef}
+        type="file"
+        accept=".pdf,.png,.jpg,.jpeg,.webp"
+        className="hidden"
+        onChange={handleReuploadFileChange}
+      />
       <div
         className="group flex cursor-pointer items-center justify-between p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80"
         onClick={() => setShowDocs(!showDocs)}
@@ -249,6 +298,8 @@ export default function ApplicationDocuments({
                   >
                     <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
+
+                  {renderReuploadButton(doc)}
                 </div>
               </div>
             ))}
@@ -481,6 +532,8 @@ export default function ApplicationDocuments({
                   >
                     <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
+
+                  {renderReuploadButton(offerLetterDoc)}
                 </div>
               </div>
             </div>
@@ -582,6 +635,8 @@ export default function ApplicationDocuments({
                   >
                     <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
+
+                  {renderReuploadButton(visaDoc)}
                 </div>
               </div>
             </div>
@@ -624,6 +679,8 @@ export default function ApplicationDocuments({
                     >
                       <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                     </button>
+
+                    {renderReuploadButton(doc)}
                   </div>
                 </div>
               ))}

@@ -248,7 +248,7 @@ const ModernApplicationsTable = () => {
       </div>
 
       {grandTotal > 0 && (
-        <div className="p-6 border-b border-slate-200">
+        <div className="hidden sm:block p-6 border-b border-slate-200">
           <PipelineCard
             stages={stages}
             stageCounts={stageCounts}
