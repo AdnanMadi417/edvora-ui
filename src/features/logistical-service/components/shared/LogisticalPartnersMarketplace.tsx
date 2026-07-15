@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import PresignedImage from "components/ui/PresignedImage";
 import {
   ArrowRight,
@@ -24,7 +25,13 @@ import PrevButton from "components/ui/buttons/PrevButton";
 
 const ITEMS_PER_PAGE = 9;
 
-const LogisticalPartnersList = ({ locked = false, visaProcessingCount = 0 }: { locked?: boolean; visaProcessingCount?: number }) => {
+interface LogisticalPartnersListProps {
+  locked?: boolean;
+  visaProcessingCount?: number;
+  basePath?: string;
+}
+
+const LogisticalPartnersList = ({ locked = false, visaProcessingCount = 0, basePath = "/partner" }: LogisticalPartnersListProps) => {
   const { serviceProviders, loading, error } = useLogisticProviders();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -135,12 +142,12 @@ const LogisticalPartnersList = ({ locked = false, visaProcessingCount = 0 }: { l
                 <p className="text-[11px] text-slate-400">
                   Once unlocked, this feature will remain available permanently.
                 </p>
-                <a
+                <Link
                   href="/partner/applications"
                   className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-blue-600 hover:underline"
                 >
                   View My Applications <ArrowRight className="h-3 w-3" />
-                </a>
+                </Link>
               </div>
 
             </div>
@@ -158,7 +165,7 @@ const LogisticalPartnersList = ({ locked = false, visaProcessingCount = 0 }: { l
                   </div>
                 )}
                 <a
-                  href={locked ? undefined : `/partner/logistical-partners/${m.id}`}
+                  href={locked ? undefined : `${basePath}/logistical-partners/${m.id}`}
                   className={`flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md ${locked ? "cursor-default" : ""}`}
                 >
                   <div className={`flex items-center gap-4 px-5 py-5 ${locked ? "blur-sm select-none pointer-events-none" : ""}`}>

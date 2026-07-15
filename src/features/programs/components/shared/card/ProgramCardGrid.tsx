@@ -19,7 +19,12 @@ import Link from "next/link";
 
 const ITEMS_PER_PAGE = 9;
 
-const ProgramsCards = () => {
+interface ProgramsCardsProps {
+  basePath?: string;
+  showApplyAction?: boolean;
+}
+
+const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: ProgramsCardsProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -162,7 +167,7 @@ const ProgramsCards = () => {
                 {programs.map((program) => (
                   <div
                     key={program.id}
-                    onClick={() => window.open(`/partner/knowledge-hub/${program.id}`, "_blank")}
+                    onClick={() => window.open(`${basePath}/knowledge-hub/${program.id}`, "_blank")}
                     className="group relative cursor-pointer flex flex-col overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50/40 hover:shadow-md"
                   >
                     {/* Header */}
@@ -255,26 +260,28 @@ const ProgramsCards = () => {
                     </div>
 
                     {/* Apply Now */}
-                    <div className="px-4 pb-4">
-                      <Link
-                        href={{
-                          pathname: "/partner/applications/apply-for-program",
-                          query: {
-                            program_id: program.id,
-                            university_id: program.university.id,
-                            intake_date:
-                              program.intake_dates?.[0] ??
-                              program.university.intake_months?.[0] ??
-                              new Date().toISOString().split("T")[0],
-                          },
-                        }}
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
-                      >
-                        <Send className="h-4 w-4" />
-                        Apply Now
-                      </Link>
-                    </div>
+                    {showApplyAction && (
+                      <div className="px-4 pb-4">
+                        <Link
+                          href={{
+                            pathname: "/partner/applications/apply-for-program",
+                            query: {
+                              program_id: program.id,
+                              university_id: program.university.id,
+                              intake_date:
+                                program.intake_dates?.[0] ??
+                                program.university.intake_months?.[0] ??
+                                new Date().toISOString().split("T")[0],
+                            },
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
+                        >
+                          <Send className="h-4 w-4" />
+                          Apply Now
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

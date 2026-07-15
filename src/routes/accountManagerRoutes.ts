@@ -1,5 +1,5 @@
 import { IRoute } from "../types/navigation";
-import { MdNotifications, MdHandshake, MdAssignment, MdPayments, MdManageAccounts } from 'react-icons/md';
+import { MdNotifications, MdHandshake, MdAssignment, MdPayments, MdManageAccounts, MdMenuBook, MdBusinessCenter } from 'react-icons/md';
 
 const accountManagerRoutes: IRoute[] = [
     {
@@ -7,6 +7,18 @@ const accountManagerRoutes: IRoute[] = [
         layout: "/account-manager",
         path: "/applications",
         icon: MdAssignment,
+    },
+    {
+        name: "Knowledge Hub",
+        layout: "/account-manager",
+        path: "/knowledge-hub",
+        icon: MdMenuBook,
+    },
+    {
+        name: "Logistical Partners",
+        layout: "/account-manager",
+        path: "/logistical-partners",
+        icon: MdBusinessCenter,
     },
     // {
     //     name: "Partners",

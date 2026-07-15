@@ -125,11 +125,13 @@ function DocumentsSection({ requiredDocuments }: { requiredDocuments: RequiredDo
 
 interface ProgramDetailsProps {
   id: string;
+  basePath?: string;
+  showApplyAction?: boolean;
 }
 
-const ProgramDetails = ({ id }: ProgramDetailsProps) => {
+const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: ProgramDetailsProps) => {
   const router = useRouter();
-  const handleBack = () => router.push("/partner/knowledge-hub/");
+  const handleBack = () => router.push(`${basePath}/knowledge-hub/`);
 
   const { program, requiredDocuments, commission, loading, error } = useProgram(id);
   const [copied, setCopied] = useState(false);
@@ -579,22 +581,24 @@ const ProgramDetails = ({ id }: ProgramDetailsProps) => {
             icon={<ChevronLeft className="h-4 w-4" />}
             className="flex-1"
           />
-          <Link
-            href={{
-              pathname: "/partner/applications/apply-for-program",
-              query: {
-                program_id: program.id,
-                university_id: program.university.id,
-                intake_date:
-                  program.intake_dates?.[0] ??
-                  program.university.intake_months?.[0] ??
-                  "",
-              },
-            }}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-          >
-            Apply for This Program
-          </Link>
+          {showApplyAction && (
+            <Link
+              href={{
+                pathname: "/partner/applications/apply-for-program",
+                query: {
+                  program_id: program.id,
+                  university_id: program.university.id,
+                  intake_date:
+                    program.intake_dates?.[0] ??
+                    program.university.intake_months?.[0] ??
+                    "",
+                },
+              }}
+              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+            >
+              Apply for This Program
+            </Link>
+          )}
         </div>
 
       </div>
