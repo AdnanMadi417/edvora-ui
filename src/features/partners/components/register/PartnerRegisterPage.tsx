@@ -11,6 +11,8 @@ import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import PhoneInputField from "components/form/fields/PhoneInputField";
+import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
+import { validateSocialMediaField } from "utils/socialMedia";
 import PublicFileUploadField, { type PublicUploadResult } from "components/form/upload/PublicFileUploadField";
 import Button from "components/ui/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
@@ -49,7 +51,7 @@ export default function PartnerRegisterPage() {
     first_name: "", last_name: "", email: "",
     phone_code: "+60", phone_number: "",
     country: "", background: "",
-    social_media_url: "", linkedin_url: "",
+    social_platform: "instagram", social_username: "", social_media_url: "", linkedin_url: "",
     agreed: false,
   });
   const [indIdDoc, setIndIdDoc] = useState<PublicUploadResult | null>(null);
@@ -57,7 +59,8 @@ export default function PartnerRegisterPage() {
 
   // Company form
   const [compForm, setCompForm] = useState({
-    company_name: "", country: "", website_url: "",
+    company_name: "", country: "",
+    social_platform: "instagram", social_username: "", website_url: "",
     contact_full_name: "", contact_email: "",
     contact_phone_code: "+60", contact_phone_number: "",
     agreed: false,
@@ -88,8 +91,8 @@ export default function PartnerRegisterPage() {
     if (!indForm.country) e.country = "Country is required";
     if (!indForm.background) e.background = "Please select your background";
     if (!indIdDoc) e.ind_id_doc = "Please upload your passport or national ID";
-    if (!indForm.social_media_url.trim()) e.social_media_url = "Social media URL is required";
-    else if (!URL_REGEX.test(indForm.social_media_url.trim())) e.social_media_url = "Enter a valid URL (e.g. https://instagram.com/yourprofile)";
+    const socialError = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
+    if (socialError) e.social_media_url = socialError;
     if (indForm.linkedin_url.trim() && !URL_REGEX.test(indForm.linkedin_url.trim())) e.linkedin_url = "Enter a valid URL (e.g. https://linkedin.com/in/yourprofile)";
     if (!indForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
     setErrors(e);
@@ -101,8 +104,8 @@ export default function PartnerRegisterPage() {
     if (!compForm.company_name.trim()) e.company_name = "Agency name is required";
     else if (compForm.company_name.trim().length < 3) e.company_name = "Agency name must be at least 3 characters";
     if (!compForm.country) e.country = "Country is required";
-    if (!compForm.website_url.trim()) e.website_url = "Website or social media URL is required";
-    else if (!URL_REGEX.test(compForm.website_url.trim())) e.website_url = "Enter a valid URL (e.g. https://youragency.com)";
+    const socialError = validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" });
+    if (socialError) e.website_url = socialError;
     if (!compRegDoc) e.comp_reg_doc = "Please upload your agency registration document";
     if (!compForm.contact_full_name.trim()) e.contact_full_name = "Full name is required";
     else if (compForm.contact_full_name.trim().length < 3) e.contact_full_name = "Full name must be at least 3 characters";
@@ -119,15 +122,15 @@ export default function PartnerRegisterPage() {
         indForm.first_name.trim() && indForm.last_name.trim() &&
         indForm.email && indForm.phone_number.trim() &&
         indForm.country && indForm.background &&
-        indIdDoc && indForm.social_media_url.trim() &&
-        URL_REGEX.test(indForm.social_media_url.trim()) &&
+        indIdDoc &&
+        !validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" }) &&
         (!indForm.linkedin_url.trim() || URL_REGEX.test(indForm.linkedin_url.trim())) &&
         indForm.agreed,
       )
     : partnerType === "agency"
     ? Boolean(
         compForm.company_name.trim() && compForm.country &&
-        compForm.website_url.trim() && URL_REGEX.test(compForm.website_url.trim()) &&
+        !validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" }) &&
         compRegDoc && compForm.contact_full_name.trim() && compForm.contact_email &&
         compForm.contact_phone_number.trim() && compContactIdDoc &&
         compForm.agreed,
@@ -136,6 +139,8 @@ export default function PartnerRegisterPage() {
 
   const handleSubmit = async () => {
     if (partnerType === "individual" ? !validateInd() : !validateComp()) return;
+
+    const indSocialField = indForm.social_platform === "linkedin" ? "linkedin_url" : "social_media_url";
 
     const payload = partnerType === "individual"
       ? {
@@ -146,7 +151,7 @@ export default function PartnerRegisterPage() {
           country: indForm.country,
           background: indForm.background,
           ...(indIdDoc && { id_document_file_key: indIdDoc.file_key, id_document_file_url: indIdDoc.file_url }),
-          ...(indForm.social_media_url && { social_media_url: indForm.social_media_url }),
+          ...(indForm.social_media_url && { [indSocialField]: indForm.social_media_url }),
           ...(indForm.linkedin_url && { linkedin_url: indForm.linkedin_url }),
         }
       : {
@@ -320,14 +325,12 @@ export default function PartnerRegisterPage() {
                       error={errors.ind_id_doc}
                     />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="Social Media Account" field="social_media_url"
-                        placeholder="https://instagram.com/username"
-                        type="url"
+                      <SocialMediaInputField label="Social Media Account"
+                        platformField="social_platform" usernameField="social_username" urlField="social_media_url"
                         formData={indForm} errors={errors} updateFormData={updateInd}
                         onBlur={() => {
-                          const val = indForm.social_media_url.trim();
-                          if (!val) setErrors((p) => ({ ...p, social_media_url: "Social media URL is required" }));
-                          else if (!URL_REGEX.test(val)) setErrors((p) => ({ ...p, social_media_url: "Enter a valid URL (e.g. https://instagram.com/yourprofile)" }));
+                          const error = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
+                          setErrors((p) => ({ ...p, social_media_url: error ?? "" }));
                         }} />
                       <InputField label="LinkedIn Profile" field="linkedin_url" required={false}
                         placeholder="https://linkedin.com/in/yourprofile"
@@ -346,13 +349,12 @@ export default function PartnerRegisterPage() {
                       formData={compForm} errors={errors} updateFormData={updateComp} />
                     <SelectField label="Country of Registration" field="country" options={COUNTRY_OPTIONS}
                       formData={compForm} errors={errors} updateFormData={updateComp} />
-                    <InputField label="Website or Social Media Page" field="website_url"
-                      placeholder="https://youragency.com"
+                    <SocialMediaInputField label="Website or Social Media Page"
+                      platformField="social_platform" usernameField="social_username" urlField="website_url"
                       formData={compForm} errors={errors} updateFormData={updateComp}
                       onBlur={() => {
-                        const val = compForm.website_url.trim();
-                        if (!val) setErrors((p) => ({ ...p, website_url: "Website or social media URL is required" }));
-                        else if (!URL_REGEX.test(val)) setErrors((p) => ({ ...p, website_url: "Enter a valid URL (e.g. https://youragency.com)" }));
+                        const error = validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" });
+                        setErrors((p) => ({ ...p, website_url: error ?? "" }));
                       }} />
                   </SectionCard>
 

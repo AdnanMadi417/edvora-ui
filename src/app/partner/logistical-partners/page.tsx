@@ -1,6 +1,6 @@
 'use client';
 
-import LogisticalPartnersList from "features/logistical-service/components/partner/LogisticalPartnersMarketplace";
+import LogisticalPartnersList from "features/logistical-service/components/shared/LogisticalPartnersMarketplace";
 import { usePartnerHasLogisticalAccess } from "features/applications/partner/hooks/usePartnerHasLogisticalAccess";
 
 const LogisticalPartnersPage = () => {

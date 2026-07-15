@@ -5,10 +5,5 @@ export { default as EditLogisticalPartnersDetails } from "./admin/details/EditLo
 export { default as LogisticalPartnersServicesConfig } from "./admin/config/LogisticServicesConfig";
 export { default as DeleteServiceConfirmation } from "./admin/DeleteServiceConfirmation";
 
-export { default as LogisticalPartnersProviderTable } from "./account-manager/table/LogisticalPartnersProviderTable";
-export { default as RegisterLogisticalPartnerAccountManager } from "./account-manager/form/RegisterLogisticsProvider";
-export { default as ViewDetailsModal } from "./account-manager/popup/ViewDetailsModal";
-export { default as EditDetailsModal } from "./account-manager/popup/EditDetailsModal";
-
-export { default as LogisticalPartnersList } from "./partner/LogisticalPartnersMarketplace";
-export { default as LogisticalPartnersProviderDetails } from "./partner/LogisticalPartnersMarketplaceDetails";
+export { default as LogisticalPartnersList } from "./shared/LogisticalPartnersMarketplace";
+export { default as LogisticalPartnersProviderDetails } from "./shared/LogisticalPartnersMarketplaceDetails";

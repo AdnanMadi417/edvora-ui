@@ -21,11 +21,12 @@ import EmptyData from "components/emptyData/EmptyData";
 
 interface LogisticalPartnersProviderDetailsProps {
   id: string;
+  basePath?: string;
 }
 
-const LogisticalPartnersProviderDetails = ({ id }: LogisticalPartnersProviderDetailsProps) => {
+const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: LogisticalPartnersProviderDetailsProps) => {
   const router = useRouter();
-  const handleBack = () => { router.push("/partner/logistical-partners"); };
+  const handleBack = () => { router.push(`${basePath}/logistical-partners`); };
 
   const { service, loadingService, errorService } = useLogisticProviderDetails(id);
 
