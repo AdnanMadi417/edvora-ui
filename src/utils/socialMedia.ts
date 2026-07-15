@@ -23,6 +23,19 @@ export function buildSocialMediaUrl(platform: string, usernameOrUrl: string): st
   return `${meta.prefix}${withoutPrefix}`;
 }
 
+export function parseSocialMediaUrl(url: string): { platform: string; username: string } {
+  const trimmed = (url ?? "").trim();
+  if (!trimmed) return { platform: "", username: "" };
+
+  for (const p of SOCIAL_MEDIA_PLATFORMS) {
+    if (p.prefix && trimmed.toLowerCase().startsWith(p.prefix.toLowerCase())) {
+      return { platform: p.value, username: trimmed.slice(p.prefix.length) };
+    }
+  }
+
+  return { platform: "website", username: trimmed };
+}
+
 interface ValidateSocialMediaFields {
   platformField: string;
   usernameField: string;

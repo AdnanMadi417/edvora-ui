@@ -12,11 +12,13 @@ import PhoneInputField from "components/form/fields/PhoneInputField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
+import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { COUNTRIES, PARTNER_TYPE, BACKGROUND_OPTIONS } from "constants/lists";
+import { parseSocialMediaUrl, validateSocialMediaField } from "utils/socialMedia";
 
 interface Props {
   id: string;
@@ -129,7 +131,7 @@ export default function EditPartnerDetails({ id }: Props) {
     phone_code: "+60", phone_number: "",
     manager_id: "", assigned_manager_name: "",
     is_verified: false, is_active: true,
-    background: "", linkedin_url: "", social_media_url: "",
+    background: "", linkedin_url: "", social_media_url: "", social_platform: "", social_username: "",
     company_name: "", website_url: "",
   });
 
@@ -141,6 +143,7 @@ export default function EditPartnerDetails({ id }: Props) {
     if (!partner) return;
     const rawPhone = (partner.phone ?? "").replace(/^undefined/, "").trim();
     const phoneMatch = rawPhone.match(/^(\+\d{1,3})\s+(.*)/);
+    const { platform: socialPlatform, username: socialUsername } = parseSocialMediaUrl(partner.individual_details?.social_media_url ?? "");
     setFormData({
       name: partner.name || "",
       country: partner.country || "",
@@ -155,6 +158,8 @@ export default function EditPartnerDetails({ id }: Props) {
       background: partner.individual_details?.background ?? "",
       linkedin_url: partner.individual_details?.linkedin_url ?? "",
       social_media_url: partner.individual_details?.social_media_url ?? "",
+      social_platform: socialPlatform,
+      social_username: socialUsername,
       company_name: partner.company_details?.company_name ?? "",
       website_url: partner.company_details?.website_url ?? "",
     });
@@ -174,12 +179,15 @@ export default function EditPartnerDetails({ id }: Props) {
     if (field === "type") {
       if (value === "individual") {
         setIdDoc((p) => ({ ...p, file_key: partner?.individual_details?.id_document_file_key ?? "", file_url: partner?.individual_details?.id_document_file_url ?? "" }));
+        const { platform: socialPlatform, username: socialUsername } = parseSocialMediaUrl(partner?.individual_details?.social_media_url ?? "");
         setFormData((prev: any) => ({
           ...prev,
           type: value,
           background: partner?.individual_details?.background ?? "",
           linkedin_url: partner?.individual_details?.linkedin_url ?? "",
           social_media_url: partner?.individual_details?.social_media_url ?? "",
+          social_platform: socialPlatform,
+          social_username: socialUsername,
         }));
       } else if (value === "agency") {
         setCompanyRegDoc((p) => ({ ...p, file_key: partner?.company_details?.company_registration_doc_file_key ?? "", file_url: partner?.company_details?.company_registration_doc_file_url ?? "" }));
@@ -266,8 +274,10 @@ export default function EditPartnerDetails({ id }: Props) {
     if (formData.type === "individual") {
       if (formData.linkedin_url && !isLinkedInUrl(formData.linkedin_url))
         newErrors.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://linkedin.com/in/yourname)";
-      if (formData.social_media_url && !isValidUrl(formData.social_media_url))
-        newErrors.social_media_url = "Enter a valid URL starting with https://";
+      if (formData.social_platform || formData.social_username) {
+        const socialError = validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" });
+        if (socialError) newErrors.social_media_url = socialError;
+      }
     }
 
     if (formData.type === "agency") {
@@ -386,10 +396,7 @@ export default function EditPartnerDetails({ id }: Props) {
         {/* Account Settings */}
         <div className="border-b border-slate-200 p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Account Settings</p>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <ToggleInput label="Verified" field="is_verified" formData={formData} errors={{}} updateFormData={updateFormData} />
-            <ToggleInput label="Account Active" field="is_active" formData={formData} errors={{}} updateFormData={updateFormData} />
-          </div>
+          <ToggleInput label="Account Active" field="is_active" formData={formData} errors={{}} updateFormData={updateFormData} />
         </div>
 
         {/* Individual Details */}
@@ -415,11 +422,12 @@ export default function EditPartnerDetails({ id }: Props) {
                 errors={errors}
                 updateFormData={updateFormData}
               />
-              <InputField
+              <SocialMediaInputField
                 label="Social Media URL"
-                field="social_media_url"
+                platformField="social_platform"
+                usernameField="social_username"
+                urlField="social_media_url"
                 required={false}
-                placeholder="https://..."
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
