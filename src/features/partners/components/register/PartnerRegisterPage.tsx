@@ -48,7 +48,7 @@ export default function PartnerRegisterPage() {
 
   // Individual form
   const [indForm, setIndForm] = useState({
-    first_name: "", last_name: "", email: "",
+    name: "", email: "",
     phone_code: "+60", phone_number: "",
     country: "", background: "",
     social_platform: "instagram", social_username: "", social_media_url: "", linkedin_url: "",
@@ -82,10 +82,8 @@ export default function PartnerRegisterPage() {
 
   const validateInd = () => {
     const e: Record<string, string> = {};
-    if (!indForm.first_name.trim()) e.first_name = "First name is required";
-    else if (indForm.first_name.trim().length < 3) e.first_name = "First name must be at least 3 characters";
-    if (!indForm.last_name.trim()) e.last_name = "Last name is required";
-    else if (indForm.last_name.trim().length < 3) e.last_name = "Last name must be at least 3 characters";
+    if (!indForm.name.trim()) e.name = "Name is required";
+    else if (indForm.name.trim().length < 3) e.name = "Name must be at least 3 characters";
     if (!indForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(indForm.email)) e.email = "Enter a valid email";
     if (!indForm.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!indForm.country) e.country = "Country is required";
@@ -119,7 +117,7 @@ export default function PartnerRegisterPage() {
 
   const isFormComplete = partnerType === "individual"
     ? Boolean(
-        indForm.first_name.trim() && indForm.last_name.trim() &&
+        indForm.name.trim() &&
         indForm.email && indForm.phone_number.trim() &&
         indForm.country && indForm.background &&
         indIdDoc &&
@@ -145,7 +143,7 @@ export default function PartnerRegisterPage() {
     const payload = partnerType === "individual"
       ? {
           partner_type: "individual",
-          full_name: `${indForm.first_name.trim()} ${indForm.last_name.trim()}`,
+          full_name: indForm.name.trim(),
           email: indForm.email,
           phone: `${indForm.phone_code} ${indForm.phone_number}`,
           country: indForm.country,
@@ -272,12 +270,8 @@ export default function PartnerRegisterPage() {
               {partnerType === "individual" ? (
                 <>
                   <SectionCard title="Basic Information">
-                    <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="First Name" field="first_name" placeholder="Ahmed"
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
-                      <InputField label="Last Name" field="last_name" placeholder="Ali"
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
-                    </div>
+                    <InputField label="Name" field="name" placeholder="Ahmed Ali"
+                      formData={indForm} errors={errors} updateFormData={updateInd} />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <InputField label="Email Address" field="email" type="email" placeholder="name@mail.com"
                         formData={indForm} errors={errors} updateFormData={updateInd} />
