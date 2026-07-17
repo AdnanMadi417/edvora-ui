@@ -348,7 +348,7 @@ const PartnerApplications = () => {
               className={`flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-100/50 ${
                 needsPartnerAction(app.status) ? 'border-l-2 border-l-amber-400 bg-amber-50/30' : ''
               }`}
-              onClick={() => router.push(`/partner/applications/${app.id}`)}
+              onClick={() => window.open(`/partner/applications/${app.id}`, "_blank")}
             >
               <div className="relative shrink-0">
                 <PresignedImage
@@ -449,7 +449,7 @@ const PartnerApplications = () => {
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${
                     needsPartnerAction(app.status) ? 'border-l-2 border-l-amber-400 bg-amber-50/30' : ''
                   }`}
-                  onClick={() => router.push(`/partner/applications/${app.id}`)}
+                  onClick={() => window.open(`/partner/applications/${app.id}`, "_blank")}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
