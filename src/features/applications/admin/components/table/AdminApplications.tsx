@@ -22,7 +22,6 @@ import EmptyData from "components/emptyData/EmptyTableData";
 import PrevButton from "components/ui/buttons/PrevButton";
 import NextButton from "components/ui/buttons/NextButton";
 import ApplicationFilterBar from "components/filters/ApplicationFilterBar";
-import { useRouter } from "next/navigation";
 import api from "lib/useApi";
 import { AppDate } from "components/ui/date";
 
@@ -86,7 +85,6 @@ const SkeletonRow = () => (
 
 const ModernApplicationsTable = () => {
 
-  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -326,7 +324,7 @@ const ModernApplicationsTable = () => {
               className={`flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-100/50 ${
                 needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
               }`}
-              onClick={() => router.push(`/admin/applications/${app.id}`)}
+              onClick={() => window.open(`/admin/applications/${app.id}`, "_blank")}
             >
               <div className="relative shrink-0">
                 <PresignedImage
@@ -435,7 +433,7 @@ const ModernApplicationsTable = () => {
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${
                     needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
                   }`}
-                  onClick={() => router.push(`/admin/applications/${app.id}`)}
+                  onClick={() => window.open(`/admin/applications/${app.id}`, "_blank")}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">

@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import PipelineCard from "features/applications/partner/components/PipelineCard";
 
-import { useRouter } from "next/navigation";
 import api from "lib/useApi";
 
 import { useAccountManagerApplications } from "features/applications/account-manager/hooks/useAccountManagerApplications";
@@ -82,7 +81,6 @@ const SkeletonRow = () => (
 );
 
 const ModernApplicationsTable = () => {
-  const router = useRouter();
   const [managerId, setManagerId] = useState<string>("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
@@ -333,7 +331,7 @@ const ModernApplicationsTable = () => {
               className={`flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors bg-white hover:bg-slate-100/50 ${
                 needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
               }`}
-              onClick={() => router.push(`/account-manager/applications/${app.id}`)}
+              onClick={() => window.open(`/account-manager/applications/${app.id}`, "_blank")}
             >
               <div className="relative shrink-0">
                 <PresignedImage
@@ -446,7 +444,7 @@ const ModernApplicationsTable = () => {
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${
                     needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
                   }`}
-                  onClick={() => router.push(`/account-manager/applications/${app.id}`)}
+                  onClick={() => window.open(`/account-manager/applications/${app.id}`, "_blank")}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
