@@ -12,6 +12,7 @@ import { useToast } from "components/context/ToastContext";
 import { useEditAccountManager } from "../hooks/useEditAccountManager";
 import type { AccountManager } from "../types";
 import { useRouter } from "next/navigation";
+import { validateNewPassword } from "utils/passwordValidation";
 
 interface EditAccountManagerProps {
   manager: AccountManager;
@@ -71,8 +72,12 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.email) newErrors.email = "Email is required";
 
-    if (formData.password && formData.password !== formData.confirm_password) {
-      newErrors.confirm_password = "Passwords do not match";
+    if (formData.password) {
+      const passwordError = validateNewPassword(formData.password);
+      if (passwordError) newErrors.password = passwordError;
+      else if (formData.password !== formData.confirm_password) {
+        newErrors.confirm_password = "Passwords do not match";
+      }
     }
 
     setErrors(newErrors);
@@ -173,8 +178,8 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
             <PasswordField
               label="Password"
               field="password"
-              placeholder="At least 8 characters, letters & numbers"
-              required
+              placeholder="Leave blank to keep current password"
+              required={false}
               formData={formData}
               errors={errors}
               updateFormData={updateField}
@@ -183,8 +188,8 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
             <PasswordField
               label="Confirm Password"
               field="confirm_password"
-              placeholder="Repeat your password"
-              required
+              placeholder="Repeat your new password"
+              required={false}
               formData={formData}
               errors={errors}
               updateFormData={updateField}
