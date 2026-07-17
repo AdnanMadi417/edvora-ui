@@ -83,7 +83,7 @@ export default function PartnerRegisterPage() {
   const validateInd = () => {
     const e: Record<string, string> = {};
     if (!indForm.name.trim()) e.name = "Name is required";
-    else if (indForm.name.trim().length < 3) e.name = "Name must be at least 3 characters";
+    else if (indForm.name.trim().split(/\s+/).length < 2) e.name = "Please enter your first and last name";
     if (!indForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(indForm.email)) e.email = "Enter a valid email";
     if (!indForm.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!indForm.country) e.country = "Country is required";
@@ -117,7 +117,7 @@ export default function PartnerRegisterPage() {
 
   const isFormComplete = partnerType === "individual"
     ? Boolean(
-        indForm.name.trim() &&
+        indForm.name.trim().split(/\s+/).length >= 2 &&
         indForm.email && indForm.phone_number.trim() &&
         indForm.country && indForm.background &&
         indIdDoc &&
@@ -271,7 +271,12 @@ export default function PartnerRegisterPage() {
                 <>
                   <SectionCard title="Basic Information">
                     <InputField label="Name" field="name" placeholder="Ahmed Ali"
-                      formData={indForm} errors={errors} updateFormData={updateInd} />
+                      formData={indForm} errors={errors} updateFormData={updateInd}
+                      onBlur={() => {
+                        const val = indForm.name.trim();
+                        if (!val) setErrors((p) => ({ ...p, name: "Name is required" }));
+                        else if (val.split(/\s+/).length < 2) setErrors((p) => ({ ...p, name: "Please enter your first and last name" }));
+                      }} />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <InputField label="Email Address" field="email" type="email" placeholder="name@mail.com"
                         formData={indForm} errors={errors} updateFormData={updateInd} />
