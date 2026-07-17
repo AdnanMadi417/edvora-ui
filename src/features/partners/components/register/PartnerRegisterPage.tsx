@@ -270,7 +270,7 @@ export default function PartnerRegisterPage() {
               {partnerType === "individual" ? (
                 <>
                   <SectionCard title="Basic Information">
-                    <InputField label="Name" field="name" placeholder="Ahmed Ali"
+                    <InputField label="Name (as per Passport/National ID)" field="name" placeholder="Ahmed Ali"
                       formData={indForm} errors={errors} updateFormData={updateInd}
                       onBlur={() => {
                         const val = indForm.name.trim();
