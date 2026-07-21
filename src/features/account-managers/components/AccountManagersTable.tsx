@@ -16,7 +16,7 @@ import DeleteAccountManagerModal from "./DeleteAccountManagerModal";
 import { useToast } from "components/context/ToastContext";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
-import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -209,14 +209,37 @@ const AccountManagersTable = () => {
             </thead>
 
             <tbody className="divide-y divide-slate-100 bg-white">
-              {loading && <TableLoadingRow colSpan={6} text="Fetching account managers..." />}
+              {loading && <TableSkeletonRows columns={6} />}
 
               {!loading && error && (
                 <TableErrorRow colSpan={6} message={error} onRetry={refetch} />
               )}
 
               {!loading && !error && accountManagers.length === 0 && (
-                <TableEmptyRow colSpan={6} title="No account managers found" subtitle="Try adjusting your filters." />
+                <TableEmptyRow
+                  colSpan={6}
+                  title={activeFiltersCount > 0 ? "No account managers found" : "No account managers yet"}
+                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Create your first account manager to get started."}
+                  action={
+                    activeFiltersCount > 0 ? (
+                      <button
+                        onClick={clearFilters}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        Clear filters
+                      </button>
+                    ) : (
+                      <Link
+                        href="/admin/account-managers/create"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-blue-600 bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:border-blue-700 hover:text-blue-800"
+                      >
+                        <MdPersonAdd className="h-3.5 w-3.5" />
+                        Create Manager
+                      </Link>
+                    )
+                  }
+                />
               )}
 
               {!loading && !error && accountManagers.map((m) => (

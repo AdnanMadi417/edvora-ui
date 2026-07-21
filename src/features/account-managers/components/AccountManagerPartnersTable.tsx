@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { usePartners } from "features/partners/hooks";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
-import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -163,14 +163,29 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
             </thead>
 
             <tbody className="divide-y divide-slate-100 bg-white">
-              {loading && <TableLoadingRow colSpan={4} text="Fetching partners..." />}
+              {loading && <TableSkeletonRows columns={4} />}
 
               {!loading && error && (
                 <TableErrorRow colSpan={4} message={error} onRetry={refetch} />
               )}
 
               {!loading && !error && partners.length === 0 && (
-                <TableEmptyRow colSpan={4} title="No partners found" subtitle="Try adjusting your filters." />
+                <TableEmptyRow
+                  colSpan={4}
+                  title="No partners found"
+                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This manager has no assigned partners yet."}
+                  action={
+                    activeFiltersCount > 0 ? (
+                      <button
+                        onClick={clearFilters}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        Clear filters
+                      </button>
+                    ) : undefined
+                  }
+                />
               )}
 
               {!loading && !error && partners.map((partner) => (
