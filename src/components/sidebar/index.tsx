@@ -106,14 +106,16 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
         </button>
 
         <header className="mb-3 mt-3 flex items-center justify-center gap-2 px-6 py-6">
-          <Image
-            src={logoImg}
-            alt="Unibexs"
-            width={140}
-            height={70}
-            className="object-contain"
-            priority
-          />
+          <a href="https://www.unibexs.com" target="_blank" rel="noopener noreferrer">
+            <Image
+              src={logoImg}
+              alt="Unibexs"
+              width={140}
+              height={70}
+              className="object-contain"
+              priority
+            />
+          </a>
           {user?.role === "partner" && (
             <span className="flex shrink-0 items-center gap-1 rounded-md border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700">
               <FlaskConical className="h-3 w-3" />
