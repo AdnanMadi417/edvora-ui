@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import {
   ChevronRight, User, Mail, CheckCircle, Settings,
-  RefreshCw, ArrowLeft, ArrowRight, Pencil, Users,
+  RefreshCw, Pencil, Users,
   AlertCircle, Trash2, SlidersHorizontal, Activity,
 } from "lucide-react";
 import { MdPersonAdd } from "react-icons/md";
@@ -13,13 +13,10 @@ import { useAccountManagers } from "../hooks/useAccountManagers";
 import { useDeleteAccountManager } from "../hooks/useDeleteAccountManager";
 import DeleteAccountManagerModal from "./DeleteAccountManagerModal";
 
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
-import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
-import PrevButton from "components/ui/buttons/PrevButton";
-import NextButton from "components/ui/buttons/NextButton";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
+import { TableWrapper, TableLoadingRow, TableEmptyRow, TablePagination } from "components/ui/table";
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -63,10 +60,6 @@ const AccountManagersTable = () => {
     search: debouncedSearch || undefined,
     is_active: isActive,
   });
-
-  const displayTotal = accountManagers.length < ITEMS_PER_PAGE
-    ? (currentPage - 1) * ITEMS_PER_PAGE + accountManagers.length
-    : total;
 
   const activeFiltersCount = [
     selectedStatus !== "all",
@@ -159,7 +152,7 @@ const AccountManagersTable = () => {
 
             {(activeFiltersCount > 0 || debouncedSearch !== "") && (
               <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
-                {displayTotal.toLocaleString()}
+                {total.toLocaleString()}
                 <span className="font-normal text-blue-500">results</span>
               </span>
             )}
@@ -181,140 +174,125 @@ const AccountManagersTable = () => {
 
       <div className="p-6">
       
-        <div className="overflow-hidden rounded-lg border border-slate-200">
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-200 bg-slate-50">
-                  {[
-                    { icon: User,         label: "Name",              minW: "min-w-[200px]" },
-                    { icon: Mail,         label: "Email",             minW: "min-w-[200px]" },
-                    { icon: Users,        label: "Assigned Partners", minW: "min-w-[180px]" },
-                    { icon: CheckCircle,  label: "Status",            minW: "min-w-[120px]" },
-                    { icon: Settings,     label: "Actions" },
-                  ].map(({ icon: Icon, label, minW }) => (
-                    <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-slate-400" />
-                        {label}
-                      </div>
-                    </th>
-                  ))}
-                  <th className="w-10 px-4 py-4" />
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-slate-100 bg-white">
-                {loading && (
-                  <tr><td colSpan={6} className="px-6 py-10 text-center"><Loading text="Fetching account managers..." /></td></tr>
-                )}
-
-                {!loading && accountManagers.length === 0 && (
-                  <tr><td colSpan={6} className="px-6 py-10 text-center">
-                    <NoMessagesFound title="No account managers found" subtitle="Try adjusting your filters." />
-                  </td></tr>
-                )}
-
-                {!loading && accountManagers.map((m) => (
-                  <tr
-                    key={m.id}
-                    className="group cursor-pointer transition-colors hover:bg-slate-100/50"
-                    onClick={() => router.push(`/admin/account-managers/profile/${m.id}`)}
-                  >
-                    <td className="min-w-[200px] px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                          {m.name?.slice(0, 2).toUpperCase() ?? "?"}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-slate-900">{m.name}</div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="min-w-[200px] px-6 py-4">
-                      <div className="truncate text-sm text-slate-500">{m.email}</div>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {Number(m.assigned_partners_count) > 0 ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                          <Users className="h-3 w-3" />
-                          {Number(m.assigned_partners_count)} Partner{Number(m.assigned_partners_count) !== 1 && "s"}
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">
-                          <AlertCircle className="h-3 w-3" />
-                          Needs Partner
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold ${
-                        m.is_active
-                          ? "border-green-200 bg-green-50 text-green-700"
-                          : "border-slate-200 bg-slate-100 text-slate-500"
-                      }`}>
-                        {m.is_active ? <FaCheckCircle className="text-[10px]" /> : <FaTimesCircle className="text-[10px]" />}
-                        {m.is_active ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/admin/account-managers/profile/${m.id}/edit`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Link>
-                        <div className="h-5 border-l border-slate-200" />
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedManagerId(m.id);
-                            setSelectedManagerName(m.name);
-                            setIsDeleteOpen(true);
-                          }}
-                          className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-
-                    <td className="px-4 py-4">
-                      <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
-                    </td>
-                  </tr>
+        <TableWrapper
+          footer={
+            <TablePagination
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              itemsPerPage={ITEMS_PER_PAGE}
+              itemCount={accountManagers.length}
+              totalCount={total}
+              itemLabel="results"
+              loading={loading}
+            />
+          }
+        >
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50">
+                {[
+                  { icon: User,         label: "Name",              minW: "min-w-[200px]" },
+                  { icon: Mail,         label: "Email",             minW: "min-w-[200px]" },
+                  { icon: Users,        label: "Assigned Partners", minW: "min-w-[180px]" },
+                  { icon: CheckCircle,  label: "Status",            minW: "min-w-[120px]" },
+                  { icon: Settings,     label: "Actions" },
+                ].map(({ icon: Icon, label, minW }) => (
+                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-slate-400" />
+                      {label}
+                    </div>
+                  </th>
                 ))}
-              </tbody>
-            </table>
-          </div>
+                <th className="w-10 px-4 py-4" />
+              </tr>
+            </thead>
 
-            {/* Pagination */}
-        <div className="flex flex-col items-center justify-between gap-2 border-t border-slate-200 p-6 text-sm text-slate-500 sm:flex-row">
-          {accountManagers.length === 0 && !loading ? (
-            <span />
-          ) : (
-            <span>
-              Showing{" "}
-              <span className="font-medium text-slate-700">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to{" "}
-              <span className="font-medium text-slate-700">{(currentPage - 1) * ITEMS_PER_PAGE + accountManagers.length}</span> of{" "}
-              <span className="font-medium text-slate-700">{displayTotal}</span> results
-            </span>
-          )}
-          <div className="flex items-center gap-2">
-            <PrevButton onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage === 1} text="Prev" icon={<ArrowLeft className="h-4 w-4" />} />
-            <span className="px-2">Page {currentPage} of {Math.max(Math.ceil(displayTotal / ITEMS_PER_PAGE), 1)}</span>
-            <NextButton onClick={() => setCurrentPage((p) => p + 1)} disabled={accountManagers.length < ITEMS_PER_PAGE} text="Next" icon={<ArrowRight className="h-4 w-4" />} />
-          </div>
-        </div>
+            <tbody className="divide-y divide-slate-100 bg-white">
+              {loading && <TableLoadingRow colSpan={6} text="Fetching account managers..." />}
 
-        </div>
+              {!loading && accountManagers.length === 0 && (
+                <TableEmptyRow colSpan={6} title="No account managers found" subtitle="Try adjusting your filters." />
+              )}
+
+              {!loading && accountManagers.map((m) => (
+                <tr
+                  key={m.id}
+                  className="group cursor-pointer transition-colors hover:bg-slate-100/50"
+                  onClick={() => router.push(`/admin/account-managers/profile/${m.id}`)}
+                >
+                  <td className="min-w-[200px] px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                        {m.name?.slice(0, 2).toUpperCase() ?? "?"}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-slate-900">{m.name}</div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="min-w-[200px] px-6 py-4">
+                    <div className="truncate text-sm text-slate-500">{m.email}</div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    {Number(m.assigned_partners_count) > 0 ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                        <Users className="h-3 w-3" />
+                        {Number(m.assigned_partners_count)} Partner{Number(m.assigned_partners_count) !== 1 && "s"}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">
+                        <AlertCircle className="h-3 w-3" />
+                        Needs Partner
+                      </span>
+                    )}
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold ${
+                      m.is_active
+                        ? "border-green-200 bg-green-50 text-green-700"
+                        : "border-slate-200 bg-slate-100 text-slate-500"
+                    }`}>
+                      {m.is_active ? <FaCheckCircle className="text-[10px]" /> : <FaTimesCircle className="text-[10px]" />}
+                      {m.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </td>
+
+                  <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/account-managers/profile/${m.id}/edit`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Link>
+                      <div className="h-5 border-l border-slate-200" />
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedManagerId(m.id);
+                          setSelectedManagerName(m.name);
+                          setIsDeleteOpen(true);
+                        }}
+                        className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+
+                  <td className="px-4 py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </TableWrapper>
 
       </div>
 

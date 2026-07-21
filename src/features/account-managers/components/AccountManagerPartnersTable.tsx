@@ -2,17 +2,14 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  ArrowLeft, ArrowRight, ChevronRight, Users,
+  ChevronRight, Users, Mail, BadgeCheck,
   CheckCircle, XCircle, RefreshCw, SlidersHorizontal,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePartners } from "features/partners/hooks";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
-import NextButton from "components/ui/buttons/NextButton";
-import PrevButton from "components/ui/buttons/PrevButton";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
-import Loading from "components/loading/Loading";
+import { TableWrapper, TableLoadingRow, TableEmptyRow, TablePagination } from "components/ui/table";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -65,10 +62,6 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
     assigned_manager_id: managerId,
     ...statusToParams(selectedStatus),
   });
-
-  const displayTotal = partners.length < ITEMS_PER_PAGE
-    ? (currentPage - 1) * ITEMS_PER_PAGE + partners.length
-    : total;
 
   const activeFiltersCount = [selectedStatus !== "all", searchTerm !== ""].filter(Boolean).length;
 
@@ -137,91 +130,89 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
       </div>
 
       <div className="p-6">
-        <div className="overflow-hidden rounded-lg border border-slate-200">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-200 bg-slate-50">
-                  <th className="min-w-[220px] px-6 py-4 text-start text-sm font-semibold text-slate-900">Partner</th>
-                  <th className="min-w-[200px] px-6 py-4 text-start text-sm font-semibold text-slate-900">Contact Info</th>
-                  <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">Status</th>
-                  <th className="w-10 px-4 py-4" />
-                </tr>
-              </thead>
-
-              <tbody className="divide-y divide-slate-100 bg-white">
-                {loading && (
-                  <tr><td colSpan={4} className="px-6 py-10 text-center"><Loading text="Fetching partners..." /></td></tr>
-                )}
-
-                {!error && !loading && partners.length === 0 && (
-                  <tr><td colSpan={4} className="px-6 py-10 text-center"><NoMessagesFound title="No partners found" subtitle="Try adjusting your filters." /></td></tr>
-                )}
-
-                {!error && partners.map((partner) => (
-                  <tr
-                    key={partner.id}
-                    className="group cursor-pointer transition-colors hover:bg-slate-100/50"
-                    onClick={() => router.push(`/admin/partners/${partner.id}`)}
-                  >
-                    <td className="min-w-[220px] px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                          {partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
-                          <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-slate-900">{partner.name || "Unknown Partner"}</div>
-                          <div className="truncate text-xs text-slate-500 capitalize">{partner.type || "—"} · {partner.country || "—"}</div>
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <div className="truncate text-sm text-slate-900">{partner.phone || "—"}</div>
-                      <div className="truncate text-xs text-slate-500">{partner.email || "—"}</div>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      {partner.is_active ? (
-                        <span className="inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
-                          <CheckCircle className="h-3 w-3" /> Active
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
-                          <XCircle className="h-3 w-3" /> Inactive
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="px-4 py-4">
-                      <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
-                    </td>
-                  </tr>
+        <TableWrapper
+          footer={
+            <TablePagination
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              itemsPerPage={ITEMS_PER_PAGE}
+              itemCount={partners.length}
+              totalCount={total}
+              itemLabel="partners"
+              loading={loading}
+            />
+          }
+        >
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50">
+                {[
+                  { icon: Users,      label: "Partner",      minW: "min-w-[220px]" },
+                  { icon: Mail,       label: "Contact Info", minW: "min-w-[200px]" },
+                  { icon: BadgeCheck, label: "Status" },
+                ].map(({ icon: Icon, label, minW }) => (
+                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-slate-400" />
+                      {label}
+                    </div>
+                  </th>
                 ))}
-              </tbody>
-            </table>
-          </div>
+                <th className="w-10 px-4 py-4" />
+              </tr>
+            </thead>
 
-          {/* Pagination */}
-          <div className="flex flex-col items-center justify-between gap-2 border-t border-slate-200 p-6 text-sm text-slate-500 sm:flex-row">
-            {partners.length === 0 && !loading ? (
-              <span />
-            ) : (
-              <span>
-                Showing{" "}
-                <span className="font-medium text-slate-700">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to{" "}
-                <span className="font-medium text-slate-700">{(currentPage - 1) * ITEMS_PER_PAGE + partners.length}</span> of{" "}
-                <span className="font-medium text-slate-700">{displayTotal}</span> partners
-              </span>
-            )}
-            <div className="flex items-center gap-2">
-              <PrevButton onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage === 1} text="Prev" icon={<ArrowLeft className="h-4 w-4" />} />
-              <span>Page {currentPage} of {Math.max(Math.ceil(displayTotal / ITEMS_PER_PAGE), 1)}</span>
-              <NextButton onClick={() => setCurrentPage((p) => p + 1)} disabled={partners.length < ITEMS_PER_PAGE} text="Next" icon={<ArrowRight className="h-4 w-4" />} />
-            </div>
-          </div>
-        </div>
+            <tbody className="divide-y divide-slate-100 bg-white">
+              {loading && <TableLoadingRow colSpan={4} text="Fetching partners..." />}
+
+              {!error && !loading && partners.length === 0 && (
+                <TableEmptyRow colSpan={4} title="No partners found" subtitle="Try adjusting your filters." />
+              )}
+
+              {!error && partners.map((partner) => (
+                <tr
+                  key={partner.id}
+                  className="group cursor-pointer transition-colors hover:bg-slate-100/50"
+                  onClick={() => router.push(`/admin/partners/${partner.id}`)}
+                >
+                  <td className="min-w-[220px] px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                        {partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
+                        <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-slate-900">{partner.name || "Unknown Partner"}</div>
+                        <div className="truncate text-xs text-slate-500 capitalize">{partner.type || "—"} · {partner.country || "—"}</div>
+                      </div>
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="truncate text-sm text-slate-900">{partner.phone || "—"}</div>
+                    <div className="truncate text-xs text-slate-500">{partner.email || "—"}</div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    {partner.is_active ? (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
+                        <CheckCircle className="h-3 w-3" /> Active
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
+                        <XCircle className="h-3 w-3" /> Inactive
+                      </span>
+                    )}
+                  </td>
+
+                  <td className="px-4 py-4">
+                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </TableWrapper>
       </div>
     </div>
   );
