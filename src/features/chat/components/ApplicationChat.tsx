@@ -114,7 +114,7 @@ export default function AgentPartnerChat({
                   className={`relative max-w-[75%] break-words rounded-md px-3 py-2 text-sm ${
                     isMine
                       ? "ml-auto rounded-br-none bg-gray-200/50"
-                      : "mr-auto rounded-bl-none border border-default bg-card"
+                      : "mr-auto rounded-bl-none border border-slate-200 bg-card"
                   }`}
                 >
                   {!isMine && (
@@ -134,7 +134,7 @@ export default function AgentPartnerChat({
         <div ref={bottomRef} />
       </main>
 
-      <footer className="border-t border-default bg-card p-2 sm:p-3">
+      <footer className="border-t border-slate-200 bg-card p-2 sm:p-3">
         <ChatInput onSend={sendMessage} sending={sending} />
       </footer>
 

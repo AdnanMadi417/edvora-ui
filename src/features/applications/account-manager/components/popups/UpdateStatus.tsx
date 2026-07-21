@@ -522,7 +522,7 @@ export default function UpdateStatusPopup({
         className="w-full max-w-2xl transform rounded-md bg-card shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative border-b border-default px-6 pb-4 pt-6">
+        <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
@@ -623,7 +623,7 @@ export default function UpdateStatusPopup({
         ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60"
         : isSelected
         ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
-        : "cursor-pointer border-default bg-card hover:border-gray-300 hover:shadow"
+        : "cursor-pointer border-slate-200 bg-card hover:border-gray-300 hover:shadow"
     }
   `}
                   >
@@ -743,7 +743,7 @@ export default function UpdateStatusPopup({
                 }}
                 placeholder="Please provide a detailed reason..."
                 rows={4}
-                className={`w-full rounded-md border px-4 py-3 text-p2 outline-none transition-colors resize-y placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${reasonError ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"}`}
+                className={`w-full rounded-md border px-4 py-3 text-p2 outline-none transition-colors resize-y placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${reasonError ? "border-red-500 bg-red-50" : "border-slate-200 bg-white hover:bg-slate-50"}`}
               />
               {reasonError && <p className="mt-1 text-xs text-red-600">{reasonError}</p>}
             </div>
@@ -815,7 +815,7 @@ export default function UpdateStatusPopup({
           )}
         </div>
 
-        <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
+        <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
           <button
             onClick={handleClose}
             disabled={isSubmitting}

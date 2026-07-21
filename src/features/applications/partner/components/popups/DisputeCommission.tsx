@@ -146,7 +146,7 @@ export default function DisputeCommission({
                 placeholder="Explain why you are disputing this commission amount..."
                 rows={4}
                 className={`w-full rounded-md border px-3 py-2.5 text-sm text-slate-900 outline-none transition-colors resize-y placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-                  reasonError ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"
+                  reasonError ? "border-red-500 bg-red-50" : "border-slate-200 bg-white hover:bg-slate-50"
                 }`}
               />
               {reasonError && (

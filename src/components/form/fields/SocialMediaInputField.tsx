@@ -85,7 +85,7 @@ export default function SocialMediaInputField({
         {label} {required && <span className="text-red-600">*</span>}
       </label>
 
-      <div className={`mt-2 flex overflow-visible rounded-lg border bg-white transition ${error ? "border-red-500" : "border-default"}`}>
+      <div className={`mt-2 flex overflow-visible rounded-lg border bg-white transition ${error ? "border-red-500" : "border-slate-200"}`}>
         <div className="relative shrink-0" ref={ref}>
           <button
             type="button"

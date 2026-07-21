@@ -136,7 +136,7 @@ const Navbar = ({
         </p>
       </div>
 
-      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-md border border-default bg-card px-2 py-2">
+      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-md border border-slate-200 bg-card px-2 py-2">
         <span
           className="flex h-5 w-5 cursor-pointer items-center justify-center xl:hidden"
           onClick={onOpenSidenav}
@@ -173,14 +173,14 @@ const Navbar = ({
           }
           classNames="py-2 top-8 -left-[180px] w-max"
         >
-          <div className="flex flex-col w-56 rounded-[12px] border border-default bg-card shadow-sm text-sm">
+          <div className="flex flex-col w-56 rounded-[12px] border border-slate-200 bg-card shadow-sm text-sm">
             <div className="flex items-center gap-2 p-4">
               <p className="text-slate-900 font-semibold">
                 Hey, {loading ? "Loading..." : user?.name || "User"}
               </p>
             </div>
 
-            <div className="border-t border-default" />
+            <div className="border-t border-slate-200" />
 
             <div className="flex flex-col px-3 py-2 text-slate-900">
               <Link

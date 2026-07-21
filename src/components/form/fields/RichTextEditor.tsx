@@ -152,7 +152,7 @@ const RichTextEditor = ({
 
       <div
         className={`mt-2 overflow-hidden rounded-md border transition-colors focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 ${
-          error ? "border-red-500" : "border-default"
+          error ? "border-red-500" : "border-slate-200"
         }`}
       >
         {/* Toolbar */}

@@ -97,7 +97,7 @@ export default function VisaPaymentConfirmation({
       >
         <div className="relative overflow-hidden rounded-2xl bg-white text-sm shadow-2xl ring-1 ring-black/5">
 
-          <div className="relative border-b border-default px-6 pb-4 pt-6">
+          <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">

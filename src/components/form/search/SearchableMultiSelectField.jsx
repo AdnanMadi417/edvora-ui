@@ -82,7 +82,7 @@ const SearchableMultiSelectField = ({
         className={`mt-2 flex h-12 w-full items-center justify-between rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
           errors?.[field]
             ? "border-red-500 bg-red-50"
-            : "border-default bg-white hover:bg-slate-50"
+            : "border-slate-200 bg-white hover:bg-slate-50"
         }`}
       >
         <span
@@ -120,7 +120,7 @@ const SearchableMultiSelectField = ({
             className={`mb-2 flex h-10 w-full rounded-md border p-2 text-sm focus:ring-1 focus:ring-blue-500 bg-white hover:bg-slate-50 ${
               errors?.[field]
                 ? "border-red-500"
-                : "border-default"
+                : "border-slate-200"
             }`}
           />
 
