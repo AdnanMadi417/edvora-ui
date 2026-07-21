@@ -16,7 +16,7 @@ import DeleteAccountManagerModal from "./DeleteAccountManagerModal";
 import { useToast } from "components/context/ToastContext";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
-import { TableWrapper, TableLoadingRow, TableEmptyRow, TablePagination } from "components/ui/table";
+import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -54,7 +54,7 @@ const AccountManagersTable = () => {
 
   const isActive = selectedStatus === "true" ? true : selectedStatus === "false" ? false : undefined;
 
-  const { accountManagers, total, loading, refetch } = useAccountManagers({
+  const { accountManagers, total, loading, error, refetch } = useAccountManagers({
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
     search: debouncedSearch || undefined,
@@ -211,11 +211,15 @@ const AccountManagersTable = () => {
             <tbody className="divide-y divide-slate-100 bg-white">
               {loading && <TableLoadingRow colSpan={6} text="Fetching account managers..." />}
 
-              {!loading && accountManagers.length === 0 && (
+              {!loading && error && (
+                <TableErrorRow colSpan={6} message={error} onRetry={refetch} />
+              )}
+
+              {!loading && !error && accountManagers.length === 0 && (
                 <TableEmptyRow colSpan={6} title="No account managers found" subtitle="Try adjusting your filters." />
               )}
 
-              {!loading && accountManagers.map((m) => (
+              {!loading && !error && accountManagers.map((m) => (
                 <tr
                   key={m.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"

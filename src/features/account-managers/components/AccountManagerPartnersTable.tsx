@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { usePartners } from "features/partners/hooks";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
-import { TableWrapper, TableLoadingRow, TableEmptyRow, TablePagination } from "components/ui/table";
+import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -55,7 +55,7 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
     return () => clearTimeout(t);
   }, [searchTerm]);
 
-  const { partners, total, loading, error } = usePartners({
+  const { partners, total, loading, error, refetch } = usePartners({
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
     search: debouncedSearch || undefined,
@@ -165,11 +165,15 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
             <tbody className="divide-y divide-slate-100 bg-white">
               {loading && <TableLoadingRow colSpan={4} text="Fetching partners..." />}
 
-              {!error && !loading && partners.length === 0 && (
+              {!loading && error && (
+                <TableErrorRow colSpan={4} message={error} onRetry={refetch} />
+              )}
+
+              {!loading && !error && partners.length === 0 && (
                 <TableEmptyRow colSpan={4} title="No partners found" subtitle="Try adjusting your filters." />
               )}
 
-              {!error && partners.map((partner) => (
+              {!loading && !error && partners.map((partner) => (
                 <tr
                   key={partner.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
