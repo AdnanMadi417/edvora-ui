@@ -21,13 +21,6 @@
   --overlay-bg: rgba(0, 12, 41, 0.8);
   --overlay-light-bg: rgba(3, 72, 209, 0.5);
 
-  --border-color-default: #D0D4E0;
-  --border-color-accent: #0348D1;
-  --border-color-danger: #D32F2F;
-  --border-color-success: #2E7D32;
-  --border-color-warning: #fdc700;
-  --border-color-info: #0288D1;
-
   --font-size-h1: 3rem;
   --font-size-h2: 2.5rem;
   --font-size-h3: 2rem;

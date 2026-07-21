@@ -360,15 +360,6 @@ module.exports = {
         light: 'var(--overlay-light-bg)',
       },
 
-      borderColor: {
-        default: 'var(--border-color-default)',
-        accent: 'var(--border-color-accent)',
-        danger: 'var(--border-color-danger)',
-        success: 'var(--border-color-success)',
-        warning: 'var(--border-color-warning)',
-        info: 'var(--border-color-info)',
-      },
-
       borderWidth: {
         thin: 'var(--border-thin)',
         medium: 'var(--border-medium)',
