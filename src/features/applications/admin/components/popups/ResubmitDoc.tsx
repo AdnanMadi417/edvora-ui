@@ -105,7 +105,7 @@ export default function HoldPopup({
       >
         {/* Popup Card */}
         <div className="relative overflow-hidden rounded-2xl bg-card">
-          <div className="relative border-b border-default px-6 pb-4 pt-6">
+          <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-md border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
@@ -159,7 +159,7 @@ export default function HoldPopup({
             />
           </div>
 
-          <div className="border-t border-default px-6 py-5">
+          <div className="border-t border-slate-200 px-6 py-5">
 
             <div className="flex justify-end gap-3">
               <button

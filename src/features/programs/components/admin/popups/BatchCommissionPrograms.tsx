@@ -150,10 +150,10 @@ export default function BatchCommissionPrograms({
                 </label>
                 <div
                   className={`mt-2 flex h-12 w-full items-center overflow-hidden rounded-md border focus-within:ring-1 focus-within:ring-blue-500 ${
-                    errors.commission_amount ? "border-red-500" : "border-default"
+                    errors.commission_amount ? "border-red-500" : "border-slate-200"
                   }`}
                 >
-                  <span className="flex h-full items-center border-r border-default bg-slate-50 px-3 text-sm font-medium text-slate-500">
+                  <span className="flex h-full items-center border-r border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-500">
                     {(CURRENCY.find((c) => c.value === formData.commission_currency)?.label ?? formData.commission_currency).toUpperCase()}
                   </span>
                   <input

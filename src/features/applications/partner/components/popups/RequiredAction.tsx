@@ -202,7 +202,7 @@ export default function RequiredAction({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative overflow-hidden rounded-2xl bg-card shadow-lg">
-          <div className="relative border-b border-default px-6 pb-4 pt-6">
+          <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100">
@@ -295,7 +295,7 @@ export default function RequiredAction({
             )}
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
+          <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
             <button
               onClick={onClose}
               className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"

@@ -31,7 +31,7 @@ export default function PhoneInputField({
       <label className="block text-p2 font-medium text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}
       </label>
-      <div className={`mt-2 flex h-12 overflow-hidden rounded-lg border transition ${error ? "border-red-500" : "border-default"}`}>
+      <div className={`mt-2 flex h-12 overflow-hidden rounded-lg border transition ${error ? "border-red-500" : "border-slate-200"}`}>
         <select
           value={dialCode}
           onChange={(e) => updateFormData(dialCodeField, e.target.value)}

@@ -63,7 +63,7 @@ export default function UploadDoc({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative overflow-hidden rounded-2xl bg-card">
-          <div className="relative border-b border-default px-6 pb-4 pt-6">
+          <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-md border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
@@ -145,11 +145,11 @@ export default function UploadDoc({
             </div>
           </div>
 
-          <div className="border-t border-default px-6 py-5">
+          <div className="border-t border-slate-200 px-6 py-5">
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleClose}
-                className="rounded-md border border-default bg-card px-5 py-2.5 text-p2 font-medium text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+                className="rounded-md border border-slate-200 bg-card px-5 py-2.5 text-p2 font-medium text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
               >
                 Cancel
               </button>

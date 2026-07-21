@@ -35,7 +35,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative overflow-hidden rounded-2xl bg-card">
-          <div className="relative border-b border-default px-6 pb-4 pt-6">
+          <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
@@ -73,7 +73,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
           </div>
 
           <div className="flex flex-col gap-4 px-6 py-6 ">
-            <div className="flex flex-col items-center justify-center gap-3 rounded-md border border-dashed border-accent bg-blue-200 px-6 py-5">
+            <div className="flex flex-col items-center justify-center gap-3 rounded-md border border-dashed border-red-500 bg-blue-200 px-6 py-5">
               <Image
                 src={filePng}
                 alt="file icon"
@@ -84,14 +84,14 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
                 <h3 className="text-lg font-semibold text-gray-900">
                   Document Preview
                 </h3>
-                <p className="mt-1 text-p2 text-text-secondary">
+                <p className="mt-1 text-p2 text-slate-700">
                   Click to Close or download this document.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
+          <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
             <button
               onClick={handleClose}
               className="rounded-md border bg-card px-5 py-2.5 text-gray-700"

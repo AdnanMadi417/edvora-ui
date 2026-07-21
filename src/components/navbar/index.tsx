@@ -116,11 +116,11 @@ const Navbar = ({
       {/* Left Section */}
       <div className="ml-[6px] flex flex-col">
         <div className="flex items-center text-sm sm:text-base">
-          <span className="text-text-secondary">Pages</span>
+          <span className="text-slate-700">Pages</span>
           <span className="mx-1">/</span>
           <NavLink
             href="#"
-            className="capitalize text-text-secondary no-underline font-normal"
+            className="capitalize text-slate-700 no-underline font-normal"
           >
             {brandText}
           </NavLink>
@@ -136,7 +136,7 @@ const Navbar = ({
         </p>
       </div>
 
-      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-md border border-default bg-card px-2 py-2">
+      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-md border border-slate-200 bg-card px-2 py-2">
         <span
           className="flex h-5 w-5 cursor-pointer items-center justify-center xl:hidden"
           onClick={onOpenSidenav}
@@ -173,21 +173,21 @@ const Navbar = ({
           }
           classNames="py-2 top-8 -left-[180px] w-max"
         >
-          <div className="flex flex-col w-56 rounded-[12px] border border-default bg-card shadow-sm text-sm">
+          <div className="flex flex-col w-56 rounded-[12px] border border-slate-200 bg-card shadow-sm text-sm">
             <div className="flex items-center gap-2 p-4">
               <p className="text-slate-900 font-semibold">
                 Hey, {loading ? "Loading..." : user?.name || "User"}
               </p>
             </div>
 
-            <div className="border-t border-default" />
+            <div className="border-t border-slate-200" />
 
             <div className="flex flex-col px-3 py-2 text-slate-900">
               <Link
                 href={getProfileRoute(user?.role)}
                 className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-slate-900"
               >
-                <Settings className="h-4 w-4 text-text-secondary group-hover:text-slate-900" />
+                <Settings className="h-4 w-4 text-slate-700 group-hover:text-slate-900" />
                 <span>Profile Settings</span>
               </Link>
 
@@ -197,7 +197,7 @@ const Navbar = ({
                   onClick={() => setShowChangePassword(true)}
                   className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-slate-900"
                 >
-                  <KeyRound className="h-4 w-4 text-text-secondary group-hover:text-slate-900" />
+                  <KeyRound className="h-4 w-4 text-slate-700 group-hover:text-slate-900" />
                   <span>Change Password</span>
                 </button>
               )}
@@ -209,7 +209,7 @@ const Navbar = ({
                   disabled={isSendingReset}
                   className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <KeyRound className="h-4 w-4 text-text-secondary group-hover:text-slate-900" />
+                  <KeyRound className="h-4 w-4 text-slate-700 group-hover:text-slate-900" />
                   <span>{isSendingReset ? "Sending…" : "Reset Password"}</span>
                 </button>
               )}

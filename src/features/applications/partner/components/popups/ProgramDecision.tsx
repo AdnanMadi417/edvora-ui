@@ -63,7 +63,7 @@ export default function ProgramDecisionModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative overflow-visible rounded-2xl bg-card shadow-lg">
-          <div className="flex items-start justify-between border-b border-default px-6 pb-4 pt-6">
+          <div className="flex items-start justify-between border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-md border border-blue-200 bg-blue-50">
                 <RefreshCcw
@@ -114,7 +114,7 @@ export default function ProgramDecisionModal({
 
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
+          <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
             <button
               onClick={onClose}
               disabled={loading}

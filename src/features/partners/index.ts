@@ -5,3 +5,4 @@ export * from './types';
 // Components — exported explicitly to avoid naming conflicts with types
 export { PartnersTable, RegisterPartner, EditPartnerDetails, AssignPartnerManager, DeletePartner } from './components';
 export { default as PartnerDetailsView } from './components/details/PartnerDetails';
+export { default as PartnerApplicationsTable } from './components/details/PartnerApplicationsTable';

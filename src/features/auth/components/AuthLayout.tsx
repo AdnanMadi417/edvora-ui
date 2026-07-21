@@ -8,14 +8,16 @@ export default function AuthLayout({ children, hideLogo }: { children: React.Rea
 
         {!hideLogo && (
           <div className="flex justify-center mb-7">
-            <Image
-              src={logoImg}
-              alt="Unibexs"
-              width={130}
-              height={44}
-              className="object-contain"
-              priority
-            />
+            <a href="https://www.unibexs.com" target="_blank" rel="noopener noreferrer">
+              <Image
+                src={logoImg}
+                alt="Unibexs"
+                width={130}
+                height={44}
+                className="object-contain"
+                priority
+              />
+            </a>
           </div>
         )}
 
