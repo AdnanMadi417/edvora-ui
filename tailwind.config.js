@@ -154,17 +154,6 @@ module.exports = {
         card: 'var(--card-bg)',
         'card-hover': 'var(--card-hover)',
 
-        text: {
-          primary: 'var(--primary-text-color)',
-          secondary: 'var(--secondary-text-color)',
-          special: 'var(--special-text-color)',
-          muted: 'var(--muted-text-color)',
-          disabled: 'var(--disabled-text-color)',
-          error: 'var(--error-text)',
-          pending: 'var(--pending-text)',
-          success: 'var(--success-text)',
-        },
-
         accent: 'var(--accent-color)',
         'accent-light': 'var(--accent-light)',
 

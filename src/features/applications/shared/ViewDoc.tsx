@@ -84,7 +84,7 @@ export default function ViewPopup({ isOpen, onClose, doc }: ViewPopupProps) {
                 <h3 className="text-lg font-semibold text-gray-900">
                   Document Preview
                 </h3>
-                <p className="mt-1 text-p2 text-text-secondary">
+                <p className="mt-1 text-p2 text-slate-700">
                   Click to Close or download this document.
                 </p>
               </div>

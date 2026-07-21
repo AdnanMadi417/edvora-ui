@@ -30,16 +30,6 @@
   --hover-input-field-bg: #E2E8F5;
   --card-border: #D0D4E0;
 
-  --primary-text-color: #000C29;
-  --secondary-text-color: #2C3E50;
-  --special-text-color: #FFFFFF;
-  --muted-text-color: #9E9E9E;
-  --disabled-text-color: #B0B8C7;
-
-  --error-text: #D32F2F;
-  --pending-text: #fdc700;
-  --success-text: #2E7D32;
-
   --table-header-bg: rgba(3, 72, 209, 0.3);
 
   --linear-gradient-bg: linear-gradient(135deg, #0348D1 0%, #2563EB 50%, #EBF1FF 100%);
