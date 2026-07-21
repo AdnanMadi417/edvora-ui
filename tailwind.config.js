@@ -112,10 +112,7 @@ module.exports = {
       },
 
       fontFamily: {
-        sans: ['var(--font-jakarta)', 'sans-serif'],
-        jakarta: ['var(--font-jakarta)', 'sans-serif'],
-        poppins: ['Poppins', 'sans-serif'],
-        dm: ['DM Sans', 'sans-serif'],
+        sans: ['var(--font-inter)', 'sans-serif'],
       },
 
       boxShadow: {

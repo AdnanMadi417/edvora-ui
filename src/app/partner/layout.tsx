@@ -31,7 +31,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
             />
           </div>
 
-          <div className="relative h-full w-full font-dm dark:bg-navy-900">
+          <div className="relative h-full w-full dark:bg-navy-900">
             <main className="mx-2.5 flex-none transition-all md:pr-2 xl:ml-[300px]">
               <Navbar
                 onOpenSidenav={() => setOpen(!open)}
