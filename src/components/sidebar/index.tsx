@@ -108,7 +108,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
         <header className="mb-3 mt-3 flex items-center justify-center gap-2 px-6 py-6">
           <Image
             src={logoImg}
-            alt="Your Business Logo"
+            alt="Unibexs"
             width={140}
             height={70}
             className="object-contain"
