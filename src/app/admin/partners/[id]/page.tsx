@@ -10,9 +10,9 @@ export default function PartnerPage() {
   if (!partnerId) return null;
 
   return (
-    <>
+    <div className="block space-y-6">
       <PartnerDetails id={partnerId} />
       <PartnerApplicationsTable partnerId={partnerId} />
-    </>
+    </div>
   );
 }
