@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft, ArrowRight, ChevronRight,
+  ChevronRight,
   Pencil, RefreshCw, SlidersHorizontal, Building2,
   UserCog, Users, CheckCircle, XCircle, BadgeCheck, BadgeX, User, ShieldCheck,
 } from "lucide-react";
@@ -14,10 +14,7 @@ import ReviewPartnerPopup from "../popups/ReviewPartnerPopup";
 import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
-import NextButton from "components/ui/buttons/NextButton";
-import PrevButton from "components/ui/buttons/PrevButton";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
-import Loading from "components/loading/Loading";
+import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -186,39 +183,67 @@ export default function PartnersTable() {
       <div className="p-6">
 
         {/* Table */}
-        <div className="overflow-hidden rounded-lg border border-slate-200">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-slate-200 bg-slate-50">
-                  {[
-                    { icon: Users,      label: "Partner",          minW: "min-w-[250px]" },
-                    { icon: Users,      label: "Contact Info",     minW: "min-w-[220px]" },
-                    { icon: UserCog,    label: "Assigned Manager", minW: "min-w-[180px]" },
-                    { icon: BadgeCheck, label: "Status" },
-                    { icon: Pencil,     label: "Actions" },
-                  ].map(({ icon: Icon, label, minW }) => (
-                    <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
-                      <div className="flex items-center gap-2">
-                        <Icon className="h-4 w-4 text-slate-400" />
-                        {label}
-                      </div>
-                    </th>
-                  ))}
-                  <th className="w-10 px-4 py-4" />
-                </tr>
-              </thead>
+        <TableWrapper
+          footer={
+            <TablePagination
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              itemsPerPage={ITEMS_PER_PAGE}
+              itemCount={partners.length}
+              totalCount={total}
+              itemLabel="partners"
+              loading={loading}
+            />
+          }
+        >
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50">
+                {[
+                  { icon: Users,      label: "Partner",          minW: "min-w-[250px]" },
+                  { icon: Users,      label: "Contact Info",     minW: "min-w-[220px]" },
+                  { icon: UserCog,    label: "Assigned Manager", minW: "min-w-[180px]" },
+                  { icon: BadgeCheck, label: "Status" },
+                  { icon: Pencil,     label: "Actions" },
+                ].map(({ icon: Icon, label, minW }) => (
+                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-slate-400" />
+                      {label}
+                    </div>
+                  </th>
+                ))}
+                <th className="w-10 px-4 py-4" />
+              </tr>
+            </thead>
 
-              <tbody className="divide-y divide-slate-100 bg-white">
-                {loading && (
-                  <tr><td colSpan={6} className="px-6 py-10 text-center"><Loading text="Fetching partners..." /></td></tr>
-                )}
+            <tbody className="divide-y divide-slate-100 bg-white">
+              {loading && <TableSkeletonRows columns={6} />}
 
-                {!error && !loading && partners.length === 0 && (
-                  <tr><td colSpan={6} className="px-6 py-10 text-center"><NoMessagesFound title="No partners found" subtitle="Try adjusting your filters." /></td></tr>
-                )}
+              {!loading && error && (
+                <TableErrorRow colSpan={6} message={error} onRetry={refetch} />
+              )}
 
-                {!error && partners.map((partner) => (
+              {!loading && !error && partners.length === 0 && (
+                <TableEmptyRow
+                  colSpan={6}
+                  title="No partners found"
+                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No partners have registered yet."}
+                  action={
+                    activeFiltersCount > 0 ? (
+                      <button
+                        onClick={clearFilters}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                      >
+                        <RefreshCw className="h-3.5 w-3.5" />
+                        Clear filters
+                      </button>
+                    ) : undefined
+                  }
+                />
+              )}
+
+              {!loading && !error && partners.map((partner) => (
                   <tr
                     key={partner.id}
                     className="group cursor-pointer transition-colors hover:bg-slate-100/50"
@@ -300,29 +325,9 @@ export default function PartnersTable() {
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Pagination */}
-          <div className="flex flex-col items-center justify-between gap-2 border-t border-slate-200 p-6 text-sm text-slate-500 sm:flex-row">
-            {partners.length === 0 && !loading ? (
-              <span />
-            ) : (
-              <span>
-                Showing{" "}
-                <span className="font-medium text-slate-700">{(currentPage - 1) * ITEMS_PER_PAGE + 1}</span> to{" "}
-                <span className="font-medium text-slate-700">{(currentPage - 1) * ITEMS_PER_PAGE + partners.length}</span> of{" "}
-                <span className="font-medium text-slate-700">{displayTotal}</span> partners
-              </span>
-            )}
-            <div className="flex items-center gap-2">
-              <PrevButton onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))} disabled={currentPage === 1} text="Prev" icon={<ArrowLeft className="h-4 w-4" />} />
-              <span>Page {currentPage} of {Math.max(Math.ceil(displayTotal / ITEMS_PER_PAGE), 1)}</span>
-              <NextButton onClick={() => setCurrentPage((p) => p + 1)} disabled={partners.length < ITEMS_PER_PAGE} text="Next" icon={<ArrowRight className="h-4 w-4" />} />
-            </div>
-          </div>
-        </div>
+            </tbody>
+          </table>
+        </TableWrapper>
 
       </div>
 
