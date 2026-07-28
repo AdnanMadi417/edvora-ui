@@ -21,7 +21,6 @@ export interface Application {
 }
 
 interface UseAccountManagerApplicationProps {
-  managerId: string;
   applicationId: string;
 }
 
@@ -33,7 +32,6 @@ interface UseAccountManagerApplicationReturn {
 }
 
 export const useAccountManagerApplication = ({
-  managerId,
   applicationId,
 }: UseAccountManagerApplicationProps): UseAccountManagerApplicationReturn => {
   const [data, setData] = useState<Application | null>(null);
@@ -41,14 +39,14 @@ export const useAccountManagerApplication = ({
   const [error, setError] = useState<string | null>(null);
 
   const fetchApplication = async () => {
-    if (!managerId || !applicationId) return;
+    if (!applicationId) return;
 
     try {
       setLoading(true);
       setError(null);
 
       const response = await api.get<Application>(
-        `/account-managers/${managerId}/applications/${applicationId}`
+        `/account-managers/applications/${applicationId}`
       );
 
       setData(response.data);
@@ -62,7 +60,7 @@ export const useAccountManagerApplication = ({
 
   useEffect(() => {
     fetchApplication();
-  }, [managerId, applicationId]);
+  }, [applicationId]);
 
   return { data, loading, error, refetch: fetchApplication };
 };

@@ -72,6 +72,44 @@ export type AssignManagerPayload = {
   manager_id: string;
 };
 
+export interface AccountManagerPartnerIndividualDetails {
+  date_of_birth: string | null;
+  profile_photo_file_key: string | null;
+  profile_photo_file_url: string | null;
+  passport_photo_file_key: string | null;
+  passport_photo_file_url: string | null;
+  id_document_file_key: string | null;
+  id_document_file_url: string | null;
+  background: string | null;
+  social_media_url: string | null;
+  linkedin_url: string | null;
+}
+
+export type AccountManagerPartnerListItem = {
+  id: string;
+  name: string | null;
+  email: string;
+  type: "individual" | "agency";
+  country: string;
+  phone: string;
+  is_verified: boolean;
+  is_active: boolean;
+  applications_count: number;
+};
+
+export type AccountManagerPartnerDetails = {
+  id: string;
+  name: string | null;
+  email: string;
+  type: "individual" | "agency";
+  country: string;
+  phone: string;
+  is_verified: boolean;
+  is_active: boolean;
+  individual_details: AccountManagerPartnerIndividualDetails | null;
+  company_details: CompanyDetails | null;
+};
+
 export interface UpdatePartnerProfilePayload {
   name?: string;
   type?: string;

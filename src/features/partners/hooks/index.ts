@@ -1,5 +1,7 @@
 export { usePartners, useAllPartners } from './usePartners';
 export { usePartnerDetails } from './usePartnerDetails';
+export { useAccountManagerPartners } from './useAccountManagerPartners';
+export { useAccountManagerPartnerDetails } from './useAccountManagerPartnerDetails';
 export { useCreatePartner } from './useCreatePartner';
 export { useUpdatePartner } from './useUpdatePartner';
 export { useDeletePartner } from './useDeletePartner';
