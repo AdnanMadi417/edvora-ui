@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronRight, User, Mail, CheckCircle, Settings,
   RefreshCw, Pencil, Users,
@@ -61,6 +61,19 @@ const AccountManagersTable = () => {
     is_active: isActive,
   });
 
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const loadingStartedRef = useRef(false);
+  useEffect(() => {
+    if (loading) {
+      loadingStartedRef.current = true;
+    } else if (loadingStartedRef.current) {
+      setHasLoadedOnce(true);
+    }
+  }, [loading]);
+
+  const isInitialLoad = !hasLoadedOnce;
+  const isRefetching = loading && hasLoadedOnce;
+
   const activeFiltersCount = [
     selectedStatus !== "all",
     searchTerm !== "",
@@ -117,6 +130,9 @@ const AccountManagersTable = () => {
               placeholder="Search by name or email..."
               className="sm:w-64 sm:flex-none"
             />
+            {isRefetching && (
+              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
+            )}
             <button
               className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
               onClick={() => setShowMobileFilters((v) => !v)}
@@ -208,14 +224,14 @@ const AccountManagersTable = () => {
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {loading && <TableSkeletonRows columns={6} />}
+            <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
+              {isInitialLoad && <TableSkeletonRows columns={6} rows={ITEMS_PER_PAGE} />}
 
-              {!loading && error && (
+              {!isInitialLoad && error && (
                 <TableErrorRow colSpan={6} message={error} onRetry={refetch} />
               )}
 
-              {!loading && !error && accountManagers.length === 0 && (
+              {!isInitialLoad && !error && accountManagers.length === 0 && (
                 <TableEmptyRow
                   colSpan={6}
                   title={activeFiltersCount > 0 ? "No account managers found" : "No account managers yet"}
@@ -242,7 +258,7 @@ const AccountManagersTable = () => {
                 />
               )}
 
-              {!loading && !error && accountManagers.map((m) => (
+              {!isInitialLoad && !error && accountManagers.map((m) => (
                 <tr
                   key={m.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"

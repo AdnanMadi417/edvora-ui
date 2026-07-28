@@ -55,7 +55,7 @@ export default function ViewDetailsModal({
       >
         <div className="relative overflow-hidden rounded-2xl bg-white text-sm shadow-2xl ring-1 ring-black/5">
           <ModalHeader
-            title="Logistical Partners"
+            title="Logistics Marketplace"
             description="Browse and view available service providers"
             icon={Truck}
             iconBg="bg-blue-50"

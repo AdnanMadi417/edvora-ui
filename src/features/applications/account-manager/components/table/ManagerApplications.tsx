@@ -81,7 +81,6 @@ const SkeletonRow = () => (
 );
 
 const ModernApplicationsTable = () => {
-  const [managerId, setManagerId] = useState<string>("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -110,25 +109,11 @@ const ModernApplicationsTable = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    const resolveManager = async () => {
-      let id = localStorage.getItem("managerId");
-      if (!id) {
-        const meRes = await api.get("/auth/me");
-        id = meRes.data.manager_id ?? meRes.data.id;
-        if (id) localStorage.setItem("managerId", id);
-      }
-      if (id) setManagerId(id);
-    };
-    resolveManager();
-  }, []);
-
-
-  useEffect(() => {
-    if (stages.length === 0 || !managerId) return;
+    if (stages.length === 0) return;
     let cancelled = false;
     Promise.all(
       stages.map((s) =>
-        api.get(`/account-managers/${managerId}/applications`, { params: { stage_id: s.id, limit: 10, status: selectedLifecycle } })
+        api.get(`/account-managers/applications`, { params: { stage_id: s.id, limit: 10, status: selectedLifecycle } })
           .then((res) => ({
             id: s.id,
             count: (res.data as any)?.total ?? 0,
@@ -147,12 +132,11 @@ const ModernApplicationsTable = () => {
       setStageActionRequired(actionMap);
     });
     return () => { cancelled = true; };
-  }, [stages.length, managerId, selectedLifecycle]);
+  }, [stages.length, selectedLifecycle]);
 
-  const { total: grandTotal } = useAccountManagerApplications({ managerId, limit: 1, status: selectedLifecycle });
+  const { total: grandTotal } = useAccountManagerApplications({ limit: 1, status: selectedLifecycle });
 
   const { items: applications, total, loading } = useAccountManagerApplications({
-    managerId,
     limit: itemsPerPage,
     offset: (currentPage - 1) * itemsPerPage,
     status: selectedLifecycle,

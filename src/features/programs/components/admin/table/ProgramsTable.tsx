@@ -321,7 +321,7 @@ const ProgramsTable = () => {
           <p className="mt-1 text-sm text-slate-500">Explore and manage all programs, universities, and learning resources</p>
         </div>
         <Link
-          href="/admin/knowledge-hub/programs/create"
+          href="/admin/knowledge-hub/create"
           className="flex items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:text-blue-800"
         >
           <Plus className="h-4 w-4" />
@@ -515,7 +515,7 @@ const ProgramsTable = () => {
                 <tr
                   key={program.id}
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${selectedPrograms[program.id] ? "bg-slate-50" : ""}`}
-                  onClick={() => window.open(`/admin/knowledge-hub/programs/${program.id}`, "_blank")}
+                  onClick={() => window.open(`/admin/knowledge-hub/${program.id}`, "_blank")}
                 >
                   {/* Checkbox */}
                   <td className="pl-6" onClick={(e) => e.stopPropagation()}>
@@ -643,7 +643,7 @@ const ProgramsTable = () => {
                       <a
                         role="menuitem"
                         aria-label="Edit Program"
-                        href={`/admin/knowledge-hub/programs/${program.id}/edit`}
+                        href={`/admin/knowledge-hub/${program.id}/edit`}
                         onClick={(e) => e.stopPropagation()}
                         className="group/edit flex items-center justify-center rounded-lg p-2 text-sm hover:bg-slate-100 focus:outline-none"
                       >

@@ -245,7 +245,7 @@ export default function RegisterProgram() {
       };
       await createProgram(payload);
       showToast('Program created successfully', 'success');
-      setTimeout(() => router.push('/admin/knowledge-hub/programs'), 1500);
+      setTimeout(() => router.push('/admin/knowledge-hub'), 1500);
     } catch (error: any) {
       const backendMessage =
         error?.response?.data?.detail?.[0]?.msg ||
@@ -716,7 +716,7 @@ export default function RegisterProgram() {
                 />
               ) : (
                 <PrevButton
-                  onClick={() => router.push('/admin/knowledge-hub/programs')}
+                  onClick={() => router.push('/admin/knowledge-hub')}
                   text="Back"
                   icon={<ArrowLeft className="h-4 w-4" />}
                 />

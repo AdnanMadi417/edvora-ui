@@ -15,17 +15,17 @@ const accountManagerRoutes: IRoute[] = [
         icon: MdMenuBook,
     },
     {
-        name: "Logistical Partners",
+        name: "Logistics Marketplace",
         layout: "/account-manager",
-        path: "/logistical-partners",
+        path: "/logistics-marketplace",
         icon: MdBusinessCenter,
     },
-    // {
-    //     name: "Partners",
-    //     layout: "/account-manager",
-    //     path: "/partners",
-    //     icon: MdHandshake,
-    // },
+    {
+        name: "Partners",
+        layout: "/account-manager",
+        path: "/partners",
+        icon: MdHandshake,
+    },
     // {
     //     name: "Commission",
     //     layout: "/account-manager",

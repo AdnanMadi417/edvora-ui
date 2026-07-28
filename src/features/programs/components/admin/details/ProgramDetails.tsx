@@ -151,8 +151,8 @@ const ProgramDetails = ({ id }: Props) => {
   const { showToast } = useToast();
 
   const router = useRouter();
-  const handleBack = () => router.push('/admin/knowledge-hub/programs');
-  const handleUpdate = () => router.push(`/admin/knowledge-hub/programs/${id}/edit`);
+  const handleBack = () => router.push('/admin/knowledge-hub');
+  const handleUpdate = () => router.push(`/admin/knowledge-hub/${id}/edit`);
 
   const handleDelete = async () => {
     try {
@@ -161,7 +161,7 @@ const ProgramDetails = ({ id }: Props) => {
       await deletePrograms([id]);
       showToast('Deleted successfully', 'success');
       setIsDeleteOpen(false);
-      router.push('/admin/knowledge-hub/programs');
+      router.push('/admin/knowledge-hub');
     } catch {
       showToast('Delete failed', 'error');
     } finally {
@@ -304,14 +304,14 @@ const ProgramDetails = ({ id }: Props) => {
                   </button>
 
                   <button
-                    aria-label="Back to Programs"
+                    aria-label="Back to Knowledge Hub"
                     className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
                     onClick={handleBack}
                   >
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
                       <ChevronLeft className="h-4 w-4" />
                     </div>
-                    <span className="font-semibold text-slate-900">Back to Programs</span>
+                    <span className="font-semibold text-slate-900">Back to Knowledge Hub</span>
                   </button>
 
                 </div>
