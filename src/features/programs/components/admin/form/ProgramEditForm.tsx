@@ -257,7 +257,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
       showToast("Program updated successfully", "success");
 
-      router.push(`/admin/knowledge-hub/programs/${id}`);
+      router.push(`/admin/knowledge-hub/${id}`);
     } catch (error: any) {
       const backendMessage =
         error?.response?.data?.message || "Please try again.";
@@ -273,7 +273,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       showToast("Deleted successfully", "success");
       setIsDeleteOpen(false);
       setDeleteMode(null);
-      router.push("/admin/knowledge-hub/programs");
+      router.push("/admin/knowledge-hub");
     } catch (error: any) {
       const backendMessage =
         error?.response?.data?.message || "Please try again.";
@@ -284,7 +284,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   };
 
   const handleBack = () => {
-    router.push(`/admin/knowledge-hub/programs/${id}`);
+    router.push(`/admin/knowledge-hub/${id}`);
   };
 
   if (!program) return <Loading text="Loading program..." />;
@@ -344,7 +344,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                       </button>
 
                       <button
-                        aria-label="Back to Programs"
+                        aria-label="Back to Knowledge Hub"
                         className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
                         onClick={handleBack}
                       >
@@ -353,7 +353,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                         </div>
 
                         <span className="font-semibold text-slate-900">
-                        Back to Programs
+                        Back to Knowledge Hub
                       </span>
                       </button>
                     </div>

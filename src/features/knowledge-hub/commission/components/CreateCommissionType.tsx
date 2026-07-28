@@ -43,7 +43,7 @@ export default function CreateCommissionType({ isOpen, onClose }: CreateCommissi
     try {
       await createCommissionType(formData);
       showToast("Commission type created successfully.", "success");
-      router.push("/admin/knowledge-hub/programs/create");
+      router.push("/admin/knowledge-hub/create");
       onClose();
     } catch (error: any) {
       const backendMessage = error?.response?.data?.message || "Please try again.";
