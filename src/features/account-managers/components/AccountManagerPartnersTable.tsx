@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronRight, Users, Mail, BadgeCheck,
   CheckCircle, XCircle, RefreshCw, SlidersHorizontal,
@@ -63,6 +63,19 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
     ...statusToParams(selectedStatus),
   });
 
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const loadingStartedRef = useRef(false);
+  useEffect(() => {
+    if (loading) {
+      loadingStartedRef.current = true;
+    } else if (loadingStartedRef.current) {
+      setHasLoadedOnce(true);
+    }
+  }, [loading]);
+
+  const isInitialLoad = !hasLoadedOnce;
+  const isRefetching = loading && hasLoadedOnce;
+
   const activeFiltersCount = [selectedStatus !== "all", searchTerm !== ""].filter(Boolean).length;
 
   const clearFilters = () => {
@@ -92,6 +105,9 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
               placeholder="Search by name or email..."
               className="sm:w-64 sm:flex-none"
             />
+            {isRefetching && (
+              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
+            )}
             <button
               className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
               onClick={() => setShowMobileFilters((v) => !v)}
@@ -162,14 +178,14 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {loading && <TableSkeletonRows columns={4} />}
+            <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
+              {isInitialLoad && <TableSkeletonRows columns={4} rows={ITEMS_PER_PAGE} />}
 
-              {!loading && error && (
+              {!isInitialLoad && error && (
                 <TableErrorRow colSpan={4} message={error} onRetry={refetch} />
               )}
 
-              {!loading && !error && partners.length === 0 && (
+              {!isInitialLoad && !error && partners.length === 0 && (
                 <TableEmptyRow
                   colSpan={4}
                   title="No partners found"
@@ -188,7 +204,7 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
                 />
               )}
 
-              {!loading && !error && partners.map((partner) => (
+              {!isInitialLoad && !error && partners.map((partner) => (
                 <tr
                   key={partner.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"

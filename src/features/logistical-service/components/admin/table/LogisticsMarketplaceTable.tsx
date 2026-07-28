@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PresignedImage from "components/ui/PresignedImage";
 import {
   CheckCircle,
@@ -30,6 +30,19 @@ const LogisticsMarketplaceTable = () => {
   const router = useRouter();
   const { serviceProviders, loading, error, refetch } = useLogisticProviders();
   const { showToast } = useToast();
+
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const loadingStartedRef = useRef(false);
+  useEffect(() => {
+    if (loading) {
+      loadingStartedRef.current = true;
+    } else if (loadingStartedRef.current) {
+      setHasLoadedOnce(true);
+    }
+  }, [loading]);
+
+  const isInitialLoad = !hasLoadedOnce;
+  const isRefetching = loading && hasLoadedOnce;
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedServiceName, setSelectedServiceName] = useState<string>("");
@@ -89,6 +102,10 @@ const LogisticsMarketplaceTable = () => {
                 className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
               />
             </div>
+
+            {isRefetching && (
+              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
+            )}
 
             <Link
               className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
@@ -157,14 +174,14 @@ const LogisticsMarketplaceTable = () => {
                   </tr>
                 </thead>
 
-                <tbody className="divide-y divide-slate-200 bg-white">
-                  {loading && <TableSkeletonRows columns={8} />}
+                <tbody className={`divide-y divide-slate-200 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
+                  {isInitialLoad && <TableSkeletonRows columns={8} rows={itemsPerPage} />}
 
-                  {!loading && error && (
+                  {!isInitialLoad && error && (
                     <TableErrorRow colSpan={8} message={error} onRetry={refetch} />
                   )}
 
-                  {!loading && !error && currentServiceProviders.length === 0 && (
+                  {!isInitialLoad && !error && currentServiceProviders.length === 0 && (
                     <TableEmptyRow
                       colSpan={8}
                       title="No service providers found"
@@ -183,7 +200,7 @@ const LogisticsMarketplaceTable = () => {
                     />
                   )}
 
-                  {!loading && !error &&
+                  {!isInitialLoad && !error &&
                     currentServiceProviders.map((provider) => (
                       <tr
                         key={provider.id}

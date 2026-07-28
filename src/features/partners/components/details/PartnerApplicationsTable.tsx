@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ChevronRight, User, GraduationCap, Clock, RefreshCw, SlidersHorizontal } from "lucide-react";
 import { usePartnerApplications } from "features/applications/hooks";
 import PresignedImage from "components/ui/PresignedImage";
@@ -55,6 +55,19 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
     search: debouncedSearch || undefined,
   });
 
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const loadingStartedRef = useRef(false);
+  useEffect(() => {
+    if (loading) {
+      loadingStartedRef.current = true;
+    } else if (loadingStartedRef.current) {
+      setHasLoadedOnce(true);
+    }
+  }, [loading]);
+
+  const isInitialLoad = !hasLoadedOnce;
+  const isRefetching = loading && hasLoadedOnce;
+
   const activeFiltersCount = [selectedLifecycle !== "active", searchTerm !== ""].filter(Boolean).length;
 
   const clearFilters = () => {
@@ -84,6 +97,9 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
               placeholder="Search by student name..."
               className="sm:w-64 sm:flex-none"
             />
+            {isRefetching && (
+              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
+            )}
             <button
               className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
               onClick={() => setShowMobileFilters((v) => !v)}
@@ -154,14 +170,14 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {loading && <TableSkeletonRows columns={4} />}
+            <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
+              {isInitialLoad && <TableSkeletonRows columns={4} rows={ITEMS_PER_PAGE} />}
 
-              {!loading && error && (
+              {!isInitialLoad && error && (
                 <TableErrorRow colSpan={4} message={error} onRetry={refetch} />
               )}
 
-              {!loading && !error && applications.length === 0 && (
+              {!isInitialLoad && !error && applications.length === 0 && (
                 <TableEmptyRow
                   colSpan={4}
                   title="No applications found"
@@ -180,7 +196,7 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                 />
               )}
 
-              {!loading && !error && applications.map((app) => {
+              {!isInitialLoad && !error && applications.map((app) => {
                 const { bg, text } = getStatusColors(app.status?.toLowerCase().replace(/\s+/g, "_") ?? "");
                 return (
                   <tr
