@@ -8,9 +8,9 @@ import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { useToast } from "components/context/ToastContext";
 import Button from "components/ui/buttons/Button";
-import CreateLogisticalPartnersPopup from "../CreateLogisticalPartnersPopup";
+import CreateLogisticsMarketplacePopup from "../CreateLogisticsMarketplacePopup";
 
-const LogisticalPartnersServicesConfig = () => {
+const LogisticsMarketplaceServicesConfig = () => {
   const { logisticServices, loadingLogisticServices, errorLogisticServices, refetchLogisticServices } =
     useLogisticServices();
   const [isCreateServiceOpen, setIsCreateServiceOpen] = useState(false);
@@ -152,7 +152,7 @@ const LogisticalPartnersServicesConfig = () => {
         </div>
       </div>
 
-      <CreateLogisticalPartnersPopup
+      <CreateLogisticsMarketplacePopup
         isOpen={isCreateServiceOpen}
         onClose={() => setIsCreateServiceOpen(false)}
         onCreated={refetchLogisticServices}
@@ -161,4 +161,4 @@ const LogisticalPartnersServicesConfig = () => {
   );
 };
 
-export default LogisticalPartnersServicesConfig;
+export default LogisticsMarketplaceServicesConfig;

@@ -25,13 +25,13 @@ import PrevButton from "components/ui/buttons/PrevButton";
 
 const ITEMS_PER_PAGE = 9;
 
-interface LogisticalPartnersListProps {
+interface LogisticsMarketplaceProps {
   locked?: boolean;
   visaProcessingCount?: number;
   basePath?: string;
 }
 
-const LogisticalPartnersList = ({ locked = false, visaProcessingCount = 0, basePath = "/partner" }: LogisticalPartnersListProps) => {
+const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePath = "/partner" }: LogisticsMarketplaceProps) => {
   const { serviceProviders, loading, error } = useLogisticProviders();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -61,16 +61,16 @@ const LogisticalPartnersList = ({ locked = false, visaProcessingCount = 0, baseP
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
               <h3 className="text-xl font-semibold text-slate-900">
-                Logistical Partners
+                Logistics Marketplace
               </h3>
               <p className="mt-1 text-sm text-slate-500">
                 {!loading && serviceProviders.length > 0 ? (
                   locked
-                    ? <><span className="font-medium text-slate-700">{serviceProviders.length}</span> partners available · <span className="font-medium text-amber-600">Requires Visa Processing stage</span></>
-                    : <><span className="font-medium text-slate-700">{serviceProviders.length}</span> partners available</>
+                    ? <><span className="font-medium text-slate-700">{serviceProviders.length}</span> listings available · <span className="font-medium text-amber-600">Requires Visa Processing stage</span></>
+                    : <><span className="font-medium text-slate-700">{serviceProviders.length}</span> listings available</>
 
                 ) : (
-                  "Browse and connect with verified logistics partners and service providers"
+                  "Browse and connect with verified logistics marketplace listings and service providers"
                 )}
               </p>
             </div>
@@ -81,7 +81,7 @@ const LogisticalPartnersList = ({ locked = false, visaProcessingCount = 0, baseP
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
               <input
                 type="text"
-                placeholder="Search logistic partner by name..."
+                placeholder="Search marketplace listings by name..."
                 value={searchTerm}
                 disabled={locked}
                 onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
@@ -165,7 +165,7 @@ const LogisticalPartnersList = ({ locked = false, visaProcessingCount = 0, baseP
                   </div>
                 )}
                 <a
-                  href={locked ? undefined : `${basePath}/logistical-partners/${m.id}`}
+                  href={locked ? undefined : `${basePath}/logistics-marketplace/${m.id}`}
                   className={`flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md ${locked ? "cursor-default" : ""}`}
                 >
                   <div className={`flex items-center gap-4 px-5 py-5 ${locked ? "blur-sm select-none pointer-events-none" : ""}`}>
@@ -324,4 +324,4 @@ const LogisticalPartnersList = ({ locked = false, visaProcessingCount = 0, baseP
   );
 };
 
-export default LogisticalPartnersList;
+export default LogisticsMarketplace;

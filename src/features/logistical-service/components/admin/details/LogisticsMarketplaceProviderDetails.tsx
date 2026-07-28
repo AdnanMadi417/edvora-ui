@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import PresignedImage from "components/ui/PresignedImage";
-
 import {
   MdContentCopy,
   MdKeyboardArrowDown,
@@ -15,19 +14,15 @@ import {
 import { ChevronLeft, Globe, MapPin, Truck } from "lucide-react";
 
 import { useLogisticProviderDetails } from "features/logistical-service/hooks";
-
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyData";
 
-interface LogisticalPartnersProviderDetailsProps {
+interface LogisticsMarketplaceProviderDetailsProps {
   id: string;
-  basePath?: string;
 }
 
-const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: LogisticalPartnersProviderDetailsProps) => {
+const LogisticsMarketplaceProviderDetails = ({ id }: LogisticsMarketplaceProviderDetailsProps) => {
   const router = useRouter();
-  const handleBack = () => { router.push(`${basePath}/logistical-partners`); };
-
   const { service, loadingService, errorService } = useLogisticProviderDetails(id);
 
   const [openPackage, setOpenPackage] = useState<string | null>(null);
@@ -59,9 +54,10 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
                   }`}
                 />
               </div>
-
               <div className="min-w-0">
-                <h3 className="line-clamp-2 text-lg font-semibold text-slate-900">{service.name}</h3>
+                <h3 className="line-clamp-2 text-lg font-semibold text-slate-900">
+                  {service.name}
+                </h3>
                 <p className="mt-1 break-words text-sm text-slate-500">
                   Browse and view available service providers
                 </p>
@@ -70,7 +66,7 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
 
             <div className="flex items-center gap-2 sm:gap-6">
               <button
-                onClick={handleBack}
+                onClick={() => router.push("/admin/logistics-marketplace")}
                 className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -79,17 +75,20 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-xl bg-white py-5 px-6">
+          <div className="relative overflow-hidden rounded-xl bg-white px-6 py-5">
             <div className="absolute -right-16 -top-16 h-40 w-40 rounded-md bg-blue-100/20 blur-2xl" />
-            <div className="flex flex-col md:flex-row md:justify-between md:items-start space-y-3 md:space-y-0">
+            <div className="flex flex-col space-y-3 md:flex-row md:items-start md:justify-between md:space-y-0">
               <div>
-                <p className="text-sm text-slate-600 mt-1">
-                  Nationality: <span className="font-medium">{service?.nationality || "Not provided"}</span>
+                <p className="mt-1 text-sm text-slate-600">
+                  Nationality:{" "}
+                  <span className="font-medium">{service?.nationality || "Not provided"}</span>
                 </p>
               </div>
               <div className="mt-3 md:mt-0">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Price Range</p>
-                <p className="text-lg font-bold text-slate-800 mt-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Price Range
+                </p>
+                <p className="mt-1 text-lg font-bold text-slate-800">
                   {service?.price_range
                     ? `RM ${service.price_range.min_price} - ${service.price_range.max_price}`
                     : "Not available"}
@@ -98,8 +97,8 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-5 px-6">
-            <div className="rounded-xl border bg-slate-50 p-4 flex items-center justify-between">
+          <div className="grid grid-cols-1 gap-4 px-6 py-5 sm:grid-cols-3">
+            <div className="flex items-center justify-between rounded-xl border bg-slate-50 p-4">
               <div className="flex items-center gap-2 text-slate-500">
                 <MapPin className="h-4 w-4 text-slate-400" />
                 <span>Residence</span>
@@ -109,7 +108,7 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
               </span>
             </div>
 
-            <div className="rounded-xl border bg-slate-50 p-4 flex items-center justify-between">
+            <div className="flex items-center justify-between rounded-xl border bg-slate-50 p-4">
               <div className="flex items-center gap-2 text-slate-500">
                 <Globe className="h-4 w-4 text-slate-400" />
                 <span>Nationality</span>
@@ -120,7 +119,7 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
             </div>
 
             <div className="rounded-xl border bg-slate-50 p-4">
-              <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-slate-700">
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
                 <MdTranslate className="h-4 w-4 text-slate-500" /> Languages
               </div>
               <div className="flex flex-wrap gap-2">
@@ -137,9 +136,9 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
             </div>
           </div>
 
-          <div className="py-5 px-6">
+          <div className="px-6 py-5">
             <div className="border-y border-slate-200 py-5">
-              <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-slate-700">
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
                 <MdPublic className="h-4 w-4 text-slate-500" /> Service Locations
               </div>
               <div className="flex flex-wrap gap-2">
@@ -156,14 +155,15 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
             </div>
 
             <div className="border-b border-slate-200 py-5">
-              <div className="flex items-center gap-2 mb-2 text-sm font-semibold text-slate-700">
+              <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-slate-700">
                 <MdSchool className="h-5 w-5 text-blue-600" /> Universities Served
               </div>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-600">
+              <ul className="grid grid-cols-1 gap-2 text-sm text-slate-600 sm:grid-cols-2">
                 {service?.universities_served?.length ? (
                   service.universities_served.map((uni) => (
                     <li key={uni} className="flex items-center gap-2">
-                      <span className="h-1.5 w-1.5 rounded-md bg-blue-500" /> {uni}
+                      <span className="h-1.5 w-1.5 rounded-md bg-blue-500" />
+                      {uni}
                     </li>
                   ))
                 ) : (
@@ -173,7 +173,7 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
             </div>
 
             <div className="border-b border-slate-200 py-5">
-              <div className="flex items-center gap-2 mb-3 text-sm font-semibold text-slate-700">
+              <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700">
                 <MdLocalAirport className="h-5 w-5 text-emerald-600" /> Services Offered
               </div>
               {service?.services_offered?.length ? (
@@ -191,45 +191,37 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
             </div>
           </div>
 
-          <div className="space-y-4 py-5 px-6">
+          <div className="space-y-4 px-6 py-5">
             <p className="text-sm font-semibold text-slate-800">Packages</p>
-            {service?.packages_offered?.length ? (
-              service.packages_offered.map((pkg) => (
-                <div key={pkg.name} className="rounded-xl border border-slate-200 bg-slate-50">
-                  <button
-                    onClick={() => setOpenPackage(openPackage === pkg.name ? null : pkg.name)}
-                    className="flex w-full items-center justify-between px-5 py-4"
-                  >
-                    <div>
-                      <p className="font-medium text-slate-900">{pkg.name}</p>
-                      <p className="text-xs text-slate-500">RM {pkg.price}</p>
-                    </div>
-                    <MdKeyboardArrowDown className={`h-5 w-5 transition ${openPackage === pkg.name ? "rotate-180" : ""}`} />
-                  </button>
-                  {openPackage === pkg.name && (
-                    <div className="space-y-2 border-t px-5 py-4 text-sm text-slate-600">
-                      <p>{pkg.description}</p>
-                      {pkg.includes?.length ? (
-                        <ul className="space-y-1">
-                          {pkg.includes.map((i) => (
-                            <li key={i} className="flex items-center gap-2">
-                              <span className="h-1.5 w-1.5 rounded-md bg-emerald-500" /> {i}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-xs text-slate-400">No items included</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-                <p className="text-sm font-medium text-slate-700">No packages available</p>
-                <p className="mt-1 text-xs text-slate-400">This provider hasn't added any packages yet</p>
+            {service?.packages_offered?.map((pkg) => (
+              <div key={pkg.name} className="rounded-xl border border-slate-200 bg-slate-50">
+                <button
+                  onClick={() => setOpenPackage(openPackage === pkg.name ? null : pkg.name)}
+                  className="flex w-full items-center justify-between px-5 py-4"
+                >
+                  <div>
+                    <p className="font-medium text-slate-900">{pkg.name}</p>
+                    <p className="text-xs text-slate-500">RM {pkg.price}</p>
+                  </div>
+                  <MdKeyboardArrowDown
+                    className={`h-5 w-5 transition ${openPackage === pkg.name ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {openPackage === pkg.name && (
+                  <div className="space-y-2 border-t px-5 py-4 text-sm text-slate-600">
+                    <p>{pkg.description}</p>
+                    <ul className="space-y-1">
+                      {pkg.includes.map((i) => (
+                        <li key={i} className="flex items-center gap-2">
+                          <span className="h-1.5 w-1.5 rounded-md bg-emerald-500" />
+                          {i}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
-            )}
+            ))}
           </div>
 
           <div className="border-t border-slate-200 px-6 py-4">
@@ -237,7 +229,11 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
               <div className="flex items-center gap-2 text-sm">
                 <span className="font-medium">{service?.phone_number}</span>
                 <button
-                  onClick={() => { navigator.clipboard.writeText(service.phone_number); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(service.phone_number);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1500);
+                  }}
                   className="rounded p-1 hover:bg-slate-100"
                 >
                   <MdContentCopy className="h-4 w-4" />
@@ -258,4 +254,4 @@ const LogisticalPartnersProviderDetails = ({ id, basePath = "/partner" }: Logist
   );
 };
 
-export default LogisticalPartnersProviderDetails;
+export default LogisticsMarketplaceProviderDetails;
