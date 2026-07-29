@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ExternalLink, FileText, Save, Upload } from "lucide-react";
+import { Camera, ChevronLeft, ExternalLink, FileText, Save, Upload } from "lucide-react";
 import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
@@ -12,9 +12,13 @@ import PhoneInputField from "components/form/fields/PhoneInputField";
 import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
+import PresignedImage from "components/ui/PresignedImage";
 import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
+
+// Temporarily disabled — backend is returning 403 on photo upload/update, hide the upload control until fixed.
+const PROFILE_PHOTO_UPLOAD_ENABLED = false;
 
 type DocState = {
   file_key: string;
@@ -105,6 +109,51 @@ function DocUploadField({
   );
 }
 
+function AvatarUpload({
+  doc,
+  name,
+  isActive,
+  onUpload,
+}: {
+  doc: DocState;
+  name: string;
+  isActive: boolean;
+  onUpload: (file: File) => void;
+}) {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) onUpload(file);
+    e.target.value = "";
+  };
+
+  return (
+    <div className="relative shrink-0">
+      <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+        <PresignedImage
+          fileKey={doc.file_key}
+          alt="Profile"
+          className="h-full w-full object-cover"
+          fallback={name?.slice(0, 2).toUpperCase() || "NA"}
+        />
+        {doc.uploading && (
+          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-[10px] font-medium text-white">
+            {doc.progress}%
+          </div>
+        )}
+      </div>
+      <span className={`absolute -bottom-0.5 left-0 h-3.5 w-3.5 rounded-full border-2 border-white ${isActive ? "bg-emerald-500" : "bg-slate-300"}`} />
+      <label
+        htmlFor="profile-photo"
+        className="absolute -bottom-1 -right-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-blue-600 text-white transition-colors hover:bg-blue-700"
+        title="Change photo"
+      >
+        <Camera className="h-3 w-3" />
+        <input id="profile-photo" type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={handleChange} />
+      </label>
+    </div>
+  );
+}
+
 export default function EditPartnerProfile() {
   const router = useRouter();
   const { showToast } = useToast();
@@ -123,6 +172,7 @@ export default function EditPartnerProfile() {
     website_url: "",
   });
 
+  const [profilePhoto, setProfilePhoto] = useState<DocState>({ file_key: "", file_url: "", uploading: false, progress: 0, error: "" });
   const [idDoc, setIdDoc] = useState<DocState>({ file_key: "", file_url: "", uploading: false, progress: 0, error: "" });
   const [companyRegDoc, setCompanyRegDoc] = useState<DocState>({ file_key: "", file_url: "", uploading: false, progress: 0, error: "" });
   const [contactIdDoc, setContactIdDoc] = useState<DocState>({ file_key: "", file_url: "", uploading: false, progress: 0, error: "" });
@@ -146,6 +196,7 @@ export default function EditPartnerProfile() {
     });
     if (partner.individual_details) {
       setIdDoc((p) => ({ ...p, file_key: partner.individual_details!.id_document_file_key ?? "", file_url: partner.individual_details!.id_document_file_url ?? "" }));
+      setProfilePhoto((p) => ({ ...p, file_key: partner.individual_details!.profile_photo_file_key ?? "", file_url: partner.individual_details!.profile_photo_file_url ?? "" }));
     }
     if (partner.company_details) {
       setCompanyRegDoc((p) => ({ ...p, file_key: partner.company_details!.company_registration_doc_file_key ?? "", file_url: partner.company_details!.company_registration_doc_file_url ?? "" }));
@@ -175,7 +226,7 @@ export default function EditPartnerProfile() {
     }
   };
 
-  const isUploading = idDoc.uploading || companyRegDoc.uploading || contactIdDoc.uploading;
+  const isUploading = profilePhoto.uploading || idDoc.uploading || companyRegDoc.uploading || contactIdDoc.uploading;
 
   const isValidUrl = (val: string) => {
     try {
@@ -234,6 +285,8 @@ export default function EditPartnerProfile() {
         payload.individual_details = {
           id_document_file_key: idDoc.file_key,
           id_document_file_url: idDoc.file_url,
+          profile_photo_file_key: profilePhoto.file_key,
+          profile_photo_file_url: profilePhoto.file_url,
           background: formData.background,
           social_media_url: formData.social_media_url,
           linkedin_url: formData.linkedin_url,
@@ -269,12 +322,26 @@ export default function EditPartnerProfile() {
 
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-slate-200 px-6 py-5">
-          <div className="relative shrink-0">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-              {partner.name?.slice(0, 2).toUpperCase() || "NA"}
+          {isIndividual && PROFILE_PHOTO_UPLOAD_ENABLED ? (
+            <AvatarUpload
+              doc={profilePhoto}
+              name={partner.name}
+              isActive={partner.is_active}
+              onUpload={(f) => handleUpload(f, setProfilePhoto, "profile_photo")}
+            />
+          ) : (
+            <div className="relative shrink-0">
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                <PresignedImage
+                  fileKey={isIndividual ? profilePhoto.file_key : undefined}
+                  alt="Profile"
+                  className="h-full w-full object-cover"
+                  fallback={partner.name?.slice(0, 2).toUpperCase() || "NA"}
+                />
+              </div>
+              <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
             </div>
-            <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
-          </div>
+          )}
           <div>
             <h2 className="text-lg font-semibold text-slate-900">{partner.name}</h2>
             <p className="text-sm text-slate-500">{isIndividual ? "Individual Advisor" : "Agency / Company"}</p>

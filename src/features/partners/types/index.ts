@@ -4,6 +4,8 @@ export interface IndividualDetails {
   background: string;
   social_media_url: string;
   linkedin_url: string;
+  profile_photo_file_key?: string;
+  profile_photo_file_url?: string;
 }
 
 export interface CompanyDetails {
