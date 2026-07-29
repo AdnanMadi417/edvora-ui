@@ -13,6 +13,8 @@ import { profileRouteMap, notificationsRouteMap } from "components/navbar/config
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
 import { useToast } from "components/context/ToastContext";
 import ChangePasswordPopup from "features/partners/components/popups/ChangePasswordPopup";
+import { usePartnerProfile } from "features/partners/hooks";
+import PresignedImage from "components/ui/PresignedImage";
 
 const Navbar = ({
                   onOpenSidenav,
@@ -33,6 +35,8 @@ const Navbar = ({
   const [isSendingReset, setIsSendingReset] = useState(false);
   const { user, loading } = useMe();
   const { showToast } = useToast();
+  const { partner } = usePartnerProfile({ enabled: user?.role === "partner" });
+  const photoFileKey = partner?.individual_details?.profile_photo_file_key;
 
   const handleSendResetLink = async () => {
     if (!user?.email || isSendingReset) return;
@@ -160,10 +164,15 @@ const Navbar = ({
 
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center
-                rounded-full text-h5 font-medium text-blue-700 "
+                overflow-hidden rounded-full text-h5 font-medium text-blue-700 "
               >
                 {user ? (
-                  user.name[0].toUpperCase()
+                  <PresignedImage
+                    fileKey={photoFileKey ?? undefined}
+                    alt={user.name}
+                    className="h-full w-full object-cover"
+                    fallback={user.name[0].toUpperCase()}
+                  />
                 ) : (
                   <div className="h-5 w-5 animate-pulse rounded-md" />
                 )}

@@ -27,6 +27,7 @@ import ChangePasswordPopup from "../popups/ChangePasswordPopup";
 import ActionsDropdown from "components/ui/buttons/ActionsDropdown";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
+import PresignedImage from "components/ui/PresignedImage";
 
 interface PartnerDetailsProps {
   id: string;
@@ -122,8 +123,13 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
           <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
             <div className="flex items-center gap-4">
               <div className="relative shrink-0">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                  {partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
+                <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                  <PresignedImage
+                    fileKey={partner.individual_details?.profile_photo_file_key ?? undefined}
+                    alt="Profile"
+                    className="h-full w-full object-cover"
+                    fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
+                  />
                 </div>
                 <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
               </div>
@@ -151,7 +157,6 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
               <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Partner Type" value={partner.type === "individual" ? "Individual Advisor" : "Agency / Company"} />
               <InfoRow icon={<MdSupervisorAccount className="h-4 w-4" />} label="Assigned Manager" value={partner.assigned_manager_name} />
               <InfoRow icon={<MdVerified className="h-4 w-4" />} label="Verification" value={partner.is_verified ? "Verified" : "Not Verified"} />
-              <InfoRow icon={<MdToggleOn className="h-4 w-4" />} label="Account Status" value={partner.is_active ? "Active" : "Inactive"} />
             </div>
           </div>
 

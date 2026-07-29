@@ -10,6 +10,8 @@ import Image from "next/image";
 
 import { useEffect, useState, useCallback } from "react";
 import api, { SIGN_IN_URL, LOGOUT_URL } from "lib/useApi";
+import { usePartnerProfile } from "features/partners/hooks";
+import PresignedImage from "components/ui/PresignedImage";
 
 interface User {
   id: string;
@@ -26,6 +28,8 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const [userError, setUserError] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showBetaTooltip, setShowBetaTooltip] = useState(false);
+  const { partner } = usePartnerProfile({ enabled: user?.role === "partner" });
+  const photoFileKey = partner?.individual_details?.profile_photo_file_key;
 
   const ROLE_LABELS: Record<string, string> = {
     admin: "Admin",
@@ -152,10 +156,15 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             <div className="flex items-center gap-3">
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center
-          rounded-full bg-accent-light text-h5 font-medium text-blue-700"
+          overflow-hidden rounded-full bg-accent-light text-h5 font-medium text-blue-700"
               >
                 {user ? (
-                  user.name[0].toUpperCase()
+                  <PresignedImage
+                    fileKey={photoFileKey ?? undefined}
+                    alt={user.name}
+                    className="h-full w-full object-cover"
+                    fallback={user.name[0].toUpperCase()}
+                  />
                 ) : (
                   <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
                 )}

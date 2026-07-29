@@ -15,6 +15,7 @@ import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsF
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import PresignedImage from "components/ui/PresignedImage";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -267,8 +268,13 @@ export default function PartnersTable() {
                   >
                     <td className="min-w-[220px] px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                          {partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
+                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                          <PresignedImage
+                            fileKey={partner.individual_details?.profile_photo_file_key ?? undefined}
+                            alt={partner.name}
+                            className="h-full w-full object-cover"
+                            fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
+                          />
                           <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
                         </div>
                         <div className="min-w-0">

@@ -27,6 +27,7 @@ import EmptyData from "components/emptyData/EmptyTableData";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
+import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import { parseDate, formatDate } from "components/ui/date/utils";
 import AccountManagerPartnerApplicationsTable from "./AccountManagerPartnerApplicationsTable";
@@ -159,8 +160,13 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
           <div className="flex items-center gap-4">
             <div className="relative shrink-0">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                {partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                <PresignedImage
+                  fileKey={partner.individual_details?.profile_photo_file_key ?? undefined}
+                  alt="Profile"
+                  className="h-full w-full object-cover"
+                  fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
+                />
               </div>
               <span
                 className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${
