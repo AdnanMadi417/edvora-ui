@@ -12,7 +12,7 @@ import { useMe } from "hooks/useMe";
 import { profileRouteMap, notificationsRouteMap } from "components/navbar/config/navigation";
 import { useUnreadCount } from "hooks/notifications/useUnreadCount";
 import { useToast } from "components/context/ToastContext";
-import ChangePasswordPopup from "features/partners/components/popups/ChangePasswordPopup";
+import ChangePasswordPopup from "features/partners/components/partner/ChangePasswordPopup";
 import { usePartnerProfile } from "features/partners/hooks";
 import PresignedImage from "components/ui/PresignedImage";
 

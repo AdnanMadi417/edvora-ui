@@ -28,7 +28,7 @@ import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
-import ReviewPartnerPopup from "../popups/ReviewPartnerPopup";
+import ReviewPartnerPopup from "./ReviewPartnerPopup";
 
 interface Props {
   id: string;

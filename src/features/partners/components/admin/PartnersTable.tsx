@@ -9,8 +9,8 @@ import {
 import { useRouter } from "next/navigation";
 import { usePartners, useDeletePartner } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
-import AssignPartnerManager from "../popups/AssignPartnerManager";
-import ReviewPartnerPopup from "../popups/ReviewPartnerPopup";
+import AssignPartnerManager from "./AssignPartnerManager";
+import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";

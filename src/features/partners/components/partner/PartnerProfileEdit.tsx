@@ -17,6 +17,9 @@ import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 
+// Temporarily disabled — backend is returning 403 on photo upload/update, hide the upload control until fixed.
+const PROFILE_PHOTO_UPLOAD_ENABLED = false;
+
 type DocState = {
   file_key: string;
   file_url: string;
@@ -319,7 +322,7 @@ export default function EditPartnerProfile() {
 
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-slate-200 px-6 py-5">
-          {isIndividual ? (
+          {isIndividual && PROFILE_PHOTO_UPLOAD_ENABLED ? (
             <AvatarUpload
               doc={profilePhoto}
               name={partner.name}
@@ -328,8 +331,13 @@ export default function EditPartnerProfile() {
             />
           ) : (
             <div className="relative shrink-0">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                {partner.name?.slice(0, 2).toUpperCase() || "NA"}
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                <PresignedImage
+                  fileKey={isIndividual ? profilePhoto.file_key : undefined}
+                  alt="Profile"
+                  className="h-full w-full object-cover"
+                  fallback={partner.name?.slice(0, 2).toUpperCase() || "NA"}
+                />
               </div>
               <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
             </div>
