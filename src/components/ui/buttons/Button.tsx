@@ -11,6 +11,7 @@ type ButtonProps = {
   hoverTextColor?: string;
   hoverBorderColor?: string;
   className?: string;
+  title?: string;
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -24,11 +25,13 @@ const Button: React.FC<ButtonProps> = ({
                                          hoverTextColor = "hover:text-blue-700",
                                          hoverBorderColor = "hover:border-blue-700",
                                          className,
+                                         title,
                                        }) => {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
+      title={title}
       className={`flex min-w-0 items-center justify-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition
         ${bgColor} ${textColor} ${borderColor} ${hoverTextColor} ${hoverBorderColor} disabled:cursor-not-allowed disabled:opacity-50
         ${className || ""}`}

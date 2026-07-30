@@ -4,8 +4,12 @@ export interface IndividualDetails {
   background: string;
   social_media_url: string;
   linkedin_url: string;
-  profile_photo_file_key?: string;
-  profile_photo_file_url?: string;
+  date_of_birth?: string | null;
+  passport_number?: string;
+  profile_photo_file_key?: string | null;
+  profile_photo_file_url?: string | null;
+  passport_photo_file_key?: string | null;
+  passport_photo_file_url?: string | null;
 }
 
 export interface CompanyDetails {
@@ -15,6 +19,12 @@ export interface CompanyDetails {
   company_registration_doc_file_url: string;
   contact_id_document_file_key: string;
   contact_id_document_file_url: string;
+  date_of_birth?: string | null;
+  passport_number?: string;
+  logo_file_key?: string | null;
+  logo_file_url?: string | null;
+  passport_photo_file_key?: string | null;
+  passport_photo_file_url?: string | null;
 }
 
 export type Partner = {
@@ -76,6 +86,7 @@ export type AssignManagerPayload = {
 
 export interface AccountManagerPartnerIndividualDetails {
   date_of_birth: string | null;
+  passport_number: string | null;
   profile_photo_file_key: string | null;
   profile_photo_file_url: string | null;
   passport_photo_file_key: string | null;
