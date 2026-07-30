@@ -8,12 +8,13 @@ import {
   MdPhone,
   MdPublic,
   MdSupervisorAccount,
-  MdToggleOn,
   MdVerified,
 } from "react-icons/md";
 import {
   Briefcase,
   Clock,
+  Download,
+  Eye,
   ExternalLink,
   FileText,
   KeyRound,
@@ -27,10 +28,17 @@ import ChangePasswordPopup from "./ChangePasswordPopup";
 import ActionsDropdown from "components/ui/buttons/ActionsDropdown";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
+import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import PresignedImage from "components/ui/PresignedImage";
+import { parseDate, formatDate } from "components/ui/date/utils";
 
 interface PartnerDetailsProps {
   id: string;
+}
+
+function formatDateOfBirth(value?: string | null): string | undefined {
+  const date = parseDate(value);
+  return date ? formatDate(date, "short", "en-US") : undefined;
 }
 
 function InfoRow({ icon, label, value, href }: { icon: React.ReactNode; label: string; value?: string | null; href?: string }) {
@@ -57,20 +65,34 @@ function InfoRow({ icon, label, value, href }: { icon: React.ReactNode; label: s
   );
 }
 
-function DocRow({ label, fileKey }: { label: string; fileKey?: string | null }) {
-  const [loading, setLoading] = useState(false);
+function DocRow({ label, fileKey, personName }: { label: string; fileKey?: string | null; personName?: string | null }) {
+  const [loading, setLoading] = useState<"view" | "download" | null>(null);
   const { showToast } = useToast();
 
   const handleView = async () => {
     if (!fileKey || loading) return;
-    setLoading(true);
+    setLoading("view");
     try {
       const url = await getDocumentDownloadUrl(fileKey);
       window.open(url, "_blank");
     } catch {
       showToast("Failed to load document.", "error");
     } finally {
-      setLoading(false);
+      setLoading(null);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!fileKey || loading) return;
+    setLoading("download");
+    try {
+      const url = await getDocumentDownloadUrl(fileKey);
+      const fileName = buildDocumentFileName(personName || "", label, fileKey);
+      await downloadFileAs(url, fileName);
+    } catch {
+      showToast("Failed to download document.", "error");
+    } finally {
+      setLoading(null);
     }
   };
 
@@ -83,14 +105,24 @@ function DocRow({ label, fileKey }: { label: string; fileKey?: string | null }) 
         <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
       </div>
       {fileKey ? (
-        <button
-          onClick={handleView}
-          disabled={loading}
-          className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
-          title="View document"
-        >
-          <ExternalLink className={`h-4 w-4 ${loading ? "animate-pulse" : ""}`} />
-        </button>
+        <div className="ml-4 flex shrink-0 items-center gap-2">
+          <button
+            onClick={handleView}
+            disabled={!!loading}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent bg-slate-100 text-slate-600 transition hover:border-slate-200 hover:bg-slate-200 disabled:opacity-50"
+            title="View document"
+          >
+            <Eye className={`h-4 w-4 ${loading === "view" ? "animate-pulse" : ""}`} />
+          </button>
+          <button
+            onClick={handleDownload}
+            disabled={!!loading}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
+            title="Download document"
+          >
+            <Download className={`h-4 w-4 ${loading === "download" ? "animate-pulse" : ""}`} />
+          </button>
+        </div>
       ) : (
         <span className="ml-4 text-xs text-slate-400">Not uploaded</span>
       )}
@@ -125,7 +157,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
               <div className="relative shrink-0">
                 <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                   <PresignedImage
-                    fileKey={partner.individual_details?.profile_photo_file_key ?? undefined}
+                    fileKey={(isIndividual ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
                     alt="Profile"
                     className="h-full w-full object-cover"
                     fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
@@ -171,9 +203,12 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                 <InfoRow icon={<Briefcase className="h-4 w-4" />} label="Background" value={partner.individual_details?.background} />
                 <InfoRow icon={<Link2 className="h-4 w-4" />} label="LinkedIn" value={partner.individual_details?.linkedin_url} href={partner.individual_details?.linkedin_url || undefined} />
                 <InfoRow icon={<Link2 className="h-4 w-4" />} label="Social Media" value={partner.individual_details?.social_media_url} href={partner.individual_details?.social_media_url || undefined} />
+                <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Date of Birth" value={formatDateOfBirth(partner.individual_details?.date_of_birth)} />
+                <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Passport Number" value={partner.individual_details?.passport_number} />
               </div>
-              <div className="mt-3">
-                <DocRow label="Identity Document" fileKey={partner.individual_details?.id_document_file_key} />
+              <div className="mt-3 space-y-2">
+                <DocRow label="Identity Document" fileKey={partner.individual_details?.id_document_file_key} personName={partner.name} />
+                <DocRow label="Passport Photo" fileKey={partner.individual_details?.passport_photo_file_key} personName={partner.name} />
               </div>
             </div>
           )}
@@ -188,10 +223,14 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <InfoRow icon={<Briefcase className="h-4 w-4" />} label="Company Name" value={partner.company_details?.company_name} />
                 <InfoRow icon={<Link2 className="h-4 w-4" />} label="Website" value={partner.company_details?.website_url} href={partner.company_details?.website_url || undefined} />
+                <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Date of Birth" value={formatDateOfBirth(partner.company_details?.date_of_birth)} />
+                <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Passport Number" value={partner.company_details?.passport_number} />
               </div>
               <div className="mt-3 space-y-2">
-                <DocRow label="Company Registration Document" fileKey={partner.company_details?.company_registration_doc_file_key} />
-                <DocRow label="Contact Identity Document" fileKey={partner.company_details?.contact_id_document_file_key} />
+                <DocRow label="Company Registration Document" fileKey={partner.company_details?.company_registration_doc_file_key} personName={partner.name} />
+                <DocRow label="Contact Identity Document" fileKey={partner.company_details?.contact_id_document_file_key} personName={partner.name} />
+                <DocRow label="Passport Photo" fileKey={partner.company_details?.passport_photo_file_key} personName={partner.name} />
+                <DocRow label="Agency Logo" fileKey={partner.company_details?.logo_file_key} personName={partner.name} />
               </div>
             </div>
           )}

@@ -162,7 +162,7 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
             <div className="relative shrink-0">
               <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                 <PresignedImage
-                  fileKey={partner.individual_details?.profile_photo_file_key ?? undefined}
+                  fileKey={(isIndividual ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
                   alt="Profile"
                   className="h-full w-full object-cover"
                   fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
@@ -251,6 +251,11 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
                 value={partner.individual_details?.social_media_url}
                 href={partner.individual_details?.social_media_url || undefined}
               />
+              <InfoRow
+                icon={<MdCategory className="h-4 w-4" />}
+                label="Passport Number"
+                value={partner.individual_details?.passport_number}
+              />
             </div>
             <div className="mt-3 space-y-2">
               <DocRow
@@ -293,6 +298,16 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
                 value={partner.company_details?.website_url}
                 href={partner.company_details?.website_url || undefined}
               />
+              <InfoRow
+                icon={<MdCake className="h-4 w-4" />}
+                label="Date of Birth"
+                value={formatDateOfBirth(partner.company_details?.date_of_birth)}
+              />
+              <InfoRow
+                icon={<MdCategory className="h-4 w-4" />}
+                label="Passport Number"
+                value={partner.company_details?.passport_number}
+              />
             </div>
             <div className="mt-3 space-y-2">
               <DocRow
@@ -303,6 +318,16 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
               <DocRow
                 label="Contact Identity Document"
                 fileKey={partner.company_details?.contact_id_document_file_key}
+                personName={partner.name}
+              />
+              <DocRow
+                label="Passport Photo"
+                fileKey={partner.company_details?.passport_photo_file_key}
+                personName={partner.name}
+              />
+              <DocRow
+                label="Agency Logo"
+                fileKey={partner.company_details?.logo_file_key}
                 personName={partner.name}
               />
             </div>

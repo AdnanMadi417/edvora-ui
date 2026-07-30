@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Download, Receipt, AlertCircle } from "lucide-react";
-import { getDocumentDownloadUrl } from "services/documentService";
-import { useToast } from "components/context/ToastContext";
+import { Receipt, AlertCircle } from "lucide-react";
 import type { ApplicationActionsResponse } from "features/applications/hooks";
 import DisputeCommission from "features/applications/partner/components/popups/DisputeCommission";
+import DocumentActions from "features/applications/shared/DocumentActions";
 
 interface ApplicationCommissionProps {
   application: any;
@@ -18,9 +17,8 @@ export default function ApplicationCommission({
   actions,
   onRefetch,
 }: ApplicationCommissionProps) {
-  const [downloading, setDownloading] = useState(false);
   const [isDisputeOpen, setIsDisputeOpen] = useState(false);
-  const { showToast } = useToast();
+  const studentName = application?.student?.name;
 
   const { status: statusLabel, partner_actions } = actions || {};
 
@@ -36,20 +34,12 @@ export default function ApplicationCommission({
     application?.commission_documents || {}
   ).filter((doc: any) => doc !== null) as any[];
 
-  if (!hasCommissions && commissionDocs.length === 0) return null;
+  const formatLabel = (text?: string) =>
+    text
+      ? text.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+      : "Commission Document";
 
-  const handleDownload = async (fileKey?: string) => {
-    if (!fileKey || downloading) return;
-    try {
-      setDownloading(true);
-      const url = await getDocumentDownloadUrl(fileKey);
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch {
-      showToast("Download failed", "error");
-    } finally {
-      setDownloading(false);
-    }
-  };
+  if (!hasCommissions && commissionDocs.length === 0) return null;
 
   return (
     <>
@@ -94,18 +84,13 @@ export default function ApplicationCommission({
                     <Receipt className="h-5 w-5 text-green-600" />
                   </div>
                   <p className="font-medium text-slate-900">
-                    {doc.document_type || "Commission Document"}
+                    {formatLabel(doc.document_type)}
                   </p>
                 </div>
 
-                <button
-                  onClick={() => handleDownload(doc.file_key)}
-                  disabled={downloading}
-                  title={doc.document_type}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
-                >
-                  <Download className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <DocumentActions fileKey={doc.file_key} label={formatLabel(doc.document_type)} personName={studentName} />
+                </div>
               </div>
             </div>
           ))

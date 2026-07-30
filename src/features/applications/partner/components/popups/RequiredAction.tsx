@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { CheckCircle, Pause, XCircle, AlertCircle, Download } from "lucide-react";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import DocumentUploadList from "features/applications/partner/components/form/stages/DocumentUploadList";
+import DocumentActions from "features/applications/shared/DocumentActions";
 import { useApplicationActions } from "features/applications/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
@@ -248,16 +249,9 @@ export default function RequiredAction({
                         <p className="text-xs text-blue-600">Download and complete this form before uploading</p>
                       </div>
                     </div>
-                    <a
-                      href={arrivalFormTemplate.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download
-                      className="flex items-center gap-1.5 rounded-md border border-blue-600 bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-200"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                      Download
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <DocumentActions fileKey={arrivalFormTemplate.file_key} label="Arrival Form Template" />
+                    </div>
                   </div>
                 )}
                 <DocumentUploadList

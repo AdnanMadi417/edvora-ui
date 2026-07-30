@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FolderOpen, ChevronDown, Clock, CheckCircle, XCircle, Download } from 'lucide-react';
+import { FolderOpen, ChevronDown, Clock, CheckCircle, XCircle } from 'lucide-react';
 import EmptyData from 'components/emptyData/EmptyData';
-import { getDocumentDownloadUrl } from 'services/documentService';
-import { useToast } from 'components/context/ToastContext';
+import DocumentActions from 'features/applications/shared/DocumentActions';
 import { AppDate } from "components/ui/date";
 
 interface ApplicationDocumentsProps {
@@ -41,8 +40,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 export default function ApplicationDocuments({ application, onRefetch }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
-  const [downloading, setDownloading] = useState<string | null>(null);
-  const { showToast } = useToast();
+  const studentName = application?.student?.name;
 
   const allDocs: any[] = application?.documents || [];
   const documents = allDocs;
@@ -58,27 +56,12 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
     (d) => d.status === '1' || d.status === 'pending',
   ).length;
 
-  const handleDownload = async (fileKey: string, docId: string) => {
-    if (!fileKey || downloading) return;
-    try {
-      setDownloading(docId);
-      const url = await getDocumentDownloadUrl(fileKey);
-      window.open(url, '_blank');
-    } catch (err: any) {
-      showToast(err?.message || 'Failed to download document', 'error');
-    } finally {
-      setDownloading(null);
-    }
-  };
-
-
   if (totalDocuments === 0) return <EmptyData />;
 
   const DocRow = ({ doc }: { doc: any }) => {
     const icon = STATUS_ICON[doc.status] ?? STATUS_ICON['1'];
     const badge = STATUS_BADGE[doc.status] ?? STATUS_BADGE['1'];
     const label = STATUS_LABEL[doc.status] ?? 'Pending';
-    const isDownloading = downloading === doc.id;
 
     return (
       <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50">
@@ -105,14 +88,9 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
             )}
           </div>
         </div>
-        <button
-          onClick={() => doc.file_key && handleDownload(doc.file_key, doc.id)}
-          disabled={!doc.file_key || !!downloading}
-          className="ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-40"
-          title="Download"
-        >
-          <Download className={`h-4 w-4 ${isDownloading ? 'animate-pulse' : ''}`} />
-        </button>
+        <div className="ml-4 flex shrink-0 items-center gap-2">
+          <DocumentActions fileKey={doc.file_key} label={doc.document_type || 'Document'} personName={studentName} />
+        </div>
       </div>
     );
   };

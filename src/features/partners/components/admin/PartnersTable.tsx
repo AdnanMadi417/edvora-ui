@@ -270,7 +270,7 @@ export default function PartnersTable() {
                       <div className="flex items-center gap-3">
                         <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                           <PresignedImage
-                            fileKey={partner.individual_details?.profile_photo_file_key ?? undefined}
+                            fileKey={(partner.type === "individual" ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
                             alt={partner.name}
                             className="h-full w-full object-cover"
                             fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
