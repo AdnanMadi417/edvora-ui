@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
-import { CheckCircle, Download, CreditCard } from 'lucide-react';
-import { getDocumentDownloadUrl } from "services/documentService";
+import { CheckCircle, CreditCard } from 'lucide-react';
 import { submitOfferLetterDecision } from "services/offerLetterService";
 import { useToast } from "components/context/ToastContext";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
+import DocumentActions from "features/applications/shared/DocumentActions";
 import { AppDate } from "components/ui/date";
 
 interface OfferLetterDecisionProps {
@@ -24,26 +24,13 @@ export default function OfferLetterDecision({
   onRefetch,
 }: OfferLetterDecisionProps) {
   const offerLetter = application?.offer_letter_document;
+  const studentName = application?.student?.name;
 
-  const [downloading, setDownloading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
 
   const currentStatus = application?.stage?.statuses?.[0]?.name;
   const isUniversityApproved = currentStatus === "University Approved";
-
-  const handleDownload = async (fileKey?: string) => {
-    if (!fileKey || downloading) return;
-    try {
-      setDownloading(true);
-      const downloadUrl = await getDocumentDownloadUrl(fileKey);
-      window.open(downloadUrl, "_blank", "noopener,noreferrer");
-    } catch {
-      showToast("Download failed", "error");
-    } finally {
-      setDownloading(false);
-    }
-  };
 
   const handleDecision = async (decision: "accept") => {
     if (!application?.id || submitting) return;
@@ -135,14 +122,9 @@ export default function OfferLetterDecision({
             </div>
           </div>
 
-          <button
-            onClick={() => handleDownload(offerLetter.file_key)}
-            disabled={downloading}
-            className="group rounded-lg border border-transparent bg-green-50 p-2 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
-            title="Download Offer Letter"
-          >
-            <Download className="h-4 w-4 transition-transform group-hover:scale-110" />
-          </button>
+          <div className="flex items-center gap-2">
+            <DocumentActions fileKey={offerLetter.file_key} label="Offer Letter" personName={studentName} />
+          </div>
         </div>
 
         {isUniversityApproved && (

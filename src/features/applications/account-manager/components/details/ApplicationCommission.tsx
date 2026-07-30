@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { Receipt, Download } from "lucide-react";
-import { getDocumentDownloadUrl } from "services/documentService";
+import React from "react";
+import { Receipt } from "lucide-react";
+import DocumentActions from "features/applications/shared/DocumentActions";
 
 interface ApplicationCommissionsProps {
   application: any;
@@ -12,8 +12,7 @@ export default function ApplicationCommissions({
   application,
 }: ApplicationCommissionsProps) {
   const commissions = application?.commissions || [];
-
-  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const studentName = application?.student?.name;
 
   const commissionDocs = Object.values(
     application?.commission_documents || {}
@@ -27,20 +26,6 @@ export default function ApplicationCommissions({
     : "Commission Document";
 
   if (!hasCommissions && commissionDocs.length === 0) return null;
-
-  const handleDownload = async (doc: any) => {
-    if (!doc?.file_key || downloadingId) return;
-
-    try {
-      setDownloadingId(doc.id);
-      const url = await getDocumentDownloadUrl(doc.file_key);
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch {
-      alert("Download failed");
-    } finally {
-      setDownloadingId(null);
-    }
-  };
 
   return (
     <>
@@ -74,14 +59,9 @@ export default function ApplicationCommissions({
                     {formatLabel(doc.document_type)}
                   </p>
                 </div>
-                <button
-                  title={doc.document_type}
-                  onClick={() => handleDownload(doc)}
-                  disabled={downloadingId === doc.id}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-green-600 bg-green-50 text-green-700 hover:bg-green-100 disabled:opacity-50"
-                >
-                  <Download className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <DocumentActions fileKey={doc.file_key} label={formatLabel(doc.document_type)} personName={studentName} />
+                </div>
               </div>
             </div>
           ))
