@@ -41,6 +41,9 @@ export type Partner = {
   assigned_manager_name: string;
   individual_details: IndividualDetails | null;
   company_details: CompanyDetails | null;
+  created_at: string;
+  updated_at: string;
+  last_login: string | null;
 };
 
 export interface PartnerDetails {
@@ -57,6 +60,9 @@ export interface PartnerDetails {
   assigned_manager_name: string;
   individual_details: IndividualDetails | null;
   company_details: CompanyDetails | null;
+  created_at: string;
+  updated_at: string;
+  last_login: string | null;
 }
 
 export interface CreatePartnerPayload {

@@ -4,8 +4,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
   Pencil, RefreshCw, SlidersHorizontal, Building2,
-  UserCog, Users, CheckCircle, XCircle, BadgeCheck, BadgeX, User, ShieldCheck,
+  UserCog, Users, CheckCircle, XCircle, BadgeCheck, BadgeX, User, ShieldCheck, CalendarDays,
 } from "lucide-react";
+import { AppDate } from "components/ui/date";
 import { useRouter } from "next/navigation";
 import { usePartners, useDeletePartner } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
@@ -221,6 +222,7 @@ export default function PartnersTable() {
                   { icon: Users,      label: "Contact Info",     minW: "min-w-[220px]" },
                   { icon: UserCog,    label: "Assigned Manager", minW: "min-w-[180px]" },
                   { icon: BadgeCheck, label: "Status" },
+                  { icon: CalendarDays, label: "Registered" },
                   { icon: Pencil,     label: "Actions" },
                 ].map(({ icon: Icon, label, minW }) => (
                   <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
@@ -235,15 +237,15 @@ export default function PartnersTable() {
             </thead>
 
             <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
-              {isInitialLoad && <TableSkeletonRows columns={6} rows={ITEMS_PER_PAGE} />}
+              {isInitialLoad && <TableSkeletonRows columns={7} rows={ITEMS_PER_PAGE} />}
 
               {!isInitialLoad && error && (
-                <TableErrorRow colSpan={6} message={error} onRetry={refetch} />
+                <TableErrorRow colSpan={7} message={error} onRetry={refetch} />
               )}
 
               {!isInitialLoad && !error && partners.length === 0 && (
                 <TableEmptyRow
-                  colSpan={6}
+                  colSpan={7}
                   title="No partners found"
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No partners have registered yet."}
                   action={
@@ -310,8 +312,14 @@ export default function PartnersTable() {
                     </td>
 
                     <td className="px-6 py-4">
+                      <div className="text-sm text-slate-900">
+                        <AppDate value={partner.created_at} format="short" fallback="—" />
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
-                        
+
                         {!partner.is_verified && !partner.is_active && (
                           <>
                             <button

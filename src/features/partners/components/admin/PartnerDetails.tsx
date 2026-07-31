@@ -13,7 +13,9 @@ import {
 } from "react-icons/md";
 import {
   Briefcase,
+  CalendarDays,
   ChevronLeft,
+  Clock,
   Download,
   Eye,
   ExternalLink,
@@ -41,6 +43,11 @@ interface Props {
 function formatDateOfBirth(value?: string | null): string | undefined {
   const date = parseDate(value);
   return date ? formatDate(date, "short", "en-US") : undefined;
+}
+
+function formatDateTime(value?: string | null): string | undefined {
+  const date = parseDate(value);
+  return date ? formatDate(date, "datetime", "en-US") : undefined;
 }
 
 function InfoRow({
@@ -247,6 +254,16 @@ export default function PartnerDetails({ id }: Props) {
               icon={<MdToggleOn className="h-4 w-4" />}
               label="Account Status"
               value={partner.is_active ? "Active" : "Inactive"}
+            />
+            <InfoRow
+              icon={<CalendarDays className="h-4 w-4" />}
+              label="Registered"
+              value={formatDateOfBirth(partner.created_at)}
+            />
+            <InfoRow
+              icon={<Clock className="h-4 w-4" />}
+              label="Last Login"
+              value={formatDateTime(partner.last_login) || "Never"}
             />
           </div>
         </div>
