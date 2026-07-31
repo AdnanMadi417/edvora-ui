@@ -12,6 +12,7 @@ import {
 } from "react-icons/md";
 import {
   Briefcase,
+  Camera,
   Clock,
   Download,
   Eye,
@@ -21,7 +22,7 @@ import {
   Link2,
   User,
 } from "lucide-react";
-import { usePartnerProfile } from "features/partners";
+import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import ChangePasswordPopup from "./ChangePasswordPopup";
@@ -29,6 +30,7 @@ import ActionsDropdown from "components/ui/buttons/ActionsDropdown";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
+import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import PresignedImage from "components/ui/PresignedImage";
 import { parseDate, formatDate } from "components/ui/date/utils";
 
@@ -132,11 +134,52 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
 
 const PartnerDetails = ({ id }: PartnerDetailsProps) => {
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const router = useRouter();
+  const { showToast } = useToast();
 
-  const { partner, isPartnerLoading } = usePartnerProfile();
+  const { partner, isPartnerLoading, refetch } = usePartnerProfile();
+  const { updateProfile } = useUpdatePartnerProfile();
 
   const handleUpdate = () => router.push("/partner/profile/edit");
+
+  const handleAvatarUpload = async (file: File) => {
+    if (!partner || avatarUploading) return;
+    setAvatarUploading(true);
+    try {
+      const presigned = await getPresignedUploads([file], "partners-files");
+      const [uploaded] = await uploadFilesToSpaces([file], presigned, () => {});
+      const isIndividualPartner = partner.type === "individual";
+      const payload = {
+        name: partner.name,
+        type: partner.type,
+        country: partner.country,
+        phone: partner.phone,
+        ...(isIndividualPartner
+          ? {
+              individual_details: {
+                ...partner.individual_details,
+                profile_photo_file_key: uploaded.file_key,
+                profile_photo_file_url: uploaded.public_url,
+              },
+            }
+          : {
+              company_details: {
+                ...partner.company_details,
+                logo_file_key: uploaded.file_key,
+                logo_file_url: uploaded.public_url,
+              },
+            }),
+      };
+      await updateProfile(payload);
+      showToast("Profile photo updated", "success");
+      refetch();
+    } catch {
+      showToast("Failed to update profile photo.", "error");
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
 
   if (isPartnerLoading) return <Loading text="Loading partner profile details..." />;
   if (!partner) return <EmptyData />;
@@ -155,15 +198,39 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
           <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
             <div className="flex items-center gap-4">
               <div className="relative shrink-0">
-                <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                   <PresignedImage
                     fileKey={(isIndividual ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
                     alt="Profile"
                     className="h-full w-full object-cover"
                     fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
                   />
+                  {avatarUploading && (
+                    <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-[10px] font-medium text-white">
+                      …
+                    </div>
+                  )}
                 </div>
-                <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
+                <span className={`absolute -bottom-0.5 left-0 h-3.5 w-3.5 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
+                <label
+                  htmlFor="profile-photo-inline"
+                  className="absolute -bottom-1 -right-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-blue-600 text-white transition-colors hover:bg-blue-700"
+                  title="Change photo"
+                >
+                  <Camera className="h-3 w-3" />
+                  <input
+                    id="profile-photo-inline"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    disabled={avatarUploading}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleAvatarUpload(file);
+                      e.target.value = "";
+                    }}
+                  />
+                </label>
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-slate-900">{partner.name}</h2>
