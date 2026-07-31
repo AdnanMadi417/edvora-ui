@@ -10,7 +10,6 @@ import {
   Settings,
   ChevronRight,
   Pencil,
-  DollarSign,
   BookOpen,
   Trash2,
   RefreshCw,
@@ -140,12 +139,6 @@ const LogisticsMarketplaceTable = () => {
                         Provider Name
                       </div>
                     </th>
-                    <th className="group min-w-[200px] max-w-[250px] cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-slate-500" />
-                        Price Range
-                      </div>
-                    </th>
                     <th className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
                       <div className="flex items-center gap-2">
                         <Phone className="h-4 w-4 text-slate-500" />
@@ -232,14 +225,6 @@ const LogisticsMarketplaceTable = () => {
                                 {provider.main_location || "Not provided"}
                               </div>
                             </div>
-                          </div>
-                        </td>
-
-                        <td className="min-w-[200px] max-w-[250px] px-6 py-4">
-                          <div className="truncate text-slate-500">
-                            {provider.price_range
-                              ? `RM ${provider.price_range.min_price ?? "NA"} – ${provider.price_range.max_price ?? "NA"}`
-                              : "Not provided"}
                           </div>
                         </td>
 
