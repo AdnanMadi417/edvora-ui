@@ -34,11 +34,13 @@ function DocUploadField({
   doc,
   fieldId,
   onUpload,
+  locked = false,
 }: {
   label: string;
   doc: DocState;
   fieldId: string;
   onUpload: (file: File) => void;
+  locked?: boolean;
 }) {
   const { showToast } = useToast();
   const [downloading, setDownloading] = useState(false);
@@ -93,10 +95,12 @@ function DocUploadField({
             >
               <ExternalLink className={`h-4 w-4 ${downloading ? "animate-pulse" : ""}`} />
             </button>
-            <label htmlFor={fieldId} className="flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50">
-              <Upload className="h-3.5 w-3.5" /> Replace
-              <input id={fieldId} type="file" accept={ALLOWED_FILE_TYPES.extensions.join(",")} className="hidden" onChange={handleChange} />
-            </label>
+            {!locked && (
+              <label htmlFor={fieldId} className="flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50">
+                <Upload className="h-3.5 w-3.5" /> Replace
+                <input id={fieldId} type="file" accept={ALLOWED_FILE_TYPES.extensions.join(",")} className="hidden" onChange={handleChange} />
+              </label>
+            )}
           </div>
         </div>
       ) : (
@@ -106,6 +110,9 @@ function DocUploadField({
         </label>
       )}
       {doc.error && <p className="mt-1 text-xs text-red-600">{doc.error}</p>}
+      {locked && doc.file_key && (
+        <p className="mt-1 text-xs text-slate-400">Contact support to change your passport photo.</p>
+      )}
     </div>
   );
 }
@@ -370,6 +377,9 @@ export default function EditPartnerProfile() {
   const isIndividual = partner.type === "individual";
   const isCompany = partner.type === "agency";
 
+  const passportNumberLocked = !!(partner.individual_details?.passport_number || partner.company_details?.passport_number);
+  const passportPhotoLocked = !!(partner.individual_details?.passport_photo_file_key || partner.company_details?.passport_photo_file_key);
+
   const saveDisabledReason = isUpdating
     ? "Saving..."
     : isUploading
@@ -493,6 +503,8 @@ export default function EditPartnerProfile() {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                disabled={passportNumberLocked}
+                helperText="Contact support to change your passport number."
               />
             </div>
             <DocUploadField
@@ -506,6 +518,7 @@ export default function EditPartnerProfile() {
               doc={passportPhoto}
               fieldId="passport-photo"
               onUpload={(f) => handleUpload(f, setPassportPhoto, "passport_photo")}
+              locked={passportPhotoLocked}
             />
           </div>
         )}
@@ -549,6 +562,8 @@ export default function EditPartnerProfile() {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                disabled={passportNumberLocked}
+                helperText="Contact support to change your passport number."
               />
             </div>
             <div className="space-y-4">
@@ -569,6 +584,7 @@ export default function EditPartnerProfile() {
                 doc={passportPhoto}
                 fieldId="comp-passport-photo"
                 onUpload={(f) => handleUpload(f, setPassportPhoto, "passport_photo")}
+                locked={passportPhotoLocked}
               />
             </div>
           </div>

@@ -6,6 +6,9 @@ export function usePartnerProfile({ enabled = true }: { enabled?: boolean } = {}
   const [partner, setPartner] = useState<PartnerDetails | null>(null);
   const [isPartnerLoading, setIsPartnerLoading] = useState(false);
   const [partnerError, setPartnerError] = useState<string | null>(null);
+  const [refetchCounter, setRefetchCounter] = useState(0);
+
+  const refetch = () => setRefetchCounter((c) => c + 1);
 
   useEffect(() => {
     if (!enabled) return;
@@ -22,7 +25,7 @@ export function usePartnerProfile({ enabled = true }: { enabled?: boolean } = {}
       }
     };
     fetch();
-  }, [enabled]);
+  }, [enabled, refetchCounter]);
 
-  return { partner, isPartnerLoading, partnerError };
+  return { partner, isPartnerLoading, partnerError, refetch };
 }
