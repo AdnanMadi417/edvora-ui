@@ -114,6 +114,9 @@ export type AccountManagerPartnerListItem = {
   is_verified: boolean;
   is_active: boolean;
   applications_count: number;
+  last_login: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 export type AccountManagerPartnerDetails = {
@@ -127,6 +130,9 @@ export type AccountManagerPartnerDetails = {
   is_active: boolean;
   individual_details: AccountManagerPartnerIndividualDetails | null;
   company_details: CompanyDetails | null;
+  created_at: string;
+  updated_at: string;
+  last_login: string | null;
 };
 
 export interface UpdatePartnerProfilePayload {
