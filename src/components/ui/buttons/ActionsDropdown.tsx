@@ -46,9 +46,9 @@ export default function ActionsDropdown({ items, label = "Actions" }: ActionsDro
     };
   }, []);
 
-  const handleOpen = () => {
+  const toggle = () => {
     setMounted(true);
-    setOpen(true);
+    setOpen((v) => !v);
   };
 
   const handleItemClick = (onClick: () => void) => {
@@ -57,13 +57,14 @@ export default function ActionsDropdown({ items, label = "Actions" }: ActionsDro
   };
 
   return (
-    <div className="relative" ref={ref} onMouseEnter={handleOpen} onMouseLeave={close}>
+    <div className="relative" ref={ref}>
       {/* Trigger */}
       <button
-        onClick={handleOpen}
+        type="button"
+        onClick={toggle}
         aria-expanded={open}
         aria-haspopup="true"
-        className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all duration-150 ${
+        className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-all duration-150 ${
           open
             ? "border-slate-300 bg-slate-100 text-slate-800 shadow-inner"
             : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"
