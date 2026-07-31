@@ -3,12 +3,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronRight, Users, Mail, BadgeCheck,
-  CheckCircle, XCircle, RefreshCw, FileText,
+  CheckCircle, XCircle, RefreshCw, FileText, CalendarDays,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAccountManagerPartners } from "features/partners/hooks";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AppDate } from "components/ui/date";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -110,6 +111,7 @@ export default function AccountManagerPartnersList() {
                   { icon: Mail,       label: "Contact Info", minW: "min-w-[200px]" },
                   { icon: FileText,   label: "Applications" },
                   { icon: BadgeCheck, label: "Status" },
+                  { icon: CalendarDays, label: "Registered" },
                 ].map(({ icon: Icon, label, minW }) => (
                   <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
                     <div className="flex items-center gap-2">
@@ -123,15 +125,15 @@ export default function AccountManagerPartnersList() {
             </thead>
 
             <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
-              {isInitialLoad && <TableSkeletonRows columns={5} rows={ITEMS_PER_PAGE} />}
+              {isInitialLoad && <TableSkeletonRows columns={6} rows={ITEMS_PER_PAGE} />}
 
               {!isInitialLoad && error && (
-                <TableErrorRow colSpan={5} message={error} onRetry={refetch} />
+                <TableErrorRow colSpan={6} message={error} onRetry={refetch} />
               )}
 
               {!isInitialLoad && !error && partners.length === 0 && (
                 <TableEmptyRow
-                  colSpan={5}
+                  colSpan={6}
                   title="No partners found"
                   subtitle={searchTerm ? "Try adjusting your search." : "You don't have any assigned partners yet."}
                   action={
@@ -189,6 +191,12 @@ export default function AccountManagerPartnersList() {
                           <XCircle className="h-3 w-3" /> Inactive
                         </span>
                       )}
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="text-sm text-slate-900">
+                      <AppDate value={partner.created_at} format="short" fallback="—" />
                     </div>
                   </td>
 
