@@ -28,6 +28,8 @@ import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 import { AppDate } from "components/ui/date";
+import CurrencySelector from "features/programs/components/shared/CurrencySelector";
+import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate } from "features/programs/utils/exchangeRate";
 
 type RequiredDocument = {
   id: string;
@@ -133,8 +135,13 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
   const router = useRouter();
   const handleBack = () => router.push(`${basePath}/knowledge-hub/`);
 
-  const { program, requiredDocuments, commission, loading, error } = useProgram(id);
+  const { program, requiredDocuments, commission, exchangeRates, loading, error } = useProgram(id);
   const [copied, setCopied] = useState(false);
+  const [currency, setCurrency] = useState("MYR");
+
+  const currencyOptions = getCurrencyOptions(exchangeRates);
+  const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
+  const formatCommission = (amount: number, curr?: string | null) => formatCommissionRate(amount, curr, currency, exchangeRates);
 
   const nextIntakeDate = (() => {
     const today = new Date();
@@ -183,7 +190,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
     lines.push("");
 
     (program?.yearly_fees ?? []).forEach((item) => {
-      lines.push(`${getOrdinal(item.year)} year: MYR ${item.fee.toLocaleString()}`);
+      lines.push(`${getOrdinal(item.year)} year: ${formatMoney(item.fee)}`);
     });
 
     lines.push("");
@@ -192,7 +199,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
     lines.push("");
 
     (program?.one_time_fees ?? []).forEach((item) => {
-      lines.push(`${item.description ?? "Fee"} : MYR ${item.fee.toLocaleString()}`);
+      lines.push(`${item.description ?? "Fee"} : ${formatMoney(item.fee)}`);
     });
 
     lines.push("");
@@ -242,6 +249,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
           </div>
 
           <div className="flex shrink-0 items-center gap-2.5">
+            <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
             <button
               onClick={handleCopyAll}
               title={copied ? "Copied!" : "Copy program info"}
@@ -263,7 +271,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
             <CircleDollarSign className="h-5 w-5 text-green-600" />
             <p className="text-xs text-green-600">Commission</p>
             <p className="text-xl font-bold text-green-700">
-              {commission?.amount != null ? `${(commission.currency || "RM").toUpperCase()} ${commission.amount.toLocaleString()}` : "—"}
+              {commission?.amount != null ? formatCommission(commission.amount, commission.currency) : "—"}
             </p>
           </div>
 
@@ -271,7 +279,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
             <Banknote className="h-5 w-5 text-slate-400" />
             <p className="text-xs text-slate-500">First Year</p>
             <p className="text-xl font-bold text-slate-800">
-              {program?.yearly_fees?.[0]?.fee != null ? `RM ${program.yearly_fees[0].fee.toLocaleString()}` : "—"}
+              {program?.yearly_fees?.[0]?.fee != null ? formatMoney(program.yearly_fees[0].fee) : "—"}
             </p>
           </div>
 
@@ -417,7 +425,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
                       <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">Year {item.year}</div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                          RM {item.fee.toLocaleString()}
+                          {formatMoney(item.fee)}
                         </div>
                       </div>
                     ))
@@ -443,7 +451,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
                       <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">{item.description ?? "Fee"}</div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                          RM {item.fee.toLocaleString()}
+                          {formatMoney(item.fee)}
                         </div>
                       </div>
                     ))
@@ -492,7 +500,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
                       </div>
                       {item.description && <RichTextDisplay html={item.description} />}
                       {item.max_amount > 0 && (
-                        <p className="text-base font-bold text-amber-600">Up to RM {item.max_amount.toLocaleString()}</p>
+                        <p className="text-base font-bold text-amber-600">Up to {formatMoney(item.max_amount)}</p>
                       )}
                       {item.conditions && item.conditions.length > 0 && (
                         <div className="border-t border-slate-100 pt-3">
@@ -540,7 +548,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
                 <div>
                   <p className="text-xs font-medium text-green-600">Commission Amount</p>
                   <p className="mt-1 text-2xl font-bold text-green-700">
-                    {(commission.currency || "RM").toUpperCase()} {commission.amount.toLocaleString()}
+                    {formatCommission(commission.amount, commission.currency)}
                   </p>
                 </div>
 

@@ -52,6 +52,11 @@ export interface YearlyFee {
   fee: number | string;
 }
 
+export interface ExchangeRate {
+  to_currency: string;
+  rate: number;
+}
+
 export interface OneTimeFee {
   description: string;
   fee: number | string;
