@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { useEmgsEvalUpload } from "features/applications/hooks";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import Button from "components/ui/buttons/Button";
 
 interface EmgsEvalUploadProps {
   isOpen: boolean;
@@ -132,22 +133,29 @@ export default function EmgsEvalUpload({
 
           <div className="border-t border-gray-200 px-6 py-4">
             <div className="flex justify-end gap-3">
-              <button
+              <Button
                 onClick={handleClose}
-                className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
-              >
-                <XCircle className="h-4 w-4" />
-                Cancel
-              </button>
+                icon={<XCircle className="h-4 w-4" />}
+                text="Cancel"
+                bgColor="bg-white"
+                textColor="text-gray-600"
+                borderColor="border-gray-600"
+                hoverTextColor="hover:text-gray-700"
+                hoverBorderColor="hover:border-gray-700"
+              />
 
-              <button
+              <Button
                 disabled={!file || !!fileError || !!uploadError || isUploading}
                 onClick={handleConfirmUpload}
-                className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
-              >
-                <CheckCircle className="h-4 w-4" />
-                {isUploading ? "Uploading..." : "Submit Document"}
-              </button>
+                icon={<CheckCircle className="h-4 w-4" />}
+                text={isUploading ? "Uploading..." : "Submit Document"}
+                bgColor="bg-blue-100"
+                textColor="text-blue-700"
+                borderColor="border-blue-600"
+                hoverTextColor="hover:text-blue-700"
+                hoverBorderColor="hover:border-blue-700"
+                className="hover:bg-blue-200"
+              />
             </div>
           </div>
 

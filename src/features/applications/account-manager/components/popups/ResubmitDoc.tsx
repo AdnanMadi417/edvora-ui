@@ -5,6 +5,7 @@ import { XCircle, AlertCircle, RotateCcw, CheckCircle } from 'lucide-react';
 import InputField from "components/form/fields/InputField";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
+import Button from "components/ui/buttons/Button";
 
 interface HoldPopupProps {
   isOpen: boolean;
@@ -161,22 +162,29 @@ export default function HoldPopup({
           <div className="border-t border-slate-200 px-6 py-5">
 
             <div className="flex justify-end gap-3">
-              <button
+              <Button
                 onClick={handleClose}
-                className="flex items-center justify-center gap-2 rounded-md border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
-              >
-                <XCircle className="h-4 w-4" />
-                Cancel
-              </button>
+                icon={<XCircle className="h-4 w-4" />}
+                text="Cancel"
+                bgColor="bg-white"
+                textColor="text-gray-600"
+                borderColor="border-gray-600"
+                hoverTextColor="hover:text-gray-700"
+                hoverBorderColor="hover:border-gray-700"
+              />
 
-              <button
+              <Button
                 onClick={handleConfirm}
                 disabled={!formData.reason.trim()}
-                className="flex items-center justify-center gap-2 rounded-md border border-amber-600 bg-amber-100 text-amber-700 px-4 py-2 text-sm font-medium transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
-              >
-                <CheckCircle className="h-4 w-4" />
-                Confirm
-              </button>
+                icon={<CheckCircle className="h-4 w-4" />}
+                text="Confirm"
+                bgColor="bg-amber-100"
+                textColor="text-amber-700"
+                borderColor="border-amber-600"
+                hoverTextColor="hover:text-amber-700"
+                hoverBorderColor="hover:border-amber-700"
+                className="hover:bg-amber-200"
+              />
             </div>
 
           </div>
