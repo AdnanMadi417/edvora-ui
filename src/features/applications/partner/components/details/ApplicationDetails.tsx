@@ -19,6 +19,7 @@ import { MdAssignmentTurnedIn } from "react-icons/md";
 import { Clock, Upload, ClipboardCheck, CreditCard, Plane, CheckCircle, FileUp, Download } from 'lucide-react';
 import { getDocumentDownloadUrl } from 'services/documentService';
 import Button from 'components/ui/buttons/Button';
+import IconButton from 'components/ui/buttons/IconButton';
 import { useApplicationActions } from "features/applications/hooks";
 
 import ApplicationPartnerTopBar from "features/applications/partner/components/topBar/PartnerTopBar";
@@ -325,13 +326,17 @@ export default function ApplicationDetails({
             {actions && (
               <>
                 {hasRequiredDocs && !showArrivalExtraDocs && (
-                  <button
+                  <Button
                     onClick={openRequiredActionPopup}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"
-                  >
-                    <Upload className="h-4 w-4" />
-                    Upload Required Documents
-                  </button>
+                    icon={<Upload className="h-4 w-4" />}
+                    text="Upload Required Documents"
+                    bgColor="bg-amber-500"
+                    textColor="text-white"
+                    borderColor="border-amber-500"
+                    hoverTextColor="hover:text-white"
+                    hoverBorderColor="hover:border-amber-600"
+                    className="w-full hover:bg-amber-600"
+                  />
                 )}
                 {showArrivalExtraDocs && (() => {
                   const arrivalFormDoc = application?.arrival_documents?.find((d: any) => d.document_type === "Arrival Form Template");
@@ -360,36 +365,48 @@ export default function ApplicationDetails({
                                 <p className="text-xs text-slate-400">Provided by manager · Click to download</p>
                               </div>
                             </div>
-                            <button
+                            <IconButton
                               onClick={() => handleTemplateDownload(arrivalFormDoc.file_key)}
                               disabled={downloadingTemplate}
-                              className="ml-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-transparent bg-blue-50 text-blue-600 transition hover:border-blue-200 hover:bg-blue-100 disabled:opacity-40"
                               title="Download template"
-                            >
-                              <Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />
-                            </button>
+                              icon={<Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />}
+                              bgColor="bg-blue-50"
+                              textColor="text-blue-600"
+                              borderColor="border-transparent"
+                              hoverTextColor="hover:text-blue-600"
+                              hoverBorderColor="hover:border-blue-200"
+                              className="ml-3 shrink-0 hover:bg-blue-100"
+                            />
                           </div>
                         )}
                       </div>
-                      <button
+                      <Button
                         type="button"
                         onClick={openRequiredActionPopup}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-amber-600"
-                      >
-                        <Upload className="h-4 w-4" />
-                        Upload Arrival Form
-                      </button>
+                        icon={<Upload className="h-4 w-4" />}
+                        text="Upload Arrival Form"
+                        bgColor="bg-amber-500"
+                        textColor="text-white"
+                        borderColor="border-amber-500"
+                        hoverTextColor="hover:text-white"
+                        hoverBorderColor="hover:border-amber-600"
+                        className="w-full hover:bg-amber-600"
+                      />
                     </div>
                   );
                 })()}
                 {currentStatusCode === "PROGRAM_CHANGE_SUGGESTED" && (
-                  <button
+                  <Button
                     onClick={openProgramDecisionPopup}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-violet-500 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-violet-600"
-                  >
-                    <ClipboardCheck className="h-4 w-4" />
-                    Submit Program Decision
-                  </button>
+                    icon={<ClipboardCheck className="h-4 w-4" />}
+                    text="Submit Program Decision"
+                    bgColor="bg-violet-500"
+                    textColor="text-white"
+                    borderColor="border-violet-500"
+                    hoverTextColor="hover:text-white"
+                    hoverBorderColor="hover:border-violet-600"
+                    className="w-full hover:bg-violet-600"
+                  />
                 )}
               </>
             )}
@@ -471,14 +488,18 @@ export default function ApplicationDetails({
                               <p className="text-xs text-slate-400">Invoice for your visa payment — keep for your records</p>
                             </div>
                           </div>
-                          <button
+                          <IconButton
                             onClick={() => handleTemplateDownload(visaInvoiceKey)}
                             disabled={downloadingTemplate}
-                            className="ml-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-40"
                             title="Download Visa Invoice"
-                          >
-                            <Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />
-                          </button>
+                            icon={<Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />}
+                            bgColor="bg-green-50"
+                            textColor="text-green-600"
+                            borderColor="border-transparent"
+                            hoverTextColor="hover:text-green-600"
+                            hoverBorderColor="hover:border-green-200"
+                            className="ml-3 shrink-0 hover:bg-green-100"
+                          />
                         </div>
                       )}
                       {appFormKey && (
@@ -492,62 +513,82 @@ export default function ApplicationDetails({
                               <p className="text-xs text-slate-400">Download, complete, and re-upload when requested by your manager</p>
                             </div>
                           </div>
-                          <button
+                          <IconButton
                             onClick={() => handleTemplateDownload(appFormKey)}
                             disabled={downloadingTemplate}
-                            className="ml-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-transparent bg-blue-50 text-blue-600 transition hover:border-blue-200 hover:bg-blue-100 disabled:opacity-40"
                             title="Download Application Form Template"
-                          >
-                            <Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />
-                          </button>
+                            icon={<Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />}
+                            bgColor="bg-blue-50"
+                            textColor="text-blue-600"
+                            borderColor="border-transparent"
+                            hoverTextColor="hover:text-blue-600"
+                            hoverBorderColor="hover:border-blue-200"
+                            className="ml-3 shrink-0 hover:bg-blue-100"
+                          />
                         </div>
                       )}
                     </div>
                   );
                 })()}
 
-                <button
+                <Button
                   type="button"
                   onClick={() => setShowVisaPaymentPopup(true)}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-green-700"
-                >
-                  <CreditCard className="h-4 w-4" />
-                  Proceed to Payment
-                </button>
+                  icon={<CreditCard className="h-4 w-4" />}
+                  text="Proceed to Payment"
+                  bgColor="bg-green-600"
+                  textColor="text-white"
+                  borderColor="border-green-600"
+                  hoverTextColor="hover:text-white"
+                  hoverBorderColor="hover:border-green-700"
+                  className="w-full hover:bg-green-700"
+                />
               </div>
             )}
 
             {showArrivalConfirmation && (
-              <button
+              <Button
                 type="button"
                 onClick={() => setShowArrivalPopup(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-emerald-700"
-              >
-                <Plane className="h-4 w-4" />
-                Confirm Arrival
-              </button>
+                icon={<Plane className="h-4 w-4" />}
+                text="Confirm Arrival"
+                bgColor="bg-emerald-600"
+                textColor="text-white"
+                borderColor="border-emerald-600"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-emerald-700"
+                className="w-full hover:bg-emerald-700"
+              />
             )}
 
             {showEVisaUpload && (
-              <button
+              <Button
                 type="button"
                 onClick={() => setShowEVisaUploadPopup(true)}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700"
-              >
-                <FileUp className="h-4 w-4" />
-                Upload E-Visa
-              </button>
+                icon={<FileUp className="h-4 w-4" />}
+                text="Upload E-Visa"
+                bgColor="bg-blue-600"
+                textColor="text-white"
+                borderColor="border-blue-600"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-blue-700"
+                className="w-full hover:bg-blue-700"
+              />
             )}
 
             {showAwaitingArrival && (
-              <button
+              <Button
                 type="button"
                 onClick={openRequiredActionPopup}
-                className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700"
-              >
-                <FileUp className="h-4 w-4" />
-                Upload Payment Proof
-              </button>
+                icon={<FileUp className="h-4 w-4" />}
+                text="Upload Payment Proof"
+                bgColor="bg-blue-600"
+                textColor="text-white"
+                borderColor="border-blue-600"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-blue-700"
+                className="w-full hover:bg-blue-700"
+              />
             )}
 
             {showEmgsUpload && (
@@ -600,14 +641,18 @@ export default function ApplicationDetails({
                   </div>
                 </div>
 
-                <button
+                <Button
                   type="button"
                   onClick={() => setShowEmgsUploadPopup(true)}
-                  className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white transition-all hover:bg-blue-700"
-                >
-                  <FileUp className="h-4 w-4" />
-                  Upload EMGS Eval
-                </button>
+                  icon={<FileUp className="h-4 w-4" />}
+                  text="Upload EMGS Eval"
+                  bgColor="bg-blue-600"
+                  textColor="text-white"
+                  borderColor="border-blue-600"
+                  hoverTextColor="hover:text-white"
+                  hoverBorderColor="hover:border-blue-700"
+                  className="w-full hover:bg-blue-700"
+                />
               </div>
             )}
 

@@ -5,6 +5,7 @@ import { Receipt, AlertCircle } from "lucide-react";
 import type { ApplicationActionsResponse } from "features/applications/hooks";
 import DisputeCommission from "features/applications/partner/components/popups/DisputeCommission";
 import DocumentActions from "features/applications/shared/DocumentActions";
+import Button from "components/ui/buttons/Button";
 
 interface ApplicationCommissionProps {
   application: any;
@@ -61,13 +62,17 @@ export default function ApplicationCommission({
         </div>
 
         {canDispute && (
-          <button
+          <Button
             onClick={() => setIsDisputeOpen(true)}
-            className="flex shrink-0 items-center gap-2 rounded-lg border border-red-500 bg-red-50 px-3 py-1.5 text-sm font-medium text-red-700 transition hover:border-red-600 hover:bg-red-100"
-          >
-            <AlertCircle className="h-4 w-4" />
-            Dispute Commission
-          </button>
+            icon={<AlertCircle className="h-4 w-4" />}
+            text="Dispute Commission"
+            bgColor="bg-red-50"
+            textColor="text-red-700"
+            borderColor="border-red-500"
+            hoverTextColor="hover:text-red-700"
+            hoverBorderColor="hover:border-red-600"
+            className="shrink-0 hover:bg-red-100"
+          />
         )}
       </div>
 

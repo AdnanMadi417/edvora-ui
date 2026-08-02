@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
 import { FormDataType, DocumentType } from "features/applications/partner/components/form/utility-functions/types";
+import Button from "components/ui/buttons/Button";
 
 interface Props {
   documentTypes: DocumentType[];
@@ -184,14 +185,18 @@ function DocRow({
         </div>
       </div>
 
-      <button
+      <Button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-100 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 md:w-auto md:shrink-0"
-      >
-        <Upload className="h-4 w-4" />
-        Upload
-      </button>
+        icon={<Upload className="h-4 w-4" />}
+        text="Upload"
+        bgColor="bg-slate-100"
+        textColor="text-slate-700"
+        borderColor="border-slate-100"
+        hoverTextColor="hover:text-slate-700"
+        hoverBorderColor="hover:border-slate-200"
+        className="w-full font-semibold hover:bg-slate-200 md:w-auto md:shrink-0"
+      />
 
       <input
         ref={inputRef}
