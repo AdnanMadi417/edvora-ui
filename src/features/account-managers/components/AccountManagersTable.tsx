@@ -17,6 +17,8 @@ import { useToast } from "components/context/ToastContext";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -145,12 +147,18 @@ const AccountManagersTable = () => {
               )}
             </button>
             {activeFiltersCount > 0 && (
-              <button
-                onClick={clearFilters}
-                className="sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-red-200 bg-white text-red-500 hover:bg-red-50"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </button>
+              <div className="sm:hidden">
+                <IconButton
+                  onClick={clearFilters}
+                  icon={<RefreshCw className="h-4 w-4" />}
+                  bgColor="bg-white"
+                  textColor="text-red-500"
+                  borderColor="border-red-200"
+                  hoverTextColor="hover:text-red-500"
+                  hoverBorderColor="hover:border-red-200"
+                  className="hover:bg-red-50"
+                />
+              </div>
             )}
           </div>
 
@@ -174,13 +182,19 @@ const AccountManagersTable = () => {
             )}
 
             {activeFiltersCount > 0 && (
-              <button
-                onClick={clearFilters}
-                className="hidden sm:flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Clear
-              </button>
+              <div className="hidden sm:block">
+                <Button
+                  onClick={clearFilters}
+                  icon={<RefreshCw className="h-4 w-4" />}
+                  text="Clear"
+                  bgColor="bg-white"
+                  textColor="text-red-600"
+                  borderColor="border-red-200"
+                  hoverTextColor="hover:text-red-600"
+                  hoverBorderColor="hover:border-red-200"
+                  className="hover:bg-red-50"
+                />
+              </div>
             )}
           </div>
         </div>
@@ -238,13 +252,17 @@ const AccountManagersTable = () => {
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Create your first account manager to get started."}
                   action={
                     activeFiltersCount > 0 ? (
-                      <button
+                      <Button
                         onClick={clearFilters}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
-                      >
-                        <RefreshCw className="h-3.5 w-3.5" />
-                        Clear filters
-                      </button>
+                        icon={<RefreshCw className="h-3.5 w-3.5" />}
+                        text="Clear filters"
+                        bgColor="bg-white"
+                        textColor="text-slate-700"
+                        borderColor="border-slate-200"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-slate-200"
+                        className="hover:bg-slate-50"
+                      />
                     ) : (
                       <Link
                         href="/admin/account-managers/create"
@@ -314,17 +332,21 @@ const AccountManagersTable = () => {
                         <Pencil className="h-4 w-4" />
                       </Link>
                       <div className="h-5 border-l border-slate-200" />
-                      <button
+                      <IconButton
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedManagerId(m.id);
                           setSelectedManagerName(m.name);
                           setIsDeleteOpen(true);
                         }}
-                        className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
+                        icon={<Trash2 className="h-4 w-4" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-400"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-red-600"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-red-50"
+                      />
                     </div>
                   </td>
 
