@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 
 type ButtonProps = {
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   icon?: ReactNode;
   text?: string;
@@ -12,6 +12,7 @@ type ButtonProps = {
   hoverBorderColor?: string;
   className?: string;
   title?: string;
+  type?: "button" | "submit" | "reset";
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -26,9 +27,11 @@ const Button: React.FC<ButtonProps> = ({
                                          hoverBorderColor = "hover:border-blue-700",
                                          className,
                                          title,
+                                         type = "button",
                                        }) => {
   return (
     <button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       title={title}

@@ -310,17 +310,21 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
             <div className="flex items-center gap-2 sm:gap-6">
               <div className="relative">
-                <button
+                <Button
                   onClick={() =>
                     setOpenDropdownId(
                       openDropdownId === program.id ? null : program.id
                     )
                   }
-                  className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  Actions
-                  <MoreVertical className="h-4 w-4" />
-                </button>
+                  icon={<MoreVertical className="h-4 w-4" />}
+                  text="Actions"
+                  bgColor="bg-white"
+                  textColor="text-slate-800"
+                  borderColor="border-gray-200"
+                  hoverTextColor="hover:text-slate-800"
+                  hoverBorderColor="hover:border-gray-200"
+                  className="hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+                />
 
                 {openDropdownId === program.id && (
                   <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">

@@ -14,6 +14,7 @@ import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
 import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
@@ -88,15 +89,18 @@ function DocUploadField({
             <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
           </div>
           <div className="ml-4 flex shrink-0 items-center gap-2">
-            <button
-              type="button"
+            <IconButton
               onClick={handleView}
               disabled={downloading}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
               title="View document"
-            >
-              <ExternalLink className={`h-4 w-4 ${downloading ? "animate-pulse" : ""}`} />
-            </button>
+              icon={<ExternalLink className={`h-4 w-4 ${downloading ? "animate-pulse" : ""}`} />}
+              bgColor="bg-green-50"
+              textColor="text-green-600"
+              borderColor="border-transparent"
+              hoverTextColor="hover:text-green-600"
+              hoverBorderColor="hover:border-green-200"
+              className="hover:bg-green-100"
+            />
             <label htmlFor={fieldId} className="flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50">
               <Upload className="h-3.5 w-3.5" /> Replace
               <input id={fieldId} type="file" accept={ALLOWED_FILE_TYPES.extensions.join(",")} className="hidden" onChange={handleChange} />

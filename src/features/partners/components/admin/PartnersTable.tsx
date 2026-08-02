@@ -17,6 +17,8 @@ import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import PresignedImage from "components/ui/PresignedImage";
+import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -157,12 +159,18 @@ export default function PartnersTable() {
               )}
             </button>
             {activeFiltersCount > 0 && (
-              <button
-                onClick={clearFilters}
-                className="sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-red-200 bg-white text-red-500 hover:bg-red-50"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </button>
+              <div className="sm:hidden">
+                <IconButton
+                  onClick={clearFilters}
+                  icon={<RefreshCw className="h-4 w-4" />}
+                  bgColor="bg-white"
+                  textColor="text-red-500"
+                  borderColor="border-red-200"
+                  hoverTextColor="hover:text-red-500"
+                  hoverBorderColor="hover:border-red-200"
+                  className="hover:bg-red-50"
+                />
+              </div>
             )}
           </div>
 
@@ -186,13 +194,19 @@ export default function PartnersTable() {
             )}
 
             {activeFiltersCount > 0 && (
-              <button
-                onClick={clearFilters}
-                className="hidden sm:flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Clear
-              </button>
+              <div className="hidden sm:block">
+                <Button
+                  onClick={clearFilters}
+                  icon={<RefreshCw className="h-4 w-4" />}
+                  text="Clear"
+                  bgColor="bg-white"
+                  textColor="text-red-600"
+                  borderColor="border-red-200"
+                  hoverTextColor="hover:text-red-600"
+                  hoverBorderColor="hover:border-red-200"
+                  className="hover:bg-red-50"
+                />
+              </div>
             )}
           </div>
         </div>
@@ -250,13 +264,17 @@ export default function PartnersTable() {
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No partners have registered yet."}
                   action={
                     activeFiltersCount > 0 ? (
-                      <button
+                      <Button
                         onClick={clearFilters}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
-                      >
-                        <RefreshCw className="h-3.5 w-3.5" />
-                        Clear filters
-                      </button>
+                        icon={<RefreshCw className="h-3.5 w-3.5" />}
+                        text="Clear filters"
+                        bgColor="bg-white"
+                        textColor="text-slate-700"
+                        borderColor="border-slate-200"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-slate-200"
+                        className="hover:bg-slate-50"
+                      />
                     ) : undefined
                   }
                 />
@@ -322,13 +340,17 @@ export default function PartnersTable() {
 
                         {!partner.is_verified && !partner.is_active && (
                           <>
-                            <button
+                            <IconButton
                               onClick={() => { setReviewPartner({ id: partner.id, name: partner.name || "" }); setIsReviewOpen(true); }}
-                              className="flex items-center justify-center rounded-lg p-2 text-amber-400 transition hover:bg-amber-50 hover:text-amber-600"
                               title="Review registration"
-                            >
-                              <ShieldCheck className="h-4 w-4" />
-                            </button>
+                              icon={<ShieldCheck className="h-4 w-4" />}
+                              bgColor="bg-transparent"
+                              textColor="text-amber-400"
+                              borderColor="border-transparent"
+                              hoverTextColor="hover:text-amber-600"
+                              hoverBorderColor="hover:border-transparent"
+                              className="hover:bg-amber-50"
+                            />
                             <div className="h-5 border-l border-slate-200" />
                           </>
                         )}
@@ -341,12 +363,17 @@ export default function PartnersTable() {
                           <Pencil className="h-4 w-4" />
                         </a>
                         <div className="h-5 border-l border-slate-200" />
-                        <button
+                        <IconButton
                           onClick={() => { setSelectedPartner(partner); setIsAssignModalOpen(true); }}
-                          className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-                        >
-                          <UserCog className="h-4 w-4" />
-                        </button>
+                          title="Assign manager"
+                          icon={<UserCog className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-400"
+                          borderColor="border-transparent"
+                          hoverTextColor="hover:text-slate-700"
+                          hoverBorderColor="hover:border-transparent"
+                          className="hover:bg-slate-100"
+                        />
                       </div>
                     </td>
 

@@ -6,6 +6,7 @@ import { useToast } from "components/context/ToastContext";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { AppDate } from "components/ui/date";
+import Button from "components/ui/buttons/Button";
 
 interface OfferLetterDecisionProps {
   application: any;
@@ -134,14 +135,18 @@ export default function OfferLetterDecision({
             </p>
 
             <div className="flex flex-col justify-end gap-3 sm:flex-row">
-              <button
+              <Button
                 onClick={() => handleDecision("accept")}
                 disabled={submitting}
-                className="flex items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200"
-              >
-                <CheckCircle className="h-4 w-4" />
-                Accept Offer
-              </button>
+                icon={<CheckCircle className="h-4 w-4" />}
+                text="Accept Offer"
+                bgColor="bg-blue-100"
+                textColor="text-blue-700"
+                borderColor="border-blue-600"
+                hoverTextColor="hover:text-blue-700"
+                hoverBorderColor="hover:border-blue-700"
+                className="hover:bg-blue-200"
+              />
             </div>
           </>
         )}

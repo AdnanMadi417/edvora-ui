@@ -37,7 +37,7 @@ export default function CurrencySelector({ value, options, onChange }: CurrencyS
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="true"
-        className={`flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium transition ${
+        className={`flex h-10 items-center gap-1.5 rounded-lg border px-4 text-sm font-medium transition ${
           open
             ? "border-slate-300 bg-slate-100 text-slate-800"
             : "border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50"

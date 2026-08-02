@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Globe, MapPin, Truck } from 'lucide-react';
 import ModalHeader from "components/ui/modal/ModalHeader";
+import Button from "components/ui/buttons/Button";
 import {
   MdKeyboardArrowDown,
   MdLocalAirport,
@@ -249,12 +250,16 @@ export default function ViewDetailsModal({
                 </button>
                 {copied && <span className="text-xs text-emerald-600">Copied</span>}
               </div>
-              <button
+              <Button
                 onClick={() => window.open(`https://wa.me/${provider.whatsapp}`, "_blank")}
-                className="rounded-md bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700"
-              >
-                Contact on WhatsApp
-              </button>
+                text="Contact on WhatsApp"
+                bgColor="bg-emerald-600"
+                textColor="text-white"
+                borderColor="border-emerald-600"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-emerald-700"
+                className="hover:bg-emerald-700"
+              />
             </div>
           </div>
         </div>

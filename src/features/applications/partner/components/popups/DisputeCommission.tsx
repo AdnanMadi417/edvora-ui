@@ -7,6 +7,7 @@ import { useDisputeCommission } from "features/applications/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import Button from "components/ui/buttons/Button";
 
 interface DisputeCommissionProps {
   isOpen: boolean;
@@ -169,23 +170,30 @@ export default function DisputeCommission({
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <button
+            <Button
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex items-center gap-2 rounded-md border border-slate-600 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-700 hover:text-slate-800 disabled:opacity-50"
-            >
-              <XCircle className="h-4 w-4" />
-              Cancel
-            </button>
+              icon={<XCircle className="h-4 w-4" />}
+              text="Cancel"
+              bgColor="bg-slate-50"
+              textColor="text-slate-700"
+              borderColor="border-slate-600"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-700"
+            />
 
-            <button
+            <Button
               onClick={handleSubmit}
               disabled={isSubmitting || !isFormValid}
-              className="flex items-center gap-2 rounded-md border border-red-600 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <AlertCircle className="h-4 w-4" />
-              {uploading ? "Uploading..." : loading ? "Submitting..." : "Submit Dispute"}
-            </button>
+              icon={<AlertCircle className="h-4 w-4" />}
+              text={uploading ? "Uploading..." : loading ? "Submitting..." : "Submit Dispute"}
+              bgColor="bg-red-50"
+              textColor="text-red-700"
+              borderColor="border-red-600"
+              hoverTextColor="hover:text-red-700"
+              hoverBorderColor="hover:border-red-700"
+              className="hover:bg-red-100"
+            />
           </div>
 
         </div>

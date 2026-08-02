@@ -16,6 +16,8 @@ import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
 import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
 import { parseSocialMediaUrl, validateSocialMediaField } from "utils/socialMedia";
+import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 
@@ -86,15 +88,18 @@ function DocUploadField({
             <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
           </div>
           <div className="ml-4 flex shrink-0 items-center gap-2">
-            <button
-              type="button"
+            <IconButton
               onClick={handleView}
               disabled={downloading}
-              className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
               title="View document"
-            >
-              <ExternalLink className={`h-4 w-4 ${downloading ? "animate-pulse" : ""}`} />
-            </button>
+              icon={<ExternalLink className={`h-4 w-4 ${downloading ? "animate-pulse" : ""}`} />}
+              bgColor="bg-green-50"
+              textColor="text-green-600"
+              borderColor="border-transparent"
+              hoverTextColor="hover:text-green-600"
+              hoverBorderColor="hover:border-green-200"
+              className="hover:bg-green-100"
+            />
             {!locked && (
               <label htmlFor={fieldId} className="flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50">
                 <Upload className="h-3.5 w-3.5" /> Replace
@@ -592,24 +597,33 @@ export default function EditPartnerProfile() {
 
         {/* Footer */}
         <div className="flex justify-end gap-3 px-6 py-5">
-          <button
+          <Button
             type="button"
             onClick={() => router.push("/partner/profile")}
             disabled={isUpdating}
-            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:opacity-50"
-          >
-            <ChevronLeft className="h-4 w-4" /> Back
-          </button>
-          <button
+            icon={<ChevronLeft className="h-4 w-4" />}
+            text="Back"
+            bgColor="bg-white"
+            textColor="text-slate-700"
+            borderColor="border-slate-200"
+            hoverTextColor="hover:text-slate-700"
+            hoverBorderColor="hover:border-slate-200"
+            className="hover:bg-slate-50"
+          />
+          <Button
             type="button"
             onClick={handleUpdate}
             disabled={isUpdating || isUploading || !isFormChanged()}
             title={saveDisabledReason}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Save className="h-4 w-4" />
-            {isUpdating ? "Saving…" : "Save Changes"}
-          </button>
+            icon={<Save className="h-4 w-4" />}
+            text={isUpdating ? "Saving…" : "Save Changes"}
+            bgColor="bg-blue-600"
+            textColor="text-white"
+            borderColor="border-blue-600"
+            hoverTextColor="hover:text-white"
+            hoverBorderColor="hover:border-blue-600"
+            className="font-semibold hover:bg-blue-700"
+          />
         </div>
       </div>
     </div>

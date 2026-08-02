@@ -9,6 +9,7 @@ import { useApplicationActions } from "features/applications/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
+import Button from "components/ui/buttons/Button";
 import { DocumentItem, DocumentType, FormDataType } from "features/applications/partner/components/form/utility-functions/types";
 
 const FREE_UPLOAD_ID = "__free_upload__";
@@ -290,21 +291,28 @@ export default function RequiredAction({
           </div>
 
           <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
-            <button
+            <Button
               onClick={onClose}
-              className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
-            >
-              <XCircle className="h-4 w-4" />
-              Cancel
-            </button>
-            <button
+              icon={<XCircle className="h-4 w-4" />}
+              text="Cancel"
+              bgColor="bg-white"
+              textColor="text-gray-600"
+              borderColor="border-gray-600"
+              hoverTextColor="hover:text-gray-700"
+              hoverBorderColor="hover:border-gray-700"
+            />
+            <Button
               onClick={handleConfirm}
               disabled={!allRequiredUploaded || anyUploading || isSubmitting}
-              className="flex items-center justify-center gap-2 rounded-md border border-amber-600 bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700 transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
-            >
-              <CheckCircle className="h-4 w-4" />
-              {isSubmitting ? "Submitting..." : "Confirm"}
-            </button>
+              icon={<CheckCircle className="h-4 w-4" />}
+              text={isSubmitting ? "Submitting..." : "Confirm"}
+              bgColor="bg-amber-100"
+              textColor="text-amber-700"
+              borderColor="border-amber-600"
+              hoverTextColor="hover:text-amber-700"
+              hoverBorderColor="hover:border-amber-700"
+              className="hover:bg-amber-200"
+            />
           </div>
         </div>
       </div>

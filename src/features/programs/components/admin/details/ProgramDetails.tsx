@@ -260,27 +260,31 @@ const ProgramDetails = ({ id }: Props) => {
 
           <div className="flex shrink-0 items-center gap-2">
             <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
-            <button
+            <Button
               onClick={handleCopyAll}
               title={copied ? 'Copied!' : 'Copy program info'}
-              className={`flex h-9 items-center justify-center gap-1.5 rounded-md border px-3 text-xs font-medium transition ${
-                copied
-                  ? 'border-green-300 bg-green-50 text-green-700'
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              <Copy className="h-3.5 w-3.5" />
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
+              icon={<Copy className="h-4 w-4" />}
+              text={copied ? 'Copied!' : 'Copy'}
+              bgColor={copied ? 'bg-green-50' : 'bg-white'}
+              textColor={copied ? 'text-green-700' : 'text-slate-600'}
+              borderColor={copied ? 'border-green-300' : 'border-slate-200'}
+              hoverTextColor={copied ? 'hover:text-green-700' : 'hover:text-slate-600'}
+              hoverBorderColor={copied ? 'hover:border-green-300' : 'hover:border-slate-300'}
+              className={`h-10 ${copied ? '' : 'hover:bg-slate-50'}`}
+            />
 
             <div className="relative">
-            <button
+            <Button
               onClick={() => setOpenDropdownId(openDropdownId === program.id ? null : program.id)}
-              className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-            >
-              Actions
-              <MoreVertical className="h-4 w-4" />
-            </button>
+              icon={<MoreVertical className="h-4 w-4" />}
+              text="Actions"
+              bgColor="bg-white"
+              textColor="text-slate-700"
+              borderColor="border-slate-200"
+              hoverTextColor="hover:text-slate-700"
+              hoverBorderColor="hover:border-slate-300"
+              className="h-10 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-400"
+            />
 
             {openDropdownId === program.id && (
               <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-lg border border-slate-200 bg-white ring-1 ring-black/5">

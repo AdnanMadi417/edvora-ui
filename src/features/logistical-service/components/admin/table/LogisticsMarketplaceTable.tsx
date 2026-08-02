@@ -24,6 +24,8 @@ import Link from "next/link";
 
 import { useLogisticProviders, useDeleteLogisticProvider } from "features/logistical-service/hooks";
 import DeleteServiceConfirmation from "../DeleteServiceConfirmation";
+import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 
 const LogisticsMarketplaceTable = () => {
   const router = useRouter();
@@ -181,13 +183,17 @@ const LogisticsMarketplaceTable = () => {
                       subtitle={searchTerm ? "Try adjusting your search." : "No service providers have been added yet."}
                       action={
                         searchTerm ? (
-                          <button
+                          <Button
                             onClick={() => { setSearchTerm(""); setCurrentPage(1); }}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
-                          >
-                            <RefreshCw className="h-3.5 w-3.5" />
-                            Clear search
-                          </button>
+                            icon={<RefreshCw className="h-3.5 w-3.5" />}
+                            text="Clear search"
+                            bgColor="bg-white"
+                            textColor="text-slate-700"
+                            borderColor="border-slate-200"
+                            hoverTextColor="hover:text-slate-700"
+                            hoverBorderColor="hover:border-slate-200"
+                            className="hover:bg-slate-50"
+                          />
                         ) : undefined
                       }
                     />
@@ -281,8 +287,7 @@ const LogisticsMarketplaceTable = () => {
 
                             <div className="h-6 border-l border-slate-200" />
 
-                            <button
-                              role="menuitem"
+                            <IconButton
                               aria-label="Delete Provider"
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -290,10 +295,14 @@ const LogisticsMarketplaceTable = () => {
                                 setSelectedServiceName(provider.name);
                                 setIsDeleteOpen(true);
                               }}
-                              className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                            >
-                              <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
-                            </button>
+                              icon={<Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />}
+                              bgColor="bg-transparent"
+                              textColor="text-slate-700"
+                              borderColor="border-transparent"
+                              hoverTextColor="hover:text-slate-700"
+                              hoverBorderColor="hover:border-transparent"
+                              className="hover:bg-slate-100 focus:outline-none"
+                            />
                           </div>
                         </td>
                         <td className="px-4 py-4">

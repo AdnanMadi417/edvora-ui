@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, AlertCircle, RotateCcw } from "lucide-react";
+import Button from "components/ui/buttons/Button";
 
 interface ResubmitDocProps {
   isOpen: boolean;
@@ -147,19 +148,27 @@ export default function UploadDoc({
 
           <div className="border-t border-slate-200 px-6 py-5">
             <div className="flex justify-end gap-3">
-              <button
+              <Button
                 onClick={handleClose}
-                className="rounded-md border border-slate-200 bg-card px-5 py-2.5 text-p2 font-medium text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
-              >
-                Cancel
-              </button>
-              <button
+                text="Cancel"
+                bgColor="bg-card"
+                textColor="text-gray-700"
+                borderColor="border-slate-200"
+                hoverTextColor="hover:text-gray-700"
+                hoverBorderColor="hover:border-gray-300"
+                className="hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              />
+              <Button
                 onClick={handleConfirm}
                 disabled={!selectedFile}
-                className="rounded-md bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-p2 font-medium text-white shadow-lg shadow-amber-500/25 transition-all duration-200 hover:from-amber-600 hover:to-orange-600 hover:shadow-xl hover:shadow-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-              >
-                Confirm Upload
-              </button>
+                text="Confirm Upload"
+                bgColor="bg-gradient-to-r from-amber-500 to-orange-500"
+                textColor="text-white"
+                borderColor="border-transparent"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-transparent"
+                className="shadow-lg shadow-amber-500/25 hover:from-amber-600 hover:to-orange-600 hover:shadow-xl hover:shadow-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 disabled:shadow-none"
+              />
             </div>
           </div>
         </div>

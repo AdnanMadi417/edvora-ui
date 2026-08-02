@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Clock, RefreshCw } from "lucide-react";
 import HoldPopup from "features/applications/admin/components/popups/Hold";
 import UpdateStatus from "features/applications/admin/components/popups/UpdateStatus";
+import Button from "components/ui/buttons/Button";
 
 interface Props {
   application: any;
@@ -44,21 +45,29 @@ export default function AdminTopBar({ application, onRefetch }: Props) {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => setShowHoldPopup(true)}
-            className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-medium text-amber-700 transition-all hover:border-amber-300 hover:bg-amber-100"
-          >
-            <Clock className="h-4 w-4" />
-            <span className="hidden sm:inline">Hold</span>
-          </button>
+            icon={<Clock className="h-4 w-4" />}
+            text="Hold"
+            bgColor="bg-amber-50"
+            textColor="text-amber-700"
+            borderColor="border-amber-200"
+            hoverTextColor="hover:text-amber-700"
+            hoverBorderColor="hover:border-amber-300"
+            className="hover:bg-amber-100"
+          />
 
-          <button
+          <Button
             onClick={() => setShowUpdatePopup(true)}
-            className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700"
-          >
-            <RefreshCw className="h-4 w-4" />
-            <span>Update Status</span>
-          </button>
+            icon={<RefreshCw className="h-4 w-4" />}
+            text="Update Status"
+            bgColor="bg-blue-600"
+            textColor="text-white"
+            borderColor="border-blue-600"
+            hoverTextColor="hover:text-white"
+            hoverBorderColor="hover:border-blue-600"
+            className="hover:bg-blue-700"
+          />
         </div>
       </div>
 
