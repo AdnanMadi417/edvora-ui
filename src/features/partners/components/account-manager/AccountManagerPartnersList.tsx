@@ -10,6 +10,7 @@ import { useAccountManagerPartners } from "features/partners/hooks";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { AppDate } from "components/ui/date";
+import Button from "components/ui/buttons/Button";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -77,13 +78,17 @@ export default function AccountManagerPartnersList() {
             <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
           )}
           {searchTerm !== "" && (
-            <button
+            <Button
               onClick={clearFilters}
-              className="flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-            >
-              <RefreshCw className="h-4 w-4" />
-              Clear
-            </button>
+              icon={<RefreshCw className="h-4 w-4" />}
+              text="Clear"
+              bgColor="bg-white"
+              textColor="text-red-600"
+              borderColor="border-red-200"
+              hoverTextColor="hover:text-red-600"
+              hoverBorderColor="hover:border-red-200"
+              className="hover:bg-red-50"
+            />
           )}
         </div>
       </div>
@@ -138,13 +143,17 @@ export default function AccountManagerPartnersList() {
                   subtitle={searchTerm ? "Try adjusting your search." : "You don't have any assigned partners yet."}
                   action={
                     searchTerm ? (
-                      <button
+                      <Button
                         onClick={clearFilters}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
-                      >
-                        <RefreshCw className="h-3.5 w-3.5" />
-                        Clear search
-                      </button>
+                        icon={<RefreshCw className="h-3.5 w-3.5" />}
+                        text="Clear search"
+                        bgColor="bg-white"
+                        textColor="text-slate-700"
+                        borderColor="border-slate-200"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-slate-200"
+                        className="hover:bg-slate-50"
+                      />
                     ) : undefined
                   }
                 />

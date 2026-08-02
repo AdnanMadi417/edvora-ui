@@ -27,6 +27,7 @@ import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import ChangePasswordPopup from "./ChangePasswordPopup";
 import ActionsDropdown from "components/ui/buttons/ActionsDropdown";
+import IconButton from "components/ui/buttons/IconButton";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
@@ -108,22 +109,30 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
       </div>
       {fileKey ? (
         <div className="ml-4 flex shrink-0 items-center gap-2">
-          <button
+          <IconButton
             onClick={handleView}
             disabled={!!loading}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent bg-slate-100 text-slate-600 transition hover:border-slate-200 hover:bg-slate-200 disabled:opacity-50"
             title="View document"
-          >
-            <Eye className={`h-4 w-4 ${loading === "view" ? "animate-pulse" : ""}`} />
-          </button>
-          <button
+            icon={<Eye className={`h-4 w-4 ${loading === "view" ? "animate-pulse" : ""}`} />}
+            bgColor="bg-slate-100"
+            textColor="text-slate-600"
+            borderColor="border-transparent"
+            hoverTextColor="hover:text-slate-600"
+            hoverBorderColor="hover:border-slate-200"
+            className="hover:bg-slate-200"
+          />
+          <IconButton
             onClick={handleDownload}
             disabled={!!loading}
-            className="flex h-9 w-9 items-center justify-center rounded-lg border border-transparent bg-green-50 text-green-600 transition hover:border-green-200 hover:bg-green-100 disabled:opacity-50"
             title="Download document"
-          >
-            <Download className={`h-4 w-4 ${loading === "download" ? "animate-pulse" : ""}`} />
-          </button>
+            icon={<Download className={`h-4 w-4 ${loading === "download" ? "animate-pulse" : ""}`} />}
+            bgColor="bg-green-50"
+            textColor="text-green-600"
+            borderColor="border-transparent"
+            hoverTextColor="hover:text-green-600"
+            hoverBorderColor="hover:border-green-200"
+            className="hover:bg-green-100"
+          />
         </div>
       ) : (
         <span className="ml-4 text-xs text-slate-400">Not uploaded</span>

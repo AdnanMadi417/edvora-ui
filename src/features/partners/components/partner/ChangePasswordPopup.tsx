@@ -7,6 +7,7 @@ import PasswordField from "components/form/fields/PasswordField";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
 import { validateNewPassword } from "utils/passwordValidation";
+import Button from "components/ui/buttons/Button";
 
 interface Props {
   isOpen: boolean;
@@ -154,20 +155,28 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
             )}
 
             <div className="flex gap-3">
-              <button
+              <Button
                 type="button"
                 onClick={handleClose}
-                className="flex-1 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-              <button
+                text="Cancel"
+                bgColor="bg-white"
+                textColor="text-slate-700"
+                borderColor="border-slate-200"
+                hoverTextColor="hover:text-slate-700"
+                hoverBorderColor="hover:border-slate-200"
+                className="flex-1 hover:bg-slate-50"
+              />
+              <Button
                 type="submit"
                 disabled={isDisabled}
-                className="flex-1 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {loading ? "Updating…" : "Update Password"}
-              </button>
+                text={loading ? "Updating…" : "Update Password"}
+                bgColor="bg-blue-600"
+                textColor="text-white"
+                borderColor="border-blue-600"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-blue-600"
+                className="flex-1 font-semibold hover:bg-blue-700"
+              />
             </div>
           </form>
         </div>
