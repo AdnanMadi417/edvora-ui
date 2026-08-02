@@ -399,9 +399,17 @@ const EditLogisticsMarketplaceDetails = ({ id }: Props) => {
               <div key={index} className="mb-6 rounded-md border bg-white p-5">
                 <div className="mb-4 flex items-center justify-between">
                   <h5 className="font-medium text-slate-800">Package {index + 1}</h5>
-                  <button type="button" onClick={() => removePackage(index)} className="flex items-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700">
-                    <Trash2 className="h-4 w-4" /> Remove
-                  </button>
+                  <Button
+                    type="button"
+                    onClick={() => removePackage(index)}
+                    icon={<Trash2 className="h-4 w-4" />}
+                    text="Remove"
+                    bgColor="bg-white"
+                    textColor="text-red-600"
+                    borderColor="border-red-600"
+                    hoverTextColor="hover:text-red-700"
+                    hoverBorderColor="hover:border-red-700"
+                  />
                 </div>
                 <div className="grid grid-cols-1 gap-x-3 md:grid-cols-2">
                   <InputField label="Package Name" field="name" required formData={{ name: pkg.name }} errors={{ name: errors[`packages_offered[${index}].name`] || "" }} updateFormData={(_: string, value: string) => { updatePackage(index, "name", value); setErrors((prev) => ({ ...prev, [`packages_offered[${index}].name`]: "" })); }} onBlur={() => validateField(`packages_offered[${index}].name`, formData.packages_offered[index].name)} />

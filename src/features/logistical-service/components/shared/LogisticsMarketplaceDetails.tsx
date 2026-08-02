@@ -18,6 +18,7 @@ import { useLogisticProviderDetails } from "features/logistical-service/hooks";
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyData";
+import Button from "components/ui/buttons/Button";
 
 interface LogisticsMarketplaceDetailsProps {
   id: string;
@@ -244,12 +245,16 @@ const LogisticsMarketplaceDetails = ({ id, basePath = "/partner" }: LogisticsMar
                 </button>
                 {copied && <span className="text-xs text-emerald-600">Copied</span>}
               </div>
-              <button
+              <Button
                 onClick={() => window.open(`https://wa.me/${service.whatsapp}`, "_blank")}
-                className="rounded-md bg-emerald-600 px-4 py-2 text-xs font-medium text-white hover:bg-emerald-700"
-              >
-                Contact on WhatsApp
-              </button>
+                text="Contact on WhatsApp"
+                bgColor="bg-emerald-600"
+                textColor="text-white"
+                borderColor="border-emerald-600"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-emerald-700"
+                className="hover:bg-emerald-700"
+              />
             </div>
           </div>
         </div>

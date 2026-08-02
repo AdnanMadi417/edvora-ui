@@ -8,6 +8,7 @@ import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { useToast } from "components/context/ToastContext";
 import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 import CreateLogisticsMarketplacePopup from "../CreateLogisticsMarketplacePopup";
 
 const LogisticsMarketplaceServicesConfig = () => {
@@ -137,13 +138,17 @@ const LogisticsMarketplaceServicesConfig = () => {
                       <span className="text-sm font-medium text-slate-800">
                         {service.name}
                       </span>
-                      <button
+                      <IconButton
                         onClick={() => startEdit(service.id, service.name)}
                         aria-label="Edit service"
-                        className="flex items-center justify-center rounded-md p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
+                        icon={<Pencil className="h-4 w-4" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-500"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-slate-100"
+                      />
                     </>
                   )}
                 </div>
