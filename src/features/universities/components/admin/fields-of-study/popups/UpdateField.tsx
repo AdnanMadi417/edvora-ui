@@ -11,6 +11,7 @@ import InputField from "components/form/fields/InputField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface UpdateFieldProps {
   isOpen: boolean;
@@ -120,10 +121,7 @@ export default function UpdateFieldOfStudy({
       onSuccess?.();
 
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.detail?.[0]?.msg ||
-        error?.response?.data?.message ||
-        "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
 
       showToast(`Update failed. ${backendMessage}`, "error");
     }

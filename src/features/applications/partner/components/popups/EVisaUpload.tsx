@@ -5,6 +5,7 @@ import { XCircle, ShieldCheck, CheckCircle, AlertCircle } from "lucide-react";
 import { useEVisaUpload } from "features/applications/hooks";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import Button from "components/ui/buttons/Button";
+import { parseApiError } from "utils/parseApiError";
 
 interface EVisaUploadProps {
   isOpen: boolean;
@@ -41,12 +42,8 @@ export default function EVisaUpload({
       await uploadEVisa(file, applicationId);
       handleClose();
       onRefetch?.();
-    } catch (error: any) {
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to upload e-visa document";
-      setUploadError(message);
+    } catch (error: unknown) {
+      setUploadError(parseApiError(error, "Failed to upload e-visa document"));
     }
   };
 

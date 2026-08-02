@@ -10,6 +10,7 @@ import Button from "components/ui/buttons/Button";
 
 import { useCreateAccountManager } from "../hooks/useCreateAccountManager";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { useRouter } from "next/navigation";
 import { validateNewPassword } from "utils/passwordValidation";
 
@@ -89,10 +90,8 @@ export default function CreateAccountManager() {
       setTimeout(() => {
         router.push("/admin/account-managers");
       }, 1500);
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message ||
-        "Failed to create account manager. Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create account manager. ${backendMessage}`, "error");
     }
   };

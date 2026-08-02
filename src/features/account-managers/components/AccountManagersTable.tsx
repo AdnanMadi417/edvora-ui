@@ -14,6 +14,7 @@ import { useDeleteAccountManager } from "../hooks/useDeleteAccountManager";
 import DeleteAccountManagerModal from "./DeleteAccountManagerModal";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
@@ -90,8 +91,8 @@ const AccountManagersTable = () => {
       setSelectedManagerId(null);
       setSelectedManagerName("");
       refetch();
-    } catch {
-      showToast("Failed to delete Account Manager. Please try again.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to delete Account Manager. Please try again."), "error");
     }
   };
 

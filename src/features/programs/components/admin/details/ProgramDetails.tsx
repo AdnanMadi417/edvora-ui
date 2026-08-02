@@ -25,6 +25,7 @@ import {
 import { useProgram, useDeletePrograms } from 'features/programs/hooks';
 
 import { useToast } from 'components/context/ToastContext';
+import { parseApiError } from 'utils/parseApiError';
 import DeleteProgramsConfirmation from 'features/programs/components/admin/popups/DeleteProgramsConfirmation';
 import Loading from 'components/loading/Loading';
 import PresignedImage from 'components/ui/PresignedImage';
@@ -164,8 +165,8 @@ const ProgramDetails = ({ id }: Props) => {
       showToast('Deleted successfully', 'success');
       setIsDeleteOpen(false);
       router.push('/admin/knowledge-hub');
-    } catch {
-      showToast('Delete failed', 'error');
+    } catch (error: unknown) {
+      showToast(parseApiError(error, 'Delete failed'), 'error');
     } finally {
       setIsDeleting(false);
     }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { accountManagersApi } from "../services";
 import type { CreateAccountManagerPayload } from "../types";
+import { parseApiError } from "utils/parseApiError";
 
 export function useCreateAccountManager() {
   const [loadingCreateAccountManager, setLoading] = useState(false);
@@ -13,7 +14,7 @@ export function useCreateAccountManager() {
       const res = await accountManagersApi.create(payload);
       return res.data;
     } catch (err) {
-      setError("Failed to create account manager");
+      setError(parseApiError(err, "Failed to create account manager"));
       throw err;
     } finally {
       setLoading(false);

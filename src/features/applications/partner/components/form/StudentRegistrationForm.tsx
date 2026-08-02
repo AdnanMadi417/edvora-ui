@@ -38,6 +38,7 @@ import NextButton from "components/ui/buttons/NextButton";
 import { useRouter } from "next/navigation";
 
 import { FormDataType, DocumentItem } from "features/applications/partner/components/form/utility-functions/types";
+import { parseApiError } from "utils/parseApiError";
 
 const stages = [
   { id: 1, name: "Basic Information", icon: User },
@@ -266,9 +267,9 @@ export default function StudentRegistrationForm() {
       });
 
       showToast("File uploaded successfully", "success");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error uploading file:", err);
-      showToast(err?.message || "Upload failed", "error");
+      showToast(parseApiError(err, "Upload failed"), "error");
 
       setFormData((prev) => ({
         ...prev,
@@ -397,10 +398,9 @@ export default function StudentRegistrationForm() {
       setTimeout(() => {
         router.push("/partner/applications");
       }, 3000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error submitting application:", err);
-      const backendMessage = err?.response?.data?.message || "Please try again.";
-      showToast(`Failed to submit application. ${backendMessage}`, "error");
+      showToast(parseApiError(err, "Failed to submit application. Please try again."), "error");
     }
   };
 

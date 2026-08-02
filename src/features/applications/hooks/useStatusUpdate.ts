@@ -3,6 +3,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface UseStatusUpdateReturn {
   updateStatus: (params: {
@@ -50,7 +51,7 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
       });
       showToast("Status updated successfully.", "success");
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || "Failed to update status";
+      const msg = parseApiError(err, "Failed to update status");
       showToast(msg, "error");
       throw err;
     } finally {

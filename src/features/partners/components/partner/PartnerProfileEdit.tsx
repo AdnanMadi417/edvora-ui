@@ -18,6 +18,7 @@ import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
 import { parseSocialMediaUrl, validateSocialMediaField } from "utils/socialMedia";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
+import { parseApiError } from "utils/parseApiError";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 
@@ -370,9 +371,8 @@ export default function EditPartnerProfile() {
       await updateProfile(payload);
       showToast("Profile updated successfully", "success");
       router.push("/partner/profile");
-    } catch (err: any) {
-      const msg = err?.response?.data?.detail ?? "Please try again.";
-      showToast(typeof msg === "string" ? msg : "Update failed.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Update failed. Please try again."), "error");
     }
   };
 

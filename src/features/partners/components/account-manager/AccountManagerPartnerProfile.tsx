@@ -8,7 +8,6 @@ import {
   MdPhone,
   MdPublic,
   MdToggleOn,
-  MdVerified,
   MdCake,
 } from "react-icons/md";
 import {
@@ -221,11 +220,6 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
               icon={<MdCategory className="h-4 w-4" />}
               label="Partner Type"
               value={isIndividual ? "Individual Advisor" : "Agency / Company"}
-            />
-            <InfoRow
-              icon={<MdVerified className="h-4 w-4" />}
-              label="Verification"
-              value={partner.is_verified ? "Verified" : "Not Verified"}
             />
             <InfoRow
               icon={<MdToggleOn className="h-4 w-4" />}

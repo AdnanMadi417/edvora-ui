@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import { parseApiError } from "utils/parseApiError";
 
 export function useDeleteField() {
   const [isDeleting, setLoading] = useState<boolean>(false);
@@ -17,8 +18,8 @@ export function useDeleteField() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setSuccess(true);
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.[0]?.msg || "Failed to delete field of study");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to delete field of study"));
       throw err;
     } finally {
       setLoading(false);

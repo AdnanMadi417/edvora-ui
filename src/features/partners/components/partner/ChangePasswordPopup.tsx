@@ -8,6 +8,7 @@ import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
 import { validateNewPassword } from "utils/passwordValidation";
 import Button from "components/ui/buttons/Button";
+import { parseApiError } from "utils/parseApiError";
 
 interface Props {
   isOpen: boolean;
@@ -80,15 +81,8 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
       });
       showToast("Password updated successfully.", "success");
       handleClose();
-    } catch (err: any) {
-      const detail = err?.response?.data?.detail;
-      setApiError(
-        typeof detail === "string"
-          ? detail
-          : Array.isArray(detail)
-            ? (detail[0]?.msg ?? "Request failed.")
-            : "Something went wrong. Please try again."
-      );
+    } catch (err: unknown) {
+      setApiError(parseApiError(err, "Something went wrong. Please try again."));
     } finally {
       setLoading(false);
     }

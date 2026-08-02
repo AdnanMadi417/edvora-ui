@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Camera, ChevronLeft, ExternalLink, FileText, Pencil, Upload } from "lucide-react";
-import { usePartnerDetails, useUpdatePartner, useAssignPartnerManager, useReviewPartner } from "features/partners/hooks";
+import { usePartnerDetails, useUpdatePartner, useAssignPartnerManager } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
@@ -21,6 +21,7 @@ import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
 import { COUNTRIES, PARTNER_TYPE, BACKGROUND_OPTIONS } from "constants/lists";
 import { parseSocialMediaUrl, validateSocialMediaField } from "utils/socialMedia";
+import { parseApiError } from "utils/parseApiError";
 
 interface Props {
   id: string;
@@ -174,7 +175,6 @@ export default function EditPartnerDetails({ id }: Props) {
 
   const { partner, isPartnerLoading } = usePartnerDetails(id);
   const { updatePartner, isUpdatingPartner } = useUpdatePartner();
-  const { reviewPartner, loading: reviewLoading } = useReviewPartner();
   const { assignManager, loading: assignLoading, error: assignError } = useAssignPartnerManager();
   const { accountManagers } = useAccountManagers();
 
@@ -182,7 +182,7 @@ export default function EditPartnerDetails({ id }: Props) {
     name: "", country: "", email: "", type: "",
     phone_code: "+60", phone_number: "",
     manager_id: "", assigned_manager_name: "",
-    is_verified: false, is_active: true,
+    is_active: true,
     background: "", linkedin_url: "", linkedin_platform: "linkedin", linkedin_username: "", social_media_url: "", social_platform: "", social_username: "",
     company_name: "", website_url: "",
     date_of_birth: "", passport_number: "",
@@ -210,7 +210,6 @@ export default function EditPartnerDetails({ id }: Props) {
       phone_number: phoneMatch ? phoneMatch[2] : rawPhone,
       manager_id: partner.assigned_manager_id || "",
       assigned_manager_name: partner.assigned_manager_name || "",
-      is_verified: partner.is_verified,
       is_active: partner.is_active,
       background: partner.individual_details?.background ?? "",
       linkedin_url: partner.individual_details?.linkedin_url ?? "",
@@ -306,7 +305,6 @@ export default function EditPartnerDetails({ id }: Props) {
       (formData.manager_id || "") !== (partner.assigned_manager_id || "") ||
       `${formData.phone_code} ${formData.phone_number}`.trim() !== partner.phone?.trim() ||
       formData.is_active !== partner.is_active ||
-      formData.is_verified !== partner.is_verified ||
       idDoc.file_key !== (partner.individual_details?.id_document_file_key ?? "") ||
       profilePhoto.file_key !== (partner.individual_details?.profile_photo_file_key ?? "") ||
       formData.background !== (partner.individual_details?.background ?? "") ||
@@ -440,14 +438,10 @@ export default function EditPartnerDetails({ id }: Props) {
       if (formData.manager_id) {
         await assignManager(id, { manager_id: formData.manager_id });
       }
-      if (formData.is_verified !== partner?.is_verified) {
-        await reviewPartner(id, formData.is_verified ? "approved" : "rejected");
-      }
       showToast("Partner updated successfully", "success");
       router.push(`/admin/partners/${id}`);
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
-      showToast(`Update failed. ${backendMessage}`, "error");
+    } catch (error: unknown) {
+      showToast(parseApiError(error, "Update failed. Please try again."), "error");
     }
   };
 
@@ -457,7 +451,7 @@ export default function EditPartnerDetails({ id }: Props) {
   const isIndividual = formData.type === "individual";
   const isCompany = formData.type === "agency";
 
-  const saveDisabledReason = isUpdatingPartner || reviewLoading
+  const saveDisabledReason = isUpdatingPartner
     ? "Saving..."
     : isUploading
     ? "Please wait for the upload to finish"
@@ -665,7 +659,7 @@ export default function EditPartnerDetails({ id }: Props) {
           />
           <Button
             icon={<Pencil className="h-4 w-4" />}
-            text={isUpdatingPartner || reviewLoading ? "Saving..." : "Save Changes"}
+            text={isUpdatingPartner ? "Saving..." : "Save Changes"}
             bgColor="bg-blue-600"
             textColor="text-white"
             borderColor="border-blue-600"
@@ -673,7 +667,7 @@ export default function EditPartnerDetails({ id }: Props) {
             hoverBorderColor="hover:border-blue-700"
             className="hover:bg-blue-700"
             onClick={handleUpdate}
-            disabled={isUpdatingPartner || reviewLoading || isUploading || !isFormChanged() || !isFormValid}
+            disabled={isUpdatingPartner || isUploading || !isFormChanged() || !isFormValid}
             title={saveDisabledReason}
           />
         </div>

@@ -13,6 +13,7 @@ const FIELD_LABELS: Record<string, string> = {
 };
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { useRouter } from "next/navigation";
 
 import { useCreateUniversity, useUniversityTypes } from "features/universities/hooks";
@@ -131,8 +132,8 @@ export default function RegisterUniversity() {
       setLogoFileUrl(uploaded.public_url);
       setLogoProgress(100);
       showToast("Logo uploaded successfully.", "success");
-    } catch (err: any) {
-      showToast(err?.message || "Logo upload failed.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Logo upload failed."), "error");
       setLogoFile(null);
     } finally {
       setLogoUploading(false);

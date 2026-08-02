@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { programApi } from "../services";
+import { parseApiError } from "utils/parseApiError";
 
 export function useDeleteProgram() {
   const [loading, setLoading] = useState(false);
@@ -13,8 +14,8 @@ export function useDeleteProgram() {
     try {
       await programApi.programs.delete(programId);
       setSuccess(true);
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.[0]?.msg || "Failed to delete program");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to delete program"));
       throw err;
     } finally {
       setLoading(false);

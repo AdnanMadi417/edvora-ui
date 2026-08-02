@@ -7,6 +7,7 @@ import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hoo
 import { useUniversityPaymentMethods, useAssignUniversityPaymentMethod } from "features/universities/hooks";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { CURRENCY } from 'constants/lists';
 
 import ModalHeader from "components/ui/modal/ModalHeader";
@@ -97,7 +98,7 @@ export default function AssignPaymentUniversity({
         });
         setErrors(newErrors);
       } else {
-        showToast("Failed to assign payment method.", "error");
+        showToast(parseApiError(err, "Failed to assign payment method."), "error");
       }
     }
   };

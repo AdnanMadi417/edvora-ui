@@ -3,6 +3,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 interface OfferLetterExtras {
@@ -65,7 +66,7 @@ export const useOfferLetterUpload = (): UseOfferLetterUploadReturn => {
 
       showToast("Offer letter uploaded successfully.", "success");
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || "Upload failed";
+      const msg = parseApiError(err, "Upload failed");
       showToast(msg, "error");
       throw err;
     } finally {

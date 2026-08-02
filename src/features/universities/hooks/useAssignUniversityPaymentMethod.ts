@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { universityApi } from "../services";
 import type { AssignPaymentMethodPayload } from "../types";
+import { parseApiError } from "utils/parseApiError";
 
 export function useAssignUniversityPaymentMethod() {
   const [loading, setLoading] = useState(false);
@@ -12,8 +13,8 @@ export function useAssignUniversityPaymentMethod() {
     try {
       const res = await universityApi.paymentMethods.assign(universityId, payload);
       return res.data;
-    } catch (err: any) {
-      setError(err?.message || "Failed to assign payment method");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to assign payment method"));
       throw err;
     } finally {
       setLoading(false);

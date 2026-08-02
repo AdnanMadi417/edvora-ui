@@ -6,6 +6,7 @@ import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService
 import UploadDoc from "features/applications/partner/components/popups/UploadDoc";
 import { AlertCircle } from "lucide-react";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface RequiredApplicationActionsProps {
   params: {
@@ -61,9 +62,8 @@ export default function RequiredApplicationActions({
       showToast("Document uploaded successfully.", "success");
       setShowResubmit(false);
       fetchApplication();
-    } catch (err: any) {
-      const message = err?.response?.data?.message || "Upload failed. Please try again.";
-      showToast(message, "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Upload failed. Please try again."), "error");
     }
   };
 

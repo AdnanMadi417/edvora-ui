@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import { parseApiError } from "utils/parseApiError";
 
 export function useDeleteCommission() {
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
@@ -14,9 +15,8 @@ export function useDeleteCommission() {
       await api.delete(`/knowledge-hub/commission-types/${commissionId}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-    } catch (err) {
-      console.error(err);
-      setError("Failed to delete commission type");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to delete commission type"));
       throw err;
     } finally {
       setIsDeleting(false);

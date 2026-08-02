@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { accountManagersApi } from "../services";
 import type { EditAccountManagerPayload } from "../types";
+import { parseApiError } from "utils/parseApiError";
 
 export function useEditAccountManager(managerId?: string) {
   const [loading, setLoading] = useState(false);
@@ -14,7 +15,7 @@ export function useEditAccountManager(managerId?: string) {
       const res = await accountManagersApi.update(managerId, payload);
       return res.data;
     } catch (err) {
-      setError("Failed to update account manager");
+      setError(parseApiError(err, "Failed to update account manager"));
       throw err;
     } finally {
       setLoading(false);

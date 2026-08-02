@@ -13,6 +13,7 @@ import InputField from "components/form/fields/InputField";
 import RichTextEditor from "components/form/fields/RichTextEditor";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface PaymentMethod {
   id: string;
@@ -128,8 +129,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
       router.push(`/admin/config-universities/payment-methods/${id}`);
 
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to update payment method. ${backendMessage}`, "error");
     }
   };
@@ -146,8 +146,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
       router.push("/admin/config-universities/payment-methods");
 
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Deleted failed. ${backendMessage}`, "error");
     }
 

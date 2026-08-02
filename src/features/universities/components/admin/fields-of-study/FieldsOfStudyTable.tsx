@@ -26,6 +26,7 @@ import UpdateField from "features/universities/components/admin/fields-of-study/
 
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 
@@ -100,7 +101,7 @@ const FieldsOfStudyTable = () => {
       setSelectedFieldName("");
       refetch();
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to delete field of study. ${backendMessage}`, "error");
     }
   };

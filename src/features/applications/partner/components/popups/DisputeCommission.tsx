@@ -6,6 +6,7 @@ import { XCircle, AlertCircle } from "lucide-react";
 import { useDisputeCommission } from "features/applications/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import Button from "components/ui/buttons/Button";
 
@@ -82,8 +83,8 @@ export default function DisputeCommission({
       showToast("Commission dispute submitted successfully.", "success");
       onClose();
       onSuccess?.();
-    } catch {
-      showToast("Failed to submit commission dispute.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to submit commission dispute."), "error");
       setUploading(false);
     }
   };

@@ -10,6 +10,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 import {
   useOfferLetterUpload,
@@ -486,12 +487,8 @@ export default function UpdateStatusPopup({
 
       onConfirm(selectedStatus, reason, notes);
       handleClose();
-    } catch (err: any) {
-      const msg =
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to update application";
-      setError(msg);
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to update application"));
     } finally {
       setIsSubmitting(false);
     }

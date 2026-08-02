@@ -21,6 +21,7 @@ import InputField from "components/form/fields/InputField";
 import ImageUploadField from "components/form/upload/ImageUploadField";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { useRouter } from "next/navigation";
 import CreateLogisticsMarketplacePopup from "../CreateLogisticsMarketplacePopup";
 import type { PackageOffered, ServiceEntry } from "features/logistical-service/types";
@@ -100,8 +101,8 @@ export default function RegisterLogisticsMarketplaceProvider() {
       setLogoFileUrl(uploaded.public_url);
       setLogoProgress(100);
       showToast("Picture uploaded successfully.", "success");
-    } catch (err: any) {
-      showToast(err?.message || "Picture upload failed.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Picture upload failed."), "error");
       setLogoFile(null);
     } finally {
       setLogoUploading(false);
@@ -249,7 +250,7 @@ export default function RegisterLogisticsMarketplaceProvider() {
       setErrors({});
       setTimeout(() => { router.push("/admin/logistics-marketplace"); }, 1500);
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create logistics provider. ${backendMessage}`, "error");
     }
   };

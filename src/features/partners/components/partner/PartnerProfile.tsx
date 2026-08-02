@@ -8,7 +8,6 @@ import {
   MdPhone,
   MdPublic,
   MdSupervisorAccount,
-  MdVerified,
 } from "react-icons/md";
 import {
   Briefcase,
@@ -34,6 +33,7 @@ import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import PresignedImage from "components/ui/PresignedImage";
 import { parseDate, formatDate } from "components/ui/date/utils";
+import { parseApiError } from "utils/parseApiError";
 
 interface PartnerDetailsProps {
   id: string;
@@ -183,8 +183,8 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
       await updateProfile(payload);
       showToast("Profile photo updated", "success");
       refetch();
-    } catch {
-      showToast("Failed to update profile photo.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to update profile photo."), "error");
     } finally {
       setAvatarUploading(false);
     }
@@ -264,7 +264,6 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
               <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={partner.email} />
               <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Partner Type" value={partner.type === "individual" ? "Individual Advisor" : "Agency / Company"} />
               <InfoRow icon={<MdSupervisorAccount className="h-4 w-4" />} label="Assigned Manager" value={partner.assigned_manager_name} />
-              <InfoRow icon={<MdVerified className="h-4 w-4" />} label="Verification" value={partner.is_verified ? "Verified" : "Not Verified"} />
             </div>
           </div>
 

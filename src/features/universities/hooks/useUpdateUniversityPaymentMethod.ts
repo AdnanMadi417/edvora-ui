@@ -2,6 +2,7 @@ import { useState } from "react";
 import { universityApi } from "../services";
 import { useToast } from "components/context/ToastContext";
 import type { UpdatePaymentMethodPayload } from "../types";
+import { parseApiError } from "utils/parseApiError";
 
 export function useUpdateUniversityPaymentMethod() {
   const [loading, setLoading] = useState(false);
@@ -17,8 +18,8 @@ export function useUpdateUniversityPaymentMethod() {
       const res = await universityApi.paymentMethods.update(universityId, universityPaymentMethodId, payload);
       showToast("Payment method updated successfully.", "success");
       return res.data;
-    } catch (err: any) {
-      const backendMessage = err?.response?.data?.detail?.[0]?.msg || "Please try again.";
+    } catch (err: unknown) {
+      const backendMessage = parseApiError(err, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
       throw err;
     } finally {

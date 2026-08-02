@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { partnersApi } from '../services';
+import { parseApiError } from 'utils/parseApiError';
 
 export function useDeletePartner() {
   const [loading, setLoading] = useState(false);
@@ -13,8 +14,8 @@ export function useDeletePartner() {
     try {
       await partnersApi.delete(partnerId);
       setSuccess(true);
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.[0]?.msg || 'Failed to delete partner.');
+    } catch (err: unknown) {
+      setError(parseApiError(err, 'Failed to delete partner.'));
       throw err;
     } finally {
       setLoading(false);
