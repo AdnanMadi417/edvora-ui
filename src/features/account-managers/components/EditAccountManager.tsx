@@ -8,6 +8,7 @@ import PasswordField from "components/form/fields/PasswordField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 import { useEditAccountManager } from "../hooks/useEditAccountManager";
 import type { AccountManager } from "../types";
@@ -98,7 +99,7 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
       showToast("Account Manager updated successfully", "success");
       router.push(`/admin/account-managers/profile/${manager.id}`);
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to update Account Manager. ${backendMessage}`, "error");
 
       if (error?.response?.data?.code === "email_already_exists") {

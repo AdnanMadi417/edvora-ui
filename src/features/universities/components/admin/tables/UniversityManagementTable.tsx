@@ -30,6 +30,7 @@ import SearchInput from 'components/form/filter/SearchInput';
 import NoMessagesFound from 'components/emptyData/NoMessagesFound';
 import Loading from 'components/loading/Loading';
 import { useToast } from 'components/context/ToastContext';
+import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
 
 const UniversityManagementTable = () => {
@@ -102,7 +103,7 @@ const UniversityManagementTable = () => {
       setSelectedUniversityName('');
       refetchUniversityTypes();
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || 'Please try again.';
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to delete university type. ${backendMessage}`, 'error');
     }
   };

@@ -10,6 +10,7 @@ import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
 import Button from "components/ui/buttons/Button";
+import { parseApiError } from "utils/parseApiError";
 import { DocumentItem, DocumentType, FormDataType } from "features/applications/partner/components/form/utility-functions/types";
 
 const FREE_UPLOAD_ID = "__free_upload__";
@@ -95,8 +96,8 @@ export default function RequiredAction({
         return next;
       });
       showToast("File uploaded successfully", "success");
-    } catch {
-      showToast("Upload failed", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Upload failed"), "error");
       setDocuments((prev) =>
         prev.map((d) => (d.uploading ? { ...d, uploading: false } : d))
       );
@@ -110,8 +111,8 @@ export default function RequiredAction({
     if (doc.file_key) {
       try {
         await api.delete("/storage/file", { data: { file_key: doc.file_key } });
-      } catch {
-        showToast("Failed to delete file from storage", "error");
+      } catch (err: unknown) {
+        showToast(parseApiError(err, "Failed to delete file from storage"), "error");
         return;
       }
     }
@@ -167,9 +168,8 @@ export default function RequiredAction({
       onConfirm?.(applicationId, payload.map((d) => d.document_type_id));
       onClose();
       onRefetch?.();
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Failed to submit documents.";
-      showToast(message, "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to submit documents."), "error");
     } finally {
       setIsSubmitting(false);
     }

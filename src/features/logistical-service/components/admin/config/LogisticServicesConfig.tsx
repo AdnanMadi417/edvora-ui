@@ -7,6 +7,7 @@ import { useLogisticServices, useEditLogisticService } from "features/logistical
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import CreateLogisticsMarketplacePopup from "../CreateLogisticsMarketplacePopup";
@@ -47,8 +48,8 @@ const LogisticsMarketplaceServicesConfig = () => {
       setEditingId(null);
       setEditingName("");
       setTimeout(() => location.reload(), 1500);
-    } catch {
-      showToast("Failed to update service.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to update service."), "error");
     }
   };
 

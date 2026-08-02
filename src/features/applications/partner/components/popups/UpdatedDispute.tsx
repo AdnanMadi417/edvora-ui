@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { XCircle, AlertCircle, CheckCircle } from "lucide-react";
 import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { InputField } from "components/form";
 import Button from "components/ui/buttons/Button";
 
@@ -48,9 +49,8 @@ export default function DisputeSubmissionModal({
       showToast("Dispute submitted successfully. Manager review required.", "success");
       onSuccess?.();
       handleClose();
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to submit dispute.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to submit dispute."), "error");
     } finally {
       setIsSubmitting(false);
     }

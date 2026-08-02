@@ -10,6 +10,7 @@ import SelectField from "components/form/fields/SelectField";
 import RichTextEditor from "components/form/fields/RichTextEditor";
 import MultiSelect from "components/form/search/MultiSelect";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { CURRENCY } from 'constants/lists';
 
 interface BatchUniversitiesProps {
@@ -95,7 +96,7 @@ export default function BatchUniversities({
         });
         setErrors(newErrors);
       } else {
-        const backendMessage = error?.response?.data?.message || "Please try again.";
+        const backendMessage = parseApiError(error, "Please try again.");
         showToast(`Failed to assign payment method. ${backendMessage}`, "error");
       }
     }

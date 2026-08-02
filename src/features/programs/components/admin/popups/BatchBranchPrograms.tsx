@@ -11,6 +11,7 @@ import Button from "components/ui/buttons/Button";
 import SelectField from "components/form/fields/SelectField";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface BatchBranchProgramsProps {
   isOpen: boolean;
@@ -62,8 +63,8 @@ export default function BatchBranchPrograms({
         onClose();
         onSuccess?.();
       }, 1500);
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
     }
   };

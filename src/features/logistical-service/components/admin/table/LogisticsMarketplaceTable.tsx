@@ -19,6 +19,7 @@ import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { useToast } from 'components/context/ToastContext';
+import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -72,7 +73,7 @@ const LogisticsMarketplaceTable = () => {
       setSelectedServiceName("");
       setTimeout(() => location.reload(), 2000);
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to delete service. ${backendMessage}`, "error");
     }
   };

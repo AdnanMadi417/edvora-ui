@@ -28,6 +28,7 @@ import Loading from "components/loading/Loading";
 
 import { useRouter } from "next/navigation";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 
@@ -114,7 +115,7 @@ const PaymentMethodsTable = () => {
       setSelectedPaymentMethodName("");
       setTimeout(() => refetch(), 2000);
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to delete payment method. ${backendMessage}`, "error");
     }
   };

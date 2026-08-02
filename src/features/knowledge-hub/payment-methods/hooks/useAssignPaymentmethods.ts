@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import { parseApiError } from "utils/parseApiError";
 
 export interface UpdatePaymentMethodPayload {
   id: string;
@@ -24,8 +25,8 @@ export function useUpdatePaymentMethods() {
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
       }
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.[0]?.msg || "Failed to update payment methods");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to update payment methods"));
       throw err;
     } finally {
       setLoading(false);

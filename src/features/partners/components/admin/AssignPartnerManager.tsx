@@ -7,6 +7,7 @@ import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import SelectField from "components/form/fields/SelectField";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface Props {
   isOpen: boolean;
@@ -65,8 +66,7 @@ export default function AssignPartnerManager({
       onClose();
       onSuccess?.();
     } catch (err: any) {
-      const backendMessage =
-        err?.response?.data?.message || "Failed to assign manager. Please try again.";
+      const backendMessage = parseApiError(err, "Failed to assign manager. Please try again.");
       showToast(backendMessage, "error");
       if (err?.response?.data?.code === "manager_not_available") {
         setErrors({ manager_id: backendMessage });

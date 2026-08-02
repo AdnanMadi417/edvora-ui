@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { XCircle, Award } from "lucide-react";
 import { useCreateQualificationsType } from "features/knowledge-hub/qualifications/hooks";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { useRouter } from "next/navigation";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
@@ -45,8 +46,8 @@ export default function CreateQualificationType({ isOpen, onClose }: CreateQuali
       showToast("Qualification Type created successfully.", "success");
       setTimeout(() => router.refresh(), 1500);
       onClose();
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create Qualification Type. ${backendMessage}`, "error");
     }
   };

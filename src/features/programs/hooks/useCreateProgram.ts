@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { programApi } from "../services";
 import type { CreateProgramPayload } from "../types";
+import { parseApiError } from "utils/parseApiError";
 
 export function useCreateProgram() {
   const [loading, setLoading] = useState(false);
@@ -38,13 +39,8 @@ export function useCreateProgram() {
 
       setSuccess(true);
       return res.data;
-    } catch (err: any) {
-      const detail = err?.response?.data?.detail;
-      setError(
-        Array.isArray(detail)
-          ? detail[0]?.msg || "Failed to create program"
-          : err?.response?.data?.message || "Failed to create program"
-      );
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to create program"));
       throw err;
     } finally {
       setLoading(false);

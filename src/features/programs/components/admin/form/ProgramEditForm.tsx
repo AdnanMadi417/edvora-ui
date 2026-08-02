@@ -15,6 +15,7 @@ import {
 import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
 import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
@@ -258,9 +259,8 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       showToast("Program updated successfully", "success");
 
       router.push(`/admin/knowledge-hub/${id}`);
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
@@ -274,9 +274,8 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       setIsDeleteOpen(false);
       setDeleteMode(null);
       router.push("/admin/knowledge-hub");
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Delete failed. ${backendMessage}`, "error");
     } finally {
       setIsDeleting(false);

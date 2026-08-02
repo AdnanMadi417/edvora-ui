@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { partnersApi } from '../services';
 import type { CreatePartnerPayload } from '../types';
+import { parseApiError } from 'utils/parseApiError';
 
 export function useCreatePartner() {
   const [isCreatingPartner, setIsCreatingPartner] = useState(false);
@@ -12,10 +13,8 @@ export function useCreatePartner() {
     try {
       const res = await partnersApi.create(payload);
       return res.data;
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.detail?.[0]?.msg || 'Failed to create partner';
-      setCreatePartnerError(message);
+    } catch (err: unknown) {
+      setCreatePartnerError(parseApiError(err, 'Failed to create partner'));
       throw err;
     } finally {
       setIsCreatingPartner(false);

@@ -39,6 +39,7 @@ import DeleteUniversityConfirmation from "../popups/DeleteUniversityConfirmation
 import AssignPaymentUniversity from "../popups/AssignPaymentMethods";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { AppDate } from "components/ui/date";
 
 const UniversitiesTable = () => {
@@ -200,7 +201,7 @@ const UniversitiesTable = () => {
       refetch();
     }
     catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to delete university. ${backendMessage}`, "error");
     }
   };

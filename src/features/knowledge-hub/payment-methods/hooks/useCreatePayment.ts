@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import { parseApiError } from "utils/parseApiError";
 
 interface CreatePaymentPayload {
   name: string;
@@ -23,8 +24,8 @@ export function useCreatePayment() {
       });
       setSuccess(true);
       return response.data;
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.[0]?.msg || "Failed to create payment");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to create payment"));
       throw err;
     } finally {
       setLoading(false);

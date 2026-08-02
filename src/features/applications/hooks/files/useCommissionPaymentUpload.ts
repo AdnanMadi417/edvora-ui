@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 export const useCommissionPaymentUpload = () => {
@@ -24,7 +25,7 @@ export const useCommissionPaymentUpload = () => {
       showToast("Commission payment proof uploaded successfully.", "success");
       return uploaded;
     } catch (error: any) {
-      const message = error.response?.data?.message || error.message || "Commission payment upload failed";
+      const message = parseApiError(error, "Commission payment upload failed");
       showToast(message, "error");
       throw error;
     } finally {

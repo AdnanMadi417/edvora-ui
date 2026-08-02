@@ -7,6 +7,7 @@ import Button from "components/ui/buttons/Button";
 import InputField from "components/form/fields/InputField";
 import { useCreateLogisticService } from "features/logistical-service/hooks";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface CreateLogisticsMarketplacePopupProps {
   isOpen: boolean;
@@ -62,7 +63,7 @@ export default function CreateLogisticsMarketplacePopup({
       onCreated();
       onClose();
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create service. ${backendMessage}`, "error");
     }
   };

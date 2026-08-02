@@ -5,6 +5,7 @@ import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { useEmgsEvalUpload } from "features/applications/hooks";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import Button from "components/ui/buttons/Button";
+import { parseApiError } from "utils/parseApiError";
 
 interface EmgsEvalUploadProps {
   isOpen: boolean;
@@ -42,12 +43,8 @@ export default function EmgsEvalUpload({
       await uploadEmgsEval(file, applicationId);
       handleClose();
       onRefetch?.();
-    } catch (error: any) {
-      const message =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Failed to upload EMGS eval document";
-      setUploadError(message);
+    } catch (error: unknown) {
+      setUploadError(parseApiError(error, "Failed to upload EMGS eval document"));
     }
   };
 

@@ -13,6 +13,7 @@ import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface BatchCommissionProgramsProps {
   isOpen: boolean;
@@ -106,8 +107,8 @@ export default function BatchCommissionPrograms({
         onClose();
         onSuccess?.();
       }, 1500);
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
     }
   };

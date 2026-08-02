@@ -4,14 +4,16 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
   Pencil, RefreshCw, SlidersHorizontal, Building2,
-  UserCog, Users, CheckCircle, XCircle, BadgeCheck, BadgeX, User, ShieldCheck, CalendarDays,
+  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, CheckCircle2,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
 import { useRouter } from "next/navigation";
-import { usePartners, useDeletePartner } from "features/partners/hooks";
+import { usePartners, useDeletePartner, useUpdatePartner, useResendApprovalEmail } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import AssignPartnerManager from "./AssignPartnerManager";
 import ReviewPartnerPopup from "./ReviewPartnerPopup";
+import ResendApprovalEmailConfirmation from "./ResendApprovalEmailConfirmation";
+import SuspendActivatePartner from "./SuspendActivatePartner";
 import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
@@ -19,16 +21,16 @@ import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePag
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
+import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 const ITEMS_PER_PAGE = 10;
 
-type StatusFilter = "active" | "inactive" | "verified" | "unverified" | "individual" | "agency" | null;
+type StatusFilter = "active" | "inactive" | "individual" | "agency" | null;
 
-function statusToParams(status: StatusFilter): { is_active?: boolean; is_verified?: boolean; type?: string } {
+function statusToParams(status: StatusFilter): { is_active?: boolean; type?: string } {
   if (status === "active")     return { is_active: true };
   if (status === "inactive")   return { is_active: false };
-  if (status === "verified")   return { is_verified: true };
-  if (status === "unverified") return { is_verified: false };
   if (status === "individual") return { type: "individual" };
   if (status === "agency")     return { type: "agency" };
   return {};
@@ -36,20 +38,27 @@ function statusToParams(status: StatusFilter): { is_active?: boolean; is_verifie
 
 export default function PartnersTable() {
   const router = useRouter();
+  const { showToast } = useToast();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedManager, setSelectedManager] = useState("all");
-  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>("unverified");
+  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>(null);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const { accountManagers } = useAccountManagers();
+  const { updatePartner, isUpdatingPartner } = useUpdatePartner();
+  const { resendApprovalEmail, loading: isResendingEmail } = useResendApprovalEmail();
 
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<any>(null);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewPartner, setReviewPartner] = useState<{ id: string; name: string } | null>(null);
+  const [isResendOpen, setIsResendOpen] = useState(false);
+  const [resendTarget, setResendTarget] = useState<{ id: string; name: string } | null>(null);
+  const [isSuspendOpen, setIsSuspendOpen] = useState(false);
+  const [suspendTarget, setSuspendTarget] = useState<any>(null);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   useEffect(() => {
@@ -81,10 +90,8 @@ export default function PartnersTable() {
   const isRefetching = loading && hasLoadedOnce;
 
   const statsCards = useMemo<FilterCardItem[]>(() => [
-    { id: "unverified",  label: "Pending Review", count: stats?.unverified ?? 0, icon: BadgeX,      colorScheme: "amber" },
     { id: "active",      label: "Active",          count: stats?.active     ?? 0, icon: CheckCircle, colorScheme: "emerald" },
     { id: "inactive",    label: "Suspended",       count: stats?.inactive   ?? 0, icon: XCircle,     colorScheme: "rose" },
-    { id: "verified",    label: "Verified",        count: stats?.verified   ?? 0, icon: BadgeCheck,  colorScheme: "blue" },
     { id: "individual",  label: "Individual",      count: stats?.individual ?? 0, icon: User,        colorScheme: "violet" },
     { id: "agency",      label: "Company",         count: stats?.agency     ?? 0, icon: Building2,   colorScheme: "cyan" },
   ], [stats]);
@@ -110,6 +117,38 @@ export default function PartnersTable() {
   const handleCardSelect = (id: string | null) => {
     setSelectedStatus((prev) => (prev === id ? null : (id as StatusFilter)));
     setCurrentPage(1);
+  };
+
+  const handleResendEmail = async () => {
+    if (!resendTarget) return;
+    try {
+      await resendApprovalEmail(resendTarget.id);
+      showToast("Approval email resent successfully", "success");
+      setIsResendOpen(false);
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to resend approval email"), "error");
+    }
+  };
+
+  const handleSuspendActivate = async () => {
+    if (!suspendTarget) return;
+    try {
+      await updatePartner(suspendTarget.id, {
+        name: suspendTarget.name,
+        email: suspendTarget.email,
+        type: suspendTarget.type,
+        country: suspendTarget.country,
+        phone: suspendTarget.phone,
+        assigned_manager_id: suspendTarget.assigned_manager_id,
+        is_active: !suspendTarget.is_active,
+      });
+      showToast(suspendTarget.is_active ? "Partner account suspended" : "Partner account activated", "success");
+      setIsSuspendOpen(false);
+      refetch();
+    } catch (err: unknown) {
+      const fallback = suspendTarget.is_active ? "Failed to suspend account" : "Failed to activate account";
+      showToast(parseApiError(err, fallback), "error");
+    }
   };
 
   return (
@@ -337,7 +376,6 @@ export default function PartnersTable() {
 
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
-
                         {!partner.is_verified && !partner.is_active && (
                           <>
                             <IconButton
@@ -359,10 +397,12 @@ export default function PartnersTable() {
                           href={`/admin/partners/${partner.id}/edit`}
                           onClick={(e) => e.stopPropagation()}
                           className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                          title="Edit partner"
                         >
                           <Pencil className="h-4 w-4" />
                         </a>
                         <div className="h-5 border-l border-slate-200" />
+
                         <IconButton
                           onClick={() => { setSelectedPartner(partner); setIsAssignModalOpen(true); }}
                           title="Assign manager"
@@ -373,6 +413,36 @@ export default function PartnersTable() {
                           hoverTextColor="hover:text-slate-700"
                           hoverBorderColor="hover:border-transparent"
                           className="hover:bg-slate-100"
+                        />
+
+                        {partner.is_verified && (
+                          <>
+                            <div className="h-5 border-l border-slate-200" />
+                            <IconButton
+                              onClick={() => { setResendTarget({ id: partner.id, name: partner.name || "" }); setIsResendOpen(true); }}
+                              title="Resend approval email"
+                              icon={<Mail className="h-4 w-4" />}
+                              bgColor="bg-transparent"
+                              textColor="text-slate-400"
+                              borderColor="border-transparent"
+                              hoverTextColor="hover:text-blue-600"
+                              hoverBorderColor="hover:border-transparent"
+                              className="hover:bg-blue-50"
+                            />
+                          </>
+                        )}
+
+                        <div className="h-5 border-l border-slate-200" />
+                        <IconButton
+                          onClick={() => { setSuspendTarget(partner); setIsSuspendOpen(true); }}
+                          title={partner.is_active ? "Suspend account" : "Activate account"}
+                          icon={partner.is_active ? <Ban className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-400"
+                          borderColor="border-transparent"
+                          hoverTextColor={partner.is_active ? "hover:text-red-600" : "hover:text-emerald-600"}
+                          hoverBorderColor="hover:border-transparent"
+                          className={partner.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"}
                         />
                       </div>
                     </td>
@@ -406,6 +476,27 @@ export default function PartnersTable() {
           partnerId={selectedPartner.id}
           currentManagerId={selectedPartner.assigned_manager_id}
           managerOptions={managerOptions}
+        />
+      )}
+
+      {resendTarget && (
+        <ResendApprovalEmailConfirmation
+          isOpen={isResendOpen}
+          onClose={() => setIsResendOpen(false)}
+          onConfirm={handleResendEmail}
+          isSending={isResendingEmail}
+          partnerName={resendTarget.name}
+        />
+      )}
+
+      {suspendTarget && (
+        <SuspendActivatePartner
+          isOpen={isSuspendOpen}
+          onClose={() => setIsSuspendOpen(false)}
+          onConfirm={handleSuspendActivate}
+          isSubmitting={isUpdatingPartner}
+          partnerName={suspendTarget.name || ""}
+          isActive={!!suspendTarget.is_active}
         />
       )}
     </div>

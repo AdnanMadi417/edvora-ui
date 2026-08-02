@@ -40,6 +40,7 @@ import ApplicationTimeline from 'features/applications/shared/ApplicationTimelin
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useVisaCase } from "hooks/useVisaCase";
 import { AppDate } from "components/ui/date";
+import { parseApiError } from "utils/parseApiError";
 
 interface ApplicationDetailsProps {
   application: any;
@@ -106,8 +107,8 @@ export default function ApplicationDetails({
       });
       showToast("Commission confirmed successfully", "success");
       handleRefetch();
-    } catch {
-      showToast("Failed to confirm commission", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to confirm commission"), "error");
     } finally {
       setConfirmLoading(false);
     }

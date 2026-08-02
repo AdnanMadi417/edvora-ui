@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, BookOpen, CalendarPlus, DollarSign, Plus, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useToast } from 'components/context/ToastContext';
+import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
 
 import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
@@ -246,11 +247,8 @@ export default function RegisterProgram() {
       await createProgram(payload);
       showToast('Program created successfully', 'success');
       setTimeout(() => router.push('/admin/knowledge-hub'), 1500);
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.detail?.[0]?.msg ||
-        error?.response?.data?.message ||
-        'Please try again.';
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, 'Please try again.');
       showToast(`Failed to create program. ${backendMessage}`, 'error');
     }
   };

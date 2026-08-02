@@ -8,6 +8,7 @@ import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 import Button from "components/ui/buttons/Button";
+import { parseApiError } from "utils/parseApiError";
 
 interface VisaPaymentConfirmationProps {
   isOpen: boolean;
@@ -64,9 +65,8 @@ export default function VisaPaymentConfirmation({
 
       handleClose();
       onRefetch?.();
-    } catch (error: any) {
-      const message = error?.response?.data?.message || error?.message || "Failed to submit";
-      setUploadError(message);
+    } catch (error: unknown) {
+      setUploadError(parseApiError(error, "Failed to submit"));
     }
   };
 

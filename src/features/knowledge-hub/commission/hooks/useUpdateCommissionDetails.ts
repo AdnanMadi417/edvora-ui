@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import { parseApiError } from "utils/parseApiError";
 
 export type UpdateCommissionTypePayload = {
   name: string;
@@ -21,8 +22,8 @@ export function useUpdateCommissionType() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       return res.data;
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.[0]?.msg || "Failed to update commission type");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to update commission type"));
       throw err;
     } finally {
       setLoading(false);

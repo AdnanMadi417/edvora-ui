@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 interface VisaPaymentPayload {
@@ -53,7 +54,7 @@ export const useVisaPaymentUpload = () => {
       showToast("Visa payment submitted successfully!", "success");
       return uploaded;
     } catch (error: any) {
-      const message = error.response?.data?.message || error.message || "Failed to submit visa payment";
+      const message = parseApiError(error, "Failed to submit visa payment");
       showToast(message, "error");
       throw error;
     } finally {

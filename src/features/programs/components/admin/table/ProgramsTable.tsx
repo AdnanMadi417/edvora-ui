@@ -25,6 +25,7 @@ import { AiOutlineBank } from "react-icons/ai";
 import PresignedImage from "components/ui/PresignedImage";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { usePrograms, useStates, useDeletePrograms } from "features/programs/hooks";
 import { programApi } from "features/programs/services";
 import type { Program } from "features/programs/types";
@@ -236,8 +237,8 @@ const ProgramsTable = () => {
       setSelectedProgramId(null);
       setSelectedPrograms({});
       refetch();
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Delete failed. ${backendMessage}`, "error");
     } finally {
       setIsDeleting(false);

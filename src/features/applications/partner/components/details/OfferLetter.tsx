@@ -3,6 +3,7 @@ import { FaFilePdf } from "react-icons/fa";
 import { CheckCircle, CreditCard } from 'lucide-react';
 import { submitOfferLetterDecision } from "services/offerLetterService";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { AppDate } from "components/ui/date";
@@ -41,12 +42,9 @@ export default function OfferLetterDecision({
       await submitOfferLetterDecision(application.id, payload);
       showToast("Offer accepted successfully.", "success");
       await onRefetch?.();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      showToast(
-        err?.response?.data?.message || "Failed to submit decision",
-        "error"
-      );
+      showToast(parseApiError(err, "Failed to submit decision"), "error");
     } finally {
       setSubmitting(false);
     }

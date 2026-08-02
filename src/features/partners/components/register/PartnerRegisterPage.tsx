@@ -16,6 +16,7 @@ import { validateSocialMediaField } from "utils/socialMedia";
 import PublicFileUploadField, { type PublicUploadResult } from "components/form/upload/PublicFileUploadField";
 import ImageUploadField from "components/form/upload/ImageUploadField";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
+import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import registrationIconImg from "/public/img/icons/registration-icon.png";
@@ -56,9 +57,9 @@ function usePublicPhotoUpload() {
       const result = await uploadPublicPartnerFile(selected, setProgress);
       setFileKey(result.file_key);
       setFileUrl(result.file_url);
-    } catch {
+    } catch (err: unknown) {
       setFile(null);
-      setError("Upload failed. Please try again.");
+      setError(parseApiError(err, "Upload failed. Please try again."));
     } finally {
       setUploading(false);
     }

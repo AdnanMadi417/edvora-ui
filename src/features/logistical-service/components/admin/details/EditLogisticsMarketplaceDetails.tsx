@@ -25,6 +25,7 @@ import SearchableDropdown from "components/form/search/SearchableDropdown";
 import ImageUploadField from "components/form/upload/ImageUploadField";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { NATIONALITIES } from "constants/lists";
 
 interface Props {
@@ -169,8 +170,8 @@ const EditLogisticsMarketplaceDetails = ({ id }: Props) => {
       setLogoFileUrl(uploaded.public_url);
       setLogoProgress(100);
       showToast("Picture uploaded successfully.", "success");
-    } catch (err: any) {
-      showToast(err?.message || "Picture upload failed.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Picture upload failed."), "error");
       setLogoFile(null);
     } finally {
       setLogoUploading(false);
@@ -195,8 +196,8 @@ const EditLogisticsMarketplaceDetails = ({ id }: Props) => {
       setEditingServiceId(null);
       setEditingServiceName("");
       setTimeout(() => location.reload(), 1500);
-    } catch {
-      showToast("Failed to update service name.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to update service name."), "error");
     }
   };
 
@@ -311,7 +312,7 @@ const EditLogisticsMarketplaceDetails = ({ id }: Props) => {
       showToast("Logistics provider updated successfully", "success");
       router.push(`/admin/logistics-marketplace/${id}`);
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
     }
   };

@@ -49,8 +49,6 @@ export default function ProgramDecisionModal({
       showToast("Program updated successfully", "success");
       onClose();
       onRefetch?.();
-    } else {
-      showToast("Update failed", "error");
     }
   };
 

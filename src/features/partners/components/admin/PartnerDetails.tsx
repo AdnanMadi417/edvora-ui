@@ -9,7 +9,6 @@ import {
   MdPublic,
   MdSupervisorAccount,
   MdToggleOn,
-  MdVerified,
 } from "react-icons/md";
 import {
   Briefcase,
@@ -253,11 +252,6 @@ export default function PartnerDetails({ id }: Props) {
               icon={<MdSupervisorAccount className="h-4 w-4" />}
               label="Assigned Manager"
               value={partner.assigned_manager_name || "Not Assigned"}
-            />
-            <InfoRow
-              icon={<MdVerified className="h-4 w-4" />}
-              label="Verification"
-              value={partner.is_verified ? "Verified" : "Not Verified"}
             />
             <InfoRow
               icon={<MdToggleOn className="h-4 w-4" />}

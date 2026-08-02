@@ -6,6 +6,7 @@ import InputField from "components/form/fields/InputField";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
 import Button from "components/ui/buttons/Button";
+import { parseApiError } from "utils/parseApiError";
 
 interface HoldPopupProps {
   isOpen: boolean;
@@ -68,12 +69,8 @@ export default function HoldPopup({
       setErrors({});
       onClose();
       onRefetch?.();
-    } catch (err: any) {
-      if (err.response?.status === 422) {
-        showToast("Validation error. Please check the input.", "error");
-      } else {
-        showToast("Failed to send correction request", "error");
-      }
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to send correction request"), "error");
 
       setTimeout(() => {
         setFormData({ reason: "" });

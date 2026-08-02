@@ -7,6 +7,7 @@ import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import ApproveRejectToggle from "components/ui/buttons/ApproveRejectToggle";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface Props {
   isOpen: boolean;
@@ -53,13 +54,8 @@ export default function ReviewPartnerPopup({ isOpen, onClose, onSuccess, partner
       );
       onClose();
       onSuccess?.();
-    } catch (err: any) {
-      const data = err?.response?.data;
-      const msg =
-        (typeof data?.message === "string" ? data.message : null) ||
-        (typeof data?.detail === "string" ? data.detail : null) ||
-        "Failed to submit review";
-      showToast(msg, "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to submit review"), "error");
     }
   };
 

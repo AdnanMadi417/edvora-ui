@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, GitBranch } from "lucide-react";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { useCreateBranch } from "features/universities/hooks";
 import { useStates } from "features/programs/hooks/useStates";
 import ModalHeader from "components/ui/modal/ModalHeader";
@@ -54,7 +55,7 @@ export default function CreateBranch({ isOpen, onClose, universityId, onSuccess 
       onSuccess?.();
       return newBranch;
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create branch. ${backendMessage}`, "error");
     }
   };
