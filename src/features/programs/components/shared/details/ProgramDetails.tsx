@@ -250,18 +250,18 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
 
           <div className="flex shrink-0 items-center gap-2.5">
             <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
-            <button
+            <Button
               onClick={handleCopyAll}
               title={copied ? "Copied!" : "Copy program info"}
-              className={`flex h-10 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition ${
-                copied
-                  ? "border-green-300 bg-green-50 text-green-700"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-              }`}
-            >
-              <Copy className="h-4 w-4" />
-              {copied ? "Copied!" : "Copy"}
-            </button>
+              icon={<Copy className="h-4 w-4" />}
+              text={copied ? "Copied!" : "Copy"}
+              bgColor={copied ? "bg-green-50" : "bg-white"}
+              textColor={copied ? "text-green-700" : "text-slate-600"}
+              borderColor={copied ? "border-green-300" : "border-slate-200"}
+              hoverTextColor={copied ? "hover:text-green-700" : "hover:text-slate-600"}
+              hoverBorderColor={copied ? "hover:border-green-300" : "hover:border-slate-300"}
+              className={copied ? "" : "hover:bg-slate-50"}
+            />
           </div>
         </div>
 

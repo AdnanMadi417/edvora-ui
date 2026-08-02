@@ -34,6 +34,7 @@ import { useUniversities } from "features/universities/hooks";
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
+import IconButton from "components/ui/buttons/IconButton";
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import Link from "next/link";
@@ -652,8 +653,7 @@ const ProgramsTable = () => {
 
                       <div className="h-6 border-l border-slate-200" />
 
-                      <button
-                        role="menuitem"
+                      <IconButton
                         aria-label="Delete Program"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -661,10 +661,14 @@ const ProgramsTable = () => {
                           setDeleteMode("single");
                           setIsDeleteOpen(true);
                         }}
-                        className="group/delete flex items-center justify-center rounded-lg p-2 text-sm hover:bg-red-50 focus:outline-none"
-                      >
-                        <Trash2 className="h-4 w-4 text-slate-400 group-hover/delete:text-red-600" />
-                      </button>
+                        icon={<Trash2 className="h-4 w-4" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-400"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-red-600"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-red-50 focus:outline-none"
+                      />
 
                       <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                     </div>
