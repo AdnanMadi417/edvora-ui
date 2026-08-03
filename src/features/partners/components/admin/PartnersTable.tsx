@@ -149,6 +149,7 @@ export default function PartnersTable() {
     } catch (err: any) {
       if (err?.response?.data?.code === "partner_already_logged_in") {
         // Stale frontend check, not a real failure — the partner already logged in.
+        showToast(parseApiError(err, "This partner has already logged in. 12"), "error");
         setIsResendOpen(false);
         refetch();
         return;
