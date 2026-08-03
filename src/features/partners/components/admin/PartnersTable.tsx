@@ -4,12 +4,13 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
   Pencil, RefreshCw, SlidersHorizontal, Building2,
-  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, CalendarDays, Mail, Ban, Power,
+  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
 import { useRouter } from "next/navigation";
 import { usePartners, useDeletePartner, useUpdatePartner, useResendApprovalEmail } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
+import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import ResendApprovalEmailConfirmation from "./ResendApprovalEmailConfirmation";
 import SuspendActivatePartner from "./SuspendActivatePartner";
 import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
@@ -49,6 +50,8 @@ export default function PartnersTable() {
   const { updatePartner, isUpdatingPartner } = useUpdatePartner();
   const { resendApprovalEmail, loading: isResendingEmail } = useResendApprovalEmail();
 
+  const [isReviewOpen, setIsReviewOpen] = useState(false);
+  const [reviewPartner, setReviewPartner] = useState<{ id: string; name: string; assignedManagerId?: string } | null>(null);
   const [isResendOpen, setIsResendOpen] = useState(false);
   const [resendTarget, setResendTarget] = useState<{ id: string; name: string } | null>(null);
   const [isSuspendOpen, setIsSuspendOpen] = useState(false);
@@ -413,6 +416,23 @@ export default function PartnersTable() {
 
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
+                        {!partner.is_verified && !partner.is_active && (
+                          <>
+                            <IconButton
+                              onClick={() => { setReviewPartner({ id: partner.id, name: partner.name || "", assignedManagerId: partner.assigned_manager_id || undefined }); setIsReviewOpen(true); }}
+                              title="Review registration"
+                              icon={<ShieldCheck className="h-4 w-4" />}
+                              bgColor="bg-transparent"
+                              textColor="text-amber-400"
+                              borderColor="border-transparent"
+                              hoverTextColor="hover:text-amber-600"
+                              hoverBorderColor="hover:border-transparent"
+                              className="hover:bg-amber-50"
+                            />
+                            <div className="h-5 border-l border-slate-200" />
+                          </>
+                        )}
+
                         <a
                           href={`/admin/partners/${partner.id}/edit`}
                           onClick={(e) => e.stopPropagation()}
@@ -463,6 +483,18 @@ export default function PartnersTable() {
         </TableWrapper>
 
       </div>
+
+      {reviewPartner && (
+        <ReviewPartnerPopup
+          isOpen={isReviewOpen}
+          onClose={() => setIsReviewOpen(false)}
+          onSuccess={refetch}
+          partnerId={reviewPartner.id}
+          partnerName={reviewPartner.name}
+          managerOptions={managerOptions}
+          currentManagerId={reviewPartner.assignedManagerId}
+        />
+      )}
 
       {resendTarget && (
         <ResendApprovalEmailConfirmation
