@@ -12,6 +12,7 @@ import api from "lib/useApi";
 import { Send, User } from "lucide-react";
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import { useToast } from "components/context/ToastContext";
 
 interface AgentPartnerChatProps {
   applicationId: string;
@@ -21,12 +22,21 @@ export default function AgentPartnerChat({
   applicationId,
 }: AgentPartnerChatProps) {
   const { user } = useMe();
+  const { showToast } = useToast();
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const { messages, error, fetchInitialMessages, fetchNewMessages, setMessages } =
     useChatMessages({ applicationId });
 
-  const { sendMessage, sending } = useSendMessage({ applicationId });
+  const { sendMessage, sending, error: sendError } = useSendMessage({ applicationId });
+
+  const handleSendMessage = async (text: string) => {
+    const result = await sendMessage(text);
+    if (!result) {
+      showToast(sendError || "Failed to send message", "error");
+    }
+    return result;
+  };
   const { markMessagesRead } = useMarkMessagesRead({ applicationId });
   const { refetch: refetchUnreadCount } = useUnreadCount({ enabled: false });
   const { notifications, refetch: refetchNotifications } = useAllNotifications();
@@ -135,7 +145,7 @@ export default function AgentPartnerChat({
       </main>
 
       <footer className="border-t border-slate-200 bg-card p-2 sm:p-3">
-        <ChatInput onSend={sendMessage} sending={sending} />
+        <ChatInput onSend={handleSendMessage} sending={sending} />
       </footer>
 
       <style jsx>{`
@@ -162,8 +172,8 @@ function ChatInput({
 
   const handleSend = async () => {
     if (!text.trim() || sending) return;
-    await onSend(text);
-    setText("");
+    const result = await onSend(text);
+    if (result) setText("");
   };
 
   return (
