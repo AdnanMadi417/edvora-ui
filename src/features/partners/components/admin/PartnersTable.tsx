@@ -4,14 +4,12 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
   Pencil, RefreshCw, SlidersHorizontal, Building2,
-  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, CheckCircle2,
+  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, CalendarDays, Mail, Ban, Power,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
 import { useRouter } from "next/navigation";
 import { usePartners, useDeletePartner, useUpdatePartner, useResendApprovalEmail } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
-import AssignPartnerManager from "./AssignPartnerManager";
-import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import ResendApprovalEmailConfirmation from "./ResendApprovalEmailConfirmation";
 import SuspendActivatePartner from "./SuspendActivatePartner";
 import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
@@ -51,15 +49,35 @@ export default function PartnersTable() {
   const { updatePartner, isUpdatingPartner } = useUpdatePartner();
   const { resendApprovalEmail, loading: isResendingEmail } = useResendApprovalEmail();
 
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [selectedPartner, setSelectedPartner] = useState<any>(null);
-  const [isReviewOpen, setIsReviewOpen] = useState(false);
-  const [reviewPartner, setReviewPartner] = useState<{ id: string; name: string } | null>(null);
   const [isResendOpen, setIsResendOpen] = useState(false);
   const [resendTarget, setResendTarget] = useState<{ id: string; name: string } | null>(null);
   const [isSuspendOpen, setIsSuspendOpen] = useState(false);
   const [suspendTarget, setSuspendTarget] = useState<any>(null);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+
+  // partnerId -> epoch ms when the 60s resend-approval-email cooldown ends
+  const [resendCooldowns, setResendCooldowns] = useState<Record<string, number>>({});
+  const [cooldownTick, setCooldownTick] = useState(() => Date.now());
+
+  useEffect(() => {
+    const hasActive = Object.values(resendCooldowns).some((end) => end > Date.now());
+    if (!hasActive) return;
+    const id = setInterval(() => {
+      const now = Date.now();
+      setCooldownTick(now);
+      setResendCooldowns((prev) => {
+        const next = Object.fromEntries(Object.entries(prev).filter(([, end]) => end > now));
+        return Object.keys(next).length === Object.keys(prev).length ? prev : next;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [resendCooldowns]);
+
+  const getResendCooldownSeconds = (partnerId: string) => {
+    const end = resendCooldowns[partnerId];
+    if (!end) return 0;
+    return Math.max(0, Math.ceil((end - cooldownTick) / 1000));
+  };
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -122,10 +140,28 @@ export default function PartnersTable() {
   const handleResendEmail = async () => {
     if (!resendTarget) return;
     try {
-      await resendApprovalEmail(resendTarget.id);
-      showToast("Approval email resent successfully", "success");
+      const res = await resendApprovalEmail(resendTarget.id);
+      showToast(res?.message || "Approval email resent successfully", "success");
       setIsResendOpen(false);
-    } catch (err: unknown) {
+      // A fresh send starts its own 60s cooldown window on the backend.
+      setResendCooldowns((prev) => ({ ...prev, [resendTarget.id]: Date.now() + 60_000 }));
+      refetch();
+    } catch (err: any) {
+      if (err?.response?.data?.code === "partner_already_logged_in") {
+        // Stale frontend check, not a real failure — the partner already logged in.
+        setIsResendOpen(false);
+        refetch();
+        return;
+      }
+      if (err?.response?.status === 429) {
+        const retryAfterSeconds = err?.response?.data?.details?.retry_after_seconds;
+        if (typeof retryAfterSeconds === "number") {
+          setResendCooldowns((prev) => ({
+            ...prev,
+            [resendTarget.id]: Date.now() + retryAfterSeconds * 1000,
+          }));
+        }
+      }
       showToast(parseApiError(err, "Failed to resend approval email"), "error");
     }
   };
@@ -376,23 +412,6 @@ export default function PartnersTable() {
 
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
-                        {!partner.is_verified && !partner.is_active && (
-                          <>
-                            <IconButton
-                              onClick={() => { setReviewPartner({ id: partner.id, name: partner.name || "" }); setIsReviewOpen(true); }}
-                              title="Review registration"
-                              icon={<ShieldCheck className="h-4 w-4" />}
-                              bgColor="bg-transparent"
-                              textColor="text-amber-400"
-                              borderColor="border-transparent"
-                              hoverTextColor="hover:text-amber-600"
-                              hoverBorderColor="hover:border-transparent"
-                              className="hover:bg-amber-50"
-                            />
-                            <div className="h-5 border-l border-slate-200" />
-                          </>
-                        )}
-
                         <a
                           href={`/admin/partners/${partner.id}/edit`}
                           onClick={(e) => e.stopPropagation()}
@@ -401,21 +420,7 @@ export default function PartnersTable() {
                         >
                           <Pencil className="h-4 w-4" />
                         </a>
-                        <div className="h-5 border-l border-slate-200" />
-
-                        <IconButton
-                          onClick={() => { setSelectedPartner(partner); setIsAssignModalOpen(true); }}
-                          title="Assign manager"
-                          icon={<UserCog className="h-4 w-4" />}
-                          bgColor="bg-transparent"
-                          textColor="text-slate-400"
-                          borderColor="border-transparent"
-                          hoverTextColor="hover:text-slate-700"
-                          hoverBorderColor="hover:border-transparent"
-                          className="hover:bg-slate-100"
-                        />
-
-                        {partner.is_verified && (
+                        {partner.is_active && !partner.last_login && (
                           <>
                             <div className="h-5 border-l border-slate-200" />
                             <IconButton
@@ -436,7 +441,7 @@ export default function PartnersTable() {
                         <IconButton
                           onClick={() => { setSuspendTarget(partner); setIsSuspendOpen(true); }}
                           title={partner.is_active ? "Suspend account" : "Activate account"}
-                          icon={partner.is_active ? <Ban className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
+                          icon={partner.is_active ? <Ban className="h-4 w-4" /> : <Power className="h-4 w-4" />}
                           bgColor="bg-transparent"
                           textColor="text-slate-400"
                           borderColor="border-transparent"
@@ -458,27 +463,6 @@ export default function PartnersTable() {
 
       </div>
 
-      {reviewPartner && (
-        <ReviewPartnerPopup
-          isOpen={isReviewOpen}
-          onClose={() => setIsReviewOpen(false)}
-          onSuccess={refetch}
-          partnerId={reviewPartner.id}
-          partnerName={reviewPartner.name}
-        />
-      )}
-
-      {isAssignModalOpen && selectedPartner && (
-        <AssignPartnerManager
-          isOpen={isAssignModalOpen}
-          onClose={() => setIsAssignModalOpen(false)}
-          onSuccess={refetch}
-          partnerId={selectedPartner.id}
-          currentManagerId={selectedPartner.assigned_manager_id}
-          managerOptions={managerOptions}
-        />
-      )}
-
       {resendTarget && (
         <ResendApprovalEmailConfirmation
           isOpen={isResendOpen}
@@ -486,6 +470,7 @@ export default function PartnersTable() {
           onConfirm={handleResendEmail}
           isSending={isResendingEmail}
           partnerName={resendTarget.name}
+          cooldownSeconds={getResendCooldownSeconds(resendTarget.id)}
         />
       )}
 

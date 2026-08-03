@@ -21,7 +21,8 @@ const SelectField = ({ label, field, options, required = true, formData, errors,
         value={value}
         onChange={(e) => updateFormData(field, e.target.value)}
         onBlur={onBlur}
-        className={`mt-2 flex h-12 w-full items-center justify-start rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+        disabled={disabled}
+        className={`mt-2 flex h-12 w-full items-center justify-start rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60 ${
           errors?.[field] ? "border-red-500 bg-red-50" : "border-slate-200 bg-white hover:bg-slate-50"
         }`}
       >

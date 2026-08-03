@@ -25,6 +25,7 @@ import {
   User,
 } from "lucide-react";
 import { usePartnerDetails } from "features/partners/hooks";
+import { useAccountManagers } from "features/account-managers/hooks";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import { useToast } from "components/context/ToastContext";
@@ -163,6 +164,8 @@ export default function PartnerDetails({ id }: Props) {
   const router = useRouter();
   const { partner, isPartnerLoading, refetch } = usePartnerDetails(id);
   const [showReview, setShowReview] = useState(false);
+  const { accountManagers } = useAccountManagers();
+  const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
 
   if (isPartnerLoading) return <Loading text="Loading partner details..." />;
   if (!partner) return <EmptyData />;
@@ -178,6 +181,8 @@ export default function PartnerDetails({ id }: Props) {
         onSuccess={refetch}
         partnerId={id}
         partnerName={partner.name || ""}
+        managerOptions={managerOptions}
+        currentManagerId={partner.assigned_manager_id || undefined}
       />
 
     <div className="mx-auto mt-6 max-w-5xl">

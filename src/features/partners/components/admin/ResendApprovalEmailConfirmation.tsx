@@ -11,9 +11,10 @@ interface Props {
   onConfirm: () => void;
   isSending: boolean;
   partnerName: string;
+  cooldownSeconds?: number;
 }
 
-export default function ResendApprovalEmailConfirmation({ isOpen, onClose, onConfirm, isSending, partnerName }: Props) {
+export default function ResendApprovalEmailConfirmation({ isOpen, onClose, onConfirm, isSending, partnerName, cooldownSeconds = 0 }: Props) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -26,6 +27,9 @@ export default function ResendApprovalEmailConfirmation({ isOpen, onClose, onCon
   }, [isOpen]);
 
   if (!isVisible) return null;
+
+  const isCoolingDown = cooldownSeconds > 0;
+  const isDisabled = isSending || isCoolingDown;
 
   return (
     <div
@@ -59,6 +63,11 @@ export default function ResendApprovalEmailConfirmation({ isOpen, onClose, onCon
                 Are you sure you want to resend the approval email to <strong>{partnerName}</strong>?
               </p>
             </div>
+            {isCoolingDown && (
+              <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
+                An approval email was sent recently. You can resend again in {cooldownSeconds}s.
+              </p>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
@@ -76,14 +85,14 @@ export default function ResendApprovalEmailConfirmation({ isOpen, onClose, onCon
 
             <Button
               icon={<Mail className="h-5 w-5" />}
-              text={isSending ? "Sending..." : "Resend Email"}
+              text={isSending ? "Sending..." : isCoolingDown ? `Retry in ${cooldownSeconds}s` : "Resend Email"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"
               borderColor="border-blue-600"
               hoverTextColor="hover:text-blue-800"
               hoverBorderColor="hover:border-blue-700"
               onClick={onConfirm}
-              disabled={isSending}
+              disabled={isDisabled}
             />
           </div>
         </div>
