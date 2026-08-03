@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Ban, CheckCircle2, XCircle } from "lucide-react";
+import { Ban, Power, XCircle } from "lucide-react";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 
@@ -30,7 +30,7 @@ export default function SuspendActivatePartner({ isOpen, onClose, onConfirm, isS
   if (!isVisible) return null;
 
   const action = isActive ? "Suspend" : "Activate";
-  const icon = isActive ? Ban : CheckCircle2;
+  const icon = isActive ? Ban : Power;
   const colorClasses = isActive
     ? { bg: "bg-red-50", text: "text-red-700", border: "border-red-600", hoverText: "hover:text-red-800", hoverBorder: "hover:border-red-700", iconBg: "bg-red-50", iconColor: "text-red-600", iconBorder: "border-red-200" }
     : { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-600", hoverText: "hover:text-emerald-800", hoverBorder: "hover:border-emerald-700", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", iconBorder: "border-emerald-200" };
