@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { User, Building2, AlertCircle, CheckCircle2, ChevronRight } from "lucide-react";
 import { usePartnerRegistration } from "features/partners/hooks";
 import OtpStep from "./OtpStep";
+import EnterVerificationCodeModal from "./EnterVerificationCodeModal";
 import { AnimatePresence, motion } from "framer-motion";
 import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
 import InputField from "components/form/fields/InputField";
@@ -77,11 +79,27 @@ function usePublicPhotoUpload() {
 }
 
 export default function PartnerRegisterPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { initiateRegistration, loading: submitting, error: apiError } = usePartnerRegistration();
 
-  const [step, setStep] = useState<Step>("form");
+  const [step, setStep] = useState<Step>(() => {
+    const urlStep = searchParams.get("step");
+    const urlEmail = searchParams.get("email");
+    if (urlStep === "otp" && urlEmail) return "otp";
+    if (urlStep === "success") return "success";
+    return "form";
+  });
   const [partnerType, setPartnerType] = useState<PartnerType | null>(null);
-  const [registrationEmail, setRegistrationEmail] = useState("");
+  const [registrationEmail, setRegistrationEmail] = useState(() => searchParams.get("email") || "");
+  const [showCodeEntry, setShowCodeEntry] = useState(() => searchParams.get("showCodeEntry") === "1");
+
+  const goToOtpStep = (email: string) => {
+    setRegistrationEmail(email);
+    setStep("otp");
+    router.replace(`/auth/register?step=otp&email=${encodeURIComponent(email)}`);
+    setShowCodeEntry(false);
+  };
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -225,13 +243,18 @@ export default function PartnerRegisterPage() {
         };
     try {
       await initiateRegistration(payload);
-      setRegistrationEmail(partnerType === "individual" ? indForm.email : compForm.contact_email);
-      setStep("otp");
+      goToOtpStep(partnerType === "individual" ? indForm.email : compForm.contact_email);
     } catch { /* error shown via hook */ }
   };
 
   if (step === "otp") {
-    return <OtpStep email={registrationEmail} onSuccess={() => setStep("success")} />;
+    return (
+      <OtpStep
+        email={registrationEmail}
+        onSuccess={() => { setStep("success"); router.replace("/auth/register?step=success"); }}
+        onRestart={() => { setStep("form"); router.replace("/auth/register"); }}
+      />
+    );
   }
 
   if (step === "success") {
@@ -275,8 +298,21 @@ export default function PartnerRegisterPage() {
           <p className="text-base text-slate-500">
             Ready to connect? Drop us a message and we'll get back fast.
           </p>
+          <button
+            type="button"
+            onClick={() => setShowCodeEntry(true)}
+            className="mt-3 text-sm font-medium text-blue-600 underline-offset-2 transition hover:text-blue-700 hover:underline"
+          >
+            Already have a verification code?
+          </button>
         </div>
       </div>
+
+      <EnterVerificationCodeModal
+        isOpen={showCodeEntry}
+        onClose={() => setShowCodeEntry(false)}
+        onContinue={goToOtpStep}
+      />
 
       <div className="mx-auto max-w-3xl px-4">
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">

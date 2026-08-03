@@ -68,12 +68,18 @@ export default function SignInForm() {
             errors={errors}
             updateFormData={updateFormData}
           />
-          <div className="mt-1 flex justify-end">
+          <div className="mt-1 flex flex-col items-end gap-1">
             <Link
               href="/auth/forgot-password"
               className="text-xs font-medium text-blue-600 hover:text-blue-700 hover:underline"
             >
               Forgot password?
+            </Link>
+            <Link
+              href="/auth/register?showCodeEntry=1"
+              className="text-xs font-medium text-slate-400 hover:text-blue-600 hover:underline"
+            >
+              Already have a verification code?
             </Link>
           </div>
         </div>
