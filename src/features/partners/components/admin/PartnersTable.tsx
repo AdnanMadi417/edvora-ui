@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
   Pencil, RefreshCw, SlidersHorizontal, Building2,
-  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power,
+  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power, KeyRound, Trash2,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
 import { useRouter } from "next/navigation";
@@ -12,7 +12,9 @@ import { usePartners, useDeletePartner, useUpdatePartner, useResendApprovalEmail
 import { useAccountManagers } from "features/account-managers/hooks";
 import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import ResendApprovalEmailConfirmation from "./ResendApprovalEmailConfirmation";
+import ResendRegistrationOtpModal from "./ResendRegistrationOtpModal";
 import SuspendActivatePartner from "./SuspendActivatePartner";
+import DeletePartner from "./DeletePartner";
 import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
@@ -49,13 +51,17 @@ export default function PartnersTable() {
   const { accountManagers } = useAccountManagers();
   const { updatePartner, isUpdatingPartner } = useUpdatePartner();
   const { resendApprovalEmail, loading: isResendingEmail } = useResendApprovalEmail();
+  const { deletePartner, loading: isDeletingPartner } = useDeletePartner();
 
+  const [isResendOtpOpen, setIsResendOtpOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewPartner, setReviewPartner] = useState<{ id: string; name: string; assignedManagerId?: string } | null>(null);
   const [isResendOpen, setIsResendOpen] = useState(false);
   const [resendTarget, setResendTarget] = useState<{ id: string; name: string } | null>(null);
   const [isSuspendOpen, setIsSuspendOpen] = useState(false);
   const [suspendTarget, setSuspendTarget] = useState<any>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   // partnerId -> epoch ms when the 60s resend-approval-email cooldown ends
@@ -191,6 +197,18 @@ export default function PartnersTable() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    try {
+      await deletePartner(deleteTarget.id);
+      showToast("Partner deleted successfully", "success");
+      setIsDeleteOpen(false);
+      refetch();
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to delete partner"), "error");
+    }
+  };
+
   return (
     <div className="mt-6 max-w-5xl mx-auto text-p2 bg-white rounded-lg border border-slate-200">
 
@@ -200,6 +218,17 @@ export default function PartnersTable() {
           <h3 className="text-xl font-semibold text-slate-900">Partners</h3>
           <p className="mt-0.5 text-sm text-slate-500">Manage and view all partner organizations</p>
         </div>
+        <Button
+          icon={<KeyRound className="h-4 w-4" />}
+          text="Resend Verification Code"
+          bgColor="bg-blue-50"
+          textColor="text-blue-700"
+          borderColor="border-blue-600"
+          hoverTextColor="hover:text-blue-800"
+          hoverBorderColor="hover:border-blue-700"
+          onClick={() => setIsResendOtpOpen(true)}
+          className="whitespace-nowrap"
+        />
       </div>
 
       {/* Stats Cards */}
@@ -484,6 +513,11 @@ export default function PartnersTable() {
 
       </div>
 
+      <ResendRegistrationOtpModal
+        isOpen={isResendOtpOpen}
+        onClose={() => setIsResendOtpOpen(false)}
+      />
+
       {reviewPartner && (
         <ReviewPartnerPopup
           isOpen={isReviewOpen}
@@ -515,6 +549,15 @@ export default function PartnersTable() {
           isSubmitting={isUpdatingPartner}
           partnerName={suspendTarget.name || ""}
           isActive={!!suspendTarget.is_active}
+        />
+      )}
+
+      {deleteTarget && (
+        <DeletePartner
+          isOpen={isDeleteOpen}
+          onClose={() => setIsDeleteOpen(false)}
+          onConfirm={handleDelete}
+          isDeleting={isDeletingPartner}
         />
       )}
     </div>
