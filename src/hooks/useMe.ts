@@ -7,6 +7,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  needs_onboarding?: boolean;
 }
 
 export function useMe() {

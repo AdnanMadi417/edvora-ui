@@ -18,12 +18,10 @@ export function convertAmount(amount: number | string, currency: string, exchang
   return Number(amount) * getRate(currency, exchangeRates);
 }
 
-/** Formats a native-currency amount converted into `currency`, e.g. "USD 8,540.03" or "RM 34,900". */
+/** Formats a native-currency amount converted into `currency`, e.g. "USD 8,540" or "RM 34,900". */
 export function formatMoney(amount: number | string, currency: string, exchangeRates: ExchangeRate[]): string {
   const converted = convertAmount(amount, currency, exchangeRates);
-  const formatted = currency === NATIVE_CURRENCY
-    ? converted.toLocaleString()
-    : converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const formatted = converted.toLocaleString(undefined, { maximumFractionDigits: 0 });
   return `${currency === NATIVE_CURRENCY ? NATIVE_SYMBOL : currency} ${formatted}`;
 }
 

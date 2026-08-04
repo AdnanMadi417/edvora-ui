@@ -6,7 +6,7 @@ const loginApi = axios.create({ baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api
 
 export const authService = {
   login: (email: string, password: string) =>
-    loginApi.post<{ access_token: string; password_reset_required: boolean }>(
+    loginApi.post<{ access_token: string; password_reset_required: boolean; needs_onboarding: boolean }>(
       "/auth/login",
       { email, password },
     ),
