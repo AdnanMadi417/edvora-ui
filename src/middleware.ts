@@ -7,12 +7,16 @@ const protectedPrefixes: Record<string, string[]> = {
   "/admin": ["admin"],
   "/partner": ["partner"],
   "/account-manager": ["account_manager", "admin"],
+  "/reviewer": ["reviewer", "admin"],
+  "/data-entry": ["data_entry", "admin"],
 };
 
 const roleHomePaths: Record<string, string> = {
   admin: "/admin/applications",
   partner: "/partner/applications",
   account_manager: "/account-manager/applications",
+  reviewer: "/reviewer/partners",
+  data_entry: "/data-entry/universities",
 };
 
 function isTokenExpired(token: string): boolean {

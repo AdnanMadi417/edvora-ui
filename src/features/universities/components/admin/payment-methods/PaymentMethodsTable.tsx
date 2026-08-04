@@ -32,7 +32,17 @@ import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 
-const PaymentMethodsTable = () => {
+interface Props {
+  basePath?: string;
+  hideDelete?: boolean;
+  getRowHref?: (id: string) => string;
+}
+
+const PaymentMethodsTable = ({
+  basePath = "/admin/config-universities/payment-methods",
+  hideDelete = false,
+  getRowHref = (id: string) => `/admin/config-universities/payment-methods/${id}`,
+}: Props = {}) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const { showToast } = useToast();
@@ -230,7 +240,7 @@ const PaymentMethodsTable = () => {
               <tr
                 key={payment.id}
                 className="group cursor-pointer transition-colors hover:bg-slate-100/50"
-                onClick={() => router.push(`/admin/config-universities/payment-methods/${payment.id}`)}
+                onClick={() => router.push(getRowHref(payment.id))}
               >
                 <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -256,31 +266,35 @@ const PaymentMethodsTable = () => {
                     <a
                       role="menuitem"
                       aria-label="Edit Payment Method"
-                      href={`/admin/config-universities/payment-methods/${payment.id}/edit`}
+                      href={`${basePath}/${payment.id}/edit`}
                       onClick={(e) => e.stopPropagation()}
                       className="flex items-center justify-center rounded-lg p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                     >
                       <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                     </a>
 
-                    <div className="h-6 border-l border-slate-200" />
+                    {!hideDelete && (
+                      <>
+                        <div className="h-6 border-l border-slate-200" />
 
-                    <IconButton
-                      aria-label="Delete Payment Method"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedPaymentId(payment.id);
-                        setSelectedPaymentMethodName(payment.name);
-                        setIsDeleteOpen(true);
-                      }}
-                      icon={<Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />}
-                      bgColor="bg-transparent"
-                      textColor="text-slate-700"
-                      borderColor="border-transparent"
-                      hoverTextColor="hover:text-slate-700"
-                      hoverBorderColor="hover:border-transparent"
-                      className="hover:bg-slate-100 focus:outline-none"
-                    />
+                        <IconButton
+                          aria-label="Delete Payment Method"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPaymentId(payment.id);
+                            setSelectedPaymentMethodName(payment.name);
+                            setIsDeleteOpen(true);
+                          }}
+                          icon={<Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-700"
+                          borderColor="border-transparent"
+                          hoverTextColor="hover:text-slate-700"
+                          hoverBorderColor="hover:border-transparent"
+                          className="hover:bg-slate-100 focus:outline-none"
+                        />
+                      </>
+                    )}
                   </div>
                 </td>
 

@@ -107,7 +107,17 @@ function ProgramUniversityCell({ program }: { program: Program }) {
 
 const ITEMS_PER_PAGE = 10;
 
-const ProgramsTable = () => {
+interface Props {
+  basePath?: string;
+  hideDelete?: boolean;
+  getRowHref?: (id: string) => string;
+}
+
+const ProgramsTable = ({
+  basePath = "/admin/knowledge-hub",
+  hideDelete = false,
+  getRowHref = (id: string) => `/admin/knowledge-hub/${id}`,
+}: Props = {}) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -323,7 +333,7 @@ const ProgramsTable = () => {
           <p className="mt-1 text-sm text-slate-500">Explore and manage all programs, universities, and learning resources</p>
         </div>
         <Link
-          href="/admin/knowledge-hub/create"
+          href={`${basePath}/create`}
           className="flex items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:text-blue-800"
         >
           <Plus className="h-4 w-4" />
@@ -391,7 +401,7 @@ const ProgramsTable = () => {
                         { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("ielts") },
                         { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setActiveModal("intakes") },
                         { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setActiveModal("scholarship") },
-                        { label: "Delete Scholarships", icon: <Trash2 className="h-3.5 w-3.5 text-red-600" />, bg: "bg-red-50", onClick: () => setActiveModal("deleteScholarships") },
+                        ...(hideDelete ? [] : [{ label: "Delete Scholarships", icon: <Trash2 className="h-3.5 w-3.5 text-red-600" />, bg: "bg-red-50", onClick: () => setActiveModal("deleteScholarships") }]),
                         { label: "Tuition Fees", icon: <DollarSign className="h-3.5 w-3.5 text-green-600" />, bg: "bg-green-50", onClick: () => setActiveModal("fees") },
                         { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setActiveModal("visaFee") },
                         ...(sharedUniversityId ? [{ label: "Branch", icon: <GitBranch className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("branch") }] : []),
@@ -410,15 +420,19 @@ const ProgramsTable = () => {
                 )}
               </div>
 
-            <div className="mx-1 h-4 w-px bg-slate-200" />
+            {!hideDelete && (
+              <>
+                <div className="mx-1 h-4 w-px bg-slate-200" />
 
-            <button
-              onClick={() => { setDeleteMode("batch"); setIsDeleteOpen(true); }}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-white hover:shadow-sm"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Delete</span>
-            </button>
+                <button
+                  onClick={() => { setDeleteMode("batch"); setIsDeleteOpen(true); }}
+                  className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-white hover:shadow-sm"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Delete</span>
+                </button>
+              </>
+            )}
           </div>
         )}
       </ProgramFilterBar>
@@ -517,7 +531,7 @@ const ProgramsTable = () => {
                 <tr
                   key={program.id}
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${selectedPrograms[program.id] ? "bg-slate-50" : ""}`}
-                  onClick={() => window.open(`/admin/knowledge-hub/${program.id}`, "_blank")}
+                  onClick={() => window.open(getRowHref(program.id), "_blank")}
                 >
                   {/* Checkbox */}
                   <td className="pl-6" onClick={(e) => e.stopPropagation()}>
@@ -645,31 +659,35 @@ const ProgramsTable = () => {
                       <a
                         role="menuitem"
                         aria-label="Edit Program"
-                        href={`/admin/knowledge-hub/${program.id}/edit`}
+                        href={`${basePath}/${program.id}/edit`}
                         onClick={(e) => e.stopPropagation()}
                         className="group/edit flex items-center justify-center rounded-lg p-2 text-sm hover:bg-slate-100 focus:outline-none"
                       >
                         <Pencil className="h-4 w-4 text-slate-400 group-hover/edit:text-blue-600" />
                       </a>
 
-                      <div className="h-6 border-l border-slate-200" />
+                      {!hideDelete && (
+                        <>
+                          <div className="h-6 border-l border-slate-200" />
 
-                      <IconButton
-                        aria-label="Delete Program"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedProgramId(program.id);
-                          setDeleteMode("single");
-                          setIsDeleteOpen(true);
-                        }}
-                        icon={<Trash2 className="h-4 w-4" />}
-                        bgColor="bg-transparent"
-                        textColor="text-slate-400"
-                        borderColor="border-transparent"
-                        hoverTextColor="hover:text-red-600"
-                        hoverBorderColor="hover:border-transparent"
-                        className="hover:bg-red-50 focus:outline-none"
-                      />
+                          <IconButton
+                            aria-label="Delete Program"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedProgramId(program.id);
+                              setDeleteMode("single");
+                              setIsDeleteOpen(true);
+                            }}
+                            icon={<Trash2 className="h-4 w-4" />}
+                            bgColor="bg-transparent"
+                            textColor="text-slate-400"
+                            borderColor="border-transparent"
+                            hoverTextColor="hover:text-red-600"
+                            hoverBorderColor="hover:border-transparent"
+                            className="hover:bg-red-50 focus:outline-none"
+                          />
+                        </>
+                      )}
 
                       <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                     </div>

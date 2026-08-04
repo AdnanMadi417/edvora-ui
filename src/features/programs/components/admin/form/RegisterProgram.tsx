@@ -71,7 +71,11 @@ const stages = [
 
 const STEP1_REQUIRED = ['name', 'uni_id', 'qualification_id', 'field_of_study_id', 'is_on_campus'];
 
-export default function RegisterProgram() {
+interface Props {
+  basePath?: string;
+}
+
+export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: Props = {}) {
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -246,7 +250,7 @@ export default function RegisterProgram() {
       };
       await createProgram(payload);
       showToast('Program created successfully', 'success');
-      setTimeout(() => router.push('/admin/knowledge-hub'), 1500);
+      setTimeout(() => router.push(basePath), 1500);
     } catch (error: unknown) {
       const backendMessage = parseApiError(error, 'Please try again.');
       showToast(`Failed to create program. ${backendMessage}`, 'error');
@@ -714,7 +718,7 @@ export default function RegisterProgram() {
                 />
               ) : (
                 <PrevButton
-                  onClick={() => router.push('/admin/knowledge-hub')}
+                  onClick={() => router.push(basePath)}
                   text="Back"
                   icon={<ArrowLeft className="h-4 w-4" />}
                 />

@@ -42,7 +42,11 @@ interface FormData {
 
 type FormErrors = Record<string, string>;
 
-export default function RegisterLogisticsMarketplaceProvider() {
+interface Props {
+  basePath?: string;
+}
+
+export default function RegisterLogisticsMarketplaceProvider({ basePath = "/admin/logistics-marketplace" }: Props = {}) {
   const { showToast } = useToast();
   const router = useRouter();
   const [errors, setErrors] = useState<FormErrors>({});
@@ -248,7 +252,7 @@ export default function RegisterLogisticsMarketplaceProvider() {
       setLogoFileKey("");
       setLogoFileUrl("");
       setErrors({});
-      setTimeout(() => { router.push("/admin/logistics-marketplace"); }, 1500);
+      setTimeout(() => { router.push(basePath); }, 1500);
     } catch (error: any) {
       const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create logistics provider. ${backendMessage}`, "error");

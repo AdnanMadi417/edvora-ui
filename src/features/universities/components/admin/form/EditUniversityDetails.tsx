@@ -150,9 +150,11 @@ const normalizePayload = (formData: FormData) => ({
 
 interface Props {
   id: string;
+  /** Where "Back" and a successful save should navigate to. Defaults to this university's admin details page. */
+  redirectPath?: string;
 }
 
-const UniversityEdit = ({ id }: Props) => {
+const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Props) => {
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -455,7 +457,7 @@ const UniversityEdit = ({ id }: Props) => {
       }
 
       showToast("University updated successfully.", "success");
-      router.push(`/admin/universities/${id}`);
+      router.push(redirectPath);
     } catch (error: any) {
       const details = error?.response?.data?.details;
 
@@ -479,7 +481,7 @@ const UniversityEdit = ({ id }: Props) => {
     }
   };
 
-  const handleBack = () => router.push(`/admin/universities/${id}`);
+  const handleBack = () => router.push(redirectPath);
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
