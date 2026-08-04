@@ -2,9 +2,11 @@
 
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { FileText, BookOpen, Bell, Truck, X, LucideIcon } from "lucide-react";
+import { FileText, BookOpen, Bell, Truck, LucideIcon } from "lucide-react";
 import { useMe } from "hooks/useMe";
 import { useCompleteOnboarding } from "features/partners/hooks";
+import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface Step {
   tourId: string;
@@ -41,9 +43,9 @@ const STEPS: Step[] = [
     text: "text-amber-600",
   },
   {
-    tourId: "logistical-partners",
+    tourId: "logistics-marketplace",
     icon: Truck,
-    title: "Logistical Partners",
+    title: "Logistics Marketplace",
     description: "Connect your students with verified arrival, accommodation, and airport pickup services.",
     bg: "bg-cyan-50",
     text: "text-cyan-600",
@@ -73,28 +75,35 @@ function useIsDesktop() {
 }
 
 export default function PartnerOnboardingTour() {
+  const router = useRouter();
   const { user } = useMe();
-  const { completeOnboarding } = useCompleteOnboarding();
-  const [dismissed, setDismissed] = useState(false);
+  const { showToast } = useToast();
+  const { completeOnboarding, loading: completing } = useCompleteOnboarding();
+  const [completed, setCompleted] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const isDesktop = useIsDesktop();
 
-  const isActive = !dismissed && !!user?.needs_onboarding;
+  // Mandatory: stays open until has_completed_onboarding is actually true.
+  // completed is a local optimistic flag only set once the API call succeeds.
+  const isActive = !completed && user?.has_completed_onboarding === false;
 
-  const endTour = () => {
-    setDismissed(true);
-    completeOnboarding().catch(() => {
-      // Best-effort: the tour stays dismissed locally either way; it'll be
-      // re-offered on next login if the backend never got the signal.
-    });
+  const endTour = async () => {
+    try {
+      await completeOnboarding();
+      setCompleted(true);
+      router.push("/partner/knowledge-hub");
+    } catch (err) {
+      showToast(parseApiError(err, "Failed to complete onboarding. Please try again."), "error");
+      // Tour stays open — has_completed_onboarding is still false on the backend.
+    }
   };
 
   if (!isActive) return null;
 
   return isDesktop ? (
-    <DesktopCoachmarkTour stepIndex={stepIndex} setStepIndex={setStepIndex} onEnd={endTour} />
+    <DesktopCoachmarkTour stepIndex={stepIndex} setStepIndex={setStepIndex} onEnd={endTour} ending={completing} />
   ) : (
-    <MobileCarouselModal stepIndex={stepIndex} setStepIndex={setStepIndex} onEnd={endTour} />
+    <MobileCarouselModal stepIndex={stepIndex} setStepIndex={setStepIndex} onEnd={endTour} ending={completing} />
   );
 }
 
@@ -102,9 +111,10 @@ interface TourViewProps {
   stepIndex: number;
   setStepIndex: React.Dispatch<React.SetStateAction<number>>;
   onEnd: () => void;
+  ending: boolean;
 }
 
-function DesktopCoachmarkTour({ stepIndex, setStepIndex, onEnd }: TourViewProps) {
+function DesktopCoachmarkTour({ stepIndex, setStepIndex, onEnd, ending }: TourViewProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
@@ -172,7 +182,7 @@ function DesktopCoachmarkTour({ stepIndex, setStepIndex, onEnd }: TourViewProps)
 
   return (
     <>
-      <div className="fixed inset-0 z-[90]" onClick={onEnd} />
+      <div className="fixed inset-0 z-[90]" />
 
       <div
         className="pointer-events-none fixed z-[91] rounded-lg"
@@ -202,11 +212,7 @@ function DesktopCoachmarkTour({ stepIndex, setStepIndex, onEnd }: TourViewProps)
           }
         />
 
-        <button onClick={onEnd} aria-label="Close tour" className="absolute right-3 top-3 text-slate-400 transition hover:text-slate-600">
-          <X className="h-4 w-4" />
-        </button>
-
-        <h4 className="pr-6 text-base font-semibold text-slate-900">{step.title}</h4>
+        <h4 className="text-base font-semibold text-slate-900">{step.title}</h4>
         <p className="mt-1.5 text-sm text-slate-600">{step.description}</p>
 
         <div className="mt-5 flex items-center justify-between gap-3">
@@ -220,23 +226,20 @@ function DesktopCoachmarkTour({ stepIndex, setStepIndex, onEnd }: TourViewProps)
             ))}
           </div>
 
-          <button onClick={goNext} className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
-            {isLast ? "Got it" : "Next"}
+          <button
+            onClick={goNext}
+            disabled={ending}
+            className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isLast ? (ending ? "Finishing..." : "Got it") : "Next"}
           </button>
         </div>
-
-        <p className="mt-3 text-center text-xs text-slate-400">
-          Seen this before?{" "}
-          <button onClick={onEnd} className="font-medium text-blue-600 hover:underline">
-            Skip the tour
-          </button>
-        </p>
       </div>
     </>
   );
 }
 
-function MobileCarouselModal({ stepIndex, setStepIndex, onEnd }: TourViewProps) {
+function MobileCarouselModal({ stepIndex, setStepIndex, onEnd, ending }: TourViewProps) {
   const touchStartX = useRef<number | null>(null);
   const isLast = stepIndex === STEPS.length - 1;
 
@@ -255,16 +258,11 @@ function MobileCarouselModal({ stepIndex, setStepIndex, onEnd }: TourViewProps) 
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm" onClick={onEnd}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm">
       <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4">
-          <div>
-            <h3 className="text-base font-semibold text-slate-900">Welcome to Unibexs!</h3>
-            <p className="mt-0.5 text-xs text-slate-500">Here&apos;s a quick look at what you can do.</p>
-          </div>
-          <button onClick={onEnd} aria-label="Close" className="shrink-0 text-slate-400 transition hover:text-slate-600">
-            <X className="h-4 w-4" />
-          </button>
+        <div className="border-b border-slate-200 px-5 py-4">
+          <h3 className="text-base font-semibold text-slate-900">Welcome to Unibexs!</h3>
+          <p className="mt-0.5 text-xs text-slate-500">Here&apos;s a quick look at what you can do.</p>
         </div>
 
         <div className="overflow-hidden" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
@@ -297,12 +295,16 @@ function MobileCarouselModal({ stepIndex, setStepIndex, onEnd }: TourViewProps) 
 
           <div className="flex items-center gap-2">
             {stepIndex > 0 && (
-              <button onClick={goBack} className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50">
+              <button onClick={goBack} disabled={ending} className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50">
                 Back
               </button>
             )}
-            <button onClick={goNext} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700">
-              {isLast ? "Got it" : "Next"}
+            <button
+              onClick={goNext}
+              disabled={ending}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isLast ? (ending ? "Finishing..." : "Got it") : "Next"}
             </button>
           </div>
         </div>
