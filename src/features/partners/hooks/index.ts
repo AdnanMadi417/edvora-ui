@@ -8,6 +8,7 @@ export { useDeletePartner } from './useDeletePartner';
 export { useAssignPartnerManager } from './useAssignPartnerManager';
 export { usePartnerProfile } from './usePartnerProfile';
 export { useUpdatePartnerProfile } from './useUpdatePartnerProfile';
+export { useCompleteOnboarding } from './useCompleteOnboarding';
 export { useReviewPartner } from './useReviewPartner';
 export { useResendApprovalEmail } from './useResendApprovalEmail';
 export { useAdminResendRegistrationOtp } from './useAdminResendRegistrationOtp';

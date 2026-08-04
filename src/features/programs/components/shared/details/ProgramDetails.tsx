@@ -248,21 +248,6 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2.5">
-            <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
-            <Button
-              onClick={handleCopyAll}
-              title={copied ? "Copied!" : "Copy program info"}
-              icon={<Copy className="h-4 w-4" />}
-              text={copied ? "Copied!" : "Copy"}
-              bgColor={copied ? "bg-green-50" : "bg-white"}
-              textColor={copied ? "text-green-700" : "text-slate-600"}
-              borderColor={copied ? "border-green-300" : "border-slate-200"}
-              hoverTextColor={copied ? "hover:text-green-700" : "hover:text-slate-600"}
-              hoverBorderColor={copied ? "hover:border-green-300" : "hover:border-slate-300"}
-              className={copied ? "" : "hover:bg-slate-50"}
-            />
-          </div>
         </div>
 
         {/* Stats */}
@@ -404,11 +389,28 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
 
         {/* Tuition Fees */}
         <div className="p-6 border-b border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
-              <CreditCard className="h-5 w-5 text-blue-600" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
+                <CreditCard className="h-5 w-5 text-blue-600" />
+              </div>
+              <h4 className="text-base font-bold text-slate-900">Tuition Fees</h4>
             </div>
-            <h4 className="text-base font-bold text-slate-900">Tuition Fees</h4>
+            <div className="flex shrink-0 items-center gap-2.5">
+              <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
+              <Button
+                onClick={handleCopyAll}
+                title={copied ? "Copied!" : "Copy program info"}
+                icon={<Copy className="h-4 w-4" />}
+                text={copied ? "Copied!" : "Copy"}
+                bgColor={copied ? "bg-green-50" : "bg-white"}
+                textColor={copied ? "text-green-700" : "text-slate-600"}
+                borderColor={copied ? "border-green-300" : "border-slate-200"}
+                hoverTextColor={copied ? "hover:text-green-700" : "hover:text-slate-600"}
+                hoverBorderColor={copied ? "hover:border-green-300" : "hover:border-slate-300"}
+                className={copied ? "" : "hover:bg-slate-50"}
+              />
+            </div>
           </div>
 
           <div className="mt-4 grid grid-cols-1 items-start gap-4 md:grid-cols-2">

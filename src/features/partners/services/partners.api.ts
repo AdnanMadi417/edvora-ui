@@ -78,6 +78,9 @@ export const partnersApi = {
   updateProfile: (payload: UpdatePartnerProfilePayload) =>
     api.put('/partners/profile', payload),
 
+  completeOnboarding: () =>
+    api.post('/partners/onboarding/complete', {}, { headers: authHeader() }),
+
   // Public registration endpoints — use publicApi so a logged-in user's token is never sent
   registerInitiate: (payload: Record<string, unknown>) =>
     publicApi.post('/partners/register/initiate', payload),

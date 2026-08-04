@@ -73,6 +73,7 @@ export default function Links({ routes, onLinkClick }: { routes: IRoute[]; onLin
             ) : (
               <Link
                 href={fullPath}
+                data-tour-id={route.path.replace(/^\//, "")}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 onClick={onLinkClick}
