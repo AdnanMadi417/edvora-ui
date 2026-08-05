@@ -45,6 +45,9 @@ export const logisticServiceApi = {
 
     update: (id: string, payload: EditLogisticServicePayload) =>
       api.put(`/admin/logistic-services/${id}`, payload, { headers: authHeader() }),
+
+    delete: (id: string) =>
+      api.delete(`/admin/logistic-services/${id}`, { headers: authHeader() }),
   },
 
   languages: {
