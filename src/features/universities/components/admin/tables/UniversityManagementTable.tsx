@@ -33,18 +33,7 @@ import { useToast } from 'components/context/ToastContext';
 import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
 
-interface Props {
-  basePath?: string;
-  hideDelete?: boolean;
-  /** Where clicking a row navigates to. Defaults to this type's admin details page. */
-  getRowHref?: (id: string) => string;
-}
-
-const UniversityManagementTable = ({
-  basePath = "/admin/config-universities",
-  hideDelete = false,
-  getRowHref = (id: string) => `/admin/config-universities/${id}`,
-}: Props = {}) => {
+const UniversityManagementTable = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
 
@@ -136,7 +125,7 @@ const UniversityManagementTable = ({
           <p className="mt-1 text-sm text-slate-500">Manage submission requirements for each university type</p>
         </div>
         <Button
-          onClick={() => router.push(`${basePath}/create`)}
+          onClick={() => router.push('/admin/config-universities/create')}
           icon={<PlusCircle className="h-5 w-5" />}
           text="Create Type"
           bgColor="bg-blue-50"
@@ -256,7 +245,7 @@ const UniversityManagementTable = ({
               <tr
                 key={uni.id}
                 className="group cursor-pointer transition-colors hover:bg-slate-100/50"
-                onClick={() => router.push(getRowHref(uni.id))}
+                onClick={() => router.push(`/admin/config-universities/${uni.id}`)}
               >
                 <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -314,35 +303,31 @@ const UniversityManagementTable = ({
                     <a
                       role="menuitem"
                       aria-label="Edit University Type"
-                      href={`${basePath}/${uni.id}/edit`}
+                      href={`/admin/config-universities/${uni.id}/edit`}
                       onClick={(e) => e.stopPropagation()}
                       className="flex items-center justify-center rounded-lg p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                     >
                       <Pencil className="h-4 w-4 text-slate-500" />
                     </a>
 
-                    {!hideDelete && (
-                      <>
-                        <div className="h-6 border-l border-slate-200" />
+                    <div className="h-6 border-l border-slate-200" />
 
-                        <IconButton
-                          aria-label="Delete University Type"
-                          onClick={(e: React.MouseEvent) => {
-                            e.stopPropagation();
-                            setSelectedUniversityId(uni.id);
-                            setSelectedUniversityName(uni.name);
-                            setIsDeleteOpen(true);
-                          }}
-                          icon={<Trash2 className="h-4 w-4 text-slate-500" />}
-                          bgColor="bg-transparent"
-                          textColor="text-slate-700"
-                          borderColor="border-transparent"
-                          hoverTextColor="hover:text-slate-700"
-                          hoverBorderColor="hover:border-transparent"
-                          className="hover:bg-slate-100 focus:outline-none"
-                        />
-                      </>
-                    )}
+                    <IconButton
+                      aria-label="Delete University Type"
+                      onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        setSelectedUniversityId(uni.id);
+                        setSelectedUniversityName(uni.name);
+                        setIsDeleteOpen(true);
+                      }}
+                      icon={<Trash2 className="h-4 w-4 text-slate-500" />}
+                      bgColor="bg-transparent"
+                      textColor="text-slate-700"
+                      borderColor="border-transparent"
+                      hoverTextColor="hover:text-slate-700"
+                      hoverBorderColor="hover:border-transparent"
+                      className="hover:bg-slate-100 focus:outline-none"
+                    />
                   </div>
                 </td>
 

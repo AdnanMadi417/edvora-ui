@@ -30,11 +30,7 @@ import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 
-interface Props {
-  hideDelete?: boolean;
-}
-
-const FieldsOfStudyTable = ({ hideDelete = false }: Props = {}) => {
+const FieldsOfStudyTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { showToast } = useToast();
 
@@ -245,23 +241,19 @@ const FieldsOfStudyTable = ({ hideDelete = false }: Props = {}) => {
                         className="hover:bg-slate-100 focus:outline-none"
                       />
 
-                      {!hideDelete && (
-                        <>
-                          <div className="h-6 border-l border-slate-200" />
+                      <div className="h-6 border-l border-slate-200" />
 
-                          <IconButton
-                            aria-label="Delete Field of Study"
-                            onClick={() => { setSelectedFieldId(field.id); setSelectedFieldName(field.name); setIsDeleteOpen(true); }}
-                            icon={<Trash2 className="h-4 w-4 text-slate-500" />}
-                            bgColor="bg-transparent"
-                            textColor="text-slate-700"
-                            borderColor="border-transparent"
-                            hoverTextColor="hover:text-slate-700"
-                            hoverBorderColor="hover:border-transparent"
-                            className="hover:bg-slate-100 focus:outline-none"
-                          />
-                        </>
-                      )}
+                      <IconButton
+                        aria-label="Delete Field of Study"
+                        onClick={() => { setSelectedFieldId(field.id); setSelectedFieldName(field.name); setIsDeleteOpen(true); }}
+                        icon={<Trash2 className="h-4 w-4 text-slate-500" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-700"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-slate-100 focus:outline-none"
+                      />
                     </div>
                   </td>
                 </tr>

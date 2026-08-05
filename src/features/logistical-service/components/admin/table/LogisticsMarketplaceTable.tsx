@@ -28,17 +28,7 @@ import DeleteServiceConfirmation from "../DeleteServiceConfirmation";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 
-interface Props {
-  basePath?: string;
-  hideDelete?: boolean;
-  getRowHref?: (id: string) => string;
-}
-
-const LogisticsMarketplaceTable = ({
-  basePath = "/admin/logistics-marketplace",
-  hideDelete = false,
-  getRowHref = (id: string) => `/admin/logistics-marketplace/${id}`,
-}: Props = {}) => {
+const LogisticsMarketplaceTable = () => {
   const router = useRouter();
   const { serviceProviders, loading, error, refetch } = useLogisticProviders();
   const { showToast } = useToast();
@@ -121,7 +111,7 @@ const LogisticsMarketplaceTable = ({
 
             <Link
               className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href={`${basePath}/create`}
+              href="/admin/logistics-marketplace/create"
             >
               <MdAddBusiness className="h-4 w-4" />
               Create Service
@@ -215,7 +205,7 @@ const LogisticsMarketplaceTable = ({
                       <tr
                         key={provider.id}
                         className="group cursor-pointer transition-colors hover:bg-slate-50"
-                        onClick={() => router.push(getRowHref(provider.id))}
+                        onClick={() => router.push(`/admin/logistics-marketplace/${provider.id}`)}
                       >
                         <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                           <div className="flex items-center gap-3">
@@ -289,35 +279,31 @@ const LogisticsMarketplaceTable = ({
                             <a
                               role="menuitem"
                               aria-label="Edit Provider"
-                              href={`${basePath}/${provider.id}/edit`}
+                              href={`/admin/logistics-marketplace/${provider.id}/edit`}
                               onClick={(e) => e.stopPropagation()}
                               className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
                             >
                               <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
                             </a>
 
-                            {!hideDelete && (
-                              <>
-                                <div className="h-6 border-l border-slate-200" />
+                            <div className="h-6 border-l border-slate-200" />
 
-                                <IconButton
-                                  aria-label="Delete Provider"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setSelectedServiceId(provider.id);
-                                    setSelectedServiceName(provider.name);
-                                    setIsDeleteOpen(true);
-                                  }}
-                                  icon={<Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />}
-                                  bgColor="bg-transparent"
-                                  textColor="text-slate-700"
-                                  borderColor="border-transparent"
-                                  hoverTextColor="hover:text-slate-700"
-                                  hoverBorderColor="hover:border-transparent"
-                                  className="hover:bg-slate-100 focus:outline-none"
-                                />
-                              </>
-                            )}
+                            <IconButton
+                              aria-label="Delete Provider"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedServiceId(provider.id);
+                                setSelectedServiceName(provider.name);
+                                setIsDeleteOpen(true);
+                              }}
+                              icon={<Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />}
+                              bgColor="bg-transparent"
+                              textColor="text-slate-700"
+                              borderColor="border-transparent"
+                              hoverTextColor="hover:text-slate-700"
+                              hoverBorderColor="hover:border-transparent"
+                              className="hover:bg-slate-100 focus:outline-none"
+                            />
                           </div>
                         </td>
                         <td className="px-4 py-4">
