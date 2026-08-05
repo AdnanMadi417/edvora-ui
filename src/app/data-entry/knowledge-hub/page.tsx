@@ -1,13 +1,7 @@
 "use client";
 
-import ProgramsTable from "features/programs/components/admin/table/ProgramsTable";
+import DataEntryProgramsTable from "features/programs/components/data-entry/DataEntryProgramsTable";
 
 export default function DataEntryKnowledgeHubPage() {
-  return (
-    <ProgramsTable
-      basePath="/data-entry/knowledge-hub"
-      hideDelete
-      getRowHref={(id) => `/data-entry/knowledge-hub/${id}/edit`}
-    />
-  );
+  return <DataEntryProgramsTable />;
 }
