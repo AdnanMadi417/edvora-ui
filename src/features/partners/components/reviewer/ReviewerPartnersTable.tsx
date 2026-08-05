@@ -3,16 +3,19 @@
 import React, { useEffect, useState } from "react";
 import {
   RefreshCw, Users, UserCog, BadgeCheck, CalendarDays, Pencil,
-  ShieldCheck, CheckCircle, XCircle,
+  ShieldCheck, CheckCircle, XCircle, Ban, Power,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
-import { usePartners } from "features/partners/hooks";
+import { usePartners, useUpdatePartner } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import ReviewPartnerPopup from "../admin/ReviewPartnerPopup";
+import SuspendActivatePartner from "../admin/SuspendActivatePartner";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import PresignedImage from "components/ui/PresignedImage";
 import IconButton from "components/ui/buttons/IconButton";
+import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -27,6 +30,32 @@ export default function ReviewerPartnersTable() {
 
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewPartner, setReviewPartner] = useState<{ id: string; name: string; assignedManagerId?: string } | null>(null);
+
+  const { showToast } = useToast();
+  const { updatePartner, isUpdatingPartner } = useUpdatePartner();
+  const [isSuspendOpen, setIsSuspendOpen] = useState(false);
+  const [suspendTarget, setSuspendTarget] = useState<any>(null);
+
+  const handleSuspendActivate = async () => {
+    if (!suspendTarget) return;
+    try {
+      await updatePartner(suspendTarget.id, {
+        name: suspendTarget.name,
+        email: suspendTarget.email,
+        type: suspendTarget.type,
+        country: suspendTarget.country,
+        phone: suspendTarget.phone,
+        assigned_manager_id: suspendTarget.assigned_manager_id,
+        is_active: !suspendTarget.is_active,
+      });
+      showToast(suspendTarget.is_active ? "Partner account suspended" : "Partner account activated", "success");
+      setIsSuspendOpen(false);
+      refetch();
+    } catch (err: unknown) {
+      const fallback = suspendTarget.is_active ? "Failed to suspend account" : "Failed to activate account";
+      showToast(parseApiError(err, fallback), "error");
+    }
+  };
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -198,7 +227,17 @@ export default function ReviewerPartnersTable() {
                         className="hover:bg-amber-50"
                       />
                     ) : (
-                      <span className="text-xs text-slate-400">Reviewed</span>
+                      <IconButton
+                        onClick={() => { setSuspendTarget(partner); setIsSuspendOpen(true); }}
+                        title={partner.is_active ? "Suspend account" : "Activate account"}
+                        icon={partner.is_active ? <Ban className="h-4 w-4" /> : <Power className="h-4 w-4" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-400"
+                        borderColor="border-transparent"
+                        hoverTextColor={partner.is_active ? "hover:text-red-600" : "hover:text-emerald-600"}
+                        hoverBorderColor="hover:border-transparent"
+                        className={partner.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"}
+                      />
                     )}
                   </td>
                 </tr>
@@ -217,6 +256,17 @@ export default function ReviewerPartnersTable() {
           partnerName={reviewPartner.name}
           managerOptions={managerOptions}
           currentManagerId={reviewPartner.assignedManagerId}
+        />
+      )}
+
+      {suspendTarget && (
+        <SuspendActivatePartner
+          isOpen={isSuspendOpen}
+          onClose={() => setIsSuspendOpen(false)}
+          onConfirm={handleSuspendActivate}
+          isSubmitting={isUpdatingPartner}
+          partnerName={suspendTarget.name || ""}
+          isActive={!!suspendTarget.is_active}
         />
       )}
     </div>
