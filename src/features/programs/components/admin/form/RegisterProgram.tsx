@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, BookOpen, CalendarPlus, DollarSign, Plus, Trash2 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useToast } from 'components/context/ToastContext';
+import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
 
 import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
@@ -245,12 +246,9 @@ export default function RegisterProgram() {
       };
       await createProgram(payload);
       showToast('Program created successfully', 'success');
-      setTimeout(() => router.push('/admin/knowledge-hub/programs'), 1500);
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.detail?.[0]?.msg ||
-        error?.response?.data?.message ||
-        'Please try again.';
+      setTimeout(() => router.push('/admin/knowledge-hub'), 1500);
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, 'Please try again.');
       showToast(`Failed to create program. ${backendMessage}`, 'error');
     }
   };
@@ -716,7 +714,7 @@ export default function RegisterProgram() {
                 />
               ) : (
                 <PrevButton
-                  onClick={() => router.push('/admin/knowledge-hub/programs')}
+                  onClick={() => router.push('/admin/knowledge-hub')}
                   text="Back"
                   icon={<ArrowLeft className="h-4 w-4" />}
                 />

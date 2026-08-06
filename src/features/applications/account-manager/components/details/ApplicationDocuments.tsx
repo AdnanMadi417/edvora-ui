@@ -1,20 +1,20 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   FolderOpen,
   ChevronDown,
   Clock,
   CheckCircle,
   XCircle,
-  Download,
   RotateCcw,
+  UploadCloud,
 } from "lucide-react";
-import ViewPopup from "features/applications/shared/ViewDoc";
+import DocumentActions from "features/applications/shared/DocumentActions";
 import HoldPopup from "features/applications/account-manager/components/popups/ResubmitDoc";
 import EmptyData from "components/emptyData/EmptyData";
 import { AppDate } from "components/ui/date";
-import { getDocumentDownloadUrl } from "services/documentService";
+import { useManagerReuploadDocument } from "features/applications/hooks";
 import api from "lib/useApi"
 
 interface ApplicationDocumentsProps {
@@ -27,11 +27,50 @@ export default function ApplicationDocuments({
                                                onRefetch,
                                              }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
-  const [showViewPopup, setShowViewPopup] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
   const [showResubmitPopup, setShowResubmitPopup] = useState(false);
   const [correctionStatusId, setCorrectionStatusId] = useState<string | null>(null);
+  const [reuploadTargetDocId, setReuploadTargetDocId] = useState<string | null>(null);
+  const reuploadInputRef = useRef<HTMLInputElement>(null);
+  const { reuploadDocument, isUploading: isReuploading } = useManagerReuploadDocument();
 
+  const triggerReupload = (docId: string) => {
+    setReuploadTargetDocId(docId);
+    reuploadInputRef.current?.click();
+  };
+
+  const handleReuploadFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !reuploadTargetDocId) return;
+
+    try {
+      await reuploadDocument(file, application.id, reuploadTargetDocId);
+      onRefetch?.();
+    } catch (err) {
+      console.error("Re-upload failed:", err);
+    } finally {
+      setReuploadTargetDocId(null);
+    }
+  };
+
+  const renderReuploadButton = (doc: any) => {
+    if (!doc?.can_manager_reupload) return null;
+    return (
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          triggerReupload(doc.id);
+        }}
+        disabled={isReuploading}
+        className="group rounded-lg cursor-pointer border border-transparent bg-violet-50 p-2 text-violet-600 transition-all duration-200 hover:border-violet-200 hover:bg-violet-100 hover:text-violet-700 focus-visible:ring-2 focus-visible:ring-violet-400 disabled:opacity-50"
+        title="Re-upload Document"
+        aria-label="Re-upload Document"
+      >
+        <UploadCloud className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+      </button>
+    );
+  };
 
   useEffect(() => {
     const fetchApplicationDetails = async () => {
@@ -52,15 +91,7 @@ export default function ApplicationDocuments({
     if (application?.id) fetchApplicationDetails();
   }, [application?.id]);
 
-  const handleDownload = async (fileKey: string) => {
-    try {
-      const downloadUrl = await getDocumentDownloadUrl(fileKey);
-      window.open(downloadUrl, "_blank");
-    } catch (err: any) {
-      console.error("Download failed:", err);
-      alert(err?.message || "Failed to download document");
-    }
-  };
+  const studentName = application?.student?.name;
 
   const allDocs = application?.documents || [];
   const documents = allDocs;
@@ -93,17 +124,19 @@ export default function ApplicationDocuments({
     }
   };
 
-  const getFileName = (fileUrl: string | null) => {
-    if (!fileUrl) return "document.pdf";
-    return fileUrl.split("/").pop() || "document.pdf";
-  };
-
   if (totalDocuments === 0) {
     return <EmptyData />;
   }
 
   return (
     <>
+      <input
+        ref={reuploadInputRef}
+        type="file"
+        accept=".pdf,.png,.jpg,.jpeg,.webp"
+        className="hidden"
+        onChange={handleReuploadFileChange}
+      />
       <div
         className="group flex cursor-pointer items-center justify-between p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80"
         onClick={() => setShowDocs(!showDocs)}
@@ -223,19 +256,7 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!doc.file_key) return;
-                      handleDownload(doc.file_key);
-                    }}
-                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!doc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
 
                   <button
                     onClick={(e) => {
@@ -249,6 +270,8 @@ export default function ApplicationDocuments({
                   >
                     <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
                   </button>
+
+                  {renderReuploadButton(doc)}
                 </div>
               </div>
             ))}
@@ -316,20 +339,7 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!doc.file_key) return;
-                      handleDownload(doc.file_key);
-                    }}
-                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!doc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
 
                   <button
                     onClick={(e) => {
@@ -410,20 +420,7 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!doc.file_key) return;
-                      handleDownload(doc.file_key);
-                    }}
-                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!doc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
 
                   <button
                     onClick={(e) => {
@@ -473,14 +470,9 @@ export default function ApplicationDocuments({
                   </div>
                 </div>
                 <div className="ml-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); if (!offerLetterDoc.file_key) return; handleDownload(offerLetterDoc.file_key); }}
-                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    disabled={!offerLetterDoc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={offerLetterDoc.file_key} label={offerLetterDoc.document_type} personName={studentName} />
+
+                  {renderReuploadButton(offerLetterDoc)}
                 </div>
               </div>
             </div>
@@ -522,19 +514,7 @@ export default function ApplicationDocuments({
                   </div>
                 </div>
                 <div className="ml-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!emgsEvalDoc.file_key) return;
-                      handleDownload(emgsEvalDoc.file_key);
-                    }}
-                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!emgsEvalDoc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={emgsEvalDoc.file_key} label={emgsEvalDoc.document_type} personName={studentName} />
                 </div>
               </div>
             </div>
@@ -574,14 +554,9 @@ export default function ApplicationDocuments({
                   </div>
                 </div>
                 <div className="ml-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); if (!visaDoc.file_key) return; handleDownload(visaDoc.file_key); }}
-                    className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    disabled={!visaDoc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={visaDoc.file_key} label={visaDoc.document_type} personName={studentName} />
+
+                  {renderReuploadButton(visaDoc)}
                 </div>
               </div>
             </div>
@@ -616,26 +591,15 @@ export default function ApplicationDocuments({
                     </div>
                   </div>
                   <div className="ml-4 flex flex-wrap gap-2">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); if (!doc.file_key) return; handleDownload(doc.file_key); }}
-                      className="group rounded-lg cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                      title="Download Document"
-                      disabled={!doc.file_key}
-                    >
-                      <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                    </button>
+                    <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
+
+                    {renderReuploadButton(doc)}
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-
-        <ViewPopup
-          isOpen={showViewPopup}
-          onClose={() => setShowViewPopup(false)}
-          doc={selectedDoc}
-        />
 
         {showResubmitPopup && selectedDoc && (
           <HoldPopup

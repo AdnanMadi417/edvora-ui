@@ -5,6 +5,7 @@ import { KeyRound } from "lucide-react";
 import { usePartnerResetPassword } from "../hooks";
 import AuthLayout from "./AuthLayout";
 import PasswordField from "components/form/fields/PasswordField";
+import { validateNewPassword } from "utils/passwordValidation";
 
 export default function PartnerResetPasswordForm() {
   const { resetPassword, loading, error, success } = usePartnerResetPassword();
@@ -24,11 +25,13 @@ export default function PartnerResetPasswordForm() {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!formData.current_password) e.current_password = "Current password is required";
-    if (!formData.new_password) {
-      e.new_password = "New password is required";
-    } else if (formData.new_password.length < 8) {
-      e.new_password = "Password must be at least 8 characters";
+
+    const passwordError = validateNewPassword(formData.new_password);
+    if (passwordError) e.new_password = passwordError;
+    else if (formData.current_password && formData.new_password === formData.current_password) {
+      e.new_password = "New password must be different from your current password";
     }
+
     if (!formData.confirm_password) {
       e.confirm_password = "Please confirm your new password";
     } else if (formData.new_password !== formData.confirm_password) {
@@ -85,7 +88,7 @@ export default function PartnerResetPasswordForm() {
         <PasswordField
           label="New Password"
           field="new_password"
-          placeholder="Min. 8 characters"
+          placeholder="Min. 8 characters, 1 letter & 1 number"
           formData={formData}
           errors={errors}
           updateFormData={updateFormData}

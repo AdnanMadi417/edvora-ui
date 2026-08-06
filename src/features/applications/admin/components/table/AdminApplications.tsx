@@ -8,8 +8,6 @@ import {
   User,
   Building,
   GraduationCap,
-  ArrowLeft,
-  ArrowRight,
   Flag,
 } from "lucide-react";
 import PipelineCard from "features/applications/partner/components/PipelineCard";
@@ -19,10 +17,8 @@ import { useUniversities } from "features/universities/hooks";
 import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 
 import EmptyData from "components/emptyData/EmptyTableData";
-import PrevButton from "components/ui/buttons/PrevButton";
-import NextButton from "components/ui/buttons/NextButton";
 import ApplicationFilterBar from "components/filters/ApplicationFilterBar";
-import { useRouter } from "next/navigation";
+import { TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import api from "lib/useApi";
 import { AppDate } from "components/ui/date";
 
@@ -48,45 +44,8 @@ const getStatusColors = (code: string) => {
   return { bg: "bg-blue-50 border-blue-200", text: "text-blue-700" };
 };
 
-const SkeletonRow = () => (
-  <tr className="border-b border-slate-100">
-    <td className="px-6 py-4">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 shrink-0 animate-pulse rounded-md bg-gray-200" />
-        <div className="space-y-2">
-          <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
-          <div className="h-3 w-44 animate-pulse rounded bg-gray-200" />
-        </div>
-      </div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="space-y-2">
-        <div className="h-4 w-40 animate-pulse rounded bg-gray-200" />
-        <div className="h-3 w-28 animate-pulse rounded bg-gray-200" />
-      </div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="space-y-2">
-        <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
-        <div className="h-3 w-24 animate-pulse rounded bg-gray-200" />
-      </div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="space-y-2">
-        <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
-        <div className="h-6 w-32 animate-pulse rounded-md bg-gray-200" />
-      </div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="h-4 w-20 animate-pulse rounded bg-gray-200" />
-    </td>
-    <td className="px-4 py-4" />
-  </tr>
-);
-
 const ModernApplicationsTable = () => {
 
-  const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
@@ -141,7 +100,7 @@ const ModernApplicationsTable = () => {
 
   const { total: grandTotal } = useAdminApplications({ limit: 1, status: selectedLifecycle });
 
-  const { items: adminApplications, loading, total } = useAdminApplications({
+  const { items: adminApplications, loading, total, error, refetch } = useAdminApplications({
     limit: itemsPerPage,
     offset: (currentPage - 1) * itemsPerPage,
     status: selectedLifecycle,
@@ -248,7 +207,7 @@ const ModernApplicationsTable = () => {
       </div>
 
       {grandTotal > 0 && (
-        <div className="p-6 border-b border-slate-200">
+        <div className="hidden sm:block p-6 border-b border-slate-200">
           <PipelineCard
             stages={stages}
             stageCounts={stageCounts}
@@ -326,7 +285,7 @@ const ModernApplicationsTable = () => {
               className={`flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-100/50 ${
                 needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
               }`}
-              onClick={() => router.push(`/admin/applications/${app.id}`)}
+              onClick={() => window.open(`/admin/applications/${app.id}`, "_blank")}
             >
               <div className="relative shrink-0">
                 <PresignedImage
@@ -421,13 +380,15 @@ const ModernApplicationsTable = () => {
 
           <tbody className="divide-y divide-slate-100 bg-white">
             {loading ? (
-              Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
+              <TableSkeletonRows columns={6} rows={5} />
+            ) : error ? (
+              <TableErrorRow colSpan={6} message={error} onRetry={refetch} />
             ) : paginatedApplications.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
-                  <EmptyData />
-                </td>
-              </tr>
+              <TableEmptyRow
+                colSpan={6}
+                title="No applications found"
+                subtitle="No applications match your current filters."
+              />
             ) : (
               paginatedApplications.map((app) => (
                 <tr
@@ -435,7 +396,7 @@ const ModernApplicationsTable = () => {
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${
                     needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
                   }`}
-                  onClick={() => router.push(`/admin/applications/${app.id}`)}
+                  onClick={() => window.open(`/admin/applications/${app.id}`, "_blank")}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -499,48 +460,18 @@ const ModernApplicationsTable = () => {
         </table>
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 p-6 text-sm text-slate-500 md:flex-row">
-        <div>
-          {paginatedApplications.length === 0 && !loading ? (
-            <span>No results found</span>
-          ) : (
-            <>
-              Showing{" "}
-              <span className="font-medium text-slate-700">
-                {(currentPage - 1) * itemsPerPage + 1}
-              </span>{" "}
-              to{" "}
-              <span className="font-medium text-slate-700">
-                {(currentPage - 1) * itemsPerPage + paginatedApplications.length}
-              </span>{" "}
-              of{" "}
-              <span className="font-medium text-slate-700">{total}</span>{" "}
-              results
-            </>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <PrevButton
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            text="Prev"
-            icon={<ArrowLeft className="h-4 w-4" />}
-          />
-          <span className="px-2 text-slate-500">
-            Page {currentPage} of {Math.max(Math.ceil(total / itemsPerPage), 1)}
-          </span>
-          <NextButton
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={paginatedApplications.length < itemsPerPage}
-            text="Next"
-            icon={<ArrowRight className="h-4 w-4" />}
-          />
-        </div>
-      </div>
+      <TablePagination
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+        itemsPerPage={itemsPerPage}
+        itemCount={paginatedApplications.length}
+        totalCount={total}
+        itemLabel="results"
+        loading={loading}
+      />
 
       </div>
-      
+
       </div>
 
     </div>

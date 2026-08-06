@@ -28,7 +28,9 @@ import Loading from "components/loading/Loading";
 
 import { useRouter } from "next/navigation";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 
 const PaymentMethodsTable = () => {
   const router = useRouter();
@@ -113,7 +115,7 @@ const PaymentMethodsTable = () => {
       setSelectedPaymentMethodName("");
       setTimeout(() => refetch(), 2000);
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to delete payment method. ${backendMessage}`, "error");
     }
   };
@@ -160,13 +162,17 @@ const PaymentMethodsTable = () => {
           onChange={handleSearchChange}
           placeholder="Search by payment method name..."
         />
-        <button
+        <Button
           onClick={() => { setSearchTerm(""); setSelectedState("all"); setSelectedField("all"); setCurrentPage(1); }}
-          className="flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-        >
-          <RefreshCw className="h-4 w-4" />
-          <span className="hidden sm:inline">Clear</span>
-        </button>
+          icon={<RefreshCw className="h-4 w-4" />}
+          text="Clear"
+          bgColor="bg-white"
+          textColor="text-red-600"
+          borderColor="border-red-200"
+          hoverTextColor="hover:text-red-600"
+          hoverBorderColor="hover:border-red-200"
+          className="hover:bg-red-50"
+        />
       </div>
 
       {/* Table */}
@@ -259,8 +265,7 @@ const PaymentMethodsTable = () => {
 
                     <div className="h-6 border-l border-slate-200" />
 
-                    <button
-                      role="menuitem"
+                    <IconButton
                       aria-label="Delete Payment Method"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -268,10 +273,14 @@ const PaymentMethodsTable = () => {
                         setSelectedPaymentMethodName(payment.name);
                         setIsDeleteOpen(true);
                       }}
-                      className="flex items-center justify-center rounded-lg p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                    >
-                      <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
-                    </button>
+                      icon={<Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />}
+                      bgColor="bg-transparent"
+                      textColor="text-slate-700"
+                      borderColor="border-transparent"
+                      hoverTextColor="hover:text-slate-700"
+                      hoverBorderColor="hover:border-transparent"
+                      className="hover:bg-slate-100 focus:outline-none"
+                    />
                   </div>
                 </td>
 

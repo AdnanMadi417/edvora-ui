@@ -8,6 +8,7 @@ import { useAssignUniversityType, useUniversityTypes } from "features/universiti
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import SelectField from "components/form/fields/SelectField";
 
 interface Props {
@@ -110,8 +111,7 @@ export default function AssignUniversityTypeModal({
       onClose();
       onSuccess?.();
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
     }
   };

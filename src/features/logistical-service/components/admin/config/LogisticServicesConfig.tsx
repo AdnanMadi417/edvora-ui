@@ -7,10 +7,12 @@ import { useLogisticServices, useEditLogisticService } from "features/logistical
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
-import CreateLogisticalPartnersPopup from "../CreateLogisticalPartnersPopup";
+import IconButton from "components/ui/buttons/IconButton";
+import CreateLogisticsMarketplacePopup from "../CreateLogisticsMarketplacePopup";
 
-const LogisticalPartnersServicesConfig = () => {
+const LogisticsMarketplaceServicesConfig = () => {
   const { logisticServices, loadingLogisticServices, errorLogisticServices, refetchLogisticServices } =
     useLogisticServices();
   const [isCreateServiceOpen, setIsCreateServiceOpen] = useState(false);
@@ -46,8 +48,8 @@ const LogisticalPartnersServicesConfig = () => {
       setEditingId(null);
       setEditingName("");
       setTimeout(() => location.reload(), 1500);
-    } catch {
-      showToast("Failed to update service.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to update service."), "error");
     }
   };
 
@@ -137,13 +139,17 @@ const LogisticalPartnersServicesConfig = () => {
                       <span className="text-sm font-medium text-slate-800">
                         {service.name}
                       </span>
-                      <button
+                      <IconButton
                         onClick={() => startEdit(service.id, service.name)}
                         aria-label="Edit service"
-                        className="flex items-center justify-center rounded-md p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
+                        icon={<Pencil className="h-4 w-4" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-500"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-slate-100"
+                      />
                     </>
                   )}
                 </div>
@@ -152,7 +158,7 @@ const LogisticalPartnersServicesConfig = () => {
         </div>
       </div>
 
-      <CreateLogisticalPartnersPopup
+      <CreateLogisticsMarketplacePopup
         isOpen={isCreateServiceOpen}
         onClose={() => setIsCreateServiceOpen(false)}
         onCreated={refetchLogisticServices}
@@ -161,4 +167,4 @@ const LogisticalPartnersServicesConfig = () => {
   );
 };
 
-export default LogisticalPartnersServicesConfig;
+export default LogisticsMarketplaceServicesConfig;

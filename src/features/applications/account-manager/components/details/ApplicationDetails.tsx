@@ -270,7 +270,7 @@ export default function ApplicationDetails({
             </div>
             <div>
               <span className="block text-p1 font-medium text-slate-900">Tuition Fee</span>
-              <span className="text-p1 text-text-success">
+              <span className="text-p1 text-green-700">
                 $ {program.tuition_fee?.toLocaleString() || "Not provided"}
               </span>
             </div>
@@ -445,7 +445,7 @@ export default function ApplicationDetails({
                   <dl className="space-y-4">
                     {emergencyContact.name && (
                       <div className="grid grid-cols-[auto,1fr] items-start gap-2">
-                        <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                        <dt className="flex items-center gap-2 text-sm font-medium text-slate-700">
                           <FaUser /> Name
                         </dt>
                         <dd className="min-w-0 break-words text-sm text-slate-900">{emergencyContact.name}</dd>
@@ -453,7 +453,7 @@ export default function ApplicationDetails({
                     )}
                     {emergencyContact.relation && (
                       <div className="grid grid-cols-[auto,1fr] items-start gap-2">
-                        <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                        <dt className="flex items-center gap-2 text-sm font-medium text-slate-700">
                           <FaUsers /> Relation
                         </dt>
                         <dd className="min-w-0 text-sm text-slate-900">{emergencyContact.relation}</dd>
@@ -461,7 +461,7 @@ export default function ApplicationDetails({
                     )}
                     {emergencyContact.phone && (
                       <div className="grid grid-cols-[auto,1fr] items-start gap-2">
-                        <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                        <dt className="flex items-center gap-2 text-sm font-medium text-slate-700">
                           <FaPhoneAlt /> Phone
                         </dt>
                         <dd className="min-w-0 text-sm text-slate-900">{emergencyContact.phone}</dd>
@@ -469,7 +469,7 @@ export default function ApplicationDetails({
                     )}
                     {emergencyContact.email && (
                       <div className="grid grid-cols-[auto,1fr] items-start gap-2">
-                        <dt className="flex items-center gap-2 text-sm font-medium text-text-secondary">
+                        <dt className="flex items-center gap-2 text-sm font-medium text-slate-700">
                           <FaEnvelope /> Email
                         </dt>
                         <dd className="min-w-0 break-all text-sm text-slate-900">{emergencyContact.email}</dd>

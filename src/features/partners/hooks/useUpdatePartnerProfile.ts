@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { partnersApi } from '../services';
 import type { UpdatePartnerProfilePayload } from '../types';
+import { parseApiError } from 'utils/parseApiError';
 
 export function useUpdatePartnerProfile() {
   const [loading, setLoading] = useState(false);
@@ -12,9 +13,8 @@ export function useUpdatePartnerProfile() {
     try {
       const res = await partnersApi.updateProfile(payload);
       return res.data;
-    } catch (err: any) {
-      const message = err?.response?.data?.detail || 'Failed to update profile';
-      setError(message);
+    } catch (err: unknown) {
+      setError(parseApiError(err, 'Failed to update profile'));
       throw err;
     } finally {
       setLoading(false);

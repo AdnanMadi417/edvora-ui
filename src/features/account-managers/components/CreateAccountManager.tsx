@@ -10,7 +10,9 @@ import Button from "components/ui/buttons/Button";
 
 import { useCreateAccountManager } from "../hooks/useCreateAccountManager";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { useRouter } from "next/navigation";
+import { validateNewPassword } from "utils/passwordValidation";
 
 interface FormData {
   name: string;
@@ -54,21 +56,13 @@ export default function CreateAccountManager() {
 
     if (!formData.name) newErrors.name = "Name is required";
     if (!formData.email) newErrors.email = "Email is required";
-    if (!formData.password) newErrors.password = "Password is required";
+
+    const passwordError = validateNewPassword(formData.password);
+    if (passwordError) newErrors.password = passwordError;
+
     if (!formData.confirm_password) newErrors.confirm_password = "Please confirm password";
-
-    if (
-      formData.password &&
-      formData.confirm_password &&
-      formData.password !== formData.confirm_password
-    ) {
+    else if (formData.password !== formData.confirm_password) {
       newErrors.confirm_password = "Passwords do not match";
-    }
-
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
-    if (formData.password && !passwordRegex.test(formData.password)) {
-      newErrors.password =
-        "Password must be at least 8 characters, with at least 1 letter and 1 number";
     }
 
     setErrors(newErrors);
@@ -96,10 +90,8 @@ export default function CreateAccountManager() {
       setTimeout(() => {
         router.push("/admin/account-managers");
       }, 1500);
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message ||
-        "Failed to create account manager. Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create account manager. ${backendMessage}`, "error");
     }
   };

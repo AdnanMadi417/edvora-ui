@@ -13,6 +13,7 @@ import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface BatchCommissionProgramsProps {
   isOpen: boolean;
@@ -106,8 +107,8 @@ export default function BatchCommissionPrograms({
         onClose();
         onSuccess?.();
       }, 1500);
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
@@ -150,10 +151,10 @@ export default function BatchCommissionPrograms({
                 </label>
                 <div
                   className={`mt-2 flex h-12 w-full items-center overflow-hidden rounded-md border focus-within:ring-1 focus-within:ring-blue-500 ${
-                    errors.commission_amount ? "border-red-500" : "border-default"
+                    errors.commission_amount ? "border-red-500" : "border-slate-200"
                   }`}
                 >
-                  <span className="flex h-full items-center border-r border-default bg-slate-50 px-3 text-sm font-medium text-slate-500">
+                  <span className="flex h-full items-center border-r border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-500">
                     {(CURRENCY.find((c) => c.value === formData.commission_currency)?.label ?? formData.commission_currency).toUpperCase()}
                   </span>
                   <input

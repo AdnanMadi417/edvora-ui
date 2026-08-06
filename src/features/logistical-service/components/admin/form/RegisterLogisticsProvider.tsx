@@ -21,8 +21,9 @@ import InputField from "components/form/fields/InputField";
 import ImageUploadField from "components/form/upload/ImageUploadField";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { useRouter } from "next/navigation";
-import CreateLogisticalPartnersPopup from "../CreateLogisticalPartnersPopup";
+import CreateLogisticsMarketplacePopup from "../CreateLogisticsMarketplacePopup";
 import type { PackageOffered, ServiceEntry } from "features/logistical-service/types";
 
 interface FormData {
@@ -41,7 +42,7 @@ interface FormData {
 
 type FormErrors = Record<string, string>;
 
-export default function RegisterLogisticalPartner() {
+export default function RegisterLogisticsMarketplaceProvider() {
   const { showToast } = useToast();
   const router = useRouter();
   const [errors, setErrors] = useState<FormErrors>({});
@@ -100,8 +101,8 @@ export default function RegisterLogisticalPartner() {
       setLogoFileUrl(uploaded.public_url);
       setLogoProgress(100);
       showToast("Picture uploaded successfully.", "success");
-    } catch (err: any) {
-      showToast(err?.message || "Picture upload failed.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Picture upload failed."), "error");
       setLogoFile(null);
     } finally {
       setLogoUploading(false);
@@ -247,9 +248,9 @@ export default function RegisterLogisticalPartner() {
       setLogoFileKey("");
       setLogoFileUrl("");
       setErrors({});
-      setTimeout(() => { router.push("/admin/logistical-partners"); }, 1500);
+      setTimeout(() => { router.push("/admin/logistics-marketplace"); }, 1500);
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create logistics provider. ${backendMessage}`, "error");
     }
   };
@@ -366,14 +367,17 @@ export default function RegisterLogisticalPartner() {
             <div key={index} className="mb-6 rounded-md border bg-white p-5">
               <div className="mb-4 flex items-center justify-between">
                 <h5 className="font-medium text-slate-800">Package {index + 1}</h5>
-                <button
+                <Button
                   type="button"
                   onClick={() => removePackage(index)}
-                  className="flex items-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-700 hover:text-red-700"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Remove
-                </button>
+                  icon={<Trash2 className="h-4 w-4" />}
+                  text="Remove"
+                  bgColor="bg-white"
+                  textColor="text-red-600"
+                  borderColor="border-red-600"
+                  hoverTextColor="hover:text-red-700"
+                  hoverBorderColor="hover:border-red-700"
+                />
               </div>
 
               <div className="grid grid-cols-1 gap-x-3 md:grid-cols-2">
@@ -552,7 +556,7 @@ export default function RegisterLogisticalPartner() {
         </div>
       </div>
 
-      <CreateLogisticalPartnersPopup
+      <CreateLogisticsMarketplacePopup
         isOpen={isCreateServiceOpen}
         onClose={() => setIsCreateServiceOpen(false)}
         onCreated={refetchLogisticServices}

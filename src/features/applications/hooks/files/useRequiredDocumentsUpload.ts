@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 export const useRequiredDocumentsUpload = () => {
@@ -33,7 +34,7 @@ export const useRequiredDocumentsUpload = () => {
 
       showToast("All documents uploaded successfully.", "success");
     } catch (err: any) {
-      const message = err.response?.data?.message || err.message || "Failed to upload documents.";
+      const message = parseApiError(err, "Failed to upload documents.");
       showToast(message, "error");
       throw err;
     } finally {

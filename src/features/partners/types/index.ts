@@ -4,6 +4,12 @@ export interface IndividualDetails {
   background: string;
   social_media_url: string;
   linkedin_url: string;
+  date_of_birth?: string | null;
+  passport_number?: string;
+  profile_photo_file_key?: string | null;
+  profile_photo_file_url?: string | null;
+  passport_photo_file_key?: string | null;
+  passport_photo_file_url?: string | null;
 }
 
 export interface CompanyDetails {
@@ -13,6 +19,12 @@ export interface CompanyDetails {
   company_registration_doc_file_url: string;
   contact_id_document_file_key: string;
   contact_id_document_file_url: string;
+  date_of_birth?: string | null;
+  passport_number?: string;
+  logo_file_key?: string | null;
+  logo_file_url?: string | null;
+  passport_photo_file_key?: string | null;
+  passport_photo_file_url?: string | null;
 }
 
 export type Partner = {
@@ -29,6 +41,9 @@ export type Partner = {
   assigned_manager_name: string;
   individual_details: IndividualDetails | null;
   company_details: CompanyDetails | null;
+  created_at: string;
+  updated_at: string;
+  last_login: string | null;
 };
 
 export interface PartnerDetails {
@@ -45,6 +60,9 @@ export interface PartnerDetails {
   assigned_manager_name: string;
   individual_details: IndividualDetails | null;
   company_details: CompanyDetails | null;
+  created_at: string;
+  updated_at: string;
+  last_login: string | null;
 }
 
 export interface CreatePartnerPayload {
@@ -70,6 +88,51 @@ export interface UpdatePartnerPayload {
 
 export type AssignManagerPayload = {
   manager_id: string;
+};
+
+export interface AccountManagerPartnerIndividualDetails {
+  date_of_birth: string | null;
+  passport_number: string | null;
+  profile_photo_file_key: string | null;
+  profile_photo_file_url: string | null;
+  passport_photo_file_key: string | null;
+  passport_photo_file_url: string | null;
+  id_document_file_key: string | null;
+  id_document_file_url: string | null;
+  background: string | null;
+  social_media_url: string | null;
+  linkedin_url: string | null;
+}
+
+export type AccountManagerPartnerListItem = {
+  id: string;
+  name: string | null;
+  email: string;
+  type: "individual" | "agency";
+  country: string;
+  phone: string;
+  is_verified: boolean;
+  is_active: boolean;
+  applications_count: number;
+  last_login: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type AccountManagerPartnerDetails = {
+  id: string;
+  name: string | null;
+  email: string;
+  type: "individual" | "agency";
+  country: string;
+  phone: string;
+  is_verified: boolean;
+  is_active: boolean;
+  individual_details: AccountManagerPartnerIndividualDetails | null;
+  company_details: CompanyDetails | null;
+  created_at: string;
+  updated_at: string;
+  last_login: string | null;
 };
 
 export interface UpdatePartnerProfilePayload {

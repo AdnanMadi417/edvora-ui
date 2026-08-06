@@ -41,6 +41,7 @@ export const COUNTRIES = [
   { name: "Congo (Republic)", code: "congo republic" },
   { name: "Congo (DR)", code: "congo dr" },
   { name: "Costa Rica", code: "costa rica" },
+  { name: "Cote d'Ivoire", code: "cote d'ivoire" },
   { name: "Croatia", code: "croatia" },
   { name: "Cuba", code: "cuba" },
   { name: "Cyprus", code: "cyprus" },
@@ -236,7 +237,9 @@ export const NATIONALITIES = [
   { name: "Chinese", label: "Chinese" },
   { name: "Colombian", label: "Colombian" },
   { name: "Comoran", label: "Comoran" },
+  { name: "Congolese", label: "Congolese" },
   { name: "Costa Rican", label: "Costa Rican" },
+  { name: "Ivorian", label: "Ivorian" },
   { name: "Croatian", label: "Croatian" },
   { name: "Cuban", label: "Cuban" },
   { name: "Cypriot", label: "Cypriot" },
@@ -282,6 +285,7 @@ export const NATIONALITIES = [
   { name: "Kazakhstani", label: "Kazakhstani" },
   { name: "Kenyan", label: "Kenyan" },
   { name: "Kiribati", label: "Kiribati" },
+  { name: "Kosovar", label: "Kosovar" },
   { name: "Kuwaiti", label: "Kuwaiti" },
   { name: "Kyrgyzstani", label: "Kyrgyzstani" },
   { name: "Lao", label: "Lao" },
@@ -337,15 +341,25 @@ export const NATIONALITIES = [
   { name: "Romanian", label: "Romanian" },
   { name: "Russian", label: "Russian" },
   { name: "Rwandan", label: "Rwandan" },
+  { name: "Kittitian and Nevisian", label: "Kittitian and Nevisian" },
+  { name: "Saint Lucian", label: "Saint Lucian" },
+  { name: "Saint Vincentian", label: "Saint Vincentian" },
+  { name: "Samoan", label: "Samoan" },
+  { name: "Sammarinese", label: "Sammarinese" },
+  { name: "Sao Tomean", label: "Sao Tomean" },
   { name: "Saudi", label: "Saudi" },
   { name: "Senegalese", label: "Senegalese" },
   { name: "Serbian", label: "Serbian" },
+  { name: "Seychellois", label: "Seychellois" },
+  { name: "Sierra Leonean", label: "Sierra Leonean" },
   { name: "Singaporean", label: "Singaporean" },
   { name: "Slovak", label: "Slovak" },
   { name: "Slovenian", label: "Slovenian" },
+  { name: "Solomon Islander", label: "Solomon Islander" },
   { name: "Somali", label: "Somali" },
   { name: "South African", label: "South African" },
   { name: "South Korean", label: "South Korean" },
+  { name: "South Sudanese", label: "South Sudanese" },
   { name: "Spanish", label: "Spanish" },
   { name: "Sri Lankan", label: "Sri Lankan" },
   { name: "Sudanese", label: "Sudanese" },
@@ -357,11 +371,14 @@ export const NATIONALITIES = [
   { name: "Tajikistani", label: "Tajikistani" },
   { name: "Tanzanian", label: "Tanzanian" },
   { name: "Thai", label: "Thai" },
+  { name: "Timorese", label: "Timorese" },
   { name: "Togolese", label: "Togolese" },
+  { name: "Tongan", label: "Tongan" },
   { name: "Trinidadian and Tobagonian", label: "Trinidadian and Tobagonian" },
   { name: "Tunisian", label: "Tunisian" },
   { name: "Turkish", label: "Turkish" },
   { name: "Turkmen", label: "Turkmen" },
+  { name: "Tuvaluan", label: "Tuvaluan" },
   { name: "Ugandan", label: "Ugandan" },
   { name: "Ukrainian", label: "Ukrainian" },
   { name: "Emirati", label: "Emirati" },
@@ -401,6 +418,7 @@ export const DURATION = [
 ];
 
 export const IELTS_BANDS = [
+  { score: 4, label: "Band 4" },
   { score: 4.5, label: "Band 4.5" },
   { score: 5.0, label: "Band 5" },
   { score: 5.5, label: "Band 5.5" },
@@ -443,7 +461,6 @@ export const MONTHS = [
   { value: "11", label: "11 Months" },
   { value: "12", label: "12 Months" },
 ];
-
 
 export const DIAL_CODES = [
   // Southeast Asia
@@ -666,4 +683,12 @@ export const BACKGROUND_OPTIONS = [
   { value: "teacher", label: "Teacher / Educator" },
   { value: "agent",   label: "Education Agent" },
   { value: "other",   label: "Other" },
+];
+
+export const SOCIAL_MEDIA_PLATFORMS = [
+  { value: "facebook",  label: "Facebook",  prefix: "https://www.facebook.com/"  },
+  { value: "instagram", label: "Instagram", prefix: "https://www.instagram.com/" },
+  { value: "linkedin",  label: "LinkedIn",  prefix: "https://www.linkedin.com/in/" },
+  { value: "tiktok",    label: "TikTok",    prefix: "https://www.tiktok.com/@" },
+  { value: "website",   label: "Website",   prefix: "" },
 ];

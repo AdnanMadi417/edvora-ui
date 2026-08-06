@@ -10,8 +10,6 @@ import {
   Clock,
   User,
   GraduationCap,
-  ArrowRight,
-  ArrowLeft,
   FilePlus,
 } from 'lucide-react';
 import PipelineCard from 'features/applications/partner/components/PipelineCard';
@@ -20,10 +18,9 @@ import { useRouter } from 'next/navigation';
 import api from 'lib/useApi';
 
 import EmptyData from 'components/emptyData/EmptyTableData';
-import NextButton from 'components/ui/buttons/NextButton';
-import PrevButton from 'components/ui/buttons/PrevButton';
 import Button from 'components/ui/buttons/Button';
 import ApplicationFilterBar from 'components/filters/ApplicationFilterBar';
+import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from 'components/ui/table';
 
 import { useUniversities } from "features/universities/hooks";
 import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
@@ -57,36 +54,6 @@ const getStatusColors = (code: string) => {
   if (code.includes('review') || code.includes('waiting') || code.includes('processing') || code.includes('pending')) return { bg: 'bg-yellow-50 border-yellow-200', text: 'text-yellow-700' };
   return { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-700' };
 };
-
-const SkeletonRow = () => (
-  <tr className="border-b border-slate-100">
-    <td className="px-6 py-4">
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 shrink-0 animate-pulse rounded-md bg-gray-200" />
-        <div className="space-y-2">
-          <div className="h-4 w-32 animate-pulse rounded bg-gray-200" />
-          <div className="h-3 w-44 animate-pulse rounded bg-gray-200" />
-        </div>
-      </div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="space-y-2">
-        <div className="h-4 w-40 animate-pulse rounded bg-gray-200" />
-        <div className="h-3 w-28 animate-pulse rounded bg-gray-200" />
-      </div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="space-y-2">
-        <div className="h-3 w-20 animate-pulse rounded bg-gray-200" />
-        <div className="h-6 w-32 animate-pulse rounded-md bg-gray-200" />
-      </div>
-    </td>
-    <td className="px-6 py-4">
-      <div className="h-4 w-20 animate-pulse rounded bg-gray-200" />
-    </td>
-    <td className="px-4 py-4" />
-  </tr>
-);
 
 const PartnerApplications = () => {
 
@@ -160,7 +127,7 @@ const PartnerApplications = () => {
 
   const { total: grandTotal } = usePartnerApplications({ partnerId, limit: 1, status: selectedLifecycle });
 
-  const { items: applications, total, loading } = usePartnerApplications({
+  const { items: applications, total, loading, error, refetch } = usePartnerApplications({
     partnerId,
     limit: itemsPerPage,
     offset: (currentPage - 1) * itemsPerPage,
@@ -276,7 +243,7 @@ const PartnerApplications = () => {
       </div>
 
       {grandTotal > 0 && (
-        <div className="p-6 border-b border-slate-200">
+        <div className="hidden sm:block p-6 border-b border-slate-200">
           <PipelineCard
             stages={stages}
             stageCounts={stageCounts}
@@ -348,7 +315,7 @@ const PartnerApplications = () => {
               className={`flex cursor-pointer items-center gap-3 px-4 py-3.5 transition-colors hover:bg-slate-100/50 ${
                 needsPartnerAction(app.status) ? 'border-l-2 border-l-amber-400 bg-amber-50/30' : ''
               }`}
-              onClick={() => router.push(`/partner/applications/${app.id}`)}
+              onClick={() => window.open(`/partner/applications/${app.id}`, "_blank")}
             >
               <div className="relative shrink-0">
                 <PresignedImage
@@ -435,13 +402,15 @@ const PartnerApplications = () => {
 
           <tbody className="divide-y divide-slate-100 bg-white">
             {loading ? (
-              Array.from({ length: 5 }).map((_, i) => <SkeletonRow key={i} />)
+              <TableSkeletonRows columns={5} rows={5} />
+            ) : error ? (
+              <TableErrorRow colSpan={5} message={error} onRetry={refetch} />
             ) : paginatedApplications.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
-                  <EmptyData />
-                </td>
-              </tr>
+              <TableEmptyRow
+                colSpan={5}
+                title="No applications found"
+                subtitle="No applications match your current filters."
+              />
             ) : (
               paginatedApplications.map((app) => (
                 <tr
@@ -449,7 +418,7 @@ const PartnerApplications = () => {
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${
                     needsPartnerAction(app.status) ? 'border-l-2 border-l-amber-400 bg-amber-50/30' : ''
                   }`}
-                  onClick={() => router.push(`/partner/applications/${app.id}`)}
+                  onClick={() => window.open(`/partner/applications/${app.id}`, "_blank")}
                 >
                   <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -508,47 +477,15 @@ const PartnerApplications = () => {
         </table>
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 p-6 text-sm text-slate-500 md:flex-row">
-        <div>
-          {paginatedApplications.length === 0 && !loading ? (
-            <span>No results found</span>
-          ) : (
-            <>
-              Showing{' '}
-              <span className="font-medium text-slate-700">
-                {(currentPage - 1) * itemsPerPage + 1}
-              </span>{' '}
-              to{' '}
-              <span className="font-medium text-slate-700">
-                {(currentPage - 1) * itemsPerPage + paginatedApplications.length}
-              </span>{' '}
-              of{' '}
-              <span className="font-medium text-slate-700">
-                {displayTotal}
-              </span>{' '}
-              results
-            </>
-          )}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <PrevButton
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            text="Prev"
-            icon={<ArrowLeft className="h-4 w-4" />}
-          />
-          <span className="px-2 text-slate-500">
-            Page {currentPage} of {Math.max(Math.ceil(displayTotal / itemsPerPage), 1)}
-          </span>
-          <NextButton
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={paginatedApplications.length < itemsPerPage}
-            text="Next"
-            icon={<ArrowRight className="h-4 w-4" />}
-          />
-        </div>
-      </div>
+      <TablePagination
+        currentPage={currentPage}
+        onPageChange={setCurrentPage}
+        itemsPerPage={itemsPerPage}
+        itemCount={paginatedApplications.length}
+        totalCount={displayTotal}
+        itemLabel="results"
+        loading={loading}
+      />
 
       </div>
       </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import KnowledgeHubCard from "features/programs/components/partner/card/ProgramCardGrid";
+import KnowledgeHubCard from "features/programs/components/shared/card/ProgramCardGrid";
 
 const Dashboard = () => {
   return (

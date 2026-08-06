@@ -6,6 +6,7 @@ import { useUniversities } from "hooks/useUniversities";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import { useToast } from "components/context/ToastContext";
 import { useChangeProgram } from "features/applications/hooks";
+import Button from "components/ui/buttons/Button";
 
 interface ProgramDecisionModalProps {
   isOpen: boolean;
@@ -48,8 +49,6 @@ export default function ProgramDecisionModal({
       showToast("Program updated successfully", "success");
       onClose();
       onRefetch?.();
-    } else {
-      showToast("Update failed", "error");
     }
   };
 
@@ -63,7 +62,7 @@ export default function ProgramDecisionModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative overflow-visible rounded-2xl bg-card shadow-lg">
-          <div className="flex items-start justify-between border-b border-default px-6 pb-4 pt-6">
+          <div className="flex items-start justify-between border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-md border border-blue-200 bg-blue-50">
                 <RefreshCcw
@@ -114,24 +113,31 @@ export default function ProgramDecisionModal({
 
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
-            <button
+          <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
+            <Button
               onClick={onClose}
               disabled={loading}
-              className="flex items-center justify-center gap-2 rounded-md border border-gray-600 text-gray-600  px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
-            >
-              <XCircle className="h-4 w-4" />
-              Cancel
-            </button>
+              icon={<XCircle className="h-4 w-4" />}
+              text="Cancel"
+              bgColor="bg-white"
+              textColor="text-gray-600"
+              borderColor="border-gray-600"
+              hoverTextColor="hover:text-gray-700"
+              hoverBorderColor="hover:border-gray-700"
+            />
 
-            <button
+            <Button
               onClick={handleSubmit}
               disabled={loading || !formData.program_id}
-              className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
-            >
-              <CheckCircle className="h-4 w-4" />
-              {loading ? "Submitting..." : "Confirm"}
-            </button>
+              icon={<CheckCircle className="h-4 w-4" />}
+              text={loading ? "Submitting..." : "Confirm"}
+              bgColor="bg-blue-100"
+              textColor="text-blue-700"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-blue-700"
+              hoverBorderColor="hover:border-blue-700"
+              className="hover:bg-blue-200"
+            />
 
           </div>
         </div>

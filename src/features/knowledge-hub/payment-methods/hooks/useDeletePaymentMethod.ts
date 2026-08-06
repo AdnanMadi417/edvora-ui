@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import { parseApiError } from "utils/parseApiError";
 
 export function useDeleteUniversity() {
   const [isDeleting, setLoading] = useState<boolean>(false);
@@ -17,8 +18,8 @@ export function useDeleteUniversity() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setSuccess(true);
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.[0]?.msg || "Failed to delete payment method");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to delete payment method"));
       throw err;
     } finally {
       setLoading(false);

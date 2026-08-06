@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import { parseApiError } from "utils/parseApiError";
 
 export type CreateQualificationsTypePayload = {
   name: string;
@@ -29,9 +30,8 @@ export function useCreateQualificationsType() {
       });
       setSuccess(true);
       return res.data;
-    } catch (err: any) {
-      const msg = err?.response?.data?.detail?.[0]?.msg || err?.response?.data?.message || "Failed to create qualification type";
-      setError(msg);
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to create qualification type"));
       throw err;
     } finally {
       setLoading(false);

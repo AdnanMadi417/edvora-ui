@@ -3,15 +3,22 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { User, Building2, AlertCircle, CheckCircle2, ChevronRight } from "lucide-react";
 import { usePartnerRegistration } from "features/partners/hooks";
 import OtpStep from "./OtpStep";
+import EnterVerificationCodeModal from "./EnterVerificationCodeModal";
 import { AnimatePresence, motion } from "framer-motion";
 import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import PhoneInputField from "components/form/fields/PhoneInputField";
+import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
+import { validateSocialMediaField } from "utils/socialMedia";
 import PublicFileUploadField, { type PublicUploadResult } from "components/form/upload/PublicFileUploadField";
+import ImageUploadField from "components/form/upload/ImageUploadField";
+import { uploadPublicPartnerFile } from "services/publicUploadService";
+import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import registrationIconImg from "/public/img/icons/registration-icon.png";
@@ -33,39 +40,101 @@ function SectionCard({ title, subtitle, children }: { title: string; subtitle?: 
   );
 }
 
-const URL_REGEX = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w\-./?%&=#]*)?$/;
+function usePublicPhotoUpload() {
+  const [file, setFile] = useState<File | null>(null);
+  const [fileKey, setFileKey] = useState("");
+  const [fileUrl, setFileUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [error, setError] = useState("");
+
+  const handleSelect = async (selected: File) => {
+    setFile(selected);
+    setUploading(true);
+    setProgress(0);
+    setFileKey("");
+    setFileUrl("");
+    setError("");
+    try {
+      const result = await uploadPublicPartnerFile(selected, setProgress);
+      setFileKey(result.file_key);
+      setFileUrl(result.file_url);
+    } catch (err: unknown) {
+      setFile(null);
+      setError(parseApiError(err, "Upload failed. Please try again."));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleRemove = () => {
+    setFile(null);
+    setFileKey("");
+    setFileUrl("");
+    setProgress(0);
+    setError("");
+  };
+
+  return { file, fileKey, fileUrl, uploading, progress, error, handleSelect, handleRemove };
+}
 
 export default function PartnerRegisterPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { initiateRegistration, loading: submitting, error: apiError } = usePartnerRegistration();
 
-  const [step, setStep] = useState<Step>("form");
+  const [step, setStep] = useState<Step>(() => {
+    const urlStep = searchParams.get("step");
+    const urlEmail = searchParams.get("email");
+    if (urlStep === "otp" && urlEmail) return "otp";
+    if (urlStep === "success") return "success";
+    return "form";
+  });
   const [partnerType, setPartnerType] = useState<PartnerType | null>(null);
-  const [registrationEmail, setRegistrationEmail] = useState("");
+  const [registrationEmail, setRegistrationEmail] = useState(() => searchParams.get("email") || "");
+  const [showCodeEntry, setShowCodeEntry] = useState(() => searchParams.get("showCodeEntry") === "1");
+
+  const goToOtpStep = (email: string) => {
+    setRegistrationEmail(email);
+    setStep("otp");
+    router.replace(`/auth/register?step=otp&email=${encodeURIComponent(email)}`);
+    setShowCodeEntry(false);
+  };
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Individual form
   const [indForm, setIndForm] = useState({
-    first_name: "", last_name: "", email: "",
+    name: "", email: "",
     phone_code: "+60", phone_number: "",
     country: "", background: "",
-    social_media_url: "", linkedin_url: "",
+    date_of_birth: "", passport_number: "",
+    social_platform: "instagram", social_username: "", social_media_url: "",
+    linkedin_platform: "linkedin", linkedin_username: "", linkedin_url: "",
     agreed: false,
   });
   const [indIdDoc, setIndIdDoc] = useState<PublicUploadResult | null>(null);
   const [indIdDocName, setIndIdDocName] = useState("");
+  const [indPassportPhoto, setIndPassportPhoto] = useState<PublicUploadResult | null>(null);
+  const [indPassportPhotoName, setIndPassportPhotoName] = useState("");
+  const indProfilePhoto = usePublicPhotoUpload();
 
   // Company form
   const [compForm, setCompForm] = useState({
-    company_name: "", country: "", website_url: "",
+    company_name: "", country: "",
+    social_platform: "instagram", social_username: "", website_url: "",
     contact_full_name: "", contact_email: "",
     contact_phone_code: "+60", contact_phone_number: "",
+    date_of_birth: "", passport_number: "",
     agreed: false,
   });
   const [compRegDoc, setCompRegDoc] = useState<PublicUploadResult | null>(null);
   const [compRegDocName, setCompRegDocName] = useState("");
   const [compContactIdDoc, setCompContactIdDoc] = useState<PublicUploadResult | null>(null);
   const [compContactIdDocName, setCompContactIdDocName] = useState("");
+  const [compPassportPhoto, setCompPassportPhoto] = useState<PublicUploadResult | null>(null);
+  const [compPassportPhotoName, setCompPassportPhotoName] = useState("");
+  const compLogo = usePublicPhotoUpload();
 
   const updateInd = (field: string, value: unknown) => {
     setIndForm((p) => ({ ...p, [field]: value }));
@@ -79,18 +148,17 @@ export default function PartnerRegisterPage() {
 
   const validateInd = () => {
     const e: Record<string, string> = {};
-    if (!indForm.first_name.trim()) e.first_name = "First name is required";
-    else if (indForm.first_name.trim().length < 3) e.first_name = "First name must be at least 3 characters";
-    if (!indForm.last_name.trim()) e.last_name = "Last name is required";
-    else if (indForm.last_name.trim().length < 3) e.last_name = "Last name must be at least 3 characters";
+    if (!indForm.name.trim()) e.name = "Name is required";
+    else if (indForm.name.trim().length < 3) e.name = "Name must be at least 3 characters";
     if (!indForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(indForm.email)) e.email = "Enter a valid email";
     if (!indForm.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!indForm.country) e.country = "Country is required";
     if (!indForm.background) e.background = "Please select your background";
+    if (!indForm.date_of_birth) e.date_of_birth = "Date of birth is required";
+    if (!indForm.passport_number.trim()) e.passport_number = "Passport number is required";
     if (!indIdDoc) e.ind_id_doc = "Please upload your passport or national ID";
-    if (!indForm.social_media_url.trim()) e.social_media_url = "Social media URL is required";
-    else if (!URL_REGEX.test(indForm.social_media_url.trim())) e.social_media_url = "Enter a valid URL (e.g. https://instagram.com/yourprofile)";
-    if (indForm.linkedin_url.trim() && !URL_REGEX.test(indForm.linkedin_url.trim())) e.linkedin_url = "Enter a valid URL (e.g. https://linkedin.com/in/yourprofile)";
+    const socialError = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
+    if (socialError) e.social_media_url = socialError;
     if (!indForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -101,13 +169,15 @@ export default function PartnerRegisterPage() {
     if (!compForm.company_name.trim()) e.company_name = "Agency name is required";
     else if (compForm.company_name.trim().length < 3) e.company_name = "Agency name must be at least 3 characters";
     if (!compForm.country) e.country = "Country is required";
-    if (!compForm.website_url.trim()) e.website_url = "Website or social media URL is required";
-    else if (!URL_REGEX.test(compForm.website_url.trim())) e.website_url = "Enter a valid URL (e.g. https://youragency.com)";
+    const socialError = validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" });
+    if (socialError) e.website_url = socialError;
     if (!compRegDoc) e.comp_reg_doc = "Please upload your agency registration document";
     if (!compForm.contact_full_name.trim()) e.contact_full_name = "Full name is required";
     else if (compForm.contact_full_name.trim().length < 3) e.contact_full_name = "Full name must be at least 3 characters";
     if (!compForm.contact_email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(compForm.contact_email)) e.contact_email = "Enter a valid email";
     if (!compForm.contact_phone_number.trim()) e.contact_phone_number = "Phone number is required";
+    if (!compForm.date_of_birth) e.date_of_birth = "Date of birth is required";
+    if (!compForm.passport_number.trim()) e.passport_number = "Passport number is required";
     if (!compContactIdDoc) e.comp_contact_id_doc = "Please upload a passport or national ID";
     if (!compForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
     setErrors(e);
@@ -116,20 +186,21 @@ export default function PartnerRegisterPage() {
 
   const isFormComplete = partnerType === "individual"
     ? Boolean(
-        indForm.first_name.trim() && indForm.last_name.trim() &&
+        indForm.name.trim().length >= 3 &&
         indForm.email && indForm.phone_number.trim() &&
         indForm.country && indForm.background &&
-        indIdDoc && indForm.social_media_url.trim() &&
-        URL_REGEX.test(indForm.social_media_url.trim()) &&
-        (!indForm.linkedin_url.trim() || URL_REGEX.test(indForm.linkedin_url.trim())) &&
+        indForm.date_of_birth && indForm.passport_number.trim() &&
+        indIdDoc &&
+        !validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" }) &&
         indForm.agreed,
       )
     : partnerType === "agency"
     ? Boolean(
         compForm.company_name.trim() && compForm.country &&
-        compForm.website_url.trim() && URL_REGEX.test(compForm.website_url.trim()) &&
+        !validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" }) &&
         compRegDoc && compForm.contact_full_name.trim() && compForm.contact_email &&
-        compForm.contact_phone_number.trim() && compContactIdDoc &&
+        compForm.contact_phone_number.trim() && compForm.date_of_birth && compForm.passport_number.trim() &&
+        compContactIdDoc &&
         compForm.agreed,
       )
     : false;
@@ -137,16 +208,22 @@ export default function PartnerRegisterPage() {
   const handleSubmit = async () => {
     if (partnerType === "individual" ? !validateInd() : !validateComp()) return;
 
+    const indSocialField = indForm.social_platform === "linkedin" ? "linkedin_url" : "social_media_url";
+
     const payload = partnerType === "individual"
       ? {
           partner_type: "individual",
-          full_name: `${indForm.first_name.trim()} ${indForm.last_name.trim()}`,
+          full_name: indForm.name.trim(),
           email: indForm.email,
           phone: `${indForm.phone_code} ${indForm.phone_number}`,
           country: indForm.country,
           background: indForm.background,
+          date_of_birth: indForm.date_of_birth,
+          passport_number: indForm.passport_number.trim(),
           ...(indIdDoc && { id_document_file_key: indIdDoc.file_key, id_document_file_url: indIdDoc.file_url }),
-          ...(indForm.social_media_url && { social_media_url: indForm.social_media_url }),
+          ...(indPassportPhoto && { passport_photo_file_key: indPassportPhoto.file_key, passport_photo_file_url: indPassportPhoto.file_url }),
+          ...(indProfilePhoto.fileKey && { profile_photo_file_key: indProfilePhoto.fileKey, profile_photo_file_url: indProfilePhoto.fileUrl }),
+          ...(indForm.social_media_url && { [indSocialField]: indForm.social_media_url }),
           ...(indForm.linkedin_url && { linkedin_url: indForm.linkedin_url }),
         }
       : {
@@ -157,18 +234,27 @@ export default function PartnerRegisterPage() {
           country: compForm.country,
           company_name: compForm.company_name.trim(),
           website_url: compForm.website_url,
+          date_of_birth: compForm.date_of_birth,
+          passport_number: compForm.passport_number.trim(),
           ...(compRegDoc      && { company_registration_doc_file_key: compRegDoc.file_key,      company_registration_doc_file_url: compRegDoc.file_url }),
           ...(compContactIdDoc && { contact_id_document_file_key: compContactIdDoc.file_key, contact_id_document_file_url: compContactIdDoc.file_url }),
+          ...(compPassportPhoto && { passport_photo_file_key: compPassportPhoto.file_key, passport_photo_file_url: compPassportPhoto.file_url }),
+          ...(compLogo.fileKey && { logo_file_key: compLogo.fileKey, logo_file_url: compLogo.fileUrl }),
         };
     try {
       await initiateRegistration(payload);
-      setRegistrationEmail(partnerType === "individual" ? indForm.email : compForm.contact_email);
-      setStep("otp");
+      goToOtpStep(partnerType === "individual" ? indForm.email : compForm.contact_email);
     } catch { /* error shown via hook */ }
   };
 
   if (step === "otp") {
-    return <OtpStep email={registrationEmail} onSuccess={() => setStep("success")} />;
+    return (
+      <OtpStep
+        email={registrationEmail}
+        onSuccess={() => { setStep("success"); router.replace("/auth/register?step=success"); }}
+        onRestart={() => { setStep("form"); router.replace("/auth/register"); }}
+      />
+    );
   }
 
   if (step === "success") {
@@ -212,8 +298,21 @@ export default function PartnerRegisterPage() {
           <p className="text-base text-slate-500">
             Ready to connect? Drop us a message and we'll get back fast.
           </p>
+          <button
+            type="button"
+            onClick={() => setShowCodeEntry(true)}
+            className="mt-3 text-sm font-medium text-blue-600 underline-offset-2 transition hover:text-blue-700 hover:underline"
+          >
+            Already have a verification code?
+          </button>
         </div>
       </div>
+
+      <EnterVerificationCodeModal
+        isOpen={showCodeEntry}
+        onClose={() => setShowCodeEntry(false)}
+        onContinue={goToOtpStep}
+      />
 
       <div className="mx-auto max-w-3xl px-4">
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -267,12 +366,24 @@ export default function PartnerRegisterPage() {
               {partnerType === "individual" ? (
                 <>
                   <SectionCard title="Basic Information">
-                    <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="First Name" field="first_name" placeholder="Ahmed"
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
-                      <InputField label="Last Name" field="last_name" placeholder="Ali"
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
-                    </div>
+                    <ImageUploadField
+                      label="Profile Photo"
+                      field="ind_profile_photo"
+                      imageOnly
+                      simpleFile={indProfilePhoto.file}
+                      onSimpleFileChange={indProfilePhoto.handleSelect}
+                      onSimpleRemove={indProfilePhoto.handleRemove}
+                      simpleUploading={indProfilePhoto.uploading}
+                      simpleProgress={indProfilePhoto.progress}
+                      errors={{ ind_profile_photo: indProfilePhoto.error }}
+                    />
+                    <InputField label="Name (as per Passport/National ID)" field="name" placeholder="Ahmed Ali"
+                      formData={indForm} errors={errors} updateFormData={updateInd}
+                      onBlur={() => {
+                        const val = indForm.name.trim();
+                        if (!val) setErrors((p) => ({ ...p, name: "Name is required" }));
+                        else if (val.length < 3) setErrors((p) => ({ ...p, name: "Name must be at least 3 characters" }));
+                      }} />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <InputField label="Email Address" field="email" type="email" placeholder="name@mail.com"
                         formData={indForm} errors={errors} updateFormData={updateInd} />
@@ -281,6 +392,12 @@ export default function PartnerRegisterPage() {
                     </div>
                     <SelectField label="Country of Residence" field="country" options={COUNTRY_OPTIONS}
                       formData={indForm} errors={errors} updateFormData={updateInd} />
+                    <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                      <InputField label="Date of Birth" field="date_of_birth" type="date"
+                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                      <InputField label="Passport Number" field="passport_number" placeholder="A12345678"
+                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                    </div>
                   </SectionCard>
 
                   <SectionCard title="Background" subtitle="Which best describes you?">
@@ -319,40 +436,53 @@ export default function PartnerRegisterPage() {
                       onRemove={() => { setIndIdDoc(null); setIndIdDocName(""); }}
                       error={errors.ind_id_doc}
                     />
+                    <PublicFileUploadField
+                      label="Passport Photo"
+                      fieldId="ind-passport-photo"
+                      result={indPassportPhoto}
+                      fileName={indPassportPhotoName}
+                      onUpload={(res, name) => { setIndPassportPhoto(res); setIndPassportPhotoName(name); }}
+                      onRemove={() => { setIndPassportPhoto(null); setIndPassportPhotoName(""); }}
+                    />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <InputField label="Social Media Account" field="social_media_url"
-                        placeholder="https://instagram.com/username"
-                        type="url"
+                      <SocialMediaInputField label="Social Media Account"
+                        platformField="social_platform" usernameField="social_username" urlField="social_media_url"
                         formData={indForm} errors={errors} updateFormData={updateInd}
                         onBlur={() => {
-                          const val = indForm.social_media_url.trim();
-                          if (!val) setErrors((p) => ({ ...p, social_media_url: "Social media URL is required" }));
-                          else if (!URL_REGEX.test(val)) setErrors((p) => ({ ...p, social_media_url: "Enter a valid URL (e.g. https://instagram.com/yourprofile)" }));
+                          const error = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
+                          setErrors((p) => ({ ...p, social_media_url: error ?? "" }));
                         }} />
-                      <InputField label="LinkedIn Profile" field="linkedin_url" required={false}
-                        placeholder="https://linkedin.com/in/yourprofile"
-                        formData={indForm} errors={errors} updateFormData={updateInd}
-                        onBlur={() => {
-                          const val = indForm.linkedin_url.trim();
-                          if (val && !URL_REGEX.test(val)) setErrors((p) => ({ ...p, linkedin_url: "Enter a valid URL (e.g. https://linkedin.com/in/yourprofile)" }));
-                        }} />
+                      <SocialMediaInputField label="LinkedIn Profile"
+                        platformField="linkedin_platform" usernameField="linkedin_username" urlField="linkedin_url"
+                        lockedPlatform="linkedin" required={false}
+                        formData={indForm} errors={errors} updateFormData={updateInd} />
                     </div>
                   </SectionCard>
                 </>
               ) : (
                 <>
                   <SectionCard title="Agency Information">
+                    <ImageUploadField
+                      label="Agency Logo"
+                      field="comp_logo"
+                      imageOnly
+                      simpleFile={compLogo.file}
+                      onSimpleFileChange={compLogo.handleSelect}
+                      onSimpleRemove={compLogo.handleRemove}
+                      simpleUploading={compLogo.uploading}
+                      simpleProgress={compLogo.progress}
+                      errors={{ comp_logo: compLogo.error }}
+                    />
                     <InputField label="Agency Name" field="company_name" placeholder="Enter agency name."
                       formData={compForm} errors={errors} updateFormData={updateComp} />
                     <SelectField label="Country of Registration" field="country" options={COUNTRY_OPTIONS}
                       formData={compForm} errors={errors} updateFormData={updateComp} />
-                    <InputField label="Website or Social Media Page" field="website_url"
-                      placeholder="https://youragency.com"
+                    <SocialMediaInputField label="Website or Social Media Page"
+                      platformField="social_platform" usernameField="social_username" urlField="website_url"
                       formData={compForm} errors={errors} updateFormData={updateComp}
                       onBlur={() => {
-                        const val = compForm.website_url.trim();
-                        if (!val) setErrors((p) => ({ ...p, website_url: "Website or social media URL is required" }));
-                        else if (!URL_REGEX.test(val)) setErrors((p) => ({ ...p, website_url: "Enter a valid URL (e.g. https://youragency.com)" }));
+                        const error = validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" });
+                        setErrors((p) => ({ ...p, website_url: error ?? "" }));
                       }} />
                   </SectionCard>
 
@@ -379,6 +509,12 @@ export default function PartnerRegisterPage() {
                     </div>
                     <PhoneInputField dialCodeField="contact_phone_code" numberField="contact_phone_number"
                       formData={compForm} errors={errors} updateFormData={updateComp} />
+                    <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                      <InputField label="Date of Birth" field="date_of_birth" type="date"
+                        formData={compForm} errors={errors} updateFormData={updateComp} />
+                      <InputField label="Passport Number" field="passport_number" placeholder="A12345678"
+                        formData={compForm} errors={errors} updateFormData={updateComp} />
+                    </div>
                     <PublicFileUploadField
                       label="Passport or National ID"
                       fieldId="comp-contact-id-doc"
@@ -388,6 +524,14 @@ export default function PartnerRegisterPage() {
                       onUpload={(res, name) => { setCompContactIdDoc(res); setCompContactIdDocName(name); }}
                       onRemove={() => { setCompContactIdDoc(null); setCompContactIdDocName(""); }}
                       error={errors.comp_contact_id_doc}
+                    />
+                    <PublicFileUploadField
+                      label="Passport Photo"
+                      fieldId="comp-passport-photo"
+                      result={compPassportPhoto}
+                      fileName={compPassportPhotoName}
+                      onUpload={(res, name) => { setCompPassportPhoto(res); setCompPassportPhotoName(name); }}
+                      onRemove={() => { setCompPassportPhoto(null); setCompPassportPhotoName(""); }}
                     />
                   </SectionCard>
                 </>

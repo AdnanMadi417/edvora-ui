@@ -68,28 +68,6 @@ export default function AccountManagerProfile({ manager }: AccountManagerProfile
               </span>
             )}
           </div>
-
-          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-            <span className="flex items-center gap-2 text-slate-600">
-              <Users className="h-4 w-4" />
-              Partner List
-            </span>
-
-            {manager.assigned_partners && manager.assigned_partners.length > 0 ? (
-              <div className="flex flex-wrap gap-2 md:justify-end">
-                {manager.assigned_partners.map((partner) => (
-                  <span
-                    key={partner.id}
-                    className="rounded-md border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-700 transition hover:bg-slate-100"
-                  >
-                    {partner.name}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <span className="text-xs text-slate-400">No partners assigned</span>
-            )}
-          </div>
         </div>
       </div>
     </section>

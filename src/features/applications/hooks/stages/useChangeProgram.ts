@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api from "lib/useApi";
+import { parseApiError } from "utils/parseApiError";
 
 type FormData = {
   program_id: string;
@@ -32,8 +33,8 @@ export const useChangeProgram = (applicationId: string | number) => {
         notes: formData.note,
       });
       return true;
-    } catch (err: any) {
-      setErrors({ api: err?.message || "Failed to update program" });
+    } catch (err: unknown) {
+      setErrors({ api: parseApiError(err, "Failed to update program") });
       return false;
     } finally {
       setLoading(false);

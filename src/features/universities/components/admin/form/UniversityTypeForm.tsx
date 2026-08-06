@@ -5,6 +5,7 @@ import { ArrowLeft, Layers, } from 'lucide-react';
 import { useApplicationSubmissionFields, useCreateUniversityType } from "features/universities/hooks";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import InputField from "components/form/fields/InputField";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
@@ -98,8 +99,7 @@ export default function UniversityTypeForm() {
 
       router.push("/admin/config-universities");
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create university type. ${backendMessage}`, "error");
     }
   };

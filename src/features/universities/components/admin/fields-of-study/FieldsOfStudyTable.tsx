@@ -26,7 +26,9 @@ import UpdateField from "features/universities/components/admin/fields-of-study/
 
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 
 const FieldsOfStudyTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,7 +101,7 @@ const FieldsOfStudyTable = () => {
       setSelectedFieldName("");
       refetch();
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to delete field of study. ${backendMessage}`, "error");
     }
   };
@@ -146,13 +148,17 @@ const FieldsOfStudyTable = () => {
           onChange={handleSearchChange}
           placeholder="Search by field name..."
         />
-        <button
+        <Button
           onClick={() => { setSearchTerm(""); setSelectedState("all"); setCurrentPage(1); }}
-          className="flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-        >
-          <RefreshCw className="h-4 w-4" />
-          <span className="hidden sm:inline">Clear</span>
-        </button>
+          icon={<RefreshCw className="h-4 w-4" />}
+          text="Clear"
+          bgColor="bg-white"
+          textColor="text-red-600"
+          borderColor="border-red-200"
+          hoverTextColor="hover:text-red-600"
+          hoverBorderColor="hover:border-red-200"
+          className="hover:bg-red-50"
+        />
       </div>
 
       {/* Table */}
@@ -223,25 +229,31 @@ const FieldsOfStudyTable = () => {
 
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <button
-                        role="menuitem"
+                      <IconButton
                         aria-label="Edit Field of Study"
                         onClick={() => { setSelectedField(field); setIsUpdateOpen(true); }}
-                        className="flex items-center justify-center rounded-lg p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                      >
-                        <Pencil className="h-4 w-4 text-slate-500" />
-                      </button>
+                        icon={<Pencil className="h-4 w-4 text-slate-500" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-700"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-slate-100 focus:outline-none"
+                      />
 
                       <div className="h-6 border-l border-slate-200" />
 
-                      <button
-                        role="menuitem"
+                      <IconButton
                         aria-label="Delete Field of Study"
                         onClick={() => { setSelectedFieldId(field.id); setSelectedFieldName(field.name); setIsDeleteOpen(true); }}
-                        className="flex items-center justify-center rounded-lg p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                      >
-                        <Trash2 className="h-4 w-4 text-slate-500" />
-                      </button>
+                        icon={<Trash2 className="h-4 w-4 text-slate-500" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-700"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-slate-100 focus:outline-none"
+                      />
                     </div>
                   </td>
                 </tr>

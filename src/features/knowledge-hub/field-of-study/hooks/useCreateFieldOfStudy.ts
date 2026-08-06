@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import { parseApiError } from "utils/parseApiError";
 
 export type CreateFieldOfStudyPayload = {
   name: string;
@@ -23,8 +24,8 @@ export function useCreateFieldOfStudy() {
       });
       setSuccess(true);
       return res.data;
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.[0]?.msg || "Failed to create field of study");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to create field of study"));
       throw err;
     } finally {
       setLoading(false);

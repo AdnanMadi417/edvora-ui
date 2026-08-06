@@ -25,6 +25,7 @@ import { AiOutlineBank } from "react-icons/ai";
 import PresignedImage from "components/ui/PresignedImage";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { usePrograms, useStates, useDeletePrograms } from "features/programs/hooks";
 import { programApi } from "features/programs/services";
 import type { Program } from "features/programs/types";
@@ -34,6 +35,7 @@ import { useUniversities } from "features/universities/hooks";
 
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
+import IconButton from "components/ui/buttons/IconButton";
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import Link from "next/link";
@@ -235,8 +237,8 @@ const ProgramsTable = () => {
       setSelectedProgramId(null);
       setSelectedPrograms({});
       refetch();
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Delete failed. ${backendMessage}`, "error");
     } finally {
       setIsDeleting(false);
@@ -321,7 +323,7 @@ const ProgramsTable = () => {
           <p className="mt-1 text-sm text-slate-500">Explore and manage all programs, universities, and learning resources</p>
         </div>
         <Link
-          href="/admin/knowledge-hub/programs/create"
+          href="/admin/knowledge-hub/create"
           className="flex items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:text-blue-800"
         >
           <Plus className="h-4 w-4" />
@@ -515,7 +517,7 @@ const ProgramsTable = () => {
                 <tr
                   key={program.id}
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${selectedPrograms[program.id] ? "bg-slate-50" : ""}`}
-                  onClick={() => window.open(`/admin/knowledge-hub/programs/${program.id}`, "_blank")}
+                  onClick={() => window.open(`/admin/knowledge-hub/${program.id}`, "_blank")}
                 >
                   {/* Checkbox */}
                   <td className="pl-6" onClick={(e) => e.stopPropagation()}>
@@ -643,7 +645,7 @@ const ProgramsTable = () => {
                       <a
                         role="menuitem"
                         aria-label="Edit Program"
-                        href={`/admin/knowledge-hub/programs/${program.id}/edit`}
+                        href={`/admin/knowledge-hub/${program.id}/edit`}
                         onClick={(e) => e.stopPropagation()}
                         className="group/edit flex items-center justify-center rounded-lg p-2 text-sm hover:bg-slate-100 focus:outline-none"
                       >
@@ -652,8 +654,7 @@ const ProgramsTable = () => {
 
                       <div className="h-6 border-l border-slate-200" />
 
-                      <button
-                        role="menuitem"
+                      <IconButton
                         aria-label="Delete Program"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -661,10 +662,14 @@ const ProgramsTable = () => {
                           setDeleteMode("single");
                           setIsDeleteOpen(true);
                         }}
-                        className="group/delete flex items-center justify-center rounded-lg p-2 text-sm hover:bg-red-50 focus:outline-none"
-                      >
-                        <Trash2 className="h-4 w-4 text-slate-400 group-hover/delete:text-red-600" />
-                      </button>
+                        icon={<Trash2 className="h-4 w-4" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-400"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-red-600"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-red-50 focus:outline-none"
+                      />
 
                       <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                     </div>

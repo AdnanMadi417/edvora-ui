@@ -59,11 +59,27 @@ export const partnersApi = {
   review: (id: string, payload: { decision: "approved" | "rejected"; rejection_reason?: string }) =>
     api.patch(`/admin/partners/${id}/review`, payload, { headers: authHeader() }),
 
+  resendApprovalEmail: (id: string) =>
+    api.post(`/admin/partners/${id}/resend-approval-email`, {}, { headers: authHeader() }),
+
+  adminResendRegistrationOtp: (email: string) =>
+    api.post<{ message: string }>('/admin/partners/register/resend-otp', { email }, { headers: authHeader() }),
+
+  // Account-manager-scoped: only the AM's own assigned partners (AM identified via Bearer token)
+  listForAccountManager: (params?: { limit?: number; offset?: number; search?: string }) =>
+    api.get('/account-managers/partners', { params, headers: authHeader() }),
+
+  getForAccountManager: (id: string) =>
+    api.get(`/account-managers/partners/${id}`, { headers: authHeader() }),
+
   getProfile: () =>
     api.get('/partners/profile', { headers: authHeader() }),
 
   updateProfile: (payload: UpdatePartnerProfilePayload) =>
     api.put('/partners/profile', payload),
+
+  completeOnboarding: () =>
+    api.post('/partners/onboarding/complete', {}, { headers: authHeader() }),
 
   // Public registration endpoints — use publicApi so a logged-in user's token is never sent
   registerInitiate: (payload: Record<string, unknown>) =>

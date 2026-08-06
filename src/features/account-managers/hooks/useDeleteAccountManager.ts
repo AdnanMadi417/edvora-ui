@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { accountManagersApi } from "../services";
+import { parseApiError } from "utils/parseApiError";
 
 export function useDeleteAccountManager() {
   const [loading, setLoading] = useState(false);
@@ -13,10 +14,8 @@ export function useDeleteAccountManager() {
     try {
       await accountManagersApi.delete(managerId);
       setSuccess(true);
-    } catch (err: any) {
-      setError(
-        err?.response?.data?.detail?.[0]?.msg || "Failed to delete account manager"
-      );
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to delete account manager"));
       throw err;
     } finally {
       setLoading(false);

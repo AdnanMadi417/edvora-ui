@@ -9,7 +9,7 @@ import Footer from "components/footer/Footer";
 import partnerRoutes from '../../routes/partnerRoutes';
 import RoleGuard from "components/guard/RoleGuard";
 import { ToastProvider } from "components/context/ToastContext";
-import BetaBanner from "components/beta/BetaBanner";
+import PartnerOnboardingTour from "components/onboarding/PartnerOnboardingTour";
 
 const PARTNER_ROLES = ["partner"];
 
@@ -21,6 +21,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
     <RoleGuard allowedRoles={PARTNER_ROLES}>
 
       <ToastProvider>
+        <PartnerOnboardingTour />
         <div className="relative flex min-h-screen w-full bg-slate-50">
           <div className="z-[60]">
             <Sidebar
@@ -31,7 +32,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
             />
           </div>
 
-          <div className="relative h-full w-full font-dm dark:bg-navy-900">
+          <div className="relative h-full w-full dark:bg-navy-900">
             <main className="mx-2.5 flex-none transition-all md:pr-2 xl:ml-[300px]">
               <Navbar
                 onOpenSidenav={() => setOpen(!open)}
@@ -39,7 +40,6 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
                 secondary={getActiveNavbar(partnerRoutes, pathname)}
               />
               <div className="mx-auto min-h-screen p-2 !pt-[10px] md:p-2">
-                <BetaBanner/>
                 {children}
               </div>
               <div className="p-3">

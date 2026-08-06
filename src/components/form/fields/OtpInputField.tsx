@@ -90,7 +90,7 @@ const OtpInputField = ({
                 ? "border-red-500 bg-red-50 text-red-700"
                 : digit
                 ? "border-blue-400 bg-blue-50 text-slate-900"
-                : "border-default bg-white text-slate-900 hover:bg-slate-50"
+                : "border-slate-200 bg-white text-slate-900 hover:bg-slate-50"
             }`}
           />
         ))}

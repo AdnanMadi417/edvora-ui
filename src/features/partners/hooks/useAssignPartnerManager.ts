@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { partnersApi } from '../services';
 import type { AssignManagerPayload } from '../types';
+import { parseApiError } from 'utils/parseApiError';
 
 export function useAssignPartnerManager() {
   const [loading, setLoading] = useState(false);
@@ -15,8 +16,8 @@ export function useAssignPartnerManager() {
       const res = await partnersApi.assignManager(partnerId, payload);
       setSuccess(true);
       return res.data;
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.[0]?.msg || 'Failed to assign manager');
+    } catch (err: unknown) {
+      setError(parseApiError(err, 'Failed to assign manager'));
       throw err;
     } finally {
       setLoading(false);

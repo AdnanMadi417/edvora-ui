@@ -7,14 +7,12 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  Download,
   RotateCcw,
 } from "lucide-react";
-import ViewPopup from "features/applications/shared/ViewDoc";
+import DocumentActions from "features/applications/shared/DocumentActions";
 import HoldPopup from "features/applications/admin/components/popups/ResubmitDoc";
 import EmptyData from "components/emptyData/EmptyData";
 import { AppDate } from "components/ui/date";
-import { getDocumentDownloadUrl } from "services/documentService";
 import api from "lib/useApi"
 
 interface ApplicationDocumentsProps {
@@ -27,10 +25,10 @@ export default function ApplicationDocuments({
   onRefetch,
 }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
-  const [showViewPopup, setShowViewPopup] = useState(false);
   const [selectedDoc, setSelectedDoc] = useState<any>(null);
   const [showResubmitPopup, setShowResubmitPopup] = useState(false);
   const [correctionStatusId, setCorrectionStatusId] = useState<string | null>(null);
+  const studentName = application?.student?.name;
 
 
   useEffect(() => {
@@ -51,16 +49,6 @@ export default function ApplicationDocuments({
 
     if (application?.id) fetchApplicationDetails();
   }, [application?.id]);
-
-  const handleDownload = async (fileKey: string) => {
-    try {
-      const downloadUrl = await getDocumentDownloadUrl(fileKey);
-      window.open(downloadUrl, "_blank");
-    } catch (err: any) {
-      console.error("Download failed:", err);
-      alert(err?.message || "Failed to download document");
-    }
-  };
 
   const allDocs = application?.documents || [];
   const documents = allDocs;
@@ -91,11 +79,6 @@ export default function ApplicationDocuments({
       default:
         return <Clock className="h-5 w-5 text-yellow-500" />;
     }
-  };
-
-  const getFileName = (fileUrl: string | null) => {
-    if (!fileUrl) return "document.pdf";
-    return fileUrl.split("/").pop() || "document.pdf";
   };
 
   if (totalDocuments === 0) {
@@ -223,19 +206,7 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!doc.file_key) return;
-                      handleDownload(doc.file_key);
-                    }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!doc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
 
                   <button
                     onClick={(e) => {
@@ -316,19 +287,7 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!doc.file_key) return;
-                      handleDownload(doc.file_key);
-                    }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!doc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
 
                   <button
                     onClick={(e) => {
@@ -408,19 +367,7 @@ export default function ApplicationDocuments({
                 </div>
 
                 <div className="ml-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!doc.file_key) return;
-                      handleDownload(doc.file_key);
-                    }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!doc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
 
                   <button
                     onClick={(e) => {
@@ -469,14 +416,7 @@ export default function ApplicationDocuments({
                   </div>
                 </div>
                 <div className="ml-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); if (!offerLetterDoc.file_key) return; handleDownload(offerLetterDoc.file_key); }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    disabled={!offerLetterDoc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={offerLetterDoc.file_key} label={offerLetterDoc.document_type} personName={studentName} />
                 </div>
               </div>
             </div>
@@ -518,19 +458,7 @@ export default function ApplicationDocuments({
                   </div>
                 </div>
                 <div className="ml-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!emgsEvalDoc.file_key) return;
-                      handleDownload(emgsEvalDoc.file_key);
-                    }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    aria-label="Download Document"
-                    disabled={!emgsEvalDoc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={emgsEvalDoc.file_key} label={emgsEvalDoc.document_type} personName={studentName} />
                 </div>
               </div>
             </div>
@@ -570,14 +498,7 @@ export default function ApplicationDocuments({
                   </div>
                 </div>
                 <div className="ml-4 flex flex-wrap gap-2">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); if (!visaDoc.file_key) return; handleDownload(visaDoc.file_key); }}
-                    className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                    title="Download Document"
-                    disabled={!visaDoc.file_key}
-                  >
-                    <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
+                  <DocumentActions fileKey={visaDoc.file_key} label={visaDoc.document_type} personName={studentName} />
                 </div>
               </div>
             </div>
@@ -612,26 +533,13 @@ export default function ApplicationDocuments({
                     </div>
                   </div>
                   <div className="ml-4 flex flex-wrap gap-2">
-                    <button
-                      onClick={(e) => { e.stopPropagation(); if (!doc.file_key) return; handleDownload(doc.file_key); }}
-                      className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400"
-                      title="Download Document"
-                      disabled={!doc.file_key}
-                    >
-                      <Download className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                    </button>
+                    <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-
-        <ViewPopup
-          isOpen={showViewPopup}
-          onClose={() => setShowViewPopup(false)}
-          doc={selectedDoc}
-        />
 
         {showResubmitPopup && selectedDoc && (
           <HoldPopup

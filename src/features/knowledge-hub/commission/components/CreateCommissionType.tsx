@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { XCircle, BadgePercent } from "lucide-react";
 import { useCreateCommissionType } from "features/knowledge-hub/commission/hooks";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { useRouter } from "next/navigation";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
@@ -43,10 +44,10 @@ export default function CreateCommissionType({ isOpen, onClose }: CreateCommissi
     try {
       await createCommissionType(formData);
       showToast("Commission type created successfully.", "success");
-      router.push("/admin/knowledge-hub/programs/create");
+      router.push("/admin/knowledge-hub/create");
       onClose();
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create commission type. ${backendMessage}`, "error");
     }
   };

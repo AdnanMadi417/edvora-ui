@@ -10,11 +10,12 @@ import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 interface Props {
   email: string;
   onSuccess: () => void;
+  onRestart: () => void;
 }
 
-export default function OtpStep({ email, onSuccess }: Props) {
+export default function OtpStep({ email, onSuccess, onRestart }: Props) {
   const { verifyOtp, loading: verifyLoading, error: otpError } = useVerifyRegistrationOtp();
-  const { resendOtp, loading: resendLoading, error: resendError } = useResendRegistrationOtp();
+  const { resendOtp, loading: resendLoading, error: resendError, maxResendsReached } = useResendRegistrationOtp();
 
   const [otp, setOtp] = useState("");
   const [resendSuccess, setResendSuccess] = useState(false);
@@ -79,13 +80,21 @@ export default function OtpStep({ email, onSuccess }: Props) {
         />
 
         <div className="mt-4 space-y-2 text-center">
-          {resendSuccess && (
+          {resendSuccess && !maxResendsReached && (
             <p className="text-sm text-green-600">Code resent — check your inbox.</p>
           )}
           {resendError && (
             <p className="text-sm text-red-600">{resendError}</p>
           )}
-          {resendCooldown > 0 ? (
+          {maxResendsReached ? (
+            <button
+              type="button"
+              onClick={onRestart}
+              className="text-sm font-medium text-blue-600 transition hover:text-blue-700"
+            >
+              Restart registration
+            </button>
+          ) : resendCooldown > 0 ? (
             <p className="text-sm text-slate-400">
               Resend available in <span className="font-medium text-slate-600">{resendCooldown}s</span>
             </p>

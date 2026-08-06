@@ -12,6 +12,7 @@ import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface UniversityDetailsProps {
   id: string;
@@ -112,8 +113,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
       router.push(`/admin/config-universities/${id}`);
 
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
