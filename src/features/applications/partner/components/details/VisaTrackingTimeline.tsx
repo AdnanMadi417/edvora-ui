@@ -104,9 +104,9 @@ export default function VisaTrackingTimeline({
             {visaPayments.map((payment) => (
               <div
                 key={payment.id}
-                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+                className="overflow-hidden"
               >
-                <div className="flex flex-col justify-between gap-4 p-5 sm:flex-row">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row">
                   <div className="space-y-3">
                     <div className="w-full rounded-md bg-gray-50 px-4 py-5 sm:w-fit">
                       <p className="flex gap-2 text-sm font-medium">
