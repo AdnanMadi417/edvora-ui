@@ -109,7 +109,8 @@ export default function ReviewerPartnersTable() {
         </div>
       </div>
 
-      <TableWrapper
+      <div className="overflow-x-auto p-6">
+         <TableWrapper
         footer={
           <TablePagination
             currentPage={currentPage}
@@ -214,19 +215,24 @@ export default function ReviewerPartnersTable() {
                   </td>
 
                   <td className="px-6 py-4">
-                    {isPending ? (
-                      <IconButton
-                        onClick={() => { setReviewPartner({ id: partner.id, name: partner.name || "", assignedManagerId: partner.assigned_manager_id || undefined }); setIsReviewOpen(true); }}
-                        title="Review registration"
-                        icon={<ShieldCheck className="h-4 w-4" />}
-                        bgColor="bg-transparent"
-                        textColor="text-amber-500"
-                        borderColor="border-transparent"
-                        hoverTextColor="hover:text-amber-600"
-                        hoverBorderColor="hover:border-transparent"
-                        className="hover:bg-amber-50"
-                      />
-                    ) : (
+                    <div className="flex items-center gap-2">
+                      {isPending && (
+                        <>
+                          <IconButton
+                            onClick={() => { setReviewPartner({ id: partner.id, name: partner.name || "", assignedManagerId: partner.assigned_manager_id || undefined }); setIsReviewOpen(true); }}
+                            title="Review registration"
+                            icon={<ShieldCheck className="h-4 w-4" />}
+                            bgColor="bg-transparent"
+                            textColor="text-amber-500"
+                            borderColor="border-transparent"
+                            hoverTextColor="hover:text-amber-600"
+                            hoverBorderColor="hover:border-transparent"
+                            className="hover:bg-amber-50"
+                          />
+                          <div className="h-5 border-l border-slate-200" />
+                        </>
+                      )}
+
                       <IconButton
                         onClick={() => { setSuspendTarget(partner); setIsSuspendOpen(true); }}
                         title={partner.is_active ? "Suspend account" : "Activate account"}
@@ -238,7 +244,7 @@ export default function ReviewerPartnersTable() {
                         hoverBorderColor="hover:border-transparent"
                         className={partner.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"}
                       />
-                    )}
+                    </div>
                   </td>
                 </tr>
               );
@@ -246,6 +252,9 @@ export default function ReviewerPartnersTable() {
           </tbody>
         </table>
       </TableWrapper>
+      
+      </div>
+
 
       {reviewPartner && (
         <ReviewPartnerPopup
