@@ -31,6 +31,7 @@ import VisaPaymentConfirmation from "features/applications/partner/components/po
 import ArrivalDate from "features/applications/partner/components/popups/ArrivalDate";
 import EmgsEvalUpload from "features/applications/partner/components/popups/EmgsEvaluationUpload";
 import EVisaUpload from "features/applications/partner/components/popups/EVisaUpload";
+import ApplicationFormReupload from "features/applications/partner/components/popups/ApplicationFormReupload";
 import ApplicationCommission from './ApplicationCommission';
 import ApplicationDocuments from './ApplicationDocuments';
 import { useToast } from 'components/context/ToastContext';
@@ -129,6 +130,8 @@ export default function ApplicationDetails({
     currentStatusCode === "WAITING_FOR_PAYMENT" ||
     currentStatusCode === "PAYMENT_REJECTED";
 
+  const showApplicationFormReupload = currentStatusCode === "APPLICATION_FORM_REJECTED";
+
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
   const [downloadingTemplate, setDownloadingTemplate] = useState(false);
 
@@ -147,6 +150,7 @@ export default function ApplicationDetails({
 
   const [showEmgsUploadPopup, setShowEmgsUploadPopup] = useState(false);
   const [showEVisaUploadPopup, setShowEVisaUploadPopup] = useState(false);
+  const [showApplicationFormReuploadPopup, setShowApplicationFormReuploadPopup] = useState(false);
 
   const showArrivalConfirmation = currentStatusCode === "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE";
 
@@ -226,7 +230,8 @@ export default function ApplicationDetails({
                 )}
                 <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
                   {program.name && (
-                    <span className="flex items-center gap-1 hidden md:flex">
+                    <span className="flex items-center gap-1 
+                     md:flex">
                       <GraduationCap className="h-3.5 w-3.5 text-blue-400" />
                       {program.name}
                     </span>
@@ -574,6 +579,21 @@ export default function ApplicationDetails({
                 hoverTextColor="hover:text-white"
                 hoverBorderColor="hover:border-blue-700"
                 className="w-full hover:bg-blue-700"
+              />
+            )}
+
+            {showApplicationFormReupload && (
+              <Button
+                type="button"
+                onClick={() => setShowApplicationFormReuploadPopup(true)}
+                icon={<FileUp className="h-4 w-4" />}
+                text="Re-upload Application Form"
+                bgColor="bg-red-600"
+                textColor="text-white"
+                borderColor="border-red-600"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-red-700"
+                className="w-full hover:bg-red-700"
               />
             )}
 
@@ -1006,6 +1026,15 @@ export default function ApplicationDetails({
         <EVisaUpload
           isOpen={showEVisaUploadPopup}
           onClose={() => setShowEVisaUploadPopup(false)}
+          applicationId={application.id}
+          onRefetch={handleRefetch}
+        />
+      )}
+
+      {showApplicationFormReuploadPopup && (
+        <ApplicationFormReupload
+          isOpen={showApplicationFormReuploadPopup}
+          onClose={() => setShowApplicationFormReuploadPopup(false)}
           applicationId={application.id}
           onRefetch={handleRefetch}
         />
