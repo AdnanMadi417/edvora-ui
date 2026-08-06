@@ -66,7 +66,7 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
               <p className="mt-1 text-sm text-slate-500">
                 {!loading && serviceProviders.length > 0 ? (
                   locked
-                    ? <><span className="font-medium text-slate-700">{serviceProviders.length}</span> listings available · <span className="font-medium text-amber-600">Requires Visa Processing stage</span></>
+                    ? <><span className="font-medium text-slate-700">{serviceProviders.length}</span> listings available · <span className="font-medium text-amber-600">Requires Visa Processing stage or later</span></>
                     : <><span className="font-medium text-slate-700">{serviceProviders.length}</span> listings available</>
 
                 ) : (
@@ -112,8 +112,8 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-slate-900">Unlock Logistics Marketplace</p>
                   <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                    The Logistics Marketplace becomes available once you have at least 1 student in{" "}
-                    <span className="font-semibold text-slate-700">Visa Processing</span>.
+                    The Logistics Marketplace becomes available once you have at least 1 student at{" "}
+                    <span className="font-semibold text-slate-700">Visa Processing or a later stage</span>.
                     This ensures logistics support is used at the right stage — when students are
                     preparing for arrival, accommodation, airport pickup, and local assistance.
                   </p>
@@ -124,7 +124,7 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
                 <div className="rounded-xl bg-slate-50 p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Requirement</p>
                   <p className="mt-1 text-sm font-bold text-slate-900">1 student</p>
-                  <p className="text-xs text-slate-500">in Visa Processing</p>
+                  <p className="text-xs text-slate-500">at Visa Processing or later</p>
                 </div>
                 <div className="rounded-xl bg-slate-50 p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Current Status</p>
@@ -134,7 +134,7 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
                       {visaProcessingCount} student{visaProcessingCount !== 1 ? "s" : ""}
                     </p>
                   </div>
-                  <p className="text-xs text-slate-500">in Visa Processing</p>
+                  <p className="text-xs text-slate-500">at Visa Processing or later</p>
                 </div>
               </div>
 
