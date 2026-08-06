@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { partnersApi } from '../services';
 import type { UpdatePartnerPayload } from '../types';
+import { parseApiError } from 'utils/parseApiError';
 
 export function useUpdatePartner() {
   const [isUpdatingPartner, setIsUpdatingPartner] = useState(false);
@@ -12,10 +13,8 @@ export function useUpdatePartner() {
     try {
       const res = await partnersApi.update(partnerId, payload);
       return res.data;
-    } catch (err: any) {
-      const message =
-        err?.response?.data?.detail?.[0]?.msg || 'Failed to update partner';
-      setUpdatePartnerError(message);
+    } catch (err: unknown) {
+      setUpdatePartnerError(parseApiError(err, 'Failed to update partner'));
       throw err;
     } finally {
       setIsUpdatingPartner(false);

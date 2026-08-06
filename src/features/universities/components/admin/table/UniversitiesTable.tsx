@@ -27,6 +27,8 @@ import { useDeleteUniversity, useUniversities } from "features/universities/hook
 import { useRouter } from "next/navigation";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
+import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 import Link from "components/ui/links/LinkBtn";
 
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
@@ -37,6 +39,7 @@ import DeleteUniversityConfirmation from "../popups/DeleteUniversityConfirmation
 import AssignPaymentUniversity from "../popups/AssignPaymentMethods";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { AppDate } from "components/ui/date";
 
 const UniversitiesTable = () => {
@@ -198,7 +201,7 @@ const UniversitiesTable = () => {
       refetch();
     }
     catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to delete university. ${backendMessage}`, "error");
     }
   };
@@ -311,13 +314,17 @@ const UniversitiesTable = () => {
             />
           </div>
 
-          <button
+          <Button
             onClick={() => { setSearchTerm(""); setSelectedStatus("all"); setSelectedType("all"); setCurrentPage(1); setShowFilters(false); }}
-            className="flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-          >
-            <RefreshCw className="h-4 w-4" />
-            <span className="hidden sm:inline">Clear</span>
-          </button>
+            icon={<RefreshCw className="h-4 w-4" />}
+            text="Clear"
+            bgColor="bg-white"
+            textColor="text-red-600"
+            borderColor="border-red-200"
+            hoverTextColor="hover:text-red-600"
+            hoverBorderColor="hover:border-red-200"
+            className="hover:bg-red-50"
+          />
         </div>
       </div>
 
@@ -525,18 +532,21 @@ const UniversitiesTable = () => {
 
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
-                      <button
-                        role="menuitem"
+                      <IconButton
                         aria-label="Assign Payment Method"
                         onClick={(e) => {
                           e.stopPropagation();
                           setAssignPaymentUniversityId(uni.id);
                           setIsAssignPaymentOpen(true);
                         }}
-                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                      >
-                        <Wallet className="h-4 w-4 text-slate-500 hover:text-blue-600" />
-                      </button>
+                        icon={<Wallet className="h-4 w-4 text-slate-500 hover:text-blue-600" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-700"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-slate-100 focus:outline-none"
+                      />
 
                       <div className="h-6 border-l border-slate-200" />
 
@@ -552,8 +562,7 @@ const UniversitiesTable = () => {
 
                       <div className="h-6 border-l border-slate-200" />
 
-                      <button
-                        role="menuitem"
+                      <IconButton
                         aria-label="Delete University"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -561,10 +570,14 @@ const UniversitiesTable = () => {
                           setSelectedUniversityName(uni.name);
                           setIsDeleteOpen(true);
                         }}
-                        className="flex items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                      >
-                        <Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />
-                      </button>
+                        icon={<Trash2 className="h-4 w-4 text-slate-500 hover:text-red-600" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-700"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-slate-100 focus:outline-none"
+                      />
                     </div>
                   </td>
                   <td className="w-8 pr-4 py-4">

@@ -25,12 +25,15 @@ import {
 import { useProgram, useDeletePrograms } from 'features/programs/hooks';
 
 import { useToast } from 'components/context/ToastContext';
+import { parseApiError } from 'utils/parseApiError';
 import DeleteProgramsConfirmation from 'features/programs/components/admin/popups/DeleteProgramsConfirmation';
 import Loading from 'components/loading/Loading';
 import PresignedImage from 'components/ui/PresignedImage';
 import Button from 'components/ui/buttons/Button';
 import RichTextDisplay from 'components/ui/RichTextDisplay';
 import { AppDate } from 'components/ui/date';
+import CurrencySelector from 'features/programs/components/shared/CurrencySelector';
+import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate } from 'features/programs/utils/exchangeRate';
 
 type RequiredDocument = {
   id: string;
@@ -151,8 +154,8 @@ const ProgramDetails = ({ id }: Props) => {
   const { showToast } = useToast();
 
   const router = useRouter();
-  const handleBack = () => router.push('/admin/knowledge-hub/programs');
-  const handleUpdate = () => router.push(`/admin/knowledge-hub/programs/${id}/edit`);
+  const handleBack = () => router.push('/admin/knowledge-hub');
+  const handleUpdate = () => router.push(`/admin/knowledge-hub/${id}/edit`);
 
   const handleDelete = async () => {
     try {
@@ -161,15 +164,20 @@ const ProgramDetails = ({ id }: Props) => {
       await deletePrograms([id]);
       showToast('Deleted successfully', 'success');
       setIsDeleteOpen(false);
-      router.push('/admin/knowledge-hub/programs');
-    } catch {
-      showToast('Delete failed', 'error');
+      router.push('/admin/knowledge-hub');
+    } catch (error: unknown) {
+      showToast(parseApiError(error, 'Delete failed'), 'error');
     } finally {
       setIsDeleting(false);
     }
   };
 
-  const { program, requiredDocuments, commission } = useProgram(id);
+  const { program, requiredDocuments, commission, exchangeRates } = useProgram(id);
+  const [currency, setCurrency] = useState('MYR');
+
+  const currencyOptions = getCurrencyOptions(exchangeRates);
+  const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
+  const formatCommission = (amount: number, curr?: string | null) => formatCommissionRate(amount, curr, currency, exchangeRates);
 
   const nextIntakeDate = (() => {
     const today = new Date();
@@ -199,14 +207,14 @@ const ProgramDetails = ({ id }: Props) => {
     lines.push('Yearly Tuition fees');
     lines.push('');
     (program?.yearly_fees ?? []).forEach((item) => {
-      lines.push(`${getOrdinal(item.year)} year: MYR ${Number(item.fee).toLocaleString()}`);
+      lines.push(`${getOrdinal(item.year)} year: ${formatMoney(item.fee)}`);
     });
     lines.push('');
     lines.push('');
     lines.push('Other fees');
     lines.push('');
     (program?.one_time_fees ?? []).forEach((item) => {
-      lines.push(`${item.description ?? 'Fee'} : MYR ${Number(item.fee).toLocaleString()}`);
+      lines.push(`${item.description ?? 'Fee'} : ${formatMoney(item.fee)}`);
     });
     lines.push('');
     lines.push('University fees for this course include 6% tax (SST)');
@@ -252,27 +260,18 @@ const ProgramDetails = ({ id }: Props) => {
           </div>
 
           <div className="flex shrink-0 items-center gap-2">
-            <button
-              onClick={handleCopyAll}
-              title={copied ? 'Copied!' : 'Copy program info'}
-              className={`flex h-9 items-center justify-center gap-1.5 rounded-md border px-3 text-xs font-medium transition ${
-                copied
-                  ? 'border-green-300 bg-green-50 text-green-700'
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              <Copy className="h-3.5 w-3.5" />
-              {copied ? 'Copied!' : 'Copy'}
-            </button>
-
             <div className="relative">
-            <button
+            <Button
               onClick={() => setOpenDropdownId(openDropdownId === program.id ? null : program.id)}
-              className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-            >
-              Actions
-              <MoreVertical className="h-4 w-4" />
-            </button>
+              icon={<MoreVertical className="h-4 w-4" />}
+              text="Actions"
+              bgColor="bg-white"
+              textColor="text-slate-700"
+              borderColor="border-slate-200"
+              hoverTextColor="hover:text-slate-700"
+              hoverBorderColor="hover:border-slate-300"
+              className="h-10 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-400"
+            />
 
             {openDropdownId === program.id && (
               <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-lg border border-slate-200 bg-white ring-1 ring-black/5">
@@ -304,14 +303,14 @@ const ProgramDetails = ({ id }: Props) => {
                   </button>
 
                   <button
-                    aria-label="Back to Programs"
+                    aria-label="Back to Knowledge Hub"
                     className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
                     onClick={handleBack}
                   >
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
                       <ChevronLeft className="h-4 w-4" />
                     </div>
-                    <span className="font-semibold text-slate-900">Back to Programs</span>
+                    <span className="font-semibold text-slate-900">Back to Knowledge Hub</span>
                   </button>
 
                 </div>
@@ -327,7 +326,7 @@ const ProgramDetails = ({ id }: Props) => {
           <CircleDollarSign className="h-5 w-5 text-green-600" />
           <p className="text-xs text-green-600">Commission</p>
           <p className="text-xl font-bold text-green-700">
-            {commission?.amount != null ? `${(commission.currency || "RM").toUpperCase()} ${commission.amount.toLocaleString()}` : '—'}
+            {commission?.amount != null ? formatCommission(commission.amount, commission.currency) : '—'}
           </p>
         </div>
 
@@ -335,7 +334,7 @@ const ProgramDetails = ({ id }: Props) => {
           <Banknote className="h-5 w-5 text-slate-400" />
           <p className="text-xs text-slate-500">First Year</p>
           <p className="text-xl font-bold text-slate-800">
-            {program?.yearly_fees?.[0]?.fee != null ? `RM ${Number(program.yearly_fees[0].fee).toLocaleString()}` : '—'}
+            {program?.yearly_fees?.[0]?.fee != null ? formatMoney(program.yearly_fees[0].fee) : '—'}
           </p>
         </div>
 
@@ -448,11 +447,28 @@ const ProgramDetails = ({ id }: Props) => {
       </div>
 
       <div className="p-6 border-b border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
-              <CreditCard className="h-5 w-5 text-blue-600" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
+                <CreditCard className="h-5 w-5 text-blue-600" />
+              </div>
+              <h4 className="text-base font-bold text-slate-900">Tuition Fees</h4>
             </div>
-            <h4 className="text-base font-bold text-slate-900">Tuition Fees</h4>
+            <div className="flex shrink-0 items-center gap-2">
+              <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
+              <Button
+                onClick={handleCopyAll}
+                title={copied ? 'Copied!' : 'Copy program info'}
+                icon={<Copy className="h-4 w-4" />}
+                text={copied ? 'Copied!' : 'Copy'}
+                bgColor={copied ? 'bg-green-50' : 'bg-white'}
+                textColor={copied ? 'text-green-700' : 'text-slate-600'}
+                borderColor={copied ? 'border-green-300' : 'border-slate-200'}
+                hoverTextColor={copied ? 'hover:text-green-700' : 'hover:text-slate-600'}
+                hoverBorderColor={copied ? 'hover:border-green-300' : 'hover:border-slate-300'}
+                className={`h-10 ${copied ? '' : 'hover:bg-slate-50'}`}
+              />
+            </div>
           </div>
 
         <div className="mt-4 grid grid-cols-1 items-start gap-4 md:grid-cols-2">
@@ -469,7 +485,7 @@ const ProgramDetails = ({ id }: Props) => {
                     <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                       <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">Year {item.year}</div>
                       <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                        RM {Number(item.fee).toLocaleString()}
+                        {formatMoney(item.fee)}
                       </div>
                     </div>
                   ))
@@ -493,7 +509,7 @@ const ProgramDetails = ({ id }: Props) => {
                     <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                       <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">{item.description ?? 'Fee'}</div>
                       <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                        RM {Number(item.fee).toLocaleString()}
+                        {formatMoney(item.fee)}
                       </div>
                     </div>
                   ))
@@ -540,7 +556,7 @@ const ProgramDetails = ({ id }: Props) => {
                 </div>
                 {item.description && <RichTextDisplay html={item.description} />}
                 {item.max_amount > 0 && (
-                  <p className="text-base font-bold text-amber-600">Up to RM {item.max_amount.toLocaleString()}</p>
+                  <p className="text-base font-bold text-amber-600">Up to {formatMoney(item.max_amount)}</p>
                 )}
                 {item.conditions && item.conditions.length > 0 && (
                   <div className="border-t border-slate-100 pt-3">
@@ -588,7 +604,7 @@ const ProgramDetails = ({ id }: Props) => {
               <div>
                 <p className="text-xs font-medium text-green-600">Commission Amount</p>
                 <p className="mt-1 text-2xl font-bold text-green-700">
-                  {(commission.currency || 'RM').toUpperCase()} {commission.amount.toLocaleString()}
+                  {formatCommission(commission.amount, commission.currency)}
                 </p>
               </div>
 

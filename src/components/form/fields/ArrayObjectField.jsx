@@ -60,7 +60,7 @@ const ArrayObjectField = ({
   };
 
   return (
-    <div className="space-y-4 rounded-lg border border-default p-4">
+    <div className="space-y-4 rounded-lg border border-slate-200 p-4">
 
       <div className="flex items-center justify-between">
         <label className="text-sm font-semibold text-slate-900">
@@ -128,7 +128,7 @@ const ArrayObjectField = ({
                     onChange={(e) =>
                       handleChange(index, f.key, e.target.value)
                     }
-                    className="h-11 w-full rounded-lg border border-default px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
+                    className="h-11 w-full rounded-lg border border-slate-200 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
                   />
 
                   {errorMessage && (

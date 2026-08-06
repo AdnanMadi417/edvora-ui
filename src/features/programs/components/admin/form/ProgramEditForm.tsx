@@ -15,6 +15,7 @@ import {
 import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
 import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
@@ -257,10 +258,9 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
       showToast("Program updated successfully", "success");
 
-      router.push(`/admin/knowledge-hub/programs/${id}`);
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      router.push(`/admin/knowledge-hub/${id}`);
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
     }
   };
@@ -273,10 +273,9 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       showToast("Deleted successfully", "success");
       setIsDeleteOpen(false);
       setDeleteMode(null);
-      router.push("/admin/knowledge-hub/programs");
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      router.push("/admin/knowledge-hub");
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Delete failed. ${backendMessage}`, "error");
     } finally {
       setIsDeleting(false);
@@ -284,7 +283,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   };
 
   const handleBack = () => {
-    router.push(`/admin/knowledge-hub/programs/${id}`);
+    router.push(`/admin/knowledge-hub/${id}`);
   };
 
   if (!program) return <Loading text="Loading program..." />;
@@ -310,17 +309,21 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
             <div className="flex items-center gap-2 sm:gap-6">
               <div className="relative">
-                <button
+                <Button
                   onClick={() =>
                     setOpenDropdownId(
                       openDropdownId === program.id ? null : program.id
                     )
                   }
-                  className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-                >
-                  Actions
-                  <MoreVertical className="h-4 w-4" />
-                </button>
+                  icon={<MoreVertical className="h-4 w-4" />}
+                  text="Actions"
+                  bgColor="bg-white"
+                  textColor="text-slate-800"
+                  borderColor="border-gray-200"
+                  hoverTextColor="hover:text-slate-800"
+                  hoverBorderColor="hover:border-gray-200"
+                  className="hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+                />
 
                 {openDropdownId === program.id && (
                   <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
@@ -344,7 +347,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                       </button>
 
                       <button
-                        aria-label="Back to Programs"
+                        aria-label="Back to Knowledge Hub"
                         className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
                         onClick={handleBack}
                       >
@@ -353,7 +356,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                         </div>
 
                         <span className="font-semibold text-slate-900">
-                        Back to Programs
+                        Back to Knowledge Hub
                       </span>
                       </button>
                     </div>

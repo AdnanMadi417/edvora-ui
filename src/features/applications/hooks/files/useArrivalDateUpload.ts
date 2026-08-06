@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 export const useArrivalDateUpload = () => {
@@ -44,7 +45,7 @@ export const useArrivalDateUpload = () => {
 
       showToast("Arrival date submitted successfully", "success");
     } catch (err: any) {
-      const message = err.response?.data?.message || err.message || "Failed to submit arrival date";
+      const message = parseApiError(err, "Failed to submit arrival date");
       showToast(message, "error");
       throw err;
     } finally {

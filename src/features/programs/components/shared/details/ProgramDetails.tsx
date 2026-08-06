@@ -28,6 +28,8 @@ import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 import { AppDate } from "components/ui/date";
+import CurrencySelector from "features/programs/components/shared/CurrencySelector";
+import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate } from "features/programs/utils/exchangeRate";
 
 type RequiredDocument = {
   id: string;
@@ -133,8 +135,13 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
   const router = useRouter();
   const handleBack = () => router.push(`${basePath}/knowledge-hub/`);
 
-  const { program, requiredDocuments, commission, loading, error } = useProgram(id);
+  const { program, requiredDocuments, commission, exchangeRates, loading, error } = useProgram(id);
   const [copied, setCopied] = useState(false);
+  const [currency, setCurrency] = useState("MYR");
+
+  const currencyOptions = getCurrencyOptions(exchangeRates);
+  const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
+  const formatCommission = (amount: number, curr?: string | null) => formatCommissionRate(amount, curr, currency, exchangeRates);
 
   const nextIntakeDate = (() => {
     const today = new Date();
@@ -183,7 +190,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
     lines.push("");
 
     (program?.yearly_fees ?? []).forEach((item) => {
-      lines.push(`${getOrdinal(item.year)} year: MYR ${item.fee.toLocaleString()}`);
+      lines.push(`${getOrdinal(item.year)} year: ${formatMoney(item.fee)}`);
     });
 
     lines.push("");
@@ -192,7 +199,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
     lines.push("");
 
     (program?.one_time_fees ?? []).forEach((item) => {
-      lines.push(`${item.description ?? "Fee"} : MYR ${item.fee.toLocaleString()}`);
+      lines.push(`${item.description ?? "Fee"} : ${formatMoney(item.fee)}`);
     });
 
     lines.push("");
@@ -241,20 +248,6 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
             </div>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2.5">
-            <button
-              onClick={handleCopyAll}
-              title={copied ? "Copied!" : "Copy program info"}
-              className={`flex h-10 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition ${
-                copied
-                  ? "border-green-300 bg-green-50 text-green-700"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
-              }`}
-            >
-              <Copy className="h-4 w-4" />
-              {copied ? "Copied!" : "Copy"}
-            </button>
-          </div>
         </div>
 
         {/* Stats */}
@@ -263,7 +256,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
             <CircleDollarSign className="h-5 w-5 text-green-600" />
             <p className="text-xs text-green-600">Commission</p>
             <p className="text-xl font-bold text-green-700">
-              {commission?.amount != null ? `${(commission.currency || "RM").toUpperCase()} ${commission.amount.toLocaleString()}` : "—"}
+              {commission?.amount != null ? formatCommission(commission.amount, commission.currency) : "—"}
             </p>
           </div>
 
@@ -271,7 +264,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
             <Banknote className="h-5 w-5 text-slate-400" />
             <p className="text-xs text-slate-500">First Year</p>
             <p className="text-xl font-bold text-slate-800">
-              {program?.yearly_fees?.[0]?.fee != null ? `RM ${program.yearly_fees[0].fee.toLocaleString()}` : "—"}
+              {program?.yearly_fees?.[0]?.fee != null ? formatMoney(program.yearly_fees[0].fee) : "—"}
             </p>
           </div>
 
@@ -396,11 +389,28 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
 
         {/* Tuition Fees */}
         <div className="p-6 border-b border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
-              <CreditCard className="h-5 w-5 text-blue-600" />
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
+                <CreditCard className="h-5 w-5 text-blue-600" />
+              </div>
+              <h4 className="text-base font-bold text-slate-900">Tuition Fees</h4>
             </div>
-            <h4 className="text-base font-bold text-slate-900">Tuition Fees</h4>
+            <div className="flex shrink-0 items-center gap-2.5">
+              <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
+              <Button
+                onClick={handleCopyAll}
+                title={copied ? "Copied!" : "Copy program info"}
+                icon={<Copy className="h-4 w-4" />}
+                text={copied ? "Copied!" : "Copy"}
+                bgColor={copied ? "bg-green-50" : "bg-white"}
+                textColor={copied ? "text-green-700" : "text-slate-600"}
+                borderColor={copied ? "border-green-300" : "border-slate-200"}
+                hoverTextColor={copied ? "hover:text-green-700" : "hover:text-slate-600"}
+                hoverBorderColor={copied ? "hover:border-green-300" : "hover:border-slate-300"}
+                className={copied ? "" : "hover:bg-slate-50"}
+              />
+            </div>
           </div>
 
           <div className="mt-4 grid grid-cols-1 items-start gap-4 md:grid-cols-2">
@@ -417,7 +427,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
                       <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">Year {item.year}</div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                          RM {item.fee.toLocaleString()}
+                          {formatMoney(item.fee)}
                         </div>
                       </div>
                     ))
@@ -443,7 +453,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
                       <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">{item.description ?? "Fee"}</div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                          RM {item.fee.toLocaleString()}
+                          {formatMoney(item.fee)}
                         </div>
                       </div>
                     ))
@@ -492,7 +502,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
                       </div>
                       {item.description && <RichTextDisplay html={item.description} />}
                       {item.max_amount > 0 && (
-                        <p className="text-base font-bold text-amber-600">Up to RM {item.max_amount.toLocaleString()}</p>
+                        <p className="text-base font-bold text-amber-600">Up to {formatMoney(item.max_amount)}</p>
                       )}
                       {item.conditions && item.conditions.length > 0 && (
                         <div className="border-t border-slate-100 pt-3">
@@ -540,7 +550,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
                 <div>
                   <p className="text-xs font-medium text-green-600">Commission Amount</p>
                   <p className="mt-1 text-2xl font-bold text-green-700">
-                    {(commission.currency || "RM").toUpperCase()} {commission.amount.toLocaleString()}
+                    {formatCommission(commission.amount, commission.currency)}
                   </p>
                 </div>
 

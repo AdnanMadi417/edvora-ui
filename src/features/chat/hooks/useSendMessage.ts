@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import api from "lib/useApi";
 import type { ChatMessage } from "../types";
+import { parseApiError } from "utils/parseApiError";
 
 interface UseSendMessageOptions {
   applicationId: string;
@@ -23,8 +24,8 @@ export function useSendMessage({ applicationId }: UseSendMessageOptions) {
           { message_text: messageText }
         );
         return response.data;
-      } catch (err: any) {
-        setError(err.message || "Failed to send message");
+      } catch (err: unknown) {
+        setError(parseApiError(err, "Failed to send message"));
         return null;
       } finally {
         setSending(false);

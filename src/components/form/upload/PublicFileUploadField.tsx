@@ -4,6 +4,7 @@ import React, { useRef, useState } from "react";
 import { AlertCircle, CloudUpload, FileCheck, Trash2 } from "lucide-react";
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
+import { parseApiError } from "utils/parseApiError";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -50,8 +51,8 @@ export default function PublicFileUploadField({
     try {
       const res = await uploadPublicPartnerFile(file, setProgress);
       onUpload(res, file.name);
-    } catch {
-      setUploadError("Upload failed. Please try again.");
+    } catch (err: unknown) {
+      setUploadError(parseApiError(err, "Upload failed. Please try again."));
     } finally {
       setUploading(false);
     }

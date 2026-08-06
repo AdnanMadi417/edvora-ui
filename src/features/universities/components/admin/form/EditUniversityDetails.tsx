@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { CURRENCY } from "constants/lists";
 import {
   useAssignUniversityType,
@@ -301,9 +302,9 @@ const UniversityEdit = ({ id }: Props) => {
         branches: prev.branches.filter((_, i) => i !== index),
       }));
       refetchUniversity();
-    } catch (error: any) {
+    } catch (error: unknown) {
       showToast(
-        `Failed to delete branch. ${error?.response?.data?.message ?? "Please try again."}`,
+        `Failed to delete branch. ${parseApiError(error, "Please try again.")}`,
         "error"
       );
     }
@@ -339,8 +340,8 @@ const UniversityEdit = ({ id }: Props) => {
         progress: 100,
       }));
       showToast("Logo uploaded successfully.", "success");
-    } catch (err: any) {
-      showToast(err?.message ?? "Logo upload failed.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Logo upload failed."), "error");
       setLogo((prev) => ({ ...prev, file: null }));
     } finally {
       setLogo((prev) => ({ ...prev, uploading: false }));
@@ -374,9 +375,9 @@ const UniversityEdit = ({ id }: Props) => {
       setPaymentRows((prev) => prev.filter((p) => p.id !== methodId));
       showToast("Payment method deleted successfully.", "success");
       refetchPayments();
-    } catch (error: any) {
+    } catch (error: unknown) {
       showToast(
-        `Failed to delete payment method. ${error?.response?.data?.message ?? "Please try again."}`,
+        `Failed to delete payment method. ${parseApiError(error, "Please try again.")}`,
         "error"
       );
     }
@@ -408,7 +409,7 @@ const UniversityEdit = ({ id }: Props) => {
         });
         setPaymentErrors(newErrors);
       } else {
-        showToast("Failed to assign payment method.", "error");
+        showToast(parseApiError(err, "Failed to assign payment method."), "error");
       }
     }
   };
@@ -466,7 +467,7 @@ const UniversityEdit = ({ id }: Props) => {
         setErrors(newErrors);
       }
 
-      let message = error?.response?.data?.message ?? "Please try again.";
+      let message = parseApiError(error, "Please try again.");
       if (Array.isArray(details) && details.length > 0) {
         const first = details[0];
         const field = first?.loc?.[1];

@@ -7,6 +7,8 @@ import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applicatio
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import RichTextDisplay from "components/ui/RichTextDisplay";
+import Button from "components/ui/buttons/Button";
+import { parseApiError } from "utils/parseApiError";
 
 interface VisaPaymentConfirmationProps {
   isOpen: boolean;
@@ -63,9 +65,8 @@ export default function VisaPaymentConfirmation({
 
       handleClose();
       onRefetch?.();
-    } catch (error: any) {
-      const message = error?.response?.data?.message || error?.message || "Failed to submit";
-      setUploadError(message);
+    } catch (error: unknown) {
+      setUploadError(parseApiError(error, "Failed to submit"));
     }
   };
 
@@ -97,7 +98,7 @@ export default function VisaPaymentConfirmation({
       >
         <div className="relative overflow-hidden rounded-2xl bg-white text-sm shadow-2xl ring-1 ring-black/5">
 
-          <div className="relative border-b border-default px-6 pb-4 pt-6">
+          <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
@@ -205,14 +206,17 @@ export default function VisaPaymentConfirmation({
 
           <div className="border-t border-slate-200 px-6 py-4">
             <div className="flex justify-end gap-3">
-              <button
+              <Button
                 onClick={handleClose}
-                className="flex items-center justify-center gap-2 rounded-md border border-gray-600 text-gray-600 px-4 py-2 text-sm font-medium transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
-              >
-                <XCircle className="h-4 w-4" />
-                Cancel
-              </button>
-              <button
+                icon={<XCircle className="h-4 w-4" />}
+                text="Cancel"
+                bgColor="bg-white"
+                textColor="text-gray-600"
+                borderColor="border-gray-600"
+                hoverTextColor="hover:text-gray-700"
+                hoverBorderColor="hover:border-gray-700"
+              />
+              <Button
                 disabled={
                   !paymentReference ||
                   !!fileError ||
@@ -222,11 +226,15 @@ export default function VisaPaymentConfirmation({
                   (hasAppFormTemplate && !appFormFile)
                 }
                 onClick={handleConfirmUpload}
-                className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 text-blue-700 px-4 py-2 text-sm font-medium transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
-              >
-                <CheckCircle className="h-4 w-4" />
-                {isUploading ? "Submitting..." : paymentLoading ? "Loading..." : "Proceed to Payment"}
-              </button>
+                icon={<CheckCircle className="h-4 w-4" />}
+                text={isUploading ? "Submitting..." : paymentLoading ? "Loading..." : "Proceed to Payment"}
+                bgColor="bg-blue-100"
+                textColor="text-blue-700"
+                borderColor="border-blue-600"
+                hoverTextColor="hover:text-blue-700"
+                hoverBorderColor="hover:border-blue-700"
+                className="hover:bg-blue-200"
+              />
             </div>
           </div>
         </div>

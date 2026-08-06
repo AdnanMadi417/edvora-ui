@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api from "lib/useApi";
+import { parseApiError } from "utils/parseApiError";
 
 interface DeleteScholarshipsPayload {
   program_ids: string[];
@@ -19,10 +20,8 @@ export function useDeleteScholarships() {
         data: payload,
       });
       return res.data;
-    } catch (err: any) {
-      const errorMessage =
-        err?.response?.data?.message || "Failed to delete scholarships";
-      setError(errorMessage);
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to delete scholarships"));
       throw err;
     } finally {
       setLoading(false);

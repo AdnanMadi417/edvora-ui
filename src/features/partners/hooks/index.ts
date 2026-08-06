@@ -1,12 +1,17 @@
 export { usePartners, useAllPartners } from './usePartners';
 export { usePartnerDetails } from './usePartnerDetails';
+export { useAccountManagerPartners } from './useAccountManagerPartners';
+export { useAccountManagerPartnerDetails } from './useAccountManagerPartnerDetails';
 export { useCreatePartner } from './useCreatePartner';
 export { useUpdatePartner } from './useUpdatePartner';
 export { useDeletePartner } from './useDeletePartner';
 export { useAssignPartnerManager } from './useAssignPartnerManager';
 export { usePartnerProfile } from './usePartnerProfile';
 export { useUpdatePartnerProfile } from './useUpdatePartnerProfile';
+export { useCompleteOnboarding } from './useCompleteOnboarding';
 export { useReviewPartner } from './useReviewPartner';
+export { useResendApprovalEmail } from './useResendApprovalEmail';
+export { useAdminResendRegistrationOtp } from './useAdminResendRegistrationOtp';
 export { usePartnerRegistration } from './usePartnerRegistration';
 export { useResendRegistrationOtp } from './useResendRegistrationOtp';
 export { useVerifyRegistrationOtp } from './useVerifyRegistrationOtp';

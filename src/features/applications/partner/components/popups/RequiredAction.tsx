@@ -4,10 +4,13 @@ import React, { useState } from "react";
 import { CheckCircle, Pause, XCircle, AlertCircle, Download } from "lucide-react";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import DocumentUploadList from "features/applications/partner/components/form/stages/DocumentUploadList";
+import DocumentActions from "features/applications/shared/DocumentActions";
 import { useApplicationActions } from "features/applications/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
+import Button from "components/ui/buttons/Button";
+import { parseApiError } from "utils/parseApiError";
 import { DocumentItem, DocumentType, FormDataType } from "features/applications/partner/components/form/utility-functions/types";
 
 const FREE_UPLOAD_ID = "__free_upload__";
@@ -93,8 +96,8 @@ export default function RequiredAction({
         return next;
       });
       showToast("File uploaded successfully", "success");
-    } catch {
-      showToast("Upload failed", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Upload failed"), "error");
       setDocuments((prev) =>
         prev.map((d) => (d.uploading ? { ...d, uploading: false } : d))
       );
@@ -108,8 +111,8 @@ export default function RequiredAction({
     if (doc.file_key) {
       try {
         await api.delete("/storage/file", { data: { file_key: doc.file_key } });
-      } catch {
-        showToast("Failed to delete file from storage", "error");
+      } catch (err: unknown) {
+        showToast(parseApiError(err, "Failed to delete file from storage"), "error");
         return;
       }
     }
@@ -165,9 +168,8 @@ export default function RequiredAction({
       onConfirm?.(applicationId, payload.map((d) => d.document_type_id));
       onClose();
       onRefetch?.();
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Failed to submit documents.";
-      showToast(message, "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to submit documents."), "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -202,7 +204,7 @@ export default function RequiredAction({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative overflow-hidden rounded-2xl bg-card shadow-lg">
-          <div className="relative border-b border-default px-6 pb-4 pt-6">
+          <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100">
@@ -248,16 +250,9 @@ export default function RequiredAction({
                         <p className="text-xs text-blue-600">Download and complete this form before uploading</p>
                       </div>
                     </div>
-                    <a
-                      href={arrivalFormTemplate.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      download
-                      className="flex items-center gap-1.5 rounded-md border border-blue-600 bg-blue-100 px-3 py-1.5 text-xs font-medium text-blue-700 transition hover:bg-blue-200"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                      Download
-                    </a>
+                    <div className="flex items-center gap-2">
+                      <DocumentActions fileKey={arrivalFormTemplate.file_key} label="Arrival Form Template" />
+                    </div>
                   </div>
                 )}
                 <DocumentUploadList
@@ -295,22 +290,29 @@ export default function RequiredAction({
             )}
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
-            <button
+          <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
+            <Button
               onClick={onClose}
-              className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
-            >
-              <XCircle className="h-4 w-4" />
-              Cancel
-            </button>
-            <button
+              icon={<XCircle className="h-4 w-4" />}
+              text="Cancel"
+              bgColor="bg-white"
+              textColor="text-gray-600"
+              borderColor="border-gray-600"
+              hoverTextColor="hover:text-gray-700"
+              hoverBorderColor="hover:border-gray-700"
+            />
+            <Button
               onClick={handleConfirm}
               disabled={!allRequiredUploaded || anyUploading || isSubmitting}
-              className="flex items-center justify-center gap-2 rounded-md border border-amber-600 bg-amber-100 px-4 py-2 text-sm font-medium text-amber-700 transition hover:border-amber-700 hover:bg-amber-200 disabled:opacity-50"
-            >
-              <CheckCircle className="h-4 w-4" />
-              {isSubmitting ? "Submitting..." : "Confirm"}
-            </button>
+              icon={<CheckCircle className="h-4 w-4" />}
+              text={isSubmitting ? "Submitting..." : "Confirm"}
+              bgColor="bg-amber-100"
+              textColor="text-amber-700"
+              borderColor="border-amber-600"
+              hoverTextColor="hover:text-amber-700"
+              hoverBorderColor="hover:border-amber-700"
+              className="hover:bg-amber-200"
+            />
           </div>
         </div>
       </div>

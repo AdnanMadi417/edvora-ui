@@ -10,6 +10,7 @@ import Button from "components/ui/buttons/Button";
 import Loading from "components/loading/Loading";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface BatchDeleteScholarshipsProps {
   isOpen: boolean;
@@ -74,9 +75,8 @@ export default function BatchDeleteScholarships({
         onClose();
         onSuccess?.();
       }, 1500);
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Delete failed. ${backendMessage}`, "error");
     }
   };

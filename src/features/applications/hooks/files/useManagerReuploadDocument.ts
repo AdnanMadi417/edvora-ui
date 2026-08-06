@@ -4,6 +4,7 @@ import { useState } from "react";
 import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
+import { parseApiError } from "utils/parseApiError";
 
 interface UseManagerReuploadDocumentReturn {
   reuploadDocument: (file: File, applicationId: string, documentId: string) => Promise<string | undefined>;
@@ -40,7 +41,7 @@ export const useManagerReuploadDocument = (): UseManagerReuploadDocumentReturn =
       return data?.id as string | undefined;
     } catch (err: any) {
       const code = err.response?.data?.code || err.response?.data?.detail;
-      const msg = ERROR_MESSAGES[code] || err.response?.data?.message || err.message || "Re-upload failed";
+      const msg = ERROR_MESSAGES[code] || parseApiError(err, "Re-upload failed");
       showToast(msg, "error");
       throw err;
     } finally {

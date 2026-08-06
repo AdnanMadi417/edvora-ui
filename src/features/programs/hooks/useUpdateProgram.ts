@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { programApi } from "../services";
 import type { UpdateProgramPayload } from "../types";
+import { parseApiError } from "utils/parseApiError";
 
 export function useUpdateProgram() {
   const [updateProgrLoading, setLoading] = useState(false);
@@ -39,9 +40,8 @@ export function useUpdateProgram() {
       const res = await programApi.programs.update(programId, sanitized);
       setSuccess(true);
       return res.data;
-    } catch (err: any) {
-      const apiError = err?.response?.data?.detail || err?.response?.data?.message || err?.message;
-      setError(Array.isArray(apiError) ? apiError[0]?.msg || "Failed to update program" : apiError || "Failed to update program");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to update program"));
       throw err;
     } finally {
       setLoading(false);

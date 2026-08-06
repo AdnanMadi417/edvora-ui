@@ -9,6 +9,7 @@ import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import InputField from "components/form/fields/InputField";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface CreateFieldOfStudyProps {
   isOpen: boolean;
@@ -83,7 +84,7 @@ export default function CreateFieldOfStudy({
       onSuccess?.();
 
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create Field Of Study. ${backendMessage}`, "error");
       setErrors({ name: backendMessage });
     }

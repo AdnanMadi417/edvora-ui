@@ -1,5 +1,6 @@
 import { useState } from "react";
 import api from "lib/useApi";
+import { parseApiError } from "utils/parseApiError";
 
 interface DisputeCommissionPayload {
   reason_text: string;
@@ -16,8 +17,8 @@ export function useDisputeCommission(applicationId: string) {
     setError(null);
     try {
       await api.post(`/applications/${applicationId}/dispute-commission`, payload);
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || "Failed to submit dispute";
+    } catch (err: unknown) {
+      const msg = parseApiError(err, "Failed to submit dispute");
       setError(msg);
       throw err;
     } finally {

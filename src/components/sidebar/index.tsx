@@ -10,6 +10,8 @@ import Image from "next/image";
 
 import { useEffect, useState, useCallback } from "react";
 import api, { SIGN_IN_URL, LOGOUT_URL } from "lib/useApi";
+import { usePartnerProfile } from "features/partners/hooks";
+import PresignedImage from "components/ui/PresignedImage";
 
 interface User {
   id: string;
@@ -25,6 +27,9 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const [user, setUser] = useState<User | null>(null);
   const [userError, setUserError] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showBetaTooltip, setShowBetaTooltip] = useState(false);
+  const { partner } = usePartnerProfile({ enabled: user?.role === "partner" });
+  const photoFileKey = partner?.individual_details?.profile_photo_file_key;
 
   const ROLE_LABELS: Record<string, string> = {
     admin: "Admin",
@@ -106,19 +111,33 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
         </button>
 
         <header className="mb-3 mt-3 flex items-center justify-center gap-2 px-6 py-6">
-          <Image
-            src={logoImg}
-            alt="Your Business Logo"
-            width={140}
-            height={70}
-            className="object-contain"
-            priority
-          />
+          <a href="https://www.unibexs.com" target="_blank" rel="noopener noreferrer">
+            <Image
+              src={logoImg}
+              alt="Unibexs"
+              width={140}
+              height={70}
+              className="object-contain"
+              priority
+            />
+          </a>
           {user?.role === "partner" && (
-            <span className="flex shrink-0 items-center gap-1 rounded-md border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700">
-              <FlaskConical className="h-3 w-3" />
-              Beta
-            </span>
+            <div className="relative">
+              <span
+                className="flex shrink-0 cursor-default items-center gap-1 rounded-md border border-amber-300 bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700"
+                onMouseEnter={() => setShowBetaTooltip(true)}
+                onMouseLeave={() => setShowBetaTooltip(false)}
+              >
+                <FlaskConical className="h-3 w-3" />
+                Beta
+              </span>
+              {showBetaTooltip && (
+                <div className="absolute left-1/2 top-full z-50 mt-2 w-48 -translate-x-1/2 rounded-md bg-slate-900 px-3 py-2 text-center text-[11px] font-normal normal-case leading-snug text-white shadow-lg">
+                  <div className="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-slate-900" />
+                  Things are still being polished — you might spot a few bugs. Thanks for testing with us!
+                </div>
+              )}
+            </div>
           )}
         </header>
 
@@ -137,10 +156,15 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             <div className="flex items-center gap-3">
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center
-          rounded-full bg-accent-light text-h5 font-medium text-blue-700"
+          overflow-hidden rounded-full bg-accent-light text-h5 font-medium text-blue-700"
               >
                 {user ? (
-                  user.name[0].toUpperCase()
+                  <PresignedImage
+                    fileKey={photoFileKey ?? undefined}
+                    alt={user.name}
+                    className="h-full w-full object-cover"
+                    fallback={user.name[0].toUpperCase()}
+                  />
                 ) : (
                   <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
                 )}

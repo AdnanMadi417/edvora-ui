@@ -3,5 +3,6 @@ export * from './services';
 export * from './types';
 
 // Components — exported explicitly to avoid naming conflicts with types
-export { PartnersTable, RegisterPartner, EditPartnerDetails, AssignPartnerManager, DeletePartner } from './components';
-export { default as PartnerDetailsView } from './components/details/PartnerDetails';
+export { PartnersTable, RegisterPartner, EditPartnerDetails, DeletePartner } from './components';
+export { default as PartnerDetailsView } from './components/admin/PartnerDetails';
+export { default as PartnerApplicationsTable } from './components/admin/PartnerApplicationsTable';

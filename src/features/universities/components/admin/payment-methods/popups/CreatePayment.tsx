@@ -10,6 +10,7 @@ import Button from "components/ui/buttons/Button";
 import InputField from "components/form/fields/InputField";
 import RichTextEditor from "components/form/fields/RichTextEditor";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface CreatePaymentMethodProps {
   isOpen: boolean;
@@ -95,8 +96,7 @@ export default function CreatePayment({
       onClose();
       setTimeout(() => onSuccess?.(), 1500);
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
 
       setApiError(backendMessage);
 

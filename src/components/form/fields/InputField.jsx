@@ -8,7 +8,7 @@ const getNestedValue = (obj, path) => {
     .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
-const InputField = ({ label, field, type = "text", required = true, placeholder = "", formData, errors, updateFormData, onBlur = undefined }) => {
+const InputField = ({ label, field, type = "text", required = true, placeholder = "", formData, errors, updateFormData, onBlur = undefined, disabled = false, helperText = "" }) => {
   const value = getNestedValue(formData, field) ?? "";
   const error = errors?.[field];
 
@@ -26,14 +26,22 @@ const InputField = ({ label, field, type = "text", required = true, placeholder 
         onChange={(e) => updateFormData(field, type === "email" ? e.target.value.toLowerCase() : e.target.value)}
         onBlur={onBlur}
         placeholder={placeholder}
+        disabled={disabled}
         {...dateProps}
         className={`mt-2 flex h-12 w-full items-center justify-start rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-          error ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"
+          disabled
+            ? "cursor-not-allowed border-slate-200 bg-slate-100 text-slate-500"
+            : error
+            ? "border-red-500 bg-red-50"
+            : "border-slate-200 bg-white hover:bg-slate-50"
         }`}
       />
 
       {error && (
         <p className="mt-1 text-xs text-red-600">{error}</p>
+      )}
+      {!error && disabled && helperText && (
+        <p className="mt-1 text-xs text-slate-400">{helperText}</p>
       )}
     </div>
   );

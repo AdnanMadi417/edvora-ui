@@ -2,6 +2,7 @@ import { useState } from "react";
 import Cookies from "js-cookie";
 import { programApi } from "../services";
 import type { UpdateDefaultVisaFeePayload } from "../types";
+import { parseApiError } from "utils/parseApiError";
 
 export function useUpdateDefaultVisaFee() {
   const [loading, setLoading] = useState(false);
@@ -18,8 +19,8 @@ export function useUpdateDefaultVisaFee() {
     try {
       const res = await programApi.admin.updateDefaultVisaFee(payload);
       return res.data;
-    } catch (err: any) {
-      setError(err?.response?.data?.message || err?.response?.data?.detail || "Failed to update default visa fee");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to update default visa fee"));
       throw err;
     } finally {
       setLoading(false);

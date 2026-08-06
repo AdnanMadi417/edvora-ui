@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import { XCircle, AlertCircle, CheckCircle } from "lucide-react";
 import api from "lib/useApi";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { InputField } from "components/form";
+import Button from "components/ui/buttons/Button";
 
 interface DisputeSubmissionModalProps {
   isOpen: boolean;
@@ -47,9 +49,8 @@ export default function DisputeSubmissionModal({
       showToast("Dispute submitted successfully. Manager review required.", "success");
       onSuccess?.();
       handleClose();
-    } catch (err) {
-      console.error(err);
-      showToast("Failed to submit dispute.", "error");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to submit dispute."), "error");
     } finally {
       setIsSubmitting(false);
     }
@@ -110,21 +111,28 @@ export default function DisputeSubmissionModal({
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <button
+            <Button
               onClick={handleClose}
-              className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4 py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
-            >
-              <XCircle className="h-4 w-4" />
-              Cancel
-            </button>
-            <button
+              icon={<XCircle className="h-4 w-4" />}
+              text="Cancel"
+              bgColor="bg-white"
+              textColor="text-gray-600"
+              borderColor="border-gray-600"
+              hoverTextColor="hover:text-gray-700"
+              hoverBorderColor="hover:border-gray-700"
+            />
+            <Button
               onClick={handleSubmitDispute}
               disabled={!formData.disputeReason.trim() || isSubmitting}
-              className="flex items-center justify-center gap-2 rounded-md border border-red-600 bg-red-100 px-4 py-2 text-sm font-medium text-red-700 transition hover:border-red-700 hover:bg-red-200 disabled:opacity-50"
-            >
-              <CheckCircle className="h-4 w-4" />
-              {isSubmitting ? "Submitting..." : "Submit Dispute"}
-            </button>
+              icon={<CheckCircle className="h-4 w-4" />}
+              text={isSubmitting ? "Submitting..." : "Submit Dispute"}
+              bgColor="bg-red-100"
+              textColor="text-red-700"
+              borderColor="border-red-600"
+              hoverTextColor="hover:text-red-700"
+              hoverBorderColor="hover:border-red-700"
+              className="hover:bg-red-200"
+            />
           </div>
 
         </div>

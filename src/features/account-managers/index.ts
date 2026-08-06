@@ -3,6 +3,7 @@ export * from "./hooks";
 export {
   AccountManagersTable,
   AccountManagerProfile,
+  AccountManagerPartnersTable,
   CreateAccountManager,
   EditAccountManager,
   DeleteAccountManagerModal,

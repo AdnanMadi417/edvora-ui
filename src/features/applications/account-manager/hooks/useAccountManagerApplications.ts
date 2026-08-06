@@ -28,10 +28,10 @@ export type AccountManagerApplicationsResponse = {
 };
 
 export type UseAccountManagerApplicationsParams = {
-  managerId: string;
   limit?: number;
   offset?: number;
   status?: "active" | "hold" | "cancel" | "all";
+  partner_id?: string;
   stage_id?: string;
   stage_status_id?: string;
   search?: string;
@@ -39,31 +39,30 @@ export type UseAccountManagerApplicationsParams = {
 };
 
 export function useAccountManagerApplications({
-  managerId,
   limit = 20,
   offset = 0,
   status = "active",
+  partner_id,
   stage_id,
   stage_status_id,
   search,
   university_id,
-}: UseAccountManagerApplicationsParams) {
+}: UseAccountManagerApplicationsParams = {}) {
   const [data, setData] = useState<AccountManagerApplicationsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchApplications = async () => {
-    if (!managerId) return;
-
     setLoading(true);
     setError(null);
 
     try {
       const res = await api.get<AccountManagerApplicationsResponse>(
-        `/account-managers/${managerId}/applications`,
+        "/account-managers/applications",
         {
           params: {
             limit, offset, status,
+            ...(partner_id ? { partner_id } : {}),
             ...(stage_id ? { stage_id } : {}),
             ...(stage_status_id ? { stage_status_id } : {}),
             ...(search ? { search } : {}),
@@ -83,7 +82,7 @@ export function useAccountManagerApplications({
 
   useEffect(() => {
     fetchApplications();
-  }, [managerId, limit, offset, status, stage_id, stage_status_id, search, university_id]);
+  }, [limit, offset, status, partner_id, stage_id, stage_status_id, search, university_id]);
 
   return {
     items: data?.items ?? [],

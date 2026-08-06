@@ -12,6 +12,7 @@ import InputField from "components/form/fields/InputField";
 import RichTextEditor from "components/form/fields/RichTextEditor";
 
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface BatchProgramScholarshipsProps {
   isOpen: boolean;
@@ -161,9 +162,8 @@ export default function BatchProgramScholarships({
         onClose();
         onSuccess?.();
       }, 1500);
-    } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+    } catch (error: unknown) {
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
     }
   };

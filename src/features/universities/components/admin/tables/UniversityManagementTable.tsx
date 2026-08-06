@@ -25,10 +25,12 @@ import DeleteUniversityConfirmation from 'features/universities/components/admin
 import NextButton from 'components/ui/buttons/NextButton';
 import PrevButton from 'components/ui/buttons/PrevButton';
 import Button from 'components/ui/buttons/Button';
+import IconButton from 'components/ui/buttons/IconButton';
 import SearchInput from 'components/form/filter/SearchInput';
 import NoMessagesFound from 'components/emptyData/NoMessagesFound';
 import Loading from 'components/loading/Loading';
 import { useToast } from 'components/context/ToastContext';
+import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
 
 const UniversityManagementTable = () => {
@@ -101,7 +103,7 @@ const UniversityManagementTable = () => {
       setSelectedUniversityName('');
       refetchUniversityTypes();
     } catch (error: any) {
-      const backendMessage = error?.response?.data?.message || 'Please try again.';
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to delete university type. ${backendMessage}`, 'error');
     }
   };
@@ -154,13 +156,17 @@ const UniversityManagementTable = () => {
           onChange={handleSearchChange}
           placeholder="Search by university type name..."
         />
-        <button
+        <Button
           onClick={() => { setSearchTerm(''); setSelectedState('all'); setSelectedField('all'); setCurrentPage(1); }}
-          className="flex shrink-0 items-center justify-center gap-2 rounded-lg border border-red-200 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-        >
-          <RefreshCw className="h-4 w-4" />
-          <span className="hidden sm:inline">Clear</span>
-        </button>
+          icon={<RefreshCw className="h-4 w-4" />}
+          text="Clear"
+          bgColor="bg-white"
+          textColor="text-red-600"
+          borderColor="border-red-200"
+          hoverTextColor="hover:text-red-600"
+          hoverBorderColor="hover:border-red-200"
+          className="hover:bg-red-50"
+        />
       </div>
 
       {/* Table */}
@@ -306,19 +312,22 @@ const UniversityManagementTable = () => {
 
                     <div className="h-6 border-l border-slate-200" />
 
-                    <button
-                      role="menuitem"
+                    <IconButton
                       aria-label="Delete University Type"
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent) => {
                         e.stopPropagation();
                         setSelectedUniversityId(uni.id);
                         setSelectedUniversityName(uni.name);
                         setIsDeleteOpen(true);
                       }}
-                      className="flex items-center justify-center rounded-lg p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                    >
-                      <Trash2 className="h-4 w-4 text-slate-500" />
-                    </button>
+                      icon={<Trash2 className="h-4 w-4 text-slate-500" />}
+                      bgColor="bg-transparent"
+                      textColor="text-slate-700"
+                      borderColor="border-transparent"
+                      hoverTextColor="hover:text-slate-700"
+                      hoverBorderColor="hover:border-transparent"
+                      className="hover:bg-slate-100 focus:outline-none"
+                    />
                   </div>
                 </td>
 

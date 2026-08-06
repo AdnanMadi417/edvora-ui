@@ -112,10 +112,7 @@ module.exports = {
       },
 
       fontFamily: {
-        sans: ['var(--font-jakarta)', 'sans-serif'],
-        jakarta: ['var(--font-jakarta)', 'sans-serif'],
-        poppins: ['Poppins', 'sans-serif'],
-        dm: ['DM Sans', 'sans-serif'],
+        sans: ['var(--font-inter)', 'sans-serif'],
       },
 
       boxShadow: {
@@ -157,55 +154,13 @@ module.exports = {
         card: 'var(--card-bg)',
         'card-hover': 'var(--card-hover)',
 
-        text: {
-          primary: 'var(--primary-text-color)',
-          secondary: 'var(--secondary-text-color)',
-          special: 'var(--special-text-color)',
-          muted: 'var(--muted-text-color)',
-          disabled: 'var(--disabled-text-color)',
-          error: 'var(--error-text)',
-          pending: 'var(--pending-text)',
-          success: 'var(--success-text)',
-        },
-
         accent: 'var(--accent-color)',
-        'accent-hover': 'var(--accent-hover)',
         'accent-light': 'var(--accent-light)',
 
         success: 'var(--success-color)',
         failed: 'var(--failed-color)',
         'failed-hover': 'var(--failed-color-hover)',
-        warning: 'var(--warning-color)',
         info: 'var(--info-color)',
-
-        button: {
-          DEFAULT: 'var(--button-bg)',
-          hover: 'var(--hover-button-bg)',
-          disabled: 'var(--button-disabled-bg)',
-          cancel: 'var(--cancel-button-bg)',
-          'cancel-hover': 'var(--cancel-hover-button-bg)',
-        },
-
-        input: {
-          DEFAULT: 'var(--input-field-bg)',
-          hover: 'var(--hover-input-field-bg)',
-        },
-
-        alert: {
-          success: 'var(--alert-success-bg)',
-          danger: 'var(--alert-danger-bg)',
-          warning: 'var(--alert-warning-bg)',
-          info: 'var(--alert-info-bg)',
-          hover: 'var(--alert-hover-bg)',
-        },
-
-        chart: {
-          1: 'var(--chart-1)',
-          2: 'var(--chart-2)',
-          3: 'var(--chart-3)',
-          4: 'var(--chart-4)',
-          5: 'var(--chart-5)',
-        },
 
         overlay: {
           DEFAULT: 'var(--overlay-bg)',
@@ -213,9 +168,6 @@ module.exports = {
         },
 
         white: '#ffffff',
-        lightPrimary: '#F4F7FE',
-        blueSecondary: '#0348D1',
-        brandLinear: '#2563EB',
 
         gray: {
           50: 'rgba(245,246,250,0.9)',
@@ -400,109 +352,12 @@ module.exports = {
         background: {
           100: 'rgb(244 247 254)', 900: '#070f2e',
         },
-        brand: {
-          50:  "#EBF1FF",
-          100: "#D6E4FF",
-          200: "#ADC8FF",
-          300: "#84A9FF",
-          400: "#5A8CFF",
-          500: "#0348D1",
-          600: "#003DB8",
-          700: "#003099",
-          800: "#002377",
-          900: "#001855",
-        },
-        horizonGreen: {
-          50: '#E1FFF4',
-          100: '#BDFFE7',
-          200: '#7BFECE',
-          300: '#39FEB6',
-          400: '#01F99E',
-          500: '#01B574',
-          600: '#01935D',
-          700: '#016B44',
-          800: '#00472D',
-          900: '#002417',
-        },
-        horizonOrange: {
-          50: '#FFF7EB',
-          100: '#FFF1DB',
-          200: '#FFE2B8',
-          300: '#FFD28F',
-          400: '#FFC46B',
-          500: '#FFB547',
-          600: '#FF9B05',
-          700: '#C27400',
-          800: '#855000',
-          900: '#422800',
-          950: '#1F1200',
-        },
-        horizonRed: {
-          50: '#FCE8E8',
-          100: '#FAD1D1',
-          200: '#F4A4A4',
-          300: '#EF7676',
-          400: '#EA4848',
-          500: '#E31A1A',
-          600: '#B71515',
-          700: '#891010',
-          800: '#5B0B0B',
-          900: '#2E0505',
-          950: '#170303',
-        },
-        horizonBlue: {
-          50: '#EBEFFF',
-          100: '#D6DFFF',
-          200: '#ADBFFF',
-          300: '#8AA3FF',
-          400: '#6183FF',
-          500: '#3965FF',
-          600: '#0036FA',
-          700: '#0029BD',
-          800: '#001B7A',
-          900: '#000D3D',
-          950: '#00071F',
-        },
-        horizonTeal: {
-          50: '#EBFAF8',
-          100: '#D7F4F2',
-          200: '#AAE9E4',
-          300: '#82DED6',
-          400: '#59D4C9',
-          500: '#33C3B7',
-          600: '#299E94',
-          700: '#1F756E',
-          800: '#144D48',
-          900: '#0B2826',
-          950: '#051413',
-        },
-        horizonPurple: {
-          50: '#EFEBFF',
-          100: '#E9E3FF',
-          200: '#422AFB',
-          300: '#422AFB',
-          400: '#7551FF',
-          500: '#422AFB',
-          600: '#3311DB',
-          700: '#02044A',
-          800: '#190793',
-          900: '#11047A',
-        },
 
       },
 
       overlay: {
         DEFAULT: 'var(--overlay-bg)',
         light: 'var(--overlay-light-bg)',
-      },
-
-      borderColor: {
-        default: 'var(--border-color-default)',
-        accent: 'var(--border-color-accent)',
-        danger: 'var(--border-color-danger)',
-        success: 'var(--border-color-success)',
-        warning: 'var(--border-color-warning)',
-        info: 'var(--border-color-info)',
       },
 
       borderWidth: {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { logisticServiceApi } from "../services";
 import type { ServiceProviders } from "../types";
 
@@ -7,7 +7,9 @@ export function useLogisticProviders() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchProviders = useCallback(() => {
+    setLoading(true);
+    setError(null);
     logisticServiceApi.providers
       .list()
       .then((res) => setServiceProviders(res.data))
@@ -15,5 +17,9 @@ export function useLogisticProviders() {
       .finally(() => setLoading(false));
   }, []);
 
-  return { serviceProviders, loading, error };
+  useEffect(() => {
+    fetchProviders();
+  }, [fetchProviders]);
+
+  return { serviceProviders, loading, error, refetch: fetchProviders };
 }

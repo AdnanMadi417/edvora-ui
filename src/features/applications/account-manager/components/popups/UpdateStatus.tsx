@@ -10,6 +10,7 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 import {
   useOfferLetterUpload,
@@ -26,6 +27,7 @@ import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import { InputField } from "components/form";
+import Button from "components/ui/buttons/Button";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
 
 const DocumentRequestList = ({
@@ -487,12 +489,8 @@ export default function UpdateStatusPopup({
 
       onConfirm(selectedStatus, reason, notes);
       handleClose();
-    } catch (err: any) {
-      const msg =
-        err.response?.data?.message ||
-        err.message ||
-        "Failed to update application";
-      setError(msg);
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to update application"));
     } finally {
       setIsSubmitting(false);
     }
@@ -522,7 +520,7 @@ export default function UpdateStatusPopup({
         className="w-full max-w-2xl transform rounded-md bg-card shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative border-b border-default px-6 pb-4 pt-6">
+        <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
@@ -623,7 +621,7 @@ export default function UpdateStatusPopup({
         ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60"
         : isSelected
         ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
-        : "cursor-pointer border-default bg-card hover:border-gray-300 hover:shadow"
+        : "cursor-pointer border-slate-200 bg-card hover:border-gray-300 hover:shadow"
     }
   `}
                   >
@@ -743,7 +741,7 @@ export default function UpdateStatusPopup({
                 }}
                 placeholder="Please provide a detailed reason..."
                 rows={4}
-                className={`w-full rounded-md border px-4 py-3 text-p2 outline-none transition-colors resize-y placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${reasonError ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"}`}
+                className={`w-full rounded-md border px-4 py-3 text-p2 outline-none transition-colors resize-y placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${reasonError ? "border-red-500 bg-red-50" : "border-slate-200 bg-white hover:bg-slate-50"}`}
               />
               {reasonError && <p className="mt-1 text-xs text-red-600">{reasonError}</p>}
             </div>
@@ -815,16 +813,19 @@ export default function UpdateStatusPopup({
           )}
         </div>
 
-        <div className="flex justify-end gap-3 border-t border-default px-6 py-5">
-          <button
+        <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
+          <Button
             onClick={handleClose}
             disabled={isSubmitting}
-            className="flex items-center justify-center gap-2 rounded-md border border-gray-600 px-4  py-2 text-sm font-medium text-gray-600 transition hover:border-gray-700 hover:text-gray-700 disabled:opacity-50"
-          >
-            <XCircle className="h-4 w-4" />
-            Cancel
-          </button>
-          <button
+            icon={<XCircle className="h-4 w-4" />}
+            text="Cancel"
+            bgColor="bg-white"
+            textColor="text-gray-600"
+            borderColor="border-gray-600"
+            hoverTextColor="hover:text-gray-700"
+            hoverBorderColor="hover:border-gray-700"
+          />
+          <Button
             onClick={handleConfirm}
             disabled={
               !selectedStatus ||
@@ -836,11 +837,15 @@ export default function UpdateStatusPopup({
               (isCommissionPaid && !commissionPaymentFile) ||
               (hasArrivalFormSelected && !arrivalFormTemplateFile)
             }
-            className="flex items-center justify-center gap-2 rounded-md border border-blue-600 bg-blue-100 px-4 py-2 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:bg-blue-200 disabled:opacity-50"
-          >
-            <CheckCircle className="h-4 w-4" />
-            {isSubmitting ? "Updating..." : "Update Status"}
-          </button>
+            icon={<CheckCircle className="h-4 w-4" />}
+            text={isSubmitting ? "Updating..." : "Update Status"}
+            bgColor="bg-blue-100"
+            textColor="text-blue-700"
+            borderColor="border-blue-600"
+            hoverTextColor="hover:text-blue-700"
+            hoverBorderColor="hover:border-blue-700"
+            className="hover:bg-blue-200"
+          />
         </div>
       </div>
     </div>

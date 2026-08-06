@@ -31,7 +31,7 @@ const RadioField = ({
             className={`mt-2 flex h-12 w-full items-center justify-start rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
               errors?.[field]
                 ? "border-red-500 bg-red-50"
-                : "border-default"
+                : "border-slate-200"
             } ${value === opt.value ? "bg-blue-100 border-blue-500" : "bg-white hover:bg-slate-50"}`}
           >
             <input

@@ -23,6 +23,8 @@ interface SocialMediaInputFieldProps {
   updateFormData: (field: string, value: unknown) => void;
   required?: boolean;
   onBlur?: () => void;
+  /** When set, the platform is fixed to this value and the picker dropdown is hidden. */
+  lockedPlatform?: string;
 }
 
 export default function SocialMediaInputField({
@@ -35,10 +37,18 @@ export default function SocialMediaInputField({
   updateFormData,
   required = true,
   onBlur,
+  lockedPlatform,
 }: SocialMediaInputFieldProps) {
-  const platform = formData[platformField] ?? "";
+  const platform = lockedPlatform ?? (formData[platformField] ?? "");
   const username = formData[usernameField] ?? "";
   const error = errors?.[urlField];
+
+  useEffect(() => {
+    if (lockedPlatform && formData[platformField] !== lockedPlatform) {
+      updateFormData(platformField, lockedPlatform);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockedPlatform, formData[platformField]]);
 
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -85,20 +95,21 @@ export default function SocialMediaInputField({
         {label} {required && <span className="text-red-600">*</span>}
       </label>
 
-      <div className={`mt-2 flex overflow-visible rounded-lg border bg-white transition ${error ? "border-red-500" : "border-default"}`}>
+      <div className={`mt-2 flex overflow-visible rounded-lg border bg-white transition ${error ? "border-red-500" : "border-slate-200"}`}>
         <div className="relative shrink-0" ref={ref}>
           <button
             type="button"
-            onClick={() => setOpen((o) => !o)}
-            aria-haspopup="listbox"
-            aria-expanded={open}
-            className="flex h-11 w-16 items-center justify-center gap-1 rounded-l-lg border-r border-slate-200 bg-white px-2 text-slate-600 transition hover:bg-slate-50 sm:h-12"
+            onClick={() => { if (!lockedPlatform) setOpen((o) => !o); }}
+            aria-haspopup={lockedPlatform ? undefined : "listbox"}
+            aria-expanded={lockedPlatform ? undefined : open}
+            disabled={Boolean(lockedPlatform)}
+            className={`flex h-11 w-16 items-center justify-center gap-1 rounded-l-lg border-r border-slate-200 bg-white px-2 text-slate-600 transition sm:h-12 ${lockedPlatform ? "cursor-default" : "hover:bg-slate-50"}`}
           >
             {SelectedIcon ? <SelectedIcon className="h-5 w-5 shrink-0" /> : <span className="text-[10px] text-slate-400">Select</span>}
-            <ChevronDown className={`h-3 w-3 shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} />
+            {!lockedPlatform && <ChevronDown className={`h-3 w-3 shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} />}
           </button>
 
-          {open && (
+          {!lockedPlatform && open && (
             <div
               role="listbox"
               className="absolute left-0 top-full z-20 mt-1 w-44 overflow-hidden rounded-lg border border-slate-200 bg-white py-1 shadow-lg"

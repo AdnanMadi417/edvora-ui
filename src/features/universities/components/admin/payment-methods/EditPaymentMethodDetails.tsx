@@ -13,6 +13,7 @@ import InputField from "components/form/fields/InputField";
 import RichTextEditor from "components/form/fields/RichTextEditor";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 
 interface PaymentMethod {
   id: string;
@@ -128,8 +129,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
       router.push(`/admin/config-universities/payment-methods/${id}`);
 
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to update payment method. ${backendMessage}`, "error");
     }
   };
@@ -146,8 +146,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
       router.push("/admin/config-universities/payment-methods");
 
     } catch (error: any) {
-      const backendMessage =
-        error?.response?.data?.message || "Please try again.";
+      const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Deleted failed. ${backendMessage}`, "error");
     }
 
@@ -183,15 +182,19 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
             </div>
 
             <div className="relative">
-              <button
+              <Button
                 onClick={() =>
                   setOpenDropdownId(openDropdownId === paymentMethod?.id ? null : paymentMethod?.id)
                 }
-                className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
-              >
-                Actions
-                <MoreVertical className="h-4 w-4" />
-              </button>
+                icon={<MoreVertical className="h-4 w-4" />}
+                text="Actions"
+                bgColor="bg-white"
+                textColor="text-slate-800"
+                borderColor="border-slate-200"
+                hoverTextColor="hover:text-slate-800"
+                hoverBorderColor="hover:border-slate-200"
+                className="hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+              />
 
               {openDropdownId === paymentMethod?.id && (
                 <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white ring-1 ring-black/5">

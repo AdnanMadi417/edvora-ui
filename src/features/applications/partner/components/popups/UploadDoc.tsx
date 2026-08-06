@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, AlertCircle, RotateCcw } from "lucide-react";
+import Button from "components/ui/buttons/Button";
 
 interface ResubmitDocProps {
   isOpen: boolean;
@@ -63,7 +64,7 @@ export default function UploadDoc({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative overflow-hidden rounded-2xl bg-card">
-          <div className="relative border-b border-default px-6 pb-4 pt-6">
+          <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-md border border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50">
@@ -145,21 +146,29 @@ export default function UploadDoc({
             </div>
           </div>
 
-          <div className="border-t border-default px-6 py-5">
+          <div className="border-t border-slate-200 px-6 py-5">
             <div className="flex justify-end gap-3">
-              <button
+              <Button
                 onClick={handleClose}
-                className="rounded-md border border-default bg-card px-5 py-2.5 text-p2 font-medium text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
-              >
-                Cancel
-              </button>
-              <button
+                text="Cancel"
+                bgColor="bg-card"
+                textColor="text-gray-700"
+                borderColor="border-slate-200"
+                hoverTextColor="hover:text-gray-700"
+                hoverBorderColor="hover:border-gray-300"
+                className="hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200"
+              />
+              <Button
                 onClick={handleConfirm}
                 disabled={!selectedFile}
-                className="rounded-md bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-p2 font-medium text-white shadow-lg shadow-amber-500/25 transition-all duration-200 hover:from-amber-600 hover:to-orange-600 hover:shadow-xl hover:shadow-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-              >
-                Confirm Upload
-              </button>
+                text="Confirm Upload"
+                bgColor="bg-gradient-to-r from-amber-500 to-orange-500"
+                textColor="text-white"
+                borderColor="border-transparent"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-transparent"
+                className="shadow-lg shadow-amber-500/25 hover:from-amber-600 hover:to-orange-600 hover:shadow-xl hover:shadow-amber-500/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 disabled:shadow-none"
+              />
             </div>
           </div>
         </div>

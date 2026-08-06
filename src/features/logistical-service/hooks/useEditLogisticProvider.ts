@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { logisticServiceApi } from "../services";
 import type { EditLogisticsProviderPayload } from "../types";
+import { parseApiError } from "utils/parseApiError";
 
 export function useEditLogisticProvider() {
   const [loadingEditLogisticsProvider, setLoading] = useState(false);
@@ -13,7 +14,7 @@ export function useEditLogisticProvider() {
       const res = await logisticServiceApi.providers.update(id, payload);
       return res.data;
     } catch (err) {
-      setError("Failed to update logistics provider");
+      setError(parseApiError(err, "Failed to update logistics provider"));
       throw err;
     } finally {
       setLoading(false);

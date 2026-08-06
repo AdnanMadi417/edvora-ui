@@ -9,17 +9,12 @@ import { MessageCircle, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ApplicationChat as AgentPartnerChat, useUnreadCount } from "features/chat";
 import { useAccountManagerApplication } from 'features/applications/hooks';
-import { useMe } from 'hooks/useMe';
 
 export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();
-  const { user } = useMe();
   const [chatOpen, setChatOpen] = useState(false);
 
-  const managerId = user?.id;
-
   const { data: application, loading, error, refetch } = useAccountManagerApplication({
-    managerId: managerId || "",
     applicationId: applicationId || "",
   });
 

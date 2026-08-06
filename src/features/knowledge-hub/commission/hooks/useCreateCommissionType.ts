@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import { parseApiError } from "utils/parseApiError";
 
 export type CreateCommissionTypePayload = {
   name: string;
@@ -24,8 +25,8 @@ export function useCreateCommissionType() {
       });
       setSuccess(true);
       return res.data;
-    } catch (err: any) {
-      setError(err?.response?.data?.detail?.[0]?.msg || "Failed to create commission type");
+    } catch (err: unknown) {
+      setError(parseApiError(err, "Failed to create commission type"));
       throw err;
     } finally {
       setLoading(false);

@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
-import { Download, FileText, Calendar, XCircle } from "lucide-react";
+import React from "react";
+import { FileText, Calendar, XCircle } from "lucide-react";
 
 import { useVisaPayments } from "hooks/useVisaPayments";
-import { getDocumentDownloadUrl } from "services/documentService";
+import DocumentActions from "features/applications/shared/DocumentActions";
 import { AppDate } from "components/ui/date";
 
 interface VisaTrackingTimelineProps {
@@ -14,24 +14,10 @@ interface VisaTrackingTimelineProps {
 export default function VisaTrackingTimeline({
   application,
 }: VisaTrackingTimelineProps) {
-  const [downloading, setDownloading] = useState(false);
-
   const { payments: visaPayments, loading: paymentsLoading } = useVisaPayments(
     application?.id || ""
   );
-
-  const handleDownload = async (fileKey?: string) => {
-    if (!fileKey || downloading) return;
-    try {
-      setDownloading(true);
-      const url = await getDocumentDownloadUrl(fileKey);
-      window.open(url, "_blank", "noopener,noreferrer");
-    } catch {
-      // silent — download errors are non-critical
-    } finally {
-      setDownloading(false);
-    }
-  };
+  const studentName = application?.student?.name;
 
   const hasEmgs = !!application?.emgs_evaluation_document;
   const hasVisaDoc = !!application?.visa_document;
@@ -62,16 +48,13 @@ export default function VisaTrackingTimeline({
                 </p>
               </div>
             </div>
-            <button
-              onClick={() =>
-                handleDownload(application.emgs_evaluation_document.file_key)
-              }
-              disabled={downloading}
-              className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
-              title="Download document"
-            >
-              <Download className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <DocumentActions
+                fileKey={application.emgs_evaluation_document.file_key}
+                label={application.emgs_evaluation_document.document_type}
+                personName={studentName}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -95,14 +78,13 @@ export default function VisaTrackingTimeline({
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => handleDownload(application.visa_document.file_key)}
-              disabled={downloading}
-              className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
-              title="Download document"
-            >
-              <Download className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              <DocumentActions
+                fileKey={application.visa_document.file_key}
+                label={application.visa_document.document_type}
+                personName={studentName}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -122,9 +104,9 @@ export default function VisaTrackingTimeline({
             {visaPayments.map((payment) => (
               <div
                 key={payment.id}
-                className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"
+                className="overflow-hidden"
               >
-                <div className="flex flex-col justify-between gap-4 p-5 sm:flex-row">
+                <div className="flex flex-col justify-between gap-4 sm:flex-row">
                   <div className="space-y-3">
                     <div className="w-full rounded-md bg-gray-50 px-4 py-5 sm:w-fit">
                       <p className="flex gap-2 text-sm font-medium">
@@ -156,14 +138,7 @@ export default function VisaTrackingTimeline({
                     ) : (
                       <div className="flex flex-wrap justify-end gap-2">
                         {payment.documents.map((doc: any) => (
-                          <button
-                            key={doc.id}
-                            onClick={() => handleDownload(doc.file_key)}
-                            disabled={downloading}
-                            className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 hover:bg-green-100 disabled:opacity-50"
-                          >
-                            <Download className="h-4 w-4" />
-                          </button>
+                          <DocumentActions key={doc.id} fileKey={doc.file_key} label="Visa Payment Document" personName={studentName} />
                         ))}
                       </div>
                     )}
@@ -196,14 +171,9 @@ export default function VisaTrackingTimeline({
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleDownload(doc.file_key)}
-                  disabled={downloading}
-                  className="rounded-md border border-green-600 bg-green-50 p-2 text-green-700 transition hover:bg-green-100 disabled:opacity-50"
-                  title="Download document"
-                >
-                  <Download className="h-4 w-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
+                </div>
               </div>
             ))}
           </div>

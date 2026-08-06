@@ -74,7 +74,7 @@ const CreatableSelectField = ({
       <div
         onClick={() => setIsOpen((prev) => !prev)}
         className={`mt-2 flex h-12 w-full items-center justify-start rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
-          errors?.[field] ? "border-red-500 bg-red-50" : "border-default bg-white hover:bg-slate-50"
+          errors?.[field] ? "border-red-500 bg-red-50" : "border-slate-200 bg-white hover:bg-slate-50"
         }`}
       >
         <span
@@ -108,7 +108,7 @@ const CreatableSelectField = ({
             className={`mt-2 flex h-10 w-full items-start justify-between rounded-md border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 bg-white hover:bg-slate-50 ${
               errors?.[field]
                 ? "border-red-500"
-                : "border-default"
+                : "border-slate-200"
             }`}
           />
 
