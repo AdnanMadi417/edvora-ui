@@ -37,6 +37,10 @@ export function useSignIn() {
       } else if (role === "admin") {
         localStorage.setItem("adminId", user.id);
         router.replace("/admin/applications");
+      } else if (role === "reviewer") {
+        router.replace("/reviewer/partners");
+      } else if (role === "data_entry") {
+        router.replace("/data-entry/universities");
       } else {
         setError("Unauthorized role");
       }

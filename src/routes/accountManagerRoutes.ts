@@ -1,30 +1,30 @@
 import { IRoute } from "../types/navigation";
-import { MdNotifications, MdHandshake, MdAssignment, MdPayments, MdManageAccounts, MdMenuBook, MdBusinessCenter } from 'react-icons/md';
+import { ClipboardList, Handshake, BookOpen, Truck } from "lucide-react";
 
 const accountManagerRoutes: IRoute[] = [
     {
         name: "Applications",
         layout: "/account-manager",
         path: "/applications",
-        icon: MdAssignment,
+        icon: ClipboardList,
     },
     {
         name: "Knowledge Hub",
         layout: "/account-manager",
         path: "/knowledge-hub",
-        icon: MdMenuBook,
+        icon: BookOpen,
     },
     {
         name: "Logistics Marketplace",
         layout: "/account-manager",
         path: "/logistics-marketplace",
-        icon: MdBusinessCenter,
+        icon: Truck,
     },
     {
         name: "Partners",
         layout: "/account-manager",
         path: "/partners",
-        icon: MdHandshake,
+        icon: Handshake,
     },
     // {
     //     name: "Commission",
@@ -32,12 +32,6 @@ const accountManagerRoutes: IRoute[] = [
     //     path: "/commission",
     //     icon: MdPayments,
     // },
-    {
-        name: "Notifications",
-        layout: "/account-manager",
-        path: "/notifications",
-        icon: MdNotifications,
-    }
 ];
 
 

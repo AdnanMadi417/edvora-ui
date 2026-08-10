@@ -12,7 +12,11 @@ import Button from "components/ui/buttons/Button";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import { useRouter } from "next/navigation";
 
-export default function UniversityTypeForm() {
+interface Props {
+  basePath?: string;
+}
+
+export default function UniversityTypeForm({ basePath = "/admin/config-universities" }: Props = {}) {
   const { createUniversityType, loading } = useCreateUniversityType();
   const { showToast } = useToast();
   const { submissionFields, loading: fieldsLoading } =
@@ -97,7 +101,7 @@ export default function UniversityTypeForm() {
 
       showToast("University type created successfully.", "success");
 
-      router.push("/admin/config-universities");
+      router.push(basePath);
     } catch (error: any) {
       const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create university type. ${backendMessage}`, "error");
@@ -105,7 +109,7 @@ export default function UniversityTypeForm() {
   };
 
   const handleBack = () => {
-    router.push("/admin/config-universities");
+    router.push(basePath);
   };
 
   if (fieldsLoading) {

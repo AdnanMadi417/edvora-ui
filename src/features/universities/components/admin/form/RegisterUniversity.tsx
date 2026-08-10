@@ -31,7 +31,11 @@ import { getPresignedUploads, uploadFilesToSpaces } from 'services/uploadService
 import { validateUniversity, isUniversityComplete } from './validateUniversity';
 
 
-export default function RegisterUniversity() {
+interface Props {
+  basePath?: string;
+}
+
+export default function RegisterUniversity({ basePath = "/admin/universities" }: Props = {}) {
   const { createUniversity, loading } = useCreateUniversity();
   const { states } = useStates();
   const { universities } = useUniversityTypes();
@@ -162,7 +166,7 @@ export default function RegisterUniversity() {
       showToast("University created successfully.", "success");
 
       setTimeout(() => {
-        router.push("/admin/universities");
+        router.push(basePath);
       }, 2000);
 
     } catch (error: any) {
@@ -216,7 +220,7 @@ export default function RegisterUniversity() {
   };
 
   const handleBack = () => {
-    router.push("/admin/universities");
+    router.push(basePath);
   };
 
   return (

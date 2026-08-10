@@ -7,6 +7,7 @@ import PresignedImage from "components/ui/PresignedImage";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { StatusBadge, type StatusBadgeVariant } from "components/ui/badges";
 import Button from "components/ui/buttons/Button";
 
 const ITEMS_PER_PAGE = 5;
@@ -20,13 +21,13 @@ const LIFECYCLE_OPTIONS = [
   { value: "all", label: "All" },
 ];
 
-const getStatusColors = (code: string) => {
-  if (!code) return { bg: "bg-gray-100 border-slate-200", text: "text-gray-700" };
-  if (code.includes("reject") || code.includes("expired")) return { bg: "bg-red-50 border-red-200", text: "text-red-700" };
-  if (code.includes("approv") || code.includes("confirm") || code.includes("accepted") || code.includes("completed")) return { bg: "bg-green-50 border-green-200", text: "text-green-700" };
-  if (code.includes("correction") || code.includes("re_upload") || code.includes("re-upload") || code.includes("disputed")) return { bg: "bg-orange-50 border-orange-200", text: "text-orange-700" };
-  if (code.includes("review") || code.includes("waiting") || code.includes("processing") || code.includes("pending")) return { bg: "bg-yellow-50 border-yellow-200", text: "text-yellow-700" };
-  return { bg: "bg-blue-50 border-blue-200", text: "text-blue-700" };
+const getStatusVariant = (code: string): StatusBadgeVariant => {
+  if (!code) return "neutral";
+  if (code.includes("reject") || code.includes("expired")) return "danger";
+  if (code.includes("approv") || code.includes("confirm") || code.includes("accepted") || code.includes("completed")) return "success";
+  if (code.includes("correction") || code.includes("re_upload") || code.includes("re-upload") || code.includes("disputed")) return "attention";
+  if (code.includes("review") || code.includes("waiting") || code.includes("processing") || code.includes("pending")) return "warning";
+  return "info";
 };
 
 interface PartnerApplicationsTableProps {
@@ -206,7 +207,7 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
               )}
 
               {!isInitialLoad && !error && applications.map((app) => {
-                const { bg, text } = getStatusColors(app.status?.toLowerCase().replace(/\s+/g, "_") ?? "");
+                const statusVariant = getStatusVariant(app.status?.toLowerCase().replace(/\s+/g, "_") ?? "");
                 return (
                   <tr
                     key={app.id}
@@ -238,9 +239,9 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                     </td>
 
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium ${bg} ${text}`}>
+                      <StatusBadge variant={statusVariant}>
                         <span className="truncate max-w-[160px]">{app.status}</span>
-                      </span>
+                      </StatusBadge>
                     </td>
 
                     <td className="px-4 py-4">

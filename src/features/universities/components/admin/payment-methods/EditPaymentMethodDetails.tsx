@@ -23,9 +23,18 @@ interface PaymentMethod {
 
 interface EditPaymentMethodDetailsProps {
   id: string;
+  /** Where "Back" and a successful save navigate to. Defaults to this payment method's admin details page. */
+  redirectPath?: string;
+  listPath?: string;
+  hideDelete?: boolean;
 }
 
-const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
+const EditPaymentMethodDetails = ({
+  id,
+  redirectPath = `/admin/config-universities/payment-methods/${id}`,
+  listPath = "/admin/config-universities/payment-methods",
+  hideDelete = false,
+}: EditPaymentMethodDetailsProps) => {
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -126,7 +135,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
       await updatePaymentMethods(paymentMethod.id, payload);
 
       showToast("Payment method updated successfully", "success");
-      router.push(`/admin/config-universities/payment-methods/${id}`);
+      router.push(redirectPath);
 
     } catch (error: any) {
       const backendMessage = parseApiError(error, "Please try again.");
@@ -143,7 +152,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
       showToast("Payment method deleted successfully", "success");
 
       setIsDeleteOpen(false);
-      router.push("/admin/config-universities/payment-methods");
+      router.push(listPath);
 
     } catch (error: any) {
       const backendMessage = parseApiError(error, "Please try again.");
@@ -153,7 +162,7 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
   };
 
   const handleBack = () => {
-    router.push(`/admin/config-universities/payment-methods/${id}`);
+    router.push(redirectPath);
   };
 
   if (loadingPayment) {
@@ -200,19 +209,21 @@ const EditPaymentMethodDetails = ({ id }: EditPaymentMethodDetailsProps) => {
                 <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white ring-1 ring-black/5">
                   <div className="space-y-2 p-2">
 
-                    <button
-                      className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-red-200 hover:bg-red-50 hover:shadow-sm"
-                      onClick={() => {
-                        setSelectedPaymentId(paymentMethod?.id || null);
-                        setSelectedPaymentMethodName(paymentMethod?.name || "");
-                        setIsDeleteOpen(true);
-                      }}
-                    >
-                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
-                        <Trash2 className="h-4 w-4" />
-                      </div>
-                      <span className="font-semibold text-red-900">Delete Payment</span>
-                    </button>
+                    {!hideDelete && (
+                      <button
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-red-200 hover:bg-red-50 hover:shadow-sm"
+                        onClick={() => {
+                          setSelectedPaymentId(paymentMethod?.id || null);
+                          setSelectedPaymentMethodName(paymentMethod?.name || "");
+                          setIsDeleteOpen(true);
+                        }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
+                          <Trash2 className="h-4 w-4" />
+                        </div>
+                        <span className="font-semibold text-red-900">Delete Payment</span>
+                      </button>
+                    )}
 
                     <button
                       className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"

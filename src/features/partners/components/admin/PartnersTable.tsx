@@ -7,6 +7,7 @@ import {
   UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power, KeyRound, Trash2,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
+import { StatusBadge } from "components/ui/badges";
 import { useRouter } from "next/navigation";
 import { usePartners, useDeletePartner, useUpdatePartner, useResendApprovalEmail } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
@@ -417,7 +418,7 @@ export default function PartnersTable() {
                       <div className="truncate text-xs text-slate-500">{partner.email || "—"}</div>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="max-w-[180px] px-6 py-4">
                       <div className="truncate text-sm text-slate-900">
                         {partner.assigned_manager_name || <span className="text-slate-400">Unassigned</span>}
                       </div>
@@ -426,13 +427,9 @@ export default function PartnersTable() {
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap items-center gap-1.5">
                         {partner.is_active ? (
-                          <span className="inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
-                            <CheckCircle className="h-3 w-3" /> Active
-                          </span>
+                          <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
-                            <XCircle className="h-3 w-3" /> Inactive
-                          </span>
+                          <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
                         )}
                       </div>
                     </td>

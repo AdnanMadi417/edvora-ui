@@ -16,9 +16,11 @@ import { parseApiError } from "utils/parseApiError";
 
 interface UniversityDetailsProps {
   id: string;
+  /** Where "Back" and a successful save navigate to. Defaults to this type's admin details page. */
+  redirectPath?: string;
 }
 
-const UniversityDetails = ({ id }: UniversityDetailsProps) => {
+const UniversityDetails = ({ id, redirectPath = `/admin/config-universities/${id}` }: UniversityDetailsProps) => {
   const router = useRouter();
   const { showToast } = useToast();
   const { university, error } = useUniversityTypeDetails(id);
@@ -110,7 +112,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
       showToast("University type updated successfully", "success");
 
-      router.push(`/admin/config-universities/${id}`);
+      router.push(redirectPath);
 
     } catch (error: any) {
       const backendMessage = parseApiError(error, "Please try again.");
@@ -147,11 +149,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   }, [formData, initialFormData]);
 
   const handleBack = () => {
-    router.push(`/admin/config-universities/${id}`);
+    router.push(redirectPath);
   };
 
   const handleUpdateLink = () => {
-    router.push(`/admin/config-universities/${id}`);
+    router.push(redirectPath);
   };
 
   if (loading) {
