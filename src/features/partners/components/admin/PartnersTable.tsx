@@ -418,7 +418,7 @@ export default function PartnersTable() {
                       <div className="truncate text-xs text-slate-500">{partner.email || "—"}</div>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="max-w-[180px] px-6 py-4">
                       <div className="truncate text-sm text-slate-900">
                         {partner.assigned_manager_name || <span className="text-slate-400">Unassigned</span>}
                       </div>

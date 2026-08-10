@@ -327,9 +327,9 @@ const ModernApplicationsTable = () => {
                 onClick={() => handleSort("student_name")}
                 className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100/50"
               >
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-slate-400" />
-                  Student
+                <div className="flex min-w-0 items-center gap-2">
+                  <User className="h-4 w-4 shrink-0 text-slate-400" />
+                  <span className="truncate">Student</span>
                   <SortIndicator field="student_name" />
                 </div>
               </th>
@@ -339,8 +339,8 @@ const ModernApplicationsTable = () => {
                 className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100/50"
               >
                 <div className="flex min-w-[250px] items-center gap-2">
-                  <GraduationCap className="h-4 w-4 text-slate-400" />
-                  University / Program
+                  <GraduationCap className="h-4 w-4 shrink-0 text-slate-400" />
+                  <span className="truncate">University / Program</span>
                   <SortIndicator field="program_name" />
                 </div>
               </th>
@@ -349,9 +349,9 @@ const ModernApplicationsTable = () => {
                 onClick={() => handleSort("partner_name")}
                 className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100/50"
               >
-                <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4 text-slate-400" />
-                  Ownership
+                <div className="flex min-w-0 items-center gap-2">
+                  <Building className="h-4 w-4 shrink-0 text-slate-400" />
+                  <span className="truncate">Ownership</span>
                   <SortIndicator field="partner_name" />
                 </div>
               </th>
@@ -361,16 +361,16 @@ const ModernApplicationsTable = () => {
                 className="group cursor-pointer px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors hover:bg-slate-100/50"
               >
                 <div className="flex min-w-[200px] items-center gap-2">
-                  <Flag className="h-4 w-4 text-slate-400" />
-                  Stage / Status
+                  <Flag className="h-4 w-4 shrink-0 text-slate-400" />
+                  <span className="truncate">Stage / Status</span>
                   <SortIndicator field="stage" />
                 </div>
               </th>
 
               <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
                 <div className="flex min-w-[100px] items-center gap-2">
-                  <Clock className="h-4 w-4 text-slate-400" />
-                  Updated
+                  <Clock className="h-4 w-4 shrink-0 text-slate-400" />
+                  <span className="truncate">Updated</span>
                 </div>
               </th>
 
