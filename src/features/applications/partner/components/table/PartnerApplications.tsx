@@ -20,7 +20,8 @@ import api from 'lib/useApi';
 import EmptyData from 'components/emptyData/EmptyTableData';
 import Button from 'components/ui/buttons/Button';
 import ApplicationFilterBar from 'components/filters/ApplicationFilterBar';
-import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from 'components/ui/table';
+import { TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from 'components/ui/table';
+import { StatusBadge, type StatusBadgeVariant } from 'components/ui/badges';
 
 import { useUniversities } from "features/universities/hooks";
 import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
@@ -46,13 +47,13 @@ const ACTION_REQUIRED_STATUSES = new Set([
   'commission_ready',
 ]);
 
-const getStatusColors = (code: string) => {
-  if (!code) return { bg: 'bg-gray-100 border-slate-200', text: 'text-gray-700' };
-  if (code.includes('reject') || code.includes('expired')) return { bg: 'bg-red-50 border-red-200', text: 'text-red-700' };
-  if (code.includes('approv') || code.includes('confirm') || code.includes('accepted') || code.includes('completed')) return { bg: 'bg-green-50 border-green-200', text: 'text-green-700' };
-  if (code.includes('correction') || code.includes('re_upload') || code.includes('re-upload') || code.includes('disputed')) return { bg: 'bg-orange-50 border-orange-200', text: 'text-orange-700' };
-  if (code.includes('review') || code.includes('waiting') || code.includes('processing') || code.includes('pending')) return { bg: 'bg-yellow-50 border-yellow-200', text: 'text-yellow-700' };
-  return { bg: 'bg-blue-50 border-blue-200', text: 'text-blue-700' };
+const getStatusVariant = (code: string): StatusBadgeVariant => {
+  if (!code) return 'neutral';
+  if (code.includes('reject') || code.includes('expired')) return 'danger';
+  if (code.includes('approv') || code.includes('confirm') || code.includes('accepted') || code.includes('completed')) return 'success';
+  if (code.includes('correction') || code.includes('re_upload') || code.includes('re-upload') || code.includes('disputed')) return 'attention';
+  if (code.includes('review') || code.includes('waiting') || code.includes('processing') || code.includes('pending')) return 'warning';
+  return 'info';
 };
 
 const PartnerApplications = () => {
@@ -186,15 +187,14 @@ const PartnerApplications = () => {
     ? (currentPage - 1) * itemsPerPage + paginatedApplications.length
     : grandTotal;
 
-  const StatusBadge = ({ status }: { status: string }) => {
+  const ApplicationStatusBadge = ({ status }: { status: string }) => {
     const normalized = status?.toLowerCase().replace(/\s+/g, '_') ?? '';
     const match = stageStatuses.find((s) => s.name.toLowerCase().replace(/\s+/g, '_') === normalized);
     const label = match?.name ?? (normalized.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()) || 'Unknown');
-    const { bg, text } = getStatusColors(normalized);
     return (
-      <span className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium ${bg} ${text}`} title={label}>
+      <StatusBadge variant={getStatusVariant(normalized)} className="max-w-full">
         <span className="truncate max-w-[160px]">{label}</span>
-      </span>
+      </StatusBadge>
     );
   };
 
@@ -340,7 +340,7 @@ const PartnerApplications = () => {
                   <span className="shrink-0 text-xs text-slate-400"><AppDate value={app.updated_at} format="relative" /></span>
                 </div>
                 <div className="mt-0.5 truncate text-xs text-slate-500">{app.program_name}</div>
-                <div className="mt-1.5"><StatusBadge status={app.status} /></div>
+                <div className="mt-1.5"><ApplicationStatusBadge status={app.status} /></div>
               </div>
               <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
             </div>
@@ -457,7 +457,7 @@ const PartnerApplications = () => {
                   <td className="px-6 py-4">
                     <div className="space-y-1.5">
                       <div className="text-xs text-slate-500 truncate">{app.stage}</div>
-                      <StatusBadge status={app.status} />
+                      <ApplicationStatusBadge status={app.status} />
                     </div>
                   </td>
 
