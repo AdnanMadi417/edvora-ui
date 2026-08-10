@@ -19,14 +19,14 @@ import PresignedImage from "components/ui/PresignedImage";
 import IconButton from "components/ui/buttons/IconButton";
 import { AppDate } from "components/ui/date";
 import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { StatusBadge } from "components/ui/badges";
 import { useToast } from "components/context/ToastContext";
 import type { Program } from "features/programs/types";
 
 function ProgramUniversityCell({ program }: { program: Program }) {
-  const tags: { label: string; color: "green" | "blue" | "gray" | "slate" }[] = [];
+  const tags: { label: string; color: "green" | "blue" | "gray" }[] = [];
 
   if (program.university?.name) tags.push({ label: program.university.name, color: "green" });
-  if (program.university?.country) tags.push({ label: program.university.country, color: "slate" });
   if (program.branch?.name) tags.push({ label: program.branch.name, color: "blue" });
   if (program.branch?.location || program.branch?.state) {
     tags.push({
@@ -51,9 +51,7 @@ function ProgramUniversityCell({ program }: { program: Program }) {
               ? "bg-green-50 text-green-700"
               : tag.color === "blue"
                 ? "bg-blue-50 text-blue-700"
-                : tag.color === "slate"
-                  ? "bg-slate-100 text-slate-500"
-                  : "bg-slate-100 text-slate-600"
+                : "bg-slate-100 text-slate-600"
           }`}
         >
           {tag.label}
@@ -331,13 +329,9 @@ export default function KnowledgeHubTable({
               {/* Scholarship */}
               <td className="px-6 py-4">
                 {program.has_scholarship ? (
-                  <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-green-600 bg-green-50 px-3 py-1 text-xs text-green-600">
-                    <CheckCircle className="h-3.5 w-3.5" /> Available
-                  </span>
+                  <StatusBadge variant="success" icon={<CheckCircle className="h-3.5 w-3.5" />}>Available</StatusBadge>
                 ) : (
-                  <span className="inline-flex items-center gap-1 whitespace-nowrap rounded-md border border-red-300 bg-red-50 px-3 py-1 text-xs text-red-500">
-                    <XCircle className="h-3.5 w-3.5" /> None
-                  </span>
+                  <StatusBadge variant="danger" icon={<XCircle className="h-3.5 w-3.5" />}>None</StatusBadge>
                 )}
               </td>
 

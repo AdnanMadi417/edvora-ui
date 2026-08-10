@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PresignedImage from "components/ui/PresignedImage";
 import {
   CheckCircle,
+  XCircle,
   Search,
   Phone,
   User,
@@ -14,9 +15,9 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { MdAddBusiness } from "react-icons/md";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { StatusBadge } from "components/ui/badges";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -232,20 +233,11 @@ const DataEntryLogisticsMarketplaceTable = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <div
-                            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-3 py-1 text-xs font-semibold ${
-                              provider.is_active
-                                ? "border-green-600 bg-green-100 text-green-700"
-                                : "border-slate-300 bg-slate-100 text-slate-500"
-                            }`}
-                          >
-                            {provider.is_active ? (
-                              <FaCheckCircle className="text-[10px]" />
-                            ) : (
-                              <FaTimesCircle className="text-[10px]" />
-                            )}
-                            {provider.is_active ? "Active" : "Inactive"}
-                          </div>
+                          {provider.is_active ? (
+                            <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
+                          ) : (
+                            <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
+                          )}
                         </td>
 
                         <td className="px-6 py-4">

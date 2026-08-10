@@ -2,26 +2,42 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Plus, RefreshCw } from "lucide-react";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { Pencil, Plus, RefreshCw, CheckCircle, XCircle, GraduationCap } from "lucide-react";
 import PresignedImage from "components/ui/PresignedImage";
+import { AppDate } from "components/ui/date";
 import { useUniversities } from "features/universities/hooks";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import SearchInput from "components/form/filter/SearchInput";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
-import Loading from "components/loading/Loading";
+import { StatusBadge } from "components/ui/badges";
+import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+
+const ITEMS_PER_PAGE = 10;
 
 export default function DataEntryUniversitiesTable() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState<"all" | "active" | "inactive">("all");
+  const [currentPage, setCurrentPage] = useState(1);
   const { universities, loading, error, refetch } = useUniversities({ includeInactive: true });
 
+  const stats = React.useMemo(() => ({
+    total: universities.length,
+    active: universities.filter((u) => u.is_active).length,
+    inactive: universities.filter((u) => !u.is_active).length,
+  }), [universities]);
+
   const filtered = universities.filter((u) => {
-    if (!searchTerm.trim()) return true;
-    const term = searchTerm.toLowerCase();
-    return u.name?.toLowerCase().includes(term) || u.country?.toLowerCase().includes(term);
+    const term = searchTerm.trim().toLowerCase();
+    const matchesSearch = !term || u.name?.toLowerCase().includes(term) || u.country?.toLowerCase().includes(term);
+    const matchesStatus =
+      selectedStatus === "all" ||
+      (selectedStatus === "active" && u.is_active) ||
+      (selectedStatus === "inactive" && !u.is_active);
+    return matchesSearch && matchesStatus;
   });
+
+  const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
     <div className="mt-6 max-w-5xl mx-auto text-p2 bg-white rounded-lg border border-slate-200">
@@ -45,12 +61,66 @@ export default function DataEntryUniversitiesTable() {
         />
       </div>
 
+      {/* Stats Cards */}
+      <div className="p-6 border-b border-slate-200 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <button
+          onClick={() => { setSelectedStatus("all"); setCurrentPage(1); }}
+          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
+            selectedStatus === "all"
+              ? "border-slate-400 bg-slate-100 shadow-sm"
+              : "border-slate-200 bg-white hover:bg-slate-50"
+          }`}
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+            <GraduationCap className="h-5 w-5 text-slate-600" />
+          </div>
+          <div>
+            <p className="text-xl font-bold text-slate-900">{stats.total}</p>
+            <p className="text-xs text-slate-500">Total Universities</p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => { setSelectedStatus("active"); setCurrentPage(1); }}
+          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
+            selectedStatus === "active"
+              ? "border-green-300 bg-green-50 shadow-sm"
+              : "border-slate-200 bg-white hover:bg-slate-50"
+          }`}
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+          </div>
+          <div>
+            <p className="text-xl font-bold text-slate-900">{stats.active}</p>
+            <p className="text-xs text-slate-500">Active</p>
+          </div>
+        </button>
+
+        <button
+          onClick={() => { setSelectedStatus("inactive"); setCurrentPage(1); }}
+          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
+            selectedStatus === "inactive"
+              ? "border-slate-400 bg-slate-100 shadow-sm"
+              : "border-slate-200 bg-white hover:bg-slate-50"
+          }`}
+        >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+            <XCircle className="h-5 w-5 text-slate-500" />
+          </div>
+          <div>
+            <p className="text-xl font-bold text-slate-900">{stats.inactive}</p>
+            <p className="text-xs text-slate-500">Inactive</p>
+          </div>
+        </button>
+      </div>
+
       {/* Search */}
       <div className="p-6 border-b border-slate-200">
         <div className="flex items-center gap-2">
           <SearchInput
             value={searchTerm}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
             placeholder="Search by name or country..."
             className="sm:w-64 sm:flex-none"
           />
@@ -60,27 +130,52 @@ export default function DataEntryUniversitiesTable() {
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        {loading && universities.length === 0 ? (
-          <Loading text="Loading universities..." />
-        ) : error ? (
-          <div className="p-8 text-center text-sm text-red-600">{error}</div>
-        ) : filtered.length === 0 ? (
-          <NoMessagesFound title="No universities found" subtitle="No universities match your search." />
-        ) : (
+      <div className="p-6">
+        <TableWrapper
+          footer={
+            <TablePagination
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              itemsPerPage={ITEMS_PER_PAGE}
+              itemCount={paginated.length}
+              totalCount={filtered.length}
+              itemLabel="universities"
+              loading={loading}
+            />
+          }
+        >
           <table className="w-full">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 <th className="min-w-[220px] px-6 py-4 text-start text-sm font-semibold text-slate-900">University</th>
                 <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">Country</th>
+                <th className="min-w-[180px] px-6 py-4 text-start text-sm font-semibold text-slate-900">Next Intake</th>
                 <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">Status</th>
                 <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
-              {filtered.map((uni) => (
-                <tr key={uni.id} className="transition-colors hover:bg-slate-100/50">
-                  <td className="min-w-[220px] px-6 py-4">
+              {loading && <TableSkeletonRows columns={5} rows={ITEMS_PER_PAGE} />}
+
+              {!loading && error && (
+                <TableErrorRow colSpan={5} message={error} onRetry={refetch} />
+              )}
+
+              {!loading && !error && paginated.length === 0 && (
+                <TableEmptyRow
+                  colSpan={5}
+                  title="No universities found"
+                  subtitle="No universities match your search."
+                />
+              )}
+
+              {!loading && !error && paginated.map((uni) => (
+                <tr
+                  key={uni.id}
+                  className="cursor-pointer transition-colors hover:bg-slate-100/50"
+                  onClick={() => router.push(`/data-entry/universities/${uni.id}`)}
+                >
+                  <td className="min-w-[220px] max-w-[300px] px-6 py-4">
                     <div className="flex items-center gap-3">
                       <PresignedImage
                         fileKey={uni.logo_file_key}
@@ -93,26 +188,39 @@ export default function DataEntryUniversitiesTable() {
                         }
                       />
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-slate-900">{uni.name}</div>
+                        <div className="truncate text-sm font-medium text-slate-900" title={uni.name}>{uni.name}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-900">{uni.country || "—"}</td>
-                  <td className="px-6 py-4">
-                    <div
-                      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-3 py-1 text-xs font-semibold ${
-                        uni.is_active
-                          ? "border-green-600 bg-green-100 text-green-700"
-                          : "border-slate-300 bg-slate-100 text-slate-500"
-                      }`}
-                    >
-                      {uni.is_active ? <FaCheckCircle className="text-[10px]" /> : <FaTimesCircle className="text-[10px]" />}
-                      {uni.is_active ? "Active" : "Inactive"}
+                  <td className="max-w-[160px] px-6 py-4">
+                    <div className="truncate text-sm text-slate-900" title={uni.country || undefined}>{uni.country || "—"}</div>
+                  </td>
+                  <td className="min-w-[180px] px-6 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      {uni.intake_months && uni.intake_months.length > 0 ? (
+                        uni.intake_months.map((date: string, index: number) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
+                          >
+                            <AppDate value={date} format="month" />
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-sm text-slate-400">TBA</span>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
+                    {uni.is_active ? (
+                      <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
+                    ) : (
+                      <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
                     <IconButton
-                      onClick={() => router.push(`/data-entry/universities/${uni.id}/edit`)}
+                      onClick={(e) => { e.stopPropagation(); router.push(`/data-entry/universities/${uni.id}/edit`); }}
                       title="Edit university"
                       icon={<Pencil className="h-4 w-4" />}
                       bgColor="bg-transparent"
@@ -127,7 +235,7 @@ export default function DataEntryUniversitiesTable() {
               ))}
             </tbody>
           </table>
-        )}
+        </TableWrapper>
       </div>
     </div>
   );

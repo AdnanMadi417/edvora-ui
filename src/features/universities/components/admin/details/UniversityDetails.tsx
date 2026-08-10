@@ -21,9 +21,10 @@ import EmptyData from "components/emptyData/EmptyTableData";
 
 interface UniversityDetailsProps {
   id: string;
+  basePath?: string;
 }
 
-const UniversityDetails = ({ id }: UniversityDetailsProps) => {
+const UniversityDetails = ({ id, basePath = "/admin/universities" }: UniversityDetailsProps) => {
   const router = useRouter();
 
   const { universityPaymentMethods, loading } = useUniversityPaymentMethods(id);
@@ -31,7 +32,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const { university, branches, universityLoading } = useUniversityDetails(id);
 
   const handleBack = () => {
-    router.push("/admin/universities");
+    router.push(basePath);
   };
 
   if (universityLoading) {
@@ -225,7 +226,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
               className="flex-1 hover:bg-slate-50"
             />
             <Button
-              onClick={() => router.push(`/admin/universities/${id}/edit`)}
+              onClick={() => router.push(`${basePath}/${id}/edit`)}
               icon={<Pencil className="h-5 w-5" />}
               text="Edit University"
               bgColor="bg-blue-600"

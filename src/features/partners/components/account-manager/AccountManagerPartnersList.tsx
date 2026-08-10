@@ -10,6 +10,7 @@ import { useAccountManagerPartners } from "features/partners/hooks";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { AppDate } from "components/ui/date";
+import { StatusBadge } from "components/ui/badges";
 import Button from "components/ui/buttons/Button";
 
 const ITEMS_PER_PAGE = 10;
@@ -192,13 +193,9 @@ export default function AccountManagerPartnersList() {
                   <td className="px-6 py-4">
                     <div className="flex flex-wrap items-center gap-1.5">
                       {partner.is_active ? (
-                        <span className="inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
-                          <CheckCircle className="h-3 w-3" /> Active
-                        </span>
+                        <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
-                          <XCircle className="h-3 w-3" /> Inactive
-                        </span>
+                        <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
                       )}
                     </div>
                   </td>

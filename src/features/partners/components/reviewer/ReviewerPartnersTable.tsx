@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from "react";
 import {
   RefreshCw, Users, UserCog, BadgeCheck, CalendarDays, Pencil,
-  ShieldCheck, CheckCircle, XCircle, Ban, Power,
+  ShieldCheck, CheckCircle, XCircle, Ban, Power, Clock,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
+import { StatusBadge } from "components/ui/badges";
 import { usePartners, useUpdatePartner } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import ReviewPartnerPopup from "../admin/ReviewPartnerPopup";
@@ -194,17 +195,11 @@ export default function ReviewerPartnersTable() {
 
                   <td className="px-6 py-4">
                     {isPending ? (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
-                        Pending Review
-                      </span>
+                      <StatusBadge variant="warning" icon={<Clock className="h-3 w-3" />}>Pending Review</StatusBadge>
                     ) : partner.is_active ? (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
-                        <CheckCircle className="h-3 w-3" /> Active
-                      </span>
+                      <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                     ) : (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
-                        <XCircle className="h-3 w-3" /> Inactive
-                      </span>
+                      <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
                     )}
                   </td>
 

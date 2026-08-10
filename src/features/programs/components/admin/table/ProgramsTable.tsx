@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import {
-  BookOpen,
   Settings,
   CheckCircle,
   Pencil,
@@ -13,7 +12,6 @@ import {
   Plus,
   GitBranch,
   DollarSign,
-  GraduationCap,
 } from "lucide-react";
 
 import { useToast } from "components/context/ToastContext";
@@ -26,7 +24,6 @@ import { useAllQualifications } from "features/knowledge-hub/qualifications/hook
 import { useUniversities } from "features/universities/hooks";
 
 import Link from "next/link";
-import StatsFilterCards, { type FilterCardItem, type CardColorScheme } from "components/filters/StatsFilterCards";
 import ProgramFilterBar from "components/filters/ProgramFilterBar";
 import KnowledgeHubTable from "features/programs/components/shared/table/KnowledgeHubTable";
 
@@ -41,8 +38,6 @@ import BatchBranchPrograms from "features/programs/components/admin/popups/Batch
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
 
 type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "deleteScholarships" | "fees" | "visaFee" | "branch";
-
-const QUAL_COLORS: CardColorScheme[] = ["blue", "violet", "emerald", "amber", "rose", "cyan"];
 
 const ITEMS_PER_PAGE = 10;
 
@@ -72,28 +67,6 @@ const ProgramsTable = () => {
     return () => clearTimeout(t);
   }, [searchTerm]);
 
-  // Per-qualification counts fetched once in parallel via qualification_id (the proven backend filter)
-  const [qualCounts, setQualCounts] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    if (qualifications.length === 0) return;
-    let cancelled = false;
-    Promise.all(
-      qualifications.map((q) =>
-        programApi.programs
-          .list({ qualification_id: q.id, page: 1, page_size: 1 })
-          .then((res) => ({ id: q.id, count: (res.data as any)?.total ?? 0 }))
-          .catch(() => ({ id: q.id, count: 0 }))
-      )
-    ).then((results) => {
-      if (cancelled) return;
-      const map: Record<string, number> = {};
-      results.forEach((r) => { map[r.id] = r.count; });
-      setQualCounts(map);
-    });
-    return () => { cancelled = true; };
-  }, [qualifications.length]);
-
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteMode, setDeleteMode] = useState<"single" | "batch" | null>(null);
@@ -121,20 +94,6 @@ const ProgramsTable = () => {
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
-
-  // Unfiltered grand total for the "All Programs" card
-  const { total: grandTotal } = usePrograms({ page: 1, page_size: 1 });
-
-  const fixedCards = useMemo<FilterCardItem[]>(() => [
-    { id: null, label: "All Programs", count: grandTotal, icon: BookOpen, colorScheme: "slate" },
-    ...qualifications.map((q, i) => ({
-      id: q.id,
-      label: q.name,
-      count: (qualCounts as Record<string, number | undefined>)[q.id] ?? "—",
-      icon: GraduationCap,
-      colorScheme: QUAL_COLORS[i % QUAL_COLORS.length],
-    })),
-  ], [grandTotal, qualifications, qualCounts]);
 
   const activeFiltersCount = [
     selectedState !== "all",
@@ -380,7 +339,7 @@ const ProgramsTable = () => {
             selectedCount={selectedCount}
             isSelectingAll={isSelectingAll}
             onSelectAll={handleSelectAll}
-            onRowClick={(program) => window.open(`/admin/knowledge-hub/${program.id}`, "_blank")}
+            onRowClick={(program) => window.open(`/admin/universities/${program.university.id}`, "_blank")}
             editHref={(id) => `/admin/knowledge-hub/${id}/edit`}
             onDeleteClick={(program) => {
               setSelectedProgramId(program.id);

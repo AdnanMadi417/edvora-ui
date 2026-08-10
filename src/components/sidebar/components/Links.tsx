@@ -6,21 +6,34 @@ import { usePathname } from "next/navigation";
 import type { IRoute } from "../../../types/navigation";
 import { ChevronDown } from "lucide-react";
 
+function matchesPath(pathname: string, path: string) {
+  return pathname === path || pathname.startsWith(path + "/");
+}
+
 export default function Links({ routes, onLinkClick }: { routes: IRoute[]; onLinkClick?: () => void }) {
   const pathname = usePathname();
 
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
+  // Some children share overlapping path prefixes (e.g. a child with an empty
+  // sub-path is itself a prefix of sibling children's paths), so prefix-matching
+  // more than one child at a time is possible — only the longest (most specific)
+  // match should be highlighted.
+  const getActiveChild = (route: IRoute) =>
+    route.children
+      ?.filter((child) => matchesPath(pathname, child.layout + child.path))
+      .sort((a, b) => (b.layout + b.path).length - (a.layout + a.path).length)[0];
+
   useEffect(() => {
     routes.forEach((route, index) => {
       const parentPath = route.layout + route.path;
       const hasActiveChild =
         route.children?.some(
-          (child) => pathname === child.layout + child.path
+          (child) => matchesPath(pathname, child.layout + child.path)
         ) ?? false;
 
-      if (pathname === parentPath || hasActiveChild) {
+      if (matchesPath(pathname, parentPath) || hasActiveChild) {
         setExpandedIndex(index);
       }
     });
@@ -36,12 +49,8 @@ export default function Links({ routes, onLinkClick }: { routes: IRoute[]; onLin
         const isExpanded = expandedIndex === index;
         const isHovered = hoveredIndex === index;
 
-        const isActive =
-          pathname === fullPath ||
-          pathname.startsWith(fullPath + "/") ||
-          route.children?.some(
-            (child) => pathname === child.layout + child.path
-          );
+        const activeChild = getActiveChild(route);
+        const isActive = matchesPath(pathname, fullPath) || !!activeChild;
 
         return (
           <div key={index} className="relative">
@@ -116,7 +125,7 @@ export default function Links({ routes, onLinkClick }: { routes: IRoute[]; onLin
                   {route.children!.map((child, childIndex) => {
                     const childPath = child.layout + child.path;
                     const ChildIcon = child.icon;
-                    const isChildActive = pathname === childPath;
+                    const isChildActive = child === activeChild;
 
                     return (
                       <Link
