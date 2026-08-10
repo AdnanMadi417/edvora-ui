@@ -84,6 +84,7 @@ export default function CreateLogisticsMarketplacePopup({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
+          
           <ModalHeader
             title="New Logistic Service"
             description="Add a new service type to the system."

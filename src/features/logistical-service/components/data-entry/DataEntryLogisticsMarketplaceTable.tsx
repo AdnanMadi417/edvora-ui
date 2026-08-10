@@ -5,7 +5,6 @@ import PresignedImage from "components/ui/PresignedImage";
 import {
   CheckCircle,
   XCircle,
-  Search,
   Phone,
   User,
   Settings,
@@ -18,11 +17,12 @@ import { MdAddBusiness } from "react-icons/md";
 
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { StatusBadge } from "components/ui/badges";
+import SearchInput from "components/form/filter/SearchInput";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 import { useLogisticProviders } from "features/logistical-service/hooks";
 import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 
 const DataEntryLogisticsMarketplaceTable = () => {
   const router = useRouter();
@@ -54,8 +54,9 @@ const DataEntryLogisticsMarketplaceTable = () => {
   const currentServiceProviders = filteredProviders.slice(indexOfFirstItem, indexOfLastItem);
 
   return (
-    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-gray-200 bg-white">
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white">
+      
+      <div className="relative overflow-hidden border-b border-slate-200">
         <div className="relative p-6">
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div>
@@ -69,33 +70,35 @@ const DataEntryLogisticsMarketplaceTable = () => {
           </div>
 
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center md:w-auto">
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search marketplace listings by name..."
-                value={searchTerm}
-                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                className="bg-background w-full rounded-md border border-gray-200 px-4 py-2.5 pl-10 pr-4 text-sm text-slate-500 outline-0 placeholder:text-slate-500 focus:border-blue-500 focus:ring-0 focus:ring-blue-500"
-              />
-            </div>
+            <SearchInput
+              value={searchTerm}
+              onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              placeholder="Search marketplace listings by name..."
+              className="sm:w-64 sm:flex-none"
+            />
 
             {isRefetching && (
               <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
             )}
 
-            <Link
-              className="bg-background-700 flex items-center justify-center gap-2 rounded-md border border-gray-200 px-4 py-2.5 text-sm text-slate-500 outline-0 transition hover:border-blue-700 hover:text-blue-700 sm:w-auto"
-              href="/data-entry/logistics-marketplace/create"
-            >
-              <MdAddBusiness className="h-4 w-4" />
-              Create Service
-            </Link>
+            <Button
+              icon={<MdAddBusiness className="h-4 w-4" />}
+              text="Create Service"
+              bgColor="bg-blue-50"
+              textColor="text-blue-700"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-blue-800"
+              hoverBorderColor="hover:border-blue-700"
+              onClick={() => router.push("/data-entry/logistics-marketplace/create")}
+              className="whitespace-nowrap"
+            />
           </div>
         </div>
       </div>
 
-      <TableWrapper
+      <div className="p-6">
+
+        <TableWrapper
         footer={
           <TablePagination
             currentPage={currentPage}
@@ -241,15 +244,20 @@ const DataEntryLogisticsMarketplaceTable = () => {
                         </td>
 
                         <td className="px-6 py-4">
-                          <a
-                            role="menuitem"
+                          <IconButton
                             aria-label="Edit Provider"
-                            href={`/data-entry/logistics-marketplace/${provider.id}/edit`}
-                            onClick={(e) => e.stopPropagation()}
-                            className="flex w-fit items-center justify-center rounded-md p-2 text-sm text-slate-700 hover:bg-slate-100 focus:outline-none"
-                          >
-                            <Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />
-                          </a>
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              router.push(`/data-entry/logistics-marketplace/${provider.id}/edit`);
+                            }}
+                            icon={<Pencil className="h-4 w-4 text-slate-500 hover:text-slate-700" />}
+                            bgColor="bg-transparent"
+                            textColor="text-slate-700"
+                            borderColor="border-transparent"
+                            hoverTextColor="hover:text-slate-700"
+                            hoverBorderColor="hover:border-transparent"
+                            className="hover:bg-slate-100 focus:outline-none"
+                          />
                         </td>
                         <td className="px-4 py-4">
                           <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -258,7 +266,10 @@ const DataEntryLogisticsMarketplaceTable = () => {
                     ))}
                 </tbody>
               </table>
-      </TableWrapper>
+          </TableWrapper>
+
+      </div>
+    
     </div>
   );
 };
