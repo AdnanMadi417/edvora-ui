@@ -9,4 +9,6 @@ export const notificationsRouteMap: Record<string, string> = {
   admin: "/admin/notifications",
   account_manager: "/account-manager/notifications",
   partner: "/partner/notifications",
+  data_entry: "/data-entry/notifications",
+  reviewer: "/reviewer/notifications",
 };
