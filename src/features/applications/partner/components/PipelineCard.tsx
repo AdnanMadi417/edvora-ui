@@ -3,6 +3,7 @@
 import React from "react";
 import { FileText, Mail, Send, GraduationCap, Wallet, Flag, ArrowUpRight } from "lucide-react";
 import Button from "components/ui/buttons/Button";
+import { SolidBadge } from "components/ui/badges";
 
 interface Stage {
   id: string;
@@ -111,14 +112,14 @@ export default function PipelineCard({
                   <Icon className={`h-5 w-5 ${colors.iconColor}`} />
                 </div>
                 {isComm && (
-                  <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                  <SolidBadge variant="success" className="rounded-full px-2 py-0.5 text-[10px]">
                     Payout
-                  </span>
+                  </SolidBadge>
                 )}
                 {needsMove && (
-                  <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-semibold text-white">
+                  <SolidBadge variant="warning" className="rounded-full px-2 py-0.5 text-[10px]">
                     Your move
-                  </span>
+                  </SolidBadge>
                 )}
               </div>
 
