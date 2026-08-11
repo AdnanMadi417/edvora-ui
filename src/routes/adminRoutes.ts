@@ -12,6 +12,8 @@ import {
   Truck,
   Building2,
   Tag,
+  ShieldCheck,
+  Users,
 } from "lucide-react";
 
 const AdminRoutes: IRoute[] = [
@@ -32,6 +34,18 @@ const AdminRoutes: IRoute[] = [
     layout: "/admin",
     path: "/account-managers",
     icon: UserCog,
+  },
+  {
+    name: "Roles",
+    layout: "/admin",
+    path: "/roles",
+    icon: ShieldCheck,
+  },
+  {
+    name: "Staff Users",
+    layout: "/admin",
+    path: "/staff-users",
+    icon: Users,
   },
   {
     name: "Knowledge Hub",
