@@ -1,5 +1,6 @@
 import { AlertCircle, Check, Users, X } from "lucide-react";
 import React from "react";
+import { StatusBadge } from "components/ui/badges";
 import type { AccountManager } from "../types";
 
 interface AccountManagerProfileProps {
@@ -9,7 +10,7 @@ interface AccountManagerProfileProps {
 export default function AccountManagerProfile({ manager }: AccountManagerProfileProps) {
   return (
     <section>
-      <div className="mb-5 mt-5 max-w-5xl mx-auto block rounded-lg border border-slate-200 bg-card p-6 shadow-sm">
+      <div className="mb-5 mt-5 max-w-5xl mx-auto block rounded-lg border border-slate-200 bg-card p-6 ">
         <div className="flex items-center gap-5">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-slate-700">
             {manager.name?.charAt(0).toUpperCase() ?? "?"}
@@ -21,25 +22,12 @@ export default function AccountManagerProfile({ manager }: AccountManagerProfile
                 {manager.name}
               </h1>
 
-              <span
-                className={`inline-flex items-center gap-1 rounded-md px-3 py-1 text-xs font-semibold ${
-                  manager.is_active
-                    ? "border border-green-700 bg-green-100 text-green-700"
-                    : "border border-slate-500 bg-slate-100 text-slate-500"
-                }`}
+              <StatusBadge
+                variant={manager.is_active ? "success" : "neutral"}
+                icon={manager.is_active ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
               >
-                {manager.is_active ? (
-                  <>
-                    <Check className="h-3 w-3" />
-                    Active
-                  </>
-                ) : (
-                  <>
-                    <X className="h-3 w-3" />
-                    Inactive
-                  </>
-                )}
-              </span>
+                {manager.is_active ? "Active" : "Inactive"}
+              </StatusBadge>
             </div>
 
             <p className="break-all text-sm text-slate-500">{manager.email}</p>
@@ -56,16 +44,14 @@ export default function AccountManagerProfile({ manager }: AccountManagerProfile
             </span>
 
             {Number(manager.assigned_partners_count) > 0 ? (
-              <span className="inline-flex items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 w-fit">
-                <Users className="h-3 w-3" />
+              <StatusBadge variant="success" icon={<Users className="h-3 w-3" />} className="w-fit">
                 {Number(manager.assigned_partners_count)} Partner
                 {Number(manager.assigned_partners_count) !== 1 && "s"}
-              </span>
+              </StatusBadge>
             ) : (
-              <span className="inline-flex items-center gap-2 rounded-md border border-rose-200 bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700">
-                <AlertCircle className="h-3 w-3" />
+              <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>
                 Needs Partner
-              </span>
+              </StatusBadge>
             )}
           </div>
         </div>

@@ -21,7 +21,7 @@ interface StatusBadgeProps {
 export default function StatusBadge({ variant, icon, children, className }: StatusBadgeProps) {
   return (
     <span
-      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-md border px-2.5 py-1 text-xs font-medium ${VARIANT_CLASSES[variant]} ${className ?? ""}`}
+      className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-medium ${VARIANT_CLASSES[variant]} ${className ?? ""}`}
     >
       {icon}
       {children}

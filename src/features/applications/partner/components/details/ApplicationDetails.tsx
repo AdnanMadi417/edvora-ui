@@ -42,6 +42,8 @@ import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useVisaCase } from "hooks/useVisaCase";
 import { AppDate } from "components/ui/date";
 import { parseApiError } from "utils/parseApiError";
+import { DetailStatusBadge } from "components/ui/badges";
+import { getStatusVariant } from "utils/getStatusVariant";
 
 interface ApplicationDetailsProps {
   application: any;
@@ -239,7 +241,7 @@ export default function ApplicationDetails({
                   {university.name && (
                     <>
                       <span className="text-slate-300 hidden md:block">|</span>
-                      <span className="flex items-center gap-1 hidden md:flex">
+                      <span className="items-center gap-1 hidden md:flex">
                         <Building2 className="h-3.5 w-3.5 text-blue-400" />
                         {university.name}
                       </span>
@@ -248,7 +250,7 @@ export default function ApplicationDetails({
                   {university.country && (
                     <>
                       <span className="text-slate-300 hidden md:block">|</span>
-                      <span className="flex items-center gap-1 hidden md:flex">
+                      <span className="items-center gap-1 hidden md:flex">
                         <Globe className="h-3.5 w-3.5 text-blue-400" />
                         {university.country}
                       </span>
@@ -260,14 +262,14 @@ export default function ApplicationDetails({
 
             <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
               {program.name && (
-                <span className="flex items-center gap-1 flex md:hidden">
+                <span className="flex items-center gap-1 md:hidden">
                   <GraduationCap className="h-3.5 w-3.5 text-blue-400" />
                   {program.name}
                 </span>
               )}
               {university.name && (
                 <>
-                  <span className="flex items-center gap-1 flex md:hidden">
+                  <span className="flex items-center gap-1 md:hidden">
                     <Building2 className="h-3.5 w-3.5 text-blue-400" />
                     {university.name}
                   </span>
@@ -275,7 +277,7 @@ export default function ApplicationDetails({
               )}
               {university.country && (
                 <>
-                  <span className="flex items-center gap-1 flex md:hidden">
+                  <span className="flex items-center gap-1 md:hidden">
                     <Globe className="h-3.5 w-3.5 text-blue-400" />
                     {university.country}
                   </span>
@@ -297,9 +299,9 @@ export default function ApplicationDetails({
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Current Status</p>
               <div className="flex flex-wrap gap-2">
                 {currentStatus.name && (
-                  <span className="inline-flex items-center rounded-md border border-amber-200 bg-amber-50 px-3 py-1 text-sm font-normal text-amber-700">
+                  <DetailStatusBadge variant={getStatusVariant(currentStatus.name)}>
                     {currentStatus.name}
-                  </span>
+                  </DetailStatusBadge>
                 )}
                 {stage.name && (
                   <span className="inline-flex items-center rounded-md border border-slate-200 bg-white px-3 py-1 text-sm font-normal text-slate-800">

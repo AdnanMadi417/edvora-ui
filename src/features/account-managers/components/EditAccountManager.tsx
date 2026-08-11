@@ -7,6 +7,7 @@ import InputField from "components/form/fields/InputField";
 import PasswordField from "components/form/fields/PasswordField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import Button from "components/ui/buttons/Button";
+import { StatusBadge } from "components/ui/badges";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
@@ -130,10 +131,9 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
                   Edit Account Manager
                 </h1>
 
-                <span className="inline-flex items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-[11px] font-medium text-blue-700">
-                  <Pencil className="h-3 w-3" />
+                <StatusBadge variant="info" icon={<Pencil className="h-3 w-3" />}>
                   Editing
-                </span>
+                </StatusBadge>
               </div>
 
               <p className="text-sm text-slate-500">

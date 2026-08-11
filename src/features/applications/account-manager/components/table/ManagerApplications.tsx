@@ -23,7 +23,8 @@ import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 import EmptyData from "components/emptyData/EmptyTableData";
 import ApplicationFilterBar from "components/filters/ApplicationFilterBar";
 import { TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
-import { StatusBadge, type StatusBadgeVariant } from "components/ui/badges";
+import { StatusBadge } from "components/ui/badges";
+import { getStatusVariant } from "utils/getStatusVariant";
 import { AppDate } from "components/ui/date";
 
 
@@ -38,15 +39,6 @@ const ACTION_REQUIRED_STATUSES = new Set([
   'issue_response_received',
   'commission_disputed',
 ]);
-
-const getStatusVariant = (code: string): StatusBadgeVariant => {
-  if (!code) return "neutral";
-  if (code.includes("reject") || code.includes("expired")) return "danger";
-  if (code.includes("approv") || code.includes("confirm") || code.includes("accepted") || code.includes("completed")) return "success";
-  if (code.includes("correction") || code.includes("re_upload") || code.includes("re-upload") || code.includes("disputed")) return "attention";
-  if (code.includes("review") || code.includes("waiting") || code.includes("processing") || code.includes("pending")) return "warning";
-  return "info";
-};
 
 const ModernApplicationsTable = () => {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });

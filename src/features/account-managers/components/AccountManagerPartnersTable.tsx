@@ -10,6 +10,7 @@ import { usePartners } from "features/partners/hooks";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { StatusBadge } from "components/ui/badges";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 
@@ -245,13 +246,9 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
 
                   <td className="px-6 py-4">
                     {partner.is_active ? (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
-                        <CheckCircle className="h-3 w-3" /> Active
-                      </span>
+                      <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                     ) : (
-                      <span className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
-                        <XCircle className="h-3 w-3" /> Inactive
-                      </span>
+                      <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
                     )}
                   </td>
 

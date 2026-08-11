@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle, CheckCircle2, ClipboardCheck, ShieldCheck, UserCog, XCircle } from "lucide-react";
 import { useReviewPartner, useAssignPartnerManager } from "features/partners/hooks";
 import ModalHeader from "components/ui/modal/ModalHeader";
+import { StatusBadge } from "components/ui/badges";
 import Button from "components/ui/buttons/Button";
 import ApproveRejectToggle from "components/ui/buttons/ApproveRejectToggle";
 import SelectField from "components/form/fields/SelectField";
@@ -152,17 +153,17 @@ export default function ReviewPartnerPopup({
                 </div>
 
                 {managerIsMissing ? (
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
-                    <AlertTriangle className="h-3 w-3" /> Not assigned
-                  </span>
+                  <StatusBadge variant="warning" icon={<AlertTriangle className="h-3 w-3" />} className="shrink-0">
+                    Not assigned
+                  </StatusBadge>
                 ) : managerIsPending ? (
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                  <StatusBadge variant="info" className="shrink-0">
                     Pending change
-                  </span>
+                  </StatusBadge>
                 ) : (
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
-                    <CheckCircle2 className="h-3 w-3" /> Assigned
-                  </span>
+                  <StatusBadge variant="success" icon={<CheckCircle2 className="h-3 w-3" />} className="shrink-0">
+                    Assigned
+                  </StatusBadge>
                 )}
               </div>
 

@@ -71,14 +71,8 @@ export default function OfferLetterDecision({
       </div>
 
       <div className="space-y-4 p-6">
-        <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-          <p className="text-sm font-medium text-green-800">🎉 Congratulations!</p>
-          <p className="mt-1 text-sm text-green-700">
-            You have been offered admission. Please review your offer letter.
-          </p>
-        </div>
-
-        <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4">
+      
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <FaFilePdf className="text-2xl text-red-500" />
             <div className="min-w-0">

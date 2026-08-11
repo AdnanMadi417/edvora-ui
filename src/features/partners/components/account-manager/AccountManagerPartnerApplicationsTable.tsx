@@ -7,7 +7,8 @@ import PresignedImage from "components/ui/PresignedImage";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
-import { StatusBadge, type StatusBadgeVariant } from "components/ui/badges";
+import { StatusBadge } from "components/ui/badges";
+import { getStatusVariant } from "utils/getStatusVariant";
 import Button from "components/ui/buttons/Button";
 
 const ITEMS_PER_PAGE = 5;
@@ -20,15 +21,6 @@ const LIFECYCLE_OPTIONS = [
   { value: "cancel", label: "Cancelled" },
   { value: "all", label: "All" },
 ];
-
-const getStatusVariant = (code: string): StatusBadgeVariant => {
-  if (!code) return "neutral";
-  if (code.includes("reject") || code.includes("expired")) return "danger";
-  if (code.includes("approv") || code.includes("confirm") || code.includes("accepted") || code.includes("completed")) return "success";
-  if (code.includes("correction") || code.includes("re_upload") || code.includes("re-upload") || code.includes("disputed")) return "attention";
-  if (code.includes("review") || code.includes("waiting") || code.includes("processing") || code.includes("pending")) return "warning";
-  return "info";
-};
 
 interface AccountManagerPartnerApplicationsTableProps {
   partnerId: string;
