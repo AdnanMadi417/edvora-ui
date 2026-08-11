@@ -16,7 +16,7 @@ const roleHomePaths: Record<string, string> = {
   partner: "/partner/applications",
   account_manager: "/account-manager/applications",
   reviewer: "/reviewer/partners",
-  data_entry: "/data-entry/universities",
+  data_entry: "/data-entry/knowledge-hub",
 };
 
 function isTokenExpired(token: string): boolean {

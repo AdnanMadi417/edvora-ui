@@ -339,7 +339,7 @@ const ProgramsTable = () => {
             selectedCount={selectedCount}
             isSelectingAll={isSelectingAll}
             onSelectAll={handleSelectAll}
-            onRowClick={(program) => window.open(`/admin/universities/${program.university.id}`, "_blank")}
+            onRowClick={(program) => window.open(`/admin/knowledge-hub/${program.id}`, "_blank")}
             editHref={(id) => `/admin/knowledge-hub/${id}/edit`}
             onDeleteClick={(program) => {
               setSelectedProgramId(program.id);
