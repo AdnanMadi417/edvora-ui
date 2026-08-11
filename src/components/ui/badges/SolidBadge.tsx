@@ -7,7 +7,7 @@ import type { StatusBadgeVariant } from "./StatusBadge";
 const VARIANT_CLASSES: Record<StatusBadgeVariant, string> = {
   success: "bg-emerald-700 text-white",
   danger: "bg-red-700 text-white",
-  warning: "bg-amber-700 text-white",
+  warning: "bg-amber-500 text-white",
   attention: "bg-orange-700 text-white",
   info: "bg-blue-600 text-white",
   neutral: "bg-slate-600 text-white",
