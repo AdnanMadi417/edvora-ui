@@ -11,6 +11,7 @@ import {
   Plus,
   GitBranch,
   DollarSign,
+  Trash2,
 } from "lucide-react";
 
 import { usePrograms, useStates } from "features/programs/hooks";
@@ -21,7 +22,6 @@ import { useAllQualifications } from "features/knowledge-hub/qualifications/hook
 import { useUniversities } from "features/universities/hooks";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import ProgramFilterBar from "components/filters/ProgramFilterBar";
 import KnowledgeHubTable from "features/programs/components/shared/table/KnowledgeHubTable";
 
@@ -29,16 +29,16 @@ import BatchUpdatePrograms from "features/programs/components/admin/popups/Batch
 import BatchIELTSPrograms from "features/programs/components/admin/popups/BatchIELTSPrograms";
 import BatchProgramIntakes from "features/programs/components/admin/popups/BatchProgramIntakes";
 import BatchProgramScholarship from "features/programs/components/admin/popups/BatchProgramScholarship";
+import BatchDeleteScholarships from "features/programs/components/admin/popups/BatchDeleteScholarships";
 import BatchFeesPrograms from "features/programs/components/admin/popups/BatchFeesPrograms";
 import BatchBranchPrograms from "features/programs/components/admin/popups/BatchBranchPrograms";
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
 
-type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "fees" | "visaFee" | "branch";
+type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "deleteScholarships" | "fees" | "visaFee" | "branch";
 
 const ITEMS_PER_PAGE = 10;
 
 const DataEntryProgramsTable = () => {
-  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -247,6 +247,7 @@ const DataEntryProgramsTable = () => {
                         { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("ielts") },
                         { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setActiveModal("intakes") },
                         { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setActiveModal("scholarship") },
+                        { label: "Delete Scholarships", icon: <Trash2 className="h-3.5 w-3.5 text-red-600" />, bg: "bg-red-50", onClick: () => setActiveModal("deleteScholarships") },
                         { label: "Tuition Fees", icon: <DollarSign className="h-3.5 w-3.5 text-green-600" />, bg: "bg-green-50", onClick: () => setActiveModal("fees") },
                         { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setActiveModal("visaFee") },
                         ...(sharedUniversityId ? [{ label: "Branch", icon: <GitBranch className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("branch") }] : []),
@@ -289,7 +290,7 @@ const DataEntryProgramsTable = () => {
             selectedCount={selectedCount}
             isSelectingAll={isSelectingAll}
             onSelectAll={handleSelectAll}
-            onRowClick={(program) => router.push(`/data-entry/universities/${program.university.id}`)}
+            onRowClick={(program) => window.open(`/data-entry/knowledge-hub/${program.id}`, "_blank")}
             editHref={(id) => `/data-entry/knowledge-hub/${id}/edit`}
             hideDelete
           />
@@ -321,6 +322,13 @@ const DataEntryProgramsTable = () => {
 
       <BatchProgramScholarship
         isOpen={activeModal === "scholarship"}
+        onClose={() => setActiveModal(null)}
+        selectedProgramIds={selectedProgramIds}
+        onSuccess={refetch}
+      />
+
+      <BatchDeleteScholarships
+        isOpen={activeModal === "deleteScholarships"}
         onClose={() => setActiveModal(null)}
         selectedProgramIds={selectedProgramIds}
         onSuccess={refetch}
