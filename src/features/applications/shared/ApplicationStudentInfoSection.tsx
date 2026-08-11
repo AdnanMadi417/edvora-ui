@@ -14,6 +14,7 @@ import {
 } from "react-icons/fa";
 import { AppDate } from "components/ui/date";
 import { formatGender } from "utils/applicationFormatting";
+import { SectionIconBadge } from "components/ui/icons";
 
 interface ApplicationStudentInfoSectionProps {
   application: any;
@@ -48,9 +49,7 @@ export default function ApplicationStudentInfoSection({ application }: Applicati
   return (
     <div className="p-6 border-b border-slate-200">
       <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-        <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-          <FaUser className="text-xl text-blue-700" />
-        </span>
+        <SectionIconBadge icon={FaUser} color="blue" />
         Student Information
       </h3>
 
@@ -210,7 +209,7 @@ export default function ApplicationStudentInfoSection({ application }: Applicati
                 <FaPhoneAlt className="text-xs text-red-600" />
                 <h4 className="text-p2 font-semibold tracking-wide text-red-700">Emergency Contact</h4>
               </div>
-              <dl className="space-y-4">
+              <dl className="space-y-3">
                 {emergencyContact.name && (
                   <div className="grid grid-cols-[auto,1fr] items-start gap-2">
                     <dt className="flex items-center gap-2 text-sm font-medium text-slate-700">

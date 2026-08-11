@@ -4,6 +4,7 @@ import { useVisaCase } from "hooks/useVisaCase";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { AppDate } from "components/ui/date";
+import { SectionIconBadge } from "components/ui/icons";
 
 interface OfferLetterDecisionProps {
   application: any;
@@ -26,10 +27,8 @@ export default function OfferLetterDecision({
 
       {visaCase && (
         <>
-          <div className="flex items-center gap-4 border-b border-slate-200 p-6">
-              <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-                <CreditCard className="text-xl text-blue-700" />
-              </span>
+          <div className="flex items-center gap-3 border-b border-slate-200 p-6">
+              <SectionIconBadge icon={CreditCard} color="blue" />
               <div>
                 <h3 className="text-p3 font-semibold text-slate-900">Visa Payment</h3>
                 <span className="text-sm text-slate-500">Visa processing fee details</span>
@@ -38,7 +37,7 @@ export default function OfferLetterDecision({
 
             <div className="grid grid-cols-1 gap-6 p-6 sm:grid-cols-3">
               <div>
-                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">Visa Fee Amount</p>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Visa Fee Amount</p>
                 <p className="text-lg font-bold text-slate-900">
                   {visaCase.visa_fee_amount
                     ? `RM ${Number(visaCase.visa_fee_amount).toLocaleString()}`
@@ -46,13 +45,13 @@ export default function OfferLetterDecision({
                 </p>
               </div>
               <div>
-                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">Created At</p>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Created At</p>
                 <p className="text-sm text-slate-700">
                   <AppDate value={visaCase.created_at} format="datetime" />
                 </p>
               </div>
               <div>
-                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-slate-400">Notes</p>
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-slate-500">Notes</p>
                 <p className="text-sm text-slate-700">{visaCase.notes || "No notes"}</p>
               </div>
             </div>
@@ -63,9 +62,7 @@ export default function OfferLetterDecision({
 
       {/* Offer Letter header */}
       <div className="flex items-center gap-3 border-b border-slate-200 p-6">
-        <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-          <FaFilePdf className="text-xl text-blue-700" />
-        </span>
+        <SectionIconBadge icon={FaFilePdf} color="blue" />
         <div>
           <h3 className="text-p3 font-semibold text-slate-900">University Offer Letter</h3>
           <span className="text-sm text-slate-500">Admission offer from the university</span>

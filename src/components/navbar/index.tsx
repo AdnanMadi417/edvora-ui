@@ -133,7 +133,7 @@ const Navbar = ({
         </p>
       </div>
 
-      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-md border border-slate-200 bg-card px-2 py-2">
+      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-lg border border-slate-200 bg-card px-2 py-2">
         <span
           className="flex h-5 w-5 cursor-pointer items-center justify-center xl:hidden"
           onClick={onOpenSidenav}

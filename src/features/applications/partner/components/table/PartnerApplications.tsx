@@ -253,7 +253,7 @@ const PartnerApplications = () => {
         </div>
       )}
 
-      <div className="border-t border-slate-200 p-6 border-b border-slate-200">
+      <div className="border-b border-slate-200 p-6">
         <ApplicationFilterBar
           searchTerm={searchTerm}
           onSearchChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}

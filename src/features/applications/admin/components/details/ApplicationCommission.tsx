@@ -3,6 +3,7 @@
 import React from "react";
 import { Receipt } from "lucide-react";
 import DocumentActions from "features/applications/shared/DocumentActions";
+import { SectionIconBadge } from "components/ui/icons";
 
 interface ApplicationCommissionsProps {
   application: any;
@@ -30,9 +31,7 @@ export default function ApplicationCommissions({
   return (
     <>
       <div className="flex items-start gap-3 border-b border-slate-200 p-6">
-          <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
-            <Receipt className="text-xl text-blue-700" />
-          </span>
+          <SectionIconBadge icon={Receipt} color="blue" />
           <div>
             <h3 className="text-p3 font-semibold text-slate-900">
               Commission Details

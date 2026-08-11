@@ -38,14 +38,14 @@ export default function ApplicationHero({ application, children }: ApplicationHe
               {student.name}
             </h2>
             {application.intake_date && (
-              <div className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 sm:hidden">
+              <div className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500 sm:hidden">
                 <Clock className="h-3 w-3" />
                 <span>Intake: <AppDate value={application.intake_date} format="short" fallback="Not provided" /></span>
               </div>
             )}
             <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
               {program.name && (
-                <span className="items-center gap-1 hidden md:flex">
+                <span className="items-center gap-1.5 hidden md:flex">
                   <GraduationCap className="h-3.5 w-3.5 text-blue-400" />
                   {program.name}
                 </span>
@@ -53,7 +53,7 @@ export default function ApplicationHero({ application, children }: ApplicationHe
               {university.name && (
                 <>
                   <span className="text-slate-300 hidden md:block">|</span>
-                  <span className="items-center gap-1 hidden md:flex">
+                  <span className="items-center gap-1.5 hidden md:flex">
                     <Building2 className="h-3.5 w-3.5 text-blue-400" />
                     {university.name}
                   </span>
@@ -62,7 +62,7 @@ export default function ApplicationHero({ application, children }: ApplicationHe
               {university.country && (
                 <>
                   <span className="text-slate-300 hidden md:block">|</span>
-                  <span className="items-center gap-1 hidden md:flex">
+                  <span className="items-center gap-1.5 hidden md:flex">
                     <Globe className="h-3.5 w-3.5 text-blue-400" />
                     {university.country}
                   </span>
@@ -74,19 +74,19 @@ export default function ApplicationHero({ application, children }: ApplicationHe
 
         <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
           {program.name && (
-            <span className="flex items-center gap-1 md:hidden">
+            <span className="flex items-center gap-1.5 md:hidden">
               <GraduationCap className="h-3.5 w-3.5 text-blue-400" />
               {program.name}
             </span>
           )}
           {university.name && (
-            <span className="flex items-center gap-1 md:hidden">
+            <span className="flex items-center gap-1.5 md:hidden">
               <Building2 className="h-3.5 w-3.5 text-blue-400" />
               {university.name}
             </span>
           )}
           {university.country && (
-            <span className="flex items-center gap-1 md:hidden">
+            <span className="flex items-center gap-1.5 md:hidden">
               <Globe className="h-3.5 w-3.5 text-blue-400" />
               {university.country}
             </span>

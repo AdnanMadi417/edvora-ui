@@ -1,6 +1,7 @@
 import React from "react";
 import { MdAssignmentTurnedIn } from "react-icons/md";
 import { AppDate } from "components/ui/date";
+import { SectionIconBadge } from "components/ui/icons";
 
 interface ApplicationInfoSectionProps {
   application: any;
@@ -16,9 +17,7 @@ export default function ApplicationInfoSection({ application }: ApplicationInfoS
   return (
     <div className="p-6 border-b border-slate-200">
       <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
-        <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-          <MdAssignmentTurnedIn className="text-xl text-blue-700" />
-        </span>
+        <SectionIconBadge icon={MdAssignmentTurnedIn} color="blue" />
         Application Information
       </h3>
 
