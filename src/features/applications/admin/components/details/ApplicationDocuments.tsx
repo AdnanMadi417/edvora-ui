@@ -14,6 +14,7 @@ import HoldPopup from "features/applications/admin/components/popups/ResubmitDoc
 import EmptyData from "components/emptyData/EmptyData";
 import { AppDate } from "components/ui/date";
 import { SectionIconBadge } from "components/ui/icons";
+import { SolidBadge } from "components/ui/badges";
 import api from "lib/useApi"
 
 interface ApplicationDocumentsProps {
@@ -97,9 +98,9 @@ export default function ApplicationDocuments({
           <div className="relative shrink-0">
             <SectionIconBadge icon={FolderOpen} color="blue" />
             {pendingDocuments > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-md bg-amber-500 text-[10px] font-bold text-white">
+              <SolidBadge variant="warning" className="absolute -right-1 -top-1 h-5 w-5 rounded-md text-[10px]">
                 {pendingDocuments}
-              </span>
+              </SolidBadge>
             )}
           </div>
           <div>
