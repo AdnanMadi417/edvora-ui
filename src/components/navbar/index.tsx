@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
 import { KeyRound, LogOut, Settings, Bell } from "lucide-react";
-import NavLink from "components/link/NavLink";
 import Link from "next/link";
 import api, { setLoggingOut, SIGN_IN_URL } from "../../lib/useApi";
 
@@ -122,21 +121,15 @@ const Navbar = ({
         <div className="flex items-center text-sm sm:text-base">
           <span className="text-slate-700">Pages</span>
           <span className="mx-1">/</span>
-          <NavLink
-            href="#"
-            className="capitalize text-slate-700 no-underline font-normal"
-          >
+          <span className="capitalize text-slate-700 font-normal">
             {brandText}
-          </NavLink>
+          </span>
         </div>
 
         <p className="text-lg font-bold capitalize sm:text-2xl lg:text-3xl">
-          <NavLink
-            href="#"
-            className="font-bold text-slate-900 no-underline capitalize"
-          >
+          <span className="font-bold text-slate-900 capitalize">
             {brandText}
-          </NavLink>
+          </span>
         </p>
       </div>
 
