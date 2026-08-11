@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   RefreshCw, Users, UserCog, BadgeCheck, CalendarDays, Pencil,
   ShieldCheck, CheckCircle, XCircle, Ban, Power, Clock,
@@ -21,6 +22,7 @@ import { parseApiError } from "utils/parseApiError";
 const ITEMS_PER_PAGE = 10;
 
 export default function ReviewerPartnersTable() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -163,7 +165,11 @@ export default function ReviewerPartnersTable() {
             {!isInitialLoad && !error && partners.map((partner) => {
               const isPending = !partner.is_verified && !partner.is_active;
               return (
-                <tr key={partner.id} className="transition-colors hover:bg-slate-100/50">
+                <tr
+                  key={partner.id}
+                  className="cursor-pointer transition-colors hover:bg-slate-100/50"
+                  onClick={() => router.push(`/reviewer/partners/${partner.id}`)}
+                >
                   <td className="min-w-[220px] px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
@@ -209,7 +215,7 @@ export default function ReviewerPartnersTable() {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center gap-2">
                       {isPending && (
                         <>
