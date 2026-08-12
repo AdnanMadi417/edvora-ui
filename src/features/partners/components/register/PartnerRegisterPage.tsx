@@ -157,7 +157,7 @@ export default function PartnerRegisterPage() {
     if (!indForm.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!indForm.passport_number.trim()) e.passport_number = "Passport number is required";
     if (!indProfilePhoto.fileKey) e.ind_profile_photo = "Profile photo is required";
-    if (!indIdDoc) e.ind_id_doc = "Please upload your passport or national ID";
+    if (!indIdDoc) e.ind_id_doc = "Please upload your identity document";
     if (!indPassportPhoto) e.ind_passport_photo = "Please upload your passport photo";
     const socialError = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
     if (socialError) e.social_media_url = socialError;
@@ -181,7 +181,7 @@ export default function PartnerRegisterPage() {
     if (!compForm.contact_phone_number.trim()) e.contact_phone_number = "Phone number is required";
     if (!compForm.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!compForm.passport_number.trim()) e.passport_number = "Passport number is required";
-    if (!compContactIdDoc) e.comp_contact_id_doc = "Please upload a passport or national ID";
+    if (!compContactIdDoc) e.comp_contact_id_doc = "Please upload an identity document";
     if (!compPassportPhoto) e.comp_passport_photo = "Please upload a passport photo";
     if (!compForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
     setErrors(e);
@@ -384,7 +384,7 @@ export default function PartnerRegisterPage() {
                       simpleProgress={indProfilePhoto.progress}
                       errors={{ ind_profile_photo: indProfilePhoto.error || errors.ind_profile_photo }}
                     />
-                    <InputField label="Name (as per Passport/National ID)" field="name" placeholder="Ahmed Ali"
+                    <InputField label="Name (as per Passport)" field="name" placeholder="Ahmed Ali"
                       formData={indForm} errors={errors} updateFormData={updateInd}
                       onBlur={() => {
                         const val = indForm.name.trim();
@@ -434,7 +434,7 @@ export default function PartnerRegisterPage() {
                   <SectionCard title="Identity Verification"
                     subtitle="To ensure trust and authenticity, all advisors must verify their identity.">
                     <PublicFileUploadField
-                      label="Passport or National ID"
+                      label="Identity Document"
                       fieldId="ind-id-doc"
                       required
                       result={indIdDoc}
@@ -526,7 +526,7 @@ export default function PartnerRegisterPage() {
                         formData={compForm} errors={errors} updateFormData={updateComp} />
                     </div>
                     <PublicFileUploadField
-                      label="Passport or National ID"
+                      label="Identity Document"
                       fieldId="comp-contact-id-doc"
                       required
                       result={compContactIdDoc}
