@@ -1,4 +1,4 @@
-import { ClipboardList, BookOpen, Bell, Truck } from "lucide-react";
+import { ClipboardList, BookOpen, Bell, Truck, UserPlus } from "lucide-react";
 
 import type { IRoute } from "../types/navigation";
 
@@ -32,6 +32,13 @@ const partnerRoutes: IRoute[] = [
     layout: "/partner",
     path: "/logistics-marketplace",
     icon: Truck,
+  },
+
+  {
+    name: "Team Members",
+    layout: "/partner",
+    path: "/team-members",
+    icon: UserPlus,
   },
 ];
 
