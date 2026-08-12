@@ -120,7 +120,7 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
   };
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white">
+    <>
       {/* Filter Bar */}
       <div className="p-6 border-b border-slate-200">
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
@@ -341,6 +341,6 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
         onSuccess={() => { refetch(); onChanged?.(); }}
         member={commissionTarget}
       />
-    </div>
+    </>
   );
 }
