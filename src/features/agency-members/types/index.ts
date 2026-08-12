@@ -44,12 +44,14 @@ export interface InviteAgencyMemberPayload {
   email: string;
   name: string;
   commission_visible: boolean;
-  commission_display_percentage: number;
+  /** Must be omitted entirely (not 0) when commission_visible is false. */
+  commission_display_percentage?: number;
 }
 
 export interface UpdateMemberCommissionPayload {
   commission_visible: boolean;
-  commission_display_percentage: number;
+  /** Must be omitted entirely (not 0) when commission_visible is false. */
+  commission_display_percentage?: number;
 }
 
 export interface SubmitAgencyMemberProfilePayload {

@@ -198,10 +198,10 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
     if (!member) return;
     try {
       if (member.is_active) {
-        await suspendMember(member.id);
+        await suspendMember(member.partner_id);
         showToast("Member suspended successfully.", "success");
       } else {
-        await reactivateMember(member.id);
+        await reactivateMember(member.partner_id);
         showToast("Member reactivated successfully.", "success");
       }
       setIsSuspendOpen(false);
@@ -215,7 +215,7 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
   const handleResendWelcome = async () => {
     if (!member) return;
     try {
-      await resendMemberWelcomeEmail(member.id);
+      await resendMemberWelcomeEmail(member.partner_id);
       showToast("Welcome email resent successfully.", "success");
       setIsResendWelcomeOpen(false);
       setWelcomeCooldownUntil(Date.now() + 60_000);

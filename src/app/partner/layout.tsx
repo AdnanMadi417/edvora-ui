@@ -10,12 +10,20 @@ import partnerRoutes from '../../routes/partnerRoutes';
 import RoleGuard from "components/guard/RoleGuard";
 import { ToastProvider } from "components/context/ToastContext";
 import PartnerOnboardingTour from "components/onboarding/PartnerOnboardingTour";
+import { usePartnerProfile } from "features/partners/hooks";
 
 const PARTNER_ROLES = ["partner"];
 
 export default function PartnerLayout({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const { partner } = usePartnerProfile();
+
+  // "Team Members" (agency invitations) only applies to agency/company
+  // partners — individual advisors have no team to manage.
+  const visibleRoutes = partner && partner.type !== "agency"
+    ? partnerRoutes.filter((route) => route.name !== "Team Members")
+    : partnerRoutes;
 
   return (
     <RoleGuard allowedRoles={PARTNER_ROLES}>
@@ -25,7 +33,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
         <div className="relative flex min-h-screen w-full bg-slate-50">
           <div className="z-[60]">
             <Sidebar
-              routes={partnerRoutes}
+              routes={visibleRoutes}
               open={open}
               setOpen={setOpen}
               variant="admin"
@@ -36,8 +44,8 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
             <main className="mx-2.5 flex-none transition-all md:pr-2 xl:ml-[300px]">
               <Navbar
                 onOpenSidenav={() => setOpen(!open)}
-                brandText={getActiveRoute(partnerRoutes, pathname)}
-                secondary={getActiveNavbar(partnerRoutes, pathname)}
+                brandText={getActiveRoute(visibleRoutes, pathname)}
+                secondary={getActiveNavbar(visibleRoutes, pathname)}
               />
               <div className="mx-auto min-h-screen p-2 !pt-[10px] md:p-2">
                 {children}

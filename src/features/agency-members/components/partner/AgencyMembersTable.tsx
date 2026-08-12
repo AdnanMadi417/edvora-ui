@@ -103,10 +103,10 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
     if (!suspendTarget) return;
     try {
       if (suspendTarget.is_active) {
-        await suspendMember(suspendTarget.id);
+        await suspendMember(suspendTarget.partner_id);
         showToast("Member suspended successfully.", "success");
       } else {
-        await reactivateMember(suspendTarget.id);
+        await reactivateMember(suspendTarget.partner_id);
         showToast("Member reactivated successfully.", "success");
       }
       setIsSuspendOpen(false);
@@ -255,7 +255,7 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
                 <tr
                   key={member.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
-                  onClick={() => router.push(`/partner/team-members/${member.id}`)}
+                  onClick={() => router.push(`/partner/team-members/${member.partner_id}`)}
                 >
                   <td className="min-w-[200px] px-6 py-4">
                     <div className="flex items-center gap-3">
