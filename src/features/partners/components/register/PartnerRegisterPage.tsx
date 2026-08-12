@@ -156,7 +156,9 @@ export default function PartnerRegisterPage() {
     if (!indForm.background) e.background = "Please select your background";
     if (!indForm.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!indForm.passport_number.trim()) e.passport_number = "Passport number is required";
-    if (!indIdDoc) e.ind_id_doc = "Please upload your passport or national ID";
+    if (!indProfilePhoto.fileKey) e.ind_profile_photo = "Profile photo is required";
+    if (!indIdDoc) e.ind_id_doc = "Please upload your identity document";
+    if (!indPassportPhoto) e.ind_passport_photo = "Please upload your passport photo";
     const socialError = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
     if (socialError) e.social_media_url = socialError;
     if (!indForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
@@ -169,6 +171,7 @@ export default function PartnerRegisterPage() {
     if (!compForm.company_name.trim()) e.company_name = "Agency name is required";
     else if (compForm.company_name.trim().length < 3) e.company_name = "Agency name must be at least 3 characters";
     if (!compForm.country) e.country = "Country is required";
+    if (!compLogo.fileKey) e.comp_logo = "Agency logo is required";
     const socialError = validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" });
     if (socialError) e.website_url = socialError;
     if (!compRegDoc) e.comp_reg_doc = "Please upload your agency registration document";
@@ -178,7 +181,8 @@ export default function PartnerRegisterPage() {
     if (!compForm.contact_phone_number.trim()) e.contact_phone_number = "Phone number is required";
     if (!compForm.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!compForm.passport_number.trim()) e.passport_number = "Passport number is required";
-    if (!compContactIdDoc) e.comp_contact_id_doc = "Please upload a passport or national ID";
+    if (!compContactIdDoc) e.comp_contact_id_doc = "Please upload an identity document";
+    if (!compPassportPhoto) e.comp_passport_photo = "Please upload a passport photo";
     if (!compForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -190,17 +194,19 @@ export default function PartnerRegisterPage() {
         indForm.email && indForm.phone_number.trim() &&
         indForm.country && indForm.background &&
         indForm.date_of_birth && indForm.passport_number.trim() &&
-        indIdDoc &&
+        indProfilePhoto.fileKey &&
+        indIdDoc && indPassportPhoto &&
         !validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" }) &&
         indForm.agreed,
       )
     : partnerType === "agency"
     ? Boolean(
         compForm.company_name.trim() && compForm.country &&
+        compLogo.fileKey &&
         !validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" }) &&
         compRegDoc && compForm.contact_full_name.trim() && compForm.contact_email &&
         compForm.contact_phone_number.trim() && compForm.date_of_birth && compForm.passport_number.trim() &&
-        compContactIdDoc &&
+        compContactIdDoc && compPassportPhoto &&
         compForm.agreed,
       )
     : false;
@@ -369,15 +375,16 @@ export default function PartnerRegisterPage() {
                     <ImageUploadField
                       label="Profile Photo"
                       field="ind_profile_photo"
+                      required
                       imageOnly
                       simpleFile={indProfilePhoto.file}
                       onSimpleFileChange={indProfilePhoto.handleSelect}
                       onSimpleRemove={indProfilePhoto.handleRemove}
                       simpleUploading={indProfilePhoto.uploading}
                       simpleProgress={indProfilePhoto.progress}
-                      errors={{ ind_profile_photo: indProfilePhoto.error }}
+                      errors={{ ind_profile_photo: indProfilePhoto.error || errors.ind_profile_photo }}
                     />
-                    <InputField label="Name (as per Passport/National ID)" field="name" placeholder="Ahmed Ali"
+                    <InputField label="Name (as per Passport)" field="name" placeholder="Ahmed Ali"
                       formData={indForm} errors={errors} updateFormData={updateInd}
                       onBlur={() => {
                         const val = indForm.name.trim();
@@ -427,7 +434,7 @@ export default function PartnerRegisterPage() {
                   <SectionCard title="Identity Verification"
                     subtitle="To ensure trust and authenticity, all advisors must verify their identity.">
                     <PublicFileUploadField
-                      label="Passport or National ID"
+                      label="Identity Document"
                       fieldId="ind-id-doc"
                       required
                       result={indIdDoc}
@@ -439,10 +446,12 @@ export default function PartnerRegisterPage() {
                     <PublicFileUploadField
                       label="Passport Photo"
                       fieldId="ind-passport-photo"
+                      required
                       result={indPassportPhoto}
                       fileName={indPassportPhotoName}
                       onUpload={(res, name) => { setIndPassportPhoto(res); setIndPassportPhotoName(name); }}
                       onRemove={() => { setIndPassportPhoto(null); setIndPassportPhotoName(""); }}
+                      error={errors.ind_passport_photo}
                     />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <SocialMediaInputField label="Social Media Account"
@@ -465,13 +474,14 @@ export default function PartnerRegisterPage() {
                     <ImageUploadField
                       label="Agency Logo"
                       field="comp_logo"
+                      required
                       imageOnly
                       simpleFile={compLogo.file}
                       onSimpleFileChange={compLogo.handleSelect}
                       onSimpleRemove={compLogo.handleRemove}
                       simpleUploading={compLogo.uploading}
                       simpleProgress={compLogo.progress}
-                      errors={{ comp_logo: compLogo.error }}
+                      errors={{ comp_logo: compLogo.error || errors.comp_logo }}
                     />
                     <InputField label="Agency Name" field="company_name" placeholder="Enter agency name."
                       formData={compForm} errors={errors} updateFormData={updateComp} />
@@ -516,7 +526,7 @@ export default function PartnerRegisterPage() {
                         formData={compForm} errors={errors} updateFormData={updateComp} />
                     </div>
                     <PublicFileUploadField
-                      label="Passport or National ID"
+                      label="Identity Document"
                       fieldId="comp-contact-id-doc"
                       required
                       result={compContactIdDoc}
@@ -528,10 +538,12 @@ export default function PartnerRegisterPage() {
                     <PublicFileUploadField
                       label="Passport Photo"
                       fieldId="comp-passport-photo"
+                      required
                       result={compPassportPhoto}
                       fileName={compPassportPhotoName}
                       onUpload={(res, name) => { setCompPassportPhoto(res); setCompPassportPhotoName(name); }}
                       onRemove={() => { setCompPassportPhoto(null); setCompPassportPhotoName(""); }}
+                      error={errors.comp_passport_photo}
                     />
                   </SectionCard>
                 </>

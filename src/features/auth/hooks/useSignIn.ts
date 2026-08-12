@@ -40,7 +40,7 @@ export function useSignIn() {
       } else if (role === "reviewer") {
         router.replace("/reviewer/partners");
       } else if (role === "data_entry") {
-        router.replace("/data-entry/universities");
+        router.replace("/data-entry/knowledge-hub");
       } else {
         setError("Unauthorized role");
       }
