@@ -66,9 +66,9 @@ export default function EditMemberCommissionModal({
     }
 
     try {
-      await updateMemberCommission(member.id, {
+      await updateMemberCommission(member.partner_id, {
         commission_visible: formData.commission_visible,
-        commission_display_percentage: formData.commission_visible ? Number(formData.commission_display_percentage) : 0,
+        ...(formData.commission_visible && { commission_display_percentage: Number(formData.commission_display_percentage) }),
       });
       showToast("Commission settings updated successfully.", "success");
       onClose();
