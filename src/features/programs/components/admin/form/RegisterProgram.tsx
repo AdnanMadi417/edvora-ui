@@ -128,9 +128,9 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
       updateFormData('branch_id', '');
       return;
     }
-    if (branches.length === 1) {
-      updateFormData('branch_id', String(branches[0].id));
-    }
+    const stillValid = branches.some((b) => String(b.id) === String(formData.branch_id));
+    if (stillValid) return;
+    updateFormData('branch_id', branches.length === 1 ? String(branches[0].id) : '');
   }, [branches]);
 
   const isStep1Valid =

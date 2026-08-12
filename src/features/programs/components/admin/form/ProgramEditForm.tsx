@@ -86,6 +86,16 @@ const EditKnowledgeHubProgramDetails = ({
   const { universities } = useUniversities();
   const { branches } = useBranches(formData.uni_id);
 
+  useEffect(() => {
+    if (!branches || branches.length === 0) {
+      updateFormData('branch_id', '');
+      return;
+    }
+    const stillValid = branches.some((b: any) => String(b.id) === String(formData.branch_id));
+    if (stillValid) return;
+    updateFormData('branch_id', branches.length === 1 ? String(branches[0].id) : '');
+  }, [branches]);
+
   const removeScholarship = (index: number) => {
     setFormData((prev) => ({
       ...prev,
