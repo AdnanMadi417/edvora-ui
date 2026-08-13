@@ -14,6 +14,7 @@ import FilterSelectField from "components/form/filter/FilterSelectField";
 import { AppDate } from "components/ui/date";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { StatusBadge, type StatusBadgeVariant } from "components/ui/badges";
+import { Tooltip } from "components/ui/tooltip";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import { useToast } from "components/context/ToastContext";
@@ -49,6 +50,15 @@ const PROGRESS_VARIANTS: Record<InvitationProgress, StatusBadgeVariant> = {
   link_expired: "danger",
   otp_expired: "danger",
   superseded: "neutral",
+};
+
+const PROGRESS_TOOLTIPS: Record<InvitationProgress, string> = {
+  otp_pending: "They haven't entered their verification code yet. Use “Resend Verification Code” if they say it never arrived.",
+  otp_expired: "Their verification code expired before they used it. Use “Resend Verification Code” to send a fresh one.",
+  pending_profile: "Code verified, but they haven't finished their profile yet. Use “Resend Submission Link” if their link expired or got lost.",
+  link_expired: "Their profile-completion link expired before they finished. Use “Resend Submission Link” to send a new one.",
+  completed: "Their account has been created. No action needed.",
+  superseded: "This invitation was replaced by a newer one sent to the same email. No action needed.",
 };
 
 const RESENDABLE_PROGRESS: InvitationProgress[] = ["link_expired", "pending_profile"];
@@ -270,9 +280,11 @@ export default function AgencyInvitationsTable() {
                   </td>
 
                   <td className="px-6 py-4">
-                    <StatusBadge variant={PROGRESS_VARIANTS[invitation.progress]}>
-                      {PROGRESS_LABELS[invitation.progress] ?? invitation.progress}
-                    </StatusBadge>
+                    <Tooltip content={PROGRESS_TOOLTIPS[invitation.progress]} position="right">
+                      <StatusBadge variant={PROGRESS_VARIANTS[invitation.progress]}>
+                        {PROGRESS_LABELS[invitation.progress] ?? invitation.progress}
+                      </StatusBadge>
+                    </Tooltip>
                   </td>
 
                   <td className="px-6 py-4">

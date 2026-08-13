@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, UserPlus } from "lucide-react";
+import { XCircle, UserPlus, Info } from "lucide-react";
 
 import { useInviteAgencyMember } from "../../hooks";
 
@@ -9,6 +9,7 @@ import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import InputField from "components/form/fields/InputField";
 import ToggleInput from "components/form/toggle/ToggleInput";
+import { Tooltip } from "components/ui/tooltip";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
@@ -146,8 +147,14 @@ export default function InviteAgencyMemberModal({
             {formData.commission_visible && (
               <div className="mb-4">
                 <div className="flex items-center justify-between">
-                  <label className="block text-p2 font-medium text-slate-900">
+                  <label className="flex items-center gap-1.5 text-p2 font-medium text-slate-900">
                     Commission Display Percentage
+                    <Tooltip
+                      position="top"
+                      content="What percentage of the total commission this member sees reflected in their own dashboard — this doesn't change their actual payout."
+                    >
+                      <Info className="h-3.5 w-3.5 text-slate-400" />
+                    </Tooltip>
                   </label>
                   <span className="text-sm font-semibold text-blue-700">
                     {formData.commission_display_percentage}%

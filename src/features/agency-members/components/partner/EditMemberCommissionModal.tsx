@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, Percent } from "lucide-react";
+import { XCircle, Percent, Info } from "lucide-react";
 
 import { useUpdateMemberCommission } from "../../hooks";
 import type { AgencyMember } from "../../types";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import InputField from "components/form/fields/InputField";
 import ToggleInput from "components/form/toggle/ToggleInput";
+import { Tooltip } from "components/ui/tooltip";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
@@ -59,8 +59,8 @@ export default function EditMemberCommissionModal({
 
     if (formData.commission_visible) {
       const pct = Number(formData.commission_display_percentage);
-      if (Number.isNaN(pct) || pct < 0 || pct > 100) {
-        setErrors({ commission_display_percentage: "Enter a percentage between 0 and 100" });
+      if (Number.isNaN(pct) || pct < 1 || pct > 100) {
+        setErrors({ commission_display_percentage: "Enter a percentage between 1 and 100" });
         return;
       }
     }
@@ -115,17 +115,35 @@ export default function EditMemberCommissionModal({
               updateFormData={updateFormData}
             />
             {formData.commission_visible && (
-              <InputField
-                label="Commission Display Percentage"
-                field="commission_display_percentage"
-                type="number"
-                placeholder="100"
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-                disabled={loading}
-                helperText="What percentage of the commission this member sees."
-              />
+              <div className="mb-4">
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-1.5 text-p2 font-medium text-slate-900">
+                    Commission Display Percentage
+                    <Tooltip
+                      position="top"
+                      content="What percentage of the total commission this member sees reflected in their own dashboard — this doesn't change their actual payout."
+                    >
+                      <Info className="h-3.5 w-3.5 text-slate-400" />
+                    </Tooltip>
+                  </label>
+                  <span className="text-sm font-semibold text-blue-700">
+                    {formData.commission_display_percentage}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={100}
+                  step={1}
+                  value={formData.commission_display_percentage}
+                  disabled={loading}
+                  onChange={(e) => updateFormData("commission_display_percentage", Number(e.target.value))}
+                  className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+                />
+                {errors.commission_display_percentage && (
+                  <p className="mt-1 text-xs text-red-600">{errors.commission_display_percentage}</p>
+                )}
+              </div>
             )}
           </div>
 
