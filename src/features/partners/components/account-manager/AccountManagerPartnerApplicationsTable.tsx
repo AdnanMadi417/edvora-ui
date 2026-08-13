@@ -74,7 +74,7 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
   return (
     <>
       {/* Header */}
-      <div className="flex flex-col gap-4 border-b border-slate-200 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-slate-200 sm:flex-row sm:items-center sm:justify-between p-6">
         <div>
           <h3 className="text-base font-semibold text-slate-900">Applications</h3>
           <p className="mt-0.5 text-sm text-slate-500">Student applications submitted by this partner</p>
