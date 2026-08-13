@@ -3,10 +3,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   User, Mail, Activity, CalendarDays,
-  RefreshCw, SlidersHorizontal, Send,
+  RefreshCw, SlidersHorizontal, Send, KeyRound,
 } from "lucide-react";
 
-import { useAgencyInvitations, useResendSubmissionLink } from "../../hooks";
+import { useAgencyInvitations, useResendSubmissionLink, useResendAgencyInvitationOtp } from "../../hooks";
 import type { AgencyInvitation, InvitationProgress } from "../../types";
 
 import SearchInput from "components/form/filter/SearchInput";
@@ -20,6 +20,7 @@ import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 import ResendSubmissionLinkConfirmation from "./ResendSubmissionLinkConfirmation";
+import ResendInvitationOtpConfirmation from "./ResendInvitationOtpConfirmation";
 
 const ITEMS_PER_PAGE = 20;
 
@@ -51,6 +52,7 @@ const PROGRESS_VARIANTS: Record<InvitationProgress, StatusBadgeVariant> = {
 };
 
 const RESENDABLE_PROGRESS: InvitationProgress[] = ["link_expired", "pending_profile"];
+const OTP_RESENDABLE_PROGRESS: InvitationProgress[] = ["otp_pending", "otp_expired"];
 
 export default function AgencyInvitationsTable() {
   const { showToast } = useToast();
@@ -81,6 +83,10 @@ export default function AgencyInvitationsTable() {
   const { resendSubmissionLink, loading: isResending } = useResendSubmissionLink();
   const [resendTarget, setResendTarget] = useState<AgencyInvitation | null>(null);
   const [isResendOpen, setIsResendOpen] = useState(false);
+
+  const { resendOtp, loading: isResendingOtp } = useResendAgencyInvitationOtp();
+  const [resendOtpTarget, setResendOtpTarget] = useState<AgencyInvitation | null>(null);
+  const [isResendOtpOpen, setIsResendOtpOpen] = useState(false);
 
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const loadingStartedRef = useRef(false);
@@ -115,6 +121,20 @@ export default function AgencyInvitationsTable() {
     } catch (error: any) {
       const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to resend submission link. ${backendMessage}`, "error");
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!resendOtpTarget) return;
+    try {
+      await resendOtp(resendOtpTarget.email);
+      showToast("Verification code resent successfully.", "success");
+      setIsResendOtpOpen(false);
+      setResendOtpTarget(null);
+      refetch();
+    } catch (error: any) {
+      const backendMessage = parseApiError(error, "Please try again.");
+      showToast(`Failed to resend verification code. ${backendMessage}`, "error");
     }
   };
 
@@ -275,6 +295,19 @@ export default function AgencyInvitationsTable() {
                         className="hover:bg-blue-50"
                       />
                     )}
+                    {OTP_RESENDABLE_PROGRESS.includes(invitation.progress) && (
+                      <IconButton
+                        onClick={() => { setResendOtpTarget(invitation); setIsResendOtpOpen(true); }}
+                        title="Resend verification code"
+                        icon={<KeyRound className="h-4 w-4" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-400"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-blue-600"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-blue-50"
+                      />
+                    )}
                   </td>
                 </tr>
               ))}
@@ -290,6 +323,15 @@ export default function AgencyInvitationsTable() {
         isSending={isResending}
         invitationName={resendTarget?.name ?? ""}
         invitationEmail={resendTarget?.email ?? ""}
+      />
+
+      <ResendInvitationOtpConfirmation
+        isOpen={isResendOtpOpen}
+        onClose={() => { setIsResendOtpOpen(false); setResendOtpTarget(null); }}
+        onConfirm={handleResendOtp}
+        isSending={isResendingOtp}
+        invitationName={resendOtpTarget?.name ?? ""}
+        invitationEmail={resendOtpTarget?.email ?? ""}
       />
     </>
   );
