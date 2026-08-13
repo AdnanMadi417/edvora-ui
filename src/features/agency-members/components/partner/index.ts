@@ -6,4 +6,5 @@ export { default as InviteAgencyMemberModal } from "./InviteAgencyMemberModal";
 export { default as EditMemberCommissionModal } from "./EditMemberCommissionModal";
 export { default as SuspendReactivateMemberModal } from "./SuspendReactivateMemberModal";
 export { default as ResendSubmissionLinkConfirmation } from "./ResendSubmissionLinkConfirmation";
+export { default as ResendInvitationOtpConfirmation } from "./ResendInvitationOtpConfirmation";
 export { default as ResendMemberWelcomeEmailConfirmation } from "./ResendMemberWelcomeEmailConfirmation";
