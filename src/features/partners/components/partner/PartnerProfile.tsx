@@ -19,8 +19,12 @@ import {
   FileText,
   KeyRound,
   Link2,
+  ShieldCheck,
   User,
+  Users,
 } from "lucide-react";
+import { StatusBadge } from "components/ui/badges";
+import { Tabs, type TabItem } from "components/ui/tabs";
 import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
@@ -38,6 +42,13 @@ import { parseApiError } from "utils/parseApiError";
 interface PartnerDetailsProps {
   id: string;
 }
+
+type ProfileTab = "profile" | "team";
+
+const PROFILE_TABS: TabItem<ProfileTab>[] = [
+  { key: "profile", label: "Profile" },
+  { key: "team", label: "Team" },
+];
 
 function formatDateOfBirth(value?: string | null): string | undefined {
   const date = parseDate(value);
@@ -144,6 +155,7 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
 const PartnerDetails = ({ id }: PartnerDetailsProps) => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [tab, setTab] = useState<ProfileTab>("profile");
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -255,7 +267,11 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
             />
           </div>
 
+          {isCompany && <Tabs<ProfileTab> tabs={PROFILE_TABS} active={tab} onChange={setTab} />}
+
           {/* Account Overview */}
+          {(!isCompany || tab === "profile") && (
+          <div key={tab} className="animate-in fade-in duration-200">
           <div className="border-b border-slate-200 p-6">
             <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Account Overview</p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -264,6 +280,16 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
               <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={partner.email} />
               <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Partner Type" value={partner.type === "individual" ? "Individual Advisor" : "Agency / Company"} />
               <InfoRow icon={<MdSupervisorAccount className="h-4 w-4" />} label="Assigned Manager" value={partner.assigned_manager_name} />
+              {partner.agency_role && (
+                <InfoRow
+                  icon={<ShieldCheck className="h-4 w-4" />}
+                  label="Agency Role"
+                  value={partner.agency_role.charAt(0).toUpperCase() + partner.agency_role.slice(1)}
+                />
+              )}
+              {partner.agency_membership && (
+                <InfoRow icon={<Users className="h-4 w-4" />} label="Member Of" value={partner.agency_membership.agency_name} />
+              )}
             </div>
           </div>
 
@@ -307,6 +333,51 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                 <DocRow label="Passport Photo" fileKey={partner.company_details?.passport_photo_file_key} personName={partner.name} />
                 <DocRow label="Agency Logo" fileKey={partner.company_details?.logo_file_key} personName={partner.name} />
               </div>
+            </div>
+          )}
+          </div>
+          )}
+
+          {/* Team Members */}
+          {isCompany && tab === "team" && (
+            <div key={tab} className="animate-in fade-in duration-200 p-6">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-slate-500" />
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Team Members</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => router.push("/partner/team-members")}
+                  className="text-sm font-medium text-blue-600 hover:underline"
+                >
+                  Manage Team
+                </button>
+              </div>
+              {!partner.agency_members?.length ? (
+                <p className="py-8 text-center text-sm text-slate-500">
+                  No team members yet. Invite one from the full Team Members page.
+                </p>
+              ) : (
+              <div className="space-y-2">
+                {partner.agency_members.map((member) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between rounded-lg border border-slate-200 p-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-slate-900">{member.name}</p>
+                      <p className="truncate text-xs text-slate-500">{member.email}</p>
+                    </div>
+                    {member.is_active ? (
+                      <StatusBadge variant="success">Active</StatusBadge>
+                    ) : (
+                      <StatusBadge variant="neutral">Suspended</StatusBadge>
+                    )}
+                  </div>
+                ))}
+              </div>
+              )}
             </div>
           )}
 

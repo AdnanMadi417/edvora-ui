@@ -89,7 +89,7 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
   };
 
   return (
-    <div className="mb-5 max-w-5xl mx-auto rounded-lg border border-slate-200 bg-card">
+    <>
       {/* Header */}
       <div className="flex flex-col gap-4 border-b border-slate-200 p-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -261,6 +261,6 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
           </table>
         </TableWrapper>
       </div>
-    </div>
+    </>
   );
 }

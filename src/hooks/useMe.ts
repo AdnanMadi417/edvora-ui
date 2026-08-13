@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import api from "lib/useApi";
 
+interface AgencyMembership {
+  agency_id: string;
+  agency_name: string;
+}
+
 interface User {
   id: string;
   partner_id: string;
@@ -8,6 +13,8 @@ interface User {
   email: string;
   role: string;
   has_completed_onboarding?: boolean;
+  agency_role?: string | null;
+  agency_membership?: AgencyMembership | null;
 }
 
 export function useMe() {

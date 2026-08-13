@@ -1,14 +1,16 @@
 "use client";
 
 import { HiX } from "react-icons/hi";
-import { MdLogout } from "react-icons/md";
+import { MdLogout, MdPerson } from "react-icons/md";
 import { MessageSquarePlus, FlaskConical } from "lucide-react";
 import Links from "./components/Links";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import { IRoute } from "types/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 import { useEffect, useState, useCallback } from "react";
+import { usePathname } from "next/navigation";
 import api, { SIGN_IN_URL, LOGOUT_URL } from "lib/useApi";
 import { usePartnerProfile } from "features/partners/hooks";
 import PresignedImage from "components/ui/PresignedImage";
@@ -24,10 +26,12 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
 
 
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [userError, setUserError] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showBetaTooltip, setShowBetaTooltip] = useState(false);
+  const [isProfileHovered, setIsProfileHovered] = useState(false);
   const { partner } = usePartnerProfile({ enabled: user?.role === "partner" });
   const photoFileKey = partner?.individual_details?.profile_photo_file_key;
 
@@ -42,6 +46,13 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   function getRoleLabel(role: string): string {
     return ROLE_LABELS[role] || role;
   }
+
+  const PROFILE_PATHS: Record<string, string> = {
+    partner: "/partner/profile",
+    account_manager: "/account-manager/profile",
+  };
+  const profilePath = user?.role ? PROFILE_PATHS[user.role] : undefined;
+  const isProfileActive = !!profilePath && (pathname === profilePath || pathname.startsWith(profilePath + "/"));
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -204,6 +215,31 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
         >
           <Links routes={routes} onLinkClick={() => setOpen(false)} />
         </div>
+
+        {profilePath && (
+          <div className="relative py-1">
+            <Link
+              href={profilePath}
+              onMouseEnter={() => setIsProfileHovered(true)}
+              onMouseLeave={() => setIsProfileHovered(false)}
+              onClick={() => setOpen(false)}
+              className={`ml-3 flex cursor-pointer items-center justify-between rounded-md px-3 py-3 text-sm font-medium transition-colors duration-200 ease-in-out
+              ${isProfileActive || isProfileHovered ? "text-slate-900" : "text-slate-500"}`}
+            >
+              <div className="flex items-center gap-3">
+                <MdPerson
+                  className={`text-lg transition-colors ${
+                    isProfileActive || isProfileHovered ? "text-slate-900" : "text-slate-600"
+                  }`}
+                />
+                <span>View Profile</span>
+              </div>
+            </Link>
+            {isProfileActive && (
+              <div className="absolute right-0 top-1 h-[calc(100%-8px)] max-h-[36px] w-1 rounded-md bg-blue-700" />
+            )}
+          </div>
+        )}
 
         <footer className="border-t border-gray-200 px-6 py-4">
           {user?.role === "partner" && (

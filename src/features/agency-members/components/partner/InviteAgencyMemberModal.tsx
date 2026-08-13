@@ -33,14 +33,14 @@ export default function InviteAgencyMemberModal({
     name: "",
     email: "",
     commission_visible: true,
-    commission_display_percentage: 100,
+    commission_display_percentage: 10,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
-      setFormData({ name: "", email: "", commission_visible: true, commission_display_percentage: 100 });
+      setFormData({ name: "", email: "", commission_visible: true, commission_display_percentage: 10 });
       setErrors({});
     } else {
       const timer = setTimeout(() => setIsVisible(false), 300);
@@ -62,7 +62,7 @@ export default function InviteAgencyMemberModal({
     else if (!EMAIL_REGEX.test(formData.email.trim())) next.email = "Enter a valid email address";
     if (formData.commission_visible) {
       const pct = Number(formData.commission_display_percentage);
-      if (Number.isNaN(pct) || pct < 0 || pct > 100) next.commission_display_percentage = "Enter a percentage between 0 and 100";
+      if (Number.isNaN(pct) || pct < 1 || pct > 100) next.commission_display_percentage = "Enter a percentage between 1 and 100";
     }
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -144,17 +144,32 @@ export default function InviteAgencyMemberModal({
               updateFormData={updateFormData}
             />
             {formData.commission_visible && (
-              <InputField
-                label="Commission Display Percentage"
-                field="commission_display_percentage"
-                type="number"
-                placeholder="100"
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-                disabled={loading}
-                helperText="What percentage of the commission this member sees."
-              />
+              <div className="mb-4">
+                <div className="flex items-center justify-between">
+                  <label className="block text-p2 font-medium text-slate-900">
+                    Commission Display Percentage
+                  </label>
+                  <span className="text-sm font-semibold text-blue-700">
+                    {formData.commission_display_percentage}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min={1}
+                  max={100}
+                  step={1}
+                  value={formData.commission_display_percentage}
+                  disabled={loading}
+                  onChange={(e) => updateFormData("commission_display_percentage", Number(e.target.value))}
+                  className="mt-3 h-2 w-full cursor-pointer appearance-none rounded-full bg-slate-200 accent-blue-600 disabled:cursor-not-allowed disabled:opacity-60"
+                />
+                <p className="mt-1 text-xs text-slate-400">
+                  What percentage of the commission this member sees.
+                </p>
+                {errors.commission_display_percentage && (
+                  <p className="mt-1 text-xs text-red-600">{errors.commission_display_percentage}</p>
+                )}
+              </div>
             )}
           </div>
 

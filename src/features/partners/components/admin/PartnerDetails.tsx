@@ -23,6 +23,7 @@ import {
   Pencil,
   ShieldCheck,
   User,
+  Users,
 } from "lucide-react";
 import { usePartnerDetails } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
@@ -34,12 +35,17 @@ import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
+import { StatusBadge } from "components/ui/badges";
+import { Tabs, type TabItem } from "components/ui/tabs";
 import ReviewPartnerPopup from "./ReviewPartnerPopup";
+import PartnerApplicationsTable from "./PartnerApplicationsTable";
 import { parseDate, formatDate } from "components/ui/date/utils";
 
 interface Props {
   id: string;
 }
+
+type DetailsTab = "profile" | "team" | "applications";
 
 function formatDateOfBirth(value?: string | null): string | undefined {
   const date = parseDate(value);
@@ -164,6 +170,7 @@ export default function PartnerDetails({ id }: Props) {
   const router = useRouter();
   const { partner, isPartnerLoading, refetch } = usePartnerDetails(id);
   const [showReview, setShowReview] = useState(false);
+  const [tab, setTab] = useState<DetailsTab>("profile");
   const { accountManagers } = useAccountManagers();
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
 
@@ -172,6 +179,17 @@ export default function PartnerDetails({ id }: Props) {
 
   const isIndividual = partner.type === "individual";
   const isCompany = partner.type === "agency";
+
+  const TABS: TabItem<DetailsTab>[] = isCompany
+    ? [
+        { key: "profile", label: "Profile" },
+        { key: "team", label: "Team" },
+        { key: "applications", label: "Applications" },
+      ]
+    : [
+        { key: "profile", label: "Profile" },
+        { key: "applications", label: "Applications" },
+      ];
 
   return (
     <>
@@ -239,6 +257,11 @@ export default function PartnerDetails({ id }: Props) {
           </div>
         </div>
 
+        <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} />
+
+        {tab === "profile" && (
+        <div key={tab} className="animate-in fade-in duration-200">
+
         {/* Account Overview */}
         <div className="border-b border-slate-200 p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -273,6 +296,16 @@ export default function PartnerDetails({ id }: Props) {
               label="Last Login"
               value={formatDateTime(partner.last_login) || "Never"}
             />
+            {partner.agency_role && (
+              <InfoRow
+                icon={<ShieldCheck className="h-4 w-4" />}
+                label="Agency Role"
+                value={partner.agency_role.charAt(0).toUpperCase() + partner.agency_role.slice(1)}
+              />
+            )}
+            {partner.agency_membership && (
+              <InfoRow icon={<Users className="h-4 w-4" />} label="Member Of" value={partner.agency_membership.agency_name} />
+            )}
           </div>
         </div>
 
@@ -383,6 +416,50 @@ export default function PartnerDetails({ id }: Props) {
                 personName={partner.name}
               />
             </div>
+          </div>
+        )}
+
+        </div>
+        )}
+
+        {/* Team Members */}
+        {isCompany && tab === "team" && (
+          <div key={tab} className="animate-in fade-in duration-200 p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <Users className="h-4 w-4 text-slate-500" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Team Members
+              </p>
+            </div>
+            {!partner.agency_members?.length ? (
+              <p className="py-8 text-center text-sm text-slate-500">No team members yet.</p>
+            ) : (
+            <div className="space-y-2">
+              {partner.agency_members.map((member) => (
+                <div
+                  key={member.id}
+                  className="flex items-center justify-between rounded-lg border border-slate-200 p-3"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-slate-900">{member.name}</p>
+                    <p className="truncate text-xs text-slate-500">{member.email}</p>
+                  </div>
+                  {member.is_active ? (
+                    <StatusBadge variant="success">Active</StatusBadge>
+                  ) : (
+                    <StatusBadge variant="neutral">Suspended</StatusBadge>
+                  )}
+                </div>
+              ))}
+            </div>
+            )}
+          </div>
+        )}
+
+        {/* Applications */}
+        {tab === "applications" && (
+          <div key={tab} className="animate-in fade-in duration-200">
+            <PartnerApplicationsTable partnerId={id} />
           </div>
         )}
 
