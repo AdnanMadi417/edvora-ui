@@ -1,9 +1,11 @@
+import type { AgencyMember } from "features/agency-members/types";
+
 export interface IndividualDetails {
-  id_document_file_key: string;
-  id_document_file_url: string;
-  background: string;
-  social_media_url: string;
-  linkedin_url: string;
+  id_document_file_key: string | null;
+  id_document_file_url: string | null;
+  background: string | null;
+  social_media_url: string | null;
+  linkedin_url: string | null;
   date_of_birth?: string | null;
   passport_number?: string;
   profile_photo_file_key?: string | null;
@@ -46,6 +48,11 @@ export type Partner = {
   last_login: string | null;
 };
 
+export interface AgencyMembership {
+  agency_id: string;
+  agency_name: string;
+}
+
 export interface PartnerDetails {
   id: string;
   user_id: string;
@@ -56,13 +63,16 @@ export interface PartnerDetails {
   phone: string;
   is_active: boolean;
   is_verified: boolean;
-  assigned_manager_id: string;
-  assigned_manager_name: string;
+  assigned_manager_id: string | null;
+  assigned_manager_name: string | null;
   individual_details: IndividualDetails | null;
   company_details: CompanyDetails | null;
-  created_at: string;
-  updated_at: string;
+  created_at: string | null;
+  updated_at: string | null;
   last_login: string | null;
+  agency_role: string | null;
+  agency_membership: AgencyMembership | null;
+  agency_members?: AgencyMember[] | null;
 }
 
 export interface CreatePartnerPayload {
@@ -133,6 +143,9 @@ export type AccountManagerPartnerDetails = {
   created_at: string;
   updated_at: string;
   last_login: string | null;
+  agency_role?: string | null;
+  agency_membership?: AgencyMembership | null;
+  agency_members?: AgencyMember[] | null;
 };
 
 export interface UpdatePartnerProfilePayload {

@@ -45,11 +45,13 @@ export default function TeamMembersPage() {
 
         <Tabs<Tab> tabs={TABS} active={tab} onChange={setTab} />
 
-        {tab === "members" ? (
-          <AgencyMembersTable key={`members-${refreshKey}`} />
-        ) : (
-          <AgencyInvitationsTable key={`invitations-${refreshKey}`} />
-        )}
+        <div key={tab} className="animate-in fade-in duration-200">
+          {tab === "members" ? (
+            <AgencyMembersTable key={`members-${refreshKey}`} />
+          ) : (
+            <AgencyInvitationsTable key={`invitations-${refreshKey}`} />
+          )}
+        </div>
       </div>
 
       <InviteAgencyMemberModal

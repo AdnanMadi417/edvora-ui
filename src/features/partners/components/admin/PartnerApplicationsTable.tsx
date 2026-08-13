@@ -72,7 +72,7 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
   };
 
   return (
-    <div className="mb-5 max-w-5xl mx-auto rounded-lg border border-slate-200 bg-card">
+    <>
       {/* Header */}
       <div className="flex flex-col gap-4 border-b border-slate-200 p-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -246,6 +246,6 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
           </table>
         </TableWrapper>
       </div>
-    </div>
+    </>
   );
 }

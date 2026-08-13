@@ -14,6 +14,7 @@ import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { StatusBadge } from "components/ui/badges";
+import { Tooltip } from "components/ui/tooltip";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import { useToast } from "components/context/ToastContext";
@@ -274,9 +275,16 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
 
                   <td className="px-6 py-4">
                     {member.commission_visible ? (
-                      <StatusBadge variant="info">{member.commission_display_percentage}% Visible</StatusBadge>
+                      <Tooltip
+                        position="right"
+                        content={`This member can see ${member.commission_display_percentage}% of their commission. Use the settings icon to change this.`}
+                      >
+                        <StatusBadge variant="info">{member.commission_display_percentage}% Visible</StatusBadge>
+                      </Tooltip>
                     ) : (
-                      <StatusBadge variant="neutral">Hidden</StatusBadge>
+                      <Tooltip position="right" content="This member can't see any commission info. Use the settings icon to make it visible.">
+                        <StatusBadge variant="neutral">Hidden</StatusBadge>
+                      </Tooltip>
                     )}
                   </td>
 
