@@ -14,13 +14,15 @@ import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
-import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
+import { COUNTRIES, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
 import { parseSocialMediaUrl, validateSocialMediaField } from "utils/socialMedia";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import { parseApiError } from "utils/parseApiError";
+import SearchableDropdown from "components/form/search/SearchableDropdown";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
+const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
 
 const PROFILE_PHOTO_UPLOAD_ENABLED = true;
 
@@ -188,6 +190,7 @@ export default function EditPartnerProfile() {
     linkedin_username: "",
     company_name: "",
     website_url: "",
+    nationality: "",
     date_of_birth: "",
     passport_number: "",
   });
@@ -221,6 +224,7 @@ export default function EditPartnerProfile() {
       linkedin_username: linkedinUsername,
       company_name: partner.company_details?.company_name ?? "",
       website_url: partner.company_details?.website_url ?? "",
+      nationality: partner.nationality ?? "",
       date_of_birth: (partner.individual_details?.date_of_birth ?? partner.company_details?.date_of_birth) ?? "",
       passport_number: (partner.individual_details?.passport_number ?? partner.company_details?.passport_number) ?? "",
     });
@@ -275,6 +279,7 @@ export default function EditPartnerProfile() {
       formData.social_media_url !== (partner.individual_details?.social_media_url ?? "") ||
       formData.company_name !== (partner.company_details?.company_name ?? "") ||
       formData.website_url !== (partner.company_details?.website_url ?? "") ||
+      formData.nationality !== (partner.nationality ?? "") ||
       formData.date_of_birth !== ((partner.individual_details?.date_of_birth ?? partner.company_details?.date_of_birth) ?? "") ||
       formData.passport_number !== ((partner.individual_details?.passport_number ?? partner.company_details?.passport_number) ?? "") ||
       companyRegDoc.file_key !== (partner.company_details?.company_registration_doc_file_key ?? "") ||
@@ -336,6 +341,7 @@ export default function EditPartnerProfile() {
         name: formData.name.trim(),
         type: partner.type,
         country: formData.country,
+        ...(formData.nationality ? { nationality: formData.nationality } : {}),
         phone: `${formData.phone_code || "+60"} ${formData.phone_number}`,
       };
       if (partner.type === "individual") {
@@ -439,9 +445,17 @@ export default function EditPartnerProfile() {
               updateFormData={updateFormData}
             />
             <SelectField
-              label="Country"
+              label="Country of Residence"
               field="country"
               options={COUNTRY_OPTIONS}
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+            />
+            <SearchableDropdown
+              label="Nationality"
+              field="nationality"
+              options={NATIONALITY_OPTIONS}
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}

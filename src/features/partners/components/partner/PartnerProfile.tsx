@@ -275,7 +275,8 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
           <div className="border-b border-slate-200 p-6">
             <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Account Overview</p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Country" value={partner.country} />
+              <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Country of Residence" value={partner.country} />
+              <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Nationality" value={partner.nationality} />
               <InfoRow icon={<MdPhone className="h-4 w-4" />} label="Phone Number" value={partner.phone} />
               <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={partner.email} />
               <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Partner Type" value={partner.type === "individual" ? "Individual Advisor" : "Agency / Company"} />

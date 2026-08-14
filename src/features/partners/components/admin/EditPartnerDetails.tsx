@@ -19,13 +19,15 @@ import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
-import { COUNTRIES, PARTNER_TYPE, BACKGROUND_OPTIONS } from "constants/lists";
+import { COUNTRIES, NATIONALITIES, PARTNER_TYPE, BACKGROUND_OPTIONS } from "constants/lists";
 import { parseSocialMediaUrl, validateSocialMediaField } from "utils/socialMedia";
 import { parseApiError } from "utils/parseApiError";
 
 interface Props {
   id: string;
 }
+
+const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
 
 type DocState = {
   file_key: string;
@@ -185,7 +187,7 @@ export default function EditPartnerDetails({ id }: Props) {
     is_active: true,
     background: "", linkedin_url: "", linkedin_platform: "linkedin", linkedin_username: "", social_media_url: "", social_platform: "", social_username: "",
     company_name: "", website_url: "",
-    date_of_birth: "", passport_number: "",
+    nationality: "", date_of_birth: "", passport_number: "",
   });
 
   const [profilePhoto, setProfilePhoto] = useState<DocState>(EMPTY_DOC);
@@ -220,6 +222,7 @@ export default function EditPartnerDetails({ id }: Props) {
       social_username: socialUsername,
       company_name: partner.company_details?.company_name ?? "",
       website_url: partner.company_details?.website_url ?? "",
+      nationality: partner.nationality ?? "",
       date_of_birth: (partner.individual_details?.date_of_birth ?? partner.company_details?.date_of_birth) ?? "",
       passport_number: (partner.individual_details?.passport_number ?? partner.company_details?.passport_number) ?? "",
     });
@@ -316,6 +319,7 @@ export default function EditPartnerDetails({ id }: Props) {
       contactIdDoc.file_key !== (partner.company_details?.contact_id_document_file_key ?? "") ||
       logo.file_key !== (partner.company_details?.logo_file_key ?? "") ||
       passportPhoto.file_key !== ((partner.individual_details?.passport_photo_file_key ?? partner.company_details?.passport_photo_file_key) ?? "") ||
+      formData.nationality !== (partner.nationality ?? "") ||
       formData.date_of_birth !== ((partner.individual_details?.date_of_birth ?? partner.company_details?.date_of_birth) ?? "") ||
       formData.passport_number !== ((partner.individual_details?.passport_number ?? partner.company_details?.passport_number) ?? "")
     );
@@ -390,6 +394,7 @@ export default function EditPartnerDetails({ id }: Props) {
         email: formData.email.trim(),
         type: formData.type,
         country: formData.country,
+        ...(formData.nationality ? { nationality: formData.nationality } : {}),
         phone: `${formData.phone_code || "+60"} ${formData.phone_number}`,
         is_active: formData.is_active,
         assigned_manager_id: formData.manager_id,
@@ -501,7 +506,8 @@ export default function EditPartnerDetails({ id }: Props) {
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <InputField label="Partner Name" field="name" required formData={formData} errors={errors} updateFormData={updateFormData} />
             <InputField label="Email Address" field="email" type="email" required formData={formData} errors={errors} updateFormData={updateFormData} />
-            <SearchableDropdown label="Country" field="country" options={COUNTRIES.map((c) => ({ value: c.code, label: c.name }))} formData={formData} errors={errors} updateFormData={updateFormData} />
+            <SearchableDropdown label="Country of Residence" field="country" options={COUNTRIES.map((c) => ({ value: c.code, label: c.name }))} formData={formData} errors={errors} updateFormData={updateFormData} />
+            <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS} formData={formData} errors={errors} updateFormData={updateFormData} />
             <SelectField label="Partner Type" field="type" options={PARTNER_TYPE.map((p) => ({ value: p.value, label: p.label }))} formData={formData} errors={errors} updateFormData={updateFormData} />
             <PhoneInputField dialCodeField="phone_code" numberField="phone_number" formData={formData} errors={errors} updateFormData={updateFormData} required />
             <SelectField label="Assigned Manager" field="manager_id" required={false} options={accountManagers.map((m) => ({ label: m.name, value: m.id }))} formData={formData} errors={errors} updateFormData={updateFormData} />
