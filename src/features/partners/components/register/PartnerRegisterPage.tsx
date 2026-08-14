@@ -9,9 +9,10 @@ import { usePartnerRegistration } from "features/partners/hooks";
 import OtpStep from "./OtpStep";
 import EnterVerificationCodeModal from "./EnterVerificationCodeModal";
 import { AnimatePresence, motion } from "framer-motion";
-import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
+import { COUNTRIES, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
+import SearchableDropdown from "components/form/search/SearchableDropdown";
 import PhoneInputField from "components/form/fields/PhoneInputField";
 import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
 import { validateSocialMediaField } from "utils/socialMedia";
@@ -29,6 +30,7 @@ type Step = "form" | "otp" | "success"; // "otp" rendered by OtpStep
 type PartnerType = "individual" | "agency";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
+const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
 
 function SectionCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
@@ -107,7 +109,7 @@ export default function PartnerRegisterPage() {
   const [indForm, setIndForm] = useState({
     name: "", email: "",
     phone_code: "+60", phone_number: "",
-    country: "", background: "",
+    country: "", nationality: "", background: "",
     date_of_birth: "", passport_number: "",
     social_platform: "instagram", social_username: "", social_media_url: "",
     linkedin_platform: "linkedin", linkedin_username: "", linkedin_url: "",
@@ -125,7 +127,7 @@ export default function PartnerRegisterPage() {
     social_platform: "instagram", social_username: "", website_url: "",
     contact_full_name: "", contact_email: "",
     contact_phone_code: "+60", contact_phone_number: "",
-    date_of_birth: "", passport_number: "",
+    nationality: "", date_of_birth: "", passport_number: "",
     agreed: false,
   });
   const [compRegDoc, setCompRegDoc] = useState<PublicUploadResult | null>(null);
@@ -153,6 +155,7 @@ export default function PartnerRegisterPage() {
     if (!indForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(indForm.email)) e.email = "Enter a valid email";
     if (!indForm.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!indForm.country) e.country = "Country is required";
+    if (!indForm.nationality) e.nationality = "Nationality is required";
     if (!indForm.background) e.background = "Please select your background";
     if (!indForm.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!indForm.passport_number.trim()) e.passport_number = "Passport number is required";
@@ -179,6 +182,7 @@ export default function PartnerRegisterPage() {
     else if (compForm.contact_full_name.trim().length < 3) e.contact_full_name = "Full name must be at least 3 characters";
     if (!compForm.contact_email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(compForm.contact_email)) e.contact_email = "Enter a valid email";
     if (!compForm.contact_phone_number.trim()) e.contact_phone_number = "Phone number is required";
+    if (!compForm.nationality) e.nationality = "Nationality is required";
     if (!compForm.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!compForm.passport_number.trim()) e.passport_number = "Passport number is required";
     if (!compContactIdDoc) e.comp_contact_id_doc = "Please upload an identity document";
@@ -192,7 +196,7 @@ export default function PartnerRegisterPage() {
     ? Boolean(
         indForm.name.trim().length >= 3 &&
         indForm.email && indForm.phone_number.trim() &&
-        indForm.country && indForm.background &&
+        indForm.country && indForm.nationality && indForm.background &&
         indForm.date_of_birth && indForm.passport_number.trim() &&
         indProfilePhoto.fileKey &&
         indIdDoc && indPassportPhoto &&
@@ -205,7 +209,8 @@ export default function PartnerRegisterPage() {
         compLogo.fileKey &&
         !validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" }) &&
         compRegDoc && compForm.contact_full_name.trim() && compForm.contact_email &&
-        compForm.contact_phone_number.trim() && compForm.date_of_birth && compForm.passport_number.trim() &&
+        compForm.contact_phone_number.trim() && compForm.nationality &&
+        compForm.date_of_birth && compForm.passport_number.trim() &&
         compContactIdDoc && compPassportPhoto &&
         compForm.agreed,
       )
@@ -223,6 +228,7 @@ export default function PartnerRegisterPage() {
           email: indForm.email,
           phone: `${indForm.phone_code} ${indForm.phone_number}`,
           country: indForm.country,
+          nationality: indForm.nationality,
           background: indForm.background,
           date_of_birth: indForm.date_of_birth,
           passport_number: indForm.passport_number.trim(),
@@ -240,6 +246,7 @@ export default function PartnerRegisterPage() {
           country: compForm.country,
           company_name: compForm.company_name.trim(),
           website_url: compForm.website_url,
+          nationality: compForm.nationality,
           date_of_birth: compForm.date_of_birth,
           passport_number: compForm.passport_number.trim(),
           ...(compRegDoc      && { company_registration_doc_file_key: compRegDoc.file_key,      company_registration_doc_file_url: compRegDoc.file_url }),
@@ -397,8 +404,12 @@ export default function PartnerRegisterPage() {
                       <PhoneInputField dialCodeField="phone_code" numberField="phone_number"
                         formData={indForm} errors={errors} updateFormData={updateInd} />
                     </div>
-                    <SelectField label="Country of Residence" field="country" options={COUNTRY_OPTIONS}
-                      formData={indForm} errors={errors} updateFormData={updateInd} />
+                    <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                      <SelectField label="Country of Residence" field="country" options={COUNTRY_OPTIONS}
+                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                      <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS}
+                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                    </div>
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <InputField label="Date of Birth" field="date_of_birth" type="date"
                         formData={indForm} errors={errors} updateFormData={updateInd} />
@@ -518,6 +529,8 @@ export default function PartnerRegisterPage() {
                         formData={compForm} errors={errors} updateFormData={updateComp} />
                     </div>
                     <PhoneInputField dialCodeField="contact_phone_code" numberField="contact_phone_number"
+                      formData={compForm} errors={errors} updateFormData={updateComp} />
+                    <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS}
                       formData={compForm} errors={errors} updateFormData={updateComp} />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <InputField label="Date of Birth" field="date_of_birth" type="date"

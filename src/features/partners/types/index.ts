@@ -36,6 +36,7 @@ export type Partner = {
   email: string;
   type: string;
   country: string;
+  nationality?: string | null;
   phone: string;
   is_verified: boolean;
   is_active: boolean;
@@ -60,6 +61,7 @@ export interface PartnerDetails {
   email: string;
   type: string;
   country: string;
+  nationality?: string | null;
   phone: string;
   is_active: boolean;
   is_verified: boolean;
@@ -90,6 +92,7 @@ export interface UpdatePartnerPayload {
   is_active: boolean;
   type: string;
   country: string;
+  nationality?: string | null;
   phone: string;
   assigned_manager_id: string;
   individual_details?: Partial<IndividualDetails>;
@@ -135,6 +138,7 @@ export type AccountManagerPartnerDetails = {
   email: string;
   type: "individual" | "agency";
   country: string;
+  nationality?: string | null;
   phone: string;
   is_verified: boolean;
   is_active: boolean;
@@ -152,6 +156,7 @@ export interface UpdatePartnerProfilePayload {
   name?: string;
   type?: string;
   country?: string;
+  nationality?: string | null;
   phone?: string;
   individual_details?: Partial<IndividualDetails>;
   company_details?: Partial<CompanyDetails>;
