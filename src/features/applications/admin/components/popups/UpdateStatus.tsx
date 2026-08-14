@@ -144,7 +144,7 @@ const DocumentRequestList = ({
 interface UpdateStatusPopupProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (status: string, reason: string, notes: string) => void;
+  onConfirm: (status: string, reason: string) => void;
   application?: any;
 }
 
@@ -156,9 +156,8 @@ export default function UpdateStatusPopup({
 }: UpdateStatusPopupProps) {
   const [selectedStatus, setSelectedStatus] = useState<string>("");
   const [reason, setReason] = useState("");
-  const [notes, setNotes] = useState("");
   const [documents, setDocuments] = useState<DocumentRequest[]>([
-    { id: "1", type: [], reason: "" },
+    { id: "1", type: [] },
   ]);
 
   const [statusOptions, setStatusOptions] = useState<StatusOption[]>([]);
@@ -340,7 +339,6 @@ export default function UpdateStatusPopup({
       applicationId: application.id,
       statusId: selectedStatus,
       reason,
-      notes,
       requiredDocumentTypeIds: shouldShowDocumentSection
         ? documents.flatMap((doc) => doc.type)
         : [],
@@ -485,7 +483,7 @@ export default function UpdateStatusPopup({
         if (visaDocumentFile) await handleVisaIssuedUpload();
       }
 
-      onConfirm(selectedStatus, reason, notes);
+      onConfirm(selectedStatus, reason);
       handleClose();
     } catch (err: unknown) {
       setError(parseApiError(err, "Failed to update application"));
@@ -497,8 +495,7 @@ export default function UpdateStatusPopup({
   const handleClose = () => {
     setSelectedStatus("");
     setReason("");
-    setNotes("");
-    setDocuments([{ id: "1", type: [], reason: "" }]);
+    setDocuments([{ id: "1", type: [] }]);
     setError("");
     setArrivalFormTemplateFile(null);
     setOfferLetterVisaInvoiceFile(null);
@@ -588,11 +585,7 @@ export default function UpdateStatusPopup({
               </span>
             </label>
 
-            {statusOptions === null ? (
-              <p className="py-4 text-sm text-gray-500">
-                Loading status options...
-              </p>
-            ) : statusOptions.length === 0 ? (
+            {statusOptions.length === 0 ? (
               <NoDocumentsRequired
                 title="No status"
                 subtitle="There are no status options available at the moment."

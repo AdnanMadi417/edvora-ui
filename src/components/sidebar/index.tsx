@@ -167,21 +167,41 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <div
-                className="flex h-10 w-10 shrink-0 items-center justify-center
+              {profilePath ? (
+                <Link
+                  href={profilePath}
+                  onClick={() => setOpen(false)}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center
           overflow-hidden rounded-full bg-accent-light text-h5 font-medium text-blue-700"
-              >
-                {user ? (
-                  <PresignedImage
-                    fileKey={photoFileKey ?? undefined}
-                    alt={user.name}
-                    className="h-full w-full object-cover"
-                    fallback={user.name[0].toUpperCase()}
-                  />
-                ) : (
-                  <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
-                )}
-              </div>
+                >
+                  {user ? (
+                    <PresignedImage
+                      fileKey={photoFileKey ?? undefined}
+                      alt={user.name}
+                      className="h-full w-full object-cover"
+                      fallback={user.name[0].toUpperCase()}
+                    />
+                  ) : (
+                    <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
+                  )}
+                </Link>
+              ) : (
+                <div
+                  className="flex h-10 w-10 shrink-0 items-center justify-center
+          overflow-hidden rounded-full bg-accent-light text-h5 font-medium text-blue-700"
+                >
+                  {user ? (
+                    <PresignedImage
+                      fileKey={photoFileKey ?? undefined}
+                      alt={user.name}
+                      className="h-full w-full object-cover"
+                      fallback={user.name[0].toUpperCase()}
+                    />
+                  ) : (
+                    <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
+                  )}
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 {user ? (
                   <>

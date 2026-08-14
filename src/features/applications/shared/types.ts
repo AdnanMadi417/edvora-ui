@@ -3,7 +3,6 @@ import React from 'react';
 export interface DocumentRequest {
   id: string;
   type: string[];
-  reason: string;
 }
 
 export interface StatusOption {
