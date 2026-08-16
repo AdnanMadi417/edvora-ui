@@ -26,6 +26,10 @@ export default function PhoneInputField({
   const number = formData[numberField] ?? "";
   const error = errors?.[numberField];
 
+  const handleNumberChange = (value: string) => {
+    updateFormData(numberField, value.replace(/[^\d\s()-]/g, ""));
+  };
+
   return (
     <div className="mb-4">
       <label className="block text-p2 font-medium text-slate-900">
@@ -44,7 +48,7 @@ export default function PhoneInputField({
         <input
           type="tel"
           value={number}
-          onChange={(e) => updateFormData(numberField, e.target.value)}
+          onChange={(e) => handleNumberChange(e.target.value)}
           placeholder={placeholder}
           className="flex-1 bg-white px-3 text-sm outline-none hover:bg-slate-50"
         />

@@ -78,7 +78,7 @@ function InfoRow({
         {href && value ? (
           <button
             type="button"
-            onClick={() => window.open(href, "_blank", "noopener,noreferrer")}
+            onClick={() => window.open(encodeURI(href), "_blank", "noopener,noreferrer")}
             className="mt-0.5 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
           >
             Visit Link <ExternalLink className="h-3 w-3" />

@@ -79,15 +79,16 @@ export default function SocialMediaInputField({
   };
 
   const handleUsernameChange = (value: string) => {
-    updateFormData(usernameField, value);
-    updateFormData(urlField, buildSocialMediaUrl(platform, value));
+    const sanitized = platform === "website" ? value : value.replace(/\s+/g, "");
+    updateFormData(usernameField, sanitized);
+    updateFormData(urlField, buildSocialMediaUrl(platform, sanitized));
   };
 
   const placeholder = !selected
     ? "Select a platform first"
     : selected.value === "website"
     ? "https://yourwebsite.com"
-    : `Enter your ${selected.label} username`;
+    : `Paste your ${selected.label} profile URL`;
 
   return (
     <div className="mb-4">

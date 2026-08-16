@@ -15,7 +15,7 @@ import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "se
 import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
 import { COUNTRIES, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
-import { parseSocialMediaUrl, validateSocialMediaField } from "utils/socialMedia";
+import { parseSocialMediaUrl, validateSocialMediaField, isValidPlatformUrl } from "utils/socialMedia";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import { parseApiError } from "utils/parseApiError";
@@ -295,13 +295,6 @@ export default function EditPartnerProfile() {
     } catch { return false; }
   };
 
-  const isLinkedInUrl = (val: string) => {
-    try {
-      const url = new URL(val);
-      return (url.protocol === "https:" || url.protocol === "http:") && url.hostname.includes("linkedin.com");
-    } catch { return false; }
-  };
-
   const validate = () => {
     const e: Record<string, string> = {};
     const type = partner?.type;
@@ -315,7 +308,7 @@ export default function EditPartnerProfile() {
     else if (formData.phone_number.trim().length < 5) e.phone_number = "Enter a valid phone number";
 
     if (type === "individual") {
-      if (formData.linkedin_url && !isLinkedInUrl(formData.linkedin_url))
+      if (formData.linkedin_url && !isValidPlatformUrl("linkedin", formData.linkedin_url))
         e.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://linkedin.com/in/yourname)";
       if (formData.social_platform || formData.social_username) {
         const socialError = validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" });

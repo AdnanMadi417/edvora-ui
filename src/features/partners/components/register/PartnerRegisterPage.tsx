@@ -15,7 +15,7 @@ import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import PhoneInputField from "components/form/fields/PhoneInputField";
 import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
-import { validateSocialMediaField } from "utils/socialMedia";
+import { validateSocialMediaField, isValidPlatformUrl } from "utils/socialMedia";
 import PublicFileUploadField, { type PublicUploadResult } from "components/form/upload/PublicFileUploadField";
 import ImageUploadField from "components/form/upload/ImageUploadField";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
@@ -164,6 +164,8 @@ export default function PartnerRegisterPage() {
     if (!indPassportPhoto) e.ind_passport_photo = "Please upload your passport photo";
     const socialError = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
     if (socialError) e.social_media_url = socialError;
+    if (indForm.linkedin_url && !isValidPlatformUrl("linkedin", indForm.linkedin_url))
+      e.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://www.linkedin.com/in/yourname)";
     if (!indForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -201,6 +203,7 @@ export default function PartnerRegisterPage() {
         indProfilePhoto.fileKey &&
         indIdDoc && indPassportPhoto &&
         !validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" }) &&
+        (!indForm.linkedin_url || isValidPlatformUrl("linkedin", indForm.linkedin_url)) &&
         indForm.agreed,
       )
     : partnerType === "agency"
