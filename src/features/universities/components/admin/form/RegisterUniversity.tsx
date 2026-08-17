@@ -287,7 +287,7 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
 
         </div>
 
-        <div className="border-t px-6 py-6">
+        <div className="border-t px-6 py-6" data-field="branches">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-sm font-semibold uppercase text-slate-500">
               Branches
@@ -303,6 +303,10 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
               onClick={handleAddBranch}
             />
           </div>
+
+          {errors.branches && (
+            <p className="mb-3 text-xs text-red-600">{errors.branches}</p>
+          )}
 
           <div className="grid grid-cols-1 gap-4">
             {formData.branches.map((branch: any, index: number) => (

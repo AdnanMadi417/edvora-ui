@@ -583,7 +583,7 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
       </div>
 
       {/* Branches */}
-      <div className="border-t px-6 py-6">
+      <div className="border-t px-6 py-6" data-field="branches">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm font-semibold uppercase text-slate-500">Branches</h3>
           <IconButton
