@@ -22,6 +22,7 @@ const CreatableSelectField = ({
                                 placeholder = "Select...",
                                 disabledOptions = [],
                                 onSelect = undefined,
+                                onBlur = undefined,
                               }) => {
   const containerRef = useRef(null);
 
@@ -50,13 +51,14 @@ const CreatableSelectField = ({
       ) {
         setIsOpen(false);
         setSearch("");
+        onBlur?.();
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
     return () =>
       document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [onBlur]);
 
   const handleSelect = (option) => {
     if (disabledOptions.includes(option.value)) return;
@@ -68,7 +70,7 @@ const CreatableSelectField = ({
   };
 
   return (
-    <div className="mb-4" ref={containerRef}>
+    <div className="mb-4" ref={containerRef} data-field={field}>
 
       <label className="block text-sm font-medium text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}

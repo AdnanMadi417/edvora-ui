@@ -15,7 +15,7 @@ const InputField = ({ label, field, type = "text", required = true, placeholder 
   const dateProps = type === "date" ? { min: "1900-01-01", max: "2099-12-31" } : {};
 
   return (
-    <div className="mb-4">
+    <div className="mb-4" data-field={field}>
       <label className="block text-p2 font-medium text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}
       </label>

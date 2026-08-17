@@ -55,15 +55,10 @@ export function isValidPlatformUrl(platform: string, value: string): boolean {
   if (!meta || !meta.prefix) return isValidWebsiteUrl(value);
   if (!/^https?:\/\//i.test(value)) return false;
 
-  try {
-    const valueUrl = new URL(value);
-    const prefixUrl = new URL(meta.prefix);
-    const expectedHost = prefixUrl.hostname.replace(/^www\./i, "").toLowerCase();
-    const actualHost = valueUrl.hostname.replace(/^www\./i, "").toLowerCase();
-    return actualHost === expectedHost;
-  } catch {
-    return false;
-  }
+  // Reject a bare-domain URL (e.g. "https://www.linkedin.com/in/") — the host
+  // matches, but there's no actual profile handle after the prefix.
+  const handle = extractHandleForPlatform(meta.prefix, value);
+  return handle !== null && handle.length > 0;
 }
 
 export function parseSocialMediaUrl(url: string): { platform: string; username: string } {
