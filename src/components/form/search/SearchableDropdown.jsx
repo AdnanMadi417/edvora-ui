@@ -14,6 +14,7 @@ const getNestedValue = (obj, path) => {
 const CreatableSelectField = ({
                                 label,
                                 field,
+                                dataField = undefined,
                                 options = [],
                                 required = true,
                                 formData,
@@ -70,7 +71,7 @@ const CreatableSelectField = ({
   };
 
   return (
-    <div className="mb-4" ref={containerRef} data-field={field}>
+    <div className="mb-4" ref={containerRef} data-field={dataField ?? field}>
 
       <label className="block text-sm font-medium text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}

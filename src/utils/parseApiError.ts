@@ -33,27 +33,35 @@ export function parseApiError(err: unknown, fallback: string): string {
   return fallback;
 }
 
-/**
- * Extracts a field-name -> message map from a field-level validation error
- * response (`details: [{ loc: ["body", ..., "email"], msg: "..." }, ...]`).
- * The key for each entry is the LAST segment of its `loc` path — the actual
- * field name, e.g. "email" from `["body", "individual", "email"]`.
- * Returns {} when the error isn't this shape (e.g. a business-logic error
- * like a duplicate email, which carries `details: null` and should instead
- * be read via `parseApiError` and attached by the caller).
- */
-export function parseFieldErrors(err: unknown): Record<string, string> {
-  if (!isAxiosError(err)) return {};
-  const details = getValidationDetails(err.response?.data);
-  if (!details) return {};
+export interface FieldError {
+  /** The LAST segment of the `loc` path — the leaf field name, e.g. "email". */
+  field: string;
+  /** The full `loc` path, e.g. `["body", "branches", 0, "name"]` — needed to
+   * disambiguate repeated/array fields (a form's fieldMap can inspect the
+   * numeric index instead of colliding every array item onto one key). */
+  loc: Array<string | number>;
+  msg: string;
+}
 
-  const fieldErrors: Record<string, string> = {};
+/**
+ * Extracts each field-level validation error from a response
+ * (`details: [{ loc: ["body", ..., "email"], msg: "..." }, ...]`), one entry
+ * per item, in order. Returns [] when the error isn't this shape (e.g. a
+ * business-logic error like a duplicate email, which carries `details: null`
+ * and should instead be read via `parseApiError` and attached by the caller).
+ */
+export function parseFieldErrors(err: unknown): FieldError[] {
+  if (!isAxiosError(err)) return [];
+  const details = getValidationDetails(err.response?.data);
+  if (!details) return [];
+
+  const fieldErrors: FieldError[] = [];
   for (const item of details) {
     if (!item?.msg) continue;
-    const loc = Array.isArray(item.loc) ? item.loc : [];
+    const loc = Array.isArray(item.loc) ? (item.loc as Array<string | number>) : [];
     const field = loc[loc.length - 1];
     if (typeof field === "string") {
-      fieldErrors[field] = String(item.msg);
+      fieldErrors.push({ field, loc, msg: String(item.msg) });
     }
   }
   return fieldErrors;

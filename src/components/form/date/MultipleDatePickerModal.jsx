@@ -33,7 +33,7 @@ const MultipleDatePickerModal = ({
   };
 
   return (
-    <div className="mb-4 rounded-lg border border-slate-300 bg-white p-6 text-center">
+    <div className="mb-4 rounded-lg border border-slate-300 bg-white p-6 text-center" data-field={field}>
       <div className="flex items-center justify-between">
         <label className="text-p2 font-medium text-slate-900">
           {label} {required && <span className="text-red-600">*</span>}

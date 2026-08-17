@@ -11,6 +11,8 @@ import InputField from "components/form/fields/InputField";
 import RichTextEditor from "components/form/fields/RichTextEditor";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 
 interface CreatePaymentMethodProps {
   isOpen: boolean;
@@ -35,6 +37,15 @@ export default function CreatePayment({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [apiError, setApiError] = useState<string | null>(null);
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      setApiError(null);
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => setApiError(message),
+  });
 
   const validateName = (value: string): string => {
     if (!value.trim()) return "Name is required";
@@ -83,6 +94,7 @@ export default function CreatePayment({
     if (descErr) newErrors.description = descErr;
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      scrollToFirstError(newErrors);
       return;
     }
 
@@ -95,12 +107,9 @@ export default function CreatePayment({
 
       onClose();
       setTimeout(() => onSuccess?.(), 1500);
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-
-      setApiError(backendMessage);
-
-      showToast(`Failed to create Payment Method. ${backendMessage}`, "error");
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
+      showToast(`Failed to create Payment Method. ${parseApiError(error, "Please try again.")}`, "error");
     }
   };
 

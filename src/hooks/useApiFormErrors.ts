@@ -1,14 +1,22 @@
 import { useCallback } from "react";
 import { parseApiError, parseFieldErrors, isDuplicateEmailError } from "utils/parseApiError";
 
+type FieldMap = Record<string, string> | ((field: string, loc: Array<string | number>) => string | undefined);
+
 interface UseApiFormErrorsOptions {
   /**
    * Maps a backend field name (the last segment of a validation error's
    * `loc` path, e.g. "email" from `["body", "individual", "email"]`) to
    * this form's own field/error key, wherever they differ. Fields not
-   * listed here are assumed to already match the backend name 1:1.
+   * listed here (or returning undefined from the function form) are assumed
+   * to already match the backend name 1:1.
+   *
+   * Use the function form for repeated/array fields (e.g. a list of
+   * branches), where a plain name-to-name map can't tell which item an
+   * error belongs to — inspect `loc`'s numeric index instead, e.g.
+   * `(field, loc) => loc[0] === "branches" ? \`branches[${loc[1]}].${field}\` : field`.
    */
-  fieldMap?: Record<string, string>;
+  fieldMap?: FieldMap;
   /** Merges the given patch into the form's `errors` state, e.g.
    * `(patch) => setErrors((prev) => ({ ...prev, ...patch }))`. */
   setErrors: (patch: Record<string, string>) => void;
@@ -46,10 +54,11 @@ interface UseApiFormErrorsOptions {
 export function useApiFormErrors({ fieldMap = {}, setErrors, onUnmappedError, emailField }: UseApiFormErrorsOptions) {
   return useCallback((err: unknown, fallbackMessage: string) => {
     const fieldErrors = parseFieldErrors(err);
-    if (Object.keys(fieldErrors).length > 0) {
+    if (fieldErrors.length > 0) {
       const mapped: Record<string, string> = {};
-      for (const [backendField, msg] of Object.entries(fieldErrors)) {
-        mapped[fieldMap[backendField] ?? backendField] = msg;
+      for (const { field, loc, msg } of fieldErrors) {
+        const key = typeof fieldMap === "function" ? (fieldMap(field, loc) ?? field) : (fieldMap[field] ?? field);
+        mapped[key] = msg;
       }
       setErrors(mapped);
       return;

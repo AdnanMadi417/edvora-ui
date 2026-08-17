@@ -66,7 +66,7 @@ const CreatableSelectField = ({
   };
 
   return (
-    <div className="z-[9999] mb-4" ref={containerRef}>
+    <div className="z-[9999] mb-4" ref={containerRef} data-field={field}>
       <label className="block text-sm font-medium text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}
       </label>
