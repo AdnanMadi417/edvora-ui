@@ -8,7 +8,8 @@ import { useAssignUniversityType, useUniversityTypes } from "features/universiti
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import SelectField from "components/form/fields/SelectField";
 
 interface Props {
@@ -49,6 +50,14 @@ export default function AssignUniversityTypeModal({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Update failed. ${message}`, "error"),
+  });
 
   const isFormValid = formData.university_type_id.trim() !== "";
 
@@ -94,10 +103,9 @@ export default function AssignUniversityTypeModal({
 
   const handleSubmit = async () => {
     if (!isFormValid) {
-      setErrors({
-        university_type_id: "University type is required",
-      });
-
+      const e = { university_type_id: "University type is required" };
+      setErrors(e);
+      scrollToFirstError(e);
       return;
     }
 
@@ -110,9 +118,8 @@ export default function AssignUniversityTypeModal({
 
       onClose();
       onSuccess?.();
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-      showToast(`Update failed. ${backendMessage}`, "error");
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 

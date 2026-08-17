@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, GitBranch } from "lucide-react";
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import { useCreateBranch } from "features/universities/hooks";
 import { useStates } from "features/programs/hooks/useStates";
 import ModalHeader from "components/ui/modal/ModalHeader";
@@ -28,6 +29,14 @@ export default function CreateBranch({ isOpen, onClose, universityId, onSuccess 
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({ name: "", location: "", state_id: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Failed to create branch. ${message}`, "error"),
+  });
 
   const isFormValid = formData.name.trim() && formData.location.trim() && formData.state_id;
 
@@ -54,9 +63,8 @@ export default function CreateBranch({ isOpen, onClose, universityId, onSuccess 
       onClose();
       onSuccess?.();
       return newBranch;
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-      showToast(`Failed to create branch. ${backendMessage}`, "error");
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 

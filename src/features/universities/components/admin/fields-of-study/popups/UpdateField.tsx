@@ -11,7 +11,8 @@ import InputField from "components/form/fields/InputField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 
 interface UpdateFieldProps {
   isOpen: boolean;
@@ -45,6 +46,14 @@ export default function UpdateFieldOfStudy({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Update failed. ${message}`, "error"),
+  });
 
   useEffect(() => {
     if (isOpen) setIsVisible(true);
@@ -105,7 +114,9 @@ export default function UpdateFieldOfStudy({
   const handleUpdate = async () => {
     const nameErr = validateName(formData.name);
     if (nameErr) {
-      setErrors({ name: nameErr });
+      const e = { name: nameErr };
+      setErrors(e);
+      scrollToFirstError(e);
       return;
     }
 
@@ -120,10 +131,8 @@ export default function UpdateFieldOfStudy({
       onClose();
       onSuccess?.();
 
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-
-      showToast(`Update failed. ${backendMessage}`, "error");
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 

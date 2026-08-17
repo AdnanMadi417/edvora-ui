@@ -10,6 +10,8 @@ import InputField from "components/form/fields/InputField";
 
 import { useCreateUniversityType } from "features/universities/hooks";
 import { useToast } from "components/context/ToastContext";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 
 interface CreateUniversityProps {
   isOpen: boolean;
@@ -34,6 +36,14 @@ export default function CreateUniversityType({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Failed to create university type. ${message}`, "error"),
+  });
 
   const validateName = (value: string): string => {
     if (!value.trim()) return "Name is required";
@@ -82,6 +92,7 @@ export default function CreateUniversityType({
     if (descErr) newErrors.description = descErr;
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      scrollToFirstError(newErrors);
       return;
     }
 
@@ -92,17 +103,8 @@ export default function CreateUniversityType({
 
       onClose();
       onSuccess?.();
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
-        });
-        setErrors(newErrors);
-      }
-      showToast("Failed to create university.", "error");
+    } catch (err: unknown) {
+      handleApiError(err, "Please try again.");
     }
   };
   if (!isVisible) return null;

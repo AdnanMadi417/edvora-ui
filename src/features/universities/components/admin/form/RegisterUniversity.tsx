@@ -3,17 +3,10 @@
 import React, { useState } from "react";
 import { GraduationCap, ChevronLeft, CalendarPlus, Trash2 } from 'lucide-react';
 
-const FIELD_LABELS: Record<string, string> = {
-  name: "University Name",
-  description: "Description",
-  intake_months: "Intake Dates",
-  country: "Country",
-  university_type_id: "University Type",
-  branches: "Branches",
-};
-
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import { useRouter } from "next/navigation";
 
 import { useCreateUniversity, useUniversityTypes } from "features/universities/hooks";
@@ -28,7 +21,7 @@ import IconButton from 'components/ui/buttons/IconButton';
 import SelectField from 'components/form/fields/SelectField';
 import ImageUploadField from 'components/form/upload/ImageUploadField';
 import { getPresignedUploads, uploadFilesToSpaces } from 'services/uploadService';
-import { validateUniversity, isUniversityComplete } from './validateUniversity';
+import { validateUniversity, isUniversityComplete, universityFieldMap } from './validateUniversity';
 
 
 interface Props {
@@ -66,6 +59,15 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
     ]
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleApiError = useApiFormErrors({
+    fieldMap: universityFieldMap,
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Failed to create university. ${message}`, "error"),
+  });
 
   const isFormValid = React.useMemo(() => isUniversityComplete(formData), [formData]);
 
@@ -153,6 +155,7 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
     const { isValid, errors: validationErrors } = validateUniversity(formData);
     if (!isValid) {
       setErrors(validationErrors);
+      scrollToFirstError(validationErrors);
       return;
     }
 
@@ -169,32 +172,15 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
         router.push(basePath);
       }, 2000);
 
-    } catch (error: any) {
-      const details = error?.response?.data?.details;
-      const code = error?.response?.data?.code;
-
-      if (Array.isArray(details)) {
-        const newErrors: Record<string, string> = {};
-        details.forEach((e: any) => {
-          const field = e?.loc?.[1];
-          if (field) newErrors[field] = e.msg;
-        });
-        setErrors(newErrors);
-      }
-
-      let message = "Please try again.";
+    } catch (error: unknown) {
+      const code = (error as { response?: { data?: { code?: string } } })?.response?.data?.code;
       if (code === "university_name_exists") {
-        message = "A university with this name already exists. Please use a different name.";
-      } else if (Array.isArray(details) && details.length > 0) {
-        const first = details[0];
-        const field = first?.loc?.[1];
-        const label = field ? (FIELD_LABELS[field] ?? field) : null;
-        message = label ? `${label}: ${first.msg}` : first.msg;
-      } else if (error?.response?.data?.message) {
-        message = error.response.data.message;
+        const msg = parseApiError(error, "A university with this name already exists. Please use a different name.");
+        setErrors((prev) => ({ ...prev, name: msg }));
+        scrollToFirstError({ name: msg });
+        return;
       }
-
-      showToast(`Failed to create university. ${message}`, "error");
+      handleApiError(error, "Please try again.");
     }
   };
 
@@ -301,7 +287,7 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
 
         </div>
 
-        <div className="border-t px-6 py-6">
+        <div className="border-t px-6 py-6" data-field="branches">
           <div className="mb-4 flex items-center justify-between">
             <h3 className="text-sm font-semibold uppercase text-slate-500">
               Branches
@@ -317,6 +303,10 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
               onClick={handleAddBranch}
             />
           </div>
+
+          {errors.branches && (
+            <p className="mb-3 text-xs text-red-600">{errors.branches}</p>
+          )}
 
           <div className="grid grid-cols-1 gap-4">
             {formData.branches.map((branch: any, index: number) => (
@@ -347,6 +337,7 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
                     label="Branch Name"
                     placeholder="e.g Branch Name"
                     field="name"
+                    dataField={`branches[${index}].name`}
                     formData={branch}
                     errors={{ name: errors[`branches[${index}].name`] }}
                     updateFormData={(field, value) => {
@@ -360,6 +351,7 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
                     label="Location"
                     placeholder="e.g Location"
                     field="location"
+                    dataField={`branches[${index}].location`}
                     formData={branch}
                     errors={{ location: errors[`branches[${index}].location`] }}
                     updateFormData={(field, value) => {
@@ -372,6 +364,7 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
                   <SearchableDropdown
                     label="State"
                     field="state_id"
+                    dataField={`branches[${index}].state_id`}
                     options={stateOptions}
                     formData={branch}
                     errors={{ state_id: errors[`branches[${index}].state_id`] }}

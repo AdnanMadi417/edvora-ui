@@ -14,6 +14,8 @@ import RichTextEditor from "components/form/fields/RichTextEditor";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 
 interface PaymentMethod {
   id: string;
@@ -55,6 +57,14 @@ const EditPaymentMethodDetails = ({
 
   const { deletePayment, isDeleting } = useDeleteUniversity();
   const { updatePaymentMethods, loading } = useUpdatePaymentMethods();
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Failed to update payment method. ${message}`, "error"),
+  });
 
   useEffect(() => {
     const fetchPaymentMethod = async () => {
@@ -123,6 +133,7 @@ const EditPaymentMethodDetails = ({
     if (descErr) newErrors.description = descErr;
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      scrollToFirstError(newErrors);
       return;
     }
 
@@ -137,9 +148,8 @@ const EditPaymentMethodDetails = ({
       showToast("Payment method updated successfully", "success");
       router.push(redirectPath);
 
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-      showToast(`Failed to update payment method. ${backendMessage}`, "error");
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 

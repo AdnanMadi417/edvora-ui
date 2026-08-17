@@ -12,7 +12,8 @@ import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 
 interface UniversityDetailsProps {
   id: string;
@@ -31,6 +32,14 @@ const UniversityDetails = ({ id, redirectPath = `/admin/config-universities/${id
   const [initialFormData, setInitialFormData] = useState<Record<string, any> | null>(null);
 
   const { updateUniversityType, loading } = useUpdateUniversityType(id);
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Update failed. ${message}`, "error"),
+  });
 
   const fieldSource = React.useMemo(() => {
     const universityFields = university?.required_fields || [];
@@ -94,6 +103,7 @@ const UniversityDetails = ({ id, redirectPath = `/admin/config-universities/${id
     if (descErr) newErrors.description = descErr;
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      scrollToFirstError(newErrors);
       return;
     }
 
@@ -114,9 +124,8 @@ const UniversityDetails = ({ id, redirectPath = `/admin/config-universities/${id
 
       router.push(redirectPath);
 
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-      showToast(`Update failed. ${backendMessage}`, "error");
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 

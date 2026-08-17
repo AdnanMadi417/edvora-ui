@@ -5,7 +5,8 @@ import { ArrowLeft, Layers, } from 'lucide-react';
 import { useApplicationSubmissionFields, useCreateUniversityType } from "features/universities/hooks";
 
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import InputField from "components/form/fields/InputField";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
@@ -30,6 +31,14 @@ export default function UniversityTypeForm({ basePath = "/admin/config-universit
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Failed to create university type. ${message}`, "error"),
+  });
 
   const validateName = (value: string): string => {
     if (!value.trim()) return "Name is required";
@@ -82,6 +91,7 @@ export default function UniversityTypeForm({ basePath = "/admin/config-universit
     if (descErr) newErrors.description = descErr;
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      scrollToFirstError(newErrors);
       return;
     }
 
@@ -102,9 +112,8 @@ export default function UniversityTypeForm({ basePath = "/admin/config-universit
       showToast("University type created successfully.", "success");
 
       router.push(basePath);
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-      showToast(`Failed to create university type. ${backendMessage}`, "error");
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 

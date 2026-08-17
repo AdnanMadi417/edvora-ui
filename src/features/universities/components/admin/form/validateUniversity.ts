@@ -75,6 +75,15 @@ export const validateUniversity = (formData: UniversityFormData): UniversityVali
   return { isValid: Object.keys(errors).length === 0, errors };
 };
 
+// Backend loc paths look like [..., "branches", <index>, "name"] for a
+// repeated branch field — locate the array index so each branch's error
+// lands on its own row's key (`branches[0].name`) instead of colliding.
+export const universityFieldMap = (field: string, loc: Array<string | number>): string => {
+  const branchesAt = loc.indexOf("branches");
+  const index = branchesAt !== -1 ? loc[branchesAt + 1] : undefined;
+  return typeof index === "number" ? `branches[${index}].${field}` : field;
+};
+
 export const isUniversityComplete = (formData: UniversityFormData): boolean => {
   if (!formData.name?.trim() || formData.name.trim().length < 3) return false;
   if (formData.country !== undefined && !formData.country?.trim()) return false;
