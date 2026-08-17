@@ -11,7 +11,8 @@ import Button from "components/ui/buttons/Button";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import CommissionPercentageField from "components/form/fields/CommissionPercentageField";
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 
 interface EditMemberCommissionModalProps {
   isOpen: boolean;
@@ -32,6 +33,14 @@ export default function EditMemberCommissionModal({
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({ commission_visible: true, commission_display_percentage: 100 });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Failed to update commission settings. ${message}`, "error"),
+  });
 
   useEffect(() => {
     if (isOpen && member) {
@@ -60,7 +69,9 @@ export default function EditMemberCommissionModal({
     if (formData.commission_visible) {
       const pct = Number(formData.commission_display_percentage);
       if (Number.isNaN(pct) || pct < 1 || pct > 100) {
-        setErrors({ commission_display_percentage: "Enter a percentage between 1 and 100" });
+        const e = { commission_display_percentage: "Enter a percentage between 1 and 100" };
+        setErrors(e);
+        scrollToFirstError(e);
         return;
       }
     }
@@ -73,9 +84,8 @@ export default function EditMemberCommissionModal({
       showToast("Commission settings updated successfully.", "success");
       onClose();
       onSuccess?.();
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-      showToast(`Failed to update commission settings. ${backendMessage}`, "error");
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 
