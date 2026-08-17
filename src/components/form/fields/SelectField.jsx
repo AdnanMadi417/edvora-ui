@@ -12,7 +12,7 @@ const SelectField = ({ label, field, options, required = true, formData, errors,
   const value = getNestedValue(formData, field) ?? "";
 
   return (
-    <div className="mb-4">
+    <div className="mb-4" data-field={field}>
       <label className="block text-p2 font-medium text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}
       </label>

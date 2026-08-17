@@ -20,14 +20,20 @@ import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "se
 import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
 import { COUNTRIES, NATIONALITIES, PARTNER_TYPE, BACKGROUND_OPTIONS } from "constants/lists";
-import { parseSocialMediaUrl, validateSocialMediaField } from "utils/socialMedia";
-import { parseApiError } from "utils/parseApiError";
+import { parseSocialMediaUrl, validateSocialMediaField, isValidPlatformUrl } from "utils/socialMedia";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 
 interface Props {
   id: string;
 }
 
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
+
+const PARTNER_UPDATE_FIELD_MAP: Record<string, string> = {
+  phone: "phone_number",
+  assigned_manager_id: "manager_id",
+};
 
 type DocState = {
   file_key: string;
@@ -84,14 +90,14 @@ function DocUploadField({
           </div>
         </div>
       ) : doc.file_key ? (
-        <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3 sm:flex-1">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
               <FileText className="h-5 w-5" />
             </div>
             <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
           </div>
-          <div className="ml-4 flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2 sm:ml-4">
             <IconButton
               onClick={handleView}
               disabled={downloading}
@@ -174,6 +180,16 @@ export default function EditPartnerDetails({ id }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleApiError = useApiFormErrors({
+    fieldMap: PARTNER_UPDATE_FIELD_MAP,
+    emailField: "email",
+    setErrors: (patch) => {
+      setErrors((prev: any) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(message, "error"),
+  });
 
   const { partner, isPartnerLoading } = usePartnerDetails(id);
   const { updatePartner, isUpdatingPartner } = useUpdatePartner();
@@ -332,12 +348,6 @@ export default function EditPartnerDetails({ id }: Props) {
     } catch { return false; }
   };
 
-  const isLinkedInUrl = (val: string) => {
-    try {
-      const url = new URL(val);
-      return (url.protocol === "https:" || url.protocol === "http:") && url.hostname.includes("linkedin.com");
-    } catch { return false; }
-  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -352,10 +362,10 @@ export default function EditPartnerDetails({ id }: Props) {
     if (!formData.type) newErrors.type = "Partner type is required";
 
     if (!formData.phone_number.trim()) newErrors.phone_number = "Phone number is required";
-    else if (formData.phone_number.trim().length < 5) newErrors.phone_number = "Enter a valid phone number";
+    else if (formData.phone_number.trim().length < 5) newErrors.phone_number = "Phone number must be at least 5 digits";
 
     if (formData.type === "individual") {
-      if (formData.linkedin_url && !isLinkedInUrl(formData.linkedin_url))
+      if (formData.linkedin_url && !isValidPlatformUrl("linkedin", formData.linkedin_url))
         newErrors.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://linkedin.com/in/yourname)";
       if (formData.social_platform || formData.social_username) {
         const socialError = validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" });
@@ -373,17 +383,21 @@ export default function EditPartnerDetails({ id }: Props) {
     return newErrors;
   };
 
-  const isFormValid =
-    formData.name.trim() !== "" &&
-    formData.country.trim() !== "" &&
-    formData.type.trim() !== "" &&
-    formData.phone_number.trim() !== "" &&
-    true;
+  const validateField = (field: string) => {
+    const allErrors = validateForm();
+    setErrors((prev: any) => ({ ...prev, [field]: allErrors[field] ?? "" }));
+  };
+
+  const formValidationErrors = validateForm();
+  const isFormValid = Object.keys(formValidationErrors).length === 0;
 
   const handleUpdate = async () => {
     const newErrors = validateForm();
     setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
+    if (Object.keys(newErrors).length > 0) {
+      scrollToFirstError(newErrors);
+      return;
+    }
 
     const isIndividual = formData.type === "individual";
     const isCompany = formData.type === "agency";
@@ -446,7 +460,7 @@ export default function EditPartnerDetails({ id }: Props) {
       showToast("Partner updated successfully", "success");
       router.push(`/admin/partners/${id}`);
     } catch (error: unknown) {
-      showToast(parseApiError(error, "Update failed. Please try again."), "error");
+      handleApiError(error, "Update failed. Please try again.");
     }
   };
 
@@ -461,7 +475,7 @@ export default function EditPartnerDetails({ id }: Props) {
     : isUploading
     ? "Please wait for the upload to finish"
     : !isFormValid
-    ? "Fill in all required fields before saving"
+    ? Object.values(formValidationErrors)[0]
     : !isFormChanged()
     ? "No changes to save"
     : undefined;
@@ -472,7 +486,7 @@ export default function EditPartnerDetails({ id }: Props) {
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-4">
             {PROFILE_PHOTO_UPLOAD_ENABLED ? (
               <AvatarUpload
                 doc={isIndividual ? profilePhoto : logo}
@@ -493,9 +507,9 @@ export default function EditPartnerDetails({ id }: Props) {
                 <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
               </div>
             )}
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">{partner.name}</h2>
-              <p className="text-sm text-slate-500">{partner.email}</p>
+            <div className="min-w-0">
+              <h2 className="truncate text-lg font-semibold text-slate-900">{partner.name}</h2>
+              <p className="truncate text-sm text-slate-500">{partner.email}</p>
             </div>
           </div>
         </div>
@@ -504,12 +518,12 @@ export default function EditPartnerDetails({ id }: Props) {
         <div className="border-b border-slate-200 p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Partner Details</p>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <InputField label="Partner Name" field="name" required formData={formData} errors={errors} updateFormData={updateFormData} />
-            <InputField label="Email Address" field="email" type="email" required formData={formData} errors={errors} updateFormData={updateFormData} />
-            <SearchableDropdown label="Country of Residence" field="country" options={COUNTRIES.map((c) => ({ value: c.code, label: c.name }))} formData={formData} errors={errors} updateFormData={updateFormData} />
+            <InputField label="Partner Name" field="name" required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("name")} />
+            <InputField label="Email Address" field="email" type="email" required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("email")} />
+            <SearchableDropdown label="Country of Residence" field="country" options={COUNTRIES.map((c) => ({ value: c.code, label: c.name }))} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("country")} />
             <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS} formData={formData} errors={errors} updateFormData={updateFormData} />
-            <SelectField label="Partner Type" field="type" options={PARTNER_TYPE.map((p) => ({ value: p.value, label: p.label }))} formData={formData} errors={errors} updateFormData={updateFormData} />
-            <PhoneInputField dialCodeField="phone_code" numberField="phone_number" formData={formData} errors={errors} updateFormData={updateFormData} required />
+            <SelectField label="Partner Type" field="type" options={PARTNER_TYPE.map((p) => ({ value: p.value, label: p.label }))} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("type")} />
+            <PhoneInputField dialCodeField="phone_code" numberField="phone_number" formData={formData} errors={errors} updateFormData={updateFormData} required onBlur={() => validateField("phone_number")} />
             <SelectField label="Assigned Manager" field="manager_id" required={false} options={accountManagers.map((m) => ({ label: m.name, value: m.id }))} formData={formData} errors={errors} updateFormData={updateFormData} />
           </div>
         </div>
@@ -544,6 +558,7 @@ export default function EditPartnerDetails({ id }: Props) {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                onBlur={() => validateField("linkedin_url")}
               />
               <SocialMediaInputField
                 label="Social Media URL"
@@ -554,6 +569,7 @@ export default function EditPartnerDetails({ id }: Props) {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                onBlur={() => validateField("social_media_url")}
               />
               <InputField
                 label="Date of Birth"
@@ -601,6 +617,7 @@ export default function EditPartnerDetails({ id }: Props) {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                onBlur={() => validateField("company_name")}
               />
               <InputField
                 label="Website URL"
@@ -610,6 +627,7 @@ export default function EditPartnerDetails({ id }: Props) {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                onBlur={() => validateField("website_url")}
               />
               <InputField
                 label="Date of Birth"

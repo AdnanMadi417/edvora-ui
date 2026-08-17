@@ -15,14 +15,19 @@ import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "se
 import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
 import { COUNTRIES, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
-import { parseSocialMediaUrl, validateSocialMediaField } from "utils/socialMedia";
+import { parseSocialMediaUrl, validateSocialMediaField, isValidPlatformUrl } from "utils/socialMedia";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
+
+const PROFILE_UPDATE_FIELD_MAP: Record<string, string> = {
+  phone: "phone_number",
+};
 
 const PROFILE_PHOTO_UPLOAD_ENABLED = true;
 
@@ -83,14 +88,14 @@ function DocUploadField({
           </div>
         </div>
       ) : doc.file_key ? (
-        <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3 sm:flex-1">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
               <FileText className="h-5 w-5" />
             </div>
             <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
           </div>
-          <div className="ml-4 flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2 sm:ml-4">
             <IconButton
               onClick={handleView}
               disabled={downloading}
@@ -204,6 +209,15 @@ export default function EditPartnerProfile() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const handleApiError = useApiFormErrors({
+    fieldMap: PROFILE_UPDATE_FIELD_MAP,
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(message, "error"),
+  });
+
   useEffect(() => {
     if (!partner) return;
     const rawPhone = (partner.phone ?? "").replace(/^undefined/, "").trim();
@@ -295,14 +309,7 @@ export default function EditPartnerProfile() {
     } catch { return false; }
   };
 
-  const isLinkedInUrl = (val: string) => {
-    try {
-      const url = new URL(val);
-      return (url.protocol === "https:" || url.protocol === "http:") && url.hostname.includes("linkedin.com");
-    } catch { return false; }
-  };
-
-  const validate = () => {
+  const computeErrors = () => {
     const e: Record<string, string> = {};
     const type = partner?.type;
 
@@ -312,10 +319,10 @@ export default function EditPartnerProfile() {
     if (!formData.country) e.country = "Country is required";
 
     if (!formData.phone_number.trim()) e.phone_number = "Phone number is required";
-    else if (formData.phone_number.trim().length < 5) e.phone_number = "Enter a valid phone number";
+    else if (formData.phone_number.trim().length < 5) e.phone_number = "Phone number must be at least 5 digits";
 
     if (type === "individual") {
-      if (formData.linkedin_url && !isLinkedInUrl(formData.linkedin_url))
+      if (formData.linkedin_url && !isValidPlatformUrl("linkedin", formData.linkedin_url))
         e.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://linkedin.com/in/yourname)";
       if (formData.social_platform || formData.social_username) {
         const socialError = validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" });
@@ -330,8 +337,19 @@ export default function EditPartnerProfile() {
         e.website_url = "Enter a valid URL starting with https://";
     }
 
+    return e;
+  };
+
+  const validate = () => {
+    const e = computeErrors();
     setErrors(e);
+    if (Object.keys(e).length > 0) scrollToFirstError(e);
     return Object.keys(e).length === 0;
+  };
+
+  const validateField = (field: string) => {
+    const e = computeErrors();
+    setErrors((prev) => ({ ...prev, [field]: e[field] ?? "" }));
   };
 
   const handleUpdate = async () => {
@@ -378,7 +396,7 @@ export default function EditPartnerProfile() {
       showToast("Profile updated successfully", "success");
       router.push("/partner/profile");
     } catch (err: unknown) {
-      showToast(parseApiError(err, "Update failed. Please try again."), "error");
+      handleApiError(err, "Update failed. Please try again.");
     }
   };
 
@@ -443,6 +461,7 @@ export default function EditPartnerProfile() {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => validateField("name")}
             />
             <SelectField
               label="Country of Residence"
@@ -451,6 +470,7 @@ export default function EditPartnerProfile() {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => validateField("country")}
             />
             <SearchableDropdown
               label="Nationality"
@@ -466,6 +486,7 @@ export default function EditPartnerProfile() {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => validateField("phone_number")}
             />
           </div>
         </div>
@@ -494,6 +515,7 @@ export default function EditPartnerProfile() {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                onBlur={() => validateField("linkedin_url")}
               />
               <SocialMediaInputField
                 label="Social Media URL"
@@ -504,6 +526,7 @@ export default function EditPartnerProfile() {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                onBlur={() => validateField("social_media_url")}
               />
               <InputField
                 label="Date of Birth"
@@ -554,6 +577,7 @@ export default function EditPartnerProfile() {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                onBlur={() => validateField("company_name")}
               />
               <InputField
                 label="Website URL"
@@ -563,6 +587,7 @@ export default function EditPartnerProfile() {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                onBlur={() => validateField("website_url")}
               />
               <InputField
                 label="Date of Birth"

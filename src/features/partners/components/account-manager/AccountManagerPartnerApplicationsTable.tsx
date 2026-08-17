@@ -153,8 +153,8 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: User,          label: "Student", minW: "min-w-[220px]" },
-                  { icon: GraduationCap, label: "Program", minW: "min-w-[200px]" },
+                  { icon: User,          label: "Student", minW: "min-w-[160px] sm:min-w-[220px]" },
+                  { icon: GraduationCap, label: "Program", minW: "min-w-[150px] sm:min-w-[200px]" },
                   { icon: Clock,         label: "Status" },
                 ].map(({ icon: Icon, label, minW }) => (
                   <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
@@ -206,7 +206,7 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
                     className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                     onClick={() => window.open(`/account-manager/applications/${app.id}`, "_blank")}
                   >
-                    <td className="min-w-[220px] px-6 py-4">
+                    <td className="min-w-[160px] max-w-[160px] px-6 py-4 sm:min-w-[220px] sm:max-w-[220px]">
                       <div className="flex items-center gap-3">
                         <PresignedImage
                           fileKey={app.student_photo_file_key}
@@ -225,14 +225,14 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
                       </div>
                     </td>
 
-                    <td className="min-w-[200px] px-6 py-4">
+                    <td className="min-w-[150px] max-w-[150px] px-6 py-4 sm:min-w-[200px] sm:max-w-[200px]">
                       <div className="truncate text-sm text-slate-900">{app.program_name}</div>
                       <div className="truncate text-xs text-slate-500">{app.university_name}</div>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="max-w-[140px] px-6 py-4">
                       <StatusBadge variant={statusVariant}>
-                        <span className="truncate max-w-[160px]">{app.status}</span>
+                        <span className="truncate max-w-[110px]">{app.status}</span>
                       </StatusBadge>
                     </td>
 

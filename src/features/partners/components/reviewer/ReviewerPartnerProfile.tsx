@@ -20,7 +20,9 @@ import {
   ExternalLink,
   FileText,
   Link2,
+  ShieldCheck,
   User,
+  Users,
 } from "lucide-react";
 import { usePartnerDetails } from "features/partners/hooks";
 import Loading from "components/loading/Loading";
@@ -31,7 +33,11 @@ import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
+import { StatusBadge } from "components/ui/badges";
+import { Tabs, type TabItem } from "components/ui/tabs";
 import { parseDate, formatDate } from "components/ui/date/utils";
+
+type DetailsTab = "profile" | "team";
 
 function formatDateOfBirth(value?: string | null): string | undefined {
   const date = parseDate(value);
@@ -68,7 +74,7 @@ function InfoRow({
         {href && value ? (
           <button
             type="button"
-            onClick={() => window.open(href, "_blank", "noopener,noreferrer")}
+            onClick={() => window.open(encodeURI(href), "_blank", "noopener,noreferrer")}
             className="mt-0.5 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
           >
             Visit Link <ExternalLink className="h-3 w-3" />
@@ -115,15 +121,15 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
   };
 
   return (
-    <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50">
-      <div className="flex min-w-0 flex-1 items-center gap-3">
+    <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 items-center gap-3 sm:flex-1">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
           <FileText className="h-5 w-5" />
         </div>
         <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
       </div>
       {fileKey ? (
-        <div className="ml-4 flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 sm:ml-4">
           <IconButton
             onClick={handleView}
             disabled={!!loading}
@@ -150,7 +156,7 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
           />
         </div>
       ) : (
-        <span className="ml-4 text-xs text-slate-400">Not uploaded</span>
+        <span className="text-xs text-slate-400 sm:ml-4">Not uploaded</span>
       )}
     </div>
   );
@@ -159,6 +165,7 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
 export default function ReviewerPartnerProfile({ id }: Props) {
   const router = useRouter();
   const { partner, isPartnerLoading } = usePartnerDetails(id);
+  const [tab, setTab] = useState<DetailsTab>("profile");
 
   if (isPartnerLoading) return <Loading text="Loading partner details..." />;
   if (!partner) return <EmptyData />;
@@ -166,13 +173,20 @@ export default function ReviewerPartnerProfile({ id }: Props) {
   const isIndividual = partner.type === "individual";
   const isCompany = partner.type === "agency";
 
+  const TABS: TabItem<DetailsTab>[] = isCompany
+    ? [
+        { key: "profile", label: "Profile" },
+        { key: "team", label: "Team" },
+      ]
+    : [{ key: "profile", label: "Profile" }];
+
   return (
     <div className="mx-auto mt-6 max-w-5xl">
       <div className="rounded-lg border border-slate-200 bg-white">
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-4">
             <div className="relative shrink-0">
               <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                 <PresignedImage
@@ -188,13 +202,14 @@ export default function ReviewerPartnerProfile({ id }: Props) {
                 }`}
               />
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">{partner.name || "Unknown Partner"}</h2>
-              <p className="text-sm text-slate-500">{partner.email}</p>
+            <div className="min-w-0">
+              <h2 className="truncate text-lg font-semibold text-slate-900">{partner.name || "Unknown Partner"}</h2>
+              <p className="truncate text-sm text-slate-500">{partner.email}</p>
             </div>
           </div>
 
           <Button
+            className="shrink-0 self-end sm:self-auto"
             onClick={() => router.push("/reviewer/partners")}
             icon={<ChevronLeft className="h-4 w-4" />}
             text="Back"
@@ -205,6 +220,11 @@ export default function ReviewerPartnerProfile({ id }: Props) {
             hoverBorderColor="hover:border-slate-300"
           />
         </div>
+
+        <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} />
+
+        {tab === "profile" && (
+        <div key={tab} className="animate-in fade-in duration-200">
 
         {/* Account Overview */}
         <div className="border-b border-slate-200 p-6">
@@ -235,6 +255,16 @@ export default function ReviewerPartnerProfile({ id }: Props) {
               label="Last Login"
               value={formatDateTime(partner.last_login) || "Never"}
             />
+            {partner.agency_role && (
+              <InfoRow
+                icon={<ShieldCheck className="h-4 w-4" />}
+                label="Agency Role"
+                value={partner.agency_role.charAt(0).toUpperCase() + partner.agency_role.slice(1)}
+              />
+            )}
+            {partner.agency_membership && (
+              <InfoRow icon={<Users className="h-4 w-4" />} label="Member Of" value={partner.agency_membership.agency_name} />
+            )}
           </div>
         </div>
 
@@ -350,6 +380,43 @@ export default function ReviewerPartnerProfile({ id }: Props) {
                 personName={partner.name}
               />
             </div>
+          </div>
+        )}
+
+        </div>
+        )}
+
+        {/* Team Members */}
+        {isCompany && tab === "team" && (
+          <div key={tab} className="animate-in fade-in duration-200 p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <Users className="h-4 w-4 text-slate-500" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Team Members
+              </p>
+            </div>
+            {!partner.agency_members?.length ? (
+              <p className="py-8 text-center text-sm text-slate-500">No team members yet.</p>
+            ) : (
+              <div className="space-y-2">
+                {partner.agency_members.map((member) => (
+                  <div
+                    key={member.id}
+                    className="flex items-center justify-between rounded-lg border border-slate-200 p-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-slate-900">{member.name}</p>
+                      <p className="truncate text-xs text-slate-500">{member.email}</p>
+                    </div>
+                    {member.is_active ? (
+                      <StatusBadge variant="success">Active</StatusBadge>
+                    ) : (
+                      <StatusBadge variant="neutral">Suspended</StatusBadge>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

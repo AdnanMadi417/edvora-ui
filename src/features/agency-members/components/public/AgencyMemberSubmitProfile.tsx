@@ -12,15 +12,27 @@ import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import PhoneInputField from "components/form/fields/PhoneInputField";
 import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
-import { validateSocialMediaField } from "utils/socialMedia";
+import { validateSocialMediaField, isValidPlatformUrl } from "utils/socialMedia";
 import PublicFileUploadField, { type PublicUploadResult } from "components/form/upload/PublicFileUploadField";
 import ImageUploadField from "components/form/upload/ImageUploadField";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
 import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import Button from "components/ui/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
+
+const SUBMIT_PROFILE_FIELD_MAP: Record<string, string> = {
+  phone: "phone_number",
+  id_document_file_key: "id_doc",
+  id_document_file_url: "id_doc",
+  passport_photo_file_key: "passport_photo",
+  passport_photo_file_url: "passport_photo",
+  profile_photo_file_key: "profile_photo",
+  profile_photo_file_url: "profile_photo",
+};
 
 function SectionCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
@@ -74,10 +86,21 @@ export default function AgencyMemberSubmitProfile() {
   const searchParams = useSearchParams();
   const submissionToken = searchParams.get("token") ?? "";
 
-  const { submitProfile, loading: submitting, error: apiError } = useSubmitAgencyMemberProfile();
+  const { submitProfile, loading: submitting } = useSubmitAgencyMemberProfile();
 
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [apiError, setApiError] = useState("");
+
+  const handleApiError = useApiFormErrors({
+    fieldMap: SUBMIT_PROFILE_FIELD_MAP,
+    setErrors: (patch) => {
+      setErrors((p) => ({ ...p, ...patch }));
+      setApiError("");
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => setApiError(message),
+  });
 
   const [formData, setFormData] = useState({
     phone_code: "+60", phone_number: "",
@@ -97,7 +120,7 @@ export default function AgencyMemberSubmitProfile() {
     setErrors((p) => ({ ...p, [field]: "" }));
   };
 
-  const validate = () => {
+  const computeErrors = () => {
     const e: Record<string, string> = {};
     if (!formData.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!formData.country) e.country = "Country is required";
@@ -109,15 +132,29 @@ export default function AgencyMemberSubmitProfile() {
     if (!passportPhoto) e.passport_photo = "Please upload your passport photo";
     const socialError = validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" });
     if (socialError) e.social_media_url = socialError;
+    if (formData.linkedin_url && !isValidPlatformUrl("linkedin", formData.linkedin_url))
+      e.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://www.linkedin.com/in/yourname)";
+    return e;
+  };
+
+  const validate = () => {
+    const e = computeErrors();
     setErrors(e);
+    if (Object.keys(e).length > 0) scrollToFirstError(e);
     return Object.keys(e).length === 0;
+  };
+
+  const validateField = (field: string) => {
+    const e = computeErrors();
+    setErrors((p) => ({ ...p, [field]: e[field] ?? "" }));
   };
 
   const isFormComplete = Boolean(
     formData.phone_number.trim() && formData.country && formData.background &&
     formData.date_of_birth && formData.passport_number.trim() &&
     profilePhoto.fileKey && idDoc && passportPhoto &&
-    !validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" }),
+    !validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" }) &&
+    (!formData.linkedin_url || isValidPlatformUrl("linkedin", formData.linkedin_url)),
   );
 
   const handleSubmit = async () => {
@@ -140,7 +177,9 @@ export default function AgencyMemberSubmitProfile() {
         ...(formData.linkedin_url && { linkedin_url: formData.linkedin_url }),
       });
       setSubmitted(true);
-    } catch { /* error shown via hook */ }
+    } catch (err: unknown) {
+      handleApiError(err, "Failed to submit your profile. Please try again.");
+    }
   };
 
   if (!submissionToken) {
@@ -212,19 +251,23 @@ export default function AgencyMemberSubmitProfile() {
               errors={{ profile_photo: profilePhoto.error || errors.profile_photo }}
             />
             <PhoneInputField dialCodeField="phone_code" numberField="phone_number"
-              formData={formData} errors={errors} updateFormData={updateForm} />
+              formData={formData} errors={errors} updateFormData={updateForm}
+              onBlur={() => validateField("phone_number")} />
             <SelectField label="Country of Residence" field="country" options={COUNTRY_OPTIONS}
-              formData={formData} errors={errors} updateFormData={updateForm} />
+              formData={formData} errors={errors} updateFormData={updateForm}
+              onBlur={() => validateField("country")} />
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
               <InputField label="Date of Birth" field="date_of_birth" type="date"
-                formData={formData} errors={errors} updateFormData={updateForm} />
+                formData={formData} errors={errors} updateFormData={updateForm}
+                onBlur={() => validateField("date_of_birth")} />
               <InputField label="Passport Number" field="passport_number" placeholder="A12345678"
-                formData={formData} errors={errors} updateFormData={updateForm} />
+                formData={formData} errors={errors} updateFormData={updateForm}
+                onBlur={() => validateField("passport_number")} />
             </div>
           </SectionCard>
 
           <SectionCard title="Background" subtitle="Which best describes you?">
-            <div className="space-y-2">
+            <div className="space-y-2" data-field="background">
               {BACKGROUND_OPTIONS.map((opt) => (
                 <label key={opt.value}
                   className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition ${
@@ -252,6 +295,7 @@ export default function AgencyMemberSubmitProfile() {
             <PublicFileUploadField
               label="Identity Document"
               fieldId="member-id-doc"
+              field="id_doc"
               required
               result={idDoc}
               fileName={idDocName}
@@ -262,6 +306,7 @@ export default function AgencyMemberSubmitProfile() {
             <PublicFileUploadField
               label="Passport Photo"
               fieldId="member-passport-photo"
+              field="passport_photo"
               required
               result={passportPhoto}
               fileName={passportPhotoName}
@@ -273,14 +318,12 @@ export default function AgencyMemberSubmitProfile() {
               <SocialMediaInputField label="Social Media Account"
                 platformField="social_platform" usernameField="social_username" urlField="social_media_url"
                 formData={formData} errors={errors} updateFormData={updateForm}
-                onBlur={() => {
-                  const error = validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" });
-                  setErrors((p) => ({ ...p, social_media_url: error ?? "" }));
-                }} />
+                onBlur={() => validateField("social_media_url")} />
               <SocialMediaInputField label="LinkedIn Profile"
                 platformField="linkedin_platform" usernameField="linkedin_username" urlField="linkedin_url"
                 lockedPlatform="linkedin" required={false}
-                formData={formData} errors={errors} updateFormData={updateForm} />
+                formData={formData} errors={errors} updateFormData={updateForm}
+                onBlur={() => validateField("linkedin_url")} />
             </div>
           </SectionCard>
 

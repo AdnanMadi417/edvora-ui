@@ -113,13 +113,13 @@ export default function AccountManagerPartnersList() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: Users,      label: "Partner",      minW: "min-w-[220px]" },
-                  { icon: Mail,       label: "Contact Info", minW: "min-w-[200px]" },
+                  { icon: Users,      label: "Partner",      minW: "min-w-[160px] sm:min-w-[220px]" },
+                  { icon: Mail,       label: "Contact Info", minW: "min-w-[150px] sm:min-w-[200px]", hide: "hidden sm:table-cell" },
                   { icon: FileText,   label: "Applications" },
                   { icon: BadgeCheck, label: "Status" },
-                  { icon: CalendarDays, label: "Registered" },
-                ].map(({ icon: Icon, label, minW }) => (
-                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
+                  { icon: CalendarDays, label: "Registered", hide: "hidden lg:table-cell" },
+                ].map(({ icon: Icon, label, minW, hide }) => (
+                  <th key={label} className={`${minW ?? ""} ${hide ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4 text-slate-400" />
                       {label}
@@ -166,7 +166,7 @@ export default function AccountManagerPartnersList() {
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                   onClick={() => router.push(`/account-manager/partners/${partner.id}`)}
                 >
-                  <td className="min-w-[220px] px-6 py-4">
+                  <td className="min-w-[160px] max-w-[160px] px-6 py-4 sm:min-w-[220px] sm:max-w-[220px]">
                     <div className="flex items-center gap-3">
                       <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                         {partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
@@ -179,7 +179,7 @@ export default function AccountManagerPartnersList() {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="hidden min-w-[150px] max-w-[150px] px-6 py-4 sm:table-cell sm:min-w-[200px] sm:max-w-[200px]">
                     <div className="truncate text-sm text-slate-900">{partner.phone || "—"}</div>
                     <div className="truncate text-xs text-slate-500">{partner.email || "—"}</div>
                   </td>
@@ -200,7 +200,7 @@ export default function AccountManagerPartnersList() {
                     </div>
                   </td>
 
-                  <td className="px-6 py-4">
+                  <td className="hidden px-6 py-4 lg:table-cell">
                     <div className="text-sm text-slate-900">
                       <AppDate value={partner.created_at} format="short" fallback="—" />
                     </div>

@@ -42,16 +42,23 @@ export default function ResendRegistrationOtpModal({ isOpen, onClose }: Props) {
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
-  const handleSubmit = async () => {
+  const validateEmail = () => {
     const email = formData.email.trim();
     if (!email) {
       setErrors({ email: "Email is required" });
-      return;
+      return false;
     }
     if (!EMAIL_REGEX.test(email)) {
       setErrors({ email: "Enter a valid email address" });
-      return;
+      return false;
     }
+    setErrors({});
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    if (!validateEmail()) return;
+    const email = formData.email.trim();
     try {
       const res = await resendRegistrationOtp(email);
       showToast(res?.message || "Verification code resent successfully", "success");
@@ -103,11 +110,13 @@ export default function ResendRegistrationOtpModal({ isOpen, onClose }: Props) {
               errors={errors}
               updateFormData={updateFormData}
               disabled={loading}
+              onBlur={validateEmail}
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
             <Button
+              className="w-full sm:w-auto"
               onClick={onClose}
               disabled={loading}
               icon={<XCircle className="h-5 w-5" />}
@@ -120,6 +129,7 @@ export default function ResendRegistrationOtpModal({ isOpen, onClose }: Props) {
             />
 
             <Button
+              className="w-full sm:w-auto"
               icon={<KeyRound className="h-5 w-5" />}
               text={loading ? "Sending..." : "Resend Code"}
               bgColor="bg-blue-50"

@@ -204,8 +204,8 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: User,       label: "Name",       minW: "min-w-[200px]" },
-                  { icon: Mail,       label: "Email",      minW: "min-w-[200px]" },
+                  { icon: User,       label: "Name",       minW: "min-w-[140px] sm:min-w-[200px]" },
+                  { icon: Mail,       label: "Email",      minW: "min-w-[160px] sm:min-w-[200px]" },
                   { icon: Percent,    label: "Commission" },
                   { icon: BadgeCheck, label: "Status" },
                 ].map(({ icon: Icon, label, minW }) => (
@@ -258,7 +258,7 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                   onClick={() => router.push(`/partner/team-members/${member.partner_id}`)}
                 >
-                  <td className="min-w-[200px] px-6 py-4">
+                  <td className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                         {member.name?.slice(0, 2).toUpperCase() ?? "?"}
@@ -269,7 +269,7 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
                     </div>
                   </td>
 
-                  <td className="min-w-[200px] px-6 py-4">
+                  <td className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
                     <div className="truncate text-sm text-slate-500">{member.email}</div>
                   </td>
 

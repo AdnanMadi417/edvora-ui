@@ -341,14 +341,14 @@ export default function PartnersTable() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: Users,      label: "Partner",          minW: "min-w-[250px]" },
-                  { icon: Users,      label: "Contact Info",     minW: "min-w-[220px]" },
-                  { icon: UserCog,    label: "Assigned Manager", minW: "min-w-[180px]" },
+                  { icon: Users,      label: "Partner",          minW: "min-w-[180px] sm:min-w-[250px]" },
+                  { icon: Users,      label: "Contact Info",     minW: "min-w-[160px] sm:min-w-[220px]", hide: "hidden sm:table-cell" },
+                  { icon: UserCog,    label: "Assigned Manager", minW: "min-w-[130px] sm:min-w-[180px]", hide: "hidden md:table-cell" },
                   { icon: BadgeCheck, label: "Status" },
-                  { icon: CalendarDays, label: "Registered" },
+                  { icon: CalendarDays, label: "Registered", hide: "hidden lg:table-cell" },
                   { icon: Pencil,     label: "Actions" },
-                ].map(({ icon: Icon, label, minW }) => (
-                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
+                ].map(({ icon: Icon, label, minW, hide }) => (
+                  <th key={label} className={`${minW ?? ""} ${hide ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4 text-slate-400" />
                       {label}
@@ -395,7 +395,7 @@ export default function PartnersTable() {
                     className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                     onClick={() => router.push(`/admin/partners/${partner.id}`)}
                   >
-                    <td className="min-w-[220px] px-6 py-4">
+                    <td className="min-w-[180px] max-w-[180px] px-6 py-4 sm:min-w-[250px] sm:max-w-[250px]">
                       <div className="flex items-center gap-3">
                         <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                           <PresignedImage
@@ -413,12 +413,12 @@ export default function PartnersTable() {
                       </div>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="hidden min-w-[160px] max-w-[160px] px-6 py-4 sm:table-cell sm:min-w-[220px] sm:max-w-[220px]">
                       <div className="truncate text-sm text-slate-900">{partner.phone || "—"}</div>
                       <div className="truncate text-xs text-slate-500">{partner.email || "—"}</div>
                     </td>
 
-                    <td className="max-w-[180px] px-6 py-4">
+                    <td className="hidden max-w-[180px] px-6 py-4 md:table-cell">
                       <div className="truncate text-sm text-slate-900">
                         {partner.assigned_manager_name || <span className="text-slate-400">Unassigned</span>}
                       </div>
@@ -434,7 +434,7 @@ export default function PartnersTable() {
                       </div>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="hidden px-6 py-4 lg:table-cell">
                       <div className="text-sm text-slate-900">
                         <AppDate value={partner.created_at} format="short" fallback="—" />
                       </div>

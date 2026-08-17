@@ -75,7 +75,7 @@ function InfoRow({
         {href && value ? (
           <button
             type="button"
-            onClick={() => window.open(href, "_blank", "noopener,noreferrer")}
+            onClick={() => window.open(encodeURI(href), "_blank", "noopener,noreferrer")}
             className="mt-0.5 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
           >
             Visit Link <ExternalLink className="h-3 w-3" />
@@ -122,15 +122,15 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
   };
 
   return (
-    <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50">
-      <div className="flex min-w-0 flex-1 items-center gap-3">
+    <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 items-center gap-3 sm:flex-1">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
           <FileText className="h-5 w-5" />
         </div>
         <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
       </div>
       {fileKey ? (
-        <div className="ml-4 flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 sm:ml-4">
           <IconButton
             onClick={handleView}
             disabled={!!loading}
@@ -157,7 +157,7 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
           />
         </div>
       ) : (
-        <span className="ml-4 text-xs text-slate-400">Not uploaded</span>
+        <span className="text-xs text-slate-400 sm:ml-4">Not uploaded</span>
       )}
     </div>
   );
@@ -190,8 +190,8 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
       <div className="rounded-lg border border-slate-200 bg-white">
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-4">
             <div className="relative shrink-0">
               <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                 <PresignedImage
@@ -207,13 +207,14 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
                 }`}
               />
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">{partner.name || "Unknown Partner"}</h2>
-              <p className="text-sm text-slate-500">{partner.email}</p>
+            <div className="min-w-0">
+              <h2 className="truncate text-lg font-semibold text-slate-900">{partner.name || "Unknown Partner"}</h2>
+              <p className="truncate text-sm text-slate-500">{partner.email}</p>
             </div>
           </div>
 
           <Button
+            className="shrink-0 self-end sm:self-auto"
             onClick={() => router.push("/account-manager/partners")}
             icon={<ChevronLeft className="h-4 w-4" />}
             text="Back"

@@ -15,7 +15,7 @@ const ToggleInput = ({
   };
 
   return (
-    <div className="mb-5">
+    <div className="mb-5" data-field={field}>
       <label className="mb-2 block text-sm font-semibold text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}
       </label>
@@ -49,9 +49,6 @@ const ToggleInput = ({
           <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
         </div>
 
-        {selected && (
-          <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-blue-600" />
-        )}
       </label>
 
       {errors?.[field] && (

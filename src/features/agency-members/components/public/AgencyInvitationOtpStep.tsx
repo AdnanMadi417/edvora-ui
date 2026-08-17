@@ -22,6 +22,20 @@ export default function AgencyInvitationOtpStep() {
   const [verified, setVerified] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(60);
+  const [emailError, setEmailError] = useState("");
+
+  const validateEmail = () => {
+    if (!email.trim()) {
+      setEmailError("Email is required");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setEmailError("Enter a valid email address");
+      return false;
+    }
+    setEmailError("");
+    return true;
+  };
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -30,7 +44,7 @@ export default function AgencyInvitationOtpStep() {
   }, [resendCooldown]);
 
   const handleVerify = async () => {
-    if (!email.trim() || otp.length < 6) return;
+    if (!validateEmail() || otp.length < 6) return;
     try {
       await verifyOtp(email.trim(), otp);
       setVerified(true);
@@ -38,7 +52,7 @@ export default function AgencyInvitationOtpStep() {
   };
 
   const handleResend = async () => {
-    if (!email.trim()) return;
+    if (!validateEmail()) return;
     setResendSuccess(false);
     try {
       await resendOtp(email.trim());
@@ -86,8 +100,9 @@ export default function AgencyInvitationOtpStep() {
             type="email"
             placeholder="you@example.com"
             formData={{ email }}
-            errors={{}}
-            updateFormData={(_field: string, value: string) => setEmail(value)}
+            errors={{ email: emailError }}
+            updateFormData={(_field: string, value: string) => { setEmail(value); setEmailError(""); }}
+            onBlur={validateEmail}
           />
 
           <OtpInputField
