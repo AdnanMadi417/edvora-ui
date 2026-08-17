@@ -251,14 +251,16 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
         </div>
 
         {/* Stats */}
-        <div className="p-6 border-b border-slate-200 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-green-200 bg-green-50 p-5 text-center">
-            <CircleDollarSign className="h-5 w-5 text-green-600" />
-            <p className="text-xs text-green-600">Commission</p>
-            <p className="text-xl font-bold text-green-700">
-              {commission?.amount != null ? formatCommission(commission.amount, commission.currency) : "—"}
-            </p>
-          </div>
+        <div className={`p-6 border-b border-slate-200 grid grid-cols-2 gap-3 ${commission?.amount != null ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}>
+          {commission?.amount != null && (
+            <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-green-200 bg-green-50 p-5 text-center">
+              <CircleDollarSign className="h-5 w-5 text-green-600" />
+              <p className="text-xs text-green-600">Commission</p>
+              <p className="text-xl font-bold text-green-700">
+                {formatCommission(commission.amount, commission.currency)}
+              </p>
+            </div>
+          )}
 
           <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white p-5 text-center">
             <Banknote className="h-5 w-5 text-slate-400" />
