@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
-  ShieldCheck, KeyRound, BadgeCheck, ChevronRight, Trash2, Plus,
+  ShieldCheck, KeyRound, BadgeCheck, Trash2, Plus,
 } from "lucide-react";
 
 import { useRoles, useDeleteRole } from "../../hooks";
@@ -23,7 +22,6 @@ import DeleteRoleConfirmation from "./DeleteRoleConfirmation";
 const ITEMS_PER_PAGE = 10;
 
 export default function RolesTable() {
-  const router = useRouter();
   const { showToast } = useToast();
   const { roles, loading, error, refetch } = useRoles();
   const { deleteRole, loading: isDeleting } = useDeleteRole();
@@ -138,31 +136,26 @@ export default function RolesTable() {
                   </th>
                 ))}
                 <th className="w-10 px-4 py-4" />
-                <th className="w-10 px-4 py-4" />
               </tr>
             </thead>
 
             <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
-              {isInitialLoad && <TableSkeletonRows columns={5} rows={ITEMS_PER_PAGE} />}
+              {isInitialLoad && <TableSkeletonRows columns={4} rows={ITEMS_PER_PAGE} />}
 
               {!isInitialLoad && error && (
-                <TableErrorRow colSpan={5} message={error} onRetry={refetch} />
+                <TableErrorRow colSpan={4} message={error} onRetry={refetch} />
               )}
 
               {!isInitialLoad && !error && filteredRoles.length === 0 && (
                 <TableEmptyRow
-                  colSpan={5}
+                  colSpan={4}
                   title={searchTerm ? "No roles found" : "No roles yet"}
                   subtitle={searchTerm ? "Try adjusting your search." : "Create your first custom role to get started."}
                 />
               )}
 
               {!isInitialLoad && !error && pagedRoles.map((role) => (
-                <tr
-                  key={role.id}
-                  className="group cursor-pointer transition-colors hover:bg-slate-50/50"
-                  onClick={() => router.push(`/admin/roles/${role.id}`)}
-                >
+                <tr key={role.id} className="transition-colors hover:bg-slate-50/50">
                   <td className="min-w-[200px] px-6 py-4">
                     <div className="truncate text-sm font-medium text-slate-900">{role.name}</div>
                   </td>
@@ -179,7 +172,7 @@ export default function RolesTable() {
                     )}
                   </td>
 
-                  <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
+                  <td className="px-4 py-4">
                     {!role.is_system && (
                       <IconButton
                         onClick={() => { setSelectedRole(role); setIsDeleteOpen(true); }}
@@ -193,10 +186,6 @@ export default function RolesTable() {
                         className="hover:bg-red-50"
                       />
                     )}
-                  </td>
-
-                  <td className="px-4 py-4">
-                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
                 </tr>
               ))}
