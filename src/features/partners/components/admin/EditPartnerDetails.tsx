@@ -84,14 +84,14 @@ function DocUploadField({
           </div>
         </div>
       ) : doc.file_key ? (
-        <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50">
-          <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3 sm:flex-1">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
               <FileText className="h-5 w-5" />
             </div>
             <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
           </div>
-          <div className="ml-4 flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2 sm:ml-4">
             <IconButton
               onClick={handleView}
               disabled={downloading}
@@ -466,7 +466,7 @@ export default function EditPartnerDetails({ id }: Props) {
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-          <div className="flex items-center gap-4">
+          <div className="flex min-w-0 items-center gap-4">
             {PROFILE_PHOTO_UPLOAD_ENABLED ? (
               <AvatarUpload
                 doc={isIndividual ? profilePhoto : logo}
@@ -487,9 +487,9 @@ export default function EditPartnerDetails({ id }: Props) {
                 <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
               </div>
             )}
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">{partner.name}</h2>
-              <p className="text-sm text-slate-500">{partner.email}</p>
+            <div className="min-w-0">
+              <h2 className="truncate text-lg font-semibold text-slate-900">{partner.name}</h2>
+              <p className="truncate text-sm text-slate-500">{partner.email}</p>
             </div>
           </div>
         </div>

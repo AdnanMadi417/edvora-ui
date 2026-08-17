@@ -106,8 +106,9 @@ export default function ResendRegistrationOtpModal({ isOpen, onClose }: Props) {
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
             <Button
+              className="w-full sm:w-auto"
               onClick={onClose}
               disabled={loading}
               icon={<XCircle className="h-5 w-5" />}
@@ -120,6 +121,7 @@ export default function ResendRegistrationOtpModal({ isOpen, onClose }: Props) {
             />
 
             <Button
+              className="w-full sm:w-auto"
               icon={<KeyRound className="h-5 w-5" />}
               text={loading ? "Sending..." : "Resend Code"}
               bgColor="bg-blue-50"

@@ -70,8 +70,9 @@ export default function ResendApprovalEmailConfirmation({ isOpen, onClose, onCon
             )}
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
             <Button
+              className="w-full sm:w-auto"
               onClick={onClose}
               disabled={isSending}
               icon={<XCircle className="h-5 w-5" />}
@@ -84,6 +85,7 @@ export default function ResendApprovalEmailConfirmation({ isOpen, onClose, onCon
             />
 
             <Button
+              className="w-full sm:w-auto"
               icon={<Mail className="h-5 w-5" />}
               text={isSending ? "Sending..." : isCoolingDown ? `Retry in ${cooldownSeconds}s` : "Resend Email"}
               bgColor="bg-blue-50"

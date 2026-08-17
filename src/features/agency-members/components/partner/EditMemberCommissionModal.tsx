@@ -147,8 +147,9 @@ export default function EditMemberCommissionModal({
             )}
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
             <Button
+              className="w-full sm:w-auto"
               onClick={onClose}
               disabled={loading}
               icon={<XCircle className="h-5 w-5" />}
@@ -161,6 +162,7 @@ export default function EditMemberCommissionModal({
             />
 
             <Button
+              className="w-full sm:w-auto"
               onClick={handleSave}
               disabled={loading}
               icon={<Percent className="h-5 w-5" />}

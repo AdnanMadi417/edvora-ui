@@ -223,8 +223,8 @@ export default function AgencyInvitationsTable() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: User,         label: "Name",     minW: "min-w-[200px]" },
-                  { icon: Mail,         label: "Email",    minW: "min-w-[200px]" },
+                  { icon: User,         label: "Name",     minW: "min-w-[140px] sm:min-w-[200px]" },
+                  { icon: Mail,         label: "Email",    minW: "min-w-[160px] sm:min-w-[200px]" },
                   { icon: Activity,     label: "Progress" },
                   { icon: CalendarDays, label: "Invited" },
                 ].map(({ icon: Icon, label, minW }) => (
@@ -271,11 +271,11 @@ export default function AgencyInvitationsTable() {
 
               {!isInitialLoad && !error && invitations.map((invitation) => (
                 <tr key={invitation.id} className="transition-colors hover:bg-slate-50/50">
-                  <td className="min-w-[200px] px-6 py-4">
+                  <td className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
                     <div className="truncate text-sm font-medium text-slate-900">{invitation.name}</div>
                   </td>
 
-                  <td className="min-w-[200px] px-6 py-4">
+                  <td className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
                     <div className="truncate text-sm text-slate-500">{invitation.email}</div>
                   </td>
 

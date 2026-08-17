@@ -243,8 +243,9 @@ export default function ReviewPartnerPopup({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-end">
             <Button
+              className="w-full sm:w-auto"
               text="Cancel"
               onClick={onClose}
               bgColor="bg-slate-50"
@@ -254,7 +255,7 @@ export default function ReviewPartnerPopup({
               hoverBorderColor="hover:border-slate-700"
             />
 
-            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${decision ? "max-w-[200px] opacity-100" : "max-w-0 opacity-0"}`}>
+            <div className={`w-full overflow-hidden transition-all duration-300 ease-in-out sm:w-auto ${decision ? "max-w-full opacity-100 sm:max-w-[200px]" : "max-w-0 opacity-0"}`}>
               {decision === "approved" ? (
                 <Button
                   icon={<CheckCircle className="h-5 w-5" />}
@@ -266,7 +267,7 @@ export default function ReviewPartnerPopup({
                   borderColor="border-emerald-600"
                   hoverTextColor="hover:text-emerald-800"
                   hoverBorderColor="hover:border-emerald-700"
-                  className="whitespace-nowrap"
+                  className="w-full whitespace-nowrap sm:w-auto"
                 />
               ) : (
                 <Button
@@ -279,7 +280,7 @@ export default function ReviewPartnerPopup({
                   borderColor="border-red-600"
                   hoverTextColor="hover:text-red-800"
                   hoverBorderColor="hover:border-red-700"
-                  className="whitespace-nowrap"
+                  className="w-full whitespace-nowrap sm:w-auto"
                 />
               )}
             </div>
