@@ -1,11 +1,11 @@
 'use client';
 
-import Notification from "../../../components/notifications/accountManager/Notifications";
+import Notification from "features/notifications/components/Notifications";
 
 const Dashboard = () => {
   return (
     <div>
-      <Notification />
+      <Notification applicationBasePath="/account-manager/applications" />
     </div>
   );
 };

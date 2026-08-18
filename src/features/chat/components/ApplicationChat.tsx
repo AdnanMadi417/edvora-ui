@@ -6,8 +6,7 @@ import { useSendMessage } from "features/chat/hooks/useSendMessage";
 import { useMarkMessagesRead } from "features/chat/hooks/useMarkMessagesRead";
 import { useChatPolling } from "features/chat/hooks/useChatPolling";
 import { useMe } from "hooks/useMe";
-import { useUnreadCount } from "hooks/notifications/useUnreadCount";
-import { useAllNotifications } from "hooks/notifications/useNotifications";
+import { useUnreadCount, useAllNotifications } from "features/notifications/hooks";
 import api from "lib/useApi";
 import { Send, User } from "lucide-react";
 import Loading from "components/loading/Loading";
@@ -39,7 +38,13 @@ export default function AgentPartnerChat({
   };
   const { markMessagesRead } = useMarkMessagesRead({ applicationId });
   const { refetch: refetchUnreadCount } = useUnreadCount({ enabled: false });
-  const { notifications, refetch: refetchNotifications } = useAllNotifications();
+  // Only unread notifications matter here (we're looking for ones to mark
+  // read), so pull a large page of just those rather than paging through
+  // everything — page_size 100 is the API's max.
+  const { notifications, refetch: refetchNotifications } = useAllNotifications({
+    readStatus: "unread",
+    pageSize: 100,
+  });
 
   const [loading, setLoading] = useState(true);
 

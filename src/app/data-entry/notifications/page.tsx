@@ -1,6 +1,6 @@
 'use client';
 
-import Notification from "components/notifications/dataEntry/Notifications";
+import Notification from "features/notifications/components/Notifications";
 
 const Dashboard = () => {
   return (

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import api from "lib/useApi";
-import Cookies from "js-cookie";
+import { notificationsApi } from "../services";
 
 export function useMarkAsRead() {
   const [loading, setLoading] = useState(false);
@@ -11,10 +10,7 @@ export function useMarkAsRead() {
     setError(null);
 
     try {
-      const token = Cookies.get("token");
-      await api.put(`/me/notifications/${notificationId}/read`, null, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      await notificationsApi.markAsRead(notificationId);
     } catch (err: any) {
       setError(err.message || "Failed to mark notification as read");
       throw err;
