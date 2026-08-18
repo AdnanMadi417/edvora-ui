@@ -15,6 +15,7 @@ export interface AgencyMember {
 
 export interface AgencyMemberDetails extends AgencyMember {
   country?: string;
+  nationality?: string;
   phone?: string;
   last_login?: string | null;
   individual_details?: IndividualDetails;
@@ -58,6 +59,7 @@ export interface SubmitAgencyMemberProfilePayload {
   submission_token: string;
   phone: string;
   country: string;
+  nationality: string;
   date_of_birth: string;
   passport_number: string;
   profile_photo_file_key?: string;

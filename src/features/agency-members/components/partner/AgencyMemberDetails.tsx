@@ -286,6 +286,7 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Country" value={member.country} />
+            <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Nationality" value={member.nationality} />
             <InfoRow icon={<MdPhone className="h-4 w-4" />} label="Phone Number" value={member.phone} />
             <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={member.email} />
             <InfoRow
