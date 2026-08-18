@@ -22,6 +22,7 @@ import {
   UploadCloud,
   type LucideIcon,
 } from "lucide-react";
+import type { Notification } from "../types";
 
 export type NotificationIconConfig = {
   icon: LucideIcon;
@@ -105,7 +106,7 @@ const FALLBACK: NotificationIconConfig = {
   badgeBg: "bg-slate-400",
 };
 
-export function getNotificationIconConfig(notification: any): NotificationIconConfig {
+export function getNotificationIconConfig(notification: Notification): NotificationIconConfig {
   // Messages → always blue chat bubble
   if (notification.type === "application_message_received") {
     return { icon: MessageCircle, bg: "bg-blue-100", iconColor: "text-blue-600", badgeBg: "bg-blue-500" };
@@ -124,18 +125,19 @@ export function getNotificationIconConfig(notification: any): NotificationIconCo
   // Stage changes → look up the destination status UUID
   if (notification.type === "application_stage_changed") {
     const statusId = notification.data?.to_status_id;
-    return STATUS_ICON_MAP[statusId] ?? FALLBACK;
+    return (statusId && STATUS_ICON_MAP[statusId]) || FALLBACK;
   }
 
   return FALLBACK;
 }
 
-export function getSenderName(notification: any): string {
+export function getSenderName(notification: Notification): string {
+  const data = notification.data as Record<string, unknown>;
   return (
-    notification.data?.sender_name ||
-    notification.data?.actor_name ||
-    notification.data?.partner_name ||
-    notification.data?.student_name ||
+    (data?.sender_name as string) ||
+    (data?.actor_name as string) ||
+    (data?.partner_name as string) ||
+    (data?.student_name as string) ||
     "System"
   );
 }

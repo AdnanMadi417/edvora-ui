@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import api from "lib/useApi";
+import { notificationsApi } from "../services";
 
 interface UseUnreadCountOptions {
   enabled?: boolean;
@@ -21,10 +21,7 @@ export function useUnreadCount({
     setError(null);
 
     try {
-      const response = await api.get<{ count: number }>(
-        `/me/notifications/unread-count`
-      );
-
+      const response = await notificationsApi.unreadCount();
       setUnreadCount(response.data.count);
     } catch (err: any) {
       setError(err.message || "Failed to fetch unread count");
