@@ -11,6 +11,7 @@ import {
   MdToggleOn,
 } from "react-icons/md";
 import {
+  Ban,
   Briefcase,
   CalendarDays,
   ChevronLeft,
@@ -21,16 +22,21 @@ import {
   FileText,
   Link2,
   Pencil,
+  Power,
   ShieldCheck,
   User,
   Users,
 } from "lucide-react";
 import { usePartnerDetails } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
+import { useSuspendMember, useReactivateMember } from "features/agency-members/hooks";
+import SuspendReactivateMemberModal from "features/agency-members/components/partner/SuspendReactivateMemberModal";
+import type { AgencyMember } from "features/agency-members/types";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
+import { parseApiError } from "utils/parseApiError";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
@@ -168,11 +174,33 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
 
 export default function PartnerDetails({ id }: Props) {
   const router = useRouter();
+  const { showToast } = useToast();
   const { partner, isPartnerLoading, refetch } = usePartnerDetails(id);
   const [showReview, setShowReview] = useState(false);
   const [tab, setTab] = useState<DetailsTab>("profile");
   const { accountManagers } = useAccountManagers();
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
+
+  const [suspendTarget, setSuspendTarget] = useState<AgencyMember | null>(null);
+  const { suspendMember, loading: isSuspending } = useSuspendMember();
+  const { reactivateMember, loading: isReactivating } = useReactivateMember();
+
+  const handleConfirmSuspendToggle = async () => {
+    if (!suspendTarget) return;
+    try {
+      if (suspendTarget.is_active) {
+        await suspendMember(suspendTarget.partner_id);
+        showToast("Member suspended successfully.", "success");
+      } else {
+        await reactivateMember(suspendTarget.partner_id);
+        showToast("Member reactivated successfully.", "success");
+      }
+      setSuspendTarget(null);
+      refetch();
+    } catch (error: unknown) {
+      showToast(parseApiError(error, "Please try again."), "error");
+    }
+  };
 
   if (isPartnerLoading) return <Loading text="Loading partner details..." />;
   if (!partner) return <EmptyData />;
@@ -201,6 +229,15 @@ export default function PartnerDetails({ id }: Props) {
         partnerName={partner.name || ""}
         managerOptions={managerOptions}
         currentManagerId={partner.assigned_manager_id || undefined}
+      />
+
+      <SuspendReactivateMemberModal
+        isOpen={!!suspendTarget}
+        onClose={() => setSuspendTarget(null)}
+        onConfirm={handleConfirmSuspendToggle}
+        isSubmitting={isSuspending || isReactivating}
+        memberName={suspendTarget?.name || ""}
+        isActive={!!suspendTarget?.is_active}
       />
 
     <div className="mx-auto mt-6 max-w-5xl">
@@ -445,11 +482,24 @@ export default function PartnerDetails({ id }: Props) {
                     <p className="truncate text-sm font-medium text-slate-900">{member.name}</p>
                     <p className="truncate text-xs text-slate-500">{member.email}</p>
                   </div>
-                  {member.is_active ? (
-                    <StatusBadge variant="success">Active</StatusBadge>
-                  ) : (
-                    <StatusBadge variant="neutral">Suspended</StatusBadge>
-                  )}
+                  <div className="flex shrink-0 items-center gap-3">
+                    {member.is_active ? (
+                      <StatusBadge variant="success">Active</StatusBadge>
+                    ) : (
+                      <StatusBadge variant="neutral">Suspended</StatusBadge>
+                    )}
+                    <IconButton
+                      onClick={() => setSuspendTarget(member)}
+                      title={member.is_active ? "Suspend member" : "Reactivate member"}
+                      icon={member.is_active ? <Ban className="h-4 w-4" /> : <Power className="h-4 w-4" />}
+                      bgColor="bg-transparent"
+                      textColor={member.is_active ? "text-slate-400" : "text-emerald-600"}
+                      borderColor="border-transparent"
+                      hoverTextColor={member.is_active ? "hover:text-red-600" : "hover:text-emerald-700"}
+                      hoverBorderColor="hover:border-transparent"
+                      className={member.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
