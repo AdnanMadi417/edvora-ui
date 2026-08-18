@@ -11,6 +11,7 @@ import {
   MdToggleOn,
 } from "react-icons/md";
 import {
+  Ban,
   Briefcase,
   CalendarDays,
   ChevronLeft,
@@ -21,16 +22,22 @@ import {
   FileText,
   Link2,
   Pencil,
+  Power,
   ShieldCheck,
   User,
   Users,
 } from "lucide-react";
 import { usePartnerDetails } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
+import { useSuspendMember, useReactivateMember } from "features/agency-members/hooks";
+import SuspendReactivateMemberModal from "features/agency-members/components/partner/SuspendReactivateMemberModal";
+import type { AgencyMember } from "features/agency-members/types";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
+import { parseApiError } from "utils/parseApiError";
+import { formatAgencyRole } from "features/partners/utils";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
@@ -168,11 +175,33 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
 
 export default function PartnerDetails({ id }: Props) {
   const router = useRouter();
+  const { showToast } = useToast();
   const { partner, isPartnerLoading, refetch } = usePartnerDetails(id);
   const [showReview, setShowReview] = useState(false);
   const [tab, setTab] = useState<DetailsTab>("profile");
   const { accountManagers } = useAccountManagers();
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
+
+  const [suspendTarget, setSuspendTarget] = useState<AgencyMember | null>(null);
+  const { suspendMember, loading: isSuspending } = useSuspendMember();
+  const { reactivateMember, loading: isReactivating } = useReactivateMember();
+
+  const handleConfirmSuspendToggle = async () => {
+    if (!suspendTarget) return;
+    try {
+      if (suspendTarget.is_active) {
+        await suspendMember(suspendTarget.partner_id);
+        showToast("Member suspended successfully.", "success");
+      } else {
+        await reactivateMember(suspendTarget.partner_id);
+        showToast("Member reactivated successfully.", "success");
+      }
+      setSuspendTarget(null);
+      refetch();
+    } catch (error: unknown) {
+      showToast(parseApiError(error, "Please try again."), "error");
+    }
+  };
 
   if (isPartnerLoading) return <Loading text="Loading partner details..." />;
   if (!partner) return <EmptyData />;
@@ -201,6 +230,15 @@ export default function PartnerDetails({ id }: Props) {
         partnerName={partner.name || ""}
         managerOptions={managerOptions}
         currentManagerId={partner.assigned_manager_id || undefined}
+      />
+
+      <SuspendReactivateMemberModal
+        isOpen={!!suspendTarget}
+        onClose={() => setSuspendTarget(null)}
+        onConfirm={handleConfirmSuspendToggle}
+        isSubmitting={isSuspending || isReactivating}
+        memberName={suspendTarget?.name || ""}
+        isActive={!!suspendTarget?.is_active}
       />
 
     <div className="mx-auto mt-6 max-w-5xl">
@@ -288,9 +326,19 @@ export default function PartnerDetails({ id }: Props) {
               value={partner.is_active ? "Active" : "Inactive"}
             />
             <InfoRow
+              icon={<ShieldCheck className="h-4 w-4" />}
+              label="Verification Status"
+              value={partner.is_verified ? "Verified" : "Pending Verification"}
+            />
+            <InfoRow
               icon={<CalendarDays className="h-4 w-4" />}
               label="Registered"
               value={formatDateOfBirth(partner.created_at)}
+            />
+            <InfoRow
+              icon={<Clock className="h-4 w-4" />}
+              label="Last Updated"
+              value={formatDateTime(partner.updated_at)}
             />
             <InfoRow
               icon={<Clock className="h-4 w-4" />}
@@ -301,7 +349,7 @@ export default function PartnerDetails({ id }: Props) {
               <InfoRow
                 icon={<ShieldCheck className="h-4 w-4" />}
                 label="Agency Role"
-                value={partner.agency_role.charAt(0).toUpperCase() + partner.agency_role.slice(1)}
+                value={formatAgencyRole(partner.agency_role)}
               />
             )}
             {partner.agency_membership && (
@@ -363,13 +411,13 @@ export default function PartnerDetails({ id }: Props) {
           </div>
         )}
 
-        {/* Company Details */}
+        {/* Company Info */}
         {isCompany && (
           <div className="border-b border-slate-200 p-6">
             <div className="mb-4 flex items-center gap-2">
               <Briefcase className="h-4 w-4 text-slate-500" />
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Company Details
+                Company Info
               </p>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -384,6 +432,32 @@ export default function PartnerDetails({ id }: Props) {
                 value={partner.company_details?.website_url}
                 href={partner.company_details?.website_url || undefined}
               />
+            </div>
+            <div className="mt-3 space-y-2">
+              <DocRow
+                label="Company Registration Document"
+                fileKey={partner.company_details?.company_registration_doc_file_key}
+                personName={partner.name}
+              />
+              <DocRow
+                label="Agency Logo"
+                fileKey={partner.company_details?.logo_file_key}
+                personName={partner.name}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Personal Info — the company's contact person */}
+        {isCompany && (
+          <div className="border-b border-slate-200 p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <User className="h-4 w-4 text-slate-500" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Personal Info
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <InfoRow
                 icon={<MdCategory className="h-4 w-4" />}
                 label="Date of Birth"
@@ -397,11 +471,6 @@ export default function PartnerDetails({ id }: Props) {
             </div>
             <div className="mt-3 space-y-2">
               <DocRow
-                label="Company Registration Document"
-                fileKey={partner.company_details?.company_registration_doc_file_key}
-                personName={partner.name}
-              />
-              <DocRow
                 label="Contact Identity Document"
                 fileKey={partner.company_details?.contact_id_document_file_key}
                 personName={partner.name}
@@ -409,11 +478,6 @@ export default function PartnerDetails({ id }: Props) {
               <DocRow
                 label="Passport Photo"
                 fileKey={partner.company_details?.passport_photo_file_key}
-                personName={partner.name}
-              />
-              <DocRow
-                label="Agency Logo"
-                fileKey={partner.company_details?.logo_file_key}
                 personName={partner.name}
               />
             </div>
@@ -439,17 +503,31 @@ export default function PartnerDetails({ id }: Props) {
               {partner.agency_members.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-200 p-3"
+                  onClick={() => router.push(`/admin/partners/${member.partner_id}`)}
+                  className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 p-3 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-slate-900">{member.name}</p>
                     <p className="truncate text-xs text-slate-500">{member.email}</p>
                   </div>
-                  {member.is_active ? (
-                    <StatusBadge variant="success">Active</StatusBadge>
-                  ) : (
-                    <StatusBadge variant="neutral">Suspended</StatusBadge>
-                  )}
+                  <div className="flex shrink-0 items-center gap-3">
+                    {member.is_active ? (
+                      <StatusBadge variant="success">Active</StatusBadge>
+                    ) : (
+                      <StatusBadge variant="neutral">Suspended</StatusBadge>
+                    )}
+                    <IconButton
+                      onClick={(e) => { e.stopPropagation(); setSuspendTarget(member); }}
+                      title={member.is_active ? "Suspend member" : "Reactivate member"}
+                      icon={member.is_active ? <Ban className="h-4 w-4" /> : <Power className="h-4 w-4" />}
+                      bgColor="bg-transparent"
+                      textColor={member.is_active ? "text-slate-400" : "text-emerald-600"}
+                      borderColor="border-transparent"
+                      hoverTextColor={member.is_active ? "hover:text-red-600" : "hover:text-emerald-700"}
+                      hoverBorderColor="hover:border-transparent"
+                      className={member.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"}
+                    />
+                  </div>
                 </div>
               ))}
             </div>

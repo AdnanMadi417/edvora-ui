@@ -25,6 +25,7 @@ import {
   Users,
 } from "lucide-react";
 import { useAccountManagerPartnerDetails } from "features/partners/hooks";
+import { formatAgencyRole } from "features/partners/utils";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import { useToast } from "components/context/ToastContext";
@@ -265,7 +266,7 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
               <InfoRow
                 icon={<ShieldCheck className="h-4 w-4" />}
                 label="Agency Role"
-                value={partner.agency_role.charAt(0).toUpperCase() + partner.agency_role.slice(1)}
+                value={formatAgencyRole(partner.agency_role)}
               />
             )}
             {partner.agency_membership && (
