@@ -38,6 +38,7 @@ import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService
 import PresignedImage from "components/ui/PresignedImage";
 import { parseDate, formatDate } from "components/ui/date/utils";
 import { parseApiError } from "utils/parseApiError";
+import { formatAgencyRole } from "features/partners/utils";
 
 interface PartnerDetailsProps {
   id: string;
@@ -287,7 +288,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                 <InfoRow
                   icon={<ShieldCheck className="h-4 w-4" />}
                   label="Agency Role"
-                  value={partner.agency_role.charAt(0).toUpperCase() + partner.agency_role.slice(1)}
+                  value={formatAgencyRole(partner.agency_role)}
                 />
               )}
               {partner.agency_membership && (
@@ -366,7 +367,8 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                 {partner.agency_members.map((member) => (
                   <div
                     key={member.id}
-                    className="flex items-center justify-between rounded-lg border border-slate-200 p-3"
+                    onClick={() => router.push(`/partner/team-members/${member.partner_id}`)}
+                    className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 p-3 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
                   >
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-slate-900">{member.name}</p>

@@ -13,6 +13,7 @@ import { useEffect, useState, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import api, { SIGN_IN_URL, LOGOUT_URL } from "lib/useApi";
 import { usePartnerProfile } from "features/partners/hooks";
+import { formatAgencyRole } from "features/partners/utils";
 import PresignedImage from "components/ui/PresignedImage";
 
 interface User {
@@ -20,6 +21,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  agency_role?: string | null;
 }
 
 function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
@@ -209,7 +211,9 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
                       {user.name}
                     </p>
                     <p className="truncate text-caption text-slate-500">
-                      {getRoleLabel(user.role)}
+                      {user.role === "partner" && user.agency_role
+                        ? formatAgencyRole(user.agency_role)
+                        : getRoleLabel(user.role)}
                     </p>
                   </>
                 ) : (
@@ -261,18 +265,19 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           </div>
         )}
 
+        {user?.role === "partner" && (
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLScbdcaLfK0utkj8DaMVEJdBUW82swRrWWZODNcFq1DNaRLLTQ/viewform"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-3 flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-slate-500 transition-colors duration-200 ease-in-out hover:text-slate-900"
+          >
+            <MessageSquarePlus className="h-[18px] w-[18px]" />
+            <span>Send feedback</span>
+          </a>
+        )}
+
         <footer className="border-t border-gray-200 px-6 py-4">
-          {user?.role === "partner" && (
-            <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLScbdcaLfK0utkj8DaMVEJdBUW82swRrWWZODNcFq1DNaRLLTQ/viewform"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mb-1 flex w-full items-center gap-3 rounded-md border border-transparent px-4 py-3 text-left font-medium text-slate-600 transition-all duration-200 hover:border-slate-100 hover:bg-slate-50"
-            >
-              <MessageSquarePlus className="h-5 w-5" />
-              <span className="text-sm">Send feedback</span>
-            </a>
-          )}
           <button
             onClick={handleLogout}
             disabled={isLoggingOut}
