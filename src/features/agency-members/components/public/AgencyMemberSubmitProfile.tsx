@@ -7,9 +7,10 @@ import { useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 import { useSubmitAgencyMemberProfile } from "features/agency-members/hooks";
-import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
+import { COUNTRIES, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
+import SearchableDropdown from "components/form/search/SearchableDropdown";
 import PhoneInputField from "components/form/fields/PhoneInputField";
 import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
 import { validateSocialMediaField, isValidPlatformUrl } from "utils/socialMedia";
@@ -23,6 +24,7 @@ import Button from "components/ui/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
+const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
 
 const SUBMIT_PROFILE_FIELD_MAP: Record<string, string> = {
   phone: "phone_number",
@@ -104,7 +106,7 @@ export default function AgencyMemberSubmitProfile() {
 
   const [formData, setFormData] = useState({
     phone_code: "+60", phone_number: "",
-    country: "", background: "",
+    country: "", nationality: "", background: "",
     date_of_birth: "", passport_number: "",
     social_platform: "instagram", social_username: "", social_media_url: "",
     linkedin_platform: "linkedin", linkedin_username: "", linkedin_url: "",
@@ -124,6 +126,7 @@ export default function AgencyMemberSubmitProfile() {
     const e: Record<string, string> = {};
     if (!formData.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!formData.country) e.country = "Country is required";
+    if (!formData.nationality) e.nationality = "Nationality is required";
     if (!formData.background) e.background = "Please select your background";
     if (!formData.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!formData.passport_number.trim()) e.passport_number = "Passport number is required";
@@ -150,7 +153,7 @@ export default function AgencyMemberSubmitProfile() {
   };
 
   const isFormComplete = Boolean(
-    formData.phone_number.trim() && formData.country && formData.background &&
+    formData.phone_number.trim() && formData.country && formData.nationality && formData.background &&
     formData.date_of_birth && formData.passport_number.trim() &&
     profilePhoto.fileKey && idDoc && passportPhoto &&
     !validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" }) &&
@@ -167,6 +170,7 @@ export default function AgencyMemberSubmitProfile() {
         submission_token: submissionToken,
         phone: `${formData.phone_code} ${formData.phone_number}`,
         country: formData.country,
+        nationality: formData.nationality,
         date_of_birth: formData.date_of_birth,
         passport_number: formData.passport_number.trim(),
         ...(idDoc && { id_document_file_key: idDoc.file_key, id_document_file_url: idDoc.file_url }),
@@ -253,9 +257,14 @@ export default function AgencyMemberSubmitProfile() {
             <PhoneInputField dialCodeField="phone_code" numberField="phone_number"
               formData={formData} errors={errors} updateFormData={updateForm}
               onBlur={() => validateField("phone_number")} />
-            <SelectField label="Country of Residence" field="country" options={COUNTRY_OPTIONS}
-              formData={formData} errors={errors} updateFormData={updateForm}
-              onBlur={() => validateField("country")} />
+            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+              <SelectField label="Country of Residence" field="country" options={COUNTRY_OPTIONS}
+                formData={formData} errors={errors} updateFormData={updateForm}
+                onBlur={() => validateField("country")} />
+              <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS}
+                formData={formData} errors={errors} updateFormData={updateForm}
+                onBlur={() => validateField("nationality")} />
+            </div>
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
               <InputField label="Date of Birth" field="date_of_birth" type="date"
                 formData={formData} errors={errors} updateFormData={updateForm}
