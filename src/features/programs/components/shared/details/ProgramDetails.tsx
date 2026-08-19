@@ -28,8 +28,8 @@ import Loading from "components/loading/Loading";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import RichTextDisplay from "components/ui/RichTextDisplay";
-import { AppDate } from "components/ui/date";
 import CurrencySelector from "features/programs/components/shared/CurrencySelector";
+import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
 import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate } from "features/programs/utils/exchangeRate";
 
 type RequiredDocument = {
@@ -365,26 +365,8 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Intake Dates</p>
-                  <div className="mt-1.5 flex flex-wrap gap-2">
-                    {[...program.intake_dates]
-                      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-                      .map((dateStr) => {
-                        const d = new Date(dateStr);
-                        const isPast = d < new Date();
-                        return (
-                          <span
-                            key={dateStr}
-                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border ${
-                              isPast
-                                ? "border-slate-200 bg-slate-100 text-slate-400 line-through"
-                                : "border-emerald-200 bg-emerald-50 text-emerald-700"
-                            }`}
-                          >
-                            {!isPast && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />}
-                            {d.toLocaleString("en-US", { month: "short" })}
-                          </span>
-                        );
-                      })}
+                  <div className="mt-1.5">
+                    <IntakeDatesChips dates={program.intake_dates} />
                   </div>
                 </div>
               </div>

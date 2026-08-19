@@ -13,6 +13,7 @@ import { useAllQualifications } from "features/knowledge-hub/qualifications/hook
 import { useUniversities } from "features/universities/hooks";
 
 import ProgramFilterBar from "components/filters/ProgramFilterBar";
+import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "next/link";
@@ -233,6 +234,14 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                         </p>
                       </div>
                     </div>
+
+                    {/* Intake Dates */}
+                    {program.intake_dates && program.intake_dates.length > 0 && (
+                      <div className="px-4 pb-3">
+                        <p className="mb-1.5 text-xs text-slate-400">Intakes</p>
+                        <IntakeDatesChips dates={program.intake_dates} size="sm" showYear showDot={false} />
+                      </div>
+                    )}
 
                     {/* Scholarship badge */}
                     <div className="px-4 pb-3">

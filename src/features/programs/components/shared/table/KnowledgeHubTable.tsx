@@ -17,11 +17,11 @@ import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 import PresignedImage from "components/ui/PresignedImage";
 import IconButton from "components/ui/buttons/IconButton";
-import { AppDate } from "components/ui/date";
 import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { StatusBadge } from "components/ui/badges";
 import { useToast } from "components/context/ToastContext";
 import type { Program } from "features/programs/types";
+import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
 
 function ProgramUniversityCell({ program }: { program: Program }) {
   const tags: { label: string; color: "green" | "blue" | "gray" }[] = [];
@@ -311,14 +311,11 @@ export default function KnowledgeHubTable({
 
               {/* Intakes */}
               <td className="px-6 py-4">
-                <div className="flex flex-col gap-1 text-xs text-slate-600">
-                  <span className="font-medium text-slate-700">
-                    <AppDate value={program.next_intake} format="month" fallback="TBA" />
-                  </span>
-                  {program.intake_dates && program.intake_dates.length > 0 && (
-                    <span className="text-slate-400">
-                      {program.intake_dates.length} intake{program.intake_dates.length !== 1 ? "s" : ""}
-                    </span>
+                <div className="flex flex-col gap-1.5 text-xs text-slate-600">
+                  {program.intake_dates && program.intake_dates.length > 0 ? (
+                    <IntakeDatesChips dates={program.intake_dates} size="sm" showYear showDot={false} maxVisible={2} />
+                  ) : (
+                    <span className="text-slate-400">TBA</span>
                   )}
                   {program.english_required_score != null && (
                     <span className="text-slate-400">IELTS: {program.english_required_score}</span>

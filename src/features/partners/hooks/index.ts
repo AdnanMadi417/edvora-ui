@@ -15,3 +15,4 @@ export { useAdminResendRegistrationOtp } from './useAdminResendRegistrationOtp';
 export { usePartnerRegistration } from './usePartnerRegistration';
 export { useResendRegistrationOtp } from './useResendRegistrationOtp';
 export { useVerifyRegistrationOtp } from './useVerifyRegistrationOtp';
+export { useUpdateAgencyMemberStatus } from './useUpdateAgencyMemberStatus';
