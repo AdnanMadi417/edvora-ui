@@ -407,8 +407,13 @@ export default function PartnersTable() {
                           <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
                         </div>
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-slate-900">{partner.name || "Unknown Partner"}</div>
-                          <div className="truncate text-xs text-slate-500 capitalize">{partner.type || "—"} · {partner.country || "—"}</div>
+                          <div className="truncate text-sm font-medium text-slate-900">
+                            {partner.type === "agency" ? partner.company_details?.company_name || partner.name || "Unknown Partner" : partner.name || "Unknown Partner"}
+                          </div>
+                          <div className="truncate text-xs text-slate-500 capitalize">
+                            {partner.type === "agency" && partner.company_details?.company_name ? `${partner.name} · ` : ""}
+                            {partner.type || "—"} · {partner.country || "—"}
+                          </div>
                         </div>
                       </div>
                     </td>

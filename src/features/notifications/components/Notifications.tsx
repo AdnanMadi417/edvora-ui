@@ -1,18 +1,52 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AlertTriangle, Bell, CheckCheck, ExternalLink, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useAllNotifications, useUnreadCount, useMarkAsRead, useMarkAllAsRead } from "../hooks";
 import { getNotificationIconConfig, getSenderName } from "../utils/notificationIcons";
+import { getNotificationCategory, type NotificationCategory } from "../utils/notificationCategory";
 import type { ReadStatus } from "../types";
 import TablePagination from "components/ui/table/TablePagination";
 import { Tabs, type TabItem } from "components/ui/tabs";
 import EmptyData from "components/emptyData/EmptyData";
 
 const PAGE_SIZE = 20;
+// Unread notifications are fetched as one bounded batch (instead of paginated)
+// so the Action Required / System Info split can be computed client-side.
+const UNREAD_BATCH_SIZE = 100;
+
+type UnreadCategoryFilter = "all" | NotificationCategory;
+
+const UNREAD_CATEGORY_TABS: { key: UnreadCategoryFilter; label: string }[] = [
+  { key: "all", label: "All Unread" },
+  { key: "action_required", label: "Action Required" },
+  { key: "info", label: "System Info" },
+];
+
+// Semantic color per sub-filter, matching StatusBadge's warning/info/neutral palette.
+const UNREAD_CATEGORY_COLORS: Record<UnreadCategoryFilter, { active: string; inactive: string; dot: string; count: string }> = {
+  all: {
+    active: "border-slate-700 bg-slate-100 text-slate-800",
+    inactive: "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50",
+    dot: "bg-slate-500",
+    count: "text-slate-400",
+  },
+  action_required: {
+    active: "border-amber-600 bg-amber-50 text-amber-700",
+    inactive: "border-slate-200 bg-white text-slate-600 hover:border-amber-200 hover:bg-amber-50",
+    dot: "bg-amber-500",
+    count: "text-amber-500",
+  },
+  info: {
+    active: "border-blue-600 bg-blue-50 text-blue-700",
+    inactive: "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50",
+    dot: "bg-blue-500",
+    count: "text-blue-500",
+  },
+};
 
 function timeAgo(dateStr: string): string {
   const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -37,12 +71,16 @@ interface NotificationsProps {
 export default function Notifications({ applicationBasePath }: NotificationsProps) {
   const [filter, setFilter] = useState<ReadStatus>("unread");
   const [page, setPage] = useState(1);
+  const [unreadCategory, setUnreadCategory] = useState<UnreadCategoryFilter>("action_required");
+  const autoSelectedRef = useRef(false);
   const router = useRouter();
+
+  const isUnreadTab = filter === "unread";
 
   const { notifications, total, loading, error, refetch: refetchNotifications } = useAllNotifications({
     readStatus: filter,
-    page,
-    pageSize: PAGE_SIZE,
+    page: isUnreadTab ? 1 : page,
+    pageSize: isUnreadTab ? UNREAD_BATCH_SIZE : PAGE_SIZE,
   });
   const { unreadCount, refetch: refetchCount } = useUnreadCount({});
   const { markAsRead: markRead } = useMarkAsRead();
@@ -51,6 +89,13 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
   const changeFilter = (next: ReadStatus) => {
     setFilter(next);
     setPage(1);
+    setUnreadCategory("action_required");
+    autoSelectedRef.current = false;
+  };
+
+  const selectUnreadCategory = (next: UnreadCategoryFilter) => {
+    setUnreadCategory(next);
+    autoSelectedRef.current = true;
   };
 
   const markAsRead = async (id: string) => {
@@ -73,9 +118,32 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
     }
   };
 
-  const displayed = [...notifications].sort(
+  const sorted = [...notifications].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
+
+  const actionRequiredCount = isUnreadTab
+    ? sorted.filter((n) => getNotificationCategory(n) === "action_required").length
+    : 0;
+  const infoCount = isUnreadTab ? sorted.length - actionRequiredCount : 0;
+
+  // Default the Unread tab to Action Required; if there's nothing needing
+  // action, fall back to System Info instead of landing on an empty tab.
+  useEffect(() => {
+    if (!isUnreadTab || loading || autoSelectedRef.current) return;
+    autoSelectedRef.current = true;
+    if (actionRequiredCount === 0 && infoCount > 0) {
+      setUnreadCategory("info");
+    }
+  }, [isUnreadTab, loading, actionRequiredCount, infoCount]);
+
+  const displayed = isUnreadTab && unreadCategory !== "all"
+    ? sorted.filter((n) => getNotificationCategory(n) === unreadCategory)
+    : sorted;
+
+  // The unread batch is capped at UNREAD_BATCH_SIZE — if the real unread
+  // total exceeds what we fetched, say so instead of silently truncating.
+  const isUnreadTruncated = isUnreadTab && total > notifications.length;
 
   return (
     <section className="mb-6 mt-6 max-w-5xl mx-auto overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
@@ -103,6 +171,36 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
 
       {/* Filter tabs */}
       <Tabs<ReadStatus> tabs={FILTER_TABS(unreadCount)} active={filter} onChange={changeFilter} className="pt-2" />
+
+      {/* Unread sub-filter: Action Required vs System Info */}
+      {isUnreadTab && !loading && !error && sorted.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-6 py-3">
+          {UNREAD_CATEGORY_TABS.map(({ key, label }) => {
+            const count = key === "all" ? sorted.length : key === "action_required" ? actionRequiredCount : infoCount;
+            const active = unreadCategory === key;
+            const colors = UNREAD_CATEGORY_COLORS[key];
+            return (
+              <button
+                key={key}
+                type="button"
+                onClick={() => selectUnreadCategory(key)}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                  active ? colors.active : colors.inactive
+                }`}
+              >
+                <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
+                {label} {count > 0 && <span className={active ? colors.count : "text-slate-400"}>({count})</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {isUnreadTruncated && (
+        <p className="border-b border-slate-100 bg-amber-50 px-6 py-2 text-xs text-amber-700">
+          Showing the {notifications.length} most recent of {total} unread — mark some as read to see the rest.
+        </p>
+      )}
 
       {/* List */}
       <div>
@@ -140,8 +238,17 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
           <EmptyData
             icon={Bell}
             color="blue"
-            title={filter === "unread" ? "No unread notifications" : "No notifications yet"}
-            subtitle={filter === "unread" ? "You're all caught up." : "You'll see updates here as they happen."}
+            title={
+              isUnreadTab && sorted.length > 0 && unreadCategory === "action_required" ? "Nothing needs your attention"
+              : isUnreadTab && sorted.length > 0 && unreadCategory === "info" ? "No system updates"
+              : isUnreadTab ? "No unread notifications"
+              : "No notifications yet"
+            }
+            subtitle={
+              isUnreadTab && sorted.length > 0 && unreadCategory !== "all" ? "Switch tabs to see other unread notifications."
+              : isUnreadTab ? "You're all caught up."
+              : "You'll see updates here as they happen."
+            }
           />
         ) : (
           <div>
@@ -212,7 +319,7 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
         )}
       </div>
 
-      {!loading && !error && total > 0 && (
+      {!loading && !error && !isUnreadTab && total > 0 && (
         <TablePagination
           currentPage={page}
           onPageChange={setPage}

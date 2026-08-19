@@ -19,7 +19,6 @@ import {
   FileText,
   KeyRound,
   Link2,
-  ShieldCheck,
   User,
   Users,
 } from "lucide-react";
@@ -38,7 +37,6 @@ import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService
 import PresignedImage from "components/ui/PresignedImage";
 import { parseDate, formatDate } from "components/ui/date/utils";
 import { parseApiError } from "utils/parseApiError";
-import { formatAgencyRole } from "features/partners/utils";
 
 interface PartnerDetailsProps {
   id: string;
@@ -255,8 +253,13 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                 </label>
               </div>
               <div className="min-w-0">
-                <h2 className="truncate text-lg font-semibold text-slate-900">{partner.name}</h2>
-                <p className="truncate text-sm text-slate-500">{partner.email}</p>
+                <h2 className="truncate text-lg font-semibold text-slate-900">
+                  {isCompany ? partner.company_details?.company_name || partner.name : partner.name}
+                </h2>
+                <p className="truncate text-sm text-slate-500">
+                  {isCompany && partner.company_details?.company_name ? `${partner.name} • ` : ""}
+                  {partner.email}
+                </p>
               </div>
             </div>
 
@@ -284,13 +287,6 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
               <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={partner.email} />
               <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Partner Type" value={partner.type === "individual" ? "Individual Advisor" : "Agency / Company"} />
               <InfoRow icon={<MdSupervisorAccount className="h-4 w-4" />} label="Assigned Manager" value={partner.assigned_manager_name} />
-              {partner.agency_role && (
-                <InfoRow
-                  icon={<ShieldCheck className="h-4 w-4" />}
-                  label="Agency Role"
-                  value={formatAgencyRole(partner.agency_role)}
-                />
-              )}
               {partner.agency_membership && (
                 <InfoRow icon={<Users className="h-4 w-4" />} label="Member Of" value={partner.agency_membership.agency_name} />
               )}

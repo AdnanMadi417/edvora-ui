@@ -8,8 +8,9 @@ import Link from "next/link";
 import api, { setLoggingOut, SIGN_IN_URL } from "../../lib/useApi";
 
 import { useMe } from "hooks/useMe";
-import { profileRouteMap, notificationsRouteMap } from "components/navbar/config/navigation";
+import { profileRouteMap, notificationsRouteMap, applicationsRouteMap } from "components/navbar/config/navigation";
 import { useUnreadCount } from "features/notifications/hooks";
+import NotificationsPreviewPopover from "features/notifications/components/NotificationsPreviewPopover";
 import { useToast } from "components/context/ToastContext";
 import ChangePasswordPopup from "features/partners/components/partner/ChangePasswordPopup";
 import { usePartnerProfile } from "features/partners/hooks";
@@ -66,6 +67,8 @@ const Navbar = ({
     if (!role) return "/auth/sign-in";
     return notificationsRouteMap[role] || "/notifications";
   };
+
+  const getApplicationsBasePath = (role?: string) => (role ? applicationsRouteMap[role] : undefined);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -141,14 +144,20 @@ const Navbar = ({
           <FiAlignJustify className="h-5 w-5 text-slate-600" />
         </span>
 
-        <Link href={getNotificationsRoute(user?.role)} className="relative flex items-center justify-center">
-          <Bell className="h-5 w-5 text-slate-600" />
-          {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </span>
-          )}
-        </Link>
+        <NotificationsPreviewPopover
+          notificationsPath={getNotificationsRoute(user?.role)}
+          applicationBasePath={getApplicationsBasePath(user?.role)}
+          onNotificationHandled={refetchUnreadCount}
+        >
+          <Link href={getNotificationsRoute(user?.role)} className="relative flex items-center justify-center">
+            <Bell className="h-5 w-5 text-slate-600" />
+            {unreadCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </Link>
+        </NotificationsPreviewPopover>
 
         <Dropdown
           button={

@@ -263,8 +263,13 @@ export default function PartnerDetails({ id }: Props) {
               />
             </div>
             <div className="min-w-0">
-              <h2 className="truncate text-lg font-semibold text-slate-900">{partner.name}</h2>
-              <p className="truncate text-sm text-slate-500">{partner.email}</p>
+              <h2 className="truncate text-lg font-semibold text-slate-900">
+                {isCompany ? partner.company_details?.company_name || partner.name : partner.name}
+              </h2>
+              <p className="truncate text-sm text-slate-500">
+                {isCompany && partner.company_details?.company_name ? `${partner.name} • ` : ""}
+                {partner.email}
+              </p>
             </div>
           </div>
 
