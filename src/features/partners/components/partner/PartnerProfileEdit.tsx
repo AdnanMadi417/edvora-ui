@@ -444,8 +444,13 @@ export default function EditPartnerProfile() {
             </div>
           )}
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">{partner.name}</h2>
-            <p className="text-sm text-slate-500">{isIndividual ? "Individual Advisor" : "Agency / Company"}</p>
+            <h2 className="text-lg font-semibold text-slate-900">
+              {isCompany ? formData.company_name || partner.name : partner.name}
+            </h2>
+            <p className="text-sm text-slate-500">
+              {isCompany && formData.company_name ? `${partner.name} • ` : ""}
+              {isIndividual ? "Individual Advisor" : "Agency / Company"}
+            </p>
           </div>
         </div>
 

@@ -209,8 +209,13 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
               />
             </div>
             <div className="min-w-0">
-              <h2 className="truncate text-lg font-semibold text-slate-900">{partner.name || "Unknown Partner"}</h2>
-              <p className="truncate text-sm text-slate-500">{partner.email}</p>
+              <h2 className="truncate text-lg font-semibold text-slate-900">
+                {isCompany ? partner.company_details?.company_name || partner.name || "Unknown Partner" : partner.name || "Unknown Partner"}
+              </h2>
+              <p className="truncate text-sm text-slate-500">
+                {isCompany && partner.company_details?.company_name ? `${partner.name} • ` : ""}
+                {partner.email}
+              </p>
             </div>
           </div>
 
