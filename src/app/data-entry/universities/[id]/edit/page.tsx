@@ -9,5 +9,5 @@ export default function DataEntryEditUniversityPage() {
 
   if (!universityId) return null;
 
-  return <EditUniversityDetails id={universityId} redirectPath="/data-entry/universities" />;
+  return <EditUniversityDetails id={universityId} redirectPath={`/data-entry/universities/${universityId}`} />;
 }

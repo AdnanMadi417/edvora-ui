@@ -12,7 +12,7 @@ export default function DataEntryEditPaymentMethodPage() {
   return (
     <EditPaymentMethodDetails
       id={paymentMethodId}
-      redirectPath="/data-entry/payment-methods"
+      redirectPath={`/data-entry/payment-methods/${paymentMethodId}/edit`}
       listPath="/data-entry/payment-methods"
       hideDelete
     />

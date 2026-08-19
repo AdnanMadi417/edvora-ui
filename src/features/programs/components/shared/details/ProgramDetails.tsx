@@ -18,6 +18,7 @@ import {
   BookOpen,
   Languages,
   Clock,
+  Pencil,
 } from "lucide-react";
 
 import { useProgram } from "features/programs/hooks";
@@ -129,9 +130,12 @@ interface ProgramDetailsProps {
   id: string;
   basePath?: string;
   showApplyAction?: boolean;
+  /** When set, shows an "Edit Program" button linking here — for roles
+   * (e.g. data entry) that can edit but shouldn't see the Apply action. */
+  editPath?: string;
 }
 
-const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: ProgramDetailsProps) => {
+const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, editPath }: ProgramDetailsProps) => {
   const router = useRouter();
   const handleBack = () => router.push(`${basePath}/knowledge-hub/`);
 
@@ -610,6 +614,19 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
             >
               Apply for This Program
             </Link>
+          )}
+          {editPath && (
+            <Button
+              text="Edit Program"
+              onClick={() => router.push(editPath)}
+              icon={<Pencil className="h-4 w-4" />}
+              bgColor="bg-blue-600"
+              textColor="text-white"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
+              className="flex-1 !bg-blue-600 hover:!bg-blue-700"
+            />
           )}
         </div>
 

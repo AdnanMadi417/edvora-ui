@@ -7,5 +7,12 @@ export default function KnowledgeHubDetailsPage() {
   const params = useParams();
   const id = params.id as string;
 
-  return <ProgramDetails id={id} basePath="/data-entry" showApplyAction={false} />;
+  return (
+    <ProgramDetails
+      id={id}
+      basePath="/data-entry"
+      showApplyAction={false}
+      editPath={`/data-entry/knowledge-hub/${id}/edit`}
+    />
+  );
 }
