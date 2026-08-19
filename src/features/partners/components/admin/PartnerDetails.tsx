@@ -27,9 +27,8 @@ import {
   User,
   Users,
 } from "lucide-react";
-import { usePartnerDetails } from "features/partners/hooks";
+import { usePartnerDetails, useUpdateAgencyMemberStatus } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
-import { useSuspendMember, useReactivateMember } from "features/agency-members/hooks";
 import SuspendReactivateMemberModal from "features/agency-members/components/partner/SuspendReactivateMemberModal";
 import type { AgencyMember } from "features/agency-members/types";
 import Loading from "components/loading/Loading";
@@ -183,19 +182,16 @@ export default function PartnerDetails({ id }: Props) {
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
 
   const [suspendTarget, setSuspendTarget] = useState<AgencyMember | null>(null);
-  const { suspendMember, loading: isSuspending } = useSuspendMember();
-  const { reactivateMember, loading: isReactivating } = useReactivateMember();
+  const { updateAgencyMemberStatus, loading: isUpdatingStatus } = useUpdateAgencyMemberStatus();
 
   const handleConfirmSuspendToggle = async () => {
     if (!suspendTarget) return;
     try {
-      if (suspendTarget.is_active) {
-        await suspendMember(suspendTarget.partner_id);
-        showToast("Member suspended successfully.", "success");
-      } else {
-        await reactivateMember(suspendTarget.partner_id);
-        showToast("Member reactivated successfully.", "success");
-      }
+      await updateAgencyMemberStatus(suspendTarget.partner_id, !suspendTarget.is_active);
+      showToast(
+        suspendTarget.is_active ? "Member suspended successfully." : "Member reactivated successfully.",
+        "success"
+      );
       setSuspendTarget(null);
       refetch();
     } catch (error: unknown) {
@@ -236,7 +232,7 @@ export default function PartnerDetails({ id }: Props) {
         isOpen={!!suspendTarget}
         onClose={() => setSuspendTarget(null)}
         onConfirm={handleConfirmSuspendToggle}
-        isSubmitting={isSuspending || isReactivating}
+        isSubmitting={isUpdatingStatus}
         memberName={suspendTarget?.name || ""}
         isActive={!!suspendTarget?.is_active}
       />
