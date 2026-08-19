@@ -12,7 +12,7 @@ export default function DataEntryEditProgramPage() {
   return (
     <ProgramEditForm
       id={programId}
-      redirectPath="/data-entry/knowledge-hub"
+      redirectPath={`/data-entry/knowledge-hub/${programId}`}
       listPath="/data-entry/knowledge-hub"
       hideDelete
     />
