@@ -152,13 +152,7 @@ export default function AgencyMemberSubmitProfile() {
     setErrors((p) => ({ ...p, [field]: e[field] ?? "" }));
   };
 
-  const isFormComplete = Boolean(
-    formData.phone_number.trim() && formData.country && formData.nationality && formData.background &&
-    formData.date_of_birth && formData.passport_number.trim() &&
-    profilePhoto.fileKey && idDoc && passportPhoto &&
-    !validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" }) &&
-    (!formData.linkedin_url || isValidPlatformUrl("linkedin", formData.linkedin_url)),
-  );
+  const isFormComplete = Object.keys(computeErrors()).length === 0;
 
   const handleSubmit = async () => {
     if (!validate()) return;

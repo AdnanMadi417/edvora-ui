@@ -448,7 +448,17 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
 
                 <div className="space-y-4 border-b border-slate-200 p-6">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Delivery Mode</h3>
-                  <ToggleInput label="On Campus" field="is_on_campus" formData={formData} errors={errors} updateFormData={updateFormData} />
+                  <ToggleInput
+                    label="On Campus"
+                    field="is_on_campus"
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                    enabledText="On campus"
+                    disabledText="Online"
+                    enabledDescription="Students attend this program in person."
+                    disabledDescription="Students attend this program online."
+                  />
                 </div>
 
                 <div className="space-y-4 p-6">
@@ -576,7 +586,17 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                     )}
                   </div>
 
-                  <ToggleInput label="Has Scholarship" field="has_scholarship" formData={formData} errors={errors} updateFormData={updateFormData} />
+                  <ToggleInput
+                    label="Has Scholarship"
+                    field="has_scholarship"
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                    enabledText="Scholarship available"
+                    disabledText="No scholarship"
+                    enabledDescription="Scholarship details are shown below."
+                    disabledDescription="Turn on to add scholarship details for this program."
+                  />
 
                   {formData.has_scholarship && (
                     <div className="space-y-6">

@@ -173,6 +173,10 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
             formData={formData}
             errors={errors}
             updateFormData={updateField}
+            enabledText="Active"
+            disabledText="Suspended"
+            enabledDescription="This account manager can log in and access the platform."
+            disabledDescription="This account manager cannot log in until reactivated."
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3">

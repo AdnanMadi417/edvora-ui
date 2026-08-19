@@ -10,6 +10,7 @@ import {
   MdCake,
 } from "react-icons/md";
 import {
+  AlertTriangle,
   Ban,
   Briefcase,
   CalendarDays,
@@ -23,6 +24,7 @@ import {
   Mail,
   Percent,
   Power,
+  RefreshCw,
   CheckCircle,
   XCircle,
 } from "lucide-react";
@@ -35,7 +37,7 @@ import {
 } from "../../hooks";
 
 import Loading from "components/loading/Loading";
-import EmptyData from "components/emptyData/EmptyTableData";
+import EmptyData from "components/emptyData/EmptyData";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
@@ -176,7 +178,7 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
   const router = useRouter();
   const { showToast } = useToast();
 
-  const { member, loading, refetch } = useAgencyMemberDetails(memberId);
+  const { member, loading, error, refetch } = useAgencyMemberDetails(memberId);
   const { suspendMember, loading: isSuspending } = useSuspendMember();
   const { reactivateMember, loading: isReactivating } = useReactivateMember();
   const { resendMemberWelcomeEmail, loading: isResendingWelcome } = useResendMemberWelcomeEmail();
@@ -227,7 +229,29 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
   };
 
   if (loading && !member) return <Loading text="Loading member details..." />;
-  if (!member) return <EmptyData />;
+
+  if (error) {
+    return (
+      <EmptyData
+        icon={AlertTriangle}
+        color="red"
+        title="Something went wrong"
+        subtitle={error}
+        action={
+          <button
+            type="button"
+            onClick={refetch}
+            className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            Retry
+          </button>
+        }
+      />
+    );
+  }
+
+  if (!member) return <EmptyData title="Member not found" subtitle="This member may have been removed." />;
 
   const canResendWelcome = member.is_active && !member.last_login;
 

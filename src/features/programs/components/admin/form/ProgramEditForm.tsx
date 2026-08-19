@@ -538,6 +538,10 @@ const EditKnowledgeHubProgramDetails = ({
                 field="is_on_campus"
                 formData={formData}
                 errors={errors}
+                enabledText="On campus"
+                disabledText="Online"
+                enabledDescription="Students attend this program in person."
+                disabledDescription="Students attend this program online."
                 updateFormData={(field, value) => {
                   updateFormData(field, value);
                   updateFormData("is_online", !value);
@@ -697,6 +701,10 @@ const EditKnowledgeHubProgramDetails = ({
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                enabledText="Scholarship available"
+                disabledText="No scholarship"
+                enabledDescription="Scholarship details are shown below."
+                disabledDescription="Turn on to add scholarship details for this program."
               />
             </div>
 
