@@ -182,6 +182,10 @@ export default function UpdateFieldOfStudy({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              enabledText="Active"
+              disabledText="Inactive"
+              enabledDescription="This field of study is visible and selectable."
+              disabledDescription="This field of study is hidden from selection."
             />
 
           </div>

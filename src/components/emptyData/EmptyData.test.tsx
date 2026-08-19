@@ -19,12 +19,12 @@ describe('EmptyData Component', () => {
 
   it('has the correct structure', () => {
     const { container } = render(<EmptyData />)
-    
+
     const section = container.querySelector('section')
     expect(section).toBeInTheDocument()
-    
-    const card = container.querySelector('.rounded-2xl')
-    expect(card).toBeInTheDocument()
+
+    const iconBadge = container.querySelector('.rounded-full')
+    expect(iconBadge).toBeInTheDocument()
   })
 })
 

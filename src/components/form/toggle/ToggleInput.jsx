@@ -7,6 +7,10 @@ const ToggleInput = ({
                        updateFormData,
                        errors,
                        required = false,
+                       enabledText = "Enabled",
+                       disabledText = "Disabled",
+                       enabledDescription = "Click to toggle",
+                       disabledDescription = "Click to toggle",
                      }) => {
   const selected = Boolean(formData[field]);
 
@@ -29,16 +33,16 @@ const ToggleInput = ({
         }
       `}
       >
-        <div className="flex flex-col">
-          <span className="text-sm font-medium text-slate-800">
-            {selected ? "Enabled" : "Disabled"}
+        <div className="flex min-w-0 flex-col pr-3">
+          <span className="truncate text-sm font-medium text-slate-800">
+            {selected ? enabledText : disabledText}
           </span>
-          <span className="text-xs text-slate-400">
-            Click to toggle
+          <span className="truncate text-xs text-slate-400">
+            {selected ? enabledDescription : disabledDescription}
           </span>
         </div>
 
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <input
             type="checkbox"
             checked={selected}

@@ -578,6 +578,10 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
             formData={formData}
             errors={{}}
             updateFormData={updateFormData}
+            enabledText="Active"
+            disabledText="Inactive"
+            enabledDescription="This university is visible and available for applications."
+            disabledDescription="This university is hidden and unavailable for new applications."
           />
         </div>
       </div>
@@ -759,6 +763,10 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
                 formData={method}
                 errors={{}}
                 updateFormData={(field, value) => updatePaymentRow(method.id, field, value)}
+                enabledText="Active"
+                disabledText="Inactive"
+                enabledDescription="This payment method is available for use."
+                disabledDescription="This payment method is hidden from selection."
               />
             </div>
           ))}

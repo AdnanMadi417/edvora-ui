@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Bell, CheckCheck, ExternalLink } from "lucide-react";
+import { AlertTriangle, Bell, CheckCheck, ExternalLink, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -120,7 +120,22 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
             ))}
           </div>
         ) : error ? (
-          <div className="px-6 py-12 text-center text-sm text-red-500">{error}</div>
+          <EmptyData
+            icon={AlertTriangle}
+            color="red"
+            title="Something went wrong"
+            subtitle="We couldn't load your notifications. Please try again."
+            action={
+              <button
+                type="button"
+                onClick={() => refetchNotifications()}
+                className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                <RefreshCw className="h-3.5 w-3.5" />
+                Retry
+              </button>
+            }
+          />
         ) : displayed.length === 0 ? (
           <EmptyData
             icon={Bell}

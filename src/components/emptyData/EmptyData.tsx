@@ -20,6 +20,8 @@ interface EmptyDataProps {
    * illustration when omitted. */
   icon?: React.ComponentType<{ className?: string }>;
   color?: SectionIconBadgeColor;
+  /** Optional control rendered below the subtitle, e.g. a Retry button for error states. */
+  action?: React.ReactNode;
 }
 
 export default function EmptyData({
@@ -27,6 +29,7 @@ export default function EmptyData({
   subtitle = "There is no data available at the moment",
   icon: Icon,
   color = "slate",
+  action,
 }: EmptyDataProps) {
   return (
     <section>
@@ -44,6 +47,8 @@ export default function EmptyData({
             <p className="text-p2 font-semibold text-slate-900">{title}</p>
             <p className="text-caption font-normal text-slate-500">{subtitle}</p>
           </div>
+
+          {action}
         </div>
       </div>
     </section>

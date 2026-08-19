@@ -165,6 +165,10 @@ export default function InviteAgencyMemberModal({
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              enabledText="Visible to member"
+              disabledText="Hidden from member"
+              enabledDescription="This member can see their commission details."
+              disabledDescription="This member cannot see their commission details."
             />
             {formData.commission_visible && (
               <CommissionPercentageField

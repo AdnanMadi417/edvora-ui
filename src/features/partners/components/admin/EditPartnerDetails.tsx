@@ -531,7 +531,17 @@ export default function EditPartnerDetails({ id }: Props) {
         {/* Account Settings */}
         <div className="border-b border-slate-200 p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Account Settings</p>
-          <ToggleInput label="Account Active" field="is_active" formData={formData} errors={{}} updateFormData={updateFormData} />
+          <ToggleInput
+            label="Account Active"
+            field="is_active"
+            formData={formData}
+            errors={{}}
+            updateFormData={updateFormData}
+            enabledText="Active"
+            disabledText="Suspended"
+            enabledDescription="This partner can log in and access the platform."
+            disabledDescription="This partner cannot log in until reactivated."
+          />
         </div>
 
         {/* Individual Details */}
