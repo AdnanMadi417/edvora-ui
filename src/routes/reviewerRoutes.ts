@@ -1,5 +1,5 @@
 import { IRoute } from "../types/navigation";
-import { Handshake, UserCog } from "lucide-react";
+import { Handshake, UserCog, Bell } from "lucide-react";
 
 const reviewerRoutes: IRoute[] = [
     {
@@ -13,6 +13,12 @@ const reviewerRoutes: IRoute[] = [
         layout: "/reviewer",
         path: "/account-managers",
         icon: UserCog,
+    },
+    {
+        name: "Notifications",
+        layout: "/reviewer",
+        path: "/notifications",
+        icon: Bell,
     },
 ];
 

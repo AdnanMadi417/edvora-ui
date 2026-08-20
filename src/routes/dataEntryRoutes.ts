@@ -9,6 +9,7 @@ import {
   Truck,
   Building2,
   Tag,
+  Bell,
 } from "lucide-react";
 
 const dataEntryRoutes: IRoute[] = [
@@ -69,6 +70,12 @@ const dataEntryRoutes: IRoute[] = [
         icon: Tag,
       },
     ],
+  },
+  {
+    name: "Notifications",
+    layout: "/data-entry",
+    path: "/notifications",
+    icon: Bell,
   },
 ];
 

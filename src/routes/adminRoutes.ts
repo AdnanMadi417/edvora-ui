@@ -13,6 +13,7 @@ import {
   Building2,
   Tag,
   Users,
+  Bell,
 } from "lucide-react";
 
 const AdminRoutes: IRoute[] = [
@@ -39,6 +40,12 @@ const AdminRoutes: IRoute[] = [
     layout: "/admin",
     path: "/staff-users",
     icon: Users,
+  },
+  {
+    name: "Notifications",
+    layout: "/admin",
+    path: "/notifications",
+    icon: Bell,
   },
   {
     name: "Knowledge Hub",
