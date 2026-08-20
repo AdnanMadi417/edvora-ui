@@ -259,28 +259,9 @@ export default function PartnerRegisterPage() {
   };
 
   const isFormComplete = partnerType === "individual"
-    ? Boolean(
-        indForm.name.trim().length >= 3 &&
-        indForm.email && indForm.phone_number.trim() &&
-        indForm.country && indForm.nationality && indForm.background &&
-        indForm.date_of_birth && indForm.passport_number.trim() &&
-        indProfilePhoto.fileKey &&
-        indIdDoc && indPassportPhoto &&
-        !validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" }) &&
-        (!indForm.linkedin_url || isValidPlatformUrl("linkedin", indForm.linkedin_url)) &&
-        indForm.agreed,
-      )
+    ? Object.keys(computeIndErrors()).length === 0
     : partnerType === "agency"
-    ? Boolean(
-        compForm.company_name.trim() && compForm.country &&
-        compLogo.fileKey &&
-        !validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" }) &&
-        compRegDoc && compForm.contact_full_name.trim() && compForm.contact_email &&
-        compForm.contact_phone_number.trim() && compForm.nationality &&
-        compForm.date_of_birth && compForm.passport_number.trim() &&
-        compContactIdDoc && compPassportPhoto &&
-        compForm.agreed,
-      )
+    ? Object.keys(computeCompErrors()).length === 0
     : false;
 
   const handleSubmit = async () => {
