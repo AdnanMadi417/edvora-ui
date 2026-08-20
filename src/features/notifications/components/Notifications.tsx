@@ -8,14 +8,15 @@ import { useRouter } from "next/navigation";
 import { useAllNotifications, useUnreadCount, useMarkAsRead, useMarkAllAsRead } from "../hooks";
 import { getNotificationIconConfig, getSenderName } from "../utils/notificationIcons";
 import { getNotificationCategory, type NotificationCategory } from "../utils/notificationCategory";
-import type { ReadStatus } from "../types";
+import type { ReadStatus, Notification } from "../types";
 import TablePagination from "components/ui/table/TablePagination";
 import { Tabs, type TabItem } from "components/ui/tabs";
 import EmptyData from "components/emptyData/EmptyData";
 
 const PAGE_SIZE = 20;
-// Unread notifications are fetched as one bounded batch (instead of paginated)
-// so the Action Required / System Info split can be computed client-side.
+// Unread notifications load in batches of this size via "Load more" (rather
+// than numbered pages) so the Action Required / System Info split can keep
+// being computed over everything loaded so far.
 const UNREAD_BATCH_SIZE = 100;
 
 type UnreadCategoryFilter = "all" | NotificationCategory;
@@ -71,6 +72,8 @@ interface NotificationsProps {
 export default function Notifications({ applicationBasePath }: NotificationsProps) {
   const [filter, setFilter] = useState<ReadStatus>("unread");
   const [page, setPage] = useState(1);
+  const [unreadPage, setUnreadPage] = useState(1);
+  const [accumulatedUnread, setAccumulatedUnread] = useState<Notification[]>([]);
   const [unreadCategory, setUnreadCategory] = useState<UnreadCategoryFilter>("action_required");
   const autoSelectedRef = useRef(false);
   const router = useRouter();
@@ -79,16 +82,30 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
 
   const { notifications, total, loading, error, refetch: refetchNotifications } = useAllNotifications({
     readStatus: filter,
-    page: isUnreadTab ? 1 : page,
+    page: isUnreadTab ? unreadPage : page,
     pageSize: isUnreadTab ? UNREAD_BATCH_SIZE : PAGE_SIZE,
   });
   const { unreadCount, refetch: refetchCount } = useUnreadCount({});
   const { markAsRead: markRead } = useMarkAsRead();
   const { markAllAsRead, loading: markingAll } = useMarkAllAsRead();
 
+  // Each successful unread fetch either replaces (page 1) or appends
+  // (page > 1, via "Load more") into the running accumulated list.
+  useEffect(() => {
+    if (!isUnreadTab || loading) return;
+    setAccumulatedUnread((prev) => {
+      if (unreadPage === 1) return notifications;
+      const seen = new Set(prev.map((n) => n.id));
+      return [...prev, ...notifications.filter((n) => !seen.has(n.id))];
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isUnreadTab, loading, unreadPage, notifications]);
+
   const changeFilter = (next: ReadStatus) => {
     setFilter(next);
     setPage(1);
+    setUnreadPage(1);
+    setAccumulatedUnread([]);
     setUnreadCategory("action_required");
     autoSelectedRef.current = false;
   };
@@ -98,9 +115,14 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
     autoSelectedRef.current = true;
   };
 
+  const loadMoreUnread = () => setUnreadPage((p) => p + 1);
+
   const markAsRead = async (id: string) => {
     try {
       await markRead(id);
+      // The unread set just shifted — start over from page 1 rather than
+      // re-merging a now-stale later page into the accumulated list.
+      if (isUnreadTab) setUnreadPage(1);
       await Promise.all([refetchNotifications(), refetchCount()]);
       window.dispatchEvent(new CustomEvent("notifications:refetch"));
     } catch (err) {
@@ -111,6 +133,7 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
   const handleMarkAllAsRead = async () => {
     try {
       await markAllAsRead();
+      if (isUnreadTab) setUnreadPage(1);
       await Promise.all([refetchNotifications(), refetchCount()]);
       window.dispatchEvent(new CustomEvent("notifications:refetch"));
     } catch (err) {
@@ -118,7 +141,8 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
     }
   };
 
-  const sorted = [...notifications].sort(
+  const sourceList = isUnreadTab ? accumulatedUnread : notifications;
+  const sorted = [...sourceList].sort(
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
@@ -141,9 +165,12 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
     ? sorted.filter((n) => getNotificationCategory(n) === unreadCategory)
     : sorted;
 
-  // The unread batch is capped at UNREAD_BATCH_SIZE — if the real unread
-  // total exceeds what we fetched, say so instead of silently truncating.
-  const isUnreadTruncated = isUnreadTab && total > notifications.length;
+  // Only show the big list-level skeleton on the very first load for a tab;
+  // a "Load more" fetch keeps the existing items visible and shows its own
+  // small loading state on the button instead.
+  const showFullSkeleton = loading && !(isUnreadTab && accumulatedUnread.length > 0);
+  const isLoadingMoreUnread = isUnreadTab && loading && accumulatedUnread.length > 0;
+  const hasMoreUnread = isUnreadTab && accumulatedUnread.length < total;
 
   return (
     <section className="mb-6 mt-6 max-w-5xl mx-auto overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
@@ -173,7 +200,7 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
       <Tabs<ReadStatus> tabs={FILTER_TABS(unreadCount)} active={filter} onChange={changeFilter} className="pt-2" />
 
       {/* Unread sub-filter: Action Required vs System Info */}
-      {isUnreadTab && !loading && !error && sorted.length > 0 && (
+      {isUnreadTab && !showFullSkeleton && !error && sorted.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-6 py-3">
           {UNREAD_CATEGORY_TABS.map(({ key, label }) => {
             const count = key === "all" ? sorted.length : key === "action_required" ? actionRequiredCount : infoCount;
@@ -196,15 +223,9 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
         </div>
       )}
 
-      {isUnreadTruncated && (
-        <p className="border-b border-slate-100 bg-amber-50 px-6 py-2 text-xs text-amber-700">
-          Showing the {notifications.length} most recent of {total} unread — mark some as read to see the rest.
-        </p>
-      )}
-
       {/* List */}
       <div>
-        {loading ? (
+        {showFullSkeleton ? (
           <div className="flex flex-col">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-start gap-4 px-4 py-4">
@@ -318,6 +339,21 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
           </div>
         )}
       </div>
+
+      {!error && hasMoreUnread && (
+        <div className="border-t border-slate-100 p-3 text-center">
+          <button
+            type="button"
+            onClick={loadMoreUnread}
+            disabled={isLoadingMoreUnread}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isLoadingMoreUnread
+              ? "Loading more…"
+              : `Load more (${total - accumulatedUnread.length} remaining)`}
+          </button>
+        </div>
+      )}
 
       {!loading && !error && !isUnreadTab && total > 0 && (
         <TablePagination
