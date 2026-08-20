@@ -239,6 +239,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Country of Residence" value={partner.country} />
+            <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Nationality" value={partner.nationality} />
             <InfoRow icon={<MdPhone className="h-4 w-4" />} label="Phone Number" value={partner.phone} />
             <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={partner.email} />
             <InfoRow
