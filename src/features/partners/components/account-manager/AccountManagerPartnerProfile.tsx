@@ -414,7 +414,8 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
               {partner.agency_members.map((member) => (
                 <div
                   key={member.id}
-                  className="flex items-center justify-between rounded-lg border border-slate-200 p-3"
+                  onClick={() => router.push(`/account-manager/partners/${member.partner_id}`)}
+                  className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 p-3 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
                 >
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-slate-900">{member.name}</p>
