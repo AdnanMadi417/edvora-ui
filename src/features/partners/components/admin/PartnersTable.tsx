@@ -502,7 +502,7 @@ export default function PartnersTable() {
                           className={partner.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"}
                         />
 
-                        {/* <div className="h-5 border-l border-slate-200" />
+                        <div className="h-5 border-l border-slate-200" />
                         <IconButton
                           onClick={() => { setDeleteTarget({ id: partner.id, name: partner.name || "" }); setIsDeleteOpen(true); }}
                           title="Delete partner"
@@ -513,7 +513,7 @@ export default function PartnersTable() {
                           hoverTextColor="hover:text-red-600"
                           hoverBorderColor="hover:border-transparent"
                           className="hover:bg-red-50"
-                        /> */}
+                        />
                       </div>
                     </td>
 

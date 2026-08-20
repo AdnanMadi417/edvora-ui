@@ -18,9 +18,8 @@ const partnerRoutes: IRoute[] = [
   },
 
   {
-    // Kept in the sidebar (unlike admin/account-manager) — the mandatory partner
-    // onboarding tour (PartnerOnboardingTour.tsx) spotlights this exact nav item
-    // via data-tour-id="notifications" as one of its fixed steps.
+    // The mandatory partner onboarding tour (PartnerOnboardingTour.tsx) spotlights
+    // this exact nav item via data-tour-id="notifications" as one of its fixed steps.
     name: "Notifications",
     layout: "/partner",
     path: "/notifications",
