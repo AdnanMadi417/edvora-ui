@@ -399,11 +399,6 @@ export default function PartnerDetails({ id }: Props) {
             </div>
             <div className="mt-3 space-y-2">
               <DocRow
-                label="Identity Document"
-                fileKey={partner.individual_details?.id_document_file_key}
-                personName={partner.name}
-              />
-              <DocRow
                 label="Passport Photo"
                 fileKey={partner.individual_details?.passport_photo_file_key}
                 personName={partner.name}
@@ -471,11 +466,6 @@ export default function PartnerDetails({ id }: Props) {
               />
             </div>
             <div className="mt-3 space-y-2">
-              <DocRow
-                label="Contact Identity Document"
-                fileKey={partner.company_details?.contact_id_document_file_key}
-                personName={partner.name}
-              />
               <DocRow
                 label="Passport Photo"
                 fileKey={partner.company_details?.passport_photo_file_key}

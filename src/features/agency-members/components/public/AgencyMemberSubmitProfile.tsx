@@ -28,8 +28,6 @@ const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.
 
 const SUBMIT_PROFILE_FIELD_MAP: Record<string, string> = {
   phone: "phone_number",
-  id_document_file_key: "id_doc",
-  id_document_file_url: "id_doc",
   passport_photo_file_key: "passport_photo",
   passport_photo_file_url: "passport_photo",
   profile_photo_file_key: "profile_photo",
@@ -111,8 +109,6 @@ export default function AgencyMemberSubmitProfile() {
     social_platform: "instagram", social_username: "", social_media_url: "",
     linkedin_platform: "linkedin", linkedin_username: "", linkedin_url: "",
   });
-  const [idDoc, setIdDoc] = useState<PublicUploadResult | null>(null);
-  const [idDocName, setIdDocName] = useState("");
   const [passportPhoto, setPassportPhoto] = useState<PublicUploadResult | null>(null);
   const [passportPhotoName, setPassportPhotoName] = useState("");
   const profilePhoto = usePublicPhotoUpload();
@@ -131,7 +127,6 @@ export default function AgencyMemberSubmitProfile() {
     if (!formData.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!formData.passport_number.trim()) e.passport_number = "Passport number is required";
     if (!profilePhoto.fileKey) e.profile_photo = "Profile photo is required";
-    if (!idDoc) e.id_doc = "Please upload your identity document";
     if (!passportPhoto) e.passport_photo = "Please upload your passport photo";
     const socialError = validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" });
     if (socialError) e.social_media_url = socialError;
@@ -167,7 +162,6 @@ export default function AgencyMemberSubmitProfile() {
         nationality: formData.nationality,
         date_of_birth: formData.date_of_birth,
         passport_number: formData.passport_number.trim(),
-        ...(idDoc && { id_document_file_key: idDoc.file_key, id_document_file_url: idDoc.file_url }),
         ...(passportPhoto && { passport_photo_file_key: passportPhoto.file_key, passport_photo_file_url: passportPhoto.file_url }),
         ...(profilePhoto.fileKey && { profile_photo_file_key: profilePhoto.fileKey, profile_photo_file_url: profilePhoto.fileUrl }),
         background: formData.background,
@@ -295,17 +289,6 @@ export default function AgencyMemberSubmitProfile() {
 
           <SectionCard title="Identity Verification"
             subtitle="To ensure trust and authenticity, all members must verify their identity.">
-            <PublicFileUploadField
-              label="Identity Document"
-              fieldId="member-id-doc"
-              field="id_doc"
-              required
-              result={idDoc}
-              fileName={idDocName}
-              onUpload={(res, name) => { setIdDoc(res); setIdDocName(name); }}
-              onRemove={() => { setIdDoc(null); setIdDocName(""); }}
-              error={errors.id_doc}
-            />
             <PublicFileUploadField
               label="Passport Photo"
               fieldId="member-passport-photo"

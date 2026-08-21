@@ -209,9 +209,7 @@ export default function EditPartnerDetails({ id }: Props) {
   const [profilePhoto, setProfilePhoto] = useState<DocState>(EMPTY_DOC);
   const [logo, setLogo] = useState<DocState>(EMPTY_DOC);
   const [passportPhoto, setPassportPhoto] = useState<DocState>(EMPTY_DOC);
-  const [idDoc, setIdDoc] = useState<DocState>(EMPTY_DOC);
   const [companyRegDoc, setCompanyRegDoc] = useState<DocState>(EMPTY_DOC);
-  const [contactIdDoc, setContactIdDoc] = useState<DocState>(EMPTY_DOC);
 
   useEffect(() => {
     if (!partner) return;
@@ -243,13 +241,11 @@ export default function EditPartnerDetails({ id }: Props) {
       passport_number: (partner.individual_details?.passport_number ?? partner.company_details?.passport_number) ?? "",
     });
     if (partner.individual_details) {
-      setIdDoc((p) => ({ ...p, file_key: partner.individual_details!.id_document_file_key ?? "", file_url: partner.individual_details!.id_document_file_url ?? "" }));
       setProfilePhoto((p) => ({ ...p, file_key: partner.individual_details!.profile_photo_file_key ?? "", file_url: partner.individual_details!.profile_photo_file_url ?? "" }));
       setPassportPhoto((p) => ({ ...p, file_key: partner.individual_details!.passport_photo_file_key ?? "", file_url: partner.individual_details!.passport_photo_file_url ?? "" }));
     }
     if (partner.company_details) {
       setCompanyRegDoc((p) => ({ ...p, file_key: partner.company_details!.company_registration_doc_file_key ?? "", file_url: partner.company_details!.company_registration_doc_file_url ?? "" }));
-      setContactIdDoc((p) => ({ ...p, file_key: partner.company_details!.contact_id_document_file_key ?? "", file_url: partner.company_details!.contact_id_document_file_url ?? "" }));
       setLogo((p) => ({ ...p, file_key: partner.company_details!.logo_file_key ?? "", file_url: partner.company_details!.logo_file_url ?? "" }));
       setPassportPhoto((p) => ({ ...p, file_key: partner.company_details!.passport_photo_file_key ?? "", file_url: partner.company_details!.passport_photo_file_url ?? "" }));
     }
@@ -261,7 +257,6 @@ export default function EditPartnerDetails({ id }: Props) {
 
     if (field === "type") {
       if (value === "individual") {
-        setIdDoc((p) => ({ ...p, file_key: partner?.individual_details?.id_document_file_key ?? "", file_url: partner?.individual_details?.id_document_file_url ?? "" }));
         setProfilePhoto((p) => ({ ...p, file_key: partner?.individual_details?.profile_photo_file_key ?? "", file_url: partner?.individual_details?.profile_photo_file_url ?? "" }));
         setPassportPhoto((p) => ({ ...p, file_key: partner?.individual_details?.passport_photo_file_key ?? "", file_url: partner?.individual_details?.passport_photo_file_url ?? "" }));
         const { platform: socialPlatform, username: socialUsername } = parseSocialMediaUrl(partner?.individual_details?.social_media_url ?? "");
@@ -281,7 +276,6 @@ export default function EditPartnerDetails({ id }: Props) {
         }));
       } else if (value === "agency") {
         setCompanyRegDoc((p) => ({ ...p, file_key: partner?.company_details?.company_registration_doc_file_key ?? "", file_url: partner?.company_details?.company_registration_doc_file_url ?? "" }));
-        setContactIdDoc((p) => ({ ...p, file_key: partner?.company_details?.contact_id_document_file_key ?? "", file_url: partner?.company_details?.contact_id_document_file_url ?? "" }));
         setLogo((p) => ({ ...p, file_key: partner?.company_details?.logo_file_key ?? "", file_url: partner?.company_details?.logo_file_url ?? "" }));
         setPassportPhoto((p) => ({ ...p, file_key: partner?.company_details?.passport_photo_file_key ?? "", file_url: partner?.company_details?.passport_photo_file_url ?? "" }));
         setFormData((prev: any) => ({
@@ -312,7 +306,7 @@ export default function EditPartnerDetails({ id }: Props) {
     }
   };
 
-  const isUploading = profilePhoto.uploading || logo.uploading || passportPhoto.uploading || idDoc.uploading || companyRegDoc.uploading || contactIdDoc.uploading;
+  const isUploading = profilePhoto.uploading || logo.uploading || passportPhoto.uploading || companyRegDoc.uploading;
 
   const isFormChanged = () => {
     if (!partner) return false;
@@ -324,7 +318,6 @@ export default function EditPartnerDetails({ id }: Props) {
       (formData.manager_id || "") !== (partner.assigned_manager_id || "") ||
       `${formData.phone_code} ${formData.phone_number}`.trim() !== partner.phone?.trim() ||
       formData.is_active !== partner.is_active ||
-      idDoc.file_key !== (partner.individual_details?.id_document_file_key ?? "") ||
       profilePhoto.file_key !== (partner.individual_details?.profile_photo_file_key ?? "") ||
       formData.background !== (partner.individual_details?.background ?? "") ||
       formData.linkedin_url !== (partner.individual_details?.linkedin_url ?? "") ||
@@ -332,7 +325,6 @@ export default function EditPartnerDetails({ id }: Props) {
       formData.company_name !== (partner.company_details?.company_name ?? "") ||
       formData.website_url !== (partner.company_details?.website_url ?? "") ||
       companyRegDoc.file_key !== (partner.company_details?.company_registration_doc_file_key ?? "") ||
-      contactIdDoc.file_key !== (partner.company_details?.contact_id_document_file_key ?? "") ||
       logo.file_key !== (partner.company_details?.logo_file_key ?? "") ||
       passportPhoto.file_key !== ((partner.individual_details?.passport_photo_file_key ?? partner.company_details?.passport_photo_file_key) ?? "") ||
       formData.nationality !== (partner.nationality ?? "") ||
@@ -420,9 +412,6 @@ export default function EditPartnerDetails({ id }: Props) {
                 social_media_url: formData.social_media_url,
                 ...(formData.date_of_birth ? { date_of_birth: formData.date_of_birth } : {}),
                 ...(formData.passport_number ? { passport_number: formData.passport_number } : {}),
-                ...(idDoc.file_key
-                  ? { id_document_file_key: idDoc.file_key, id_document_file_url: idDoc.file_url }
-                  : {}),
                 ...(profilePhoto.file_key
                   ? { profile_photo_file_key: profilePhoto.file_key, profile_photo_file_url: profilePhoto.file_url }
                   : {}),
@@ -440,9 +429,6 @@ export default function EditPartnerDetails({ id }: Props) {
                 ...(formData.website_url ? { website_url: formData.website_url } : {}),
                 ...(companyRegDoc.file_key
                   ? { company_registration_doc_file_key: companyRegDoc.file_key, company_registration_doc_file_url: companyRegDoc.file_url }
-                  : {}),
-                ...(contactIdDoc.file_key
-                  ? { contact_id_document_file_key: contactIdDoc.file_key, contact_id_document_file_url: contactIdDoc.file_url }
                   : {}),
                 ...(logo.file_key
                   ? { logo_file_key: logo.file_key, logo_file_url: logo.file_url }
@@ -606,12 +592,6 @@ export default function EditPartnerDetails({ id }: Props) {
               />
             </div>
             <DocUploadField
-              label="Identity Document"
-              doc={idDoc}
-              fieldId="id-doc"
-              onUpload={(f) => handleUpload(f, setIdDoc)}
-            />
-            <DocUploadField
               label="Passport Photo"
               doc={passportPhoto}
               fieldId="passport-photo"
@@ -668,12 +648,6 @@ export default function EditPartnerDetails({ id }: Props) {
               doc={companyRegDoc}
               fieldId="company-reg-doc"
               onUpload={(f) => handleUpload(f, setCompanyRegDoc)}
-            />
-            <DocUploadField
-              label="Contact Identity Document"
-              doc={contactIdDoc}
-              fieldId="contact-id-doc"
-              onUpload={(f) => handleUpload(f, setContactIdDoc)}
             />
             <DocUploadField
               label="Passport Photo"

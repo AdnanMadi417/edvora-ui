@@ -379,11 +379,6 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
               fileKey={member.individual_details?.passport_photo_file_key}
               personName={member.name}
             />
-            <DocRow
-              label="Identity Document"
-              fileKey={member.individual_details?.id_document_file_key}
-              personName={member.name}
-            />
           </div>
         </div>
 
