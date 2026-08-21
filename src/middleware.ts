@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
 const publicRoutes = ["/auth/sign-in", "/auth/register", "/register/verify", "/auth/forgot-password", "/auth/partner-reset-password", "/auth/staff-invitation", "/team/verify-otp", "/team/accept-invite", "/reset-password", "/unauthorized", "/", "/api/health", "/api/auth/logout"];
 
@@ -19,15 +20,6 @@ const roleHomePaths: Record<string, string> = {
   data_entry: "/data-entry/knowledge-hub",
 };
 
-function isTokenExpired(token: string): boolean {
-  try {
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    return typeof payload.exp === "number" && payload.exp * 1000 < Date.now();
-  } catch {
-    return true;
-  }
-}
-
 function redirectTo(req: NextRequest, pathname: string) {
   const url = req.nextUrl.clone();
   url.pathname = pathname;
@@ -41,13 +33,32 @@ function redirectToSignIn(req: NextRequest) {
   return res;
 }
 
-export function middleware(req: NextRequest) {
+// Verifies the token's signature (and standard exp claim) with jose — the
+// role used for routing decisions comes only from this verified payload,
+// never from the separate, user-editable `userRole` cookie. Any failure
+// (bad signature, expired, missing secret, malformed token) resolves to
+// "no role" rather than falling back to trusting anything client-supplied.
+async function getVerifiedRole(token: string): Promise<string | null> {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    console.error("[middleware] JWT_SECRET is not configured — rejecting all tokens.");
+    return null;
+  }
+  try {
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
+    return typeof payload.role === "string" ? payload.role : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("token")?.value;
-  const role = req.cookies.get("userRole")?.value;
+  const role = token ? await getVerifiedRole(token) : null;
 
-  if (pathname === "/auth/sign-in" && token && !isTokenExpired(token)) {
-    const destination = (role && roleHomePaths[role]) ?? "/unauthorized";
+  if (pathname === "/auth/sign-in" && role) {
+    const destination = roleHomePaths[role] ?? "/unauthorized";
     return NextResponse.redirect(redirectTo(req, destination));
   }
 
@@ -55,11 +66,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  if (!token || isTokenExpired(token)) {
-    return redirectToSignIn(req);
-  }
-
-  if (!role) {
+  if (!token || !role) {
     return redirectToSignIn(req);
   }
 
