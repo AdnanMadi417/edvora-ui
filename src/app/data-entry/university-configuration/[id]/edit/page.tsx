@@ -9,5 +9,11 @@ export default function DataEntryEditUniversityTypePage() {
 
   if (!universityTypeId) return null;
 
-  return <EditUniversityForm id={universityTypeId} redirectPath={`/data-entry/university-configuration/${universityTypeId}/edit`} />;
+  return (
+    <EditUniversityForm
+      id={universityTypeId}
+      redirectPath={`/data-entry/university-configuration/${universityTypeId}/edit`}
+      listPath="/data-entry/university-configuration"
+    />
+  );
 }

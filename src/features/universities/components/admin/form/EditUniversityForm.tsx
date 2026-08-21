@@ -17,11 +17,17 @@ import { scrollToFirstError } from "utils/scrollToError";
 
 interface UniversityDetailsProps {
   id: string;
-  /** Where "Back" and a successful save navigate to. Defaults to this type's admin details page. */
+  /** Where a successful save navigates to. Defaults to this type's admin details page. */
   redirectPath?: string;
+  /** Where "Back" navigates to. Defaults to the admin university configuration list. */
+  listPath?: string;
 }
 
-const UniversityDetails = ({ id, redirectPath = `/admin/config-universities/${id}` }: UniversityDetailsProps) => {
+const UniversityDetails = ({
+  id,
+  redirectPath = `/admin/config-universities/${id}`,
+  listPath = "/admin/config-universities",
+}: UniversityDetailsProps) => {
   const router = useRouter();
   const { showToast } = useToast();
   const { university, error } = useUniversityTypeDetails(id);
@@ -158,7 +164,7 @@ const UniversityDetails = ({ id, redirectPath = `/admin/config-universities/${id
   }, [formData, initialFormData]);
 
   const handleBack = () => {
-    router.push(redirectPath);
+    router.push(listPath);
   };
 
   const handleUpdateLink = () => {

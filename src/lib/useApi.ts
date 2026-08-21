@@ -5,7 +5,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 export const SIGN_IN_URL = `${BASE_PATH}/auth/sign-in`;
 export const LOGOUT_URL = `${BASE_PATH}/api/auth/logout`;
-export const UNAUTHORIZED_URL = `${BASE_PATH}/unauthorized`;
 
 const api = axios.create({
   baseURL: `${API_URL}/api`,
@@ -29,12 +28,6 @@ api.interceptors.response.use(
       authRedirectScheduled = true;
       Cookies.remove("token");
       window.location.replace(SIGN_IN_URL);
-    } else if (err.response?.status === 403 && !loggingOut && !authRedirectScheduled) {
-      // Authenticated but forbidden — a stale role/session mismatch that
-      // slipped past route middleware. Don't clear the token (still valid),
-      // just get the user out of a page they shouldn't be looking at.
-      authRedirectScheduled = true;
-      window.location.replace(UNAUTHORIZED_URL);
     }
     return Promise.reject(err);
   }
