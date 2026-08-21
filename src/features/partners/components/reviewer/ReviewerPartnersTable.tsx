@@ -42,13 +42,9 @@ export default function ReviewerPartnersTable() {
   const handleSuspendActivate = async () => {
     if (!suspendTarget) return;
     try {
+      // Only the field actually changing — see PartnersTable.tsx for why
+      // sending the whole stale row here is dangerous.
       await updatePartner(suspendTarget.id, {
-        name: suspendTarget.name,
-        email: suspendTarget.email,
-        type: suspendTarget.type,
-        country: suspendTarget.country,
-        phone: suspendTarget.phone,
-        assigned_manager_id: suspendTarget.assigned_manager_id,
         is_active: !suspendTarget.is_active,
       });
       showToast(suspendTarget.is_active ? "Partner account suspended" : "Partner account activated", "success");

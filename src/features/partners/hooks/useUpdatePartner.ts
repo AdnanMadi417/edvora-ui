@@ -7,7 +7,7 @@ export function useUpdatePartner() {
   const [isUpdatingPartner, setIsUpdatingPartner] = useState(false);
   const [updatePartnerError, setUpdatePartnerError] = useState<string | null>(null);
 
-  const updatePartner = async (partnerId: string, payload: UpdatePartnerPayload) => {
+  const updatePartner = async (partnerId: string, payload: Partial<UpdatePartnerPayload>) => {
     setIsUpdatingPartner(true);
     setUpdatePartnerError(null);
     try {
