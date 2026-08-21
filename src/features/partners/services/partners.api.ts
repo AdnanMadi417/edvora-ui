@@ -41,10 +41,13 @@ export const partnersApi = {
       { headers: authHeader() }
     ),
 
-  update: (id: string, payload: UpdatePartnerPayload) =>
+  // Partial by design — the backend is a genuine partial-update endpoint
+  // (missing fields are left untouched), so callers like suspend/reactivate
+  // should only send the field(s) they actually mean to change.
+  update: (id: string, payload: Partial<UpdatePartnerPayload>) =>
     api.put(
       `/admin/partners/${id}`,
-      { ...payload, name: payload.name.trim() },
+      { ...payload, ...(payload.name !== undefined ? { name: payload.name.trim() } : {}) },
       { headers: authHeader() }
     ),
 
