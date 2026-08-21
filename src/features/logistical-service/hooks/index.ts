@@ -6,6 +6,7 @@ export { useDeleteLogisticProvider } from "./useDeleteLogisticProvider";
 export { useLogisticServices } from "./useLogisticServices";
 export { useCreateLogisticService } from "./useCreateLogisticService";
 export { useEditLogisticService } from "./useEditLogisticService";
+export { useDeleteLogisticService } from "./useDeleteLogisticService";
 export { useLogisticLanguages } from "./useLogisticLanguages";
 export { useLogisticUniversities } from "./useLogisticUniversities";
 export { useLogisticServiceLocations } from "./useLogisticServiceLocations";

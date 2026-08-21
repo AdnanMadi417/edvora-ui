@@ -10,6 +10,7 @@ interface PhoneInputFieldProps {
   updateFormData: (field: string, value: unknown) => void;
   required?: boolean;
   placeholder?: string;
+  onBlur?: () => void;
 }
 
 export default function PhoneInputField({
@@ -21,13 +22,18 @@ export default function PhoneInputField({
   updateFormData,
   required = true,
   placeholder = "12-345 6789",
+  onBlur,
 }: PhoneInputFieldProps) {
   const dialCode = formData[dialCodeField] ?? "+60";
   const number = formData[numberField] ?? "";
   const error = errors?.[numberField];
 
+  const handleNumberChange = (value: string) => {
+    updateFormData(numberField, value.replace(/[^\d\s()-]/g, ""));
+  };
+
   return (
-    <div className="mb-4">
+    <div className="mb-4" data-field={numberField}>
       <label className="block text-p2 font-medium text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}
       </label>
@@ -44,7 +50,8 @@ export default function PhoneInputField({
         <input
           type="tel"
           value={number}
-          onChange={(e) => updateFormData(numberField, e.target.value)}
+          onChange={(e) => handleNumberChange(e.target.value)}
+          onBlur={onBlur}
           placeholder={placeholder}
           className="flex-1 bg-white px-3 text-sm outline-none hover:bg-slate-50"
         />

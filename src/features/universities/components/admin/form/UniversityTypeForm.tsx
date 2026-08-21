@@ -5,14 +5,19 @@ import { ArrowLeft, Layers, } from 'lucide-react';
 import { useApplicationSubmissionFields, useCreateUniversityType } from "features/universities/hooks";
 
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import InputField from "components/form/fields/InputField";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import { useRouter } from "next/navigation";
 
-export default function UniversityTypeForm() {
+interface Props {
+  basePath?: string;
+}
+
+export default function UniversityTypeForm({ basePath = "/admin/config-universities" }: Props = {}) {
   const { createUniversityType, loading } = useCreateUniversityType();
   const { showToast } = useToast();
   const { submissionFields, loading: fieldsLoading } =
@@ -26,6 +31,14 @@ export default function UniversityTypeForm() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Failed to create university type. ${message}`, "error"),
+  });
 
   const validateName = (value: string): string => {
     if (!value.trim()) return "Name is required";
@@ -78,6 +91,7 @@ export default function UniversityTypeForm() {
     if (descErr) newErrors.description = descErr;
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      scrollToFirstError(newErrors);
       return;
     }
 
@@ -97,15 +111,14 @@ export default function UniversityTypeForm() {
 
       showToast("University type created successfully.", "success");
 
-      router.push("/admin/config-universities");
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-      showToast(`Failed to create university type. ${backendMessage}`, "error");
+      router.push(basePath);
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 
   const handleBack = () => {
-    router.push("/admin/config-universities");
+    router.push(basePath);
   };
 
   if (fieldsLoading) {

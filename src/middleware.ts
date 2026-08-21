@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const publicRoutes = ["/auth/sign-in", "/auth/register", "/auth/forgot-password", "/auth/partner-reset-password", "/reset-password", "/unauthorized", "/", "/api/health", "/api/auth/logout"];
+const publicRoutes = ["/auth/sign-in", "/auth/register", "/register/verify", "/auth/forgot-password", "/auth/partner-reset-password", "/auth/staff-invitation", "/team/verify-otp", "/team/accept-invite", "/reset-password", "/unauthorized", "/", "/api/health", "/api/auth/logout"];
 
 const protectedPrefixes: Record<string, string[]> = {
   "/admin": ["admin"],
   "/partner": ["partner"],
   "/account-manager": ["account_manager", "admin"],
+  "/reviewer": ["reviewer", "admin"],
+  "/data-entry": ["data_entry", "admin"],
 };
 
 const roleHomePaths: Record<string, string> = {
   admin: "/admin/applications",
   partner: "/partner/applications",
   account_manager: "/account-manager/applications",
+  reviewer: "/reviewer/partners",
+  data_entry: "/data-entry/knowledge-hub",
 };
 
 function isTokenExpired(token: string): boolean {

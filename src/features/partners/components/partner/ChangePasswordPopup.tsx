@@ -25,7 +25,6 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState("");
 
   useEffect(() => {
     if (isOpen) {
@@ -41,10 +40,9 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
   const updateFormData = (field: string, value: string) => {
     setFormData((p) => ({ ...p, [field]: value }));
     setErrors((p) => ({ ...p, [field]: "" }));
-    setApiError("");
   };
 
-  const validate = () => {
+  const computeErrors = () => {
     const e: Record<string, string> = {};
     if (!formData.current_password) e.current_password = "Current password is required";
 
@@ -59,14 +57,23 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
     } else if (formData.new_password !== formData.confirm_password) {
       e.confirm_password = "Passwords do not match";
     }
+    return e;
+  };
+
+  const validate = () => {
+    const e = computeErrors();
     setErrors(e);
     return Object.keys(e).length === 0;
+  };
+
+  const validateField = (field: string) => {
+    const e = computeErrors();
+    setErrors((p) => ({ ...p, [field]: e[field] ?? "" }));
   };
 
   const handleClose = () => {
     setFormData({ current_password: "", new_password: "", confirm_password: "" });
     setErrors({});
-    setApiError("");
     onClose();
   };
 
@@ -82,7 +89,7 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
       showToast("Password updated successfully.", "success");
       handleClose();
     } catch (err: unknown) {
-      setApiError(parseApiError(err, "Something went wrong. Please try again."));
+      setErrors((p) => ({ ...p, current_password: parseApiError(err, "Current password is incorrect.") }));
     } finally {
       setLoading(false);
     }
@@ -124,6 +131,7 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => validateField("current_password")}
             />
             <PasswordField
               label="New Password"
@@ -132,6 +140,7 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => validateField("new_password")}
             />
             <PasswordField
               label="Confirm New Password"
@@ -140,13 +149,8 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
+              onBlur={() => validateField("confirm_password")}
             />
-
-            {apiError && (
-              <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-                {apiError}
-              </p>
-            )}
 
             <div className="flex gap-3">
               <Button

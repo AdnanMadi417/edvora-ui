@@ -4,13 +4,13 @@ import React, { useEffect, useState } from "react";
 import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
 import { KeyRound, LogOut, Settings, Bell } from "lucide-react";
-import NavLink from "components/link/NavLink";
 import Link from "next/link";
 import api, { setLoggingOut, SIGN_IN_URL } from "../../lib/useApi";
 
 import { useMe } from "hooks/useMe";
-import { profileRouteMap, notificationsRouteMap } from "components/navbar/config/navigation";
-import { useUnreadCount } from "hooks/notifications/useUnreadCount";
+import { profileRouteMap, notificationsRouteMap, applicationsRouteMap } from "components/navbar/config/navigation";
+import { useUnreadCount } from "features/notifications/hooks";
+import NotificationsPreviewPopover from "features/notifications/components/NotificationsPreviewPopover";
 import { useToast } from "components/context/ToastContext";
 import ChangePasswordPopup from "features/partners/components/partner/ChangePasswordPopup";
 import { usePartnerProfile } from "features/partners/hooks";
@@ -68,6 +68,8 @@ const Navbar = ({
     return notificationsRouteMap[role] || "/notifications";
   };
 
+  const getApplicationsBasePath = (role?: string) => (role ? applicationsRouteMap[role] : undefined);
+
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && open && setOpen) setOpen(false);
@@ -122,25 +124,19 @@ const Navbar = ({
         <div className="flex items-center text-sm sm:text-base">
           <span className="text-slate-700">Pages</span>
           <span className="mx-1">/</span>
-          <NavLink
-            href="#"
-            className="capitalize text-slate-700 no-underline font-normal"
-          >
+          <span className="capitalize text-slate-700 font-normal">
             {brandText}
-          </NavLink>
+          </span>
         </div>
 
         <p className="text-lg font-bold capitalize sm:text-2xl lg:text-3xl">
-          <NavLink
-            href="#"
-            className="font-bold text-slate-900 no-underline capitalize"
-          >
+          <span className="font-bold text-slate-900 capitalize">
             {brandText}
-          </NavLink>
+          </span>
         </p>
       </div>
 
-      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-md border border-slate-200 bg-card px-2 py-2">
+      <div className="relative mt-3 flex w-fit items-center gap-4 rounded-lg border border-slate-200 bg-card px-2 py-2">
         <span
           className="flex h-5 w-5 cursor-pointer items-center justify-center xl:hidden"
           onClick={onOpenSidenav}
@@ -148,14 +144,20 @@ const Navbar = ({
           <FiAlignJustify className="h-5 w-5 text-slate-600" />
         </span>
 
-        <Link href={getNotificationsRoute(user?.role)} className="relative flex items-center justify-center">
-          <Bell className="h-5 w-5 text-slate-600" />
-          {unreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-              {unreadCount > 99 ? "99+" : unreadCount}
-            </span>
-          )}
-        </Link>
+        <NotificationsPreviewPopover
+          notificationsPath={getNotificationsRoute(user?.role)}
+          applicationBasePath={getApplicationsBasePath(user?.role)}
+          onNotificationHandled={refetchUnreadCount}
+        >
+          <Link href={getNotificationsRoute(user?.role)} className="relative flex items-center justify-center">
+            <Bell className="h-5 w-5 text-slate-600" />
+            {unreadCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
+          </Link>
+        </NotificationsPreviewPopover>
 
         <Dropdown
           button={

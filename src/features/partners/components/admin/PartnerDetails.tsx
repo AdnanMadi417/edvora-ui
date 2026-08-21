@@ -11,6 +11,7 @@ import {
   MdToggleOn,
 } from "react-icons/md";
 import {
+  Ban,
   Briefcase,
   CalendarDays,
   ChevronLeft,
@@ -21,25 +22,36 @@ import {
   FileText,
   Link2,
   Pencil,
+  Power,
   ShieldCheck,
   User,
+  Users,
 } from "lucide-react";
-import { usePartnerDetails } from "features/partners/hooks";
+import { usePartnerDetails, useUpdateAgencyMemberStatus } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
+import SuspendReactivateMemberModal from "features/agency-members/components/partner/SuspendReactivateMemberModal";
+import type { AgencyMember } from "features/agency-members/types";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
+import { parseApiError } from "utils/parseApiError";
+import { formatAgencyRole } from "features/partners/utils";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
+import { StatusBadge } from "components/ui/badges";
+import { Tabs, type TabItem } from "components/ui/tabs";
 import ReviewPartnerPopup from "./ReviewPartnerPopup";
+import PartnerApplicationsTable from "./PartnerApplicationsTable";
 import { parseDate, formatDate } from "components/ui/date/utils";
 
 interface Props {
   id: string;
 }
+
+type DetailsTab = "profile" | "team" | "applications";
 
 function formatDateOfBirth(value?: string | null): string | undefined {
   const date = parseDate(value);
@@ -72,7 +84,7 @@ function InfoRow({
         {href && value ? (
           <button
             type="button"
-            onClick={() => window.open(href, "_blank", "noopener,noreferrer")}
+            onClick={() => window.open(encodeURI(href), "_blank", "noopener,noreferrer")}
             className="mt-0.5 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
           >
             Visit Link <ExternalLink className="h-3 w-3" />
@@ -119,15 +131,15 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
   };
 
   return (
-    <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50">
-      <div className="flex min-w-0 flex-1 items-center gap-3">
+    <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 items-center gap-3 sm:flex-1">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
           <FileText className="h-5 w-5" />
         </div>
         <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
       </div>
       {fileKey ? (
-        <div className="ml-4 flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 sm:ml-4">
           <IconButton
             onClick={handleView}
             disabled={!!loading}
@@ -154,7 +166,7 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
           />
         </div>
       ) : (
-        <span className="ml-4 text-xs text-slate-400">Not uploaded</span>
+        <span className="text-xs text-slate-400 sm:ml-4">Not uploaded</span>
       )}
     </div>
   );
@@ -162,16 +174,47 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
 
 export default function PartnerDetails({ id }: Props) {
   const router = useRouter();
+  const { showToast } = useToast();
   const { partner, isPartnerLoading, refetch } = usePartnerDetails(id);
   const [showReview, setShowReview] = useState(false);
+  const [tab, setTab] = useState<DetailsTab>("profile");
   const { accountManagers } = useAccountManagers();
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
+
+  const [suspendTarget, setSuspendTarget] = useState<AgencyMember | null>(null);
+  const { updateAgencyMemberStatus, loading: isUpdatingStatus } = useUpdateAgencyMemberStatus();
+
+  const handleConfirmSuspendToggle = async () => {
+    if (!suspendTarget) return;
+    try {
+      await updateAgencyMemberStatus(suspendTarget.partner_id, !suspendTarget.is_active);
+      showToast(
+        suspendTarget.is_active ? "Member suspended successfully." : "Member reactivated successfully.",
+        "success"
+      );
+      setSuspendTarget(null);
+      refetch();
+    } catch (error: unknown) {
+      showToast(parseApiError(error, "Please try again."), "error");
+    }
+  };
 
   if (isPartnerLoading) return <Loading text="Loading partner details..." />;
   if (!partner) return <EmptyData />;
 
   const isIndividual = partner.type === "individual";
   const isCompany = partner.type === "agency";
+
+  const TABS: TabItem<DetailsTab>[] = isCompany
+    ? [
+        { key: "profile", label: "Profile" },
+        { key: "team", label: "Team" },
+        { key: "applications", label: "Applications" },
+      ]
+    : [
+        { key: "profile", label: "Profile" },
+        { key: "applications", label: "Applications" },
+      ];
 
   return (
     <>
@@ -185,12 +228,21 @@ export default function PartnerDetails({ id }: Props) {
         currentManagerId={partner.assigned_manager_id || undefined}
       />
 
+      <SuspendReactivateMemberModal
+        isOpen={!!suspendTarget}
+        onClose={() => setSuspendTarget(null)}
+        onConfirm={handleConfirmSuspendToggle}
+        isSubmitting={isUpdatingStatus}
+        memberName={suspendTarget?.name || ""}
+        isActive={!!suspendTarget?.is_active}
+      />
+
     <div className="mx-auto mt-6 max-w-5xl">
       <div className="rounded-lg border border-slate-200 bg-white">
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-5">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-4">
             <div className="relative shrink-0">
               <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                 <PresignedImage
@@ -206,13 +258,18 @@ export default function PartnerDetails({ id }: Props) {
                 }`}
               />
             </div>
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900">{partner.name}</h2>
-              <p className="text-sm text-slate-500">{partner.email}</p>
+            <div className="min-w-0">
+              <h2 className="truncate text-lg font-semibold text-slate-900">
+                {isCompany ? partner.company_details?.company_name || partner.name : partner.name}
+              </h2>
+              <p className="truncate text-sm text-slate-500">
+                {isCompany && partner.company_details?.company_name ? `${partner.name} • ` : ""}
+                {partner.email}
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 self-end sm:self-auto">
             {!partner.is_verified && !partner.is_active && (
               <Button
                 onClick={() => setShowReview(true)}
@@ -239,13 +296,19 @@ export default function PartnerDetails({ id }: Props) {
           </div>
         </div>
 
+        <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} />
+
+        {tab === "profile" && (
+        <div key={tab} className="animate-in fade-in duration-200">
+
         {/* Account Overview */}
         <div className="border-b border-slate-200 p-6">
           <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
             Account Overview
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Country" value={partner.country} />
+            <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Country of Residence" value={partner.country} />
+            <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Nationality" value={partner.nationality} />
             <InfoRow icon={<MdPhone className="h-4 w-4" />} label="Phone Number" value={partner.phone} />
             <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={partner.email} />
             <InfoRow
@@ -264,15 +327,35 @@ export default function PartnerDetails({ id }: Props) {
               value={partner.is_active ? "Active" : "Inactive"}
             />
             <InfoRow
+              icon={<ShieldCheck className="h-4 w-4" />}
+              label="Verification Status"
+              value={partner.is_verified ? "Verified" : "Pending Verification"}
+            />
+            <InfoRow
               icon={<CalendarDays className="h-4 w-4" />}
               label="Registered"
               value={formatDateOfBirth(partner.created_at)}
             />
             <InfoRow
               icon={<Clock className="h-4 w-4" />}
+              label="Last Updated"
+              value={formatDateTime(partner.updated_at)}
+            />
+            <InfoRow
+              icon={<Clock className="h-4 w-4" />}
               label="Last Login"
               value={formatDateTime(partner.last_login) || "Never"}
             />
+            {partner.agency_role && (
+              <InfoRow
+                icon={<ShieldCheck className="h-4 w-4" />}
+                label="Agency Role"
+                value={formatAgencyRole(partner.agency_role)}
+              />
+            )}
+            {partner.agency_membership && (
+              <InfoRow icon={<Users className="h-4 w-4" />} label="Member Of" value={partner.agency_membership.agency_name} />
+            )}
           </div>
         </div>
 
@@ -316,11 +399,6 @@ export default function PartnerDetails({ id }: Props) {
             </div>
             <div className="mt-3 space-y-2">
               <DocRow
-                label="Identity Document"
-                fileKey={partner.individual_details?.id_document_file_key}
-                personName={partner.name}
-              />
-              <DocRow
                 label="Passport Photo"
                 fileKey={partner.individual_details?.passport_photo_file_key}
                 personName={partner.name}
@@ -329,13 +407,13 @@ export default function PartnerDetails({ id }: Props) {
           </div>
         )}
 
-        {/* Company Details */}
+        {/* Company Info */}
         {isCompany && (
           <div className="border-b border-slate-200 p-6">
             <div className="mb-4 flex items-center gap-2">
               <Briefcase className="h-4 w-4 text-slate-500" />
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                Company Details
+                Company Info
               </p>
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -350,6 +428,32 @@ export default function PartnerDetails({ id }: Props) {
                 value={partner.company_details?.website_url}
                 href={partner.company_details?.website_url || undefined}
               />
+            </div>
+            <div className="mt-3 space-y-2">
+              <DocRow
+                label="Company Registration Document"
+                fileKey={partner.company_details?.company_registration_doc_file_key}
+                personName={partner.name}
+              />
+              <DocRow
+                label="Agency Logo"
+                fileKey={partner.company_details?.logo_file_key}
+                personName={partner.name}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Personal Info — the company's contact person */}
+        {isCompany && (
+          <div className="border-b border-slate-200 p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <User className="h-4 w-4 text-slate-500" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Personal Info
+              </p>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <InfoRow
                 icon={<MdCategory className="h-4 w-4" />}
                 label="Date of Birth"
@@ -363,26 +467,69 @@ export default function PartnerDetails({ id }: Props) {
             </div>
             <div className="mt-3 space-y-2">
               <DocRow
-                label="Company Registration Document"
-                fileKey={partner.company_details?.company_registration_doc_file_key}
-                personName={partner.name}
-              />
-              <DocRow
-                label="Contact Identity Document"
-                fileKey={partner.company_details?.contact_id_document_file_key}
-                personName={partner.name}
-              />
-              <DocRow
                 label="Passport Photo"
                 fileKey={partner.company_details?.passport_photo_file_key}
                 personName={partner.name}
               />
-              <DocRow
-                label="Agency Logo"
-                fileKey={partner.company_details?.logo_file_key}
-                personName={partner.name}
-              />
             </div>
+          </div>
+        )}
+
+        </div>
+        )}
+
+        {/* Team Members */}
+        {isCompany && tab === "team" && (
+          <div key={tab} className="animate-in fade-in duration-200 p-6">
+            <div className="mb-4 flex items-center gap-2">
+              <Users className="h-4 w-4 text-slate-500" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                Team Members
+              </p>
+            </div>
+            {!partner.agency_members?.length ? (
+              <p className="py-8 text-center text-sm text-slate-500">No team members yet.</p>
+            ) : (
+            <div className="space-y-2">
+              {partner.agency_members.map((member) => (
+                <div
+                  key={member.id}
+                  onClick={() => router.push(`/admin/partners/${member.partner_id}`)}
+                  className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 p-3 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-slate-900">{member.name}</p>
+                    <p className="truncate text-xs text-slate-500">{member.email}</p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-3">
+                    {member.is_active ? (
+                      <StatusBadge variant="success">Active</StatusBadge>
+                    ) : (
+                      <StatusBadge variant="neutral">Suspended</StatusBadge>
+                    )}
+                    <IconButton
+                      onClick={(e) => { e.stopPropagation(); setSuspendTarget(member); }}
+                      title={member.is_active ? "Suspend member" : "Reactivate member"}
+                      icon={member.is_active ? <Ban className="h-4 w-4" /> : <Power className="h-4 w-4" />}
+                      bgColor="bg-transparent"
+                      textColor={member.is_active ? "text-slate-400" : "text-emerald-600"}
+                      borderColor="border-transparent"
+                      hoverTextColor={member.is_active ? "hover:text-red-600" : "hover:text-emerald-700"}
+                      hoverBorderColor="hover:border-transparent"
+                      className={member.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            )}
+          </div>
+        )}
+
+        {/* Applications */}
+        {tab === "applications" && (
+          <div key={tab} className="animate-in fade-in duration-200">
+            <PartnerApplicationsTable partnerId={id} />
           </div>
         )}
 

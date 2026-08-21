@@ -9,7 +9,8 @@ import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import InputField from "components/form/fields/InputField";
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 
 interface CreateFieldOfStudyProps {
   isOpen: boolean;
@@ -34,6 +35,21 @@ export default function CreateFieldOfStudy({
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    // This form has just one real input — attach any unrecognized error
+    // (e.g. a duplicate-name conflict) straight to it rather than only toasting.
+    onUnmappedError: (message) => {
+      showToast(`Failed to create Field Of Study. ${message}`, "error");
+      const e = { name: message };
+      setErrors(e);
+      scrollToFirstError(e);
+    },
+  });
 
   useEffect(() => {
     if (isOpen) {
@@ -68,7 +84,9 @@ export default function CreateFieldOfStudy({
   const handleCreate = async () => {
     const nameErr = validateName(formData.name);
     if (nameErr) {
-      setErrors({ name: nameErr });
+      const e = { name: nameErr };
+      setErrors(e);
+      scrollToFirstError(e);
       return;
     }
 
@@ -83,10 +101,8 @@ export default function CreateFieldOfStudy({
       onClose();
       onSuccess?.();
 
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-      showToast(`Failed to create Field Of Study. ${backendMessage}`, "error");
-      setErrors({ name: backendMessage });
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 

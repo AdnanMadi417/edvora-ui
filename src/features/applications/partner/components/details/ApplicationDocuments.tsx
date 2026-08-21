@@ -5,6 +5,8 @@ import { FolderOpen, ChevronDown, Clock, CheckCircle, XCircle } from 'lucide-rea
 import EmptyData from 'components/emptyData/EmptyData';
 import DocumentActions from 'features/applications/shared/DocumentActions';
 import { AppDate } from "components/ui/date";
+import { SectionIconBadge } from "components/ui/icons";
+import { SolidBadge } from "components/ui/badges";
 
 interface ApplicationDocumentsProps {
   application: any;
@@ -64,9 +66,9 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
     const label = STATUS_LABEL[doc.status] ?? 'Pending';
 
     return (
-      <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50">
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary">
+      <div className="flex items-center justify-between rounded-lg border border-slate-200 p-5 transition-colors hover:bg-slate-50">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-primary">
             {icon}
           </div>
           <div className="min-w-0 flex-1">
@@ -82,7 +84,7 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
             </div>
             <p className="mt-0.5 text-xs text-slate-400"><AppDate value={doc.created_at} format="short" fallback="Not provided" /></p>
             {doc.approve_notes && (
-              <p className="mt-1 text-xs text-slate-500">
+              <p className="mt-2.5 text-xs text-slate-500">
                 Note: <span className="font-medium text-slate-700">{doc.approve_notes}</span>
               </p>
             )}
@@ -99,8 +101,8 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
     if (docs.length === 0) return null;
     return (
       <div className="space-y-2">
-        <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{label}</p>
-        <div className="space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{label}</p>
+        <div className="space-y-4">
           {docs.map((doc: any) => (
             <DocRow key={doc.id} doc={doc} />
           ))}
@@ -112,23 +114,21 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
   return (
     <>
       <div
-        className="group flex cursor-pointer items-center justify-between p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80"
+        className="group flex cursor-pointer items-center justify-between p-6 transition-all duration-200 hover:bg-slate-50/80"
         onClick={() => setShowDocs(!showDocs)}
       >
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-3">
           <div className="relative shrink-0">
-            <div className="flex h-11 w-11 items-center justify-center rounded-md bg-blue-50">
-              <FolderOpen className="h-5 w-5 text-blue-600" />
-            </div>
+            <SectionIconBadge icon={FolderOpen} color="blue" />
             {pendingDocuments > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-md bg-amber-500 text-[10px] font-bold text-white">
+              <SolidBadge variant="warning" className="absolute -right-1 -top-1 h-5 w-5 rounded-md text-[10px]">
                 {pendingDocuments}
-              </span>
+              </SolidBadge>
             )}
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">Application Documents</h3>
-            <p className="mt-0.5 text-xs text-slate-500">
+            <h3 className="text-p3 font-semibold text-slate-900">Application Documents</h3>
+            <p className="text-sm text-slate-500">
               {totalDocuments} {totalDocuments === 1 ? 'file' : 'files'}
               {pendingDocuments > 0 && (
                 <span className="font-medium text-amber-600"> · {pendingDocuments} pending review</span>
@@ -159,7 +159,7 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
       </div>
 
       {showDocs && (
-        <div className="space-y-6 border-t border-slate-200 p-6">
+        <div className="space-y-4 border-t border-slate-200 p-6">
           {allDocs.map((doc: any) => <DocRow key={doc.id} doc={doc} />)}
           <DocGroup label="Payment Documents" docs={paymentDocuments} />
           <DocGroup label="Arrival Documents" docs={arrivalDocuments} />

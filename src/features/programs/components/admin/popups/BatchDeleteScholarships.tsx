@@ -8,6 +8,7 @@ import { useDeleteScholarships, useGetProgramScholarships } from "features/progr
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import Loading from "components/loading/Loading";
+import RichTextDisplay from "components/ui/RichTextDisplay";
 
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -179,9 +180,7 @@ export default function BatchDeleteScholarships({
                             )}
                           </div>
                           {s.description && (
-                            <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">
-                              {s.description}
-                            </p>
+                            <RichTextDisplay html={s.description} className="mt-0.5 line-clamp-2 text-xs text-slate-500" />
                           )}
                           {s.max_amount > 0 && (
                             <p className={`mt-1 text-xs font-medium ${isChecked ? "text-red-600" : "text-slate-400"}`}>

@@ -1,26 +1,31 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from "react";
-import { Pencil, Check, X, Settings, Plus } from "lucide-react";
+import { Pencil, Check, X, Settings, Plus, Tag, Trash2 } from "lucide-react";
 
-import { useLogisticServices, useEditLogisticService } from "features/logistical-service/hooks";
-import Loading from "components/loading/Loading";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import { useLogisticServices, useEditLogisticService, useDeleteLogisticService } from "features/logistical-service/hooks";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
+import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow } from "components/ui/table";
 import CreateLogisticsMarketplacePopup from "../CreateLogisticsMarketplacePopup";
+import DeleteServiceConfirmation from "../DeleteServiceConfirmation";
 
 const LogisticsMarketplaceServicesConfig = () => {
   const { logisticServices, loadingLogisticServices, errorLogisticServices, refetchLogisticServices } =
     useLogisticServices();
   const [isCreateServiceOpen, setIsCreateServiceOpen] = useState(false);
   const { editLogisticService, loadingEditLogisticService } = useEditLogisticService();
+  const { deleteLogisticService, isDeleting } = useDeleteLogisticService();
   const { showToast } = useToast();
 
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
+
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+  const [selectedServiceName, setSelectedServiceName] = useState("");
 
   const startEdit = (id: string, name: string) => {
     setEditingId(id);
@@ -53,60 +58,85 @@ const LogisticsMarketplaceServicesConfig = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!selectedServiceId) return;
+    try {
+      await deleteLogisticService(selectedServiceId);
+      showToast("Service deleted successfully.", "success");
+      setIsDeleteOpen(false);
+      setSelectedServiceId(null);
+      setSelectedServiceName("");
+      refetchLogisticServices();
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to delete service."), "error");
+    }
+  };
+
   return (
     <>
-      <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2">
-        <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
-          <div className="border-b border-slate-200 p-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-md border border-blue-200 bg-blue-50">
-                  <Settings className="h-5 w-5 text-blue-700" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-slate-900">
-                    Logistic Services
-                  </h3>
-                  <p className="mt-0.5 text-sm text-slate-500">
-                    Manage available logistic service types
-                  </p>
-                </div>
-              </div>
-              <Button
-                icon={<Plus className="h-4 w-4" />}
-                text="New Service"
-                bgColor="bg-blue-50"
-                textColor="text-blue-700"
-                borderColor="border-blue-600"
-                hoverTextColor="hover:text-blue-800"
-                hoverBorderColor="hover:border-blue-700"
-                onClick={() => setIsCreateServiceOpen(true)}
-              />
+      <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white p-6">
+
+        {/* Header */}
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-md border border-blue-200 bg-blue-50">
+              <Settings className="h-5 w-5 text-blue-700" />
+            </div>
+            <div>
+              <h3 className="text-xl font-semibold text-slate-900">Logistic Services</h3>
+              <p className="mt-0.5 text-sm text-slate-500">Manage available logistic service types</p>
             </div>
           </div>
+          <Button
+            icon={<Plus className="h-4 w-4" />}
+            text="New Service"
+            bgColor="bg-blue-50"
+            textColor="text-blue-700"
+            borderColor="border-blue-600"
+            hoverTextColor="hover:text-blue-800"
+            hoverBorderColor="hover:border-blue-700"
+            onClick={() => setIsCreateServiceOpen(true)}
+          />
+        </div>
 
-          <div className="divide-y divide-slate-200">
-            {loadingLogisticServices && (
-              <Loading text="Fetching logistic services..." />
-            )}
+        <TableWrapper>
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50">
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <Tag className="h-4 w-4 text-slate-500" />
+                    <span>Service Name</span>
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <Settings className="h-4 w-4 text-slate-500" />
+                    <span>Actions</span>
+                  </div>
+                </th>
+              </tr>
+            </thead>
 
-            {!loadingLogisticServices &&
-              !errorLogisticServices &&
-              logisticServices.length === 0 && (
-                <NoMessagesFound
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {loadingLogisticServices && <TableSkeletonRows columns={2} rows={5} />}
+
+              {!loadingLogisticServices && errorLogisticServices && (
+                <TableErrorRow colSpan={2} message={errorLogisticServices} />
+              )}
+
+              {!loadingLogisticServices && !errorLogisticServices && logisticServices.length === 0 && (
+                <TableEmptyRow
+                  colSpan={2}
                   title="No logistic services found"
                   subtitle="No services have been added yet."
                 />
               )}
 
-            {!loadingLogisticServices &&
-              logisticServices.map((service) => (
-                <div
-                  key={service.id}
-                  className="flex items-center justify-between bg-white px-6 py-4 transition-colors hover:bg-slate-50"
-                >
-                  {editingId === service.id ? (
-                    <div className="flex flex-1 items-center gap-3">
+              {!loadingLogisticServices && !errorLogisticServices && logisticServices.map((service) => (
+                <tr key={service.id} className="transition-colors hover:bg-slate-50">
+                  <td className="px-6 py-4">
+                    {editingId === service.id ? (
                       <input
                         type="text"
                         value={editingName}
@@ -116,52 +146,92 @@ const LogisticsMarketplaceServicesConfig = () => {
                           if (e.key === "Escape") cancelEdit();
                         }}
                         autoFocus
-                        className="flex-1 rounded-md border border-blue-400 px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        className="w-full max-w-sm rounded-md border border-blue-400 px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
                       />
-                      <button
-                        onClick={() => handleSave(service.id)}
-                        disabled={loadingEditLogisticService}
-                        aria-label="Save"
-                        className="flex items-center justify-center rounded-md border border-green-600 p-1.5 text-green-600 transition hover:bg-green-50 disabled:opacity-50"
-                      >
-                        <Check className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={cancelEdit}
-                        aria-label="Cancel"
-                        className="flex items-center justify-center rounded-md border border-slate-300 p-1.5 text-slate-500 transition hover:bg-slate-50"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <span className="text-sm font-medium text-slate-800">
-                        {service.name}
-                      </span>
-                      <IconButton
-                        onClick={() => startEdit(service.id, service.name)}
-                        aria-label="Edit service"
-                        icon={<Pencil className="h-4 w-4" />}
-                        bgColor="bg-transparent"
-                        textColor="text-slate-500"
-                        borderColor="border-transparent"
-                        hoverTextColor="hover:text-slate-700"
-                        hoverBorderColor="hover:border-transparent"
-                        className="hover:bg-slate-100"
-                      />
-                    </>
-                  )}
-                </div>
+                    ) : (
+                      <span className="text-sm font-medium text-slate-800">{service.name}</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    {editingId === service.id ? (
+                      <div className="flex items-center gap-2">
+                        <IconButton
+                          onClick={() => handleSave(service.id)}
+                          disabled={loadingEditLogisticService}
+                          aria-label="Save"
+                          icon={<Check className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-green-600"
+                          borderColor="border-green-600"
+                          hoverTextColor="hover:text-green-700"
+                          hoverBorderColor="hover:border-green-700"
+                          className="hover:bg-green-50"
+                        />
+                        <IconButton
+                          onClick={cancelEdit}
+                          aria-label="Cancel"
+                          icon={<X className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-500"
+                          borderColor="border-slate-300"
+                          hoverTextColor="hover:text-slate-700"
+                          hoverBorderColor="hover:border-slate-300"
+                          className="hover:bg-slate-50"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <IconButton
+                          onClick={() => startEdit(service.id, service.name)}
+                          aria-label="Edit service"
+                          icon={<Pencil className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-500"
+                          borderColor="border-transparent"
+                          hoverTextColor="hover:text-slate-700"
+                          hoverBorderColor="hover:border-transparent"
+                          className="hover:bg-slate-100"
+                        />
+
+                        <div className="h-6 border-l border-slate-200" />
+
+                        <IconButton
+                          onClick={() => {
+                            setSelectedServiceId(service.id);
+                            setSelectedServiceName(service.name);
+                            setIsDeleteOpen(true);
+                          }}
+                          aria-label="Delete service"
+                          icon={<Trash2 className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-500"
+                          borderColor="border-transparent"
+                          hoverTextColor="hover:text-red-600"
+                          hoverBorderColor="hover:border-transparent"
+                          className="hover:bg-red-50"
+                        />
+                      </div>
+                    )}
+                  </td>
+                </tr>
               ))}
-          </div>
-        </div>
+            </tbody>
+          </table>
+        </TableWrapper>
       </div>
 
       <CreateLogisticsMarketplacePopup
         isOpen={isCreateServiceOpen}
         onClose={() => setIsCreateServiceOpen(false)}
         onCreated={refetchLogisticServices}
+      />
+
+      <DeleteServiceConfirmation
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        serviceName={selectedServiceName}
       />
     </>
   );

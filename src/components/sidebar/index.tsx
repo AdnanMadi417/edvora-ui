@@ -1,16 +1,17 @@
 "use client";
 
 import { HiX } from "react-icons/hi";
-import { MdLogout } from "react-icons/md";
 import { MessageSquarePlus, FlaskConical } from "lucide-react";
 import Links from "./components/Links";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import { IRoute } from "types/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 import { useEffect, useState, useCallback } from "react";
-import api, { SIGN_IN_URL, LOGOUT_URL } from "lib/useApi";
+import api from "lib/useApi";
 import { usePartnerProfile } from "features/partners/hooks";
+import { formatAgencyRole } from "features/partners/utils";
 import PresignedImage from "components/ui/PresignedImage";
 
 interface User {
@@ -18,6 +19,7 @@ interface User {
   name: string;
   email: string;
   role: string;
+  agency_role?: string | null;
 }
 
 function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
@@ -26,20 +28,31 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
 
   const [user, setUser] = useState<User | null>(null);
   const [userError, setUserError] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showBetaTooltip, setShowBetaTooltip] = useState(false);
   const { partner } = usePartnerProfile({ enabled: user?.role === "partner" });
-  const photoFileKey = partner?.individual_details?.profile_photo_file_key;
+  const isAgencyPartner = partner?.type === "agency";
+  const photoFileKey = isAgencyPartner
+    ? partner?.company_details?.logo_file_key
+    : partner?.individual_details?.profile_photo_file_key;
+  const sidebarDisplayName = (isAgencyPartner && partner?.company_details?.company_name) || user?.name || "";
 
   const ROLE_LABELS: Record<string, string> = {
     admin: "Admin",
     account_manager: "Account Manager",
     partner: "Partner",
+    data_entry: "Data Entry",
+    reviewer: "Reviewer",
   };
 
   function getRoleLabel(role: string): string {
     return ROLE_LABELS[role] || role;
   }
+
+  const PROFILE_PATHS: Record<string, string> = {
+    partner: "/partner/profile",
+    account_manager: "/account-manager/profile",
+  };
+  const profilePath = user?.role ? PROFILE_PATHS[user.role] : undefined;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -68,18 +81,6 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const handleOverlayClick = useCallback(() => {
     setOpen(false);
   }, [setOpen]);
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      await fetch(LOGOUT_URL, { method: "POST" });
-    } catch {
-      // non-fatal
-    }
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.replace(SIGN_IN_URL);
-  };
 
   return (
     <>
@@ -141,7 +142,33 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           )}
         </header>
 
-        <div className="border-y-thin border-gray-200 px-6 py-4">
+        <div className="max-h-30 block overflow-y-auto [&::-webkit-scrollbar-thumb]:bg-slate-100 [&::-webkit-scrollbar-thumb]:[border-radius:3px] [&::-webkit-scrollbar-thumb]:[margin-left:3px] [&::-webkit-scrollbar]:[width:6px]" />
+
+        <div
+          className="flex-1 overflow-y-auto 
+          border-t border-slate-200 pt-6
+        [&::-webkit-scrollbar-thumb]:bg-slate-200
+        [&::-webkit-scrollbar-thumb]:[border-radius:3px]
+        [&::-webkit-scrollbar-thumb]:[margin-left:3px]
+        [&::-webkit-scrollbar]:[width:6px]
+      "
+        >
+          <Links routes={routes} onLinkClick={() => setOpen(false)} />
+        </div>
+
+        {user?.role === "partner" && (
+          <a
+            href="https://docs.google.com/forms/d/e/1FAIpQLScbdcaLfK0utkj8DaMVEJdBUW82swRrWWZODNcFq1DNaRLLTQ/viewform"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-3 flex items-center gap-3 rounded-md px-3 py-3 text-sm font-medium text-slate-500 transition-colors duration-200 ease-in-out hover:text-slate-900"
+          >
+            <MessageSquarePlus className="h-[18px] w-[18px]" />
+            <span>Send feedback</span>
+          </a>
+        )}
+
+        <footer className="border-t border-gray-200 px-6 py-4">
           {userError ? (
             <div className="text-center">
               <p className="text-p2 text-failed">Failed to load user</p>
@@ -154,29 +181,51 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <div
-                className="flex h-10 w-10 shrink-0 items-center justify-center
+              {profilePath ? (
+                <Link
+                  href={profilePath}
+                  onClick={() => setOpen(false)}
+                  className="flex h-10 w-10 shrink-0 items-center justify-center
           overflow-hidden rounded-full bg-accent-light text-h5 font-medium text-blue-700"
-              >
-                {user ? (
-                  <PresignedImage
-                    fileKey={photoFileKey ?? undefined}
-                    alt={user.name}
-                    className="h-full w-full object-cover"
-                    fallback={user.name[0].toUpperCase()}
-                  />
-                ) : (
-                  <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
-                )}
-              </div>
+                >
+                  {user ? (
+                    <PresignedImage
+                      fileKey={photoFileKey ?? undefined}
+                      alt={sidebarDisplayName}
+                      className="h-full w-full object-cover"
+                      fallback={sidebarDisplayName ? sidebarDisplayName[0].toUpperCase() : "?"}
+                    />
+                  ) : (
+                    <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
+                  )}
+                </Link>
+              ) : (
+                <div
+                  className="flex h-10 w-10 shrink-0 items-center justify-center
+          overflow-hidden rounded-full bg-accent-light text-h5 font-medium text-blue-700"
+                >
+                  {user ? (
+                    <PresignedImage
+                      fileKey={photoFileKey ?? undefined}
+                      alt={sidebarDisplayName}
+                      className="h-full w-full object-cover"
+                      fallback={sidebarDisplayName ? sidebarDisplayName[0].toUpperCase() : "?"}
+                    />
+                  ) : (
+                    <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
+                  )}
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 {user ? (
                   <>
                     <p className="truncate text-p2 font-semibold text-slate-900">
-                      {user.name}
+                      {sidebarDisplayName}
                     </p>
                     <p className="truncate text-caption text-slate-500">
-                      {getRoleLabel(user.role)}
+                      {user.role === "partner" && user.agency_role
+                        ? formatAgencyRole(user.agency_role)
+                        : getRoleLabel(user.role)}
                     </p>
                   </>
                 ) : (
@@ -188,52 +237,6 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
               </div>
             </div>
           )}
-        </div>
-
-        <div className="max-h-30 block overflow-y-auto [&::-webkit-scrollbar-thumb]:bg-slate-100 [&::-webkit-scrollbar-thumb]:[border-radius:3px] [&::-webkit-scrollbar-thumb]:[margin-left:3px] [&::-webkit-scrollbar]:[width:6px]" />
-
-        <div
-          className="flex-1 overflow-y-auto py-4
-        [&::-webkit-scrollbar-thumb]:bg-slate-200
-        [&::-webkit-scrollbar-thumb]:[border-radius:3px]
-        [&::-webkit-scrollbar-thumb]:[margin-left:3px]
-        [&::-webkit-scrollbar]:[width:6px]
-      "
-        >
-          <Links routes={routes} onLinkClick={() => setOpen(false)} />
-        </div>
-
-        <footer className="border-t border-gray-200 px-6 py-4">
-          {user?.role === "partner" && (
-            <a
-              href="https://docs.google.com/forms/d/e/1FAIpQLScbdcaLfK0utkj8DaMVEJdBUW82swRrWWZODNcFq1DNaRLLTQ/viewform"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mb-1 flex w-full items-center gap-3 rounded-md border border-transparent px-4 py-3 text-left font-medium text-slate-600 transition-all duration-200 hover:border-slate-100 hover:bg-slate-50"
-            >
-              <MessageSquarePlus className="h-5 w-5" />
-              <span className="text-sm">Send feedback</span>
-            </a>
-          )}
-          <button
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            className="flex w-full items-center gap-3 rounded-md
-        border border-transparent px-4 py-3 text-left
-        font-medium text-red-600 transition-all duration-200
-        hover:border-red-100 hover:bg-red-50
-        focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2
-        disabled:cursor-not-allowed disabled:opacity-50"
-            aria-label="Sign out of your account"
-            type="button"
-          >
-            <MdLogout
-              className={`h-5 w-5 ${isLoggingOut ? "animate-spin" : ""}`}
-            />
-            <span className="text-sm">
-              {isLoggingOut ? "Logging out..." : "Logout"}
-            </span>
-          </button>
         </footer>
       </div>
 

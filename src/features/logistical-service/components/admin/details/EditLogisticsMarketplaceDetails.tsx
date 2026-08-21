@@ -30,6 +30,10 @@ import { NATIONALITIES } from "constants/lists";
 
 interface Props {
   id: string;
+  /** Where a successful save navigates to. Defaults to this provider's admin details page. */
+  redirectPath?: string;
+  /** Where "Back" and "Cancel" navigate to. Defaults to the admin logistics marketplace list. */
+  listPath?: string;
 }
 
 interface FormData {
@@ -48,7 +52,11 @@ interface FormData {
 
 type FormErrors = Record<string, string>;
 
-const EditLogisticsMarketplaceDetails = ({ id }: Props) => {
+const EditLogisticsMarketplaceDetails = ({
+  id,
+  redirectPath = `/admin/logistics-marketplace/${id}`,
+  listPath = "/admin/logistics-marketplace",
+}: Props) => {
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -310,7 +318,7 @@ const EditLogisticsMarketplaceDetails = ({ id }: Props) => {
     try {
       await editLogisticsProvider(service.id, payload);
       showToast("Logistics provider updated successfully", "success");
-      router.push(`/admin/logistics-marketplace/${id}`);
+      router.push(redirectPath);
     } catch (error: any) {
       const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
@@ -352,7 +360,7 @@ const EditLogisticsMarketplaceDetails = ({ id }: Props) => {
 
           <div className="flex items-center gap-2 sm:gap-6">
             <button
-              onClick={() => router.push(`/admin/logistics-marketplace/${id}`)}
+              onClick={() => router.push(listPath)}
               className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
             >
               <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -492,7 +500,7 @@ const EditLogisticsMarketplaceDetails = ({ id }: Props) => {
         </div>
 
         <div className="flex justify-end gap-2 border-t border-gray-200 px-6 py-5">
-          <Button onClick={() => router.push(`/admin/logistics-marketplace/${id}`)} icon={<X className="h-5 w-5" />} text="Cancel" bgColor="bg-slate-50" textColor="text-slate-700" borderColor="border-slate-600" hoverTextColor="hover:text-slate-800" hoverBorderColor="hover:border-slate-700" />
+          <Button onClick={() => router.push(listPath)} icon={<X className="h-5 w-5" />} text="Cancel" bgColor="bg-slate-50" textColor="text-slate-700" borderColor="border-slate-600" hoverTextColor="hover:text-slate-800" hoverBorderColor="hover:border-slate-700" />
           <Button icon={<Edit2 className="h-5 w-5" />} text={loadingEditLogisticsProvider ? "Updating..." : "Update Service"} bgColor="bg-amber-50" textColor="text-amber-700" borderColor="border-amber-600" hoverTextColor="hover:text-amber-800" hoverBorderColor="hover:border-amber-700" onClick={handleSubmit} disabled={loadingEditLogisticsProvider || logoUploading || !isChanged} />
         </div>
       </div>

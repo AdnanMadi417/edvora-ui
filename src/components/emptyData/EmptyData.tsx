@@ -1,37 +1,54 @@
 import React from "react";
 import emptyPng from "/public/img/dashboards/empty-data-icon.png";
 import Image from "next/image";
+import type { SectionIconBadgeColor } from "components/ui/icons/SectionIconBadge";
+
+const COLOR_CLASSES: Record<SectionIconBadgeColor, string> = {
+  blue: "bg-blue-50 text-blue-500",
+  green: "bg-green-50 text-green-500",
+  amber: "bg-amber-50 text-amber-500",
+  red: "bg-red-50 text-red-500",
+  violet: "bg-violet-50 text-violet-500",
+  slate: "bg-slate-100 text-slate-400",
+};
 
 interface EmptyDataProps {
   title?: string;
   subtitle?: React.ReactNode;
-  icon?: React.ReactNode;
+  /** An icon component (e.g. `Bell` from lucide-react, not `<Bell />`) —
+   * sized and colored consistently via `color`. Falls back to the default
+   * illustration when omitted. */
+  icon?: React.ComponentType<{ className?: string }>;
+  color?: SectionIconBadgeColor;
+  /** Optional control rendered below the subtitle, e.g. a Retry button for error states. */
+  action?: React.ReactNode;
 }
 
 export default function EmptyData({
   title = "No data found",
   subtitle = "There is no data available at the moment",
-  icon,
+  icon: Icon,
+  color = "slate",
+  action,
 }: EmptyDataProps) {
   return (
     <section>
-      <div className="mt-5 rounded-2xl border border-slate-200 bg-card p-10 text-center">
-        <div className="flex flex-col items-center gap-2">
-          <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-muted">
-            {icon ?? (
-              <Image
-                width={60}
-                height={60}
-                src={emptyPng}
-                alt="No data"
-                className="h-14 w-14 opacity-80"
-              />
+      <div className="bg-white p-10 text-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className={`flex h-16 w-16 items-center justify-center rounded-full ${COLOR_CLASSES[color]}`}>
+            {Icon ? (
+              <Icon className="h-7 w-7" />
+            ) : (
+              <Image width={40} height={40} src={emptyPng} alt="No data" className="h-9 w-9 opacity-70" />
             )}
           </div>
 
-          <p className="text-p2 font-medium text-slate-900">{title}</p>
+          <div className="space-y-1">
+            <p className="text-p2 font-semibold text-slate-900">{title}</p>
+            <p className="text-caption font-normal text-slate-500">{subtitle}</p>
+          </div>
 
-          <p className="text-caption font-normal text-slate-600">{subtitle}</p>
+          {action}
         </div>
       </div>
     </section>

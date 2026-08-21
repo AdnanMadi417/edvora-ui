@@ -7,7 +7,8 @@ import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hoo
 import { useUniversityPaymentMethods, useAssignUniversityPaymentMethod } from "features/universities/hooks";
 
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import { CURRENCY } from 'constants/lists';
 
 import ModalHeader from "components/ui/modal/ModalHeader";
@@ -45,6 +46,14 @@ export default function AssignPaymentUniversity({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Failed to assign payment method. ${message}`, "error"),
+  });
+
   useEffect(() => {
     if (isOpen) {
       setFormData({ payment_method_id: "", instructions: "", currency: "", is_active: true });
@@ -72,7 +81,9 @@ export default function AssignPaymentUniversity({
 
   const handleAssign = async () => {
     if (!formData.payment_method_id.trim()) {
-      setErrors({ payment_method_id: "Payment method is required" });
+      const e = { payment_method_id: "Payment method is required" };
+      setErrors(e);
+      scrollToFirstError(e);
       return;
     }
 
@@ -88,18 +99,8 @@ export default function AssignPaymentUniversity({
       onClose();
       onSuccess?.();
 
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
-        });
-        setErrors(newErrors);
-      } else {
-        showToast(parseApiError(err, "Failed to assign payment method."), "error");
-      }
+    } catch (err: unknown) {
+      handleApiError(err, "Failed to assign payment method.");
     }
   };
 

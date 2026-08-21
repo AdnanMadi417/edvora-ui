@@ -18,6 +18,7 @@ import {
   BookOpen,
   Languages,
   Clock,
+  Pencil,
 } from "lucide-react";
 
 import { useProgram } from "features/programs/hooks";
@@ -27,8 +28,8 @@ import Loading from "components/loading/Loading";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import RichTextDisplay from "components/ui/RichTextDisplay";
-import { AppDate } from "components/ui/date";
 import CurrencySelector from "features/programs/components/shared/CurrencySelector";
+import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
 import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate } from "features/programs/utils/exchangeRate";
 
 type RequiredDocument = {
@@ -129,9 +130,12 @@ interface ProgramDetailsProps {
   id: string;
   basePath?: string;
   showApplyAction?: boolean;
+  /** When set, shows an "Edit Program" button linking here — for roles
+   * (e.g. data entry) that can edit but shouldn't see the Apply action. */
+  editPath?: string;
 }
 
-const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: ProgramDetailsProps) => {
+const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, editPath }: ProgramDetailsProps) => {
   const router = useRouter();
   const handleBack = () => router.push(`${basePath}/knowledge-hub/`);
 
@@ -251,14 +255,16 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
         </div>
 
         {/* Stats */}
-        <div className="p-6 border-b border-slate-200 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-green-200 bg-green-50 p-5 text-center">
-            <CircleDollarSign className="h-5 w-5 text-green-600" />
-            <p className="text-xs text-green-600">Commission</p>
-            <p className="text-xl font-bold text-green-700">
-              {commission?.amount != null ? formatCommission(commission.amount, commission.currency) : "—"}
-            </p>
-          </div>
+        <div className={`p-6 border-b border-slate-200 grid grid-cols-2 gap-3 ${commission?.amount != null ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}>
+          {commission?.amount != null && (
+            <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-green-200 bg-green-50 p-5 text-center">
+              <CircleDollarSign className="h-5 w-5 text-green-600" />
+              <p className="text-xs text-green-600">Commission</p>
+              <p className="text-xl font-bold text-green-700">
+                {formatCommission(commission.amount, commission.currency)}
+              </p>
+            </div>
+          )}
 
           <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white p-5 text-center">
             <Banknote className="h-5 w-5 text-slate-400" />
@@ -359,26 +365,8 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Intake Dates</p>
-                  <div className="mt-1.5 flex flex-wrap gap-2">
-                    {[...program.intake_dates]
-                      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-                      .map((dateStr) => {
-                        const d = new Date(dateStr);
-                        const isPast = d < new Date();
-                        return (
-                          <span
-                            key={dateStr}
-                            className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium border ${
-                              isPast
-                                ? "border-slate-200 bg-slate-100 text-slate-400 line-through"
-                                : "border-emerald-200 bg-emerald-50 text-emerald-700"
-                            }`}
-                          >
-                            {!isPast && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />}
-                            {d.toLocaleString("en-US", { month: "short" })}
-                          </span>
-                        );
-                      })}
+                  <div className="mt-1.5">
+                    <IntakeDatesChips dates={program.intake_dates} />
                   </div>
                 </div>
               </div>
@@ -608,6 +596,19 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true }: P
             >
               Apply for This Program
             </Link>
+          )}
+          {editPath && (
+            <Button
+              text="Edit Program"
+              onClick={() => router.push(editPath)}
+              icon={<Pencil className="h-4 w-4" />}
+              bgColor="bg-blue-600"
+              textColor="text-white"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
+              className="flex-1 !bg-blue-600 hover:!bg-blue-700"
+            />
           )}
         </div>
 

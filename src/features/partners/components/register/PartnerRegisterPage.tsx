@@ -9,16 +9,19 @@ import { usePartnerRegistration } from "features/partners/hooks";
 import OtpStep from "./OtpStep";
 import EnterVerificationCodeModal from "./EnterVerificationCodeModal";
 import { AnimatePresence, motion } from "framer-motion";
-import { COUNTRIES, BACKGROUND_OPTIONS } from "constants/lists";
+import { COUNTRIES, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
+import SearchableDropdown from "components/form/search/SearchableDropdown";
 import PhoneInputField from "components/form/fields/PhoneInputField";
 import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
-import { validateSocialMediaField } from "utils/socialMedia";
+import { validateSocialMediaField, isValidPlatformUrl } from "utils/socialMedia";
 import PublicFileUploadField, { type PublicUploadResult } from "components/form/upload/PublicFileUploadField";
 import ImageUploadField from "components/form/upload/ImageUploadField";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
 import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import Button from "components/ui/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import registrationIconImg from "/public/img/icons/registration-icon.png";
@@ -29,6 +32,31 @@ type Step = "form" | "otp" | "success"; // "otp" rendered by OtpStep
 type PartnerType = "individual" | "agency";
 
 const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
+const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
+
+// Maps this backend endpoint's field names (from a 422 validation error's
+// `loc` path) to this form's own field/error keys, wherever they differ —
+// derived directly from how the submit payload below is built.
+const IND_FIELD_MAP: Record<string, string> = {
+  full_name: "name",
+  phone: "phone_number",
+  passport_photo_file_url: "ind_passport_photo",
+  passport_photo_file_key: "ind_passport_photo",
+  profile_photo_file_url: "ind_profile_photo",
+  profile_photo_file_key: "ind_profile_photo",
+};
+
+const COMP_FIELD_MAP: Record<string, string> = {
+  full_name: "contact_full_name",
+  email: "contact_email",
+  phone: "contact_phone_number",
+  company_registration_doc_file_url: "comp_reg_doc",
+  company_registration_doc_file_key: "comp_reg_doc",
+  passport_photo_file_url: "comp_passport_photo",
+  passport_photo_file_key: "comp_passport_photo",
+  logo_file_url: "comp_logo",
+  logo_file_key: "comp_logo",
+};
 
 function SectionCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
@@ -102,19 +130,29 @@ export default function PartnerRegisterPage() {
   };
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [hasFieldLevelApiError, setHasFieldLevelApiError] = useState(false);
+
+  const handleApiError = useApiFormErrors({
+    fieldMap: partnerType === "agency" ? COMP_FIELD_MAP : IND_FIELD_MAP,
+    emailField: partnerType === "agency" ? "contact_email" : "email",
+    setErrors: (patch) => {
+      setErrors((p) => ({ ...p, ...patch }));
+      setHasFieldLevelApiError(true);
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: () => setHasFieldLevelApiError(false),
+  });
 
   // Individual form
   const [indForm, setIndForm] = useState({
     name: "", email: "",
     phone_code: "+60", phone_number: "",
-    country: "", background: "",
+    country: "", nationality: "", background: "",
     date_of_birth: "", passport_number: "",
     social_platform: "instagram", social_username: "", social_media_url: "",
     linkedin_platform: "linkedin", linkedin_username: "", linkedin_url: "",
     agreed: false,
   });
-  const [indIdDoc, setIndIdDoc] = useState<PublicUploadResult | null>(null);
-  const [indIdDocName, setIndIdDocName] = useState("");
   const [indPassportPhoto, setIndPassportPhoto] = useState<PublicUploadResult | null>(null);
   const [indPassportPhotoName, setIndPassportPhotoName] = useState("");
   const indProfilePhoto = usePublicPhotoUpload();
@@ -125,13 +163,11 @@ export default function PartnerRegisterPage() {
     social_platform: "instagram", social_username: "", website_url: "",
     contact_full_name: "", contact_email: "",
     contact_phone_code: "+60", contact_phone_number: "",
-    date_of_birth: "", passport_number: "",
+    nationality: "", date_of_birth: "", passport_number: "",
     agreed: false,
   });
   const [compRegDoc, setCompRegDoc] = useState<PublicUploadResult | null>(null);
   const [compRegDocName, setCompRegDocName] = useState("");
-  const [compContactIdDoc, setCompContactIdDoc] = useState<PublicUploadResult | null>(null);
-  const [compContactIdDocName, setCompContactIdDocName] = useState("");
   const [compPassportPhoto, setCompPassportPhoto] = useState<PublicUploadResult | null>(null);
   const [compPassportPhotoName, setCompPassportPhotoName] = useState("");
   const compLogo = usePublicPhotoUpload();
@@ -146,29 +182,45 @@ export default function PartnerRegisterPage() {
     setErrors((p) => ({ ...p, [field]: "" }));
   };
 
-  const validateInd = () => {
+  const computeIndErrors = () => {
     const e: Record<string, string> = {};
     if (!indForm.name.trim()) e.name = "Name is required";
     else if (indForm.name.trim().length < 3) e.name = "Name must be at least 3 characters";
     if (!indForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(indForm.email)) e.email = "Enter a valid email";
     if (!indForm.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!indForm.country) e.country = "Country is required";
+    if (!indForm.nationality) e.nationality = "Nationality is required";
     if (!indForm.background) e.background = "Please select your background";
     if (!indForm.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!indForm.passport_number.trim()) e.passport_number = "Passport number is required";
-    if (!indIdDoc) e.ind_id_doc = "Please upload your passport or national ID";
+    if (!indProfilePhoto.fileKey) e.ind_profile_photo = "Profile photo is required";
+    if (!indPassportPhoto) e.ind_passport_photo = "Please upload your passport photo";
     const socialError = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
     if (socialError) e.social_media_url = socialError;
+    if (indForm.linkedin_url && !isValidPlatformUrl("linkedin", indForm.linkedin_url))
+      e.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://www.linkedin.com/in/yourname)";
     if (!indForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
+    return e;
+  };
+
+  const validateInd = () => {
+    const e = computeIndErrors();
     setErrors(e);
+    if (Object.keys(e).length > 0) scrollToFirstError(e);
     return Object.keys(e).length === 0;
   };
 
-  const validateComp = () => {
+  const validateIndField = (field: string) => {
+    const e = computeIndErrors();
+    setErrors((prev) => ({ ...prev, [field]: e[field] ?? "" }));
+  };
+
+  const computeCompErrors = () => {
     const e: Record<string, string> = {};
     if (!compForm.company_name.trim()) e.company_name = "Agency name is required";
     else if (compForm.company_name.trim().length < 3) e.company_name = "Agency name must be at least 3 characters";
     if (!compForm.country) e.country = "Country is required";
+    if (!compLogo.fileKey) e.comp_logo = "Agency logo is required";
     const socialError = validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" });
     if (socialError) e.website_url = socialError;
     if (!compRegDoc) e.comp_reg_doc = "Please upload your agency registration document";
@@ -176,37 +228,35 @@ export default function PartnerRegisterPage() {
     else if (compForm.contact_full_name.trim().length < 3) e.contact_full_name = "Full name must be at least 3 characters";
     if (!compForm.contact_email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(compForm.contact_email)) e.contact_email = "Enter a valid email";
     if (!compForm.contact_phone_number.trim()) e.contact_phone_number = "Phone number is required";
+    if (!compForm.nationality) e.nationality = "Nationality is required";
     if (!compForm.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!compForm.passport_number.trim()) e.passport_number = "Passport number is required";
-    if (!compContactIdDoc) e.comp_contact_id_doc = "Please upload a passport or national ID";
+    if (!compPassportPhoto) e.comp_passport_photo = "Please upload a passport photo";
     if (!compForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
+    return e;
+  };
+
+  const validateComp = () => {
+    const e = computeCompErrors();
     setErrors(e);
+    if (Object.keys(e).length > 0) scrollToFirstError(e);
     return Object.keys(e).length === 0;
   };
 
+  const validateCompField = (field: string) => {
+    const e = computeCompErrors();
+    setErrors((prev) => ({ ...prev, [field]: e[field] ?? "" }));
+  };
+
   const isFormComplete = partnerType === "individual"
-    ? Boolean(
-        indForm.name.trim().length >= 3 &&
-        indForm.email && indForm.phone_number.trim() &&
-        indForm.country && indForm.background &&
-        indForm.date_of_birth && indForm.passport_number.trim() &&
-        indIdDoc &&
-        !validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" }) &&
-        indForm.agreed,
-      )
+    ? Object.keys(computeIndErrors()).length === 0
     : partnerType === "agency"
-    ? Boolean(
-        compForm.company_name.trim() && compForm.country &&
-        !validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" }) &&
-        compRegDoc && compForm.contact_full_name.trim() && compForm.contact_email &&
-        compForm.contact_phone_number.trim() && compForm.date_of_birth && compForm.passport_number.trim() &&
-        compContactIdDoc &&
-        compForm.agreed,
-      )
+    ? Object.keys(computeCompErrors()).length === 0
     : false;
 
   const handleSubmit = async () => {
     if (partnerType === "individual" ? !validateInd() : !validateComp()) return;
+    setHasFieldLevelApiError(false);
 
     const indSocialField = indForm.social_platform === "linkedin" ? "linkedin_url" : "social_media_url";
 
@@ -217,10 +267,10 @@ export default function PartnerRegisterPage() {
           email: indForm.email,
           phone: `${indForm.phone_code} ${indForm.phone_number}`,
           country: indForm.country,
+          nationality: indForm.nationality,
           background: indForm.background,
           date_of_birth: indForm.date_of_birth,
           passport_number: indForm.passport_number.trim(),
-          ...(indIdDoc && { id_document_file_key: indIdDoc.file_key, id_document_file_url: indIdDoc.file_url }),
           ...(indPassportPhoto && { passport_photo_file_key: indPassportPhoto.file_key, passport_photo_file_url: indPassportPhoto.file_url }),
           ...(indProfilePhoto.fileKey && { profile_photo_file_key: indProfilePhoto.fileKey, profile_photo_file_url: indProfilePhoto.fileUrl }),
           ...(indForm.social_media_url && { [indSocialField]: indForm.social_media_url }),
@@ -234,17 +284,19 @@ export default function PartnerRegisterPage() {
           country: compForm.country,
           company_name: compForm.company_name.trim(),
           website_url: compForm.website_url,
+          nationality: compForm.nationality,
           date_of_birth: compForm.date_of_birth,
           passport_number: compForm.passport_number.trim(),
           ...(compRegDoc      && { company_registration_doc_file_key: compRegDoc.file_key,      company_registration_doc_file_url: compRegDoc.file_url }),
-          ...(compContactIdDoc && { contact_id_document_file_key: compContactIdDoc.file_key, contact_id_document_file_url: compContactIdDoc.file_url }),
           ...(compPassportPhoto && { passport_photo_file_key: compPassportPhoto.file_key, passport_photo_file_url: compPassportPhoto.file_url }),
           ...(compLogo.fileKey && { logo_file_key: compLogo.fileKey, logo_file_url: compLogo.fileUrl }),
         };
     try {
       await initiateRegistration(payload);
       goToOtpStep(partnerType === "individual" ? indForm.email : compForm.contact_email);
-    } catch { /* error shown via hook */ }
+    } catch (err: unknown) {
+      handleApiError(err, "");
+    }
   };
 
   if (step === "otp") {
@@ -369,39 +421,46 @@ export default function PartnerRegisterPage() {
                     <ImageUploadField
                       label="Profile Photo"
                       field="ind_profile_photo"
+                      required
                       imageOnly
                       simpleFile={indProfilePhoto.file}
                       onSimpleFileChange={indProfilePhoto.handleSelect}
                       onSimpleRemove={indProfilePhoto.handleRemove}
                       simpleUploading={indProfilePhoto.uploading}
                       simpleProgress={indProfilePhoto.progress}
-                      errors={{ ind_profile_photo: indProfilePhoto.error }}
+                      errors={{ ind_profile_photo: indProfilePhoto.error || errors.ind_profile_photo }}
                     />
-                    <InputField label="Name (as per Passport/National ID)" field="name" placeholder="Ahmed Ali"
+                    <InputField label="Name (as per Passport)" field="name" placeholder="Ahmed Ali"
                       formData={indForm} errors={errors} updateFormData={updateInd}
-                      onBlur={() => {
-                        const val = indForm.name.trim();
-                        if (!val) setErrors((p) => ({ ...p, name: "Name is required" }));
-                        else if (val.length < 3) setErrors((p) => ({ ...p, name: "Name must be at least 3 characters" }));
-                      }} />
+                      onBlur={() => validateIndField("name")} />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <InputField label="Email Address" field="email" type="email" placeholder="name@mail.com"
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                        formData={indForm} errors={errors} updateFormData={updateInd}
+                        onBlur={() => validateIndField("email")} />
                       <PhoneInputField dialCodeField="phone_code" numberField="phone_number"
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                        formData={indForm} errors={errors} updateFormData={updateInd}
+                        onBlur={() => validateIndField("phone_number")} />
                     </div>
-                    <SelectField label="Country of Residence" field="country" options={COUNTRY_OPTIONS}
-                      formData={indForm} errors={errors} updateFormData={updateInd} />
+                    <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                      <SelectField label="Country of Residence" field="country" options={COUNTRY_OPTIONS}
+                        formData={indForm} errors={errors} updateFormData={updateInd}
+                        onBlur={() => validateIndField("country")} />
+                      <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS}
+                        formData={indForm} errors={errors} updateFormData={updateInd}
+                        onBlur={() => validateIndField("nationality")} />
+                    </div>
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <InputField label="Date of Birth" field="date_of_birth" type="date"
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                        formData={indForm} errors={errors} updateFormData={updateInd}
+                        onBlur={() => validateIndField("date_of_birth")} />
                       <InputField label="Passport Number" field="passport_number" placeholder="A12345678"
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                        formData={indForm} errors={errors} updateFormData={updateInd}
+                        onBlur={() => validateIndField("passport_number")} />
                     </div>
                   </SectionCard>
 
                   <SectionCard title="Background" subtitle="Which best describes you?">
-                    <div className="space-y-2">
+                    <div className="space-y-2" data-field="background">
                       {BACKGROUND_OPTIONS.map((opt) => (
                         <label key={opt.value}
                           className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition ${
@@ -427,35 +486,26 @@ export default function PartnerRegisterPage() {
                   <SectionCard title="Identity Verification"
                     subtitle="To ensure trust and authenticity, all advisors must verify their identity.">
                     <PublicFileUploadField
-                      label="Passport or National ID"
-                      fieldId="ind-id-doc"
-                      required
-                      result={indIdDoc}
-                      fileName={indIdDocName}
-                      onUpload={(res, name) => { setIndIdDoc(res); setIndIdDocName(name); }}
-                      onRemove={() => { setIndIdDoc(null); setIndIdDocName(""); }}
-                      error={errors.ind_id_doc}
-                    />
-                    <PublicFileUploadField
                       label="Passport Photo"
                       fieldId="ind-passport-photo"
+                      field="ind_passport_photo"
+                      required
                       result={indPassportPhoto}
                       fileName={indPassportPhotoName}
                       onUpload={(res, name) => { setIndPassportPhoto(res); setIndPassportPhotoName(name); }}
                       onRemove={() => { setIndPassportPhoto(null); setIndPassportPhotoName(""); }}
+                      error={errors.ind_passport_photo}
                     />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <SocialMediaInputField label="Social Media Account"
                         platformField="social_platform" usernameField="social_username" urlField="social_media_url"
                         formData={indForm} errors={errors} updateFormData={updateInd}
-                        onBlur={() => {
-                          const error = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
-                          setErrors((p) => ({ ...p, social_media_url: error ?? "" }));
-                        }} />
+                        onBlur={() => validateIndField("social_media_url")} />
                       <SocialMediaInputField label="LinkedIn Profile"
                         platformField="linkedin_platform" usernameField="linkedin_username" urlField="linkedin_url"
                         lockedPlatform="linkedin" required={false}
-                        formData={indForm} errors={errors} updateFormData={updateInd} />
+                        formData={indForm} errors={errors} updateFormData={updateInd}
+                        onBlur={() => validateIndField("linkedin_url")} />
                     </div>
                   </SectionCard>
                 </>
@@ -465,31 +515,32 @@ export default function PartnerRegisterPage() {
                     <ImageUploadField
                       label="Agency Logo"
                       field="comp_logo"
+                      required
                       imageOnly
                       simpleFile={compLogo.file}
                       onSimpleFileChange={compLogo.handleSelect}
                       onSimpleRemove={compLogo.handleRemove}
                       simpleUploading={compLogo.uploading}
                       simpleProgress={compLogo.progress}
-                      errors={{ comp_logo: compLogo.error }}
+                      errors={{ comp_logo: compLogo.error || errors.comp_logo }}
                     />
                     <InputField label="Agency Name" field="company_name" placeholder="Enter agency name."
-                      formData={compForm} errors={errors} updateFormData={updateComp} />
+                      formData={compForm} errors={errors} updateFormData={updateComp}
+                      onBlur={() => validateCompField("company_name")} />
                     <SelectField label="Country of Registration" field="country" options={COUNTRY_OPTIONS}
-                      formData={compForm} errors={errors} updateFormData={updateComp} />
+                      formData={compForm} errors={errors} updateFormData={updateComp}
+                      onBlur={() => validateCompField("country")} />
                     <SocialMediaInputField label="Website or Social Media Page"
                       platformField="social_platform" usernameField="social_username" urlField="website_url"
                       formData={compForm} errors={errors} updateFormData={updateComp}
-                      onBlur={() => {
-                        const error = validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" });
-                        setErrors((p) => ({ ...p, website_url: error ?? "" }));
-                      }} />
+                      onBlur={() => validateCompField("website_url")} />
                   </SectionCard>
 
                   <SectionCard title="Agency Documents">
                     <PublicFileUploadField
                       label="Agency Registration Document"
                       fieldId="comp-reg-doc"
+                      field="comp_reg_doc"
                       required
                       result={compRegDoc}
                       fileName={compRegDocName}
@@ -502,43 +553,44 @@ export default function PartnerRegisterPage() {
                   <SectionCard title="Person in Charge">
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <InputField label="Full Name" field="contact_full_name" placeholder="Enter full name."
-                        formData={compForm} errors={errors} updateFormData={updateComp} />
+                        formData={compForm} errors={errors} updateFormData={updateComp}
+                        onBlur={() => validateCompField("contact_full_name")} />
                       <InputField label="Email Address" field="contact_email" type="email"
                         placeholder="contact@agency.com"
-                        formData={compForm} errors={errors} updateFormData={updateComp} />
+                        formData={compForm} errors={errors} updateFormData={updateComp}
+                        onBlur={() => validateCompField("contact_email")} />
                     </div>
                     <PhoneInputField dialCodeField="contact_phone_code" numberField="contact_phone_number"
-                      formData={compForm} errors={errors} updateFormData={updateComp} />
+                      formData={compForm} errors={errors} updateFormData={updateComp}
+                      onBlur={() => validateCompField("contact_phone_number")} />
+                    <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS}
+                      formData={compForm} errors={errors} updateFormData={updateComp}
+                      onBlur={() => validateCompField("nationality")} />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                       <InputField label="Date of Birth" field="date_of_birth" type="date"
-                        formData={compForm} errors={errors} updateFormData={updateComp} />
+                        formData={compForm} errors={errors} updateFormData={updateComp}
+                        onBlur={() => validateCompField("date_of_birth")} />
                       <InputField label="Passport Number" field="passport_number" placeholder="A12345678"
-                        formData={compForm} errors={errors} updateFormData={updateComp} />
+                        formData={compForm} errors={errors} updateFormData={updateComp}
+                        onBlur={() => validateCompField("passport_number")} />
                     </div>
-                    <PublicFileUploadField
-                      label="Passport or National ID"
-                      fieldId="comp-contact-id-doc"
-                      required
-                      result={compContactIdDoc}
-                      fileName={compContactIdDocName}
-                      onUpload={(res, name) => { setCompContactIdDoc(res); setCompContactIdDocName(name); }}
-                      onRemove={() => { setCompContactIdDoc(null); setCompContactIdDocName(""); }}
-                      error={errors.comp_contact_id_doc}
-                    />
                     <PublicFileUploadField
                       label="Passport Photo"
                       fieldId="comp-passport-photo"
+                      field="comp_passport_photo"
+                      required
                       result={compPassportPhoto}
                       fileName={compPassportPhotoName}
                       onUpload={(res, name) => { setCompPassportPhoto(res); setCompPassportPhotoName(name); }}
                       onRemove={() => { setCompPassportPhoto(null); setCompPassportPhotoName(""); }}
+                      error={errors.comp_passport_photo}
                     />
                   </SectionCard>
                 </>
               )}
 
               {/* T&C */}
-              <div className="border-y border-slate-200 p-6">
+              <div className="border-y border-slate-200 p-6" data-field="agreed">
                 <label className="flex cursor-pointer items-center gap-3">
                   <input
                     type="checkbox"
@@ -560,7 +612,7 @@ export default function PartnerRegisterPage() {
               </div>
 
               <div className="space-y-3 p-6">
-                {apiError && (
+                {apiError && !hasFieldLevelApiError && (
                   <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <AlertCircle className="h-4 w-4 shrink-0" />
                     {apiError}

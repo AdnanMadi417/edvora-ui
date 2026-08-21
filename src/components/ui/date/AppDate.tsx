@@ -24,15 +24,14 @@ const AppDate: React.FC<AppDateProps> = ({
   className,
 }) => {
   const parsed = useMemo(() => parseDate(value), [value]);
+  const formatted = useMemo(
+    () => (parsed ? formatDate(parsed, format, locale) : null),
+    [parsed, format, locale],
+  );
 
   if (!parsed) {
     return <span className={className}>{fallback}</span>;
   }
-
-  const formatted = useMemo(
-    () => formatDate(parsed, format, locale),
-    [parsed, format, locale],
-  );
 
   return (
     <time

@@ -1,11 +1,11 @@
 'use client';
 
-import Notification from "components/notifications/partner/Notifications";
+import Notification from "features/notifications/components/Notifications";
 
 const Dashboard = () => {
   return (
     <div>
-      <Notification/>
+      <Notification applicationBasePath="/partner/applications" />
     </div>
   );
 };

@@ -4,6 +4,7 @@ export {
   AccountManagersTable,
   AccountManagerProfile,
   AccountManagerPartnersTable,
+  AccountManagerDetailsTabs,
   CreateAccountManager,
   EditAccountManager,
   DeleteAccountManagerModal,

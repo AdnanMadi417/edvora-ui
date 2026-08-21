@@ -75,6 +75,10 @@ export default function StageBasicInfo({
         formData={formData}
         updateFormData={updateFormData}
         errors={errors}
+        enabledText="Fields shown"
+        disabledText="Fields hidden"
+        enabledDescription="University and program fields are visible for editing."
+        disabledDescription="Turn on to select a different university or program."
       />
 
       {formData.showProgramFields && (

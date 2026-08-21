@@ -7,6 +7,8 @@ import PresignedImage from "components/ui/PresignedImage";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { StatusBadge } from "components/ui/badges";
+import { getStatusVariant } from "utils/getStatusVariant";
 import Button from "components/ui/buttons/Button";
 
 const ITEMS_PER_PAGE = 5;
@@ -19,15 +21,6 @@ const LIFECYCLE_OPTIONS = [
   { value: "cancel", label: "Cancelled" },
   { value: "all", label: "All" },
 ];
-
-const getStatusColors = (code: string) => {
-  if (!code) return { bg: "bg-gray-100 border-slate-200", text: "text-gray-700" };
-  if (code.includes("reject") || code.includes("expired")) return { bg: "bg-red-50 border-red-200", text: "text-red-700" };
-  if (code.includes("approv") || code.includes("confirm") || code.includes("accepted") || code.includes("completed")) return { bg: "bg-green-50 border-green-200", text: "text-green-700" };
-  if (code.includes("correction") || code.includes("re_upload") || code.includes("re-upload") || code.includes("disputed")) return { bg: "bg-orange-50 border-orange-200", text: "text-orange-700" };
-  if (code.includes("review") || code.includes("waiting") || code.includes("processing") || code.includes("pending")) return { bg: "bg-yellow-50 border-yellow-200", text: "text-yellow-700" };
-  return { bg: "bg-blue-50 border-blue-200", text: "text-blue-700" };
-};
 
 interface PartnerApplicationsTableProps {
   partnerId: string;
@@ -79,7 +72,7 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
   };
 
   return (
-    <div className="mb-5 max-w-5xl mx-auto rounded-lg border border-slate-200 bg-card">
+    <>
       {/* Header */}
       <div className="flex flex-col gap-4 border-b border-slate-200 p-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -160,8 +153,8 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: User,          label: "Student", minW: "min-w-[220px]" },
-                  { icon: GraduationCap, label: "Program", minW: "min-w-[200px]" },
+                  { icon: User,          label: "Student", minW: "min-w-[160px] sm:min-w-[220px]" },
+                  { icon: GraduationCap, label: "Program", minW: "min-w-[150px] sm:min-w-[200px]" },
                   { icon: Clock,         label: "Status" },
                 ].map(({ icon: Icon, label, minW }) => (
                   <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
@@ -206,14 +199,14 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
               )}
 
               {!isInitialLoad && !error && applications.map((app) => {
-                const { bg, text } = getStatusColors(app.status?.toLowerCase().replace(/\s+/g, "_") ?? "");
+                const statusVariant = getStatusVariant(app.status?.toLowerCase().replace(/\s+/g, "_") ?? "");
                 return (
                   <tr
                     key={app.id}
                     className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                     onClick={() => window.open(`/admin/applications/${app.id}`, "_blank")}
                   >
-                    <td className="min-w-[220px] px-6 py-4">
+                    <td className="min-w-[160px] max-w-[160px] px-6 py-4 sm:min-w-[220px] sm:max-w-[220px]">
                       <div className="flex items-center gap-3">
                         <PresignedImage
                           fileKey={app.student_photo_file_key}
@@ -232,15 +225,15 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                       </div>
                     </td>
 
-                    <td className="min-w-[200px] px-6 py-4">
+                    <td className="min-w-[150px] max-w-[150px] px-6 py-4 sm:min-w-[200px] sm:max-w-[200px]">
                       <div className="truncate text-sm text-slate-900">{app.program_name}</div>
                       <div className="truncate text-xs text-slate-500">{app.university_name}</div>
                     </td>
 
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium ${bg} ${text}`}>
-                        <span className="truncate max-w-[160px]">{app.status}</span>
-                      </span>
+                    <td className="max-w-[140px] px-6 py-4">
+                      <StatusBadge variant={statusVariant}>
+                        <span className="truncate max-w-[110px]">{app.status}</span>
+                      </StatusBadge>
                     </td>
 
                     <td className="px-4 py-4">
@@ -253,6 +246,6 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
           </table>
         </TableWrapper>
       </div>
-    </div>
+    </>
   );
 }

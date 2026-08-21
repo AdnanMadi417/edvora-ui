@@ -31,8 +31,8 @@ import Loading from 'components/loading/Loading';
 import PresignedImage from 'components/ui/PresignedImage';
 import Button from 'components/ui/buttons/Button';
 import RichTextDisplay from 'components/ui/RichTextDisplay';
-import { AppDate } from 'components/ui/date';
 import CurrencySelector from 'features/programs/components/shared/CurrencySelector';
+import IntakeDatesChips from 'features/programs/components/shared/IntakeDatesChips';
 import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate } from 'features/programs/utils/exchangeRate';
 
 type RequiredDocument = {
@@ -428,16 +428,8 @@ const ProgramDetails = ({ id }: Props) => {
               </div>
               <div>
                 <p className="text-xs text-slate-500">Intake Dates</p>
-                <div className="mt-1 flex flex-wrap gap-2">
-                  {program.intake_dates!.map((date, i) => (
-                    <span
-                      key={`${date}-${i}`}
-                      className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700"
-                    >
-                      <span className="h-1.5 w-1.5 rounded-md bg-emerald-500" />
-                      <AppDate value={date} format="month" fallback={date} />
-                    </span>
-                  ))}
+                <div className="mt-1">
+                  <IntakeDatesChips dates={program.intake_dates} />
                 </div>
               </div>
             </div>

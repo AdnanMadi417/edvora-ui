@@ -15,6 +15,8 @@ import HoldPopup from "features/applications/account-manager/components/popups/R
 import EmptyData from "components/emptyData/EmptyData";
 import { AppDate } from "components/ui/date";
 import { useManagerReuploadDocument } from "features/applications/hooks";
+import { SectionIconBadge } from "components/ui/icons";
+import { SolidBadge } from "components/ui/badges";
 import api from "lib/useApi"
 
 interface ApplicationDocumentsProps {
@@ -138,24 +140,22 @@ export default function ApplicationDocuments({
         onChange={handleReuploadFileChange}
       />
       <div
-        className="group flex cursor-pointer items-center justify-between p-4 sm:p-5 transition-all duration-200 hover:bg-slate-50/80"
+        className="group flex cursor-pointer items-center justify-between p-6 transition-all duration-200 hover:bg-slate-50/80"
         onClick={() => setShowDocs(!showDocs)}
       >
         {/* Left: icon + info */}
-        <div className="flex items-center gap-3 sm:gap-4">
+        <div className="flex items-center gap-3">
           <div className="relative shrink-0">
-            <div className="flex h-11 w-11 items-center justify-center rounded-md bg-blue-50">
-              <FolderOpen className="h-5 w-5 text-blue-600" />
-            </div>
+            <SectionIconBadge icon={FolderOpen} color="blue" />
             {pendingDocuments > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-md bg-amber-500 text-[10px] font-bold text-white">
+              <SolidBadge variant="warning" className="absolute -right-1 -top-1 h-5 w-5 rounded-md text-[10px]">
                 {pendingDocuments}
-              </span>
+              </SolidBadge>
             )}
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-slate-900">Application Documents</h3>
-            <p className="mt-0.5 text-xs text-slate-500">
+            <h3 className="text-p3 font-semibold text-slate-900">Application Documents</h3>
+            <p className="text-sm text-slate-500">
               {totalDocuments} {totalDocuments === 1 ? "file" : "files"}
               {pendingDocuments > 0 && (
                 <span className="font-medium text-amber-600"> · {pendingDocuments} pending review</span>
@@ -264,7 +264,7 @@ export default function ApplicationDocuments({
                       setSelectedDoc(doc);
                       setShowResubmitPopup(true);
                     }}
-                    className="group rounded-lg border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
                     title="Resubmit Document"
                     aria-label="Resubmit Document"
                   >
@@ -347,7 +347,7 @@ export default function ApplicationDocuments({
                       setSelectedDoc(doc);
                       setShowResubmitPopup(true);
                     }}
-                    className="group rounded-lg border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
                     title="Resubmit Document"
                     aria-label="Resubmit Document"
                   >
@@ -428,7 +428,7 @@ export default function ApplicationDocuments({
                       setSelectedDoc(doc);
                       setShowResubmitPopup(true);
                     }}
-                    className="group rounded-lg border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
+                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
                     title="Resubmit Document"
                     aria-label="Resubmit Document"
                   >
@@ -442,7 +442,7 @@ export default function ApplicationDocuments({
 
           {offerLetterDoc && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Offer Letter</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Offer Letter</p>
               <div className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
@@ -480,7 +480,7 @@ export default function ApplicationDocuments({
 
           {emgsEvalDoc && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">EMGS Eval Document</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">EMGS Eval Document</p>
               <div className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
@@ -522,7 +522,7 @@ export default function ApplicationDocuments({
 
           {visaDoc && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Visa Document</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Visa Document</p>
               <div className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                 <div className="flex min-w-0 flex-1 items-start gap-4">
                   <div className="flex-shrink-0">
@@ -564,7 +564,7 @@ export default function ApplicationDocuments({
 
           {commissionDocuments.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Commission Documents</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Commission Documents</p>
               {commissionDocuments.map((doc: any) => (
                 <div key={doc.id} className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
                   <div className="flex min-w-0 flex-1 items-start gap-4">

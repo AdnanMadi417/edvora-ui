@@ -7,6 +7,7 @@ import {
   UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power, KeyRound, Trash2,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
+import { StatusBadge } from "components/ui/badges";
 import { useRouter } from "next/navigation";
 import { usePartners, useDeletePartner, useUpdatePartner, useResendApprovalEmail } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
@@ -179,13 +180,11 @@ export default function PartnersTable() {
   const handleSuspendActivate = async () => {
     if (!suspendTarget) return;
     try {
+      // Only the field actually changing — sending the whole stale row here
+      // let this click silently overwrite any edits another admin made since
+      // this list was last loaded (including re-cascading a stale
+      // assigned_manager_id onto the entire agency).
       await updatePartner(suspendTarget.id, {
-        name: suspendTarget.name,
-        email: suspendTarget.email,
-        type: suspendTarget.type,
-        country: suspendTarget.country,
-        phone: suspendTarget.phone,
-        assigned_manager_id: suspendTarget.assigned_manager_id,
         is_active: !suspendTarget.is_active,
       });
       showToast(suspendTarget.is_active ? "Partner account suspended" : "Partner account activated", "success");
@@ -340,14 +339,14 @@ export default function PartnersTable() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: Users,      label: "Partner",          minW: "min-w-[250px]" },
-                  { icon: Users,      label: "Contact Info",     minW: "min-w-[220px]" },
-                  { icon: UserCog,    label: "Assigned Manager", minW: "min-w-[180px]" },
+                  { icon: Users,      label: "Partner",          minW: "min-w-[180px] sm:min-w-[250px]" },
+                  { icon: Users,      label: "Contact Info",     minW: "min-w-[160px] sm:min-w-[220px]", hide: "hidden sm:table-cell" },
+                  { icon: UserCog,    label: "Assigned Manager", minW: "min-w-[130px] sm:min-w-[180px]", hide: "hidden md:table-cell" },
                   { icon: BadgeCheck, label: "Status" },
-                  { icon: CalendarDays, label: "Registered" },
+                  { icon: CalendarDays, label: "Registered", hide: "hidden lg:table-cell" },
                   { icon: Pencil,     label: "Actions" },
-                ].map(({ icon: Icon, label, minW }) => (
-                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
+                ].map(({ icon: Icon, label, minW, hide }) => (
+                  <th key={label} className={`${minW ?? ""} ${hide ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4 text-slate-400" />
                       {label}
@@ -394,7 +393,7 @@ export default function PartnersTable() {
                     className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                     onClick={() => router.push(`/admin/partners/${partner.id}`)}
                   >
-                    <td className="min-w-[220px] px-6 py-4">
+                    <td className="min-w-[180px] max-w-[180px] px-6 py-4 sm:min-w-[250px] sm:max-w-[250px]">
                       <div className="flex items-center gap-3">
                         <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                           <PresignedImage
@@ -406,18 +405,23 @@ export default function PartnersTable() {
                           <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
                         </div>
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-slate-900">{partner.name || "Unknown Partner"}</div>
-                          <div className="truncate text-xs text-slate-500 capitalize">{partner.type || "—"} · {partner.country || "—"}</div>
+                          <div className="truncate text-sm font-medium text-slate-900">
+                            {partner.type === "agency" ? partner.company_details?.company_name || partner.name || "Unknown Partner" : partner.name || "Unknown Partner"}
+                          </div>
+                          <div className="truncate text-xs text-slate-500 capitalize">
+                            {partner.type === "agency" && partner.company_details?.company_name ? `${partner.name} · ` : ""}
+                            {partner.type || "—"} · {partner.country || "—"}
+                          </div>
                         </div>
                       </div>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="hidden min-w-[160px] max-w-[160px] px-6 py-4 sm:table-cell sm:min-w-[220px] sm:max-w-[220px]">
                       <div className="truncate text-sm text-slate-900">{partner.phone || "—"}</div>
                       <div className="truncate text-xs text-slate-500">{partner.email || "—"}</div>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="hidden max-w-[180px] px-6 py-4 md:table-cell">
                       <div className="truncate text-sm text-slate-900">
                         {partner.assigned_manager_name || <span className="text-slate-400">Unassigned</span>}
                       </div>
@@ -426,18 +430,14 @@ export default function PartnersTable() {
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap items-center gap-1.5">
                         {partner.is_active ? (
-                          <span className="inline-flex items-center gap-1 rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
-                            <CheckCircle className="h-3 w-3" /> Active
-                          </span>
+                          <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                         ) : (
-                          <span className="inline-flex items-center gap-1 rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700">
-                            <XCircle className="h-3 w-3" /> Inactive
-                          </span>
+                          <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
                         )}
                       </div>
                     </td>
 
-                    <td className="px-6 py-4">
+                    <td className="hidden px-6 py-4 lg:table-cell">
                       <div className="text-sm text-slate-900">
                         <AppDate value={partner.created_at} format="short" fallback="—" />
                       </div>
@@ -499,6 +499,19 @@ export default function PartnersTable() {
                           hoverBorderColor="hover:border-transparent"
                           className={partner.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"}
                         />
+
+                        {/* <div className="h-5 border-l border-slate-200" />
+                        <IconButton
+                          onClick={() => { setDeleteTarget({ id: partner.id, name: partner.name || "" }); setIsDeleteOpen(true); }}
+                          title="Delete partner"
+                          icon={<Trash2 className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-400"
+                          borderColor="border-transparent"
+                          hoverTextColor="hover:text-red-600"
+                          hoverBorderColor="hover:border-transparent"
+                          className="hover:bg-red-50"
+                        /> */}
                       </div>
                     </td>
 

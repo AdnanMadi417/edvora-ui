@@ -71,7 +71,11 @@ const stages = [
 
 const STEP1_REQUIRED = ['name', 'uni_id', 'qualification_id', 'field_of_study_id', 'is_on_campus'];
 
-export default function RegisterProgram() {
+interface Props {
+  basePath?: string;
+}
+
+export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: Props = {}) {
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -124,9 +128,9 @@ export default function RegisterProgram() {
       updateFormData('branch_id', '');
       return;
     }
-    if (branches.length === 1) {
-      updateFormData('branch_id', String(branches[0].id));
-    }
+    const stillValid = branches.some((b) => String(b.id) === String(formData.branch_id));
+    if (stillValid) return;
+    updateFormData('branch_id', branches.length === 1 ? String(branches[0].id) : '');
   }, [branches]);
 
   const isStep1Valid =
@@ -246,7 +250,7 @@ export default function RegisterProgram() {
       };
       await createProgram(payload);
       showToast('Program created successfully', 'success');
-      setTimeout(() => router.push('/admin/knowledge-hub'), 1500);
+      setTimeout(() => router.push(basePath), 1500);
     } catch (error: unknown) {
       const backendMessage = parseApiError(error, 'Please try again.');
       showToast(`Failed to create program. ${backendMessage}`, 'error');
@@ -444,7 +448,17 @@ export default function RegisterProgram() {
 
                 <div className="space-y-4 border-b border-slate-200 p-6">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Delivery Mode</h3>
-                  <ToggleInput label="On Campus" field="is_on_campus" formData={formData} errors={errors} updateFormData={updateFormData} />
+                  <ToggleInput
+                    label="On Campus"
+                    field="is_on_campus"
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                    enabledText="On campus"
+                    disabledText="Online"
+                    enabledDescription="Students attend this program in person."
+                    disabledDescription="Students attend this program online."
+                  />
                 </div>
 
                 <div className="space-y-4 p-6">
@@ -572,7 +586,17 @@ export default function RegisterProgram() {
                     )}
                   </div>
 
-                  <ToggleInput label="Has Scholarship" field="has_scholarship" formData={formData} errors={errors} updateFormData={updateFormData} />
+                  <ToggleInput
+                    label="Has Scholarship"
+                    field="has_scholarship"
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                    enabledText="Scholarship available"
+                    disabledText="No scholarship"
+                    enabledDescription="Scholarship details are shown below."
+                    disabledDescription="Turn on to add scholarship details for this program."
+                  />
 
                   {formData.has_scholarship && (
                     <div className="space-y-6">
@@ -714,7 +738,7 @@ export default function RegisterProgram() {
                 />
               ) : (
                 <PrevButton
-                  onClick={() => router.push('/admin/knowledge-hub')}
+                  onClick={() => router.push(basePath)}
                   text="Back"
                   icon={<ArrowLeft className="h-4 w-4" />}
                 />
