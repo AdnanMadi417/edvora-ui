@@ -15,7 +15,7 @@ export default function AgencyInvitationOtpStep() {
   const searchParams = useSearchParams();
 
   const { verifyOtp, loading: verifyLoading, error: otpError } = useVerifyAgencyInvitationOtp();
-  const { resendOtp, loading: resendLoading, error: resendError, maxResendsReached } = useResendAgencyInvitationOtp();
+  const { resendOtp, loading: resendLoading, maxResendsReached } = useResendAgencyInvitationOtp();
 
   const [email, setEmail] = useState(() => searchParams.get("email") ?? "");
   const [otp, setOtp] = useState("");
@@ -57,8 +57,18 @@ export default function AgencyInvitationOtpStep() {
     try {
       await resendOtp(email.trim());
       setResendSuccess(true);
+    } catch (err) {
+      // This is a public, unauthenticated endpoint — don't let its response
+      // reveal whether the email has an account, a pending invitation, or
+      // neither (that's an enumeration oracle). Only a genuine rate-limit
+      // gets a distinct message; every other outcome looks like success.
+      const code = (err as { response?: { data?: { code?: string } } })?.response?.data?.code;
+      if (code !== "otp_max_resends") {
+        setResendSuccess(true);
+      }
+    } finally {
       setResendCooldown(60);
-    } catch { /* error shown via hook */ }
+    }
   };
 
   if (verified) {
@@ -128,10 +138,10 @@ export default function AgencyInvitationOtpStep() {
 
         <div className="mt-4 space-y-2 text-center">
           {resendSuccess && !maxResendsReached && (
-            <p className="text-sm text-green-600">Code resent — check your inbox.</p>
+            <p className="text-sm text-green-600">If this email is eligible, a code has been sent.</p>
           )}
-          {resendError && (
-            <p className="text-sm text-red-600">{resendError}</p>
+          {maxResendsReached && (
+            <p className="text-sm text-red-600">You&apos;ve requested too many codes. Please wait a bit before trying again.</p>
           )}
           {resendCooldown > 0 ? (
             <p className="text-sm text-slate-400">
