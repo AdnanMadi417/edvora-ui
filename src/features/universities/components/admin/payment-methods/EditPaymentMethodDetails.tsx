@@ -25,8 +25,9 @@ interface PaymentMethod {
 
 interface EditPaymentMethodDetailsProps {
   id: string;
-  /** Where "Back" and a successful save navigate to. Defaults to this payment method's admin details page. */
+  /** Where a successful save navigates to. Defaults to this payment method's admin details page. */
   redirectPath?: string;
+  /** Where "Back" (and a successful delete) navigate to. Defaults to the admin payment methods list. */
   listPath?: string;
   hideDelete?: boolean;
 }
@@ -172,7 +173,7 @@ const EditPaymentMethodDetails = ({
   };
 
   const handleBack = () => {
-    router.push(redirectPath);
+    router.push(listPath);
   };
 
   if (loadingPayment) {

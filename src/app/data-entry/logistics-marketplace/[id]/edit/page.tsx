@@ -13,6 +13,7 @@ export default function DataEntryEditLogisticsProviderPage() {
     <EditLogisticsMarketplaceDetails
       id={id}
       redirectPath={`/data-entry/logistics-marketplace/${id}/edit`}
+      listPath="/data-entry/logistics-marketplace"
     />
   );
 }
