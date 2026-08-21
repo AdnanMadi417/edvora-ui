@@ -8,6 +8,8 @@ const IMAGE_ONLY_TYPES = {
   label: "PNG or JPG",
 };
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
 /**
  * Dual-mode file upload field.
  *
@@ -100,6 +102,11 @@ const ImageUploadField = ({
       e.target.value = "";
       return;
     }
+    if (selected.size > MAX_FILE_SIZE) {
+      setFileError("File size must not exceed 10MB.");
+      e.target.value = "";
+      return;
+    }
     setFileError("");
     onSimpleFileChange?.(selected);
     e.target.value = "";
@@ -148,7 +155,7 @@ const ImageUploadField = ({
             />
           </label>
           <p className="text-xs text-slate-500">Click to upload logo</p>
-          <p className="text-[10px] text-slate-400">{resolvedLabel} accepted</p>
+          <p className="text-[10px] text-slate-400">{resolvedLabel} accepted (max 10MB)</p>
         </div>
       )}
 
