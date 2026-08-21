@@ -40,8 +40,6 @@ const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.
 const IND_FIELD_MAP: Record<string, string> = {
   full_name: "name",
   phone: "phone_number",
-  id_document_file_url: "ind_id_doc",
-  id_document_file_key: "ind_id_doc",
   passport_photo_file_url: "ind_passport_photo",
   passport_photo_file_key: "ind_passport_photo",
   profile_photo_file_url: "ind_profile_photo",
@@ -54,8 +52,6 @@ const COMP_FIELD_MAP: Record<string, string> = {
   phone: "contact_phone_number",
   company_registration_doc_file_url: "comp_reg_doc",
   company_registration_doc_file_key: "comp_reg_doc",
-  contact_id_document_file_url: "comp_contact_id_doc",
-  contact_id_document_file_key: "comp_contact_id_doc",
   passport_photo_file_url: "comp_passport_photo",
   passport_photo_file_key: "comp_passport_photo",
   logo_file_url: "comp_logo",
@@ -157,8 +153,6 @@ export default function PartnerRegisterPage() {
     linkedin_platform: "linkedin", linkedin_username: "", linkedin_url: "",
     agreed: false,
   });
-  const [indIdDoc, setIndIdDoc] = useState<PublicUploadResult | null>(null);
-  const [indIdDocName, setIndIdDocName] = useState("");
   const [indPassportPhoto, setIndPassportPhoto] = useState<PublicUploadResult | null>(null);
   const [indPassportPhotoName, setIndPassportPhotoName] = useState("");
   const indProfilePhoto = usePublicPhotoUpload();
@@ -174,8 +168,6 @@ export default function PartnerRegisterPage() {
   });
   const [compRegDoc, setCompRegDoc] = useState<PublicUploadResult | null>(null);
   const [compRegDocName, setCompRegDocName] = useState("");
-  const [compContactIdDoc, setCompContactIdDoc] = useState<PublicUploadResult | null>(null);
-  const [compContactIdDocName, setCompContactIdDocName] = useState("");
   const [compPassportPhoto, setCompPassportPhoto] = useState<PublicUploadResult | null>(null);
   const [compPassportPhotoName, setCompPassportPhotoName] = useState("");
   const compLogo = usePublicPhotoUpload();
@@ -202,7 +194,6 @@ export default function PartnerRegisterPage() {
     if (!indForm.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!indForm.passport_number.trim()) e.passport_number = "Passport number is required";
     if (!indProfilePhoto.fileKey) e.ind_profile_photo = "Profile photo is required";
-    if (!indIdDoc) e.ind_id_doc = "Please upload your identity document";
     if (!indPassportPhoto) e.ind_passport_photo = "Please upload your passport photo";
     const socialError = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
     if (socialError) e.social_media_url = socialError;
@@ -240,7 +231,6 @@ export default function PartnerRegisterPage() {
     if (!compForm.nationality) e.nationality = "Nationality is required";
     if (!compForm.date_of_birth) e.date_of_birth = "Date of birth is required";
     if (!compForm.passport_number.trim()) e.passport_number = "Passport number is required";
-    if (!compContactIdDoc) e.comp_contact_id_doc = "Please upload an identity document";
     if (!compPassportPhoto) e.comp_passport_photo = "Please upload a passport photo";
     if (!compForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
     return e;
@@ -281,7 +271,6 @@ export default function PartnerRegisterPage() {
           background: indForm.background,
           date_of_birth: indForm.date_of_birth,
           passport_number: indForm.passport_number.trim(),
-          ...(indIdDoc && { id_document_file_key: indIdDoc.file_key, id_document_file_url: indIdDoc.file_url }),
           ...(indPassportPhoto && { passport_photo_file_key: indPassportPhoto.file_key, passport_photo_file_url: indPassportPhoto.file_url }),
           ...(indProfilePhoto.fileKey && { profile_photo_file_key: indProfilePhoto.fileKey, profile_photo_file_url: indProfilePhoto.fileUrl }),
           ...(indForm.social_media_url && { [indSocialField]: indForm.social_media_url }),
@@ -299,7 +288,6 @@ export default function PartnerRegisterPage() {
           date_of_birth: compForm.date_of_birth,
           passport_number: compForm.passport_number.trim(),
           ...(compRegDoc      && { company_registration_doc_file_key: compRegDoc.file_key,      company_registration_doc_file_url: compRegDoc.file_url }),
-          ...(compContactIdDoc && { contact_id_document_file_key: compContactIdDoc.file_key, contact_id_document_file_url: compContactIdDoc.file_url }),
           ...(compPassportPhoto && { passport_photo_file_key: compPassportPhoto.file_key, passport_photo_file_url: compPassportPhoto.file_url }),
           ...(compLogo.fileKey && { logo_file_key: compLogo.fileKey, logo_file_url: compLogo.fileUrl }),
         };
@@ -498,17 +486,6 @@ export default function PartnerRegisterPage() {
                   <SectionCard title="Identity Verification"
                     subtitle="To ensure trust and authenticity, all advisors must verify their identity.">
                     <PublicFileUploadField
-                      label="Identity Document"
-                      fieldId="ind-id-doc"
-                      field="ind_id_doc"
-                      required
-                      result={indIdDoc}
-                      fileName={indIdDocName}
-                      onUpload={(res, name) => { setIndIdDoc(res); setIndIdDocName(name); }}
-                      onRemove={() => { setIndIdDoc(null); setIndIdDocName(""); }}
-                      error={errors.ind_id_doc}
-                    />
-                    <PublicFileUploadField
                       label="Passport Photo"
                       fieldId="ind-passport-photo"
                       field="ind_passport_photo"
@@ -597,17 +574,6 @@ export default function PartnerRegisterPage() {
                         formData={compForm} errors={errors} updateFormData={updateComp}
                         onBlur={() => validateCompField("passport_number")} />
                     </div>
-                    <PublicFileUploadField
-                      label="Identity Document"
-                      fieldId="comp-contact-id-doc"
-                      field="comp_contact_id_doc"
-                      required
-                      result={compContactIdDoc}
-                      fileName={compContactIdDocName}
-                      onUpload={(res, name) => { setCompContactIdDoc(res); setCompContactIdDocName(name); }}
-                      onRemove={() => { setCompContactIdDoc(null); setCompContactIdDocName(""); }}
-                      error={errors.comp_contact_id_doc}
-                    />
                     <PublicFileUploadField
                       label="Passport Photo"
                       fieldId="comp-passport-photo"

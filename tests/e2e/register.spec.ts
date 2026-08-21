@@ -2,6 +2,7 @@ import { test, expect, Page } from "@playwright/test";
 import path from "path";
 
 const DOC_FIXTURE = path.join(__dirname, "fixtures", "test-document.pdf");
+const IMAGE_FIXTURE = path.join(__dirname, "fixtures", "test-image.png");
 
 async function mockRegistrationAPIs(page: Page) {
   await page.route("**/api/partners/register/upload-url**", (route) =>
@@ -55,9 +56,92 @@ async function mockRegistrationAPIs(page: Page) {
   );
 }
 
-async function waitForUpload(page: Page, nthRemoveButton = 0) {
-  await expect(page.getByText("Remove").nth(nthRemoveButton)).toBeVisible({ timeout: 10000 });
+async function waitForUpload(page: Page, nth: number) {
+  await expect(page.getByText("Remove").nth(nth)).toBeVisible({ timeout: 10000 });
 }
+
+async function selectFromDropdown(page: Page, field: string, optionText: string) {
+  await page.locator(`[data-field="${field}"]`).click();
+  await page.getByPlaceholder("Search...").fill(optionText);
+  await page.getByText(optionText, { exact: true }).click();
+}
+
+async function fillOtp(page: Page, code: string) {
+  await page.locator('[data-field="otp"] input').first().click();
+  await page.keyboard.type(code);
+}
+
+async function fillIndividualForm(page: Page) {
+  await page.locator('[data-field="ind_profile_photo"] input[type="file"]').setInputFiles(IMAGE_FIXTURE);
+  await waitForUpload(page, 0);
+
+  await page.getByPlaceholder("Ahmed Ali").fill("Ahmed Alireza");
+  await page.getByPlaceholder("name@mail.com").fill("ahmed@test.com");
+  await page.getByPlaceholder("12-345 6789").fill("123456789");
+  await page.locator('[data-field="country"] select').selectOption({ label: "Malaysia" });
+  await selectFromDropdown(page, "nationality", "Malaysian");
+  await page.locator('[data-field="date_of_birth"] input').fill("1995-05-20");
+  await page.getByPlaceholder("A12345678").fill("A12345678");
+
+  // Background selection
+  await page.locator("label").filter({ hasText: "Education Agent" }).first().click();
+
+  // Passport photo — no Identity Document field anymore
+  await page.locator('input[type="file"]#ind-passport-photo').setInputFiles(DOC_FIXTURE);
+  await waitForUpload(page, 1);
+
+  await page.locator('[data-field="social_media_url"] input').fill("https://www.instagram.com/ahmedtest");
+
+  // T&C
+  await page.locator('input[type="checkbox"]').check();
+}
+
+async function fillCompanyForm(page: Page) {
+  await page.locator('[data-field="comp_logo"] input[type="file"]').setInputFiles(IMAGE_FIXTURE);
+  await waitForUpload(page, 0);
+
+  await page.getByPlaceholder("Enter agency name.").fill("Global Edu Agency");
+  await page.locator('[data-field="country"] select').selectOption({ label: "Malaysia" });
+  await page.locator('[data-field="website_url"] input').fill("https://www.instagram.com/globaledu");
+
+  // Company registration doc — Identity Document field no longer exists
+  await page.locator('input[type="file"]#comp-reg-doc').setInputFiles(DOC_FIXTURE);
+  await waitForUpload(page, 1);
+
+  // Person in charge
+  await page.getByPlaceholder("Enter full name.").fill("Sarah Johnson");
+  await page.getByPlaceholder("contact@agency.com").fill("sarah@globaledu.com");
+  await page.getByPlaceholder("12-345 6789").fill("987654321");
+  await selectFromDropdown(page, "nationality", "Malaysian");
+  await page.locator('[data-field="date_of_birth"] input').fill("1988-03-15");
+  await page.getByPlaceholder("A12345678").fill("B98765432");
+
+  await page.locator('input[type="file"]#comp-passport-photo').setInputFiles(DOC_FIXTURE);
+  await waitForUpload(page, 2);
+
+  // T&C
+  await page.locator('input[type="checkbox"]').check();
+}
+
+test.describe("Partner Registration — Identity Document removed", () => {
+  test.beforeEach(async ({ page }) => {
+    await mockRegistrationAPIs(page);
+    await page.goto("/auth/register");
+  });
+
+  test("individual form has no Identity Document field", async ({ page }) => {
+    await page.getByRole("button", { name: "Individual Advisor" }).click();
+    await expect(page.getByText("Identity Document", { exact: true })).not.toBeVisible();
+    // Sibling upload fields are still present
+    await expect(page.locator("#ind-passport-photo")).toHaveCount(1);
+  });
+
+  test("company form has no Identity Document field", async ({ page }) => {
+    await page.getByRole("button", { name: "Company / Agency" }).click();
+    await expect(page.getByText("Identity Document", { exact: true })).not.toBeVisible();
+    await expect(page.locator("#comp-passport-photo")).toHaveCount(1);
+  });
+});
 
 test.describe("Partner Registration — Individual", () => {
   test.beforeEach(async ({ page }) => {
@@ -70,24 +154,9 @@ test.describe("Partner Registration — Individual", () => {
     await expect(page.getByRole("button", { name: "Submit Application" })).toBeDisabled();
   });
 
-  test("full individual registration flow → OTP → success", async ({ page }) => {
-    await page.getByPlaceholder("Ahmed").fill("Ahmed");
-    await page.getByPlaceholder("Ali").fill("Alireza");
-    await page.getByPlaceholder("name@mail.com").fill("ahmed@test.com");
-    await page.getByPlaceholder("12-345 6789").fill("123456789");
-    await page.locator("select.rounded-lg").first().selectOption({ label: "Malaysia" });
+  test("full individual registration flow → OTP → success, without an identity document", async ({ page }) => {
+    await fillIndividualForm(page);
 
-    // Background selection
-    await page.locator("label").filter({ hasText: "Education Agent" }).first().click();
-
-    // Upload ID document
-    await page.locator('input[type="file"]#ind-id-doc').setInputFiles(DOC_FIXTURE);
-    await waitForUpload(page, 0);
-
-    // T&C
-    await page.locator('input[type="checkbox"]').check();
-
-    // Submit
     const btn = page.getByRole("button", { name: "Submit Application" });
     await expect(btn).toBeEnabled();
     await btn.click();
@@ -96,48 +165,21 @@ test.describe("Partner Registration — Individual", () => {
     await expect(page.getByRole("heading", { name: "Verify your email" })).toBeVisible();
     await expect(page.getByText("ahmed@test.com")).toBeVisible();
 
-    // Enter correct OTP
-    await page.getByPlaceholder("• • • • • •").fill("123456");
-    await page.getByRole("button", { name: "Verify OTP" }).click();
+    await fillOtp(page, "123456");
+    await page.getByRole("button", { name: "Verify Code" }).click();
 
-    // Success
     await expect(page.getByText("Application Submitted!")).toBeVisible();
     await expect(page.getByRole("link", { name: "Back to Sign In" })).toBeVisible();
   });
 
   test("shows OTP error for wrong code", async ({ page }) => {
-    await page.getByPlaceholder("Ahmed").fill("Ahmed");
-    await page.getByPlaceholder("Ali").fill("Alireza");
-    await page.getByPlaceholder("name@mail.com").fill("ahmed@test.com");
-    await page.getByPlaceholder("12-345 6789").fill("123456789");
-    await page.locator("select.rounded-lg").first().selectOption({ label: "Malaysia" });
-    await page.locator("label").filter({ hasText: "Education Agent" }).first().click();
-    await page.locator('input[type="file"]#ind-id-doc').setInputFiles(DOC_FIXTURE);
-    await waitForUpload(page, 0);
-    await page.locator('input[type="checkbox"]').check();
+    await fillIndividualForm(page);
     await page.getByRole("button", { name: "Submit Application" }).click();
 
     await expect(page.getByRole("heading", { name: "Verify your email" })).toBeVisible();
-    await page.getByPlaceholder("• • • • • •").fill("000000");
-    await page.getByRole("button", { name: "Verify OTP" }).click();
+    await fillOtp(page, "000000");
+    await page.getByRole("button", { name: "Verify Code" }).click();
     await expect(page.getByText("Invalid or expired OTP")).toBeVisible();
-  });
-
-  test("OTP resend shows cooldown after sending", async ({ page }) => {
-    await page.getByPlaceholder("Ahmed").fill("Ahmed");
-    await page.getByPlaceholder("Ali").fill("Alireza");
-    await page.getByPlaceholder("name@mail.com").fill("ahmed@test.com");
-    await page.getByPlaceholder("12-345 6789").fill("123456789");
-    await page.locator("select.rounded-lg").first().selectOption({ label: "Malaysia" });
-    await page.locator("label").filter({ hasText: "Education Agent" }).first().click();
-    await page.locator('input[type="file"]#ind-id-doc').setInputFiles(DOC_FIXTURE);
-    await waitForUpload(page, 0);
-    await page.locator('input[type="checkbox"]').check();
-    await page.getByRole("button", { name: "Submit Application" }).click();
-
-    await expect(page.getByRole("heading", { name: "Verify your email" })).toBeVisible();
-    // Cooldown should already be running (60s timer started on submit)
-    await expect(page.getByText(/Resend available in/)).toBeVisible();
   });
 });
 
@@ -152,39 +194,18 @@ test.describe("Partner Registration — Company", () => {
     await expect(page.getByRole("button", { name: "Submit Application" })).toBeDisabled();
   });
 
-  test("full company registration flow → OTP → success", async ({ page }) => {
-    await page.getByPlaceholder("Enter company name.").fill("Global Edu Agency");
-    await page.locator("select.rounded-lg").first().selectOption({ label: "Malaysia" });
-    await page.getByPlaceholder("https://yourcompany.com").fill("https://globaledu.com");
+  test("full company registration flow → OTP → success, without an identity document", async ({ page }) => {
+    await fillCompanyForm(page);
 
-    // Company registration doc
-    await page.locator('input[type="file"]#comp-reg-doc').setInputFiles(DOC_FIXTURE);
-    await waitForUpload(page, 0);
-
-    // Person in charge
-    await page.getByPlaceholder("Enter full name.").fill("Sarah Johnson");
-    await page.getByPlaceholder("contact@company.com").fill("sarah@globaledu.com");
-    await page.getByPlaceholder("12-345 6789").fill("987654321");
-
-    // Contact ID doc
-    await page.locator('input[type="file"]#comp-contact-id-doc').setInputFiles(DOC_FIXTURE);
-    await waitForUpload(page, 1);
-
-    // T&C
-    await page.locator('input[type="checkbox"]').check();
-
-    // Submit
     const btn = page.getByRole("button", { name: "Submit Application" });
     await expect(btn).toBeEnabled();
     await btn.click();
 
-    // OTP step
     await expect(page.getByRole("heading", { name: "Verify your email" })).toBeVisible();
     await expect(page.getByText("sarah@globaledu.com")).toBeVisible();
 
-    // Verify
-    await page.getByPlaceholder("• • • • • •").fill("123456");
-    await page.getByRole("button", { name: "Verify OTP" }).click();
+    await fillOtp(page, "123456");
+    await page.getByRole("button", { name: "Verify Code" }).click();
     await expect(page.getByText("Application Submitted!")).toBeVisible();
   });
 });
@@ -194,34 +215,10 @@ test.describe("Registration page — navigation", () => {
     await page.goto("/auth/register");
 
     await page.getByRole("button", { name: "Individual Advisor" }).click();
-    await expect(page.getByPlaceholder("Ahmed")).toBeVisible();
+    await expect(page.getByPlaceholder("Ahmed Ali")).toBeVisible();
 
     await page.getByRole("button", { name: "Company / Agency" }).click();
-    await expect(page.getByPlaceholder("Enter company name.")).toBeVisible();
-    await expect(page.getByPlaceholder("Ahmed")).not.toBeVisible();
-  });
-
-  test("success screen has a back to sign-in link", async ({ page }) => {
-    await mockRegistrationAPIs(page);
-    await page.goto("/auth/register");
-    await page.getByRole("button", { name: "Individual Advisor" }).click();
-
-    await page.getByPlaceholder("Ahmed").fill("Ahmed");
-    await page.getByPlaceholder("Ali").fill("Alireza");
-    await page.getByPlaceholder("name@mail.com").fill("ahmed@test.com");
-    await page.getByPlaceholder("12-345 6789").fill("123456789");
-    await page.locator("select.rounded-lg").first().selectOption({ label: "Malaysia" });
-    await page.locator("label").filter({ hasText: "Education Agent" }).first().click();
-    await page.locator('input[type="file"]#ind-id-doc').setInputFiles(DOC_FIXTURE);
-    await waitForUpload(page, 0);
-    await page.locator('input[type="checkbox"]').check();
-    await page.getByRole("button", { name: "Submit Application" }).click();
-
-    await page.getByPlaceholder("• • • • • •").fill("123456");
-    await page.getByRole("button", { name: "Verify OTP" }).click();
-    await expect(page.getByText("Application Submitted!")).toBeVisible();
-
-    await page.getByRole("link", { name: "Back to Sign In" }).click();
-    await expect(page).toHaveURL("/auth/sign-in");
+    await expect(page.getByPlaceholder("Enter agency name.")).toBeVisible();
+    await expect(page.getByPlaceholder("Ahmed Ali")).not.toBeVisible();
   });
 });

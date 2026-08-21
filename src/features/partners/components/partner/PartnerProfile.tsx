@@ -308,7 +308,6 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                 <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Passport Number" value={partner.individual_details?.passport_number} />
               </div>
               <div className="mt-3 space-y-2">
-                <DocRow label="Identity Document" fileKey={partner.individual_details?.id_document_file_key} personName={partner.name} />
                 <DocRow label="Passport Photo" fileKey={partner.individual_details?.passport_photo_file_key} personName={partner.name} />
               </div>
             </div>
@@ -329,7 +328,6 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
               </div>
               <div className="mt-3 space-y-2">
                 <DocRow label="Company Registration Document" fileKey={partner.company_details?.company_registration_doc_file_key} personName={partner.name} />
-                <DocRow label="Contact Identity Document" fileKey={partner.company_details?.contact_id_document_file_key} personName={partner.name} />
                 <DocRow label="Passport Photo" fileKey={partner.company_details?.passport_photo_file_key} personName={partner.name} />
                 <DocRow label="Agency Logo" fileKey={partner.company_details?.logo_file_key} personName={partner.name} />
               </div>

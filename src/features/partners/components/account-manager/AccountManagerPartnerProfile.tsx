@@ -320,11 +320,6 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
             </div>
             <div className="mt-3 space-y-2">
               <DocRow
-                label="Identity Document"
-                fileKey={partner.individual_details?.id_document_file_key}
-                personName={partner.name}
-              />
-              <DocRow
                 label="Profile Photo"
                 fileKey={partner.individual_details?.profile_photo_file_key}
                 personName={partner.name}
@@ -374,11 +369,6 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
               <DocRow
                 label="Company Registration Document"
                 fileKey={partner.company_details?.company_registration_doc_file_key}
-                personName={partner.name}
-              />
-              <DocRow
-                label="Contact Identity Document"
-                fileKey={partner.company_details?.contact_id_document_file_key}
                 personName={partner.name}
               />
               <DocRow
