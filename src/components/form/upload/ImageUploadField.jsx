@@ -69,6 +69,7 @@ const ImageUploadField = ({
   }, [existingUrl]);
 
   const isSimpleMode = !documentTypeId;
+  const uploadNoun = label ? label.toLowerCase() : "logo";
 
   // ── document-management mode ──────────────────────────────────────────────
   const documents = !isSimpleMode ? (formData?.[field] || []) : [];
@@ -154,7 +155,7 @@ const ImageUploadField = ({
               onChange={handleSimpleUpload}
             />
           </label>
-          <p className="text-xs text-slate-500">Click to upload logo</p>
+          <p className="text-xs text-slate-500">Click to upload {uploadNoun}</p>
           <p className="text-[10px] text-slate-400">{resolvedLabel} accepted (max 10MB)</p>
         </div>
       )}
