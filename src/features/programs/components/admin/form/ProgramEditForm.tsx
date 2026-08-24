@@ -50,10 +50,19 @@ const toScholarshipTypeInt = (t: any): number | null => {
 
 interface Props {
   id: string;
+  /** Where "Back" and a successful save navigate to. Defaults to this program's admin details page. */
+  redirectPath?: string;
+  listPath?: string;
+  hideDelete?: boolean;
 }
 
 
-const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
+const EditKnowledgeHubProgramDetails = ({
+  id,
+  redirectPath = `/admin/knowledge-hub/${id}`,
+  listPath = "/admin/knowledge-hub",
+  hideDelete = false,
+}: Props) => {
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const { deletePrograms } = useDeletePrograms();
 
@@ -76,6 +85,16 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   const { fields } = useAllFields();
   const { universities } = useUniversities();
   const { branches } = useBranches(formData.uni_id);
+
+  useEffect(() => {
+    if (!branches || branches.length === 0) {
+      updateFormData('branch_id', '');
+      return;
+    }
+    const stillValid = branches.some((b: any) => String(b.id) === String(formData.branch_id));
+    if (stillValid) return;
+    updateFormData('branch_id', branches.length === 1 ? String(branches[0].id) : '');
+  }, [branches]);
 
   const removeScholarship = (index: number) => {
     setFormData((prev) => ({
@@ -258,7 +277,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
 
       showToast("Program updated successfully", "success");
 
-      router.push(`/admin/knowledge-hub/${id}`);
+      router.push(redirectPath);
     } catch (error: unknown) {
       const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Update failed. ${backendMessage}`, "error");
@@ -273,7 +292,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
       showToast("Deleted successfully", "success");
       setIsDeleteOpen(false);
       setDeleteMode(null);
-      router.push("/admin/knowledge-hub");
+      router.push(listPath);
     } catch (error: unknown) {
       const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Delete failed. ${backendMessage}`, "error");
@@ -283,7 +302,7 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
   };
 
   const handleBack = () => {
-    router.push(`/admin/knowledge-hub/${id}`);
+    router.push(redirectPath);
   };
 
   if (!program) return <Loading text="Loading program..." />;
@@ -328,23 +347,25 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 {openDropdownId === program.id && (
                   <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
                     <div className="space-y-2 p-2">
-                      <button
-                        aria-label="Delete Program"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-red-200 hover:bg-red-50 hover:shadow-sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsDeleteOpen(true);
-                          setOpenDropdownId(null);
-                        }}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
-                          <Trash2 className="h-4 w-4" />
-                        </div>
+                      {!hideDelete && (
+                        <button
+                          aria-label="Delete Program"
+                          className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-red-200 hover:bg-red-50 hover:shadow-sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setIsDeleteOpen(true);
+                            setOpenDropdownId(null);
+                          }}
+                        >
+                          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
+                            <Trash2 className="h-4 w-4" />
+                          </div>
 
-                        <span className="font-semibold text-red-700">
-                        Delete Program
-                      </span>
-                      </button>
+                          <span className="font-semibold text-red-700">
+                          Delete Program
+                        </span>
+                        </button>
+                      )}
 
                       <button
                         aria-label="Back to Knowledge Hub"
@@ -517,6 +538,10 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 field="is_on_campus"
                 formData={formData}
                 errors={errors}
+                enabledText="On campus"
+                disabledText="Online"
+                enabledDescription="Students attend this program in person."
+                disabledDescription="Students attend this program online."
                 updateFormData={(field, value) => {
                   updateFormData(field, value);
                   updateFormData("is_online", !value);
@@ -676,6 +701,10 @@ const EditKnowledgeHubProgramDetails = ({ id }: Props) => {
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
+                enabledText="Scholarship available"
+                disabledText="No scholarship"
+                enabledDescription="Scholarship details are shown below."
+                disabledDescription="Turn on to add scholarship details for this program."
               />
             </div>
 

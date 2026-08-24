@@ -6,6 +6,7 @@ import type { ApplicationActionsResponse } from "features/applications/hooks";
 import DisputeCommission from "features/applications/partner/components/popups/DisputeCommission";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import Button from "components/ui/buttons/Button";
+import { SectionIconBadge } from "components/ui/icons";
 
 interface ApplicationCommissionProps {
   application: any;
@@ -45,13 +46,11 @@ export default function ApplicationCommission({
   return (
     <>
       <div className="flex items-center justify-between gap-3 border-b border-slate-200 p-6">
-        <div className="flex flex-1 items-center gap-4">
-          <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-            <Receipt className="text-xl text-blue-700" />
-          </span>
+        <div className="flex flex-1 items-center gap-3">
+          <SectionIconBadge icon={Receipt} color="blue" />
           <div>
             <h3 className="text-p3 font-semibold text-slate-900">
-              Partner Commission Details
+              Commission Details
             </h3>
             {statusLabel && (
               <span className="text-sm text-slate-500">

@@ -41,10 +41,13 @@ export const partnersApi = {
       { headers: authHeader() }
     ),
 
-  update: (id: string, payload: UpdatePartnerPayload) =>
+  // Partial by design — the backend is a genuine partial-update endpoint
+  // (missing fields are left untouched), so callers like suspend/reactivate
+  // should only send the field(s) they actually mean to change.
+  update: (id: string, payload: Partial<UpdatePartnerPayload>) =>
     api.put(
       `/admin/partners/${id}`,
-      { ...payload, name: payload.name.trim() },
+      { ...payload, ...(payload.name !== undefined ? { name: payload.name.trim() } : {}) },
       { headers: authHeader() }
     ),
 
@@ -61,6 +64,12 @@ export const partnersApi = {
 
   resendApprovalEmail: (id: string) =>
     api.post(`/admin/partners/${id}/resend-approval-email`, {}, { headers: authHeader() }),
+
+  // Team members are their own row in /admin/partners — a partial update with
+  // just is_active is enough to suspend/reactivate one, same endpoint as a
+  // whole partner account but without the full-payload fields.
+  updateAgencyMemberStatus: (memberPartnerId: string, isActive: boolean) =>
+    api.put(`/admin/partners/${memberPartnerId}`, { is_active: isActive }, { headers: authHeader() }),
 
   adminResendRegistrationOtp: (email: string) =>
     api.post<{ message: string }>('/admin/partners/register/resend-otp', { email }, { headers: authHeader() }),

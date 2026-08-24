@@ -60,8 +60,9 @@ export default function DeletePartner({ isOpen, onClose, onConfirm, isDeleting }
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
             <Button
+              className="w-full sm:w-auto"
               onClick={onClose}
               disabled={isDeleting}
               icon={<XCircle className="h-5 w-5" />}
@@ -74,6 +75,7 @@ export default function DeletePartner({ isOpen, onClose, onConfirm, isDeleting }
             />
 
             <Button
+              className="w-full sm:w-auto"
               icon={<Trash2 className="h-5 w-5" />}
               text={isDeleting ? "Deleting..." : "Delete Partner"}
               bgColor="bg-red-50"

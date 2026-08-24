@@ -4,10 +4,9 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronRight, User, Mail, CheckCircle, Settings,
   RefreshCw, Pencil, Users,
-  AlertCircle, Trash2, SlidersHorizontal, Activity,
+  AlertCircle, Trash2, SlidersHorizontal, Activity, XCircle,
 } from "lucide-react";
 import { MdPersonAdd } from "react-icons/md";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 import { useAccountManagers } from "../hooks/useAccountManagers";
 import { useDeleteAccountManager } from "../hooks/useDeleteAccountManager";
@@ -18,6 +17,7 @@ import { parseApiError } from "utils/parseApiError";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { StatusBadge } from "components/ui/badges";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 
@@ -300,27 +300,20 @@ const AccountManagersTable = () => {
 
                   <td className="px-6 py-4">
                     {Number(m.assigned_partners_count) > 0 ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">
-                        <Users className="h-3 w-3" />
+                      <StatusBadge variant="success" icon={<Users className="h-3 w-3" />}>
                         {Number(m.assigned_partners_count)} Partner{Number(m.assigned_partners_count) !== 1 && "s"}
-                      </span>
+                      </StatusBadge>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 rounded-md border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-semibold text-rose-700">
-                        <AlertCircle className="h-3 w-3" />
-                        Needs Partner
-                      </span>
+                      <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>Needs Partner</StatusBadge>
                     )}
                   </td>
 
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold ${
-                      m.is_active
-                        ? "border-green-200 bg-green-50 text-green-700"
-                        : "border-slate-200 bg-slate-100 text-slate-500"
-                    }`}>
-                      {m.is_active ? <FaCheckCircle className="text-[10px]" /> : <FaTimesCircle className="text-[10px]" />}
-                      {m.is_active ? "Active" : "Inactive"}
-                    </span>
+                    {m.is_active ? (
+                      <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
+                    ) : (
+                      <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
+                    )}
                   </td>
 
                   <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useAccountManagerDetails, AccountManagerProfile, AccountManagerPartnersTable } from "features/account-managers";
+import { useAccountManagerDetails, AccountManagerDetailsTabs } from "features/account-managers";
 
 export default function AccountManagerProfilePage() {
   const params = useParams();
@@ -15,8 +15,7 @@ export default function AccountManagerProfilePage() {
 
   return (
     <div className="pt-6">
-      <AccountManagerProfile manager={manager} />
-      <AccountManagerPartnersTable managerId={manager.id} />
+      <AccountManagerDetailsTabs manager={manager} />
     </div>
   );
 }

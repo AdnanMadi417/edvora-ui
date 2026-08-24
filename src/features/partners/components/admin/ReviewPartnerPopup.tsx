@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle, CheckCircle2, ClipboardCheck, ShieldCheck, UserCog, XCircle } from "lucide-react";
 import { useReviewPartner, useAssignPartnerManager } from "features/partners/hooks";
 import ModalHeader from "components/ui/modal/ModalHeader";
+import { StatusBadge } from "components/ui/badges";
 import Button from "components/ui/buttons/Button";
 import ApproveRejectToggle from "components/ui/buttons/ApproveRejectToggle";
 import SelectField from "components/form/fields/SelectField";
@@ -152,17 +153,17 @@ export default function ReviewPartnerPopup({
                 </div>
 
                 {managerIsMissing ? (
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700">
-                    <AlertTriangle className="h-3 w-3" /> Not assigned
-                  </span>
+                  <StatusBadge variant="warning" icon={<AlertTriangle className="h-3 w-3" />} className="shrink-0">
+                    Not assigned
+                  </StatusBadge>
                 ) : managerIsPending ? (
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700">
+                  <StatusBadge variant="info" className="shrink-0">
                     Pending change
-                  </span>
+                  </StatusBadge>
                 ) : (
-                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
-                    <CheckCircle2 className="h-3 w-3" /> Assigned
-                  </span>
+                  <StatusBadge variant="success" icon={<CheckCircle2 className="h-3 w-3" />} className="shrink-0">
+                    Assigned
+                  </StatusBadge>
                 )}
               </div>
 
@@ -242,8 +243,9 @@ export default function ReviewPartnerPopup({
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-end">
             <Button
+              className="w-full sm:w-auto"
               text="Cancel"
               onClick={onClose}
               bgColor="bg-slate-50"
@@ -253,7 +255,7 @@ export default function ReviewPartnerPopup({
               hoverBorderColor="hover:border-slate-700"
             />
 
-            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${decision ? "max-w-[200px] opacity-100" : "max-w-0 opacity-0"}`}>
+            <div className={`w-full overflow-hidden transition-all duration-300 ease-in-out sm:w-auto ${decision ? "max-w-full opacity-100 sm:max-w-[200px]" : "max-w-0 opacity-0"}`}>
               {decision === "approved" ? (
                 <Button
                   icon={<CheckCircle className="h-5 w-5" />}
@@ -265,7 +267,7 @@ export default function ReviewPartnerPopup({
                   borderColor="border-emerald-600"
                   hoverTextColor="hover:text-emerald-800"
                   hoverBorderColor="hover:border-emerald-700"
-                  className="whitespace-nowrap"
+                  className="w-full whitespace-nowrap sm:w-auto"
                 />
               ) : (
                 <Button
@@ -278,7 +280,7 @@ export default function ReviewPartnerPopup({
                   borderColor="border-red-600"
                   hoverTextColor="hover:text-red-800"
                   hoverBorderColor="hover:border-red-700"
-                  className="whitespace-nowrap"
+                  className="w-full whitespace-nowrap sm:w-auto"
                 />
               )}
             </div>

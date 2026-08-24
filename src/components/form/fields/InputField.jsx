@@ -8,14 +8,14 @@ const getNestedValue = (obj, path) => {
     .reduce((acc, key) => (acc ? acc[key] : undefined), obj);
 };
 
-const InputField = ({ label, field, type = "text", required = true, placeholder = "", formData, errors, updateFormData, onBlur = undefined, disabled = false, helperText = "" }) => {
+const InputField = ({ label, field, dataField = undefined, type = "text", required = true, placeholder = "", formData, errors, updateFormData, onBlur = undefined, disabled = false, helperText = "" }) => {
   const value = getNestedValue(formData, field) ?? "";
   const error = errors?.[field];
 
   const dateProps = type === "date" ? { min: "1900-01-01", max: "2099-12-31" } : {};
 
   return (
-    <div className="mb-4">
+    <div className="mb-4" data-field={dataField ?? field}>
       <label className="block text-p2 font-medium text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}
       </label>

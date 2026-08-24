@@ -13,6 +13,7 @@ import { useAllQualifications } from "features/knowledge-hub/qualifications/hook
 import { useUniversities } from "features/universities/hooks";
 
 import ProgramFilterBar from "components/filters/ProgramFilterBar";
+import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "next/link";
@@ -234,6 +235,14 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                       </div>
                     </div>
 
+                    {/* Intake Dates */}
+                    {program.intake_dates && program.intake_dates.length > 0 && (
+                      <div className="px-4 pb-3">
+                        <p className="mb-1.5 text-xs text-slate-400">Intakes</p>
+                        <IntakeDatesChips dates={program.intake_dates} size="sm" showYear showDot={false} />
+                      </div>
+                    )}
+
                     {/* Scholarship badge */}
                     <div className="px-4 pb-3">
                       {program.has_scholarship ? (
@@ -250,14 +259,14 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                     </div>
 
                     {/* Commission */}
-                    <div className="mx-4 mb-4 flex items-center justify-between rounded-xl bg-emerald-50 px-4 py-3">
-                      <span className="text-sm font-medium text-emerald-700">Your Commission</span>
-                      <span className="text-lg font-bold text-emerald-600">
-                        {program.commission_amount
-                          ? `${(program.commission_currency || "RM").toUpperCase()} ${program.commission_amount.toLocaleString()}`
-                          : "N/A"}
-                      </span>
-                    </div>
+                    {program.commission_amount != null && (
+                      <div className="mx-4 mb-4 flex items-center justify-between rounded-xl bg-emerald-50 px-4 py-3">
+                        <span className="text-sm font-medium text-emerald-700">Your Commission</span>
+                        <span className="text-lg font-bold text-emerald-600">
+                          {`${(program.commission_currency || "RM").toUpperCase()} ${program.commission_amount.toLocaleString()}`}
+                        </span>
+                      </div>
+                    )}
 
                     {/* Apply Now */}
                     {showApplyAction && (

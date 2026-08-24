@@ -13,6 +13,8 @@ import {
 
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import { CURRENCY } from "constants/lists";
 import {
   useAssignUniversityType,
@@ -42,16 +44,7 @@ import Loading from "components/loading/Loading";
 import IconButton from "components/ui/buttons/IconButton";
 import EmptyData from "components/emptyData/EmptyTableData";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
-import { validateUniversity, isUniversityComplete } from "./validateUniversity";
-
-const FIELD_LABELS: Record<string, string> = {
-  name: "University Name",
-  description: "Description",
-  intake_months: "Intake Dates",
-  country: "Country",
-  university_type_id: "University Type",
-  branches: "Branches",
-};
+import { validateUniversity, isUniversityComplete, universityFieldMap } from "./validateUniversity";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -150,9 +143,11 @@ const normalizePayload = (formData: FormData) => ({
 
 interface Props {
   id: string;
+  /** Where "Back" and a successful save should navigate to. Defaults to this university's admin details page. */
+  redirectPath?: string;
 }
 
-const UniversityEdit = ({ id }: Props) => {
+const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Props) => {
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -176,6 +171,23 @@ const UniversityEdit = ({ id }: Props) => {
   const [logo, setLogo] = useState<LogoState>(INITIAL_LOGO);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [paymentErrors, setPaymentErrors] = useState<Record<string, string>>({});
+
+  const handleSaveApiError = useApiFormErrors({
+    fieldMap: universityFieldMap,
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Update failed. ${message}`, "error"),
+  });
+
+  const handleAssignApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setPaymentErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Failed to assign payment method. ${message}`, "error"),
+  });
 
   const stateOptions = useMemo(
     () => states?.map((c) => ({ value: String(c.id), label: c.name })) ?? [],
@@ -400,17 +412,8 @@ const UniversityEdit = ({ id }: Props) => {
       setPaymentErrors({});
       setShowAddPayment(false);
       refetchPayments();
-    } catch (err: any) {
-      const apiErrors = err?.response?.data?.detail;
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
-        });
-        setPaymentErrors(newErrors);
-      } else {
-        showToast(parseApiError(err, "Failed to assign payment method."), "error");
-      }
+    } catch (err: unknown) {
+      handleAssignApiError(err, "Failed to assign payment method.");
     }
   };
 
@@ -425,6 +428,7 @@ const UniversityEdit = ({ id }: Props) => {
     const { isValid, errors: validationErrors } = validateUniversity(formData as any);
     if (!isValid) {
       setErrors(validationErrors);
+      scrollToFirstError(validationErrors);
       return;
     }
 
@@ -455,31 +459,13 @@ const UniversityEdit = ({ id }: Props) => {
       }
 
       showToast("University updated successfully.", "success");
-      router.push(`/admin/universities/${id}`);
-    } catch (error: any) {
-      const details = error?.response?.data?.details;
-
-      if (Array.isArray(details)) {
-        const newErrors: Record<string, string> = {};
-        details.forEach((e: any) => {
-          if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
-        });
-        setErrors(newErrors);
-      }
-
-      let message = parseApiError(error, "Please try again.");
-      if (Array.isArray(details) && details.length > 0) {
-        const first = details[0];
-        const field = first?.loc?.[1];
-        const label = field ? (FIELD_LABELS[field] ?? field) : null;
-        message = label ? `${label}: ${first.msg}` : first.msg;
-      }
-
-      showToast(`Update failed. ${message}`, "error");
+      router.push(redirectPath);
+    } catch (error: unknown) {
+      handleSaveApiError(error, "Please try again.");
     }
   };
 
-  const handleBack = () => router.push(`/admin/universities/${id}`);
+  const handleBack = () => router.push(redirectPath);
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
@@ -592,12 +578,16 @@ const UniversityEdit = ({ id }: Props) => {
             formData={formData}
             errors={{}}
             updateFormData={updateFormData}
+            enabledText="Active"
+            disabledText="Inactive"
+            enabledDescription="This university is visible and available for applications."
+            disabledDescription="This university is hidden and unavailable for new applications."
           />
         </div>
       </div>
 
       {/* Branches */}
-      <div className="border-t px-6 py-6">
+      <div className="border-t px-6 py-6" data-field="branches">
         <div className="mb-4 flex items-center justify-between">
           <h3 className="text-sm font-semibold uppercase text-slate-500">Branches</h3>
           <IconButton
@@ -640,6 +630,7 @@ const UniversityEdit = ({ id }: Props) => {
                   label="Branch Name"
                   placeholder="e.g Branch Name"
                   field="name"
+                  dataField={`branches[${index}].name`}
                   formData={branch}
                   errors={{ name: errors[`branches[${index}].name`] }}
                   updateFormData={(f, v) => {
@@ -656,6 +647,7 @@ const UniversityEdit = ({ id }: Props) => {
                   label="Location"
                   placeholder="e.g Location"
                   field="location"
+                  dataField={`branches[${index}].location`}
                   formData={branch}
                   errors={{ location: errors[`branches[${index}].location`] }}
                   updateFormData={(f, v) => {
@@ -671,6 +663,7 @@ const UniversityEdit = ({ id }: Props) => {
                 <SearchableDropdown
                   label="State"
                   field="state_id"
+                  dataField={`branches[${index}].state_id`}
                   options={stateOptions}
                   formData={{ state_id: branch.state_id }}
                   errors={{ state_id: errors[`branches[${index}].state_id`] }}
@@ -770,6 +763,10 @@ const UniversityEdit = ({ id }: Props) => {
                 formData={method}
                 errors={{}}
                 updateFormData={(field, value) => updatePaymentRow(method.id, field, value)}
+                enabledText="Active"
+                disabledText="Inactive"
+                enabledDescription="This payment method is available for use."
+                disabledDescription="This payment method is hidden from selection."
               />
             </div>
           ))}

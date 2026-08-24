@@ -12,13 +12,22 @@ import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 
 interface UniversityDetailsProps {
   id: string;
+  /** Where a successful save navigates to. Defaults to this type's admin details page. */
+  redirectPath?: string;
+  /** Where "Back" navigates to. Defaults to the admin university configuration list. */
+  listPath?: string;
 }
 
-const UniversityDetails = ({ id }: UniversityDetailsProps) => {
+const UniversityDetails = ({
+  id,
+  redirectPath = `/admin/config-universities/${id}`,
+  listPath = "/admin/config-universities",
+}: UniversityDetailsProps) => {
   const router = useRouter();
   const { showToast } = useToast();
   const { university, error } = useUniversityTypeDetails(id);
@@ -29,6 +38,14 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   const [initialFormData, setInitialFormData] = useState<Record<string, any> | null>(null);
 
   const { updateUniversityType, loading } = useUpdateUniversityType(id);
+
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Update failed. ${message}`, "error"),
+  });
 
   const fieldSource = React.useMemo(() => {
     const universityFields = university?.required_fields || [];
@@ -92,6 +109,7 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
     if (descErr) newErrors.description = descErr;
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      scrollToFirstError(newErrors);
       return;
     }
 
@@ -110,11 +128,10 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
 
       showToast("University type updated successfully", "success");
 
-      router.push(`/admin/config-universities/${id}`);
+      router.push(redirectPath);
 
-    } catch (error: any) {
-      const backendMessage = parseApiError(error, "Please try again.");
-      showToast(`Update failed. ${backendMessage}`, "error");
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 
@@ -147,11 +164,11 @@ const UniversityDetails = ({ id }: UniversityDetailsProps) => {
   }, [formData, initialFormData]);
 
   const handleBack = () => {
-    router.push(`/admin/config-universities/${id}`);
+    router.push(listPath);
   };
 
   const handleUpdateLink = () => {
-    router.push(`/admin/config-universities/${id}`);
+    router.push(redirectPath);
   };
 
   if (loading) {

@@ -66,7 +66,7 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
               <p className="mt-1 text-sm text-slate-500">
                 {!loading && serviceProviders.length > 0 ? (
                   locked
-                    ? <><span className="font-medium text-slate-700">{serviceProviders.length}</span> listings available · <span className="font-medium text-amber-600">Requires Visa Processing stage</span></>
+                    ? <><span className="font-medium text-slate-700">{serviceProviders.length}</span> listings available · <span className="font-medium text-amber-600">Requires Visa Processing stage or later</span></>
                     : <><span className="font-medium text-slate-700">{serviceProviders.length}</span> listings available</>
 
                 ) : (
@@ -112,8 +112,8 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-slate-900">Unlock Logistics Marketplace</p>
                   <p className="mt-1 text-xs leading-relaxed text-slate-500">
-                    The Logistics Marketplace becomes available once you have at least 1 student in{" "}
-                    <span className="font-semibold text-slate-700">Visa Processing</span>.
+                    The Logistics Marketplace becomes available once you have at least 1 student at{" "}
+                    <span className="font-semibold text-slate-700">Visa Processing or a later stage</span>.
                     This ensures logistics support is used at the right stage — when students are
                     preparing for arrival, accommodation, airport pickup, and local assistance.
                   </p>
@@ -124,7 +124,7 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
                 <div className="rounded-xl bg-slate-50 p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Requirement</p>
                   <p className="mt-1 text-sm font-bold text-slate-900">1 student</p>
-                  <p className="text-xs text-slate-500">in Visa Processing</p>
+                  <p className="text-xs text-slate-500">at Visa Processing or later</p>
                 </div>
                 <div className="rounded-xl bg-slate-50 p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Current Status</p>
@@ -134,7 +134,7 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
                       {visaProcessingCount} student{visaProcessingCount !== 1 ? "s" : ""}
                     </p>
                   </div>
-                  <p className="text-xs text-slate-500">in Visa Processing</p>
+                  <p className="text-xs text-slate-500">at Visa Processing or later</p>
                 </div>
               </div>
 
@@ -171,13 +171,13 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
                   <div className={`flex items-center gap-4 px-5 py-5 ${locked ? "blur-sm select-none pointer-events-none" : ""}`}>
                     <div className="relative flex-shrink-0">
                       <PresignedImage
-                        fileKey={m.picture_file_key}
-                        alt={m.name}
+                        fileKey={locked ? undefined : m.picture_file_key}
+                        alt={locked ? "Locked service provider" : m.name}
                         className="h-14 w-14 rounded-full object-cover"
                         fallback={
                           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-blue-100">
                             <span className="text-base font-semibold uppercase text-blue-700">
-                              {m.name?.slice(0, 2)}
+                              {locked ? "••" : m.name?.slice(0, 2)}
                             </span>
                           </div>
                         }
@@ -191,12 +191,12 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
 
                     <div className="min-w-0 overflow-hidden">
                       <h3 className="flex min-w-0 items-center gap-1.5 text-sm font-bold uppercase tracking-wide text-slate-900">
-                        <span className="truncate">{m.name}</span>
+                        <span className="truncate">{locked ? "Locked Provider" : m.name}</span>
                         <CheckCircle className="h-4 w-4 flex-shrink-0 fill-blue-500 text-white" />
                       </h3>
                       <p className="mt-0.5 flex min-w-0 items-center gap-1 text-xs text-slate-500">
                         <MdLocationOn className="h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate">{m.main_location || "Not Provided"}</span>
+                        <span className="truncate">{locked ? "Location hidden" : (m.main_location || "Not Provided")}</span>
                       </p>
                     </div>
                   </div>

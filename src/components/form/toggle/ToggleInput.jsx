@@ -7,6 +7,10 @@ const ToggleInput = ({
                        updateFormData,
                        errors,
                        required = false,
+                       enabledText = "Enabled",
+                       disabledText = "Disabled",
+                       enabledDescription = "Click to toggle",
+                       disabledDescription = "Click to toggle",
                      }) => {
   const selected = Boolean(formData[field]);
 
@@ -15,7 +19,7 @@ const ToggleInput = ({
   };
 
   return (
-    <div className="mb-5">
+    <div className="mb-5" data-field={field}>
       <label className="mb-2 block text-sm font-semibold text-slate-900">
         {label} {required && <span className="text-red-600">*</span>}
       </label>
@@ -29,16 +33,16 @@ const ToggleInput = ({
         }
       `}
       >
-        <div className="flex flex-col">
-          <span className="text-sm font-medium text-slate-800">
-            {selected ? "Enabled" : "Disabled"}
+        <div className="flex min-w-0 flex-col pr-3">
+          <span className="truncate text-sm font-medium text-slate-800">
+            {selected ? enabledText : disabledText}
           </span>
-          <span className="text-xs text-slate-400">
-            Click to toggle
+          <span className="truncate text-xs text-slate-400">
+            {selected ? enabledDescription : disabledDescription}
           </span>
         </div>
 
-        <div className="relative">
+        <div className="relative flex-shrink-0">
           <input
             type="checkbox"
             checked={selected}
@@ -49,9 +53,6 @@ const ToggleInput = ({
           <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
         </div>
 
-        {selected && (
-          <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-blue-600" />
-        )}
       </label>
 
       {errors?.[field] && (

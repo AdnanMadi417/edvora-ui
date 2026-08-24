@@ -3,6 +3,7 @@
 import React from "react";
 import { Check, Clock } from "lucide-react";
 import { useAllStages } from "features/applications/hooks";
+import { SectionIconBadge } from "components/ui/icons";
 
 interface ApplicationTimelineProps {
   application: any;
@@ -39,12 +40,10 @@ const ApplicationTimeline = ({ application }: ApplicationTimelineProps) => {
 
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-          <Clock className="h-5 w-5 text-blue-600" />
-        </span>
+        <SectionIconBadge icon={Clock} color="blue" />
         <div>
           <h3 className="text-p3 font-semibold text-slate-900">Application Timeline</h3>
-          <p className="text-xs text-slate-500">Track progress through each stage</p>
+          <p className="text-sm text-slate-500">Track progress through each stage</p>
         </div>
       </div>
 

@@ -16,6 +16,8 @@ export interface PublicUploadResult {
 interface Props {
   label: string;
   fieldId: string;
+  /** Error/scroll-target key, when it differs from `fieldId`. Defaults to `fieldId`. */
+  field?: string;
   required?: boolean;
   result?: PublicUploadResult | null;
   fileName?: string;
@@ -25,7 +27,7 @@ interface Props {
 }
 
 export default function PublicFileUploadField({
-  label, fieldId, required, result, fileName, onUpload, onRemove, error,
+  label, fieldId, field, required, result, fileName, onUpload, onRemove, error,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const dragCounter = useRef(0);
@@ -98,7 +100,7 @@ export default function PublicFileUploadField({
   const showError = uploadError || error;
 
   return (
-    <div className="mb-6">
+    <div className="mb-6" data-field={field ?? fieldId}>
       <label className="mb-1.5 block text-sm font-semibold text-slate-900">
         {label}{required && <span className="ml-0.5 text-red-600">*</span>}
       </label>

@@ -10,7 +10,8 @@ import SelectField from "components/form/fields/SelectField";
 import RichTextEditor from "components/form/fields/RichTextEditor";
 import MultiSelect from "components/form/search/MultiSelect";
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { useApiFormErrors } from "hooks/useApiFormErrors";
+import { scrollToFirstError } from "utils/scrollToError";
 import { CURRENCY } from 'constants/lists';
 
 interface BatchUniversitiesProps {
@@ -48,6 +49,14 @@ export default function BatchUniversities({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  const handleApiError = useApiFormErrors({
+    setErrors: (patch) => {
+      setErrors((prev) => ({ ...prev, ...patch }));
+      scrollToFirstError(patch);
+    },
+    onUnmappedError: (message) => showToast(`Failed to assign payment method. ${message}`, "error"),
+  });
+
   useEffect(() => {
     if (isOpen) {
       setFormData({
@@ -68,7 +77,9 @@ export default function BatchUniversities({
 
   const handleAssign = async () => {
     if (!formData.payment_method_ids.length) {
-      setErrors({ payment_method_ids: "At least one payment method is required" });
+      const e = { payment_method_ids: "At least one payment method is required" };
+      setErrors(e);
+      scrollToFirstError(e);
       return;
     }
 
@@ -86,19 +97,8 @@ export default function BatchUniversities({
       showToast("Payment method assigned successfully.", "success");
       onClose();
       onSuccess?.();
-    } catch (error: any) {
-      const apiErrors = error?.response?.data?.detail;
-
-      if (Array.isArray(apiErrors)) {
-        const newErrors: Record<string, string> = {};
-        apiErrors.forEach((e: any) => {
-          if (e?.loc?.[1]) newErrors[e.loc[1]] = e.msg;
-        });
-        setErrors(newErrors);
-      } else {
-        const backendMessage = parseApiError(error, "Please try again.");
-        showToast(`Failed to assign payment method. ${backendMessage}`, "error");
-      }
+    } catch (error: unknown) {
+      handleApiError(error, "Please try again.");
     }
   };
 

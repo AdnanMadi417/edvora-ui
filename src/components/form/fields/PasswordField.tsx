@@ -9,6 +9,7 @@ interface PasswordFieldProps {
   formData: Record<string, any>;
   errors: Record<string, any>;
   updateFormData: (field: string, value: string) => void;
+  onBlur?: () => void;
 }
 
 const getNestedValue = (obj: Record<string, any>, path: string) => {
@@ -27,6 +28,7 @@ const PasswordField = ({
   formData,
   errors,
   updateFormData,
+  onBlur,
 }: PasswordFieldProps) => {
   const [show, setShow] = useState(false);
   const value = getNestedValue(formData, field) ?? "";
@@ -43,6 +45,7 @@ const PasswordField = ({
           type={show ? "text" : "password"}
           value={value}
           onChange={(e) => updateFormData(field, e.target.value)}
+          onBlur={onBlur}
           placeholder={placeholder}
           className={`mt-2 flex h-12 w-full items-center justify-start rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
             error ? "border-red-500 bg-red-50" : "border-slate-200 bg-white hover:bg-slate-50"
