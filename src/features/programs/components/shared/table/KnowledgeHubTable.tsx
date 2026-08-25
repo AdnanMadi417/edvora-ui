@@ -16,6 +16,7 @@ import {
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 import PresignedImage from "components/ui/PresignedImage";
+import { getIeltsLabel } from "constants/lists";
 import IconButton from "components/ui/buttons/IconButton";
 import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { StatusBadge } from "components/ui/badges";
@@ -296,7 +297,7 @@ export default function KnowledgeHubTable({
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-1">
                     <span className="font-semibold text-slate-700">First Year:</span>
-                    <span>{program.first_year_tuition != null ? `RM ${program.first_year_tuition.toLocaleString()}` : "—"}</span>
+                    <span>{program.first_year_tuition != null ? `${program.yearly_fee_currency || "MYR"} ${program.first_year_tuition.toLocaleString()}` : "—"}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="font-semibold text-slate-700">Commission:</span>
@@ -318,7 +319,7 @@ export default function KnowledgeHubTable({
                     <span className="text-slate-400">TBA</span>
                   )}
                   {program.english_required_score != null && (
-                    <span className="text-slate-400">IELTS: {program.english_required_score}</span>
+                    <span className="text-slate-400">IELTS: {getIeltsLabel(program.english_required_score)}</span>
                   )}
                 </div>
               </td>

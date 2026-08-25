@@ -47,6 +47,14 @@ export interface Commission {
   expected_commission_to: string;
 }
 
+// Uppercase per backend contract — sent and received exactly as-is, no other values accepted.
+export type Currency = "MYR" | "USD";
+
+export const CURRENCY_OPTIONS: { value: Currency; label: string }[] = [
+  { value: "MYR", label: "MYR" },
+  { value: "USD", label: "USD" },
+];
+
 export interface YearlyFee {
   year: number;
   fee: number | string;
@@ -60,6 +68,7 @@ export interface ExchangeRate {
 export interface OneTimeFee {
   description: string;
   fee: number | string;
+  currency?: Currency;
 }
 
 // ── Program ───────────────────────────────────────────────────────────────────
@@ -78,6 +87,8 @@ export interface Program {
   duration: number | null;
 
   branch: ProgramBranch;
+  // Applies to every entry in yearly_fees — there is no per-year override.
+  yearly_fee_currency: Currency;
   yearly_fees: YearlyFee[];
   one_time_fees: OneTimeFee[];
 
@@ -160,8 +171,11 @@ export interface CreateProgramPayload {
 
   qualification_id: string;
 
+  // Defaults to "MYR" on the backend if omitted.
+  yearly_fee_currency?: Currency;
   yearly_fees?: Array<{ year: number; fee: number }>;
-  one_time_fees?: Array<{ description: string; fee: number }>;
+  // Each item's currency defaults to "MYR" on the backend if omitted.
+  one_time_fees?: Array<{ description: string; fee: number; currency?: Currency }>;
 
   scholarships?: Array<{
     type?: number | null;
@@ -196,8 +210,12 @@ export interface UpdateProgramPayload {
   expected_commission_from?: number | null;
   expected_commission_to?: number | null;
 
+  // Omit entirely to leave unchanged — sending null is ignored, not a reset.
+  yearly_fee_currency?: Currency;
+  // When provided, fully replaces the existing list (delete-then-insert): resend
+  // every item's description/fee/currency, not just the changed ones.
   yearly_fees?: Array<{ year: number; fee: number }>;
-  one_time_fees?: Array<{ description: string; fee: number }>;
+  one_time_fees?: Array<{ description: string; fee: number; currency?: Currency }>;
 
   scholarships?: Array<{
     type?: number | null;
@@ -225,8 +243,13 @@ export interface BatchUpdateProgramPayload {
   intake_dates?: string[];
   english_required_score?: string;
 
+  // Applies to every selected program. Omit entirely to leave unchanged —
+  // sending null is ignored, not a reset.
+  yearly_fee_currency?: Currency;
+  // When provided, fully replaces the existing list (delete-then-insert): resend
+  // every item's description/fee/currency, not just the changed ones.
   yearly_fees?: Array<{ year: number; fee: number }>;
-  one_time_fees?: Array<{ description: string; fee: number }>;
+  one_time_fees?: Array<{ description: string; fee: number; currency?: Currency }>;
 
   scholarships?: Array<{
     type?: number | null;

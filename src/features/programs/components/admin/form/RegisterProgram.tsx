@@ -7,6 +7,7 @@ import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
 
 import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
+import { type Currency } from 'features/programs/types';
 
 import { useCreateProgram } from 'features/programs/hooks';
 import { useUniversities, useBranches } from "features/universities/hooks";
@@ -18,8 +19,9 @@ import ToggleInput from 'components/form/toggle/ToggleInput';
 import InputField from 'components/form/fields/InputField';
 import TextareaField from 'components/form/fields/TextareaField';
 import RichTextEditor from 'components/form/fields/RichTextEditor';
-import ArrayObjectField from 'components/form/fields/ArrayObjectField';
 import SelectField from 'components/form/fields/SelectField';
+import YearlyFeesField from 'features/programs/components/shared/YearlyFeesField';
+import OneTimeFeesField from 'features/programs/components/shared/OneTimeFeesField';
 import MultipleDateInput from 'components/form/date/MultipleDateInput';
 import SearchableDropdown from 'components/form/search/SearchableDropdown';
 
@@ -50,8 +52,9 @@ export interface FormData {
   expected_commission_from: string;
   expected_commission_to: string;
   qualification_id: string;
+  yearly_fee_currency: string;
   yearly_fees: Array<{ year: number; fee: number }>;
-  one_time_fees: Array<{ description: string; fee: number }>;
+  one_time_fees: Array<{ description: string; fee: number; currency: string }>;
   scholarships: Array<{
     type: number;
     coverage_percent: number;
@@ -107,6 +110,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
     expected_commission_from: '',
     expected_commission_to: '',
     qualification_id: '',
+    yearly_fee_currency: 'MYR',
     yearly_fees: [],
     one_time_fees: [],
     scholarships: [],
@@ -234,8 +238,9 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
         commission_currency: formData.commission_currency || 'rm',
         expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
         expected_commission_to: formData.expected_commission_to ? Number(formData.expected_commission_to) : null,
+        yearly_fee_currency: (formData.yearly_fee_currency || 'MYR') as Currency,
         yearly_fees: (formData.yearly_fees || []).map((y) => ({ year: Number(y.year), fee: Number(y.fee) })),
-        one_time_fees: (formData.one_time_fees || []).map((f: any) => ({ description: f.description || '', fee: Number(f.fee || 0) })),
+        one_time_fees: (formData.one_time_fees || []).map((f: any) => ({ description: f.description || '', fee: Number(f.fee || 0), currency: (f.currency || 'MYR') as Currency })),
         scholarships: formData.has_scholarship
           ? (formData.scholarships || [])
               .filter((s) => s.name && s.description)
@@ -542,32 +547,8 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                 </div>
 
                 <div className="space-y-4 border-b border-slate-200 p-6">
-                  <ArrayObjectField
-                    label="Yearly Fees"
-                    subLabel="Year"
-                    field="yearly_fees"
-                    formData={formData}
-                    errors={errors}
-                    updateFormData={updateFormData}
-                    fields={[
-                      { key: 'year', label: 'Year', type: 'text', placeholder: 'Year' },
-                      { key: 'fee', label: 'Fee', type: 'number', placeholder: 'Fee' },
-                    ]}
-                    getDefaultRow={(currentArray: unknown[]) => ({ year: currentArray.length + 1, fee: '' })}
-                  />
-
-                  <ArrayObjectField
-                    label="One Time Fees"
-                    subLabel="Fees"
-                    field="one_time_fees"
-                    formData={formData}
-                    errors={errors}
-                    updateFormData={updateFormData}
-                    fields={[
-                      { key: 'description', label: 'Description', type: 'text', placeholder: 'One Time Fees' },
-                      { key: 'fee', label: 'Fee', type: 'number', placeholder: 'Fee' },
-                    ]}
-                  />
+                  <YearlyFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
+                  <OneTimeFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
                 </div>
 
                 <div className="space-y-4 p-6">

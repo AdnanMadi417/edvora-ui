@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { useProgram } from "features/programs/hooks";
+import { getIeltsLabel } from "constants/lists";
 
 import Link from "next/link";
 import Loading from "components/loading/Loading";
@@ -30,7 +31,7 @@ import Button from "components/ui/buttons/Button";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 import CurrencySelector from "features/programs/components/shared/CurrencySelector";
 import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
-import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate } from "features/programs/utils/exchangeRate";
+import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate, formatFeeAmount } from "features/programs/utils/exchangeRate";
 
 type RequiredDocument = {
   id: string;
@@ -146,6 +147,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
   const currencyOptions = getCurrencyOptions(exchangeRates);
   const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
   const formatCommission = (amount: number, curr?: string | null) => formatCommissionRate(amount, curr, currency, exchangeRates);
+  const formatFee = (fee: number | string, feeCurrency?: string | null) => formatFeeAmount(fee, feeCurrency, currency, exchangeRates);
 
   const nextIntakeDate = (() => {
     const today = new Date();
@@ -177,7 +179,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
     lines.push("");
 
     if (program?.duration) lines.push(`Duration: ${program.duration} year(s)`);
-    if (program?.english_required_score) lines.push(`English requirement: IELTS ${program.english_required_score}`);
+    if (program?.english_required_score) lines.push(`English requirement: IELTS ${getIeltsLabel(program.english_required_score)}`);
     lines.push("");
 
     if (program?.intake_dates && program.intake_dates.length > 0) {
@@ -194,7 +196,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
     lines.push("");
 
     (program?.yearly_fees ?? []).forEach((item) => {
-      lines.push(`${getOrdinal(item.year)} year: ${formatMoney(item.fee)}`);
+      lines.push(`${getOrdinal(item.year)} year: ${formatFee(item.fee, program?.yearly_fee_currency)}`);
     });
 
     lines.push("");
@@ -203,7 +205,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
     lines.push("");
 
     (program?.one_time_fees ?? []).forEach((item) => {
-      lines.push(`${item.description ?? "Fee"} : ${formatMoney(item.fee)}`);
+      lines.push(`${item.description ?? "Fee"} : ${formatFee(item.fee, item.currency)}`);
     });
 
     lines.push("");
@@ -270,7 +272,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
             <Banknote className="h-5 w-5 text-slate-400" />
             <p className="text-xs text-slate-500">First Year</p>
             <p className="text-xl font-bold text-slate-800">
-              {program?.yearly_fees?.[0]?.fee != null ? formatMoney(program.yearly_fees[0].fee) : "—"}
+              {program?.yearly_fees?.[0]?.fee != null ? formatFee(program.yearly_fees[0].fee, program.yearly_fee_currency) : "—"}
             </p>
           </div>
 
@@ -353,7 +355,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
               <div>
                 <p className="text-xs text-slate-500">English</p>
                 <p className="text-sm font-semibold text-slate-900">
-                  {program?.english_required_score ? `IELTS ${program.english_required_score}` : "Not Provided"}
+                  {program?.english_required_score ? `IELTS ${getIeltsLabel(program.english_required_score)}` : "Not Provided"}
                 </p>
               </div>
             </div>
@@ -415,7 +417,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
                       <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">Year {item.year}</div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                          {formatMoney(item.fee)}
+                          {formatFee(item.fee, program?.yearly_fee_currency)}
                         </div>
                       </div>
                     ))
@@ -441,7 +443,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
                       <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">{item.description ?? "Fee"}</div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                          {formatMoney(item.fee)}
+                          {formatFee(item.fee, item.currency)}
                         </div>
                       </div>
                     ))
