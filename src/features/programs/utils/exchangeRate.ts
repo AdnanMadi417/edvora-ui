@@ -37,9 +37,25 @@ export function formatCommission(
   displayCurrency: string,
   exchangeRates: ExchangeRate[]
 ): string {
+  return formatFeeAmount(amount, amountCurrency, displayCurrency, exchangeRates);
+}
+
+/**
+ * Formats an amount that carries its own fixed currency (e.g. a yearly fee,
+ * one-time fee, or commission). Only converts through the exchange-rate
+ * table when the amount's own currency is the native currency — an amount
+ * already stated in a fixed currency like USD is shown as-is, never
+ * re-converted through a rate that assumes a MYR source.
+ */
+export function formatFeeAmount(
+  amount: number | string,
+  amountCurrency: string | null | undefined,
+  displayCurrency: string,
+  exchangeRates: ExchangeRate[]
+): string {
   const code = (amountCurrency || NATIVE_CURRENCY).toUpperCase();
   if (code === NATIVE_CURRENCY || code === NATIVE_SYMBOL) {
     return formatMoney(amount, displayCurrency, exchangeRates);
   }
-  return `${code} ${amount.toLocaleString()}`;
+  return `${code} ${Number(amount).toLocaleString()}`;
 }

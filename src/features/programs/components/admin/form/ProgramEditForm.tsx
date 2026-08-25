@@ -33,8 +33,9 @@ import RichTextEditor from "components/form/fields/RichTextEditor";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import MultipleDateInput from "components/form/date/MultipleDateInput";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
-import ArrayObjectField from "components/form/fields/ArrayObjectField";
 import SelectField from "components/form/fields/SelectField";
+import YearlyFeesField from "features/programs/components/shared/YearlyFeesField";
+import OneTimeFeesField from "features/programs/components/shared/OneTimeFeesField";
 
 import IconButton from "components/ui/buttons/IconButton";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
@@ -187,8 +188,9 @@ const EditKnowledgeHubProgramDetails = ({
       expected_commission_from: commission?.expected_commission_from ?? "",
       expected_commission_to: commission?.expected_commission_to ?? "",
       qualification_id: String((program as any).qualification_id || ""),
+      yearly_fee_currency: program.yearly_fee_currency || "MYR",
       yearly_fees: program.yearly_fees ?? [],
-      one_time_fees: program.one_time_fees ?? [],
+      one_time_fees: (program.one_time_fees ?? []).map((f: any) => ({ ...f, currency: f.currency || "MYR" })),
       scholarships: (program.scholarships ?? []).map((s: any) => ({
         ...s,
         type: toScholarshipTypeInt(s.type),
@@ -245,6 +247,7 @@ const EditKnowledgeHubProgramDetails = ({
           ? formData.intake_dates.filter((d: string) => !!d)
           : [],
 
+        yearly_fee_currency: formData.yearly_fee_currency || "MYR",
         yearly_fees: Array.isArray(formData.yearly_fees)
           ? formData.yearly_fees.map((f: any) => ({
             year: Number(f.year) || 0,
@@ -256,6 +259,7 @@ const EditKnowledgeHubProgramDetails = ({
           ? formData.one_time_fees.map((f: any) => ({
             description: String(f.description || ""),
             fee: Number(f.fee) || 0,
+            currency: f.currency || "MYR",
           }))
           : [],
 
@@ -628,52 +632,8 @@ const EditKnowledgeHubProgramDetails = ({
             </div>
 
             <div className="space-y-4 border-b border-slate-200 px-6 py-5">
-              <ArrayObjectField
-                label="Yearly Fees"
-                subLabel="Year"
-                field="yearly_fees"
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-                fields={[
-                  {
-                    key: "year",
-                    label: "Year",
-                    type: "text",
-                    placeholder: "Year",
-                  },
-                  {
-                    key: "fee",
-                    label: "Fee",
-                    type: "number",
-                    placeholder: "Fee",
-                  },
-                ]}
-                getDefaultRow={(currentArray: unknown[]) => ({ year: currentArray.length + 1, fee: "" })}
-              />
-
-              <ArrayObjectField
-                label="One Time Fees"
-                subLabel="Fees"
-                field="one_time_fees"
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-                fields={[
-                  {
-                    key: "description",
-                    label: "Description",
-                    type: "text",
-                    placeholder: "One Time Fees",
-                  },
-                  {
-                    key: "fee",
-                    label: "Fee",
-                    type: "number",
-                    placeholder: "Fee",
-                  },
-                ]}
-              />
+              <YearlyFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
+              <OneTimeFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
             </div>
 
             <div className="flex items-center justify-between px-6 pb-5">

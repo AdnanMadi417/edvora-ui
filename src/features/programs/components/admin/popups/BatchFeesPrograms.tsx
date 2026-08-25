@@ -4,10 +4,12 @@ import React, { useState, useEffect } from "react";
 import { XCircle, DollarSign } from "lucide-react";
 
 import { useBatchUpdatePrograms } from "features/programs/hooks";
+import { type Currency } from "features/programs/types";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import ArrayObjectField from "components/form/fields/ArrayObjectField";
+import YearlyFeesField from "features/programs/components/shared/YearlyFeesField";
+import OneTimeFeesField from "features/programs/components/shared/OneTimeFeesField";
 
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -32,8 +34,9 @@ export default function CreateFees({
 
   const [formData, setFormData] = useState({
     program_ids: [] as string[],
+    yearly_fee_currency: "MYR",
     yearly_fees: [] as Array<{ year: number; fee: string }>,
-    one_time_fees: [] as Array<{ description: string; fee: string }>,
+    one_time_fees: [] as Array<{ description: string; fee: string; currency: string }>,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -59,6 +62,7 @@ export default function CreateFees({
     if (isOpen) {
       setFormData({
         program_ids: selectedProgramIds || [],
+        yearly_fee_currency: "MYR",
         yearly_fees: [],
         one_time_fees: [],
       });
@@ -85,8 +89,12 @@ export default function CreateFees({
     try {
       const payload = {
         program_ids: selectedProgramIds,
+        // Only sent when yearly_fees are actually being set — omitting it otherwise
+        // avoids silently resetting a program's existing currency to the picker's
+        // default when the admin only meant to touch one_time_fees.
+        yearly_fee_currency: formData.yearly_fees.length > 0 ? ((formData.yearly_fee_currency || "MYR") as Currency) : undefined,
         yearly_fees: formData.yearly_fees.length > 0 ? formData.yearly_fees.map((y) => ({ ...y, fee: Number(y.fee) })) : undefined,
-        one_time_fees: formData.one_time_fees.length > 0 ? formData.one_time_fees.map((f) => ({ ...f, fee: Number(f.fee) })) : undefined,
+        one_time_fees: formData.one_time_fees.length > 0 ? formData.one_time_fees.map((f) => ({ ...f, fee: Number(f.fee), currency: (f.currency || "MYR") as Currency })) : undefined,
       };
 
       await batchUpdatePrograms(payload);
@@ -135,52 +143,14 @@ export default function CreateFees({
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
 
-          <ArrayObjectField
-            label="Yearly Fees"
-            subLabel="Year"
-            field="yearly_fees"
+          <YearlyFeesField
             formData={formData}
             errors={errors}
             updateFormData={updateFormData}
-            fields={[
-              {
-                key: 'year',
-                label: 'Year',
-                type: 'text',
-                placeholder: 'Year',
-              },
-              {
-                key: 'fee',
-                label: 'Fee',
-                type: 'number',
-                placeholder: 'Fee',
-              },
-            ]}
-            getDefaultRow={(currentArray: unknown[]) => ({ year: currentArray.length + 1, fee: "" })}
+            alwaysShowCurrency={false}
           />
 
-          <ArrayObjectField
-            label="One Time Fees"
-            subLabel="Fees"
-            field="one_time_fees"
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-            fields={[
-              {
-                key: 'description',
-                label: 'Description',
-                type: 'text',
-                placeholder: 'One Time Fees',
-              },
-              {
-                key: 'fee',
-                label: 'Fee',
-                type: 'number',
-                placeholder: 'Fee',
-              },
-            ]}
-          />
+          <OneTimeFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
 
           </div>
 
