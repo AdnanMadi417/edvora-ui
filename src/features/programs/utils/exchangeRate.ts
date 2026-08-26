@@ -8,21 +8,21 @@ export function getCurrencyOptions(exchangeRates: ExchangeRate[]): string[] {
   return [NATIVE_CURRENCY, ...exchangeRates.map((r) => r.to_currency)];
 }
 
-/** Rate to multiply a native-currency amount by to get `currency`. 1 for the native currency itself. */
-export function getRate(currency: string, exchangeRates: ExchangeRate[]): number {
-  if (currency === NATIVE_CURRENCY) return 1;
+/** Rate to multiply a native-currency amount by to get `currency`. 1 for the native currency itself, or when no currency is selected. */
+export function getRate(currency: string | null, exchangeRates: ExchangeRate[]): number {
+  if (!currency || currency === NATIVE_CURRENCY) return 1;
   return exchangeRates.find((r) => r.to_currency === currency)?.rate ?? 1;
 }
 
-export function convertAmount(amount: number | string, currency: string, exchangeRates: ExchangeRate[]): number {
+export function convertAmount(amount: number | string, currency: string | null, exchangeRates: ExchangeRate[]): number {
   return Number(amount) * getRate(currency, exchangeRates);
 }
 
-/** Formats a native-currency amount converted into `currency`, e.g. "USD 8,540" or "RM 34,900". */
-export function formatMoney(amount: number | string, currency: string, exchangeRates: ExchangeRate[]): string {
+/** Formats a native-currency amount converted into `currency`, e.g. "USD 8,540" or "RM 34,900". No selection (null) shows the native amount unconverted. */
+export function formatMoney(amount: number | string, currency: string | null, exchangeRates: ExchangeRate[]): string {
   const converted = convertAmount(amount, currency, exchangeRates);
   const formatted = converted.toLocaleString(undefined, { maximumFractionDigits: 0 });
-  return `${currency === NATIVE_CURRENCY ? NATIVE_SYMBOL : currency} ${formatted}`;
+  return `${!currency || currency === NATIVE_CURRENCY ? NATIVE_SYMBOL : currency} ${formatted}`;
 }
 
 /**
@@ -34,7 +34,7 @@ export function formatMoney(amount: number | string, currency: string, exchangeR
 export function formatCommission(
   amount: number,
   amountCurrency: string | null | undefined,
-  displayCurrency: string,
+  displayCurrency: string | null,
   exchangeRates: ExchangeRate[]
 ): string {
   return formatFeeAmount(amount, amountCurrency, displayCurrency, exchangeRates);
@@ -50,7 +50,7 @@ export function formatCommission(
 export function formatFeeAmount(
   amount: number | string,
   amountCurrency: string | null | undefined,
-  displayCurrency: string,
+  displayCurrency: string | null,
   exchangeRates: ExchangeRate[]
 ): string {
   const code = (amountCurrency || NATIVE_CURRENCY).toUpperCase();

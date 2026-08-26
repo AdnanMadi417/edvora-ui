@@ -174,7 +174,7 @@ const ProgramDetails = ({ id }: Props) => {
   };
 
   const { program, requiredDocuments, commission, exchangeRates } = useProgram(id);
-  const [currency, setCurrency] = useState('MYR');
+  const [currency, setCurrency] = useState<string | null>(null);
 
   const currencyOptions = getCurrencyOptions(exchangeRates);
   const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
