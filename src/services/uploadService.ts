@@ -102,8 +102,8 @@ export async function uploadFilesToSpaces(
   files: File[],
   presignedUploads: PresignedUpload[],
   onProgress?: (fileIndex: number, percent: number) => void
-): Promise<{ public_url: string; file_key: string }[]> {
-  const results: { public_url: string; file_key: string }[] = [];
+): Promise<({ public_url: string; file_key: string } | undefined)[]> {
+  const results: ({ public_url: string; file_key: string } | undefined)[] = new Array(files.length);
 
   await Promise.all(
     files.map(async (file, i) => {
@@ -133,7 +133,7 @@ export async function uploadFilesToSpaces(
 
         xhr.onload = () => {
           if (xhr.status >= 200 && xhr.status < 300) {
-            results.push({ public_url: presigned.public_url, file_key: presigned.file_key });
+            results[i] = { public_url: presigned.public_url, file_key: presigned.file_key };
             onProgress?.(i, 100);
           } else {
             console.error(`Upload failed for ${file.name}: ${xhr.status}`);
