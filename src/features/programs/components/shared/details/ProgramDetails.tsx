@@ -142,7 +142,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
 
   const { program, requiredDocuments, commission, exchangeRates, loading, error } = useProgram(id);
   const [copied, setCopied] = useState(false);
-  const [currency, setCurrency] = useState("MYR");
+  const [currency, setCurrency] = useState<string | null>(null);
 
   const currencyOptions = getCurrencyOptions(exchangeRates);
   const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
