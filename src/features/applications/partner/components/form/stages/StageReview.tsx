@@ -16,6 +16,7 @@ import {
   XCircle,
   FileText
 } from "lucide-react";
+import { AppDate } from "components/ui/date";
 
 interface Props {
   formData: any;
@@ -78,7 +79,7 @@ export default function StageReview({
                 Intake Date
               </div>
               <p className="mt-1 font-medium text-slate-900">
-                {formData.intake_date}
+                <AppDate value={formData.intake_date} format="month" />
               </p>
             </div>
           )}
