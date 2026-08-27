@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo } from "react";
-import { CALENDAR_MONTHS, nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
+import React from "react";
+import { CALENDAR_MONTHS, resolveIntakeDate } from "features/programs/utils/intakeMonths";
 
 interface IntakeDatePickerProps {
   /** Recurring calendar months (1–12) this program takes intakes in. */
@@ -13,22 +13,17 @@ interface IntakeDatePickerProps {
   error?: string;
 }
 
+/** Purely controlled — the parent form owns resolving a sensible default
+ * (see the intake-months effect in ProgramApplicationForm/
+ * StudentRegistrationForm), since that has to work even when this picker
+ * isn't rendered at all (a program with 0 or 1 recurring months skips it). */
 export default function IntakeDatePicker({
   months,
   value,
   onChange,
   error,
 }: IntakeDatePickerProps) {
-  const nearestUpcoming = useMemo(() => nextIntakeMonth(months), [months]);
   const selectedMonth = value ? new Date(value).getMonth() + 1 : null;
-
-  useEffect(() => {
-    if (!months.length) return;
-    const isCurrentValid = selectedMonth != null && months.includes(selectedMonth);
-    if (!isCurrentValid && nearestUpcoming) {
-      onChange(resolveIntakeDate(nearestUpcoming));
-    }
-  }, [months]);
 
   return (
     <div>

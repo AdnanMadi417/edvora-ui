@@ -260,7 +260,7 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                     {program.intake_months && program.intake_months.length > 0 && (
                       <div className="px-4 pb-3">
                         <p className="mb-1.5 text-xs text-slate-400">Intakes</p>
-                        <IntakeMonthsChips months={program.intake_months} size="sm" showDot={false} />
+                        <IntakeMonthsChips months={program.intake_months} size="sm" showDot={false} maxVisible={3} />
                       </div>
                     )}
 

@@ -31,6 +31,7 @@ import {
 } from "services/uploadService";
 import { useMe } from "hooks/useMe";
 import { usePartnerProgramIntakeMonths } from "features/programs/hooks";
+import { isDateInIntakeMonths, nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
 import PrevButton from "components/ui/buttons/PrevButton";
@@ -122,6 +123,18 @@ export default function StudentRegistrationForm() {
       ?.map((f: any) => f.field_key) || [];
 
   const { intakeMonths, loading: loadingIntakeMonths } = usePartnerProgramIntakeMonths(formData.program_id, partnerId);
+
+  // Resolves intake_date to one of the program's actual recurring months
+  // even when the month picker never renders — e.g. a program with only
+  // one intake month skips the picker (StageAdditionalInfo requires >1),
+  // so without this it would silently stay at today's placeholder date.
+  useEffect(() => {
+    if (loadingIntakeMonths || intakeMonths.length === 0) return;
+    if (isDateInIntakeMonths(formData.intake_date, intakeMonths)) return;
+    const month = nextIntakeMonth(intakeMonths);
+    if (!month) return;
+    setFormData((prev) => ({ ...prev, intake_date: resolveIntakeDate(month) }));
+  }, [intakeMonths, loadingIntakeMonths]);
 
   const shouldShowStage3 = requiredFieldKeys.length > 0;
   const visibleStages = shouldShowStage3

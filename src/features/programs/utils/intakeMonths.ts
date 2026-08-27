@@ -41,3 +41,13 @@ export function resolveIntakeDate(month: number, today: Date = new Date()): stri
   const year = month >= today.getMonth() + 1 ? today.getFullYear() : today.getFullYear() + 1;
   return `${year}-${String(month).padStart(2, "0")}-01`;
 }
+
+/** Whether a date string's month is one of the program's recurring intake
+ * months — used to tell a placeholder default (e.g. today's date) apart
+ * from a value that's actually a valid intake for this program. */
+export function isDateInIntakeMonths(date: string | null | undefined, months: number[]): boolean {
+  if (!date || !months.length) return false;
+  const parsed = new Date(date);
+  if (isNaN(parsed.getTime())) return false;
+  return months.includes(parsed.getMonth() + 1);
+}
