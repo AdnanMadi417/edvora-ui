@@ -30,7 +30,7 @@ import {
   uploadFilesToSpaces,
 } from "services/uploadService";
 import { useMe } from "hooks/useMe";
-import { usePartnerProgramIntakeDates } from "features/programs/hooks";
+import { usePartnerProgramIntakeMonths } from "features/programs/hooks";
 import Loading from "components/loading/Loading";
 import Button from "components/ui/buttons/Button";
 import PrevButton from "components/ui/buttons/PrevButton";
@@ -121,7 +121,7 @@ export default function StudentRegistrationForm() {
       ?.filter((f: any) => f.is_required)
       ?.map((f: any) => f.field_key) || [];
 
-  const { intakeDates, loading: loadingIntakeDates } = usePartnerProgramIntakeDates(formData.program_id, partnerId);
+  const { intakeMonths, loading: loadingIntakeMonths } = usePartnerProgramIntakeMonths(formData.program_id, partnerId);
 
   const shouldShowStage3 = requiredFieldKeys.length > 0;
   const visibleStages = shouldShowStage3
@@ -533,8 +533,8 @@ export default function StudentRegistrationForm() {
               updateFormData={updateFormData}
               requiredFieldKeys={requiredFieldKeys}
               qualifications={qualifications}
-              intakeDates={intakeDates}
-              loadingIntakeDates={loadingIntakeDates}
+              intakeMonths={intakeMonths}
+              loadingIntakeMonths={loadingIntakeMonths}
             />
           )}
 

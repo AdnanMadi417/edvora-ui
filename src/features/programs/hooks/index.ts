@@ -9,5 +9,5 @@ export { useUpdateDefaultVisaFee } from "./useUpdateDefaultVisaFee";
 export { useDeleteScholarships } from "./useDeleteScholarships";
 export { useGetProgramScholarships } from "./useGetProgramScholarships";
 export { useStates } from "./useStates";
-export { usePartnerProgramIntakeDates } from "./usePartnerProgramIntakeDates";
+export { usePartnerProgramIntakeMonths } from "./usePartnerProgramIntakeMonths";
 export { useAllPrograms } from "./useProgramsList";

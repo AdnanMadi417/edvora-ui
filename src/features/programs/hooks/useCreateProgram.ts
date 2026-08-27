@@ -27,7 +27,7 @@ export function useCreateProgram() {
         overview: payload.overview?.trim(),
         curriculum: payload.curriculum?.trim(),
         commission_notes: payload.commission_notes?.trim(),
-        intake_dates: (payload.intake_dates ?? []).filter((d) => d),
+        intake_months: (payload.intake_months ?? []).filter((m) => m != null),
         yearly_fees: payload.yearly_fees ?? [],
         one_time_fees: payload.one_time_fees ?? [],
         scholarships: payload.has_scholarship ? (payload.scholarships ?? []) : [],

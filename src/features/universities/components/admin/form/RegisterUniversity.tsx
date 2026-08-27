@@ -14,7 +14,7 @@ import { useStates } from "features/programs/hooks";
 
 import InputField from "components/form/fields/InputField";
 import TextareaField from "components/form/fields/TextareaField";
-import MultipleDatePickerModal from "components/form/date/MultipleDatePickerModal";
+import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
 import SearchableDropdown from 'components/form/search/SearchableDropdown';
 import Button from "components/ui/buttons/Button";
 import IconButton from 'components/ui/buttons/IconButton';
@@ -48,7 +48,7 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
     is_active: true,
     university_type_id: "",
     description: "",
-    intake_months: [] as string[],
+    intake_months: [] as number[],
 
     branches: [
       {
@@ -262,9 +262,9 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
             required={false}
           />
 
-          <MultipleDatePickerModal
-            label="Intake Dates"
+          <IntakeMonthsField
             field="intake_months"
+            label="Intake Months"
             required={false}
             formData={formData}
             errors={errors}

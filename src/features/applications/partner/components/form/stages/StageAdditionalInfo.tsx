@@ -11,8 +11,8 @@ export default function StageAdditionalInfo({
                                               updateFormData,
                                               requiredFieldKeys,
                                               qualifications,
-                                              intakeDates = [],
-                                              loadingIntakeDates = false,
+                                              intakeMonths = [],
+                                              loadingIntakeMonths = false,
                                             }) {
   const student = formData.student;
 
@@ -58,11 +58,11 @@ export default function StageAdditionalInfo({
   return (
     <div className="space-y-5">
 
-      {isFieldRequired("intake_date") && intakeDates.length > 1 && (
+      {isFieldRequired("intake_date") && intakeMonths.length > 1 && (
         <div className="mb-8">
           <h3 className="mb-4 font-semibold uppercase text-slate-900">Intake Date</h3>
           <IntakeDatePicker
-            dates={intakeDates}
+            months={intakeMonths}
             value={formData.intake_date ?? ""}
             onChange={(date) => updateFormData("intake_date", date)}
             error={errors?.["intake_date"]}

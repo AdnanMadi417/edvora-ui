@@ -23,7 +23,7 @@ export interface ProgramUniversity {
   description: string;
   logo_file_key: string;
   logo_file_url: string;
-  intake_months: string[];
+  intake_months: number[];
   university_type_id: string;
   university_type_name: string;
 }
@@ -81,8 +81,9 @@ export interface Program {
   visa_fee_amount: number | null;
   first_year_tuition: number | null;
 
-  intake_dates: string[] | null;
-  next_intake: string | null;
+  // Recurring calendar months (1–12) the program takes intakes in — no year, no day.
+  intake_months: number[] | null;
+  next_intake_month: number | null;
 
   duration: number | null;
 
@@ -153,7 +154,7 @@ export interface CreateProgramPayload {
   field_of_study_id: string;
   name: string;
   tuition_fee: number;
-  intake_dates: string[];
+  intake_months: number[];
   duration: number;
   english_required_score: string;
   overview: string;
@@ -193,7 +194,7 @@ export interface UpdateProgramPayload {
   field_of_study_id: string;
   name: string;
   tuition_fee: number;
-  intake_dates: string[];
+  intake_months: number[];
   duration: number;
   english_required_score: string;
   overview: string;
@@ -240,7 +241,7 @@ export interface BatchUpdateProgramPayload {
   tuition_fee?: number;
   visa_fee_amount?: number;
 
-  intake_dates?: string[];
+  intake_months?: number[];
   english_required_score?: string;
 
   // Applies to every selected program. Omit entirely to leave unchanged —

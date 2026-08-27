@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { programApi } from "../services";
 
-export function usePartnerProgramIntakeDates(programId: string, partnerId: string) {
-  const [intakeDates, setIntakeDates] = useState<string[]>([]);
+export function usePartnerProgramIntakeMonths(programId: string, partnerId: string) {
+  const [intakeMonths, setIntakeMonths] = useState<number[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,10 +13,10 @@ export function usePartnerProgramIntakeDates(programId: string, partnerId: strin
       setLoading(true);
       setError(null);
       try {
-        const res = await programApi.partnerIntakeDates.list(partnerId, programId);
-        setIntakeDates(res.data.intake_dates || []);
+        const res = await programApi.partnerIntakeMonths.list(partnerId, programId);
+        setIntakeMonths(res.data.intake_months || []);
       } catch (err: any) {
-        setError(err?.response?.data?.detail || "Failed to fetch intake dates");
+        setError(err?.response?.data?.detail || "Failed to fetch intake months");
       } finally {
         setLoading(false);
       }
@@ -25,5 +25,5 @@ export function usePartnerProgramIntakeDates(programId: string, partnerId: strin
     fetch();
   }, [programId, partnerId]);
 
-  return { intakeDates, loading, error };
+  return { intakeMonths, loading, error };
 }
