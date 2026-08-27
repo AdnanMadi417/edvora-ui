@@ -15,6 +15,7 @@ import { MdEvent, MdLocationCity, MdPublic } from "react-icons/md";
 import { HiOutlineCheckCircle } from "react-icons/hi";
 
 import { useUniversityDetails, useUniversityPaymentMethods } from "features/universities/hooks";
+import { monthLabel } from "features/programs/utils/intakeMonths";
 
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
@@ -95,18 +96,18 @@ const UniversityDetails = ({ id, basePath = "/admin/universities" }: UniversityD
                 </div>
 
                 <div className="min-w-0">
-                  <p className="text-xs text-slate-500">Intake Dates</p>
+                  <p className="text-xs text-slate-500">Intake Months</p>
 
                   <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-slate-900">
                     {university?.intake_months?.length ? (
-                      university.intake_months.map((date, index) => (
+                      university.intake_months.map((month, index) => (
                         <span
-                          key={`${date}-${index}`}
+                          key={`${month}-${index}`}
                           className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5 transition"
                         >
                           <span className="h-2 w-2 rounded-lg border-2 border-green-600" />
                           <span className="text-xs font-medium text-slate-900">
-                            {date}
+                            {monthLabel(month, false)}
                           </span>
                         </span>
                       ))

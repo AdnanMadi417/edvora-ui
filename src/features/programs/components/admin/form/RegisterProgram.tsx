@@ -1,7 +1,7 @@
-﻿'use client';
+'use client';
 
-import { ArrowLeft, ArrowRight, BookOpen, CalendarPlus, DollarSign, Plus, Trash2 } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { ArrowLeft, Award, BookOpen, CalendarPlus, CalendarRange, DollarSign, MapPin, Plus, Trash2 } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useToast } from 'components/context/ToastContext';
 import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
@@ -15,21 +15,23 @@ import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useCommissionTypes } from "features/knowledge-hub/commission/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 
-import ToggleInput from 'components/form/toggle/ToggleInput';
 import InputField from 'components/form/fields/InputField';
 import TextareaField from 'components/form/fields/TextareaField';
 import RichTextEditor from 'components/form/fields/RichTextEditor';
 import SelectField from 'components/form/fields/SelectField';
 import YearlyFeesField from 'features/programs/components/shared/YearlyFeesField';
 import OneTimeFeesField from 'features/programs/components/shared/OneTimeFeesField';
-import MultipleDateInput from 'components/form/date/MultipleDateInput';
 import SearchableDropdown from 'components/form/search/SearchableDropdown';
+import ToggleInput from 'components/form/toggle/ToggleInput';
+import AccordionSection from 'features/programs/components/shared/form/AccordionSection';
+import IntakeMonthsField from 'features/programs/components/shared/form/IntakeMonthsField';
+import { useUnsavedChangesGuard, confirmDiscard } from 'features/programs/components/shared/form/useUnsavedChangesGuard';
+import { useDraftAutosave } from 'features/programs/components/shared/form/useDraftAutosave';
 
 import Button from 'components/ui/buttons/Button';
 import PrevButton from 'components/ui/buttons/PrevButton';
-import NextButton from 'components/ui/buttons/NextButton';
 import IconButton from 'components/ui/buttons/IconButton';
-import { validateProgram, isProgramComplete } from './validateProgram';
+import { validateProgram } from './validateProgram';
 
 export interface FormData {
   name: string;
@@ -37,7 +39,7 @@ export interface FormData {
   branch_id: string;
   field_of_study_id: string;
   tuition_fee: number;
-  intake_dates: string[];
+  intake_months: number[];
   duration: number;
   english_required_score: string;
   overview: string;
@@ -66,13 +68,42 @@ export interface FormData {
 }
 
 type FormErrors = Record<string, string>;
+type SectionKey = 'details' | 'university' | 'fees' | 'intakes' | 'scholarship';
 
-const stages = [
-  { id: 1, name: 'Program Details', icon: BookOpen },
-  { id: 2, name: 'Commission & Fees', icon: DollarSign },
-];
+const SECTION_FIELDS: Record<SectionKey, string[]> = {
+  details: ['name', 'qualification_id', 'field_of_study_id', 'duration', 'is_on_campus'],
+  university: ['uni_id', 'branch_id'],
+  fees: ['commission_amount', 'commission_notes', 'yearly_fees', 'one_time_fees'],
+  intakes: ['intake_months', 'english_required_score'],
+  scholarship: ['scholarships'],
+};
 
-const STEP1_REQUIRED = ['name', 'uni_id', 'qualification_id', 'field_of_study_id', 'is_on_campus'];
+const emptyFormData: FormData = {
+  name: '',
+  uni_id: '',
+  branch_id: '',
+  field_of_study_id: '',
+  tuition_fee: 0,
+  intake_months: [],
+  duration: 0,
+  english_required_score: '',
+  overview: '',
+  curriculum: '',
+  is_on_campus: true,
+  is_online: false,
+  has_scholarship: false,
+  commission_type_id: '',
+  commission_currency: 'rm',
+  commission_notes: '',
+  commission_amount: 0,
+  expected_commission_from: '',
+  expected_commission_to: '',
+  qualification_id: '',
+  yearly_fee_currency: 'MYR',
+  yearly_fees: [],
+  one_time_fees: [],
+  scholarships: [],
+};
 
 interface Props {
   basePath?: string;
@@ -85,41 +116,21 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
   const { createProgram, loading } = useCreateProgram();
   const { commissionTypes } = useCommissionTypes();
 
-  const [stage, setStage] = useState(1);
-  const [completedStages, setCompletedStages] = useState<number[]>([]);
   const [errors, setErrors] = useState<FormErrors>({});
-
-  const [formData, setFormData] = useState<FormData>({
-    name: '',
-    uni_id: '',
-    branch_id: '',
-    field_of_study_id: '',
-    tuition_fee: 0,
-    intake_dates: [],
-    duration: 0,
-    english_required_score: '',
-    overview: '',
-    curriculum: '',
-    is_on_campus: true,
-    is_online: false,
-    has_scholarship: false,
-    commission_type_id: '',
-    commission_currency: 'rm',
-    commission_notes: '',
-    commission_amount: 0,
-    expected_commission_from: '',
-    expected_commission_to: '',
-    qualification_id: '',
-    yearly_fee_currency: 'MYR',
-    yearly_fees: [],
-    one_time_fees: [],
-    scholarships: [],
+  const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
+    details: true, university: true, fees: true, intakes: true, scholarship: true,
   });
+
+  const [formData, setFormData] = useState<FormData>(emptyFormData);
 
   const { fields } = useAllFields();
   const { qualifications } = useAllQualifications();
   const { branches } = useBranches(formData.uni_id);
   const { universities } = useUniversities();
+
+  const isDirty = useMemo(() => JSON.stringify(formData) !== JSON.stringify(emptyFormData), [formData]);
+  useUnsavedChangesGuard(isDirty);
+  const { hasDraft, readDraft, clearDraft, dismissDraft } = useDraftAutosave(formData, isDirty);
 
   useEffect(() => {
     if (commissionTypes.length > 0) {
@@ -137,21 +148,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
     updateFormData('branch_id', branches.length === 1 ? String(branches[0].id) : '');
   }, [branches]);
 
-  const isStep1Valid =
-    formData.name.trim().length >= 5 &&
-    !!formData.uni_id &&
-    !!formData.qualification_id &&
-    !!formData.field_of_study_id &&
-    (formData.is_on_campus || formData.is_online);
-
-  const isStageValid = stage === 1 ? isStep1Valid : isProgramComplete(formData);
-
-  const canAccessStage = (id: number) => {
-    if (id === 1) return true;
-    if (id === stage) return true;
-    const idx = stages.findIndex((s) => s.id === id);
-    return idx > 0 && completedStages.includes(stages[idx - 1].id);
-  };
+  const toggleSection = (key: SectionKey) => setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const validateField = React.useCallback(
     (field: string, overrideValue?: any) => {
@@ -193,24 +190,6 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
     });
   };
 
-  const nextStage = () => {
-    const { errors: allErrors } = validateProgram(formData);
-    const step1Errors: FormErrors = {};
-    STEP1_REQUIRED.forEach((f) => { if (allErrors[f]) step1Errors[f] = allErrors[f]; });
-    if (Object.keys(step1Errors).length > 0) {
-      setErrors(step1Errors);
-      return;
-    }
-    setErrors({});
-    setCompletedStages((prev) => prev.includes(stage) ? prev : [...prev, stage]);
-    setStage((s) => Math.min(s + 1, stages.length));
-  };
-
-  const prevStage = () => {
-    const currentIndex = stages.findIndex((s) => s.id === stage);
-    if (currentIndex > 0) setStage(stages[currentIndex - 1].id);
-  };
-
   const removeScholarship = (index: number) => {
     setFormData((prev) => ({ ...prev, scholarships: prev.scholarships.filter((_, i) => i !== index) }));
   };
@@ -222,38 +201,54 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
     }));
   };
 
+  const buildPayload = () => ({
+    ...formData,
+    tuition_fee: Number(formData.tuition_fee || 0),
+    duration: Number(formData.duration || 0),
+    qualification_id: formData.qualification_id,
+    commission_amount: Number(formData.commission_amount || 0),
+    commission_currency: formData.commission_currency || 'rm',
+    expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
+    expected_commission_to: formData.expected_commission_to ? Number(formData.expected_commission_to) : null,
+    yearly_fee_currency: (formData.yearly_fee_currency || 'MYR') as Currency,
+    yearly_fees: (formData.yearly_fees || []).map((y) => ({ year: Number(y.year), fee: Number(y.fee) })),
+    one_time_fees: (formData.one_time_fees || []).map((f: any) => ({ description: f.description || '', fee: Number(f.fee || 0), currency: (f.currency || 'MYR') as Currency })),
+    scholarships: formData.has_scholarship
+      ? (formData.scholarships || [])
+          .filter((s) => s.name && s.description)
+          .map((s) => ({
+            coverage_percent: Number(s.coverage_percent || 0),
+            max_amount: Number(s.max_amount || 0),
+            name: s.name,
+            description: s.description,
+            conditions: Array.isArray(s.conditions) ? s.conditions : [],
+          }))
+      : [],
+  });
+
+  const focusFirstError = (validationErrors: FormErrors) => {
+    const erroredFields = new Set(Object.keys(validationErrors));
+    const sectionsToOpen: Partial<Record<SectionKey, boolean>> = {};
+    (Object.keys(SECTION_FIELDS) as SectionKey[]).forEach((key) => {
+      const touchesSection = [...erroredFields].some((f) => SECTION_FIELDS[key].some((sf) => f === sf || f.startsWith(`${sf}[`)));
+      if (touchesSection) sectionsToOpen[key] = true;
+    });
+    if (Object.keys(sectionsToOpen).length) {
+      setOpenSections((prev) => ({ ...prev, ...sectionsToOpen }));
+    }
+  };
+
   const handleSubmit = async () => {
     const { isValid, errors: validationErrors } = validateProgram(formData);
     if (!isValid) {
       setErrors(validationErrors);
+      focusFirstError(validationErrors);
+      showToast('Please fix the highlighted fields before publishing.', 'error');
       return;
     }
     try {
-      const payload = {
-        ...formData,
-        tuition_fee: Number(formData.tuition_fee || 0),
-        duration: Number(formData.duration || 0),
-        qualification_id: formData.qualification_id,
-        commission_amount: Number(formData.commission_amount || 0),
-        commission_currency: formData.commission_currency || 'rm',
-        expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
-        expected_commission_to: formData.expected_commission_to ? Number(formData.expected_commission_to) : null,
-        yearly_fee_currency: (formData.yearly_fee_currency || 'MYR') as Currency,
-        yearly_fees: (formData.yearly_fees || []).map((y) => ({ year: Number(y.year), fee: Number(y.fee) })),
-        one_time_fees: (formData.one_time_fees || []).map((f: any) => ({ description: f.description || '', fee: Number(f.fee || 0), currency: (f.currency || 'MYR') as Currency })),
-        scholarships: formData.has_scholarship
-          ? (formData.scholarships || [])
-              .filter((s) => s.name && s.description)
-              .map((s) => ({
-                coverage_percent: Number(s.coverage_percent || 0),
-                max_amount: Number(s.max_amount || 0),
-                name: s.name,
-                description: s.description,
-                conditions: Array.isArray(s.conditions) ? s.conditions : [],
-              }))
-          : [],
-      };
-      await createProgram(payload);
+      await createProgram(buildPayload());
+      clearDraft();
       showToast('Program created successfully', 'success');
       setTimeout(() => router.push(basePath), 1500);
     } catch (error: unknown) {
@@ -262,8 +257,27 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
     }
   };
 
+  const restoreDraft = () => {
+    const draft = readDraft();
+    if (draft) setFormData(draft);
+    dismissDraft();
+  };
+
+  // ── Live preview data ──────────────────────────────────────────────────
+  const selectedUniversity = universities?.find((u) => String(u.id) === String(formData.uni_id));
+  const selectedBranch = branches?.find((b) => String(b.id) === String(formData.branch_id));
+  const selectedQualification = qualifications?.find((q) => String(q.id) === String(formData.qualification_id));
+  const location = selectedBranch ? [selectedBranch.location, selectedBranch.state].filter(Boolean).join(', ') : undefined;
+  const firstYearFee = useMemo(() => {
+    const rows = formData.yearly_fees || [];
+    if (!rows.length) return null;
+    const first = [...rows].sort((a, b) => Number(a.year) - Number(b.year))[0];
+    if (!first?.fee) return null;
+    return `${formData.yearly_fee_currency || 'MYR'} ${Number(first.fee).toLocaleString()}`;
+  }, [formData.yearly_fees, formData.yearly_fee_currency]);
+
   return (
-    <section className="mx-auto mt-5 max-w-5xl">
+    <section className="mx-auto mt-5 max-w-6xl">
       <div className="mt-6 rounded-md border bg-white">
 
         {/* Header */}
@@ -277,82 +291,21 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
           </div>
         </div>
 
-        <div className="px-6 pt-6">
+        <div className="px-6 py-6">
 
-          {/* Stepper */}
-          <div className="relative mb-8">
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fit,_minmax(150px,_1fr))]">
-              {stages.map((s, index) => {
-                const Icon = s.icon;
-                const isActive = s.id === stage;
-                const isCompleted = completedStages.includes(s.id);
-                const canAccess = canAccessStage(s.id);
+          <div>
+            <div className="space-y-4">
 
-                return (
-                  <div key={s.id} className="group relative flex flex-col items-center">
-                    {index < stages.length - 1 && (
-                      <div className="absolute left-1/2 top-6 -z-10 hidden h-1 w-full bg-slate-200 sm:block">
-                        <div className={`h-full rounded-full transition-all duration-300 ${isCompleted ? 'w-full bg-blue-500' : 'w-0'}`} />
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => canAccess && setStage(s.id)}
-                      disabled={!canAccess}
-                      className={`relative mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-300 ${
-                        isCompleted
-                          ? 'border-blue-500 bg-blue-500 text-white shadow-md'
-                          : isActive
-                          ? 'scale-110 border-blue-700 bg-blue-50 text-blue-700 shadow-sm'
-                          : canAccess
-                          ? 'border-slate-300 bg-white text-slate-500 hover:border-slate-400 hover:bg-slate-50'
-                          : 'cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400'
-                      }`}
-                    >
-                      <Icon size={20} className="transition-transform duration-300 group-hover:scale-110" />
-                    </button>
-
-                    <span className={`text-center text-xs transition-colors duration-300 sm:text-sm ${isActive ? 'font-semibold text-blue-700' : 'text-slate-500'}`}>
-                      {s.name}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Stage content */}
-          <div className="mb-6 min-h-[400px] rounded-lg border border-slate-200">
-
-            {/* Step 1 — Program Details */}
-            {stage === 1 && (
-              <div className="space-y-6">
-
-                <div className="space-y-4 border-b border-slate-200 p-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Program Information</h3>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <SearchableDropdown
-                      label="University"
-                      field="uni_id"
-                      required
-                      options={(universities ?? []).filter((u) => u.is_active).map((u) => ({ value: u.id, label: u.name }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                      onSelect={(v: string) => validateField('uni_id', v)}
-                    />
-
-                    {branches.length > 1 && (
-                      <SearchableDropdown
-                        label="Branch"
-                        field="branch_id"
-                        options={branches.map((s) => ({ value: String(s.id), label: s.name }))}
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                      />
-                    )}
-
+              <AccordionSection
+                icon={BookOpen}
+                title="Program Details"
+                hasError={!!(errors.name || errors.qualification_id || errors.field_of_study_id || errors.duration || errors.is_on_campus)}
+                summary={formData.name ? `${formData.name}${selectedQualification ? ` · ${selectedQualification.name}` : ''}` : 'Not started'}
+                open={openSections.details}
+                onToggle={() => toggleSection('details')}
+              >
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="md:col-span-2">
                     <InputField
                       label="Program Name"
                       field="name"
@@ -363,126 +316,108 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                       updateFormData={updateFormData}
                       onBlur={() => validateField('name')}
                     />
-
-                    <SearchableDropdown
-                      label="Field of Study"
-                      field="field_of_study_id"
-                      required
-                      options={fields.map((f) => ({ value: String(f.id), label: f.name }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                      onSelect={(v: string) => validateField('field_of_study_id', v)}
-                    />
-
-                    <InputField
-                      label="Tuition Fee"
-                      field="tuition_fee"
-                      type="number"
-                      required={false}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-4 border-b border-slate-200 p-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Academic Details</h3>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <InputField
-                      label="Duration (Years)"
-                      field="duration"
-                      type="number"
-                      placeholder="e.g. 2"
-                      required={false}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                      onBlur={() => validateField('duration')}
-                    />
-
-                    <SearchableDropdown
-                      label="Qualification Level"
-                      field="qualification_id"
-                      required
-                      options={qualifications.map((f) => ({ value: String(f.id), label: f.name.charAt(0).toUpperCase() + f.name.slice(1) }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                      onSelect={(v: string) => validateField('qualification_id', v)}
-                    />
-
-                    <SelectField
-                      label="IELTS Required Score"
-                      field="english_required_score"
-                      required={false}
-                      options={IELTS_BANDS.map((s) => ({ label: s.label, value: s.score }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
+                    <p className="mt-1 text-xs text-slate-400">Minimum 5 characters — this is exactly what renders in the Program Info column.</p>
                   </div>
 
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-
-                  <TextareaField
-                  label="Curriculum"
-                  field="curriculum"
-                  required={false}
-                  placeholder="Program curriculum..."
-                  formData={formData}
-                  errors={errors}
-                  updateFormData={updateFormData}
-                />
-
-                <TextareaField
-                  label="Overview"
-                  field="overview"
-                  required={false}
-                  placeholder="Program overview..."
-                  formData={formData}
-                  errors={errors}
-                  updateFormData={updateFormData}
-                />                  
-                                    
-                </div>                      
-
-              </div>
-
-                <div className="space-y-4 border-b border-slate-200 p-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Delivery Mode</h3>
-                  <ToggleInput
-                    label="On Campus"
-                    field="is_on_campus"
+                  <SearchableDropdown
+                    label="Qualification Level"
+                    field="qualification_id"
+                    required
+                    options={qualifications.map((f) => ({ value: String(f.id), label: f.name.charAt(0).toUpperCase() + f.name.slice(1) }))}
                     formData={formData}
                     errors={errors}
                     updateFormData={updateFormData}
-                    enabledText="On campus"
-                    disabledText="Online"
-                    enabledDescription="Students attend this program in person."
-                    disabledDescription="Students attend this program online."
+                    onSelect={(v: string) => validateField('qualification_id', v)}
                   />
+
+                  <SearchableDropdown
+                    label="Field of Study"
+                    field="field_of_study_id"
+                    required
+                    options={fields.map((f) => ({ value: String(f.id), label: f.name }))}
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                    onSelect={(v: string) => validateField('field_of_study_id', v)}
+                  />
+
+                  <InputField
+                    label="Duration (Years)"
+                    field="duration"
+                    type="number"
+                    placeholder="e.g. 2"
+                    required={false}
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                    onBlur={() => validateField('duration')}
+                  />
+
+                  <div className="md:col-span-2">
+                    <ToggleInput
+                      label="Delivery Mode"
+                      field="is_on_campus"
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                      enabledText="On campus"
+                      disabledText="Online"
+                      enabledDescription="Students attend this program in person."
+                      disabledDescription="Students attend this program online."
+                    />
+                  </div>
                 </div>
+              </AccordionSection>
 
-                <div className="space-y-4 p-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Intake Schedule</h3>
-                  <MultipleDateInput label="Intake Dates" field="intake_dates" required={false} formData={formData} errors={errors} updateFormData={updateFormData} />
+              <AccordionSection
+                icon={MapPin}
+                title="University & Location"
+                hasError={!!(errors.uni_id || errors.branch_id)}
+                summary={selectedUniversity ? `${selectedUniversity.name}${selectedBranch ? ` · ${selectedBranch.name}` : ''}` : 'Not started'}
+                open={openSections.university}
+                onToggle={() => toggleSection('university')}
+              >
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <SearchableDropdown
+                    label="University"
+                    field="uni_id"
+                    required
+                    options={(universities ?? []).filter((u) => u.is_active).map((u) => ({ value: u.id, label: u.name }))}
+                    formData={formData}
+                    errors={errors}
+                    updateFormData={updateFormData}
+                    onSelect={(v: string) => validateField('uni_id', v)}
+                  />
+
+                  {branches.length > 1 && (
+                    <SearchableDropdown
+                      label="Branch"
+                      field="branch_id"
+                      options={branches.map((s) => ({ value: String(s.id), label: s.name }))}
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                    />
+                  )}
+
                 </div>
+              </AccordionSection>
 
-              </div>
-            )}
+              <AccordionSection
+                icon={DollarSign}
+                title="Fees & Commission"
+                hasError={!!(errors.commission_amount || errors.commission_notes)}
+                summary={firstYearFee ? `First year ${firstYearFee}` : 'Not started'}
+                open={openSections.fees}
+                onToggle={() => toggleSection('fees')}
+              >
+                <YearlyFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
+                <OneTimeFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
 
-            {/* Step 2 — Commission & Fees */}
-            {stage === 2 && (
-              <div className="space-y-6">
-
-                <div className="space-y-4 border-b border-slate-200 p-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Commission Structure</h3>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-                    
-                     <InputField
+                <div className="border-t border-slate-100 pt-4">
+                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Commission — how much</h4>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <InputField
                       label="Commission Amount"
                       field="commission_amount"
                       type="number"
@@ -502,15 +437,20 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                     />
 
                     <SelectField
-                    label="Currency"
-                    field="commission_currency"
-                    required={false}
-                    options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
-                    formData={formData}
-                    errors={errors}
-                    updateFormData={updateFormData}
-                  />
+                      label="Currency"
+                      field="commission_currency"
+                      required={false}
+                      options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={updateFormData}
+                    />
+                  </div>
+                </div>
 
+                <div className="border-t border-slate-100 pt-4">
+                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Commission — when &amp; notes</h4>
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <SelectField
                       label="Expected From"
                       field="expected_commission_from"
@@ -531,7 +471,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                       updateFormData={updateFormData}
                     />
 
-                    <div className="md:col-span-4">
+                    <div className="md:col-span-2">
                       <TextareaField
                         label="Commission Notes"
                         field="commission_notes"
@@ -545,207 +485,209 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                     </div>
                   </div>
                 </div>
+              </AccordionSection>
 
-                <div className="space-y-4 border-b border-slate-200 p-6">
-                  <YearlyFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
-                  <OneTimeFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
-                </div>
+              <AccordionSection
+                icon={CalendarRange}
+                title="Intakes & Requirements"
+                hasError={!!errors.intake_months}
+                summary={formData.intake_months?.length ? `${formData.intake_months.length} intake month${formData.intake_months.length !== 1 ? 's' : ''}` : 'Not started'}
+                open={openSections.intakes}
+                onToggle={() => toggleSection('intakes')}
+              >
+                <IntakeMonthsField field="intake_months" label="Intake Months" formData={formData} errors={errors} updateFormData={updateFormData} />
 
-                <div className="space-y-4 p-6">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Scholarship</h3>
-                    {formData.has_scholarship && (
-                      <IconButton
-                        icon={<CalendarPlus className="h-4 w-4" />}
-                        bgColor="bg-blue-50"
-                        textColor="text-blue-700"
-                        borderColor="border-blue-600"
-                        hoverTextColor="hover:text-blue-800"
-                        hoverBorderColor="hover:border-blue-700"
-                        onClick={addScholarship}
-                      />
-                    )}
+                <SelectField
+                  label="IELTS Required Score"
+                  field="english_required_score"
+                  required={false}
+                  options={IELTS_BANDS.map((s) => ({ label: s.label, value: s.score }))}
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+              </AccordionSection>
+
+              <AccordionSection
+                icon={Award}
+                title="Scholarship"
+                hasError={!!(formData.scholarships || []).some((_, i) => errors[`scholarships[${i}].name`] || errors[`scholarships[${i}].description`])}
+                summary={formData.has_scholarship ? `Available · ${formData.scholarships.length} scholarship${formData.scholarships.length !== 1 ? 's' : ''}` : 'None'}
+                open={openSections.scholarship}
+                onToggle={() => toggleSection('scholarship')}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="inline-flex rounded-lg border border-slate-200 p-1">
+                    <button
+                      type="button"
+                      onClick={() => updateFormData('has_scholarship', true)}
+                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${formData.has_scholarship ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
+                    >
+                      Available
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateFormData('has_scholarship', false)}
+                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${!formData.has_scholarship ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
+                    >
+                      None
+                    </button>
                   </div>
-
-                  <ToggleInput
-                    label="Has Scholarship"
-                    field="has_scholarship"
-                    formData={formData}
-                    errors={errors}
-                    updateFormData={updateFormData}
-                    enabledText="Scholarship available"
-                    disabledText="No scholarship"
-                    enabledDescription="Scholarship details are shown below."
-                    disabledDescription="Turn on to add scholarship details for this program."
-                  />
-
                   {formData.has_scholarship && (
-                    <div className="space-y-6">
-                      {formData.scholarships.map((_, index) => (
-                        <div key={index} className="rounded-xl border border-slate-200 bg-white p-6 transition">
-                          <div className="mb-5 flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-600">
-                                {index + 1}
-                              </div>
-                              <div>
-                                <p className="text-sm font-semibold text-slate-800">Scholarship</p>
-                                <p className="text-xs text-slate-500">Configure scholarship details</p>
-                              </div>
-                            </div>
-                            {formData.scholarships.length > 1 && (
-                              <IconButton
-                                icon={<Trash2 className="h-4 w-4" />}
-                                onClick={() => removeScholarship(index)}
-                                bgColor="bg-red-50"
-                                textColor="text-red-600"
-                                borderColor="border-red-200"
-                                hoverTextColor="hover:text-red-700"
-                                hoverBorderColor="hover:border-red-300"
-                              />
-                            )}
-                          </div>
-
-                          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                            <div className="md:col-span-2">
-                              <InputField
-                                label="Scholarship Name"
-                                field={`scholarships[${index}].name`}
-                                placeholder="e.g. Excellence Award"
-                                type="text"
-                                formData={formData}
-                                errors={errors}
-                                updateFormData={updateFormData}
-                                onBlur={() => validateField(`scholarships[${index}].name`)}
-                              />
-                            </div>
-
-                            <InputField
-                              label="Coverage Percentage"
-                              field={`scholarships[${index}].coverage_percent`}
-                              type="number"
-                              placeholder="e.g. 50"
-                              required={false}
-                              formData={formData}
-                              errors={errors}
-                              updateFormData={updateFormData}
-                            />
-
-                            <InputField
-                              label="Maximum Amount"
-                              field={`scholarships[${index}].max_amount`}
-                              type="number"
-                              placeholder="e.g. 10000"
-                              required={false}
-                              formData={formData}
-                              errors={errors}
-                              updateFormData={updateFormData}
-                            />
-
-                            <div className="md:col-span-2">
-                              <RichTextEditor
-                                label="Description"
-                                field={`scholarships[${index}].description`}
-                                placeholder="Short description..."
-                                formData={formData}
-                                errors={errors}
-                                updateFormData={updateFormData}
-                              />
-                            </div>
-
-                            <div className="md:col-span-2 space-y-3">
-                              <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-semibold tracking-wide text-slate-500">Conditions</h3>
-                                <IconButton
-                                  icon={<Plus className="h-4 w-4" />}
-                                  bgColor="bg-blue-50"
-                                  textColor="text-blue-700"
-                                  borderColor="border-blue-600"
-                                  hoverTextColor="hover:text-blue-800"
-                                  hoverBorderColor="hover:border-blue-700"
-                                  onClick={() => updateFormData(`scholarships[${index}].conditions`, [...formData.scholarships[index].conditions, ''])}
-                                />
-                              </div>
-
-                              {formData.scholarships[index].conditions.length === 0 ? (
-                                <p className="text-sm text-slate-400">No conditions added yet.</p>
-                              ) : (
-                                <div className="space-y-2">
-                                  {formData.scholarships[index].conditions.map((condition, cIndex) => (
-                                    <div key={cIndex} className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-                                      <input
-                                        value={condition}
-                                        onChange={(e) => updateFormData(`scholarships[${index}].conditions[${cIndex}]`, e.target.value)}
-                                        placeholder={`Condition ${cIndex + 1}`}
-                                        className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
-                                      />
-                                      <button
-                                        type="button"
-                                        onClick={() => updateFormData(`scholarships[${index}].conditions`, formData.scholarships[index].conditions.filter((_, i) => i !== cIndex))}
-                                        className="text-red-400 transition hover:text-red-600"
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </button>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <IconButton
+                      icon={<CalendarPlus className="h-4 w-4" />}
+                      bgColor="bg-blue-50"
+                      textColor="text-blue-700"
+                      borderColor="border-blue-600"
+                      hoverTextColor="hover:text-blue-800"
+                      hoverBorderColor="hover:border-blue-700"
+                      onClick={addScholarship}
+                    />
                   )}
                 </div>
 
-              </div>
-            )}
+                {formData.has_scholarship && (
+                  <div className="space-y-6">
+                    {formData.scholarships.map((_, index) => (
+                      <div key={index} className="rounded-xl border border-slate-200 bg-white p-6 transition">
+                        <div className="mb-5 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-50 text-sm font-semibold text-amber-600">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-slate-800">Scholarship</p>
+                              <p className="text-xs text-slate-500">Configure scholarship details</p>
+                            </div>
+                          </div>
+                          {formData.scholarships.length > 1 && (
+                            <IconButton
+                              icon={<Trash2 className="h-4 w-4" />}
+                              onClick={() => removeScholarship(index)}
+                              bgColor="bg-red-50"
+                              textColor="text-red-600"
+                              borderColor="border-red-200"
+                              hoverTextColor="hover:text-red-700"
+                              hoverBorderColor="hover:border-red-300"
+                            />
+                          )}
+                        </div>
 
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                          <div className="md:col-span-2">
+                            <InputField
+                              label="Scholarship Name"
+                              field={`scholarships[${index}].name`}
+                              placeholder="e.g. Excellence Award"
+                              type="text"
+                              formData={formData}
+                              errors={errors}
+                              updateFormData={updateFormData}
+                              onBlur={() => validateField(`scholarships[${index}].name`)}
+                            />
+                          </div>
+
+                          <InputField
+                            label="Coverage Percentage"
+                            field={`scholarships[${index}].coverage_percent`}
+                            type="number"
+                            placeholder="e.g. 50"
+                            required={false}
+                            formData={formData}
+                            errors={errors}
+                            updateFormData={updateFormData}
+                          />
+
+                          <InputField
+                            label="Maximum Amount"
+                            field={`scholarships[${index}].max_amount`}
+                            type="number"
+                            placeholder="e.g. 10000"
+                            required={false}
+                            formData={formData}
+                            errors={errors}
+                            updateFormData={updateFormData}
+                          />
+
+                          <div className="md:col-span-2">
+                            <RichTextEditor
+                              label="Description"
+                              field={`scholarships[${index}].description`}
+                              placeholder="Short description..."
+                              formData={formData}
+                              errors={errors}
+                              updateFormData={updateFormData}
+                            />
+                          </div>
+
+                          <div className="md:col-span-2 space-y-3">
+                            <div className="flex items-center justify-between">
+                              <h3 className="text-sm font-semibold tracking-wide text-slate-500">Conditions</h3>
+                              <IconButton
+                                icon={<Plus className="h-4 w-4" />}
+                                bgColor="bg-blue-50"
+                                textColor="text-blue-700"
+                                borderColor="border-blue-600"
+                                hoverTextColor="hover:text-blue-800"
+                                hoverBorderColor="hover:border-blue-700"
+                                onClick={() => updateFormData(`scholarships[${index}].conditions`, [...formData.scholarships[index].conditions, ''])}
+                              />
+                            </div>
+
+                            {formData.scholarships[index].conditions.length === 0 ? (
+                              <p className="text-sm text-slate-400">No conditions added yet.</p>
+                            ) : (
+                              <div className="space-y-2">
+                                {formData.scholarships[index].conditions.map((condition, cIndex) => (
+                                  <div key={cIndex} className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                                    <input
+                                      value={condition}
+                                      onChange={(e) => updateFormData(`scholarships[${index}].conditions[${cIndex}]`, e.target.value)}
+                                      placeholder={`Condition ${cIndex + 1}`}
+                                      className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => updateFormData(`scholarships[${index}].conditions`, formData.scholarships[index].conditions.filter((_, i) => i !== cIndex))}
+                                      className="text-red-400 transition hover:text-red-600"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </AccordionSection>
+            </div>
           </div>
 
           {/* Footer */}
-          <div className="flex flex-col gap-3 pb-6 sm:flex-row sm:items-center sm:justify-between">
-            <div className="text-sm text-slate-500">
-              Step {stage} of {stages.length} — {completedStages.length} completed
-            </div>
+          <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
+            <PrevButton
+              onClick={() => confirmDiscard(isDirty, () => router.push(basePath))}
+              text="Cancel"
+              icon={<ArrowLeft className="h-4 w-4" />}
+              disabled={loading}
+            />
 
-            <div className="flex gap-3">
-              {stage > 1 ? (
-                <PrevButton
-                  onClick={prevStage}
-                  text="Prev"
-                  icon={<ArrowLeft className="h-4 w-4" />}
-                  disabled={loading}
-                />
-              ) : (
-                <PrevButton
-                  onClick={() => router.push(basePath)}
-                  text="Back"
-                  icon={<ArrowLeft className="h-4 w-4" />}
-                />
-              )}
-
-              {stage < stages.length ? (
-                <NextButton
-                  onClick={nextStage}
-                  text="Next"
-                  icon={<ArrowRight className="h-4 w-4" />}
-                  disabled={!isStageValid}
-                />
-              ) : (
-                <Button
-                  onClick={handleSubmit}
-                  text={loading ? 'Creating...' : 'Create Program'}
-                  disabled={!isStageValid || loading}
-                  bgColor="bg-blue-50"
-                  textColor="text-blue-700"
-                  borderColor="border-blue-600"
-                  hoverTextColor="hover:text-blue-800"
-                  hoverBorderColor="hover:border-blue-700"
-                  icon={<BookOpen className="h-5 w-5" />}
-                />
-              )}
-            </div>
+            <Button
+              onClick={() => handleSubmit()}
+              text={loading ? 'Creating...' : 'Create Program'}
+              icon={<BookOpen className="h-5 w-5" />}
+              bgColor="bg-blue-600"
+              textColor="text-white"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
+              className="hover:bg-blue-700"
+              disabled={loading}
+            />
           </div>
 
         </div>

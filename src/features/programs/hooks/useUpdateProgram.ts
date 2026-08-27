@@ -25,7 +25,7 @@ export function useUpdateProgram() {
       english_required_score: payload.english_required_score?.trim() ?? "",
       tuition_fee: Number(payload.tuition_fee) || 0,
       duration: Number(payload.duration) || 0,
-      intake_dates: Array.isArray(payload.intake_dates) ? payload.intake_dates : [],
+      intake_months: Array.isArray(payload.intake_months) ? payload.intake_months : [],
       yearly_fees: Array.isArray(payload.yearly_fees) ? payload.yearly_fees : [],
       one_time_fees: Array.isArray(payload.one_time_fees) ? payload.one_time_fees : [],
       scholarships: payload.has_scholarship && Array.isArray(payload.scholarships) ? payload.scholarships : [],

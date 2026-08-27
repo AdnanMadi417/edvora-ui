@@ -33,7 +33,8 @@ import PresignedImage from 'components/ui/PresignedImage';
 import Button from 'components/ui/buttons/Button';
 import RichTextDisplay from 'components/ui/RichTextDisplay';
 import CurrencySelector from 'features/programs/components/shared/CurrencySelector';
-import IntakeDatesChips from 'features/programs/components/shared/IntakeDatesChips';
+import IntakeMonthsChips from 'features/programs/components/shared/IntakeMonthsChips';
+import { monthLabel } from 'features/programs/utils/intakeMonths';
 import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate, formatFeeAmount } from 'features/programs/utils/exchangeRate';
 
 type RequiredDocument = {
@@ -181,14 +182,6 @@ const ProgramDetails = ({ id }: Props) => {
   const formatCommission = (amount: number, curr?: string | null) => formatCommissionRate(amount, curr, currency, exchangeRates);
   const formatFee = (fee: number | string, feeCurrency?: string | null) => formatFeeAmount(fee, feeCurrency, currency, exchangeRates);
 
-  const nextIntakeDate = (() => {
-    const today = new Date();
-    return program?.intake_dates
-      ?.map((d) => new Date(d))
-      .filter((d) => d >= today)
-      .sort((a, b) => a.getTime() - b.getTime())[0] ?? null;
-  })();
-
   const handleCopyAll = async () => {
     const lines: string[] = [];
     lines.push(program?.university?.name ?? '');
@@ -197,10 +190,8 @@ const ProgramDetails = ({ id }: Props) => {
     if (program?.duration) lines.push(`Duration: ${program.duration} year(s)`);
     if (program?.english_required_score) lines.push(`English requirement: IELTS ${getIeltsLabel(program.english_required_score)}`);
     lines.push('');
-    if (program?.intake_dates && program.intake_dates.length > 0) {
-      const months = [...program.intake_dates]
-        .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-        .map((d) => new Date(d).toLocaleString('en-US', { month: 'short' }));
+    if (program?.intake_months && program.intake_months.length > 0) {
+      const months = [...program.intake_months].sort((a, b) => a - b).map((m) => monthLabel(m));
       lines.push(`Intake: ${months.join(' / ')}`);
     }
     lines.push('');
@@ -352,7 +343,7 @@ const ProgramDetails = ({ id }: Props) => {
           <Calendar className="h-5 w-5 text-slate-400" />
           <p className="text-xs text-slate-500">Next Intake</p>
           <p className="text-xl font-bold text-slate-800">
-            {nextIntakeDate ? nextIntakeDate.toLocaleString("en-US", { month: "short" }) : "—"}
+            {program?.next_intake_month ? monthLabel(program.next_intake_month) : "—"}
           </p>
         </div>
       </div>
@@ -423,15 +414,15 @@ const ProgramDetails = ({ id }: Props) => {
             </div>
           </div>
 
-          {(program?.intake_dates?.length ?? 0) > 0 && (
+          {(program?.intake_months?.length ?? 0) > 0 && (
             <div className="col-span-1 flex items-start gap-3 md:col-span-2">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
                 <Calendar className="h-5 w-5 text-slate-500" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">Intake Dates</p>
+                <p className="text-xs text-slate-500">Intake Months</p>
                 <div className="mt-1">
-                  <IntakeDatesChips dates={program.intake_dates} />
+                  <IntakeMonthsChips months={program.intake_months} />
                 </div>
               </div>
             </div>

@@ -10,7 +10,7 @@ export interface University {
   logo_file_url: string;
   university_type_id: string;
   university_type_name: string;
-  intake_months: string[];
+  intake_months: number[];
 }
 
 export interface UniversityDetails {
@@ -22,7 +22,7 @@ export interface UniversityDetails {
   logo_file_url: string;
   description?: string;
   university_type_id: string;
-  intake_months?: string[];
+  intake_months?: number[];
 }
 
 export interface UniversityResponse {
@@ -38,7 +38,7 @@ export interface CreateUniversityPayload {
   logo_file_url: string;
   university_type_id: string;
   description: string;
-  intake_months: string[];
+  intake_months: number[];
   branches: CreateBranchPayload[];
 }
 
@@ -49,7 +49,7 @@ export interface UpdateUniversityPayload {
   description?: string;
   logo_file_key: string;
   logo_file_url: string;
-  intake_months?: string[];
+  intake_months?: number[];
   university_type_id: string;
   branches: UpdateBranchPayload[];
 }

@@ -33,7 +33,7 @@ import InputField from "components/form/fields/InputField";
 import TextareaField from "components/form/fields/TextareaField";
 import RichTextEditor from "components/form/fields/RichTextEditor";
 import SelectField from "components/form/fields/SelectField";
-import MultipleDatePickerModal from "components/form/date/MultipleDatePickerModal";
+import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import ImageUploadField from "components/form/upload/ImageUploadField";
@@ -59,7 +59,7 @@ type FormData = {
   name: string;
   country: string;
   description: string;
-  intake_months: string[];
+  intake_months: number[];
   is_active: boolean;
   university_type_id: string;
   branches: Branch[];
@@ -126,7 +126,7 @@ const normalizePayload = (formData: FormData) => ({
   name: formData.name.trim(),
   country: formData.country.trim(),
   description: formData.description,
-  intake_months: formData.intake_months.filter((m) => m.trim() !== ""),
+  intake_months: formData.intake_months.filter((m) => Number.isInteger(m)),
   is_active: formData.is_active,
   university_type_id: formData.university_type_id,
   branches: formData.branches
@@ -547,9 +547,9 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
             </div>
           </div>
 
-          <MultipleDatePickerModal
-            label="Intake Dates"
+          <IntakeMonthsField
             field="intake_months"
+            label="Intake Months"
             required={false}
             formData={formData}
             errors={errors}

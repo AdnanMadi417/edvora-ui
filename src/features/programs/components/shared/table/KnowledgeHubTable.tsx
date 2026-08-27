@@ -22,7 +22,7 @@ import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagin
 import { StatusBadge } from "components/ui/badges";
 import { useToast } from "components/context/ToastContext";
 import type { Program } from "features/programs/types";
-import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
+import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
 
 function ProgramUniversityCell({ program }: { program: Program }) {
   const tags: { label: string; color: "green" | "blue" | "gray" }[] = [];
@@ -313,8 +313,8 @@ export default function KnowledgeHubTable({
               {/* Intakes */}
               <td className="px-6 py-4">
                 <div className="flex flex-col gap-1.5 text-xs text-slate-600">
-                  {program.intake_dates && program.intake_dates.length > 0 ? (
-                    <IntakeDatesChips dates={program.intake_dates} size="sm" showYear showDot={false} maxVisible={2} />
+                  {program.intake_months && program.intake_months.length > 0 ? (
+                    <IntakeMonthsChips months={program.intake_months} size="sm" showDot={false} maxVisible={2} />
                   ) : (
                     <span className="text-slate-400">TBA</span>
                   )}

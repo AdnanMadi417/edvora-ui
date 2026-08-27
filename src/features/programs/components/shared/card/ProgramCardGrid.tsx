@@ -14,7 +14,8 @@ import { useUniversities } from "features/universities/hooks";
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import ProgramFilterPanel from "features/programs/components/shared/filters/ProgramFilterPanel";
-import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
+import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
+import { nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "next/link";
@@ -256,10 +257,10 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                     </div>
 
                     {/* Intake Dates */}
-                    {program.intake_dates && program.intake_dates.length > 0 && (
+                    {program.intake_months && program.intake_months.length > 0 && (
                       <div className="px-4 pb-3">
                         <p className="mb-1.5 text-xs text-slate-400">Intakes</p>
-                        <IntakeDatesChips dates={program.intake_dates} size="sm" showYear showDot={false} />
+                        <IntakeMonthsChips months={program.intake_months} size="sm" showDot={false} maxVisible={3} />
                       </div>
                     )}
 
@@ -297,10 +298,10 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                             query: {
                               program_id: program.id,
                               university_id: program.university.id,
-                              intake_date:
-                                program.intake_dates?.[0] ??
-                                program.university.intake_months?.[0] ??
-                                new Date().toISOString().split("T")[0],
+                              intake_date: (() => {
+                                const month = program.next_intake_month ?? nextIntakeMonth(program.intake_months) ?? nextIntakeMonth(program.university.intake_months);
+                                return month ? resolveIntakeDate(month) : new Date().toISOString().split("T")[0];
+                              })(),
                             },
                           }}
                           onClick={(e) => e.stopPropagation()}
