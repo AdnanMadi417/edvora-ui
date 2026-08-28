@@ -16,6 +16,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import ProgramFilterPanel from "features/programs/components/shared/filters/ProgramFilterPanel";
 import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
 import { nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
+import { courseTypeLabel } from "features/programs/utils/courseType";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "next/link";
@@ -41,6 +42,8 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
   const [selectedUniversity, setSelectedUniversity] = useState<string>(() => searchParams.get("university_id") ?? "all");
   const [selectedQualId, setSelectedQualId] = useState<string | null>(() => searchParams.get("qualification_id"));
   const [hasScholarship, setHasScholarship] = useState<string>(() => searchParams.get("has_scholarship") ?? "all");
+  const [courseType, setCourseType] = useState<string>(() => searchParams.get("course_type") ?? "all");
+  const [classType, setClassType] = useState<string>(() => searchParams.get("class_type") ?? "all");
   const [sortBy, setSortBy] = useState<string>(() => searchParams.get("sort_by") ?? "all");
 
   useEffect(() => {
@@ -61,12 +64,14 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
     if (selectedUniversity !== "all") params.set("university_id", selectedUniversity);
     if (selectedQualId) params.set("qualification_id", selectedQualId);
     if (hasScholarship !== "all") params.set("has_scholarship", hasScholarship);
+    if (courseType !== "all") params.set("course_type", courseType);
+    if (classType !== "all") params.set("class_type", classType);
     if (sortBy !== "all") params.set("sort_by", sortBy);
     if (currentPage > 1) params.set("page", String(currentPage));
 
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, sortBy, currentPage, pathname, router]);
+  }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy, currentPage, pathname, router]);
 
   const { states } = useStates();
   const { fields } = useAllFields();
@@ -91,6 +96,8 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
     has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+    course_type: courseType !== "all" ? Number(courseType) : undefined,
+    class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
     sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
@@ -108,6 +115,8 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
     setSelectedUniversity("all");
     setSelectedQualId(null);
     setHasScholarship("all");
+    setCourseType("all");
+    setClassType("all");
     setCurrentPage(1);
   };
 
@@ -144,6 +153,8 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
               university: selectedUniversity,
               qualId: selectedQualId,
               scholarship: hasScholarship,
+              courseType,
+              classType,
             }}
             onApplyFilters={(values) => {
               setSelectedState(values.state);
@@ -151,6 +162,8 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
               setSelectedUniversity(values.university);
               setSelectedQualId(values.qualId);
               setHasScholarship(values.scholarship);
+              setCourseType(values.courseType);
+              setClassType(values.classType);
               setCurrentPage(1);
             }}
             onRemoveFilter={(key) => {
@@ -159,6 +172,8 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
               if (key === "university") setSelectedUniversity("all");
               if (key === "qualId") setSelectedQualId(null);
               if (key === "scholarship") setHasScholarship("all");
+              if (key === "courseType") setCourseType("all");
+              if (key === "classType") setClassType("all");
               setCurrentPage(1);
             }}
             onClearAll={clearAllFilters}
@@ -240,6 +255,11 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                         <p className="text-xs text-slate-400">Level</p>
                         <p className="text-sm font-bold text-slate-900">
                           {program.qualification_level ?? "N/A"}
+                          {program.course_type && (
+                            <span className="block text-xs font-medium text-slate-500">
+                              {courseTypeLabel(program.course_type)}
+                            </span>
+                          )}
                         </p>
                       </div>
                       <div>

@@ -111,6 +111,8 @@ export interface Program {
 
   qualification_id: string;
   qualification_level: "bachelor" | "master" | "phd" | string;
+  // Only ever set for master/phd programs — null for every other qualification.
+  course_type: "course_work" | "research" | "mixed_mode" | null;
 
   field_of_study: FieldOfStudy;
   university: ProgramUniversity;
@@ -134,6 +136,10 @@ export interface GetProgramsParams {
   university_id?: string;
   search?: string;
   has_scholarship?: boolean;
+  // 1 = course_work, 2 = research, 3 = mixed_mode. Programs with no course_type
+  // (i.e. not master/phd) never match any value here.
+  course_type?: number;
+  class_type?: "physical" | "online";
   sort_by?: "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc";
   page?: number;
   page_size?: number;
@@ -171,6 +177,10 @@ export interface CreateProgramPayload {
   expected_commission_to: number | null;
 
   qualification_id: string;
+  // 1 = course_work, 2 = research, 3 = mixed_mode. Only legal when
+  // qualification_id resolves to a master/phd qualification — omit
+  // entirely (or send null) for every other qualification.
+  course_type?: number | null;
 
   // Defaults to "MYR" on the backend if omitted.
   yearly_fee_currency?: Currency;
@@ -203,6 +213,10 @@ export interface UpdateProgramPayload {
   is_online: boolean;
   has_scholarship: boolean;
   qualification_id: string;
+  // 1 = course_work, 2 = research, 3 = mixed_mode. null resets to the
+  // course_work default (for a master/phd program) rather than clearing —
+  // omit the key entirely to leave the existing value untouched.
+  course_type?: number | null;
 
   commission_amount?: number | null;
   commission_currency?: string;
@@ -243,6 +257,10 @@ export interface BatchUpdateProgramPayload {
 
   intake_months?: number[];
   english_required_score?: string;
+  // 1 = course_work, 2 = research, 3 = mixed_mode. All-or-nothing: rejected
+  // for the whole batch if any selected program isn't master/phd. null
+  // resets every selected program to the course_work default.
+  course_type?: number | null;
 
   // Applies to every selected program. Omit entirely to leave unchanged —
   // sending null is ignored, not a reset.
