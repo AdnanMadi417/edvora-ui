@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { SlidersHorizontal, Globe, GraduationCap, Award, X, RotateCcw } from "lucide-react";
+import { SlidersHorizontal, Globe, GraduationCap, Award, Layers, MonitorSmartphone, X, RotateCcw } from "lucide-react";
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterChip from "components/ui/filters/FilterChip";
 import SortButton from "features/programs/components/shared/filters/SortButton";
+import { COURSE_TYPE_OPTIONS } from "features/programs/utils/courseType";
 
 interface Option {
   label: string;
@@ -19,12 +20,24 @@ const SCHOLARSHIP_OPTIONS: Option[] = [
   { label: "No Scholarship", value: "false" },
 ];
 
+const COURSE_TYPE_FILTER_OPTIONS: Option[] = COURSE_TYPE_OPTIONS.map((o) => ({
+  label: o.label,
+  value: String(o.value),
+}));
+
+const CLASS_TYPE_OPTIONS: Option[] = [
+  { label: "Physical", value: "physical" },
+  { label: "Online", value: "online" },
+];
+
 export interface ProgramFilterValues {
   state: string;
   field: string;
   university: string;
   qualId: string | null;
   scholarship: string;
+  courseType: string;
+  classType: string;
 }
 
 const DEFAULT_FILTERS: ProgramFilterValues = {
@@ -33,6 +46,8 @@ const DEFAULT_FILTERS: ProgramFilterValues = {
   university: "all",
   qualId: null,
   scholarship: "all",
+  courseType: "all",
+  classType: "all",
 };
 
 interface ProgramFilterPanelProps {
@@ -111,6 +126,8 @@ export default function ProgramFilterPanel({
     filters.university !== "all",
     filters.qualId !== null,
     filters.scholarship !== "all",
+    filters.courseType !== "all",
+    filters.classType !== "all",
   ].filter(Boolean).length;
 
   const chips: { key: keyof ProgramFilterValues; label: string }[] = [];
@@ -119,6 +136,8 @@ export default function ProgramFilterPanel({
   if (filters.university !== "all") chips.push({ key: "university", label: findLabel(universityOptions, filters.university) });
   if (filters.qualId !== null) chips.push({ key: "qualId", label: findLabel(qualificationOptions, filters.qualId) });
   if (filters.scholarship !== "all") chips.push({ key: "scholarship", label: findLabel(SCHOLARSHIP_OPTIONS, filters.scholarship) });
+  if (filters.courseType !== "all") chips.push({ key: "courseType", label: findLabel(COURSE_TYPE_FILTER_OPTIONS, filters.courseType) });
+  if (filters.classType !== "all") chips.push({ key: "classType", label: findLabel(CLASS_TYPE_OPTIONS, filters.classType) });
 
   const handleApply = () => {
     onApplyFilters(draft);
@@ -214,6 +233,20 @@ export default function ProgramFilterPanel({
                     options={SCHOLARSHIP_OPTIONS}
                     icon={Award}
                     defaultOption="All Scholarships"
+                  />
+                  <FilterSelectField
+                    value={draft.courseType}
+                    onChange={(val: string) => setDraft((d) => ({ ...d, courseType: val }))}
+                    options={COURSE_TYPE_FILTER_OPTIONS}
+                    icon={Layers}
+                    defaultOption="All Course Types"
+                  />
+                  <FilterSelectField
+                    value={draft.classType}
+                    onChange={(val: string) => setDraft((d) => ({ ...d, classType: val }))}
+                    options={CLASS_TYPE_OPTIONS}
+                    icon={MonitorSmartphone}
+                    defaultOption="All Delivery Modes"
                   />
                 </div>
 

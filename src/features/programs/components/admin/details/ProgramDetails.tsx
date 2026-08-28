@@ -20,6 +20,7 @@ import {
   Building2,
   Languages,
   Copy,
+  Layers,
 } from 'lucide-react';
 
 import { useProgram, useDeletePrograms } from 'features/programs/hooks';
@@ -35,6 +36,7 @@ import RichTextDisplay from 'components/ui/RichTextDisplay';
 import CurrencySelector from 'features/programs/components/shared/CurrencySelector';
 import IntakeMonthsChips from 'features/programs/components/shared/IntakeMonthsChips';
 import { monthLabel } from 'features/programs/utils/intakeMonths';
+import { courseTypeLabel } from 'features/programs/utils/courseType';
 import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate, formatFeeAmount } from 'features/programs/utils/exchangeRate';
 
 type RequiredDocument = {
@@ -381,6 +383,18 @@ const ProgramDetails = ({ id }: Props) => {
               <p className="text-sm font-semibold text-slate-900">{program?.qualification_level ?? 'Not Provided'}</p>
             </div>
           </div>
+
+          {program?.course_type && (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                <Layers className="h-5 w-5 text-slate-500" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500">Course Type</p>
+                <p className="text-sm font-semibold text-slate-900">{courseTypeLabel(program.course_type)}</p>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">

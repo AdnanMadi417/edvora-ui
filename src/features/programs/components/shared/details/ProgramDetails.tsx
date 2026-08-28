@@ -19,6 +19,7 @@ import {
   Languages,
   Clock,
   Pencil,
+  Layers,
 } from "lucide-react";
 
 import { useProgram } from "features/programs/hooks";
@@ -33,6 +34,7 @@ import CurrencySelector from "features/programs/components/shared/CurrencySelect
 import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
 import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate, formatFeeAmount } from "features/programs/utils/exchangeRate";
 import { monthLabel, nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
+import { courseTypeLabel } from "features/programs/utils/courseType";
 
 type RequiredDocument = {
   id: string;
@@ -318,6 +320,18 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
                 <p className="text-sm font-semibold text-slate-900">{program?.qualification_level ?? "Not Provided"}</p>
               </div>
             </div>
+
+            {program?.course_type && (
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                  <Layers className="h-5 w-5 text-slate-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Course Type</p>
+                  <p className="text-sm font-semibold text-slate-900">{courseTypeLabel(program.course_type)}</p>
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">

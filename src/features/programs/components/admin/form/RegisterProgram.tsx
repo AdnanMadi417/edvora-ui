@@ -27,6 +27,7 @@ import AccordionSection from 'features/programs/components/shared/form/Accordion
 import IntakeMonthsField from 'features/programs/components/shared/form/IntakeMonthsField';
 import { useUnsavedChangesGuard, confirmDiscard } from 'features/programs/components/shared/form/useUnsavedChangesGuard';
 import { useDraftAutosave } from 'features/programs/components/shared/form/useDraftAutosave';
+import { COURSE_TYPE_OPTIONS, isMasterOrPhd } from 'features/programs/utils/courseType';
 
 import Button from 'components/ui/buttons/Button';
 import PrevButton from 'components/ui/buttons/PrevButton';
@@ -54,6 +55,9 @@ export interface FormData {
   expected_commission_from: string;
   expected_commission_to: string;
   qualification_id: string;
+  // 1 = course_work, 2 = research, 3 = mixed_mode — only meaningful when
+  // the selected qualification is master/phd; cleared otherwise.
+  course_type: number | null;
   yearly_fee_currency: string;
   yearly_fees: Array<{ year: number; fee: number }>;
   one_time_fees: Array<{ description: string; fee: number; currency: string }>;
@@ -99,6 +103,7 @@ const emptyFormData: FormData = {
   expected_commission_from: '',
   expected_commission_to: '',
   qualification_id: '',
+  course_type: null,
   yearly_fee_currency: 'MYR',
   yearly_fees: [],
   one_time_fees: [],
@@ -185,6 +190,10 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
         updated.scholarships = [{ type: 1, coverage_percent: 0, max_amount: 0, name: '', description: '', conditions: [] }];
       }
       if (field === 'has_scholarship' && value === false) updated.scholarships = [];
+      if (field === 'qualification_id') {
+        const nextQualification = qualifications.find((q) => String(q.id) === String(value));
+        if (!isMasterOrPhd(nextQualification?.name)) updated.course_type = null;
+      }
 
       return updated;
     });
@@ -206,6 +215,9 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
     tuition_fee: Number(formData.tuition_fee || 0),
     duration: Number(formData.duration || 0),
     qualification_id: formData.qualification_id,
+    // Recomputed from the current qualification rather than trusted from
+    // formData alone — e.g. a restored draft could carry a stale pairing.
+    course_type: isMasterOrPhd(selectedQualification?.name) ? formData.course_type : null,
     commission_amount: Number(formData.commission_amount || 0),
     commission_currency: formData.commission_currency || 'rm',
     expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
@@ -329,6 +341,18 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                     updateFormData={updateFormData}
                     onSelect={(v: string) => validateField('qualification_id', v)}
                   />
+
+                  {isMasterOrPhd(selectedQualification?.name) && (
+                    <SelectField
+                      label="Course Type"
+                      field="course_type"
+                      required={false}
+                      options={COURSE_TYPE_OPTIONS.map((o) => ({ value: String(o.value), label: o.label }))}
+                      formData={formData}
+                      errors={errors}
+                      updateFormData={(f: string, v: string) => updateFormData(f, v ? Number(v) : null)}
+                    />
+                  )}
 
                   <SearchableDropdown
                     label="Field of Study"

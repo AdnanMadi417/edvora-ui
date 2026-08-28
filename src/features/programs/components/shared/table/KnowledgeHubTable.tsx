@@ -23,6 +23,7 @@ import { StatusBadge } from "components/ui/badges";
 import { useToast } from "components/context/ToastContext";
 import type { Program } from "features/programs/types";
 import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
+import { courseTypeLabel } from "features/programs/utils/courseType";
 
 function ProgramUniversityCell({ program }: { program: Program }) {
   const tags: { label: string; color: "green" | "blue" | "gray" }[] = [];
@@ -259,6 +260,12 @@ export default function KnowledgeHubTable({
                     </h3>
                     <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
                       <span className="font-medium capitalize text-slate-700">{program.qualification_level}</span>
+                      {program.course_type && (
+                        <>
+                          <span className="text-slate-300">•</span>
+                          <span className="text-slate-500">{courseTypeLabel(program.course_type)}</span>
+                        </>
+                      )}
                       {program.field_of_study?.name && (
                         <>
                           <span className="text-slate-300">•</span>

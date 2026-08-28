@@ -12,6 +12,7 @@ import {
   Plus,
   GitBranch,
   DollarSign,
+  Layers,
 } from "lucide-react";
 
 import { useToast } from "components/context/ToastContext";
@@ -36,9 +37,10 @@ import BatchProgramScholarship from "features/programs/components/admin/popups/B
 import BatchDeleteScholarships from "features/programs/components/admin/popups/BatchDeleteScholarships";
 import BatchFeesPrograms from "features/programs/components/admin/popups/BatchFeesPrograms";
 import BatchBranchPrograms from "features/programs/components/admin/popups/BatchBranchPrograms";
+import BatchCourseTypePrograms from "features/programs/components/admin/popups/BatchCourseTypePrograms";
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
 
-type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "deleteScholarships" | "fees" | "visaFee" | "branch";
+type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "deleteScholarships" | "fees" | "visaFee" | "branch" | "courseType";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -61,6 +63,8 @@ const ProgramsTable = () => {
   const [selectedUniversity, setSelectedUniversity] = useState<string>(() => searchParams.get("university_id") ?? "all");
   const [selectedQualId, setSelectedQualId] = useState<string | null>(() => searchParams.get("qualification_id"));
   const [hasScholarship, setHasScholarship] = useState<string>(() => searchParams.get("has_scholarship") ?? "all");
+  const [courseType, setCourseType] = useState<string>(() => searchParams.get("course_type") ?? "all");
+  const [classType, setClassType] = useState<string>(() => searchParams.get("class_type") ?? "all");
   const [sortBy, setSortBy] = useState<string>(() => searchParams.get("sort_by") ?? "all");
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
 
@@ -82,12 +86,14 @@ const ProgramsTable = () => {
     if (selectedUniversity !== "all") params.set("university_id", selectedUniversity);
     if (selectedQualId) params.set("qualification_id", selectedQualId);
     if (hasScholarship !== "all") params.set("has_scholarship", hasScholarship);
+    if (courseType !== "all") params.set("course_type", courseType);
+    if (classType !== "all") params.set("class_type", classType);
     if (sortBy !== "all") params.set("sort_by", sortBy);
     if (currentPage > 1) params.set("page", String(currentPage));
 
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, sortBy, currentPage, pathname, router]);
+  }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy, currentPage, pathname, router]);
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -111,6 +117,8 @@ const ProgramsTable = () => {
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
     has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+    course_type: courseType !== "all" ? Number(courseType) : undefined,
+    class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
     sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
@@ -164,6 +172,8 @@ const ProgramsTable = () => {
         state_id: selectedState !== "all" ? selectedState : undefined,
         university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
         has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+        course_type: courseType !== "all" ? Number(courseType) : undefined,
+        class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
         sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
       };
       const allIds: string[] = [];
@@ -188,11 +198,21 @@ const ProgramsTable = () => {
     setSelectedPrograms((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, sortBy]);
+  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy]);
 
   const selectedProgramIds = useMemo(
     () => Object.keys(selectedPrograms).filter((id) => selectedPrograms[id]),
     [selectedPrograms]
+  );
+
+  // Only covers programs on the current page — a "select all" selection
+  // spanning pages won't show every ineligible program here, but the
+  // backend still enforces eligibility server-side either way.
+  const selectedProgramSummaries = useMemo(
+    () => (programs ?? [])
+      .filter((p) => selectedPrograms[p.id])
+      .map((p) => ({ id: p.id, name: p.name, qualification_level: p.qualification_level })),
+    [programs, selectedPrograms]
   );
 
   const sharedUniversityId = useMemo(() => {
@@ -215,6 +235,8 @@ const ProgramsTable = () => {
     setSelectedUniversity("all");
     setSelectedQualId(null);
     setHasScholarship("all");
+    setCourseType("all");
+    setClassType("all");
     setCurrentPage(1);
   };
 
@@ -253,6 +275,8 @@ const ProgramsTable = () => {
             university: selectedUniversity,
             qualId: selectedQualId,
             scholarship: hasScholarship,
+            courseType,
+            classType,
           }}
           onApplyFilters={(values) => {
             setSelectedState(values.state);
@@ -260,6 +284,8 @@ const ProgramsTable = () => {
             setSelectedUniversity(values.university);
             setSelectedQualId(values.qualId);
             setHasScholarship(values.scholarship);
+            setCourseType(values.courseType);
+            setClassType(values.classType);
             setCurrentPage(1);
           }}
           onRemoveFilter={(key) => {
@@ -268,6 +294,8 @@ const ProgramsTable = () => {
             if (key === "university") setSelectedUniversity("all");
             if (key === "qualId") setSelectedQualId(null);
             if (key === "scholarship") setHasScholarship("all");
+            if (key === "courseType") setCourseType("all");
+            if (key === "classType") setClassType("all");
             setCurrentPage(1);
           }}
           onClearAll={clearAllFilters}
@@ -310,6 +338,7 @@ const ProgramsTable = () => {
                         { label: "Tuition Fees", icon: <DollarSign className="h-3.5 w-3.5 text-green-600" />, bg: "bg-green-50", onClick: () => setActiveModal("fees") },
                         { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setActiveModal("visaFee") },
                         ...(sharedUniversityId ? [{ label: "Branch", icon: <GitBranch className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("branch") }] : []),
+                        { label: "Course Type", icon: <Layers className="h-3.5 w-3.5 text-blue-600" />, bg: "bg-blue-50", onClick: () => setActiveModal("courseType") },
                       ].map(({ label, icon, bg, onClick }) => (
                         <button
                           key={label}
@@ -442,6 +471,13 @@ const ProgramsTable = () => {
           onSuccess={refetch}
         />
       )}
+
+      <BatchCourseTypePrograms
+        isOpen={activeModal === "courseType"}
+        onClose={() => setActiveModal(null)}
+        selectedPrograms={selectedProgramSummaries}
+        onSuccess={refetch}
+      />
 
     </div>
   );

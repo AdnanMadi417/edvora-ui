@@ -58,6 +58,8 @@ const DataEntryProgramsTable = () => {
   const [selectedUniversity, setSelectedUniversity] = useState<string>(() => searchParams.get("university_id") ?? "all");
   const [selectedQualId, setSelectedQualId] = useState<string | null>(() => searchParams.get("qualification_id"));
   const [hasScholarship, setHasScholarship] = useState<string>(() => searchParams.get("has_scholarship") ?? "all");
+  const [courseType, setCourseType] = useState<string>(() => searchParams.get("course_type") ?? "all");
+  const [classType, setClassType] = useState<string>(() => searchParams.get("class_type") ?? "all");
   const [sortBy, setSortBy] = useState<string>(() => searchParams.get("sort_by") ?? "all");
 
   useEffect(() => {
@@ -78,12 +80,14 @@ const DataEntryProgramsTable = () => {
     if (selectedUniversity !== "all") params.set("university_id", selectedUniversity);
     if (selectedQualId) params.set("qualification_id", selectedQualId);
     if (hasScholarship !== "all") params.set("has_scholarship", hasScholarship);
+    if (courseType !== "all") params.set("course_type", courseType);
+    if (classType !== "all") params.set("class_type", classType);
     if (sortBy !== "all") params.set("sort_by", sortBy);
     if (currentPage > 1) params.set("page", String(currentPage));
 
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, sortBy, currentPage, pathname, router]);
+  }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy, currentPage, pathname, router]);
 
   const [activeModal, setActiveModal] = useState<BatchModal | null>(null);
   const [isBulkMenuOpen, setIsBulkMenuOpen] = useState(false);
@@ -100,6 +104,8 @@ const DataEntryProgramsTable = () => {
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
     has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+    course_type: courseType !== "all" ? Number(courseType) : undefined,
+    class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
     sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
@@ -125,6 +131,8 @@ const DataEntryProgramsTable = () => {
         state_id: selectedState !== "all" ? selectedState : undefined,
         university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
         has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+        course_type: courseType !== "all" ? Number(courseType) : undefined,
+        class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
         sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
       };
       const allIds: string[] = [];
@@ -149,7 +157,7 @@ const DataEntryProgramsTable = () => {
     setSelectedPrograms((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, sortBy]);
+  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy]);
 
   const selectedProgramIds = useMemo(
     () => Object.keys(selectedPrograms).filter((id) => selectedPrograms[id]),
@@ -176,6 +184,8 @@ const DataEntryProgramsTable = () => {
     setSelectedUniversity("all");
     setSelectedQualId(null);
     setHasScholarship("all");
+    setCourseType("all");
+    setClassType("all");
     setCurrentPage(1);
   };
 
@@ -214,6 +224,8 @@ const DataEntryProgramsTable = () => {
             university: selectedUniversity,
             qualId: selectedQualId,
             scholarship: hasScholarship,
+            courseType,
+            classType,
           }}
           onApplyFilters={(values) => {
             setSelectedState(values.state);
@@ -221,6 +233,8 @@ const DataEntryProgramsTable = () => {
             setSelectedUniversity(values.university);
             setSelectedQualId(values.qualId);
             setHasScholarship(values.scholarship);
+            setCourseType(values.courseType);
+            setClassType(values.classType);
             setCurrentPage(1);
           }}
           onRemoveFilter={(key) => {
@@ -229,6 +243,8 @@ const DataEntryProgramsTable = () => {
             if (key === "university") setSelectedUniversity("all");
             if (key === "qualId") setSelectedQualId(null);
             if (key === "scholarship") setHasScholarship("all");
+            if (key === "courseType") setCourseType("all");
+            if (key === "classType") setClassType("all");
             setCurrentPage(1);
           }}
           onClearAll={clearAllFilters}
