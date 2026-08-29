@@ -188,7 +188,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
     lines.push("Yearly Tuition fees");
     lines.push("");
 
-    (program?.yearly_fees ?? []).forEach((item) => {
+    [...(program?.yearly_fees ?? [])].sort((a, b) => a.year - b.year).forEach((item) => {
       lines.push(`${getOrdinal(item.year)} year: ${formatFee(item.fee, program?.yearly_fee_currency)}`);
     });
 
@@ -265,7 +265,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
             <Banknote className="h-5 w-5 text-slate-400" />
             <p className="text-xs text-slate-500">First Year</p>
             <p className="text-xl font-bold text-slate-800">
-              {program?.yearly_fees?.[0]?.fee != null ? formatFee(program.yearly_fees[0].fee, program.yearly_fee_currency) : "—"}
+              {program?.first_year_tuition != null ? formatFee(program.first_year_tuition, program.yearly_fee_currency) : "—"}
             </p>
           </div>
 
@@ -418,8 +418,8 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
                 </div>
                 <div className="overflow-hidden">
                   {program?.yearly_fees?.length ? (
-                    program.yearly_fees.map((item, index) => (
-                      <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
+                    [...program.yearly_fees].sort((a, b) => a.year - b.year).map((item) => (
+                      <div key={item.year} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">Year {item.year}</div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
                           {formatFee(item.fee, program?.yearly_fee_currency)}

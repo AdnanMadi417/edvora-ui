@@ -42,6 +42,7 @@ export default function YearlyFeesField({
         const maxYear = currentArray.reduce((max, y) => Math.max(max, Number(y.year) || 0), 0);
         return { year: maxYear + 1, fee: "" };
       }}
+      insertPosition="end"
       headerExtra={
         (alwaysShowCurrency || hasFees) && (
           <div className="w-32">

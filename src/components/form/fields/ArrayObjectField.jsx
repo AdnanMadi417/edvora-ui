@@ -44,6 +44,10 @@ const ArrayObjectField = ({
   getDefaultRow = undefined,
   columns = 2,
   headerExtra = null,
+  // "start" keeps new rows immediately visible without scrolling; "end"
+  // appends instead, for fields (like yearly fees) where array position
+  // is read as meaningful order elsewhere and shouldn't get scrambled.
+  insertPosition = "start",
 }) => {
   const arrayValue = getNestedValue(formData, field) || [];
 
@@ -60,9 +64,8 @@ const ArrayObjectField = ({
   };
 
   const addRow = () => {
-    // New entries go to the top so they're immediately visible without
-    // scrolling past whatever's already been filled in.
-    updateFormData(field, [buildDefaultRow(arrayValue), ...arrayValue]);
+    const newRow = buildDefaultRow(arrayValue);
+    updateFormData(field, insertPosition === "end" ? [...arrayValue, newRow] : [newRow, ...arrayValue]);
   };
 
   const removeRow = (index) => {
