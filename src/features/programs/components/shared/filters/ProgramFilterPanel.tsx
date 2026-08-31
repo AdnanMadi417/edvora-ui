@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { SlidersHorizontal, Globe, GraduationCap, Award, Layers, MonitorSmartphone, X, RotateCcw } from "lucide-react";
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
@@ -100,10 +100,18 @@ export default function ProgramFilterPanel({
 
   const close = () => setOpen(false);
 
+  // Callers pass `filters` as a fresh object literal on every render, so
+  // this can't key off object identity — that resets an in-progress draft
+  // (e.g. a University pick not yet Applied) on any unrelated parent
+  // re-render, like typing in the search box. Key off a stable
+  // serialization of the actual values instead.
+  const filtersKey = useMemo(() => JSON.stringify(filters), [filters]);
   useEffect(() => {
     if (!open) return;
     setDraft(filters);
-  }, [open, filters]);
+    // filtersKey (not filters) is the intended dependency — see comment above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, filtersKey]);
 
   useEffect(() => {
     const onMouse = (e: MouseEvent) => {

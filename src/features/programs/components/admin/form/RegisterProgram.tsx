@@ -28,6 +28,8 @@ import IntakeMonthsField from 'features/programs/components/shared/form/IntakeMo
 import { useUnsavedChangesGuard, confirmDiscard } from 'features/programs/components/shared/form/useUnsavedChangesGuard';
 import { useDraftAutosave } from 'features/programs/components/shared/form/useDraftAutosave';
 import { COURSE_TYPE_OPTIONS, isMasterOrPhd } from 'features/programs/utils/courseType';
+import { setFormPath } from 'features/programs/components/shared/form/setFormPath';
+import { useIsFormDirty } from 'features/programs/components/shared/form/useIsFormDirty';
 
 import Button from 'components/ui/buttons/Button';
 import PrevButton from 'components/ui/buttons/PrevButton';
@@ -82,6 +84,14 @@ const SECTION_FIELDS: Record<SectionKey, string[]> = {
   scholarship: ['scholarships'],
 };
 
+// Same "does this field belong to this section" test focusFirstError uses —
+// shared so a section's live error indicator can't drift out of sync with
+// which fields it's actually considered to own (e.g. missing an indexed
+// yearly_fees[i]/scholarships[i] error, or a flat field SECTION_FIELDS
+// already lists but a hand-rolled check forgot).
+const sectionHasError = (errors: FormErrors, key: SectionKey): boolean =>
+  Object.entries(errors).some(([f, v]) => !!v && SECTION_FIELDS[key].some((sf) => f === sf || f.startsWith(`${sf}[`)));
+
 const emptyFormData: FormData = {
   name: '',
   uni_id: '',
@@ -133,13 +143,21 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
   const { branches } = useBranches(formData.uni_id);
   const { universities } = useUniversities();
 
-  const isDirty = useMemo(() => JSON.stringify(formData) !== JSON.stringify(emptyFormData), [formData]);
+  // The dirty-check baseline starts as emptyFormData but tracks the same
+  // auto-populated defaults formData does (e.g. commission_type_id below) —
+  // otherwise a legitimate default that arrives after mount makes the form
+  // look "changed" against a baseline that never learns about it, and
+  // Cancel prompts "unsaved changes" on a completely untouched form.
+  const [dirtyBaseline, setDirtyBaseline] = useState<FormData>(emptyFormData);
+  const isDirty = useIsFormDirty(formData, dirtyBaseline);
   useUnsavedChangesGuard(isDirty);
   const { hasDraft, readDraft, clearDraft, dismissDraft } = useDraftAutosave(formData, isDirty);
 
   useEffect(() => {
     if (commissionTypes.length > 0) {
-      setFormData((prev) => ({ ...prev, commission_type_id: String(commissionTypes[0].id) }));
+      const typeId = String(commissionTypes[0].id);
+      setFormData((prev) => ({ ...prev, commission_type_id: typeId }));
+      setDirtyBaseline((prev) => ({ ...prev, commission_type_id: typeId }));
     }
   }, [commissionTypes]);
 
@@ -172,15 +190,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
       return next;
     });
     setFormData((prev) => {
-      const updated = structuredClone(prev);
-      const keys = field.replace(/\[(\d+)\]/g, '.$1').split('.');
-      let current: any = updated;
-      for (let i = 0; i < keys.length - 1; i++) {
-        const key = keys[i];
-        if (current[key] === undefined) current[key] = isNaN(Number(keys[i + 1])) ? {} : [];
-        current = current[key];
-      }
-      current[keys[keys.length - 1]] = value;
+      const updated = setFormPath(prev, field, value);
 
       if (field === 'is_on_campus' && value === true) updated.is_online = false;
       if (field === 'is_online' && value === true) updated.is_on_campus = false;
@@ -239,11 +249,9 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
   });
 
   const focusFirstError = (validationErrors: FormErrors) => {
-    const erroredFields = new Set(Object.keys(validationErrors));
     const sectionsToOpen: Partial<Record<SectionKey, boolean>> = {};
     (Object.keys(SECTION_FIELDS) as SectionKey[]).forEach((key) => {
-      const touchesSection = [...erroredFields].some((f) => SECTION_FIELDS[key].some((sf) => f === sf || f.startsWith(`${sf}[`)));
-      if (touchesSection) sectionsToOpen[key] = true;
+      if (sectionHasError(validationErrors, key)) sectionsToOpen[key] = true;
     });
     if (Object.keys(sectionsToOpen).length) {
       setOpenSections((prev) => ({ ...prev, ...sectionsToOpen }));
@@ -311,7 +319,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
               <AccordionSection
                 icon={BookOpen}
                 title="Program Details"
-                hasError={!!(errors.name || errors.qualification_id || errors.field_of_study_id || errors.duration || errors.is_on_campus)}
+                hasError={sectionHasError(errors, 'details')}
                 summary={formData.name ? `${formData.name}${selectedQualification ? ` · ${selectedQualification.name}` : ''}` : 'Not started'}
                 open={openSections.details}
                 onToggle={() => toggleSection('details')}
@@ -396,7 +404,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
               <AccordionSection
                 icon={MapPin}
                 title="University & Location"
-                hasError={!!(errors.uni_id || errors.branch_id)}
+                hasError={sectionHasError(errors, 'university')}
                 summary={selectedUniversity ? `${selectedUniversity.name}${selectedBranch ? ` · ${selectedBranch.name}` : ''}` : 'Not started'}
                 open={openSections.university}
                 onToggle={() => toggleSection('university')}
@@ -430,7 +438,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
               <AccordionSection
                 icon={DollarSign}
                 title="Fees & Commission"
-                hasError={!!(errors.commission_amount || errors.commission_notes)}
+                hasError={sectionHasError(errors, 'fees')}
                 summary={firstYearFee ? `First year ${firstYearFee}` : 'Not started'}
                 open={openSections.fees}
                 onToggle={() => toggleSection('fees')}
@@ -514,7 +522,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
               <AccordionSection
                 icon={CalendarRange}
                 title="Intakes & Requirements"
-                hasError={!!errors.intake_months}
+                hasError={sectionHasError(errors, 'intakes')}
                 summary={formData.intake_months?.length ? `${formData.intake_months.length} intake month${formData.intake_months.length !== 1 ? 's' : ''}` : 'Not started'}
                 open={openSections.intakes}
                 onToggle={() => toggleSection('intakes')}
@@ -535,7 +543,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
               <AccordionSection
                 icon={Award}
                 title="Scholarship"
-                hasError={!!(formData.scholarships || []).some((_, i) => errors[`scholarships[${i}].name`] || errors[`scholarships[${i}].description`])}
+                hasError={sectionHasError(errors, 'scholarship')}
                 summary={formData.has_scholarship ? `Available · ${formData.scholarships.length} scholarship${formData.scholarships.length !== 1 ? 's' : ''}` : 'None'}
                 open={openSections.scholarship}
                 onToggle={() => toggleSection('scholarship')}

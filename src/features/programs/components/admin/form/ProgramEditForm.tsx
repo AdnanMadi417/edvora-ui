@@ -44,6 +44,8 @@ import AccordionSection from "features/programs/components/shared/form/Accordion
 import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
 import { useUnsavedChangesGuard, confirmDiscard } from "features/programs/components/shared/form/useUnsavedChangesGuard";
 import { COURSE_TYPE_OPTIONS, isMasterOrPhd, courseTypeRequestValue } from "features/programs/utils/courseType";
+import { setFormPath } from "features/programs/components/shared/form/setFormPath";
+import { useIsFormDirty } from "features/programs/components/shared/form/useIsFormDirty";
 
 import IconButton from "components/ui/buttons/IconButton";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
@@ -66,6 +68,14 @@ const SECTION_FIELDS: Record<SectionKey, string[]> = {
   intakes: ['intake_months', 'english_required_score'],
   scholarship: ['scholarships'],
 };
+
+// Same "does this field belong to this section" test focusFirstError uses —
+// shared so a section's live error indicator can't drift out of sync with
+// which fields it's actually considered to own (e.g. missing an indexed
+// yearly_fees[i]/scholarships[i] error, or a flat field SECTION_FIELDS
+// already lists but a hand-rolled check forgot).
+const sectionHasError = (errors: Record<string, string>, key: SectionKey): boolean =>
+  Object.entries(errors).some(([f, v]) => !!v && SECTION_FIELDS[key].some((sf) => f === sf || f.startsWith(`${sf}[`)));
 
 interface Props {
   id: string;
@@ -93,7 +103,7 @@ const EditKnowledgeHubProgramDetails = ({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [deleteMode, setDeleteMode] = useState<"single" | "batch" | null>(null);
-  const [initialFormData, setInitialFormData] = useState<any>({});
+  const [initialFormData, setInitialFormData] = useState<any>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
     details: true, university: true, fees: true, intakes: true, scholarship: true,
@@ -144,10 +154,7 @@ const EditKnowledgeHubProgramDetails = ({
     }));
   };
 
-  const isFormChanged = React.useMemo(() => {
-    if (!initialFormData || Object.keys(initialFormData).length === 0) return false;
-    return JSON.stringify(formData) !== JSON.stringify(initialFormData);
-  }, [formData, initialFormData]);
+  const isFormChanged = useIsFormDirty(formData, initialFormData);
 
   useUnsavedChangesGuard(isFormChanged);
 
@@ -168,15 +175,7 @@ const EditKnowledgeHubProgramDetails = ({
       return next;
     });
     setFormData((prev: any) => {
-      const clone = structuredClone(prev);
-      const path = field.replace(/\[(\w+)\]/g, ".$1").split(".");
-      let current = clone;
-
-      for (let i = 0; i < path.length - 1; i++) {
-        if (!current[path[i]]) current[path[i]] = {};
-        current = current[path[i]];
-      }
-      current[path[path.length - 1]] = value;
+      const clone = setFormPath(prev, field, value);
 
       if (field === "has_scholarship" && value === true && (!clone.scholarships || clone.scholarships.length === 0)) {
         clone.scholarships = [{ type: 1, coverage_percent: 0, max_amount: 0, name: "", description: "", conditions: [] }];
@@ -235,19 +234,22 @@ const EditKnowledgeHubProgramDetails = ({
   }, [program, commission]);
 
   useEffect(() => {
-    if (commissionTypes.length > 0) {
+    // Only backfills once the real baseline has loaded — if commissionTypes
+    // resolves first, the initial-load effect above already reads
+    // commissionTypes[0]?.id directly, so there's nothing to reconcile;
+    // touching initialFormData here while it's still null would fake a
+    // loaded baseline and defeat useIsFormDirty's "not ready yet" guard.
+    if (commissionTypes.length > 0 && initialFormData && !initialFormData.commission_type_id) {
       const typeId = String(commissionTypes[0].id);
       setFormData((prev) => ({ ...prev, commission_type_id: typeId }));
-      setInitialFormData((prev) => ({ ...prev, commission_type_id: typeId }));
+      setInitialFormData((prev: any) => ({ ...prev, commission_type_id: typeId }));
     }
-  }, [commissionTypes]);
+  }, [commissionTypes, initialFormData]);
 
   const focusFirstError = (validationErrors: Record<string, string>) => {
-    const erroredFields = new Set(Object.keys(validationErrors));
     const sectionsToOpen: Partial<Record<SectionKey, boolean>> = {};
     (Object.keys(SECTION_FIELDS) as SectionKey[]).forEach((key) => {
-      const touchesSection = [...erroredFields].some((f) => SECTION_FIELDS[key].some((sf) => f === sf || f.startsWith(`${sf}[`)));
-      if (touchesSection) sectionsToOpen[key] = true;
+      if (sectionHasError(validationErrors, key)) sectionsToOpen[key] = true;
     });
     if (Object.keys(sectionsToOpen).length) {
       setOpenSections((prev) => ({ ...prev, ...sectionsToOpen }));
@@ -459,7 +461,7 @@ const EditKnowledgeHubProgramDetails = ({
               <AccordionSection
                 icon={BookOpen}
                 title="Program Details"
-                hasError={!!(errors.name || errors.qualification_id || errors.field_of_study_id || errors.duration || errors.is_on_campus)}
+                hasError={sectionHasError(errors, 'details')}
                 summary={formData.name ? `${formData.name}${selectedQualification ? ` · ${selectedQualification.name}` : ''}` : 'Not started'}
                 open={openSections.details}
                 onToggle={() => toggleSection('details')}
@@ -545,7 +547,7 @@ const EditKnowledgeHubProgramDetails = ({
               <AccordionSection
                 icon={MapPin}
                 title="University & Location"
-                hasError={!!(errors.uni_id || errors.branch_id)}
+                hasError={sectionHasError(errors, 'university')}
                 summary={selectedUniversity ? `${selectedUniversity.name}${selectedBranch ? ` · ${selectedBranch.name}` : ''}` : 'Not started'}
                 open={openSections.university}
                 onToggle={() => toggleSection('university')}
@@ -584,7 +586,7 @@ const EditKnowledgeHubProgramDetails = ({
               <AccordionSection
                 icon={DollarSign}
                 title="Fees & Commission"
-                hasError={!!(errors.commission_amount || errors.commission_notes)}
+                hasError={sectionHasError(errors, 'fees')}
                 summary={firstYearFee ? `First year ${firstYearFee}` : 'Not started'}
                 open={openSections.fees}
                 onToggle={() => toggleSection('fees')}
@@ -659,7 +661,7 @@ const EditKnowledgeHubProgramDetails = ({
               <AccordionSection
                 icon={CalendarRange}
                 title="Intakes & Requirements"
-                hasError={!!errors.intake_months}
+                hasError={sectionHasError(errors, 'intakes')}
                 summary={formData.intake_months?.length ? `${formData.intake_months.length} intake month${formData.intake_months.length !== 1 ? 's' : ''}` : 'Not started'}
                 open={openSections.intakes}
                 onToggle={() => toggleSection('intakes')}
@@ -680,7 +682,7 @@ const EditKnowledgeHubProgramDetails = ({
               <AccordionSection
                 icon={Award}
                 title="Scholarship"
-                hasError={!!(formData.scholarships || []).some((_: any, i: number) => errors[`scholarships[${i}].name`] || errors[`scholarships[${i}].description`])}
+                hasError={sectionHasError(errors, 'scholarship')}
                 summary={formData.has_scholarship ? `Available · ${(formData.scholarships || []).length} scholarship${(formData.scholarships || []).length !== 1 ? 's' : ''}` : 'None'}
                 open={openSections.scholarship}
                 onToggle={() => toggleSection('scholarship')}
