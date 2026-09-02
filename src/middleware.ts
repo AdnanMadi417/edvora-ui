@@ -28,9 +28,9 @@ const roleHomePaths: Record<string, string> = {
 // token, unreachable /auth/me) resolves to "no role" rather than falling
 // back to anything client-supplied.
 async function verifyToken(token: string): Promise<boolean> {
-  const secret = process.env.JWT_SECRET;
+  const secret = process.env.AUTH_SECRET_KEY;
   if (!secret) {
-    console.error("[middleware] JWT_SECRET is not configured — rejecting all tokens.");
+    console.error("[middleware] AUTH_SECRET_KEY is not configured — rejecting all tokens.");
     return false;
   }
   try {
