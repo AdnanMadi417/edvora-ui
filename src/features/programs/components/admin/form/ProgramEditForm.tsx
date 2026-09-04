@@ -43,7 +43,7 @@ import OneTimeFeesField from "features/programs/components/shared/OneTimeFeesFie
 import AccordionSection from "features/programs/components/shared/form/AccordionSection";
 import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
 import { useUnsavedChangesGuard, confirmDiscard } from "features/programs/components/shared/form/useUnsavedChangesGuard";
-import { COURSE_TYPE_OPTIONS, isMasterOrPhd, courseTypeRequestValue } from "features/programs/utils/courseType";
+import { COURSE_TYPE_OPTIONS, isMasterOrPhd } from "features/programs/utils/courseType";
 import { setFormPath } from "features/programs/components/shared/form/setFormPath";
 import { useIsFormDirty } from "features/programs/components/shared/form/useIsFormDirty";
 
@@ -216,9 +216,8 @@ const EditKnowledgeHubProgramDetails = ({
       expected_commission_from: commission?.expected_commission_from ?? "",
       expected_commission_to: commission?.expected_commission_to ?? "",
       qualification_id: String((program as any).qualification_id || ""),
-      // Response comes back as a string ("course_work"/...) — the form field
-      // works in the request int (1/2/3), same as everywhere else course_type appears.
-      course_type: courseTypeRequestValue((program as any).course_type),
+      // Response and request now use the same strings — direct passthrough.
+      course_type: (program as any).course_type ?? null,
       yearly_fee_currency: program.yearly_fee_currency || "MYR",
       yearly_fees: program.yearly_fees ?? [],
       one_time_fees: (program.one_time_fees ?? []).map((f: any) => ({ ...f, currency: f.currency || "MYR" })),
@@ -497,10 +496,10 @@ const EditKnowledgeHubProgramDetails = ({
                       label="Course Type"
                       field="course_type"
                       required={false}
-                      options={COURSE_TYPE_OPTIONS.map((o) => ({ value: String(o.value), label: o.label }))}
+                      options={COURSE_TYPE_OPTIONS}
                       formData={formData}
                       errors={errors}
-                      updateFormData={(f: string, v: string) => updateFormData(f, v ? Number(v) : null)}
+                      updateFormData={(f: string, v: string) => updateFormData(f, v || null)}
                     />
                   )}
 
