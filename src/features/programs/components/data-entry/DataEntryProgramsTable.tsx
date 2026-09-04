@@ -104,7 +104,7 @@ const DataEntryProgramsTable = () => {
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
     has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
-    course_type: courseType !== "all" ? Number(courseType) : undefined,
+    course_type: courseType !== "all" ? (courseType as "course_work" | "research" | "mixed_mode") : undefined,
     class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
     sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
@@ -131,7 +131,7 @@ const DataEntryProgramsTable = () => {
         state_id: selectedState !== "all" ? selectedState : undefined,
         university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
         has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
-        course_type: courseType !== "all" ? Number(courseType) : undefined,
+        course_type: courseType !== "all" ? (courseType as "course_work" | "research" | "mixed_mode") : undefined,
         class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
         sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
       };

@@ -7,7 +7,7 @@ import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
 
 import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
-import { type Currency } from 'features/programs/types';
+import { type Currency, type CourseType } from 'features/programs/types';
 
 import { useCreateProgram } from 'features/programs/hooks';
 import { useUniversities, useBranches } from "features/universities/hooks";
@@ -57,9 +57,9 @@ export interface FormData {
   expected_commission_from: string;
   expected_commission_to: string;
   qualification_id: string;
-  // 1 = course_work, 2 = research, 3 = mixed_mode — only meaningful when
-  // the selected qualification is master/phd; cleared otherwise.
-  course_type: number | null;
+  // Only meaningful when the selected qualification is master/phd; cleared
+  // otherwise.
+  course_type: CourseType | null;
   yearly_fee_currency: string;
   yearly_fees: Array<{ year: number; fee: number }>;
   one_time_fees: Array<{ description: string; fee: number; currency: string }>;
@@ -355,10 +355,10 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                       label="Course Type"
                       field="course_type"
                       required={false}
-                      options={COURSE_TYPE_OPTIONS.map((o) => ({ value: String(o.value), label: o.label }))}
+                      options={COURSE_TYPE_OPTIONS}
                       formData={formData}
                       errors={errors}
-                      updateFormData={(f: string, v: string) => updateFormData(f, v ? Number(v) : null)}
+                      updateFormData={(f: string, v: string) => updateFormData(f, v || null)}
                     />
                   )}
 

@@ -20,10 +20,7 @@ const SCHOLARSHIP_OPTIONS: Option[] = [
   { label: "No Scholarship", value: "false" },
 ];
 
-const COURSE_TYPE_FILTER_OPTIONS: Option[] = COURSE_TYPE_OPTIONS.map((o) => ({
-  label: o.label,
-  value: String(o.value),
-}));
+const COURSE_TYPE_FILTER_OPTIONS: Option[] = COURSE_TYPE_OPTIONS;
 
 const CLASS_TYPE_OPTIONS: Option[] = [
   { label: "Physical", value: "physical" },

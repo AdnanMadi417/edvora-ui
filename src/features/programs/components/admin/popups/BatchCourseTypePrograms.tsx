@@ -62,7 +62,7 @@ export default function BatchCourseTypePrograms({
     try {
       await batchUpdatePrograms({
         program_ids: selectedPrograms.map((p) => p.id),
-        course_type: Number(courseType),
+        course_type: courseType as "course_work" | "research" | "mixed_mode",
       });
 
       showToast("Course type updated successfully.", "success");
@@ -121,7 +121,7 @@ export default function BatchCourseTypePrograms({
               label="Course Type"
               field="course_type"
               required
-              options={COURSE_TYPE_OPTIONS.map((o) => ({ value: String(o.value), label: o.label }))}
+              options={COURSE_TYPE_OPTIONS}
               formData={formData}
               errors={errors}
               updateFormData={(_field: string, value: string) => setCourseType(value)}
