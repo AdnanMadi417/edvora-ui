@@ -1,5 +1,10 @@
 // ── Core Entities ─────────────────────────────────────────────────────────────
 
+// Only meaningful for master/phd programs. Requests and responses both use
+// these strings (breaking change: requests used to take 1/2/3 — the backend
+// now rejects the old ints with a 422).
+export type CourseType = "course_work" | "research" | "mixed_mode";
+
 export interface FieldOfStudy {
   id: string;
   name: string;
@@ -23,7 +28,7 @@ export interface ProgramUniversity {
   description: string;
   logo_file_key: string;
   logo_file_url: string;
-  intake_months: string[];
+  intake_months: number[];
   university_type_id: string;
   university_type_name: string;
 }
@@ -47,6 +52,14 @@ export interface Commission {
   expected_commission_to: string;
 }
 
+// Uppercase per backend contract — sent and received exactly as-is, no other values accepted.
+export type Currency = "MYR" | "USD";
+
+export const CURRENCY_OPTIONS: { value: Currency; label: string }[] = [
+  { value: "MYR", label: "MYR" },
+  { value: "USD", label: "USD" },
+];
+
 export interface YearlyFee {
   year: number;
   fee: number | string;
@@ -60,6 +73,7 @@ export interface ExchangeRate {
 export interface OneTimeFee {
   description: string;
   fee: number | string;
+  currency?: Currency;
 }
 
 // ── Program ───────────────────────────────────────────────────────────────────
@@ -72,12 +86,15 @@ export interface Program {
   visa_fee_amount: number | null;
   first_year_tuition: number | null;
 
-  intake_dates: string[] | null;
-  next_intake: string | null;
+  // Recurring calendar months (1–12) the program takes intakes in — no year, no day.
+  intake_months: number[] | null;
+  next_intake_month: number | null;
 
   duration: number | null;
 
   branch: ProgramBranch;
+  // Applies to every entry in yearly_fees — there is no per-year override.
+  yearly_fee_currency: Currency;
   yearly_fees: YearlyFee[];
   one_time_fees: OneTimeFee[];
 
@@ -99,6 +116,8 @@ export interface Program {
 
   qualification_id: string;
   qualification_level: "bachelor" | "master" | "phd" | string;
+  // Only ever set for master/phd programs — null for every other qualification.
+  course_type: CourseType | null;
 
   field_of_study: FieldOfStudy;
   university: ProgramUniversity;
@@ -122,6 +141,9 @@ export interface GetProgramsParams {
   university_id?: string;
   search?: string;
   has_scholarship?: boolean;
+  // Programs with no course_type (i.e. not master/phd) never match any value here.
+  course_type?: CourseType;
+  class_type?: "physical" | "online";
   sort_by?: "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc";
   page?: number;
   page_size?: number;
@@ -142,7 +164,7 @@ export interface CreateProgramPayload {
   field_of_study_id: string;
   name: string;
   tuition_fee: number;
-  intake_dates: string[];
+  intake_months: number[];
   duration: number;
   english_required_score: string;
   overview: string;
@@ -159,9 +181,15 @@ export interface CreateProgramPayload {
   expected_commission_to: number | null;
 
   qualification_id: string;
+  // Only legal when qualification_id resolves to a master/phd qualification —
+  // omit entirely (or send null) for every other qualification.
+  course_type?: CourseType | null;
 
+  // Defaults to "MYR" on the backend if omitted.
+  yearly_fee_currency?: Currency;
   yearly_fees?: Array<{ year: number; fee: number }>;
-  one_time_fees?: Array<{ description: string; fee: number }>;
+  // Each item's currency defaults to "MYR" on the backend if omitted.
+  one_time_fees?: Array<{ description: string; fee: number; currency?: Currency }>;
 
   scholarships?: Array<{
     type?: number | null;
@@ -179,7 +207,7 @@ export interface UpdateProgramPayload {
   field_of_study_id: string;
   name: string;
   tuition_fee: number;
-  intake_dates: string[];
+  intake_months: number[];
   duration: number;
   english_required_score: string;
   overview: string;
@@ -188,6 +216,10 @@ export interface UpdateProgramPayload {
   is_online: boolean;
   has_scholarship: boolean;
   qualification_id: string;
+  // null resets to the course_work default (for a master/phd program)
+  // rather than clearing — omit the key entirely to leave the existing
+  // value untouched.
+  course_type?: CourseType | null;
 
   commission_amount?: number | null;
   commission_currency?: string;
@@ -196,8 +228,12 @@ export interface UpdateProgramPayload {
   expected_commission_from?: number | null;
   expected_commission_to?: number | null;
 
+  // Omit entirely to leave unchanged — sending null is ignored, not a reset.
+  yearly_fee_currency?: Currency;
+  // When provided, fully replaces the existing list (delete-then-insert): resend
+  // every item's description/fee/currency, not just the changed ones.
   yearly_fees?: Array<{ year: number; fee: number }>;
-  one_time_fees?: Array<{ description: string; fee: number }>;
+  one_time_fees?: Array<{ description: string; fee: number; currency?: Currency }>;
 
   scholarships?: Array<{
     type?: number | null;
@@ -222,11 +258,20 @@ export interface BatchUpdateProgramPayload {
   tuition_fee?: number;
   visa_fee_amount?: number;
 
-  intake_dates?: string[];
+  intake_months?: number[];
   english_required_score?: string;
+  // All-or-nothing: rejected for the whole batch if any selected program
+  // isn't master/phd. null resets every selected program to the
+  // course_work default.
+  course_type?: CourseType | null;
 
+  // Applies to every selected program. Omit entirely to leave unchanged —
+  // sending null is ignored, not a reset.
+  yearly_fee_currency?: Currency;
+  // When provided, fully replaces the existing list (delete-then-insert): resend
+  // every item's description/fee/currency, not just the changed ones.
   yearly_fees?: Array<{ year: number; fee: number }>;
-  one_time_fees?: Array<{ description: string; fee: number }>;
+  one_time_fees?: Array<{ description: string; fee: number; currency?: Currency }>;
 
   scholarships?: Array<{
     type?: number | null;

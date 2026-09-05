@@ -38,9 +38,9 @@ export const programApi = {
     list: () => api.get("/knowledge-hub/states", { headers: authHeader() }),
   },
 
-  partnerIntakeDates: {
+  partnerIntakeMonths: {
     list: (partnerId: string, programId: string) =>
-      api.get(`/partners/${partnerId}/programs/${programId}/intake-dates`, {
+      api.get(`/partners/${partnerId}/programs/${programId}/intake-months`, {
         headers: authHeader(),
       }),
   },

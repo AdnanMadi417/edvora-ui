@@ -88,13 +88,13 @@ export const validateProgram = (formData: FormData): ProgramValidationResult => 
       errors[`one_time_fees[${i}].fee`] = "Fee cannot exceed 9,999,999,999.99";
   });
 
-  // intake_dates — no past dates allowed
-  const today = new Date().toISOString().split("T")[0];
-  (formData.intake_dates || []).forEach((d, i) => {
-    if (d && d < today) {
-      errors[`intake_dates[${i}]`] = "Intake date cannot be in the past";
-    }
-  });
+  // intake_months — recurring calendar months (1–12), each valid and no duplicates
+  const intakeMonths = formData.intake_months || [];
+  if (intakeMonths.some((m) => !Number.isInteger(Number(m)) || Number(m) < 1 || Number(m) > 12)) {
+    errors.intake_months = "Intake months must be valid calendar months";
+  } else if (new Set(intakeMonths).size !== intakeMonths.length) {
+    errors.intake_months = "Each intake month can only be added once";
+  }
 
   // scholarships — validate when has_scholarship
   if (formData.has_scholarship) {
@@ -138,8 +138,6 @@ export const isProgramComplete = (formData: FormData): boolean => {
   if (!formData.qualification_id) return false;
   if (!formData.field_of_study_id) return false;
   if (!formData.is_on_campus && !formData.is_online) return false;
-  const _today = new Date().toISOString().split("T")[0];
-  if ((formData.intake_dates || []).some((d) => d && d < _today)) return false;
   if (formData.commission_amount && Number(formData.commission_amount) > 29_999) return false;
   if ((formData.yearly_fees || []).some((y) => !y.year || Number(y.year) <= 0 || !y.fee || Number(y.fee) <= 0)) return false;
   if ((formData.one_time_fees || []).some((f) => !f.description?.trim() || !f.fee || Number(f.fee) <= 0)) return false;

@@ -418,6 +418,7 @@ export const DURATION = [
 ];
 
 export const IELTS_BANDS = [
+  { score: 0, label: "Not Required" },
   { score: 4, label: "Band 4" },
   { score: 4.5, label: "Band 4.5" },
   { score: 5.0, label: "Band 5" },
@@ -430,6 +431,13 @@ export const IELTS_BANDS = [
   { score: 8.5, label: "Band 8.5" },
   { score: 9.0, label: "Band 9" }
 ];
+
+/** Maps a stored english_required_score back to its IELTS_BANDS label for display. */
+export function getIeltsLabel(score: number | string | null | undefined): string | null {
+  if (score == null || score === "") return null;
+  const match = IELTS_BANDS.find((b) => String(b.score) === String(score));
+  return match ? match.label : String(score);
+}
 
 export const SCHOLARSHIP_TYPE = [
   { value: "1", label: "Full Scholarship" },

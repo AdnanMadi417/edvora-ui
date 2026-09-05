@@ -1,7 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import DataEntryProgramsTable from "features/programs/components/data-entry/DataEntryProgramsTable";
 
 export default function DataEntryKnowledgeHubPage() {
-  return <DataEntryProgramsTable />;
+  return (
+    <Suspense fallback={null}>
+      <DataEntryProgramsTable />
+    </Suspense>
+  );
 }

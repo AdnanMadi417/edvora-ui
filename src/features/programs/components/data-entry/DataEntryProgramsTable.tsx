@@ -22,7 +22,8 @@ import { useAllQualifications } from "features/knowledge-hub/qualifications/hook
 import { useUniversities } from "features/universities/hooks";
 
 import Link from "next/link";
-import ProgramFilterBar from "components/filters/ProgramFilterBar";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import ProgramFilterPanel from "features/programs/components/shared/filters/ProgramFilterPanel";
 import KnowledgeHubTable from "features/programs/components/shared/table/KnowledgeHubTable";
 
 import BatchUpdatePrograms from "features/programs/components/admin/popups/BatchCommissionPrograms";
@@ -39,21 +40,27 @@ type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "deleteSc
 const ITEMS_PER_PAGE = 10;
 
 const DataEntryProgramsTable = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get("search") ?? "");
+  const [debouncedSearch, setDebouncedSearch] = useState(() => searchParams.get("search") ?? "");
+  const [currentPage, setCurrentPage] = useState(() => Number(searchParams.get("page")) || 1);
 
   const { states } = useStates();
   const { fields } = useAllFields();
   const { universities } = useUniversities();
   const { qualifications } = useAllQualifications();
 
-  const [selectedState, setSelectedState] = useState<string>("all");
-  const [selectedField, setSelectedField] = useState<string>("all");
-  const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
-  const [selectedQualId, setSelectedQualId] = useState<string | null>(null);
-  const [hasScholarship, setHasScholarship] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<string>("all");
+  const [selectedState, setSelectedState] = useState<string>(() => searchParams.get("state_id") ?? "all");
+  const [selectedField, setSelectedField] = useState<string>(() => searchParams.get("field_of_study_id") ?? "all");
+  const [selectedUniversity, setSelectedUniversity] = useState<string>(() => searchParams.get("university_id") ?? "all");
+  const [selectedQualId, setSelectedQualId] = useState<string | null>(() => searchParams.get("qualification_id"));
+  const [hasScholarship, setHasScholarship] = useState<string>(() => searchParams.get("has_scholarship") ?? "all");
+  const [courseType, setCourseType] = useState<string>(() => searchParams.get("course_type") ?? "all");
+  const [classType, setClassType] = useState<string>(() => searchParams.get("class_type") ?? "all");
+  const [sortBy, setSortBy] = useState<string>(() => searchParams.get("sort_by") ?? "all");
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -63,9 +70,27 @@ const DataEntryProgramsTable = () => {
     return () => clearTimeout(t);
   }, [searchTerm]);
 
+  // Keep the URL in sync with filter/search/sort/page state so it's
+  // shareable and bookmarkable, and survives a refresh.
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    if (selectedState !== "all") params.set("state_id", selectedState);
+    if (selectedField !== "all") params.set("field_of_study_id", selectedField);
+    if (selectedUniversity !== "all") params.set("university_id", selectedUniversity);
+    if (selectedQualId) params.set("qualification_id", selectedQualId);
+    if (hasScholarship !== "all") params.set("has_scholarship", hasScholarship);
+    if (courseType !== "all") params.set("course_type", courseType);
+    if (classType !== "all") params.set("class_type", classType);
+    if (sortBy !== "all") params.set("sort_by", sortBy);
+    if (currentPage > 1) params.set("page", String(currentPage));
+
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy, currentPage, pathname, router]);
+
   const [activeModal, setActiveModal] = useState<BatchModal | null>(null);
   const [isBulkMenuOpen, setIsBulkMenuOpen] = useState(false);
-  const [showPanel, setShowPanel] = useState(true);
 
   const fieldOptions = useMemo(() => fields.map((f) => ({ label: f.name, value: f.id })), [fields]);
   const universityOptions = useMemo(() => universities.map((u) => ({ label: u.name, value: u.id })), [universities]);
@@ -79,20 +104,12 @@ const DataEntryProgramsTable = () => {
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
     has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+    course_type: courseType !== "all" ? (courseType as "course_work" | "research" | "mixed_mode") : undefined,
+    class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
     sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
-
-  const activeFiltersCount = [
-    selectedState !== "all",
-    selectedField !== "all",
-    selectedUniversity !== "all",
-    selectedQualId !== null,
-    hasScholarship !== "all",
-    sortBy !== "all",
-    searchTerm !== "",
-  ].filter(Boolean).length;
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -114,6 +131,8 @@ const DataEntryProgramsTable = () => {
         state_id: selectedState !== "all" ? selectedState : undefined,
         university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
         has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+        course_type: courseType !== "all" ? (courseType as "course_work" | "research" | "mixed_mode") : undefined,
+        class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
         sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
       };
       const allIds: string[] = [];
@@ -138,7 +157,7 @@ const DataEntryProgramsTable = () => {
     setSelectedPrograms((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, sortBy]);
+  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy]);
 
   const selectedProgramIds = useMemo(
     () => Object.keys(selectedPrograms).filter((id) => selectedPrograms[id]),
@@ -157,15 +176,16 @@ const DataEntryProgramsTable = () => {
     await selectAllPrograms();
   };
 
-  const clearFilters = () => {
-    setSearchTerm("");
-    setDebouncedSearch("");
+  // Scoped to the 5 dropdown filters only — search and sort are separate,
+  // independently-controlled UI and aren't cleared by this.
+  const clearAllFilters = () => {
     setSelectedState("all");
     setSelectedField("all");
     setSelectedUniversity("all");
     setSelectedQualId(null);
     setHasScholarship("all");
-    setSortBy("all");
+    setCourseType("all");
+    setClassType("all");
     setCurrentPage(1);
   };
 
@@ -190,31 +210,47 @@ const DataEntryProgramsTable = () => {
       <div className="p-6 border-b border-slate-200">
 
         {/* Filters */}
-        <ProgramFilterBar
+        <ProgramFilterPanel
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
           searchPlaceholder="Search by university, program, or level..."
-          selectedState={selectedState}
-          onStateChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
           stateOptions={stateOptions}
-          selectedField={selectedField}
-          onFieldChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
           fieldOptions={fieldOptions}
-          selectedUniversity={selectedUniversity}
-          onUniversityChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
           universityOptions={universityOptions}
-          selectedQualId={selectedQualId}
-          onQualChange={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
           qualificationOptions={qualificationOptions}
-          hasScholarship={hasScholarship}
-          onScholarshipChange={(val) => { setHasScholarship(val); setCurrentPage(1); }}
+          filters={{
+            state: selectedState,
+            field: selectedField,
+            university: selectedUniversity,
+            qualId: selectedQualId,
+            scholarship: hasScholarship,
+            courseType,
+            classType,
+          }}
+          onApplyFilters={(values) => {
+            setSelectedState(values.state);
+            setSelectedField(values.field);
+            setSelectedUniversity(values.university);
+            setSelectedQualId(values.qualId);
+            setHasScholarship(values.scholarship);
+            setCourseType(values.courseType);
+            setClassType(values.classType);
+            setCurrentPage(1);
+          }}
+          onRemoveFilter={(key) => {
+            if (key === "state") setSelectedState("all");
+            if (key === "field") setSelectedField("all");
+            if (key === "university") setSelectedUniversity("all");
+            if (key === "qualId") setSelectedQualId(null);
+            if (key === "scholarship") setHasScholarship("all");
+            if (key === "courseType") setCourseType("all");
+            if (key === "classType") setClassType("all");
+            setCurrentPage(1);
+          }}
+          onClearAll={clearAllFilters}
           sortBy={sortBy}
-          onSortChange={(val) => { setSortBy(val); setCurrentPage(1); }}
+          onSortChange={(value) => { setSortBy(value); setCurrentPage(1); }}
           resultsCount={total}
-          activeFiltersCount={activeFiltersCount}
-          onClearFilters={clearFilters}
-          showFilters={showPanel}
-          onToggleFilters={() => setShowPanel((v) => !v)}
         >
           {/* Bulk operations */}
           {selectedCount > 0 && (
@@ -267,7 +303,7 @@ const DataEntryProgramsTable = () => {
               </div>
           </div>
         )}
-      </ProgramFilterBar>
+      </ProgramFilterPanel>
 
       </div>
 

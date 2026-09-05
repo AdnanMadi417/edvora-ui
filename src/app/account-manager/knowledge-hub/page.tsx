@@ -1,11 +1,14 @@
 'use client';
 
+import { Suspense } from "react";
 import KnowledgeHubCard from "features/programs/components/shared/card/ProgramCardGrid";
 
 const Dashboard = () => {
   return (
     <div>
-      <KnowledgeHubCard basePath="/account-manager" showApplyAction={false} />
+      <Suspense fallback={null}>
+        <KnowledgeHubCard basePath="/account-manager" showApplyAction={false} />
+      </Suspense>
     </div>
   );
 };

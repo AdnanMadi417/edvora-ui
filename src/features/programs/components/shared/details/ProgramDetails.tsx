@@ -19,9 +19,11 @@ import {
   Languages,
   Clock,
   Pencil,
+  Layers,
 } from "lucide-react";
 
 import { useProgram } from "features/programs/hooks";
+import { getIeltsLabel } from "constants/lists";
 
 import Link from "next/link";
 import Loading from "components/loading/Loading";
@@ -29,8 +31,10 @@ import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 import CurrencySelector from "features/programs/components/shared/CurrencySelector";
-import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
-import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate } from "features/programs/utils/exchangeRate";
+import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
+import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate, formatFeeAmount } from "features/programs/utils/exchangeRate";
+import { monthLabel, nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
+import { courseTypeLabel } from "features/programs/utils/courseType";
 
 type RequiredDocument = {
   id: string;
@@ -141,19 +145,12 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
 
   const { program, requiredDocuments, commission, exchangeRates, loading, error } = useProgram(id);
   const [copied, setCopied] = useState(false);
-  const [currency, setCurrency] = useState("MYR");
+  const [currency, setCurrency] = useState<string | null>(null);
 
   const currencyOptions = getCurrencyOptions(exchangeRates);
   const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
   const formatCommission = (amount: number, curr?: string | null) => formatCommissionRate(amount, curr, currency, exchangeRates);
-
-  const nextIntakeDate = (() => {
-    const today = new Date();
-    return program?.intake_dates
-      ?.map((d) => new Date(d))
-      .filter((d) => d >= today)
-      .sort((a, b) => a.getTime() - b.getTime())[0] ?? null;
-  })();
+  const formatFee = (fee: number | string, feeCurrency?: string | null) => formatFeeAmount(fee, feeCurrency, currency, exchangeRates);
 
   const getOrdinal = (n: number) => {
     const s = ["th", "st", "nd", "rd"];
@@ -177,13 +174,11 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
     lines.push("");
 
     if (program?.duration) lines.push(`Duration: ${program.duration} year(s)`);
-    if (program?.english_required_score) lines.push(`English requirement: IELTS ${program.english_required_score}`);
+    if (program?.english_required_score) lines.push(`English requirement: IELTS ${getIeltsLabel(program.english_required_score)}`);
     lines.push("");
 
-    if (program?.intake_dates && program.intake_dates.length > 0) {
-      const months = [...program.intake_dates]
-        .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-        .map((d) => new Date(d).toLocaleString("en-US", { month: "short" }));
+    if (program?.intake_months && program.intake_months.length > 0) {
+      const months = [...program.intake_months].sort((a, b) => a - b).map((m) => monthLabel(m));
       lines.push(`Intake: ${months.join(" / ")}`);
     }
     lines.push("");
@@ -193,8 +188,8 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
     lines.push("Yearly Tuition fees");
     lines.push("");
 
-    (program?.yearly_fees ?? []).forEach((item) => {
-      lines.push(`${getOrdinal(item.year)} year: ${formatMoney(item.fee)}`);
+    [...(program?.yearly_fees ?? [])].sort((a, b) => a.year - b.year).forEach((item) => {
+      lines.push(`${getOrdinal(item.year)} year: ${formatFee(item.fee, program?.yearly_fee_currency)}`);
     });
 
     lines.push("");
@@ -203,7 +198,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
     lines.push("");
 
     (program?.one_time_fees ?? []).forEach((item) => {
-      lines.push(`${item.description ?? "Fee"} : ${formatMoney(item.fee)}`);
+      lines.push(`${item.description ?? "Fee"} : ${formatFee(item.fee, item.currency)}`);
     });
 
     lines.push("");
@@ -270,7 +265,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
             <Banknote className="h-5 w-5 text-slate-400" />
             <p className="text-xs text-slate-500">First Year</p>
             <p className="text-xl font-bold text-slate-800">
-              {program?.yearly_fees?.[0]?.fee != null ? formatMoney(program.yearly_fees[0].fee) : "—"}
+              {program?.first_year_tuition != null ? formatFee(program.first_year_tuition, program.yearly_fee_currency) : "—"}
             </p>
           </div>
 
@@ -286,7 +281,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
             <Calendar className="h-5 w-5 text-slate-400" />
             <p className="text-xs text-slate-500">Next Intake</p>
             <p className="text-xl font-bold text-slate-800">
-              {nextIntakeDate ? nextIntakeDate.toLocaleString("en-US", { month: "short" }) : "—"}
+              {program?.next_intake_month ? monthLabel(program.next_intake_month) : "—"}
             </p>
           </div>
         </div>
@@ -326,6 +321,18 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
               </div>
             </div>
 
+            {program?.course_type && (
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+                  <Layers className="h-5 w-5 text-slate-500" />
+                </div>
+                <div>
+                  <p className="text-xs text-slate-500">Course Type</p>
+                  <p className="text-sm font-semibold text-slate-900">{courseTypeLabel(program.course_type)}</p>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
                 <GraduationCap className="h-5 w-5 text-slate-500" />
@@ -353,20 +360,20 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
               <div>
                 <p className="text-xs text-slate-500">English</p>
                 <p className="text-sm font-semibold text-slate-900">
-                  {program?.english_required_score ? `IELTS ${program.english_required_score}` : "Not Provided"}
+                  {program?.english_required_score ? `IELTS ${getIeltsLabel(program.english_required_score)}` : "Not Provided"}
                 </p>
               </div>
             </div>
 
-            {program?.intake_dates && program.intake_dates.length > 0 && (
+            {program?.intake_months && program.intake_months.length > 0 && (
               <div className="col-span-1 flex items-start gap-3 md:col-span-2">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
                   <Calendar className="h-5 w-5 text-slate-500" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-xs text-slate-500">Intake Dates</p>
+                  <p className="text-xs text-slate-500">Intake Months</p>
                   <div className="mt-1.5">
-                    <IntakeDatesChips dates={program.intake_dates} />
+                    <IntakeMonthsChips months={program.intake_months} />
                   </div>
                 </div>
               </div>
@@ -411,11 +418,11 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
                 </div>
                 <div className="overflow-hidden">
                   {program?.yearly_fees?.length ? (
-                    program.yearly_fees.map((item, index) => (
-                      <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
+                    [...program.yearly_fees].sort((a, b) => a.year - b.year).map((item) => (
+                      <div key={item.year} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">Year {item.year}</div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                          {formatMoney(item.fee)}
+                          {formatFee(item.fee, program?.yearly_fee_currency)}
                         </div>
                       </div>
                     ))
@@ -441,7 +448,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
                       <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
                         <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">{item.description ?? "Fee"}</div>
                         <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                          {formatMoney(item.fee)}
+                          {formatFee(item.fee, item.currency)}
                         </div>
                       </div>
                     ))
@@ -586,10 +593,10 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
                 query: {
                   program_id: program.id,
                   university_id: program.university.id,
-                  intake_date:
-                    program.intake_dates?.[0] ??
-                    program.university.intake_months?.[0] ??
-                    "",
+                  intake_date: (() => {
+                    const month = program.next_intake_month ?? nextIntakeMonth(program.intake_months) ?? nextIntakeMonth(program.university.intake_months);
+                    return month ? resolveIntakeDate(month) : "";
+                  })(),
                 },
               }}
               className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"

@@ -16,12 +16,14 @@ import {
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 import PresignedImage from "components/ui/PresignedImage";
+import { getIeltsLabel } from "constants/lists";
 import IconButton from "components/ui/buttons/IconButton";
 import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { StatusBadge } from "components/ui/badges";
 import { useToast } from "components/context/ToastContext";
 import type { Program } from "features/programs/types";
-import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
+import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
+import { courseTypeLabel } from "features/programs/utils/courseType";
 
 function ProgramUniversityCell({ program }: { program: Program }) {
   const tags: { label: string; color: "green" | "blue" | "gray" }[] = [];
@@ -258,6 +260,12 @@ export default function KnowledgeHubTable({
                     </h3>
                     <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
                       <span className="font-medium capitalize text-slate-700">{program.qualification_level}</span>
+                      {program.course_type && (
+                        <>
+                          <span className="text-slate-300">•</span>
+                          <span className="text-slate-500">{courseTypeLabel(program.course_type)}</span>
+                        </>
+                      )}
                       {program.field_of_study?.name && (
                         <>
                           <span className="text-slate-300">•</span>
@@ -296,7 +304,7 @@ export default function KnowledgeHubTable({
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center gap-1">
                     <span className="font-semibold text-slate-700">First Year:</span>
-                    <span>{program.first_year_tuition != null ? `RM ${program.first_year_tuition.toLocaleString()}` : "—"}</span>
+                    <span>{program.first_year_tuition != null ? `${program.yearly_fee_currency || "MYR"} ${program.first_year_tuition.toLocaleString()}` : "—"}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="font-semibold text-slate-700">Commission:</span>
@@ -312,13 +320,13 @@ export default function KnowledgeHubTable({
               {/* Intakes */}
               <td className="px-6 py-4">
                 <div className="flex flex-col gap-1.5 text-xs text-slate-600">
-                  {program.intake_dates && program.intake_dates.length > 0 ? (
-                    <IntakeDatesChips dates={program.intake_dates} size="sm" showYear showDot={false} maxVisible={2} />
+                  {program.intake_months && program.intake_months.length > 0 ? (
+                    <IntakeMonthsChips months={program.intake_months} size="sm" showDot={false} maxVisible={2} />
                   ) : (
                     <span className="text-slate-400">TBA</span>
                   )}
                   {program.english_required_score != null && (
-                    <span className="text-slate-400">IELTS: {program.english_required_score}</span>
+                    <span className="text-slate-400">IELTS: {getIeltsLabel(program.english_required_score)}</span>
                   )}
                 </div>
               </td>
