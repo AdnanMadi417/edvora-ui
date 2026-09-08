@@ -7,7 +7,7 @@ export default function AccountManagerProfilePage() {
   const params = useParams();
   const id = params.id as string;
 
-  const { manager, loading, error } = useAccountManagerDetails(id);
+  const { manager, loading, error, refetch } = useAccountManagerDetails(id);
 
   if (loading) return <div className="p-6">Loading...</div>;
   if (error) return <div className="p-6 text-red-500">{error}</div>;
@@ -15,7 +15,7 @@ export default function AccountManagerProfilePage() {
 
   return (
     <div className="pt-6">
-      <AccountManagerDetailsTabs manager={manager} />
+      <AccountManagerDetailsTabs manager={manager} onManagerChanged={refetch} />
     </div>
   );
 }
