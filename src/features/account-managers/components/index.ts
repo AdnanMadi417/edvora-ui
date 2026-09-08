@@ -6,3 +6,4 @@ export { default as CreateAccountManager } from "./CreateAccountManager";
 export { default as EditAccountManager } from "./EditAccountManager";
 export { default as DeleteAccountManagerModal } from "./DeleteAccountManagerModal";
 export { default as TransferPartnersModal } from "./TransferPartnersModal";
+export { default as UnsharePartnersModal } from "./UnsharePartnersModal";

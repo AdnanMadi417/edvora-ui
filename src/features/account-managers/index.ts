@@ -9,4 +9,5 @@ export {
   EditAccountManager,
   DeleteAccountManagerModal,
   TransferPartnersModal,
+  UnsharePartnersModal,
 } from "./components";

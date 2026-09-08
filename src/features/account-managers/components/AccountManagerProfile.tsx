@@ -1,4 +1,4 @@
-import { AlertCircle, Check, Users, X } from "lucide-react";
+import { AlertCircle, Check, Share2, Users, X } from "lucide-react";
 import React from "react";
 import { StatusBadge } from "components/ui/badges";
 import type { AccountManager } from "../types";
@@ -43,16 +43,23 @@ export default function AccountManagerProfile({ manager }: AccountManagerProfile
               Assigned Partners
             </span>
 
-            {Number(manager.assigned_partners_count) > 0 ? (
-              <StatusBadge variant="success" icon={<Users className="h-3 w-3" />} className="w-fit">
-                {Number(manager.assigned_partners_count)} Partner
-                {Number(manager.assigned_partners_count) !== 1 && "s"}
-              </StatusBadge>
-            ) : (
-              <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>
-                Needs Partner
-              </StatusBadge>
-            )}
+            <div className="flex flex-wrap items-center gap-1.5">
+              {Number(manager.assigned_partners_count) > 0 ? (
+                <StatusBadge variant="success" icon={<Users className="h-3 w-3" />} className="w-fit">
+                  {Number(manager.assigned_partners_count)} Partner
+                  {Number(manager.assigned_partners_count) !== 1 && "s"}
+                </StatusBadge>
+              ) : (
+                <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>
+                  Needs Partner
+                </StatusBadge>
+              )}
+              {Number(manager.shared_partners_count ?? 0) > 0 && (
+                <StatusBadge variant="info" icon={<Share2 className="h-3 w-3" />} className="w-fit">
+                  {Number(manager.shared_partners_count)} shared
+                </StatusBadge>
+              )}
+            </div>
           </div>
         </div>
       </div>

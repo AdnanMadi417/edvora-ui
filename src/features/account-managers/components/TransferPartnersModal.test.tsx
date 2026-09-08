@@ -40,6 +40,19 @@ const TARGET = {
   assigned_partners: [{ id: "p9", name: "B Own" }],
 };
 
+const MOVE_RESULT = {
+  mode: "move" as const,
+  source_manager_id: "manager-a",
+  target_manager_id: "manager-b",
+  moved_partners_count: 2,
+  moved_agency_members_count: 3,
+  moved_partner_ids: ["p1", "p2"],
+  shared_partners_count: 0,
+  shared_agency_members_count: 0,
+  already_shared_count: 0,
+  shared_partner_ids: [],
+};
+
 function apiError(status: number, code: string, details?: unknown) {
   return new AxiosError("Request failed", String(status), undefined, undefined, {
     status,
@@ -50,7 +63,7 @@ function apiError(status: number, code: string, details?: unknown) {
   });
 }
 
-function setup(overrides: { transfer?: jest.Mock; managers?: unknown[] } = {}) {
+function setup(overrides: { transfer?: jest.Mock; managers?: unknown[]; allowShare?: boolean } = {}) {
   const transfer = overrides.transfer ?? jest.fn();
   mockedUseAccountManagers.mockReturnValue({
     accountManagers: overrides.managers ?? [SOURCE, TARGET],
@@ -62,7 +75,13 @@ function setup(overrides: { transfer?: jest.Mock; managers?: unknown[] } = {}) {
   const onClose = jest.fn();
   const onTransferred = jest.fn();
   render(
-    <TransferPartnersModal isOpen onClose={onClose} sourceManager={SOURCE} onTransferred={onTransferred} />
+    <TransferPartnersModal
+      isOpen
+      onClose={onClose}
+      sourceManager={SOURCE}
+      onTransferred={onTransferred}
+      allowShare={overrides.allowShare}
+    />
   );
   return { transfer, onClose, onTransferred };
 }
@@ -74,11 +93,12 @@ describe("TransferPartnersModal", () => {
     mockedUseTransferPartners.mockReset();
   });
 
-  it("explains the move, previews the partners, and excludes the source from the target list", async () => {
+  it("defaults to Transfer, explains the move, previews the partners, and excludes the source", async () => {
     const user = userEvent.setup();
     setup();
 
-    expect(screen.getByText("Transfer Partners")).toBeInTheDocument();
+    expect(screen.getByText("Transfer or Share Partners")).toBeInTheDocument();
+    expect(screen.getByRole("radio", { name: /Transfer/ })).toHaveAttribute("aria-checked", "true");
     expect(screen.getByText(/Move all 2 partners from/)).toBeInTheDocument();
     expect(screen.getByText(/Sarah will no longer see these partners/)).toBeInTheDocument();
 
@@ -104,14 +124,7 @@ describe("TransferPartnersModal", () => {
 
   it("transfers, toasts the moved count, notifies the caller and closes", async () => {
     const user = userEvent.setup();
-    const result = {
-      source_manager_id: "manager-a",
-      target_manager_id: "manager-b",
-      moved_partners_count: 2,
-      moved_agency_members_count: 3,
-      moved_partner_ids: ["p1", "p2"],
-    };
-    const { transfer, onClose, onTransferred } = setup({ transfer: jest.fn().mockResolvedValue(result) });
+    const { transfer, onClose, onTransferred } = setup({ transfer: jest.fn().mockResolvedValue(MOVE_RESULT) });
 
     await user.selectOptions(screen.getByRole("combobox"), "manager-b");
     await user.click(screen.getByRole("button", { name: /Transfer 2 partners/ }));
@@ -119,7 +132,50 @@ describe("TransferPartnersModal", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(transfer).toHaveBeenCalledWith("manager-a", { target_manager_id: "manager-b", mode: "move" });
     expect(mockShowToast).toHaveBeenCalledWith("2 partners transferred to Ahmad Razak", "success");
-    expect(onTransferred).toHaveBeenCalledWith(result);
+    expect(onTransferred).toHaveBeenCalledWith(MOVE_RESULT);
+  });
+
+  it("switching to Share changes the copy, the confirm label, and sends mode=copy", async () => {
+    const user = userEvent.setup();
+    const shareResult = { ...MOVE_RESULT, mode: "copy" as const, moved_partners_count: 0, shared_partners_count: 2, shared_partner_ids: ["p1", "p2"] };
+    const { transfer } = setup({ transfer: jest.fn().mockResolvedValue(shareResult) });
+
+    await user.click(screen.getByRole("radio", { name: /Share/ }));
+
+    expect(screen.getByText(/Share all 2 partners of/)).toBeInTheDocument();
+    expect(screen.getByText(/Sarah keeps these partners/)).toBeInTheDocument();
+    expect(screen.getByText(/not shared automatically/)).toBeInTheDocument();
+    expect(screen.getByText("Share with account manager")).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await user.click(screen.getByRole("button", { name: /Share 2 partners/ }));
+
+    await waitFor(() =>
+      expect(transfer).toHaveBeenCalledWith("manager-a", { target_manager_id: "manager-b", mode: "copy" })
+    );
+    expect(mockShowToast).toHaveBeenCalledWith("2 partners shared with Ahmad Razak", "success");
+  });
+
+  it("mentions partners the target already had when sharing", async () => {
+    const user = userEvent.setup();
+    const shareResult = { ...MOVE_RESULT, mode: "copy" as const, moved_partners_count: 0, shared_partners_count: 1, already_shared_count: 1 };
+    setup({ transfer: jest.fn().mockResolvedValue(shareResult) });
+
+    await user.click(screen.getByRole("radio", { name: /Share/ }));
+    await user.selectOptions(screen.getByRole("combobox"), "manager-b");
+    await user.click(screen.getByRole("button", { name: /Share 2 partners/ }));
+
+    await waitFor(() =>
+      expect(mockShowToast).toHaveBeenCalledWith("1 partner shared with Ahmad Razak (1 already had access)", "success")
+    );
+  });
+
+  it("hides the Share option when allowShare is false", () => {
+    setup({ allowShare: false });
+
+    expect(screen.getByText("Transfer Partners")).toBeInTheDocument();
+    expect(screen.queryByRole("radio")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Transfer 2 partners/ })).toBeInTheDocument();
   });
 
   it("maps a known backend code to admin-facing copy and stays open", async () => {
@@ -163,6 +219,6 @@ describe("TransferPartnersModal", () => {
 
     render(<TransferPartnersModal isOpen={false} onClose={jest.fn()} sourceManager={SOURCE} />);
 
-    expect(screen.queryByText("Transfer Partners")).not.toBeInTheDocument();
+    expect(screen.queryByText("Transfer or Share Partners")).not.toBeInTheDocument();
   });
 });
