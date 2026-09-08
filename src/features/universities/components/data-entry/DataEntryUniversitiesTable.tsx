@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Plus, RefreshCw, CheckCircle, XCircle, GraduationCap } from "lucide-react";
 import PresignedImage from "components/ui/PresignedImage";
-import { AppDate } from "components/ui/date";
+import { monthLabel } from "features/programs/utils/intakeMonths";
 import { useUniversities } from "features/universities/hooks";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
@@ -149,7 +149,7 @@ export default function DataEntryUniversitiesTable() {
               <tr className="border-b border-slate-200 bg-slate-50">
                 <th className="min-w-[220px] px-6 py-4 text-start text-sm font-semibold text-slate-900">University</th>
                 <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">Country</th>
-                <th className="min-w-[180px] px-6 py-4 text-start text-sm font-semibold text-slate-900">Next Intake</th>
+                <th className="min-w-[180px] px-6 py-4 text-start text-sm font-semibold text-slate-900">Intake Months</th>
                 <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">Status</th>
                 <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">Actions</th>
               </tr>
@@ -198,12 +198,12 @@ export default function DataEntryUniversitiesTable() {
                   <td className="min-w-[180px] px-6 py-4">
                     <div className="flex flex-wrap gap-2">
                       {uni.intake_months && uni.intake_months.length > 0 ? (
-                        uni.intake_months.map((date: string, index: number) => (
+                        uni.intake_months.map((month: number, index: number) => (
                           <span
                             key={index}
                             className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
                           >
-                            <AppDate value={date} format="month" />
+                            {monthLabel(month)}
                           </span>
                         ))
                       ) : (

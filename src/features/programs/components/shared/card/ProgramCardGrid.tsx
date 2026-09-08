@@ -12,8 +12,11 @@ import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useUniversities } from "features/universities/hooks";
 
-import ProgramFilterBar from "components/filters/ProgramFilterBar";
-import IntakeDatesChips from "features/programs/components/shared/IntakeDatesChips";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import ProgramFilterPanel from "features/programs/components/shared/filters/ProgramFilterPanel";
+import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
+import { nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
+import { courseTypeLabel } from "features/programs/utils/courseType";
 import NextButton from "components/ui/buttons/NextButton";
 import PrevButton from "components/ui/buttons/PrevButton";
 import Link from "next/link";
@@ -26,17 +29,22 @@ interface ProgramsCardsProps {
 }
 
 const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: ProgramsCardsProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const [selectedState, setSelectedState] = useState<string>("all");
-  const [selectedField, setSelectedField] = useState<string>("all");
-  const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
-  const [selectedQualId, setSelectedQualId] = useState<string | null>(null);
-  const [hasScholarship, setHasScholarship] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<string>("all");
-  const [showFilters, setShowFilters] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get("search") ?? "");
+  const [debouncedSearch, setDebouncedSearch] = useState(() => searchParams.get("search") ?? "");
+  const [currentPage, setCurrentPage] = useState(() => Number(searchParams.get("page")) || 1);
+
+  const [selectedState, setSelectedState] = useState<string>(() => searchParams.get("state_id") ?? "all");
+  const [selectedField, setSelectedField] = useState<string>(() => searchParams.get("field_of_study_id") ?? "all");
+  const [selectedUniversity, setSelectedUniversity] = useState<string>(() => searchParams.get("university_id") ?? "all");
+  const [selectedQualId, setSelectedQualId] = useState<string | null>(() => searchParams.get("qualification_id"));
+  const [hasScholarship, setHasScholarship] = useState<string>(() => searchParams.get("has_scholarship") ?? "all");
+  const [courseType, setCourseType] = useState<string>(() => searchParams.get("course_type") ?? "all");
+  const [classType, setClassType] = useState<string>(() => searchParams.get("class_type") ?? "all");
+  const [sortBy, setSortBy] = useState<string>(() => searchParams.get("sort_by") ?? "all");
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -45,6 +53,25 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
     }, 400);
     return () => clearTimeout(t);
   }, [searchTerm]);
+
+  // Keep the URL in sync with filter/search/sort/page state so it's
+  // shareable and bookmarkable, and survives a refresh.
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (debouncedSearch) params.set("search", debouncedSearch);
+    if (selectedState !== "all") params.set("state_id", selectedState);
+    if (selectedField !== "all") params.set("field_of_study_id", selectedField);
+    if (selectedUniversity !== "all") params.set("university_id", selectedUniversity);
+    if (selectedQualId) params.set("qualification_id", selectedQualId);
+    if (hasScholarship !== "all") params.set("has_scholarship", hasScholarship);
+    if (courseType !== "all") params.set("course_type", courseType);
+    if (classType !== "all") params.set("class_type", classType);
+    if (sortBy !== "all") params.set("sort_by", sortBy);
+    if (currentPage > 1) params.set("page", String(currentPage));
+
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy, currentPage, pathname, router]);
 
   const { states } = useStates();
   const { fields } = useAllFields();
@@ -69,34 +96,27 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
     state_id: selectedState !== "all" ? selectedState : undefined,
     university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
     has_scholarship: hasScholarship === "true" ? true : hasScholarship === "false" ? false : undefined,
+    course_type: courseType !== "all" ? (courseType as "course_work" | "research" | "mixed_mode") : undefined,
+    class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
     sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
 
-  const activeFiltersCount = [
-    selectedState !== "all",
-    selectedField !== "all",
-    selectedUniversity !== "all",
-    selectedQualId !== null,
-    hasScholarship !== "all",
-    sortBy !== "all",
-    searchTerm !== "",
-  ].filter(Boolean).length;
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
-  const clearFilters = () => {
-    setSearchTerm("");
-    setDebouncedSearch("");
+  // Scoped to the 5 dropdown filters only — search and sort are separate,
+  // independently-controlled UI and aren't cleared by this.
+  const clearAllFilters = () => {
     setSelectedState("all");
     setSelectedField("all");
     setSelectedUniversity("all");
     setSelectedQualId(null);
     setHasScholarship("all");
-    setSortBy("all");
+    setCourseType("all");
+    setClassType("all");
     setCurrentPage(1);
   };
 
@@ -119,31 +139,47 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
 
           <div className="p-6 border-b border-slate-200">
 
-            <ProgramFilterBar
+            <ProgramFilterPanel
             searchTerm={searchTerm}
             onSearchChange={handleSearchChange}
             searchPlaceholder="Search by university, program, or level..."
-            selectedState={selectedState}
-            onStateChange={(val) => { setSelectedState(val); setCurrentPage(1); }}
             stateOptions={stateOptions}
-            selectedField={selectedField}
-            onFieldChange={(val) => { setSelectedField(val); setCurrentPage(1); }}
             fieldOptions={fieldOptions}
-            selectedUniversity={selectedUniversity}
-            onUniversityChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
             universityOptions={universityOptions}
-            selectedQualId={selectedQualId}
-            onQualChange={(id) => { setSelectedQualId(id); setCurrentPage(1); }}
             qualificationOptions={qualificationOptions}
-            hasScholarship={hasScholarship}
-            onScholarshipChange={(val) => { setHasScholarship(val); setCurrentPage(1); }}
+            filters={{
+              state: selectedState,
+              field: selectedField,
+              university: selectedUniversity,
+              qualId: selectedQualId,
+              scholarship: hasScholarship,
+              courseType,
+              classType,
+            }}
+            onApplyFilters={(values) => {
+              setSelectedState(values.state);
+              setSelectedField(values.field);
+              setSelectedUniversity(values.university);
+              setSelectedQualId(values.qualId);
+              setHasScholarship(values.scholarship);
+              setCourseType(values.courseType);
+              setClassType(values.classType);
+              setCurrentPage(1);
+            }}
+            onRemoveFilter={(key) => {
+              if (key === "state") setSelectedState("all");
+              if (key === "field") setSelectedField("all");
+              if (key === "university") setSelectedUniversity("all");
+              if (key === "qualId") setSelectedQualId(null);
+              if (key === "scholarship") setHasScholarship("all");
+              if (key === "courseType") setCourseType("all");
+              if (key === "classType") setClassType("all");
+              setCurrentPage(1);
+            }}
+            onClearAll={clearAllFilters}
             sortBy={sortBy}
-            onSortChange={(val) => { setSortBy(val); setCurrentPage(1); }}
+            onSortChange={(value) => { setSortBy(value); setCurrentPage(1); }}
             resultsCount={total}
-            activeFiltersCount={activeFiltersCount}
-            onClearFilters={clearFilters}
-            showFilters={showFilters}
-            onToggleFilters={() => setShowFilters((v) => !v)}
           />
 
           </div>
@@ -211,7 +247,7 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                         <p className="text-xs text-slate-400">First Year</p>
                         <p className="text-sm font-bold text-slate-900">
                           {program.first_year_tuition
-                            ? `RM ${program.first_year_tuition.toLocaleString()}`
+                            ? `${program.yearly_fee_currency || "MYR"} ${program.first_year_tuition.toLocaleString()}`
                             : "N/A"}
                         </p>
                       </div>
@@ -219,6 +255,11 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                         <p className="text-xs text-slate-400">Level</p>
                         <p className="text-sm font-bold text-slate-900">
                           {program.qualification_level ?? "N/A"}
+                          {program.course_type && (
+                            <span className="block text-xs font-medium text-slate-500">
+                              {courseTypeLabel(program.course_type)}
+                            </span>
+                          )}
                         </p>
                       </div>
                       <div>
@@ -236,10 +277,10 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                     </div>
 
                     {/* Intake Dates */}
-                    {program.intake_dates && program.intake_dates.length > 0 && (
+                    {program.intake_months && program.intake_months.length > 0 && (
                       <div className="px-4 pb-3">
                         <p className="mb-1.5 text-xs text-slate-400">Intakes</p>
-                        <IntakeDatesChips dates={program.intake_dates} size="sm" showYear showDot={false} />
+                        <IntakeMonthsChips months={program.intake_months} size="sm" showDot={false} maxVisible={3} />
                       </div>
                     )}
 
@@ -277,10 +318,10 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                             query: {
                               program_id: program.id,
                               university_id: program.university.id,
-                              intake_date:
-                                program.intake_dates?.[0] ??
-                                program.university.intake_months?.[0] ??
-                                new Date().toISOString().split("T")[0],
+                              intake_date: (() => {
+                                const month = program.next_intake_month ?? nextIntakeMonth(program.intake_months) ?? nextIntakeMonth(program.university.intake_months);
+                                return month ? resolveIntakeDate(month) : new Date().toISOString().split("T")[0];
+                              })(),
                             },
                           }}
                           onClick={(e) => e.stopPropagation()}

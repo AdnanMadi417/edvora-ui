@@ -2,6 +2,7 @@ import React from "react";
 import { MdAssignmentTurnedIn } from "react-icons/md";
 import { AppDate } from "components/ui/date";
 import { SectionIconBadge } from "components/ui/icons";
+import { courseTypeLabel } from "features/programs/utils/courseType";
 
 interface ApplicationInfoSectionProps {
   application: any;
@@ -35,6 +36,16 @@ export default function ApplicationInfoSection({ application }: ApplicationInfoS
           <span className="text-p2 text-slate-500">{university.country || "Not provided"}</span>
         </div>
         <div>
+          <span className="block text-p1 font-medium text-slate-900">Qualification</span>
+          <span className="text-p2 text-slate-500 capitalize">{program.qualification_level || "Not provided"}</span>
+        </div>
+        {program.course_type && (
+          <div>
+            <span className="block text-p1 font-medium text-slate-900">Course Type</span>
+            <span className="text-p2 text-slate-500">{courseTypeLabel(program.course_type)}</span>
+          </div>
+        )}
+        <div>
           <span className="block text-p1 font-medium text-slate-900">Partner</span>
           <span className="text-p2 text-slate-500">{partner.name || "Not provided"}</span>
         </div>
@@ -49,7 +60,7 @@ export default function ApplicationInfoSection({ application }: ApplicationInfoS
         <div>
           <span className="block text-p1 font-medium text-slate-900">Intake Date</span>
           <span className="text-p2 text-slate-500">
-            <AppDate value={application.intake_date} format="short" fallback="Not provided" />
+            <AppDate value={application.intake_date} format="month" fallback="Not provided" />
           </span>
         </div>
         <div>

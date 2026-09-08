@@ -40,7 +40,7 @@ import AssignPaymentUniversity from "../popups/AssignPaymentMethods";
 import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import { AppDate } from "components/ui/date";
+import { monthLabel } from "features/programs/utils/intakeMonths";
 
 const UniversitiesTable = () => {
   const router = useRouter();
@@ -360,7 +360,7 @@ const UniversitiesTable = () => {
                 <th className="group min-w-[250px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900 transition-colors">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-slate-500" />
-                    <span>Next Intake</span>
+                    <span>Intake Months</span>
                   </div>
                 </th>
 
@@ -495,12 +495,12 @@ const UniversitiesTable = () => {
                       {uni.intake_months &&
                       uni.intake_months.length > 0 ? (
                         uni.intake_months.map(
-                          (date: string, index: number) => (
+                          (month: number, index: number) => (
                             <span
                               key={index}
                               className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
                             >
-                                      <AppDate value={date} format="month" />
+                                      {monthLabel(month)}
                                     </span>
                           )
                         )

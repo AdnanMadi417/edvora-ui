@@ -22,8 +22,8 @@ export type Program = {
   tuition_fee: number | null;
   first_year_tuition: number | null;
   branch: Branch | null;
-  intake_dates: string[] | null;
-  next_intake: string | null;
+  intake_months: number[] | null;
+  next_intake_month: number | null;
   duration: number | null;
   yearly_fees: { year: string; fee: string }[];
   one_time_fees: number[];
@@ -45,7 +45,7 @@ export type Program = {
     logo_file_url: string;
     description: string | null;
     state: string | null;
-    intake_months: string[] | null;
+    intake_months: number[] | null;
   };
 };
 

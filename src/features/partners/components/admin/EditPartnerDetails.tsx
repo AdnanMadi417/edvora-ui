@@ -221,7 +221,15 @@ export default function EditPartnerDetails({ id }: Props) {
       name: partner.name || "",
       country: partner.country || "",
       email: partner.email || "",
-      type: partner.type || "",
+      // Only trust partner.type if it's one of the values this form (and the
+      // update endpoint) actually understands — a stale/legacy value like
+      // "Business" would otherwise round-trip straight back to the API
+      // untouched (see the type validation below) and get rejected with a
+      // 422, with no indication to the admin of what's actually wrong.
+      // Falling back to "" instead makes the dropdown honestly show
+      // unselected, so "Partner type is required" fires and the admin picks
+      // a real value, self-healing the record on save.
+      type: PARTNER_TYPE.some((t) => t.value === partner.type) ? partner.type : "",
       phone_code: phoneMatch ? phoneMatch[1] : "+60",
       phone_number: phoneMatch ? phoneMatch[2] : rawPhone,
       manager_id: partner.assigned_manager_id || "",
@@ -351,7 +359,11 @@ export default function EditPartnerDetails({ id }: Props) {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Enter a valid email address";
 
     if (!formData.country) newErrors.country = "Country is required";
-    if (!formData.type) newErrors.type = "Partner type is required";
+    // Not just a truthiness check — a value that isn't "individual" or
+    // "agency" (e.g. a stale/legacy value carried over from partner.type)
+    // must also be rejected here, not silently sent to the update endpoint,
+    // which only accepts those two and 422s on anything else.
+    if (!PARTNER_TYPE.some((t) => t.value === formData.type)) newErrors.type = "Partner type is required";
 
     if (!formData.phone_number.trim()) newErrors.phone_number = "Phone number is required";
     else if (formData.phone_number.trim().length < 5) newErrors.phone_number = "Phone number must be at least 5 digits";

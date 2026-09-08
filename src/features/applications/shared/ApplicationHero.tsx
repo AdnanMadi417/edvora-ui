@@ -40,7 +40,7 @@ export default function ApplicationHero({ application, children }: ApplicationHe
             {application.intake_date && (
               <div className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500 sm:hidden">
                 <Clock className="h-3 w-3" />
-                <span>Intake: <AppDate value={application.intake_date} format="short" fallback="Not provided" /></span>
+                <span>Intake: <AppDate value={application.intake_date} format="month" fallback="Not provided" /></span>
               </div>
             )}
             <div className="mt-1 block md:flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500">
@@ -97,7 +97,7 @@ export default function ApplicationHero({ application, children }: ApplicationHe
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Intake Date</p>
           <p className="mt-1 flex items-center justify-start gap-2 text-lg font-bold text-slate-900">
             <Calendar className="h-4 w-4 text-blue-400" />
-            <AppDate value={application.intake_date} format="short" fallback="Not provided" />
+            <AppDate value={application.intake_date} format="month" fallback="Not provided" />
           </p>
         </div>
       </div>

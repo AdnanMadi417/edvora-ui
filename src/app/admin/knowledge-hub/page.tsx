@@ -1,11 +1,14 @@
 "use client";
 
+import { Suspense } from "react";
 import ProgramsTable from "features/programs/components/admin/table/ProgramsTable";
 
 const KnowledgeHubOverview = () => {
   return (
     <div>
-      <ProgramsTable />
+      <Suspense fallback={null}>
+        <ProgramsTable />
+      </Suspense>
     </div>
   );
 };

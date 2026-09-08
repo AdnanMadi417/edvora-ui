@@ -7,7 +7,7 @@ import { useBatchUpdatePrograms } from "features/programs/hooks";
 
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
-import MultipleDateInput from "components/form/date/MultipleDateInput";
+import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
 
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -21,7 +21,7 @@ interface BatchProgramIntakesProps {
 
 export interface ProgramPayload {
   program_ids: string[];
-  intake_dates?: string[];
+  intake_months?: number[];
 }
 
 export default function BatchProgramIntakes({
@@ -37,15 +37,12 @@ export default function BatchProgramIntakes({
 
   const [formData, setFormData] = useState({
     program_ids: [] as string[],
-    intake_dates: [],
+    intake_months: [] as number[],
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const today = new Date().toISOString().split("T")[0];
-  const isFormValid =
-    formData.intake_dates.length > 0 &&
-    formData.intake_dates.every((d: string) => d !== "" && d >= today);
+  const isFormValid = formData.intake_months.length > 0;
 
   useEffect(() => {
     if (isOpen) {
@@ -60,7 +57,7 @@ export default function BatchProgramIntakes({
     if (isOpen) {
       setFormData({
         program_ids: selectedProgramIds || [],
-        intake_dates: [],
+        intake_months: [],
       });
 
       setErrors({});
@@ -85,7 +82,7 @@ export default function BatchProgramIntakes({
     try {
       const payload = {
         program_ids: selectedProgramIds,
-        intake_dates: formData.intake_dates || undefined,
+        intake_months: formData.intake_months || undefined,
       };
 
       await batchUpdatePrograms(payload);
@@ -137,9 +134,9 @@ export default function BatchProgramIntakes({
               Intake Schedule
             </h3>
 
-            <MultipleDateInput
-              label="Intake Dates"
-              field="intake_dates"
+            <IntakeMonthsField
+              field="intake_months"
+              label="Intake Months"
               required
               formData={formData}
               errors={errors}

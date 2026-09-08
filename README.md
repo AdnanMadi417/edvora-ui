@@ -4,8 +4,8 @@ The application uses JWT (JSON Web Token) for authentication. To set up authenti
 
 1. Create a `.env.local` file in the project root with the following variables:
 ```bash
-# Required for JWT token verification - must match your backend secret
-JWT_SECRET=your_secret_here
+# Required for JWT token verification - must match your backend's AUTH_SECRET_KEY
+AUTH_SECRET_KEY=your_secret_here
 
 # Your backend API URL (defaults to staging if not set)
 # Examples:

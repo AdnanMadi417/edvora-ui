@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { ChevronDown, Coins } from "lucide-react";
 
 interface CurrencySelectorProps {
-  value: string;
+  value: string | null;
   options: string[];
   onChange: (currency: string) => void;
 }
@@ -44,7 +44,7 @@ export default function CurrencySelector({ value, options, onChange }: CurrencyS
         }`}
       >
         <Coins className="h-4 w-4 text-slate-500" />
-        {value}
+        {value ?? "Currency"}
         <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
 

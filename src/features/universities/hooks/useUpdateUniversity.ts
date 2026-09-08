@@ -12,7 +12,7 @@ export function useUpdateUniversity(universityId: string) {
     setError(null);
     const sanitized = {
       ...payload,
-      intake_months: (payload.intake_months ?? []).filter((m) => m.trim() !== ""),
+      intake_months: (payload.intake_months ?? []).filter((m) => Number.isInteger(m) && m >= 1 && m <= 12),
     };
     try {
       const res = await universityApi.universities.update(universityId, sanitized);
