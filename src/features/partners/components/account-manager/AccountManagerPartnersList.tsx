@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronRight, Users, Mail, BadgeCheck,
-  CheckCircle, XCircle, RefreshCw, FileText, CalendarDays,
+  CheckCircle, XCircle, RefreshCw, FileText, CalendarDays, Share2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAccountManagerPartners } from "features/partners/hooks";
@@ -196,6 +196,9 @@ export default function AccountManagerPartnersList() {
                         <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                       ) : (
                         <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
+                      )}
+                      {partner.is_shared && (
+                        <StatusBadge variant="info" icon={<Share2 className="h-3 w-3" />}>Shared</StatusBadge>
                       )}
                     </div>
                   </td>
