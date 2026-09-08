@@ -6,6 +6,8 @@ import type {
   EditAccountManagerPayload,
   TransferPartnersPayload,
   TransferPartnersResult,
+  UnsharePartnersPayload,
+  UnsharePartnersResult,
 } from "../types";
 
 const authHeader = () => {
@@ -43,10 +45,18 @@ export const accountManagersApi = {
   delete: (id: string) =>
     api.delete(`/admin/account-managers/${id}`, { headers: authHeader() }),
 
-  /** Bulk handover of one manager's partners to another (UBX-318). */
+  /** Bulk handover (mode=move, UBX-318) or sharing (mode=copy, UBX-324) of one manager's partners. */
   transferPartners: (id: string, payload: TransferPartnersPayload) =>
     api.post<TransferPartnersResult>(
       `/admin/account-managers/${id}/transfer-partners`,
+      payload,
+      { headers: authHeader() }
+    ),
+
+  /** Mirror of mode=copy: remove a manager's shared access to this manager's partners (UBX-324). */
+  unsharePartners: (id: string, payload: UnsharePartnersPayload) =>
+    api.post<UnsharePartnersResult>(
+      `/admin/account-managers/${id}/unshare-partners`,
       payload,
       { headers: authHeader() }
     ),

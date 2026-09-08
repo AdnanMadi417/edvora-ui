@@ -29,6 +29,13 @@ export interface CompanyDetails {
   passport_photo_file_url?: string | null;
 }
 
+/** An account manager with shared (non-primary) access to a partner — UBX-324. */
+export interface AdditionalManager {
+  id: string;
+  name: string | null;
+  email: string;
+}
+
 export type Partner = {
   id: string;
   user_id: string;
@@ -42,6 +49,7 @@ export type Partner = {
   is_active: boolean;
   assigned_manager_id: string;
   assigned_manager_name: string;
+  additional_managers?: AdditionalManager[];
   individual_details: IndividualDetails | null;
   company_details: CompanyDetails | null;
   created_at: string;
@@ -67,6 +75,7 @@ export interface PartnerDetails {
   is_verified: boolean;
   assigned_manager_id: string | null;
   assigned_manager_name: string | null;
+  additional_managers?: AdditionalManager[];
   individual_details: IndividualDetails | null;
   company_details: CompanyDetails | null;
   created_at: string | null;
@@ -103,6 +112,13 @@ export type AssignManagerPayload = {
   manager_id: string;
 };
 
+/** Response of the per-partner add/remove additional-manager endpoints (UBX-324). */
+export interface AdditionalManagersResult {
+  partner_id: string;
+  assigned_manager_id: string | null;
+  additional_managers: AdditionalManager[];
+}
+
 export interface AccountManagerPartnerIndividualDetails {
   date_of_birth: string | null;
   passport_number: string | null;
@@ -130,6 +146,8 @@ export type AccountManagerPartnerListItem = {
   last_login: string | null;
   created_at: string;
   updated_at: string;
+  /** True when the signed-in manager reaches this partner through a share, not as primary — UBX-324. */
+  is_shared?: boolean;
 };
 
 export type AccountManagerPartnerDetails = {
