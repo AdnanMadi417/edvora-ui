@@ -4,6 +4,7 @@ import type {
   CreatePartnerPayload,
   UpdatePartnerPayload,
   AssignManagerPayload,
+  AdditionalManagersResult,
   UpdatePartnerProfilePayload,
 } from '../types';
 
@@ -21,6 +22,8 @@ export const partnersApi = {
     is_active?: boolean;
     type?: string;
     assigned_manager_id?: string;
+    /** Primary OR shared access (UBX-324); assigned_manager_id stays primary-only. */
+    manager_id?: string;
   }) => api.get('/admin/partners', { params, headers: authHeader() }),
 
   get: (id: string) =>
@@ -58,6 +61,20 @@ export const partnersApi = {
     api.post(`/admin/partners/${id}/assign-manager`, payload, {
       headers: authHeader(),
     }),
+
+  // Shared (additional, non-primary) managers on one partner — UBX-324.
+  addAdditionalManager: (id: string, managerId: string) =>
+    api.post<AdditionalManagersResult>(
+      `/admin/partners/${id}/additional-managers`,
+      { manager_id: managerId },
+      { headers: authHeader() }
+    ),
+
+  removeAdditionalManager: (id: string, managerId: string) =>
+    api.delete<AdditionalManagersResult>(
+      `/admin/partners/${id}/additional-managers/${managerId}`,
+      { headers: authHeader() }
+    ),
 
   review: (id: string, payload: { decision: "approved" | "rejected"; rejection_reason?: string }) =>
     api.patch(`/admin/partners/${id}/review`, payload, { headers: authHeader() }),

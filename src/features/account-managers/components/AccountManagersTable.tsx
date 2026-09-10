@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowRightLeft, ChevronRight, User, Mail, CheckCircle, Settings,
-  RefreshCw, Pencil, Users,
+  RefreshCw, Pencil, Share2, Users,
   AlertCircle, Trash2, SlidersHorizontal, Activity, XCircle,
 } from "lucide-react";
 import { MdPersonAdd } from "react-icons/md";
@@ -350,13 +350,20 @@ const AccountManagersTable = () => {
                   </td>
 
                   <td className="px-6 py-4">
-                    {Number(m.assigned_partners_count) > 0 ? (
-                      <StatusBadge variant="success" icon={<Users className="h-3 w-3" />}>
-                        {Number(m.assigned_partners_count)} Partner{Number(m.assigned_partners_count) !== 1 && "s"}
-                      </StatusBadge>
-                    ) : (
-                      <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>Needs Partner</StatusBadge>
-                    )}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {Number(m.assigned_partners_count) > 0 ? (
+                        <StatusBadge variant="success" icon={<Users className="h-3 w-3" />}>
+                          {Number(m.assigned_partners_count)} Partner{Number(m.assigned_partners_count) !== 1 && "s"}
+                        </StatusBadge>
+                      ) : (
+                        <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>Needs Partner</StatusBadge>
+                      )}
+                      {Number(m.shared_partners_count ?? 0) > 0 && (
+                        <StatusBadge variant="info" icon={<Share2 className="h-3 w-3" />}>
+                          {Number(m.shared_partners_count)} shared
+                        </StatusBadge>
+                      )}
+                    </div>
                   </td>
 
                   <td className="px-6 py-4">
@@ -383,7 +390,7 @@ const AccountManagersTable = () => {
                           openTransfer(m);
                         }}
                         disabled={(Number(m.assigned_partners_count) || 0) === 0}
-                        title={(Number(m.assigned_partners_count) || 0) === 0 ? "No partners to transfer" : "Transfer partners"}
+                        title={(Number(m.assigned_partners_count) || 0) === 0 ? "No partners to transfer or share" : "Transfer or share partners"}
                         icon={<ArrowRightLeft className="h-4 w-4" />}
                         bgColor="bg-transparent"
                         textColor="text-slate-400"
@@ -439,6 +446,8 @@ const AccountManagersTable = () => {
         }}
         sourceManager={transferSource}
         onTransferred={handleTransferred}
+        // From the blocked-delete path only a move unblocks the deletion.
+        allowShare={!resumeDeleteAfterTransfer}
       />
     </div>
   );

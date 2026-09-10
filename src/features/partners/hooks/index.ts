@@ -6,6 +6,7 @@ export { useCreatePartner } from './useCreatePartner';
 export { useUpdatePartner } from './useUpdatePartner';
 export { useDeletePartner } from './useDeletePartner';
 export { useAssignPartnerManager } from './useAssignPartnerManager';
+export { useAdditionalManagers } from './useAdditionalManagers';
 export { usePartnerProfile } from './usePartnerProfile';
 export { useUpdatePartnerProfile } from './useUpdatePartnerProfile';
 export { useCompleteOnboarding } from './useCompleteOnboarding';

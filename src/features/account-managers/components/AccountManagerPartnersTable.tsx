@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowRightLeft, ChevronRight, Users, Mail, BadgeCheck,
-  CheckCircle, XCircle, RefreshCw, SlidersHorizontal,
+  CheckCircle, XCircle, RefreshCw, Share2, ShieldOff, SlidersHorizontal,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePartners } from "features/partners/hooks";
@@ -14,6 +14,7 @@ import { StatusBadge } from "components/ui/badges";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import TransferPartnersModal from "./TransferPartnersModal";
+import UnsharePartnersModal from "./UnsharePartnersModal";
 import type { AccountManager } from "../types";
 
 const ITEMS_PER_PAGE = 5;
@@ -50,6 +51,10 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
   const managerId = manager.id;
   const assignedCount = Number(manager.assigned_partners_count) || 0;
   const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [isUnshareOpen, setIsUnshareOpen] = useState(false);
+  // "Include shared": also list partners this manager reaches through a share
+  // (UBX-324); the default view is the primary portfolio only.
+  const [includeShared, setIncludeShared] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -69,7 +74,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
     search: debouncedSearch || undefined,
-    assigned_manager_id: managerId,
+    ...(includeShared ? { manager_id: managerId } : { assigned_manager_id: managerId }),
     ...statusToParams(selectedStatus),
   });
 
@@ -103,19 +108,38 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
           <h3 className="text-base font-semibold text-slate-900">Assigned Partners</h3>
           <p className="mt-0.5 text-sm text-slate-500">Partners managed by this account manager</p>
         </div>
-        <Button
-          onClick={() => setIsTransferOpen(true)}
-          disabled={assignedCount === 0}
-          title={assignedCount === 0 ? "No partners to transfer" : "Move all of this manager's partners to another account manager"}
-          icon={<ArrowRightLeft className="h-4 w-4" />}
-          text="Transfer partners"
-          bgColor="bg-white"
-          textColor="text-slate-700"
-          borderColor="border-slate-300"
-          hoverTextColor="hover:text-slate-900"
-          hoverBorderColor="hover:border-slate-400"
-          className="hover:bg-slate-50 sm:w-auto"
-        />
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Button
+            onClick={() => setIsUnshareOpen(true)}
+            disabled={assignedCount === 0}
+            title="Stop another account manager from seeing this manager's partners"
+            icon={<ShieldOff className="h-4 w-4" />}
+            text="Remove shared access"
+            bgColor="bg-white"
+            textColor="text-slate-600"
+            borderColor="border-slate-200"
+            hoverTextColor="hover:text-slate-900"
+            hoverBorderColor="hover:border-slate-300"
+            className="hover:bg-slate-50 sm:w-auto"
+          />
+          <Button
+            onClick={() => setIsTransferOpen(true)}
+            disabled={assignedCount === 0}
+            title={
+              assignedCount === 0
+                ? "No partners to transfer or share"
+                : "Move all of this manager's partners to another account manager, or share them"
+            }
+            icon={<ArrowRightLeft className="h-4 w-4" />}
+            text="Transfer or share partners"
+            bgColor="bg-white"
+            textColor="text-slate-700"
+            borderColor="border-slate-300"
+            hoverTextColor="hover:text-slate-900"
+            hoverBorderColor="hover:border-slate-400"
+            className="hover:bg-slate-50 sm:w-auto"
+          />
+        </div>
       </div>
 
       {/* Filter Bar */}
@@ -154,6 +178,17 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
                 defaultOption="All Statuses"
               />
             </div>
+
+            <label className="inline-flex h-10 cursor-pointer select-none items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 hover:bg-slate-50">
+              <input
+                type="checkbox"
+                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                checked={includeShared}
+                onChange={(e) => { setIncludeShared(e.target.checked); setCurrentPage(1); }}
+              />
+              <Share2 className="h-4 w-4 text-slate-400" />
+              Include shared
+            </label>
 
             {activeFiltersCount > 0 && (
               <Button
@@ -265,11 +300,16 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
                   </td>
 
                   <td className="px-6 py-4">
-                    {partner.is_active ? (
-                      <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
-                    ) : (
-                      <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
-                    )}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {partner.is_active ? (
+                        <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
+                      ) : (
+                        <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
+                      )}
+                      {includeShared && partner.assigned_manager_id !== managerId && (
+                        <StatusBadge variant="info" icon={<Share2 className="h-3 w-3" />}>Shared</StatusBadge>
+                      )}
+                    </div>
                   </td>
 
                   <td className="px-4 py-4">
@@ -288,6 +328,16 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
         sourceManager={manager}
         onTransferred={() => {
           setCurrentPage(1);
+          refetch();
+          onTransferred?.();
+        }}
+      />
+
+      <UnsharePartnersModal
+        isOpen={isUnshareOpen}
+        onClose={() => setIsUnshareOpen(false)}
+        sourceManager={manager}
+        onUnshared={() => {
           refetch();
           onTransferred?.();
         }}
