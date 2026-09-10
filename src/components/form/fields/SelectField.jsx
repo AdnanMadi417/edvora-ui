@@ -29,7 +29,7 @@ const SelectField = ({ label, field, options, required = true, formData, errors,
         <option value="" disabled>Select ...</option>
         {options.map((opt, index) =>
           typeof opt === "object" && opt !== null ? (
-            <option key={opt.value ?? index} value={opt.value ?? ""}>
+            <option key={opt.value ?? index} value={opt.value ?? ""} disabled={opt.disabled}>
               {opt.label ?? opt.value ?? ""}
             </option>
           ) : (

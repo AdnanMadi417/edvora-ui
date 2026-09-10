@@ -286,6 +286,14 @@ export interface BatchUpdateProgramPayload {
   branch_id?: string | null;
 }
 
+// POST /knowledge-hub/programs/{id}/copy — deep-copies the program into
+// another branch of the SAME university. 201 returns the same wrapped shape
+// as the program-detail GET ({ program, required_documents, commission,
+// exchange_rates }).
+export interface CopyProgramToBranchPayload {
+  branch_id: string;
+}
+
 export interface UpdateDefaultVisaFeePayload {
   amount: number;
 }

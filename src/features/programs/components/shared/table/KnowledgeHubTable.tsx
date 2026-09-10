@@ -8,6 +8,7 @@ import {
   XCircle,
   Trash2,
   Share2,
+  CopyPlus,
   ChevronRight,
   Calendar,
   DollarSign,
@@ -18,6 +19,7 @@ import { AiOutlineBank } from "react-icons/ai";
 import PresignedImage from "components/ui/PresignedImage";
 import { getIeltsLabel } from "constants/lists";
 import IconButton from "components/ui/buttons/IconButton";
+import { Tooltip } from "components/ui/tooltip";
 import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { StatusBadge } from "components/ui/badges";
 import { useToast } from "components/context/ToastContext";
@@ -91,6 +93,11 @@ interface KnowledgeHubTableProps {
 
   hideDelete?: boolean;
   onDeleteClick?: (program: Program) => void;
+  /** When set, shows a "Copy to another branch" row action. */
+  onCopyToBranchClick?: (program: Program) => void;
+  /** Per-row copy state — used to disable the action for a program that's
+   *  already in every branch. */
+  copyEligibility?: (program: Program) => { disabled: boolean; title: string };
 }
 
 export default function KnowledgeHubTable({
@@ -112,6 +119,8 @@ export default function KnowledgeHubTable({
   editHref,
   hideDelete = false,
   onDeleteClick,
+  onCopyToBranchClick,
+  copyEligibility,
 }: KnowledgeHubTableProps) {
   const { showToast } = useToast();
 
@@ -367,6 +376,32 @@ export default function KnowledgeHubTable({
                     hoverBorderColor="hover:border-transparent"
                     className="hover:bg-blue-50 focus:outline-none"
                   />
+
+                  {onCopyToBranchClick && (() => {
+                    const copy = copyEligibility?.(program) ?? {
+                      disabled: false,
+                      title: "Copy to another branch",
+                    };
+                    return (
+                      <Tooltip content={copy.title} position="left">
+                        <IconButton
+                          aria-label="Copy to another branch"
+                          disabled={copy.disabled}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onCopyToBranchClick(program);
+                          }}
+                          icon={<CopyPlus className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-400"
+                          borderColor="border-transparent"
+                          hoverTextColor="hover:text-blue-600"
+                          hoverBorderColor="hover:border-transparent"
+                          className="hover:bg-blue-50 focus:outline-none"
+                        />
+                      </Tooltip>
+                    );
+                  })()}
 
                   {!hideDelete && (
                     <>
