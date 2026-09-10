@@ -14,9 +14,11 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { usePrograms, useStates } from "features/programs/hooks";
+import { usePrograms, useStates, useDeletePrograms, useProgramsCopyEligibility } from "features/programs/hooks";
 import { programApi } from "features/programs/services";
 import type { Program } from "features/programs/types";
+import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useUniversities } from "features/universities/hooks";
@@ -33,6 +35,8 @@ import BatchProgramScholarship from "features/programs/components/admin/popups/B
 import BatchDeleteScholarships from "features/programs/components/admin/popups/BatchDeleteScholarships";
 import BatchFeesPrograms from "features/programs/components/admin/popups/BatchFeesPrograms";
 import BatchBranchPrograms from "features/programs/components/admin/popups/BatchBranchPrograms";
+import CopyProgramToBranch from "features/programs/components/admin/popups/CopyProgramToBranch";
+import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
 
 type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "deleteScholarships" | "fees" | "visaFee" | "branch";
@@ -61,6 +65,7 @@ const DataEntryProgramsTable = () => {
   const [courseType, setCourseType] = useState<string>(() => searchParams.get("course_type") ?? "all");
   const [classType, setClassType] = useState<string>(() => searchParams.get("class_type") ?? "all");
   const [sortBy, setSortBy] = useState<string>(() => searchParams.get("sort_by") ?? "all");
+  const [copyTarget, setCopyTarget] = useState<Program | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -110,6 +115,30 @@ const DataEntryProgramsTable = () => {
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
+
+  const copyEligibility = useProgramsCopyEligibility(programs);
+
+  const { showToast } = useToast();
+  const { deletePrograms } = useDeletePrograms();
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!deleteTargetId) return;
+    try {
+      setIsDeleting(true);
+      await deletePrograms([deleteTargetId]);
+      showToast("Deleted successfully", "success");
+      setIsDeleteOpen(false);
+      setDeleteTargetId(null);
+      refetch();
+    } catch (error: unknown) {
+      showToast(`Delete failed. ${parseApiError(error, "Please try again.")}`, "error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -328,7 +357,12 @@ const DataEntryProgramsTable = () => {
             onSelectAll={handleSelectAll}
             onRowClick={(program) => window.open(`/data-entry/knowledge-hub/${program.id}`, "_blank")}
             editHref={(id) => `/data-entry/knowledge-hub/${id}/edit`}
-            hideDelete
+            onDeleteClick={(program) => {
+              setDeleteTargetId(program.id);
+              setIsDeleteOpen(true);
+            }}
+            onCopyToBranchClick={setCopyTarget}
+            copyEligibility={copyEligibility}
           />
 
         </div>
@@ -393,6 +427,35 @@ const DataEntryProgramsTable = () => {
           onSuccess={refetch}
         />
       )}
+
+      {copyTarget && (
+        <CopyProgramToBranch
+          isOpen={!!copyTarget}
+          onClose={() => setCopyTarget(null)}
+          programId={copyTarget.id}
+          programName={copyTarget.name}
+          qualificationId={copyTarget.qualification_id}
+          universityId={copyTarget.university.id}
+          currentBranchId={copyTarget.branch?.id}
+          onCopied={(created) => {
+            const newId = created?.program?.id ?? created?.id;
+            setCopyTarget(null);
+            if (newId) router.push(`/data-entry/knowledge-hub/${newId}`);
+            else refetch();
+          }}
+        />
+      )}
+
+      <DeleteProgramsConfirmation
+        isOpen={isDeleteOpen}
+        onClose={() => {
+          setIsDeleteOpen(false);
+          setDeleteTargetId(null);
+        }}
+        onConfirm={handleDelete}
+        isDeleting={isDeleting}
+        programNames={programs.filter((p) => p.id === deleteTargetId).map((p) => p.name)}
+      />
 
     </div>
   );

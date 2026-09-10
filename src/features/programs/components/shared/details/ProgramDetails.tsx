@@ -19,10 +19,13 @@ import {
   Languages,
   Clock,
   Pencil,
+  CopyPlus,
+  MoreVertical,
+  Trash2,
   Layers,
 } from "lucide-react";
 
-import { useProgram } from "features/programs/hooks";
+import { useProgram, useCopyTargetBranches, useDeletePrograms } from "features/programs/hooks";
 import { getIeltsLabel } from "constants/lists";
 
 import Link from "next/link";
@@ -32,6 +35,10 @@ import Button from "components/ui/buttons/Button";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 import CurrencySelector from "features/programs/components/shared/CurrencySelector";
 import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
+import CopyProgramToBranch from "features/programs/components/admin/popups/CopyProgramToBranch";
+import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
+import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate, formatFeeAmount } from "features/programs/utils/exchangeRate";
 import { monthLabel, nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
 import { courseTypeLabel } from "features/programs/utils/courseType";
@@ -145,7 +152,50 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
 
   const { program, requiredDocuments, commission, exchangeRates, loading, error } = useProgram(id);
   const [copied, setCopied] = useState(false);
+  const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [currency, setCurrency] = useState<string | null>(null);
+
+  const copyTargets = useCopyTargetBranches({
+    programId: program?.id ?? "",
+    programName: program?.name ?? "",
+    qualificationId: program?.qualification_id ?? "",
+    universityId: program?.university?.id ?? "",
+    currentBranchId: program?.branch?.id,
+  });
+  const copyDisabled = !!editPath && !copyTargets.loading && copyTargets.emptyReason !== null;
+  const copyDisabledReason =
+    copyTargets.emptyReason === "single"
+      ? "This university has only one branch"
+      : copyTargets.emptyReason === "all-taken"
+      ? "This program is already in every other branch"
+      : undefined;
+
+  // Admin-style Actions dropdown, shown only for the management view
+  // (data-entry passes `editPath`; the partner view does not).
+  const showActions = !!editPath;
+  const { showToast } = useToast();
+  const { deletePrograms } = useDeletePrograms();
+  const [openActions, setOpenActions] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleUpdate = () => {
+    if (editPath) router.push(editPath);
+  };
+  const handleDelete = async () => {
+    if (!program) return;
+    try {
+      setIsDeleting(true);
+      await deletePrograms([program.id]);
+      showToast("Deleted successfully", "success");
+      setIsDeleteOpen(false);
+      router.push(`${basePath}/knowledge-hub`);
+    } catch (err: unknown) {
+      showToast(`Delete failed. ${parseApiError(err, "Please try again.")}`, "error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const currencyOptions = getCurrencyOptions(exchangeRates);
   const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
@@ -246,6 +296,81 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
               </p>
             </div>
           </div>
+
+          {showActions && (
+            <div className="flex shrink-0 items-center gap-2">
+              <div className="relative">
+                <Button
+                  onClick={() => setOpenActions((v) => !v)}
+                  icon={<MoreVertical className="h-4 w-4" />}
+                  text="Actions"
+                  bgColor="bg-white"
+                  textColor="text-slate-700"
+                  borderColor="border-slate-200"
+                  hoverTextColor="hover:text-slate-700"
+                  hoverBorderColor="hover:border-slate-300"
+                  className="h-10 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-400"
+                />
+
+                {openActions && (
+                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-lg border border-slate-200 bg-white ring-1 ring-black/5">
+                    <div className="space-y-2 p-2">
+                      <button
+                        aria-label="Update Program Details"
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:shadow-sm"
+                        onClick={() => { handleUpdate(); setOpenActions(false); }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
+                          <Clock className="h-4 w-4" />
+                        </div>
+                        <span className="font-semibold text-slate-900">Update Details</span>
+                      </button>
+
+                      <button
+                        aria-label="Copy to another branch"
+                        disabled={copyDisabled}
+                        title={copyDisabledReason}
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-transparent disabled:hover:bg-white disabled:hover:shadow-none"
+                        onClick={() => { setIsCopyOpen(true); setOpenActions(false); }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
+                          <CopyPlus className="h-4 w-4" />
+                        </div>
+                        <span className="flex flex-col">
+                          <span className="font-semibold text-slate-900">Copy to another branch</span>
+                          {copyDisabled && copyDisabledReason && (
+                            <span className="text-xs font-normal text-slate-500">{copyDisabledReason}</span>
+                          )}
+                        </span>
+                      </button>
+
+                      <button
+                        aria-label="Delete Program"
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-red-200 hover:bg-red-50 hover:shadow-sm"
+                        onClick={() => { setIsDeleteOpen(true); setOpenActions(false); }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
+                          <Trash2 className="h-4 w-4" />
+                        </div>
+                        <span className="font-semibold text-red-700">Delete Program</span>
+                      </button>
+
+                      <button
+                        aria-label="Back to Knowledge Hub"
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
+                        onClick={() => { handleBack(); setOpenActions(false); }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
+                          <ChevronLeft className="h-4 w-4" />
+                        </div>
+                        <span className="font-semibold text-slate-900">Back to Knowledge Hub</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
         </div>
 
@@ -620,6 +745,33 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
         </div>
 
       </div>
+
+      {program && isCopyOpen && (
+        <CopyProgramToBranch
+          isOpen={isCopyOpen}
+          onClose={() => setIsCopyOpen(false)}
+          programId={program.id}
+          programName={program.name}
+          qualificationId={program.qualification_id}
+          universityId={program.university.id}
+          currentBranchId={program.branch?.id}
+          onCopied={(created) => {
+            const newId = created?.program?.id ?? created?.id;
+            setIsCopyOpen(false);
+            if (newId) router.push(`${basePath}/knowledge-hub/${newId}`);
+          }}
+        />
+      )}
+
+      {program && showActions && (
+        <DeleteProgramsConfirmation
+          isOpen={isDeleteOpen}
+          onClose={() => setIsDeleteOpen(false)}
+          onConfirm={handleDelete}
+          isDeleting={isDeleting}
+          programNames={program.name ? [program.name] : []}
+        />
+      )}
     </div>
   );
 };

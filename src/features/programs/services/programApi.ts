@@ -4,6 +4,7 @@ import type {
   CreateProgramPayload,
   UpdateProgramPayload,
   BatchUpdateProgramPayload,
+  CopyProgramToBranchPayload,
   UpdateDefaultVisaFeePayload,
   GetProgramsParams,
 } from "../types";
@@ -32,6 +33,10 @@ export const programApi = {
       }),
     batchUpdate: (data: BatchUpdateProgramPayload) =>
       api.put("/knowledge-hub/programs-batch", data, { headers: authHeader() }),
+    copyToBranch: (id: string, branchId: string) =>
+      api.post(`/knowledge-hub/programs/${id}/copy`, {
+        branch_id: branchId,
+      } satisfies CopyProgramToBranchPayload),
   },
 
   states: {

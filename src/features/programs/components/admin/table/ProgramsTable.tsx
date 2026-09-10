@@ -17,7 +17,7 @@ import {
 
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import { usePrograms, useStates, useDeletePrograms } from "features/programs/hooks";
+import { usePrograms, useStates, useDeletePrograms, useProgramsCopyEligibility } from "features/programs/hooks";
 import { programApi } from "features/programs/services";
 import type { Program } from "features/programs/types";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
@@ -38,6 +38,7 @@ import BatchDeleteScholarships from "features/programs/components/admin/popups/B
 import BatchFeesPrograms from "features/programs/components/admin/popups/BatchFeesPrograms";
 import BatchBranchPrograms from "features/programs/components/admin/popups/BatchBranchPrograms";
 import BatchCourseTypePrograms from "features/programs/components/admin/popups/BatchCourseTypePrograms";
+import CopyProgramToBranch from "features/programs/components/admin/popups/CopyProgramToBranch";
 import DefaultVisaFee from "features/programs/components/admin/popups/DefaultVisaFee";
 
 type BatchModal = "commission" | "ielts" | "intakes" | "scholarship" | "deleteScholarships" | "fees" | "visaFee" | "branch" | "courseType";
@@ -67,6 +68,7 @@ const ProgramsTable = () => {
   const [classType, setClassType] = useState<string>(() => searchParams.get("class_type") ?? "all");
   const [sortBy, setSortBy] = useState<string>(() => searchParams.get("sort_by") ?? "all");
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
+  const [copyTarget, setCopyTarget] = useState<Program | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -123,6 +125,8 @@ const ProgramsTable = () => {
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
+
+  const copyEligibility = useProgramsCopyEligibility(programs);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -395,6 +399,8 @@ const ProgramsTable = () => {
               setDeleteMode("single");
               setIsDeleteOpen(true);
             }}
+            onCopyToBranchClick={setCopyTarget}
+            copyEligibility={copyEligibility}
           />
 
         </div>
@@ -478,6 +484,24 @@ const ProgramsTable = () => {
         selectedPrograms={selectedProgramSummaries}
         onSuccess={refetch}
       />
+
+      {copyTarget && (
+        <CopyProgramToBranch
+          isOpen={!!copyTarget}
+          onClose={() => setCopyTarget(null)}
+          programId={copyTarget.id}
+          programName={copyTarget.name}
+          qualificationId={copyTarget.qualification_id}
+          universityId={copyTarget.university.id}
+          currentBranchId={copyTarget.branch?.id}
+          onCopied={(created) => {
+            const newId = created?.program?.id ?? created?.id;
+            setCopyTarget(null);
+            if (newId) router.push(`/admin/knowledge-hub/${newId}`);
+            else refetch();
+          }}
+        />
+      )}
 
     </div>
   );

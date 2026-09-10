@@ -20,15 +20,17 @@ import {
   Building2,
   Languages,
   Copy,
+  CopyPlus,
   Layers,
 } from 'lucide-react';
 
-import { useProgram, useDeletePrograms } from 'features/programs/hooks';
+import { useProgram, useDeletePrograms, useCopyTargetBranches } from 'features/programs/hooks';
 import { getIeltsLabel } from 'constants/lists';
 
 import { useToast } from 'components/context/ToastContext';
 import { parseApiError } from 'utils/parseApiError';
 import DeleteProgramsConfirmation from 'features/programs/components/admin/popups/DeleteProgramsConfirmation';
+import CopyProgramToBranch from 'features/programs/components/admin/popups/CopyProgramToBranch';
 import Loading from 'components/loading/Loading';
 import PresignedImage from 'components/ui/PresignedImage';
 import Button from 'components/ui/buttons/Button';
@@ -155,6 +157,7 @@ const ProgramDetails = ({ id }: Props) => {
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isCopyOpen, setIsCopyOpen] = useState(false);
   const { showToast } = useToast();
 
   const router = useRouter();
@@ -178,6 +181,21 @@ const ProgramDetails = ({ id }: Props) => {
 
   const { program, requiredDocuments, commission, exchangeRates } = useProgram(id);
   const [currency, setCurrency] = useState<string | null>(null);
+
+  const copyTargets = useCopyTargetBranches({
+    programId: program?.id ?? '',
+    programName: program?.name ?? '',
+    qualificationId: program?.qualification_id ?? '',
+    universityId: program?.university?.id ?? '',
+    currentBranchId: program?.branch?.id,
+  });
+  const copyDisabled = !copyTargets.loading && copyTargets.emptyReason !== null;
+  const copyDisabledReason =
+    copyTargets.emptyReason === 'single'
+      ? 'This university has only one branch'
+      : copyTargets.emptyReason === 'all-taken'
+      ? 'This program is already in every other branch'
+      : undefined;
 
   const currencyOptions = getCurrencyOptions(exchangeRates);
   const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
@@ -280,6 +298,28 @@ const ProgramDetails = ({ id }: Props) => {
                       <Clock className="h-4 w-4" />
                     </div>
                     <span className="font-semibold text-slate-900">Update Details</span>
+                  </button>
+
+                  <button
+                    aria-label="Copy to another branch"
+                    disabled={copyDisabled}
+                    title={copyDisabledReason}
+                    className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-transparent disabled:hover:bg-white disabled:hover:shadow-none"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsCopyOpen(true);
+                      setOpenDropdownId(null);
+                    }}
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
+                      <CopyPlus className="h-4 w-4" />
+                    </div>
+                    <span className="flex flex-col">
+                      <span className="font-semibold text-slate-900">Copy to another branch</span>
+                      {copyDisabled && copyDisabledReason && (
+                        <span className="text-xs font-normal text-slate-500">{copyDisabledReason}</span>
+                      )}
+                    </span>
                   </button>
 
                   <button
@@ -665,6 +705,23 @@ const ProgramDetails = ({ id }: Props) => {
         isDeleting={isDeleting}
         programNames={program?.name ? [program.name] : []}
       />
+
+      {program && isCopyOpen && (
+        <CopyProgramToBranch
+          isOpen={isCopyOpen}
+          onClose={() => setIsCopyOpen(false)}
+          programId={program.id}
+          programName={program.name}
+          qualificationId={program.qualification_id}
+          universityId={program.university.id}
+          currentBranchId={program.branch?.id}
+          onCopied={(created) => {
+            const newId = created?.program?.id ?? created?.id;
+            setIsCopyOpen(false);
+            if (newId) router.push(`/admin/knowledge-hub/${newId}`);
+          }}
+        />
+      )}
 
     </div>
   );
