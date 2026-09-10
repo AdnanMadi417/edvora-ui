@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Trash2, XCircle } from "lucide-react";
+import { AlertTriangle, ArrowRightLeft, Trash2, XCircle } from "lucide-react";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 
@@ -11,6 +11,13 @@ interface DeleteAccountManagerModalProps {
   onConfirm: () => void;
   isDeleting: boolean;
   AccountManager?: string;
+  /**
+   * When > 0, deletion is blocked: the manager still has this many assigned
+   * partners (the backend refuses with 409 until they are transferred).
+   */
+  blockedPartnersCount?: number | null;
+  /** Opens the transfer flow from the blocked state. */
+  onTransferPartners?: () => void;
 }
 
 export default function DeleteAccountManagerModal({
@@ -19,8 +26,11 @@ export default function DeleteAccountManagerModal({
   onConfirm,
   isDeleting,
   AccountManager,
+  blockedPartnersCount = null,
+  onTransferPartners,
 }: DeleteAccountManagerModalProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const isBlocked = typeof blockedPartnersCount === "number" && blockedPartnersCount > 0;
 
   useEffect(() => {
     if (isOpen) {
@@ -61,14 +71,39 @@ export default function DeleteAccountManagerModal({
           />
 
           <div className="space-y-4 px-7 py-6">
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900">
-                Confirm Deletion
-              </h3>
-              <p className="text-sm text-slate-500">
-                Are you sure you want to remove this account manager from the system?
-              </p>
-            </div>
+            {isBlocked ? (
+              <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+                <div className="space-y-3">
+                  <p className="text-sm text-amber-900">
+                    This account manager still has {blockedPartnersCount} assigned{" "}
+                    {blockedPartnersCount === 1 ? "partner" : "partners"}. Transfer them before deleting.
+                  </p>
+                  {onTransferPartners && (
+                    <Button
+                      onClick={onTransferPartners}
+                      icon={<ArrowRightLeft className="h-4 w-4" />}
+                      text="Transfer partners"
+                      bgColor="bg-white"
+                      textColor="text-amber-800"
+                      borderColor="border-amber-400"
+                      hoverTextColor="hover:text-amber-900"
+                      hoverBorderColor="hover:border-amber-500"
+                      className="hover:bg-amber-100"
+                    />
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">
+                  Confirm Deletion
+                </h3>
+                <p className="text-sm text-slate-500">
+                  Are you sure you want to remove this account manager from the system?
+                </p>
+              </div>
+            )}
 
             {AccountManager && (
               <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
@@ -101,7 +136,8 @@ export default function DeleteAccountManagerModal({
               hoverTextColor="hover:text-red-800"
               hoverBorderColor="hover:border-red-700"
               onClick={onConfirm}
-              disabled={isDeleting}
+              disabled={isDeleting || isBlocked}
+              title={isBlocked ? "Transfer this manager's partners first" : undefined}
             />
           </div>
         </div>

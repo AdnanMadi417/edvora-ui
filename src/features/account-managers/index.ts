@@ -8,4 +8,5 @@ export {
   CreateAccountManager,
   EditAccountManager,
   DeleteAccountManagerModal,
+  TransferPartnersModal,
 } from "./components";

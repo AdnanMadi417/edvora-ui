@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ChevronRight, Users, Mail, BadgeCheck,
+  ArrowRightLeft, ChevronRight, Users, Mail, BadgeCheck,
   CheckCircle, XCircle, RefreshCw, SlidersHorizontal,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,6 +13,8 @@ import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePag
 import { StatusBadge } from "components/ui/badges";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
+import TransferPartnersModal from "./TransferPartnersModal";
+import type { AccountManager } from "../types";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -38,11 +40,16 @@ function statusToParams(status: StatusFilter): { is_active?: boolean; is_verifie
 }
 
 interface AccountManagerPartnersTableProps {
-  managerId: string;
+  manager: AccountManager;
+  /** Fired after a successful transfer so the parent can refresh the manager's counts. */
+  onTransferred?: () => void;
 }
 
-export default function AccountManagerPartnersTable({ managerId }: AccountManagerPartnersTableProps) {
+export default function AccountManagerPartnersTable({ manager, onTransferred }: AccountManagerPartnersTableProps) {
   const router = useRouter();
+  const managerId = manager.id;
+  const assignedCount = Number(manager.assigned_partners_count) || 0;
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -96,6 +103,19 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
           <h3 className="text-base font-semibold text-slate-900">Assigned Partners</h3>
           <p className="mt-0.5 text-sm text-slate-500">Partners managed by this account manager</p>
         </div>
+        <Button
+          onClick={() => setIsTransferOpen(true)}
+          disabled={assignedCount === 0}
+          title={assignedCount === 0 ? "No partners to transfer" : "Move all of this manager's partners to another account manager"}
+          icon={<ArrowRightLeft className="h-4 w-4" />}
+          text="Transfer partners"
+          bgColor="bg-white"
+          textColor="text-slate-700"
+          borderColor="border-slate-300"
+          hoverTextColor="hover:text-slate-900"
+          hoverBorderColor="hover:border-slate-400"
+          className="hover:bg-slate-50 sm:w-auto"
+        />
       </div>
 
       {/* Filter Bar */}
@@ -261,6 +281,17 @@ export default function AccountManagerPartnersTable({ managerId }: AccountManage
           </table>
         </TableWrapper>
       </div>
+
+      <TransferPartnersModal
+        isOpen={isTransferOpen}
+        onClose={() => setIsTransferOpen(false)}
+        sourceManager={manager}
+        onTransferred={() => {
+          setCurrentPage(1);
+          refetch();
+          onTransferred?.();
+        }}
+      />
     </>
   );
 }

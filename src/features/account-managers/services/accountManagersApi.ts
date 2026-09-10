@@ -4,6 +4,8 @@ import type {
   AccountManager,
   CreateAccountManagerPayload,
   EditAccountManagerPayload,
+  TransferPartnersPayload,
+  TransferPartnersResult,
 } from "../types";
 
 const authHeader = () => {
@@ -40,4 +42,12 @@ export const accountManagersApi = {
 
   delete: (id: string) =>
     api.delete(`/admin/account-managers/${id}`, { headers: authHeader() }),
+
+  /** Bulk handover of one manager's partners to another (UBX-318). */
+  transferPartners: (id: string, payload: TransferPartnersPayload) =>
+    api.post<TransferPartnersResult>(
+      `/admin/account-managers/${id}/transfer-partners`,
+      payload,
+      { headers: authHeader() }
+    ),
 };
