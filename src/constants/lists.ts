@@ -692,11 +692,3 @@ export const BACKGROUND_OPTIONS = [
   { value: "agent",   label: "Education Agent" },
   { value: "other",   label: "Other" },
 ];
-
-export const SOCIAL_MEDIA_PLATFORMS = [
-  { value: "facebook",  label: "Facebook",  prefix: "https://www.facebook.com/"  },
-  { value: "instagram", label: "Instagram", prefix: "https://www.instagram.com/" },
-  { value: "linkedin",  label: "LinkedIn",  prefix: "https://www.linkedin.com/in/" },
-  { value: "tiktok",    label: "TikTok",    prefix: "https://www.tiktok.com/@" },
-  { value: "website",   label: "Website",   prefix: "" },
-];
