@@ -1,5 +1,10 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { BadgeCheck, Check, MessageCircle, Globe2, Languages, Linkedin, Link2, MapPin } from "lucide-react";
 import { Tooltip } from "components/ui/tooltip";
+import PillButton from "components/ui/buttons/PillButton";
+import IconButton from "components/ui/buttons/IconButton";
 import SiteFooter from "components/footer/SiteFooter";
 import FadeIn from "components/ui/FadeIn";
 import { Faq, type FaqItem } from "components/ui/faq";
@@ -51,15 +56,19 @@ const VERIFIED_EXPLANATION =
 const NOT_VERIFIED_EXPLANATION =
   "This partner hasn't yet supported a student through visa approval. Verification is granted automatically by Unibexs once they do.";
 
-// Partner.country/nationality are stored as ISO-2 codes (e.g. "MY"), which
-// don't match the app's `constants/lists` COUNTRIES (lowercase full names —
-// a different convention used by the registration form). No ISO-2 -> name
-// table exists on the frontend yet, so this shows the raw code rather than
-// a lookup that would silently miss for real data. (The UBX-317 integration
-// guide claims these arrive pre-resolved to full names — checked against
-// the live endpoint and that isn't true for real data, so not "fixed" to
-// match a claim the actual response contradicts.)
-const countryName = (code: string | null) => code?.toUpperCase() || null;
+// countries_supported holds ISO-2 codes (e.g. "MY") — short enough that
+// upper-casing them reads as a code, not as shouting. Used only for that
+// chip list below.
+const countryCode = (code: string | null) => code?.toUpperCase() || null;
+
+// Partner.country/nationality were assumed to be ISO-2 codes too (per the
+// UBX-317 integration guide), but real seed data contradicts that — some
+// partners have a full word instead (e.g. country "palestine", nationality
+// "Palestinian"), inconsistently cased. Upper-casing the whole value reads
+// as shouting; leaving "palestine" fully lowercase reads as broken. Just
+// capitalize the first letter — "MY"/"PS" (already-uppercase codes) pass
+// through unchanged, "palestine" becomes "Palestine".
+const asStored = (value: string | null) => (value ? value.charAt(0).toUpperCase() + value.slice(1) : null);
 
 // Per the integration guide: the API deliberately sends only raw digits —
 // no link, no message — both are built client-side.
@@ -75,6 +84,50 @@ interface Props {
   profile: PublicPartnerProfile;
 }
 
+// profile_photo_file_url has been seen returning a URL that 403s when this
+// page fetches it directly (this endpoint is unauthenticated, so there's no
+// token to presign with, unlike PresignedImage elsewhere in the app) — an
+// <img> with no error handling then renders as a broken image with its alt
+// text wrapping inside the circle. Falls back to the initials avatar on any
+// load failure instead, the same as every other broken-photo case.
+//
+// This page is server-rendered (see app/p/[slug]/page.tsx), so the browser
+// starts loading the <img> straight from the SSR'd HTML — often before
+// React hydrates and attaches onError. A fast-failing image's error event
+// fires and is missed in that window, leaving `failed` stuck at false even
+// though the image never loaded. The effect below catches that race by
+// checking img.complete/naturalWidth right after mount, in addition to
+// onError for failures that happen later (a slower/expired URL, etc.).
+function Avatar({ src, alt, initials }: { src: string | null; alt: string; initials: string }) {
+  const [failed, setFailed] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    setFailed(false);
+    const img = imgRef.current;
+    if (img?.complete && img.naturalWidth === 0) setFailed(true);
+  }, [src]);
+
+  if (!src || failed) {
+    return (
+      <div className="flex h-full w-full items-center justify-center rounded-full bg-blue-600 text-2xl font-bold text-white">
+        {initials}
+      </div>
+    );
+  }
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      ref={imgRef}
+      src={src}
+      alt={alt}
+      className="h-full w-full rounded-full object-cover"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
 /**
  * Renders exactly what GET /partners/public/{slug} returns — nothing more.
  * This is a sub-feature: the profile only shows what the partner has
@@ -87,24 +140,40 @@ export default function PartnerPublicProfile({ profile }: Props) {
   const displayName = profile.display_name || profile.name;
   const initials = displayName?.slice(0, 2).toUpperCase() ?? "??";
   const whatsapp = waLink(profile.whatsapp_number, displayName);
-  const country = countryName(profile.country);
-  const nationality = countryName(profile.nationality);
+  const country = asStored(profile.country);
+  const nationality = asStored(profile.nationality);
   const countriesSupported = profile.countries_supported ?? [];
 
   // Shown once in the hero and again in the sticky sidebar CTA — each
   // has a different job (hero: first impression; sidebar: stays on screen
-  // as the visitor reads the bio/FAQ), not accidental duplication.
-  const ctaButton = whatsapp && (
-    <a
-      href={whatsapp}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
-    >
-      <MessageCircle className="h-4.5 w-4.5" />
-      Chat on WhatsApp
-    </a>
-  );
+  // as the visitor reads the bio/FAQ), not accidental duplication. A
+  // function, not a plain element, because the two spots want different
+  // widths: natural width in the hero (matching unibexs.com's own "Login"
+  // button, which sizes to its text rather than stretching), full width in
+  // the narrow sidebar card, where a snug pill would look lost.
+  // window.open, not a plain <a>, matching the shared Button component's
+  // established use for external links elsewhere (see
+  // app/partner/public-profile/page.tsx's "View live profile"). PillButton
+  // (not Button) so it's shaped like that same "Login" button — solid
+  // brand blue here since this is a primary CTA, not the outline look
+  // that component defaults to. WhatsApp's own green is reserved for the
+  // icon-only floating button below, where the color itself is what
+  // signals "this opens WhatsApp".
+  const renderCta = (fullWidth: boolean) =>
+    whatsapp && (
+      <PillButton
+        onClick={() => window.open(whatsapp, "_blank", "noopener,noreferrer")}
+        icon={<MessageCircle className="h-4.5 w-4.5" />}
+        text="Chat on WhatsApp"
+        bgColor="bg-blue-600"
+        textColor="text-white"
+        borderColor="border-blue-600"
+        hoverBgColor="hover:bg-blue-700"
+        hoverTextColor="hover:text-white"
+        hoverBorderColor="hover:border-blue-700"
+        className={`text-sm font-semibold ${fullWidth ? "w-full" : ""}`}
+      />
+    );
 
   const verifiedBadgeRow = (
     <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-6 py-4">
@@ -124,6 +193,9 @@ export default function PartnerPublicProfile({ profile }: Props) {
   const hasCountries = countriesSupported.length > 0;
   const hasSocial = Boolean(profile.linkedin_url || profile.social_media_url);
 
+  // Every major section below is spaced pt-16/mt-16 apart — one consistent
+  // rhythm end to end, rather than the mix of pt-8/pt-16/mt-12 this had
+  // accumulated through incremental edits.
   return (
     <main className="min-h-screen bg-white px-4 py-10">
       {/* Hero — identity only. The one CTA below is the page's first,
@@ -134,18 +206,11 @@ export default function PartnerPublicProfile({ profile }: Props) {
 
           <div className="flex flex-col items-center gap-3 border-b border-slate-100 px-6 pb-6 text-center sm:flex-row sm:items-end sm:gap-4 sm:text-left">
             <div className="-mt-12 h-24 w-24 shrink-0 overflow-hidden rounded-full bg-white p-1 shadow-md sm:-mt-10 sm:h-28 sm:w-28">
-              {profile.profile_photo_file_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={profile.profile_photo_file_url}
-                  alt={displayName ?? "Advisor"}
-                  className="h-full w-full rounded-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center rounded-full bg-blue-600 text-2xl font-bold text-white">
-                  {initials}
-                </div>
-              )}
+              <Avatar
+                src={profile.profile_photo_file_url}
+                alt={displayName ?? "Advisor"}
+                initials={initials}
+              />
             </div>
 
             <div className="min-w-0 pt-2 sm:pb-1">
@@ -185,7 +250,6 @@ export default function PartnerPublicProfile({ profile }: Props) {
             </div>
           </div>
 
-          {ctaButton && <div className="px-6 pt-6">{ctaButton}</div>}
           {verifiedBadgeRow}
         </FadeIn>
       </div>
@@ -193,7 +257,7 @@ export default function PartnerPublicProfile({ profile }: Props) {
       {/* Main content (2/3) + sticky contact sidebar (1/3) — the same
           "profile + persistent contact card" split LinkedIn/Upwork use,
           so the CTA is never more than a glance away while reading. */}
-      <div className="mx-auto max-w-6xl grid grid-cols-1 gap-6 pt-8 md:grid-cols-3">
+      <div className="mx-auto max-w-6xl grid grid-cols-1 gap-6 pt-16 md:grid-cols-3">
         <div className="md:col-span-2">
           {hasAbout || hasCountries || hasSocial ? (
             <FadeIn className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -213,7 +277,7 @@ export default function PartnerPublicProfile({ profile }: Props) {
                   <div className="flex flex-wrap gap-2">
                     {countriesSupported.map((c) => (
                       <span key={c} className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
-                        {countryName(c)}
+                        {countryCode(c)}
                       </span>
                     ))}
                   </div>
@@ -267,7 +331,7 @@ export default function PartnerPublicProfile({ profile }: Props) {
                 <p className="mt-1 text-sm text-slate-500">
                   Message {displayName} directly on WhatsApp — no account needed.
                 </p>
-                <div className="mt-4">{ctaButton}</div>
+                <div className="mt-4">{renderCta(true)}</div>
               </div>
               {verifiedBadgeRow}
             </div>
@@ -285,21 +349,30 @@ export default function PartnerPublicProfile({ profile }: Props) {
       </div>
 
       <FadeIn>
-        <SiteFooter className="mt-12" />
+        <SiteFooter className="mt-16" />
       </FadeIn>
 
       {/* The one persistent, always-visible touchpoint — a safety net on
-          mobile, where the sidebar above isn't sticky. */}
+          mobile, where the sidebar above isn't sticky. Icon-only so it
+          doesn't crowd the page's other WhatsApp CTAs, which already carry
+          the label. WhatsApp's actual brand green (#25D366, #128C7E on
+          hover) rather than Tailwind's emerald — this button's whole job
+          is to be recognized at a glance as "open WhatsApp", so the exact
+          brand color matters here in a way it doesn't for the text CTAs
+          above (which already say "WhatsApp" and use Unibexs's own blue). */}
       {whatsapp && (
-        <a
-          href={whatsapp}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 flex items-center gap-2 rounded-full bg-emerald-500 px-5 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:bg-emerald-600"
-        >
-          <MessageCircle className="h-5 w-5 shrink-0" />
-          Chat on WhatsApp
-        </a>
+        <IconButton
+          onClick={() => window.open(whatsapp, "_blank", "noopener,noreferrer")}
+          icon={<MessageCircle className="h-6 w-6" />}
+          aria-label="Chat on WhatsApp"
+          title="Chat on WhatsApp"
+          bgColor="bg-[#25D366]"
+          textColor="text-white"
+          borderColor="border-transparent"
+          hoverTextColor="hover:text-white"
+          hoverBorderColor="hover:border-transparent"
+          className="fixed bottom-6 right-6 h-14 w-14 !rounded-full shadow-lg hover:bg-[#128C7E]"
+        />
       )}
     </main>
   );
