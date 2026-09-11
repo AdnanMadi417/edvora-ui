@@ -107,12 +107,12 @@ export default function SiteFooter({ className = "", onSubscribe }: SiteFooterPr
 
   return (
     <footer className={`w-full bg-white ${className}`}>
-      <div className="mx-auto max-w-6xl px-6 py-16 lg:px-8">
+      <div className="mx-auto max-w-6xl py-16">
         <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
           {/* Newsletter */}
           <div className="lg:max-w-sm lg:shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoImg.src} alt="Unibexs" className="h-8 w-auto" />
+            <img src={logoImg.src} alt="Unibexs" className="h-16 w-auto" />
 
             <p className="mt-4 text-sm leading-relaxed text-slate-500">
               Stay ahead with the latest industry insights, product updates, and trends. Delivered
@@ -165,7 +165,7 @@ export default function SiteFooter({ className = "", onSubscribe }: SiteFooterPr
         <div className="mt-14 border-t border-slate-100" />
 
         {/* Legal row, then social row below it */}
-        <div className="mt-6 flex flex-col gap-6">
+        <div className="mt-6 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
             {LEGAL_LINKS.map((link) => (
               <li key={link.label}>
