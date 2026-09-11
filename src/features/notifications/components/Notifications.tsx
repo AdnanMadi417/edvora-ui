@@ -6,9 +6,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useAllNotifications, useUnreadCount, useMarkAsRead, useMarkAllAsRead } from "../hooks";
-import { getNotificationIconConfig, getSenderName } from "../utils/notificationIcons";
+import {
+  getNotificationIconConfig,
+  getSenderName,
+  getNotificationPhotoUrl,
+  getNotificationStageStatus,
+} from "../utils/notificationIcons";
 import { getNotificationCategory, type NotificationCategory } from "../utils/notificationCategory";
 import type { ReadStatus, Notification } from "../types";
+import NotificationAvatar from "./NotificationAvatar";
 import TablePagination from "components/ui/table/TablePagination";
 import { Tabs, type TabItem } from "components/ui/tabs";
 import EmptyData from "components/emptyData/EmptyData";
@@ -67,9 +73,27 @@ interface NotificationsProps {
    * to `${applicationBasePath}/${application_id}`. Omit for roles that don't
    * have an applications view of their own (e.g. reviewer, data entry). */
   applicationBasePath?: string;
+  /** When set, a `partner_signed_up` notification navigates to
+   * `${partnerBasePath}/${data.partner_id}` instead. Only admin/reviewer
+   * receive that notification type, so only they need this. */
+  partnerBasePath?: string;
 }
 
-export default function Notifications({ applicationBasePath }: NotificationsProps) {
+function getNotificationHref(
+  notification: Notification,
+  applicationBasePath?: string,
+  partnerBasePath?: string
+): string | undefined {
+  if (notification.type === "partner_signed_up") {
+    const partnerId = notification.data?.partner_id;
+    return partnerBasePath && partnerId ? `${partnerBasePath}/${partnerId}` : undefined;
+  }
+  return applicationBasePath && notification.application_id
+    ? `${applicationBasePath}/${notification.application_id}`
+    : undefined;
+}
+
+export default function Notifications({ applicationBasePath, partnerBasePath }: NotificationsProps) {
   const [filter, setFilter] = useState<ReadStatus>("unread");
   const [page, setPage] = useState(1);
   const [unreadPage, setUnreadPage] = useState(1);
@@ -276,11 +300,10 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
             {displayed.map((notification, index) => {
               const isUnread = notification.read_at === null;
               const config = getNotificationIconConfig(notification);
-              const Icon = config.icon;
               const sender = getSenderName(notification);
-              const href = applicationBasePath && notification.application_id
-                ? `${applicationBasePath}/${notification.application_id}`
-                : undefined;
+              const href = getNotificationHref(notification, applicationBasePath, partnerBasePath);
+              const university = notification.data?.university_name;
+              const { stage, status } = getNotificationStageStatus(notification);
 
               return (
                 <div
@@ -293,15 +316,13 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
                     index !== displayed.length - 1 ? "border-b border-slate-50" : ""
                   } ${isUnread ? "bg-blue-50 hover:bg-blue-100/60" : "hover:bg-slate-50"}`}
                 >
-                  {/* Icon with type badge */}
-                  <div className="relative flex-shrink-0">
-                    <div className={`flex h-11 w-11 items-center justify-center rounded-md ${config.bg}`}>
-                      <Icon className={`h-5 w-5 ${config.iconColor}`} />
-                    </div>
-                    <span className={`absolute -bottom-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full ring-2 ring-white ${config.badgeBg}`}>
-                      <Bell className="h-2 w-2 text-white" />
-                    </span>
-                  </div>
+                  <NotificationAvatar
+                    photoUrl={getNotificationPhotoUrl(notification)}
+                    icon={config.icon}
+                    bg={config.bg}
+                    iconColor={config.iconColor}
+                    badgeBg={config.badgeBg}
+                  />
 
                   {/* Content */}
                   <div className="min-w-0 flex-1">
@@ -311,8 +332,25 @@ export default function Notifications({ applicationBasePath }: NotificationsProp
                         <span className="ml-1 font-normal text-slate-700">{notification.title}</span>
                       )}
                     </p>
+                    {university && (
+                      <p className="mt-0.5 truncate text-xs font-medium text-slate-500">{university}</p>
+                    )}
                     {notification.body && (
                       <p className="mt-0.5 truncate text-sm text-slate-500">{notification.body}</p>
+                    )}
+                    {(stage || status) && (
+                      <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                        {stage && (
+                          <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                            Stage: {stage}
+                          </span>
+                        )}
+                        {status && (
+                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
+                            Status: {status}
+                          </span>
+                        )}
+                      </div>
                     )}
                     <p className={`mt-1 text-xs font-semibold ${isUnread ? "text-blue-600" : "text-slate-400"}`}>
                       {timeAgo(notification.created_at)}
