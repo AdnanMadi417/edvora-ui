@@ -1,6 +1,7 @@
 import { Upload, Trash2, FileCheck, AlertCircle, Camera } from "lucide-react";
 import React, { useState, useEffect, useMemo } from 'react';
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
+import { useFileDrop } from "./useFileDrop";
 
 const IMAGE_ONLY_TYPES = {
   mimeTypes: ["image/png", "image/jpeg", "image/jpg"],
@@ -77,16 +78,24 @@ const ImageUploadField = ({
     ? documents.find((d) => d.document_type_id === documentTypeId)
     : null;
 
-  const handleDocUpload = async (e) => {
-    if (!uploadHandler) return;
-    const selected = e.target.files?.[0];
-    if (selected && !resolvedMimeTypes.includes(selected.type)) {
+  const processDocFile = async (selected) => {
+    if (!uploadHandler || !selected) return;
+    if (!resolvedMimeTypes.includes(selected.type)) {
       setFileError(`Invalid file type. Only ${resolvedLabel} files are allowed.`);
-      e.target.value = "";
+      return;
+    }
+    if (selected.size > MAX_FILE_SIZE) {
+      setFileError("File size must not exceed 10MB.");
       return;
     }
     setFileError("");
-    await uploadHandler(e, documentTypeId);
+    await uploadHandler({ target: { files: [selected] } }, documentTypeId);
+  };
+
+  const handleDocUpload = async (e) => {
+    const selected = e.target.files?.[0];
+    e.target.value = "";
+    await processDocFile(selected);
   };
 
   const handleDocRemove = async () => {
@@ -95,23 +104,28 @@ const ImageUploadField = ({
   };
 
   // ── simple mode ───────────────────────────────────────────────────────────
-  const handleSimpleUpload = (e) => {
-    const selected = e.target.files?.[0];
+  const processSimpleFile = (selected) => {
     if (!selected) return;
     if (!resolvedMimeTypes.includes(selected.type)) {
       setFileError(`Invalid file type. Only ${resolvedLabel} files are allowed.`);
-      e.target.value = "";
       return;
     }
     if (selected.size > MAX_FILE_SIZE) {
       setFileError("File size must not exceed 10MB.");
-      e.target.value = "";
       return;
     }
     setFileError("");
     onSimpleFileChange?.(selected);
-    e.target.value = "";
   };
+
+  const handleSimpleUpload = (e) => {
+    const selected = e.target.files?.[0];
+    e.target.value = "";
+    processSimpleFile(selected);
+  };
+
+  const simpleDrop = useFileDrop({ onFiles: (files) => processSimpleFile(files[0]) });
+  const docDrop = useFileDrop({ onFiles: (files) => processDocFile(files[0]) });
 
   const handleSimpleRemove = () => {
     setFileError("");
@@ -140,8 +154,12 @@ const ImageUploadField = ({
       {/* ── simple mode dropzone ── */}
       {showDropzone && isSimpleMode && (
         <div className="flex flex-col items-center gap-2">
-          <label className="group relative cursor-pointer">
-            <div className="flex h-24 w-24 items-center justify-center rounded-full border-2 border-dashed border-slate-300 bg-slate-50 transition-all duration-200 group-hover:border-blue-400 group-hover:bg-blue-50">
+          <label className="group relative cursor-pointer" {...simpleDrop.dropHandlers}>
+            <div className={`flex h-24 w-24 items-center justify-center rounded-full border-2 border-dashed transition-all duration-200 ${
+              simpleDrop.isDragging
+                ? "border-blue-400 bg-blue-50"
+                : "border-slate-300 bg-slate-50 group-hover:border-blue-400 group-hover:bg-blue-50"
+            }`}>
               <div className="flex flex-col items-center gap-1">
                 <Camera className="h-6 w-6 text-slate-400 transition-colors group-hover:text-blue-500" />
                 <span className="text-[10px] font-medium text-slate-400 transition-colors group-hover:text-blue-500">Upload</span>
@@ -162,7 +180,14 @@ const ImageUploadField = ({
 
       {/* ── document-management mode dropzone ── */}
       {showDropzone && !isSimpleMode && (
-        <label className="flex cursor-pointer flex-col items-center justify-center rounded-full border-2 border-dashed border-slate-300 bg-slate-50 p-6 text-center transition-all duration-300 hover:border-blue-400 hover:bg-blue-50">
+        <label
+          {...docDrop.dropHandlers}
+          className={`flex cursor-pointer flex-col items-center justify-center rounded-full border-2 border-dashed p-6 text-center transition-all duration-300 ${
+            docDrop.isDragging
+              ? "border-blue-400 bg-blue-50"
+              : "border-slate-300 bg-slate-50 hover:border-blue-400 hover:bg-blue-50"
+          }`}
+        >
           <Upload className="mb-3 h-8 w-8 text-slate-400" />
           <p className="text-sm text-slate-600">
             Drag & drop or{" "}
