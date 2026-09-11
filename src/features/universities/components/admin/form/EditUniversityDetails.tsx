@@ -204,7 +204,7 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
       country: university.country ?? "",
       description: university.description ?? "",
       intake_months: [...(university.intake_months ?? [])],
-      branches: (branches ?? []).map((b: any) => ({
+      branches: (branches ?? []).map((b) => ({
         id: b.id,
         name: b.name ?? "",
         location: b.location ?? "",
