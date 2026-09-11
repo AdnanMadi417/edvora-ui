@@ -6,6 +6,7 @@ import type {
   AssignManagerPayload,
   AdditionalManagersResult,
   UpdatePartnerProfilePayload,
+  PublicPartnerProfile,
 } from '../types';
 
 const authHeader = () => {
@@ -116,4 +117,8 @@ export const partnersApi = {
 
   registerVerifyOtp: (email: string, otp: string) =>
     publicApi.post<{ message: string; reference_id: string }>('/partners/register/verify-otp', { email, otp }),
+
+  // Public profile (UBX-??? — sub-feature, more endpoints expected later).
+  getPublicProfile: (slug: string) =>
+    publicApi.get<PublicPartnerProfile>(`/partners/public/${slug}`),
 };

@@ -1,4 +1,4 @@
-import { ClipboardList, BookOpen, Bell, Truck, UserPlus } from "lucide-react";
+import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2 } from "lucide-react";
 
 import type { IRoute } from "../types/navigation";
 
@@ -38,6 +38,17 @@ const partnerRoutes: IRoute[] = [
     layout: "/partner",
     path: "/team-members",
     icon: UserPlus,
+  },
+
+  {
+    // Individual advisors only — public profiles are individual-only in V1
+    // (see partner_public_profiles). Filtered out for agency partners in
+    // app/partner/layout.tsx, mirroring how "Team Members" is filtered out
+    // for individual partners.
+    name: "My Public Profile",
+    layout: "/partner",
+    path: "/public-profile",
+    icon: Globe2,
   },
 ];
 

@@ -14,8 +14,7 @@ import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import PhoneInputField from "components/form/fields/PhoneInputField";
-import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
-import { validateSocialMediaField, isValidPlatformUrl } from "utils/socialMedia";
+import { isValidWebsiteUrl } from "utils/socialMedia";
 import PublicFileUploadField, { type PublicUploadResult } from "components/form/upload/PublicFileUploadField";
 import ImageUploadField from "components/form/upload/ImageUploadField";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
@@ -149,8 +148,8 @@ export default function PartnerRegisterPage() {
     phone_code: "+60", phone_number: "",
     country: "", nationality: "", background: "",
     date_of_birth: "", passport_number: "",
-    social_platform: "instagram", social_username: "", social_media_url: "",
-    linkedin_platform: "linkedin", linkedin_username: "", linkedin_url: "",
+    social_media_url: "",
+    linkedin_url: "",
     agreed: false,
   });
   const [indPassportPhoto, setIndPassportPhoto] = useState<PublicUploadResult | null>(null);
@@ -160,7 +159,7 @@ export default function PartnerRegisterPage() {
   // Company form
   const [compForm, setCompForm] = useState({
     company_name: "", country: "",
-    social_platform: "instagram", social_username: "", website_url: "",
+    website_url: "",
     contact_full_name: "", contact_email: "",
     contact_phone_code: "+60", contact_phone_number: "",
     nationality: "", date_of_birth: "", passport_number: "",
@@ -195,10 +194,10 @@ export default function PartnerRegisterPage() {
     if (!indForm.passport_number.trim()) e.passport_number = "Passport number is required";
     if (!indProfilePhoto.fileKey) e.ind_profile_photo = "Profile photo is required";
     if (!indPassportPhoto) e.ind_passport_photo = "Please upload your passport photo";
-    const socialError = validateSocialMediaField(indForm, { platformField: "social_platform", usernameField: "social_username" });
-    if (socialError) e.social_media_url = socialError;
-    if (indForm.linkedin_url && !isValidPlatformUrl("linkedin", indForm.linkedin_url))
-      e.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://www.linkedin.com/in/yourname)";
+    if (!indForm.social_media_url.trim()) e.social_media_url = "Social media URL is required";
+    else if (!isValidWebsiteUrl(indForm.social_media_url)) e.social_media_url = "Enter a valid URL starting with https://";
+    if (indForm.linkedin_url && !isValidWebsiteUrl(indForm.linkedin_url))
+      e.linkedin_url = "Enter a valid URL starting with https://";
     if (!indForm.agreed) e.agreed = "You must agree to the Terms and Conditions";
     return e;
   };
@@ -221,8 +220,8 @@ export default function PartnerRegisterPage() {
     else if (compForm.company_name.trim().length < 3) e.company_name = "Agency name must be at least 3 characters";
     if (!compForm.country) e.country = "Country is required";
     if (!compLogo.fileKey) e.comp_logo = "Agency logo is required";
-    const socialError = validateSocialMediaField(compForm, { platformField: "social_platform", usernameField: "social_username" });
-    if (socialError) e.website_url = socialError;
+    if (!compForm.website_url.trim()) e.website_url = "Website URL is required";
+    else if (!isValidWebsiteUrl(compForm.website_url)) e.website_url = "Enter a valid URL starting with https://";
     if (!compRegDoc) e.comp_reg_doc = "Please upload your agency registration document";
     if (!compForm.contact_full_name.trim()) e.contact_full_name = "Full name is required";
     else if (compForm.contact_full_name.trim().length < 3) e.contact_full_name = "Full name must be at least 3 characters";
@@ -258,8 +257,6 @@ export default function PartnerRegisterPage() {
     if (partnerType === "individual" ? !validateInd() : !validateComp()) return;
     setHasFieldLevelApiError(false);
 
-    const indSocialField = indForm.social_platform === "linkedin" ? "linkedin_url" : "social_media_url";
-
     const payload = partnerType === "individual"
       ? {
           partner_type: "individual",
@@ -273,7 +270,7 @@ export default function PartnerRegisterPage() {
           passport_number: indForm.passport_number.trim(),
           ...(indPassportPhoto && { passport_photo_file_key: indPassportPhoto.file_key, passport_photo_file_url: indPassportPhoto.file_url }),
           ...(indProfilePhoto.fileKey && { profile_photo_file_key: indProfilePhoto.fileKey, profile_photo_file_url: indProfilePhoto.fileUrl }),
-          ...(indForm.social_media_url && { [indSocialField]: indForm.social_media_url }),
+          ...(indForm.social_media_url && { social_media_url: indForm.social_media_url }),
           ...(indForm.linkedin_url && { linkedin_url: indForm.linkedin_url }),
         }
       : {
@@ -497,13 +494,12 @@ export default function PartnerRegisterPage() {
                       error={errors.ind_passport_photo}
                     />
                     <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                      <SocialMediaInputField label="Social Media Account"
-                        platformField="social_platform" usernameField="social_username" urlField="social_media_url"
+                      <InputField label="Social Media Account" field="social_media_url" type="url"
+                        placeholder="https://..."
                         formData={indForm} errors={errors} updateFormData={updateInd}
                         onBlur={() => validateIndField("social_media_url")} />
-                      <SocialMediaInputField label="LinkedIn Profile"
-                        platformField="linkedin_platform" usernameField="linkedin_username" urlField="linkedin_url"
-                        lockedPlatform="linkedin" required={false}
+                      <InputField label="LinkedIn Profile" field="linkedin_url" type="url"
+                        required={false} placeholder="https://linkedin.com/in/yourname"
                         formData={indForm} errors={errors} updateFormData={updateInd}
                         onBlur={() => validateIndField("linkedin_url")} />
                     </div>
@@ -530,8 +526,8 @@ export default function PartnerRegisterPage() {
                     <SelectField label="Country of Registration" field="country" options={COUNTRY_OPTIONS}
                       formData={compForm} errors={errors} updateFormData={updateComp}
                       onBlur={() => validateCompField("country")} />
-                    <SocialMediaInputField label="Website or Social Media Page"
-                      platformField="social_platform" usernameField="social_username" urlField="website_url"
+                    <InputField label="Website or Social Media Page" field="website_url" type="url"
+                      placeholder="https://..."
                       formData={compForm} errors={errors} updateFormData={updateComp}
                       onBlur={() => validateCompField("website_url")} />
                   </SectionCard>

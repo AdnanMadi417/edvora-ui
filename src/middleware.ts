@@ -4,6 +4,10 @@ import { jwtVerify } from "jose";
 
 const publicRoutes = ["/auth/sign-in", "/auth/register", "/register/verify", "/auth/forgot-password", "/auth/partner-reset-password", "/auth/staff-invitation", "/team/verify-otp", "/team/accept-invite", "/reset-password", "/unauthorized", "/", "/api/health", "/api/auth/logout"];
 
+// Prefixes rather than exact paths — for public routes with a dynamic
+// segment (e.g. /p/[slug], the shareable partner profile).
+const publicRoutePrefixes = ["/p/"];
+
 const protectedPrefixes: Record<string, string[]> = {
   "/admin": ["admin"],
   "/partner": ["partner"],
@@ -87,7 +91,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectTo(req, destination));
   }
 
-  if (publicRoutes.includes(pathname)) {
+  if (publicRoutes.includes(pathname) || publicRoutePrefixes.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 
