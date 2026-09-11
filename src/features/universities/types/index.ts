@@ -22,6 +22,7 @@ export interface UniversityDetails {
   logo_file_url: string;
   description?: string;
   university_type_id: string;
+  university_type_name: string;
   intake_months?: number[];
 }
 
@@ -60,6 +61,7 @@ export interface Branch {
   id: string;
   name: string;
   location: string;
+  state_id: string;
   state: string;
 }
 
