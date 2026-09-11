@@ -20,7 +20,7 @@ import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "se
 import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
 import { useFileDrop } from "components/form/upload/useFileDrop";
-import { COUNTRIES, NATIONALITIES, PARTNER_TYPE, BACKGROUND_OPTIONS } from "constants/lists";
+import { COUNTRIES, NATIONALITIES, PARTNER_TYPE, BACKGROUND_OPTIONS, DIAL_CODES } from "constants/lists";
 import { isValidWebsiteUrl } from "utils/socialMedia";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
@@ -39,6 +39,29 @@ interface Props {
 }
 
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
+
+// whatsapp_number comes back as raw digits with no "+" or separator (unlike
+// `phone`, which is stored as "+<code> <number>"), so there's no exact
+// delimiter to split on. Best-effort: match the longest known dial code
+// that prefixes the digits. Falls back to the default dial code with the
+// full value in the number field — visibly, so a bad guess is obvious and
+// fixable before save rather than silently wrong.
+function splitWhatsapp(raw: string | null | undefined): { code: string; number: string } {
+  const digits = (raw ?? "").replace(/\D/g, "");
+  if (!digits) return { code: "+60", number: "" };
+  const match = [...DIAL_CODES]
+    .sort((a, b) => b.code.length - a.code.length)
+    .find((d) => digits.startsWith(d.code.slice(1)));
+  return match
+    ? { code: match.code, number: digits.slice(match.code.length - 1) }
+    : { code: "+60", number: digits };
+}
+
+// Inverse of splitWhatsapp — raw digits only, matching the API's own
+// no-formatting convention for this field.
+function combineWhatsapp(code: string, number: string): string {
+  return `${code}${number}`.replace(/\D/g, "");
+}
 
 const PARTNER_UPDATE_FIELD_MAP: Record<string, string> = {
   phone: "phone_number",
@@ -240,7 +263,8 @@ export default function EditPartnerDetails({ id }: Props) {
     background: "", linkedin_url: "", social_media_url: "",
     company_name: "", website_url: "",
     nationality: "", date_of_birth: "", passport_number: "",
-    pp_slug: "", pp_display_name: "", pp_bio: "", pp_whatsapp_number: "",
+    pp_slug: "", pp_display_name: "", pp_bio: "",
+    pp_whatsapp_code: "+60", pp_whatsapp_number: "",
     pp_countries_supported: "", pp_is_published: false,
   });
 
@@ -282,7 +306,10 @@ export default function EditPartnerDetails({ id }: Props) {
       pp_slug: partner.public_profile?.slug ?? "",
       pp_display_name: partner.public_profile?.display_name ?? "",
       pp_bio: partner.public_profile?.bio ?? "",
-      pp_whatsapp_number: partner.public_profile?.whatsapp_number ?? "",
+      ...(() => {
+        const { code, number } = splitWhatsapp(partner.public_profile?.whatsapp_number);
+        return { pp_whatsapp_code: code, pp_whatsapp_number: number };
+      })(),
       pp_countries_supported: (partner.public_profile?.countries_supported ?? []).join(", "),
       pp_is_published: partner.public_profile?.is_published ?? false,
     });
@@ -373,7 +400,8 @@ export default function EditPartnerDetails({ id }: Props) {
       formData.pp_slug !== (partner.public_profile?.slug ?? "") ||
       formData.pp_display_name !== (partner.public_profile?.display_name ?? "") ||
       formData.pp_bio !== (partner.public_profile?.bio ?? "") ||
-      formData.pp_whatsapp_number !== (partner.public_profile?.whatsapp_number ?? "") ||
+      combineWhatsapp(formData.pp_whatsapp_code, formData.pp_whatsapp_number) !==
+        (partner.public_profile?.whatsapp_number ?? "").replace(/\D/g, "") ||
       formData.pp_countries_supported !== (partner.public_profile?.countries_supported ?? []).join(", ") ||
       formData.pp_is_published !== (partner.public_profile?.is_published ?? false)
     );
@@ -494,7 +522,7 @@ export default function EditPartnerDetails({ id }: Props) {
                 slug: formData.pp_slug.trim(),
                 display_name: formData.pp_display_name.trim(),
                 bio: formData.pp_bio.trim(),
-                whatsapp_number: formData.pp_whatsapp_number.trim(),
+                whatsapp_number: combineWhatsapp(formData.pp_whatsapp_code, formData.pp_whatsapp_number),
                 countries_supported: formData.pp_countries_supported
                   .split(",")
                   .map((c: string) => c.trim())
@@ -699,11 +727,12 @@ export default function EditPartnerDetails({ id }: Props) {
                 errors={errors}
                 updateFormData={updateFormData}
               />
-              <InputField
+              <PhoneInputField
                 label="Public WhatsApp Number"
-                field="pp_whatsapp_number"
+                dialCodeField="pp_whatsapp_code"
+                numberField="pp_whatsapp_number"
                 required={false}
-                placeholder="60123456789"
+                placeholder="123456789"
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
