@@ -126,11 +126,11 @@ export default function SiteFooter({ className = "", onSubscribe }: SiteFooterPr
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
                 aria-label="Email address"
-                className="w-full rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                className="w-full rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
               />
               <button
                 type="submit"
-                className="w-full rounded-full bg-blue-700 px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-800"
+                className="w-full rounded-full bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-all duration-200 hover:bg-blue-800 motion-safe:hover:scale-[1.02] motion-safe:active:scale-[0.97]"
               >
                 Join Unibexs Insider
               </button>
@@ -149,7 +149,7 @@ export default function SiteFooter({ className = "", onSubscribe }: SiteFooterPr
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-slate-500 transition hover:text-slate-700"
+                        className="text-sm text-slate-500 transition-colors duration-200 hover:text-slate-700"
                       >
                         {link.label}
                       </a>
@@ -173,7 +173,7 @@ export default function SiteFooter({ className = "", onSubscribe }: SiteFooterPr
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm text-slate-500 transition hover:text-slate-700"
+                  className="text-sm text-slate-500 transition-colors duration-200 hover:text-slate-700"
                 >
                   {link.label}
                 </a>
@@ -189,7 +189,7 @@ export default function SiteFooter({ className = "", onSubscribe }: SiteFooterPr
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50 text-slate-700 transition hover:bg-indigo-100"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50 text-slate-700 transition-all duration-200 hover:bg-indigo-100 motion-safe:hover:-translate-y-0.5 motion-safe:hover:scale-110 motion-safe:active:scale-95"
               >
                 <Icon className="h-4 w-4" />
               </a>
