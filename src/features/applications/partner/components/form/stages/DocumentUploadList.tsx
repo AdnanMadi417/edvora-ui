@@ -11,6 +11,7 @@ import {
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
 import { FormDataType, DocumentType } from "features/applications/partner/components/form/utility-functions/types";
 import Button from "components/ui/buttons/Button";
+import { useFileDrop } from "components/form/upload/useFileDrop";
 
 interface Props {
   documentTypes: DocumentType[];
@@ -48,17 +49,30 @@ function DocRow({
       ? "This document is required"
       : errors[`documents.${docType.id}`]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0];
-    if (selected && !ALLOWED_FILE_TYPES.mimeTypes.includes(selected.type)) {
+  // Shared by the click-to-browse input and the drop handler below — the
+  // rest of this form's handleFileUpload only ever reads `e.target.files`
+  // (see ProgramApplicationForm.tsx/StudentRegistrationForm.tsx), so a
+  // dropped file is handed to it the same way ImageUploadField's
+  // document-management mode already does elsewhere in this codebase.
+  const processFile = (selected: File | undefined) => {
+    if (!selected) return;
+    if (!ALLOWED_FILE_TYPES.mimeTypes.includes(selected.type)) {
       setFileError(`Invalid type. Allowed: ${ALLOWED_FILE_TYPES.label}`);
-      e.target.value = "";
       return;
     }
     setFileError("");
-    handleFileUpload(e, docType.id);
-    if (inputRef.current) inputRef.current.value = "";
+    handleFileUpload({ target: { files: [selected] } } as unknown as React.ChangeEvent<HTMLInputElement>, docType.id);
   };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    e.target.value = "";
+    processFile(selected);
+  };
+
+  const { isDragging, dropHandlers } = useFileDrop({
+    onFiles: (files) => processFile(files[0]),
+  });
 
   if (isUploaded) {
     return (
@@ -143,10 +157,13 @@ function DocRow({
 
   return (
     <div
+      {...dropHandlers}
       className={`block space-y-2 rounded-2xl border p-4 transition md:flex md:items-center md:gap-3 md:space-y-0 ${
         errorMsg
           ? "border-red-300 bg-red-50"
-          : "border-dashed border-slate-300 bg-white"
+          : isDragging
+            ? "border-blue-400 bg-blue-50"
+            : "border-dashed border-slate-300 bg-white"
       }`}
     >
       <div className="flex min-w-0 flex-1 items-center gap-3">
