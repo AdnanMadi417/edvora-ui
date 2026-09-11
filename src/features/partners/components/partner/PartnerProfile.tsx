@@ -34,6 +34,7 @@ import { useToast } from "components/context/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
+import { useFileDrop } from "components/form/upload/useFileDrop";
 import PresignedImage from "components/ui/PresignedImage";
 import { parseDate, formatDate } from "components/ui/date/utils";
 import { parseApiError } from "utils/parseApiError";
@@ -201,6 +202,11 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
     }
   };
 
+  const { isDragging: isAvatarDragging, dropHandlers: avatarDropHandlers } = useFileDrop({
+    onFiles: (files) => handleAvatarUpload(files[0]),
+    disabled: avatarUploading,
+  });
+
   if (isPartnerLoading) return <Loading text="Loading partner profile details..." />;
   if (!partner) return <EmptyData />;
 
@@ -217,8 +223,15 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
           {/* Header */}
           <div className="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 items-center gap-4">
-              <div className="relative shrink-0">
-                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+              {/* The whole avatar circle is the drop target, not just the
+                  small camera badge — a badge-sized hit area is impractical
+                  to drop a file onto. */}
+              <div className="relative shrink-0" {...avatarDropHandlers}>
+                <div
+                  className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700 transition-colors ${
+                    isAvatarDragging ? "ring-2 ring-blue-400 ring-offset-2" : ""
+                  }`}
+                >
                   <PresignedImage
                     fileKey={(isIndividual ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
                     alt="Profile"
