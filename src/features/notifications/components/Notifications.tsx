@@ -9,7 +9,7 @@ import { useAllNotifications, useUnreadCount, useMarkAsRead, useMarkAllAsRead } 
 import {
   getNotificationIconConfig,
   getSenderName,
-  getNotificationPhotoUrl,
+  getNotificationPhotoKey,
   getNotificationStageStatus,
 } from "../utils/notificationIcons";
 import { getNotificationCategory, type NotificationCategory } from "../utils/notificationCategory";
@@ -317,7 +317,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                   } ${isUnread ? "bg-blue-50 hover:bg-blue-100/60" : "hover:bg-slate-50"}`}
                 >
                   <NotificationAvatar
-                    photoUrl={getNotificationPhotoUrl(notification)}
+                    photoKey={getNotificationPhotoKey(notification)}
                     icon={config.icon}
                     bg={config.bg}
                     iconColor={config.iconColor}

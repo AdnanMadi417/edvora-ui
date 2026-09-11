@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { LucideIcon } from "lucide-react";
+import { getDocumentDownloadUrl } from "services/documentService";
 
 interface NotificationAvatarProps {
-  /** Already-resolved, directly renderable image URL (student photo, partner
-   *  photo, agency logo) — not a storage key, so this renders a plain <img>
-   *  rather than going through PresignedImage's fetch-and-resolve flow. */
-  photoUrl?: string | null;
+  /** Raw storage key (student photo, partner photo, agency logo) — resolved
+   *  to a signed URL the same way every other photo in this app is
+   *  (PresignedImage's own fetch pattern, replicated here rather than
+   *  reused directly so the corner badge can be shown/hidden correctly in
+   *  both the "no photo" and "presign failed" cases). */
+  photoKey?: string | null;
   icon: LucideIcon;
   bg: string;
   iconColor: string;
@@ -22,24 +25,34 @@ const SIZES = {
 };
 
 /**
- * The notification's status/type icon square — or, when a photo/logo URL is
- * present (student photo, partner photo, agency logo), a circular avatar
- * with that same icon moved into a small corner badge instead. Falls back
- * to the plain icon square whenever there's no URL, or the image fails to
- * load, so a placeholder is always shown rather than a blank space.
+ * The notification's status/type icon square — or, when the photo/logo key
+ * resolves to a real signed URL, a circular avatar with that same icon
+ * moved into a small corner badge instead. Falls back to the plain icon
+ * square whenever there's no key, presigning fails, or the image itself
+ * fails to load, so a placeholder is always shown rather than a blank space.
  */
 export default function NotificationAvatar({
-  photoUrl,
+  photoKey,
   icon: Icon,
   bg,
   iconColor,
   badgeBg,
   size = "md",
 }: NotificationAvatarProps) {
+  const [src, setSrc] = useState<string | null>(null);
   const [broken, setBroken] = useState(false);
   const s = SIZES[size];
 
-  if (!photoUrl || broken) {
+  useEffect(() => {
+    setSrc(null);
+    setBroken(false);
+    if (!photoKey) return;
+    getDocumentDownloadUrl(photoKey)
+      .then(setSrc)
+      .catch(() => setBroken(true));
+  }, [photoKey]);
+
+  if (!photoKey || broken || !src) {
     return (
       <div className={`flex ${s.box} shrink-0 items-center justify-center rounded-md ${bg}`}>
         <Icon className={`${s.icon} ${iconColor}`} />
@@ -51,7 +64,7 @@ export default function NotificationAvatar({
     <div className={`relative ${s.box} shrink-0`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src={photoUrl}
+        src={src}
         alt=""
         className="h-full w-full rounded-full object-cover ring-1 ring-slate-100"
         onError={() => setBroken(true)}

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { CheckCheck } from "lucide-react";
 
 import { useAllNotifications, useMarkAsRead, useMarkAllAsRead } from "../hooks";
-import { getNotificationIconConfig, getSenderName, getNotificationPhotoUrl } from "../utils/notificationIcons";
+import { getNotificationIconConfig, getSenderName, getNotificationPhotoKey } from "../utils/notificationIcons";
 import type { Notification } from "../types";
 import NotificationAvatar from "./NotificationAvatar";
 
@@ -188,7 +188,7 @@ function PreviewContent({
                 }`}
               >
                 <NotificationAvatar
-                  photoUrl={getNotificationPhotoUrl(notification)}
+                  photoKey={getNotificationPhotoKey(notification)}
                   icon={config.icon}
                   bg={config.bg}
                   iconColor={config.iconColor}

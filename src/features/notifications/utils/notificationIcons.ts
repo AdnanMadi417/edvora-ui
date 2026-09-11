@@ -149,18 +149,21 @@ export function getSenderName(notification: Notification): string {
 }
 
 /**
- * The photo/logo URL to show as the notification's avatar, if any — always
- * an already-resolved, directly renderable URL (never a raw storage key;
- * see NotificationAvatar). Returns null when the notification type carries
- * no such image, or the partner/student simply hasn't uploaded one yet.
+ * The storage key for the photo/logo to show as the notification's avatar,
+ * if any. The API also sends a `*_url` sibling field claimed to be
+ * "ready-to-use" — checked against a real payload and that isn't true: it's
+ * a bare bucket URL with no signature, and 403s directly. The `*_key` is
+ * what actually works, resolved the same way as every other photo in this
+ * app (NotificationAvatar → getDocumentDownloadUrl). Returns null when the
+ * notification type carries no such image, or nothing's been uploaded yet.
  */
-export function getNotificationPhotoUrl(notification: Notification): string | null {
+export function getNotificationPhotoKey(notification: Notification): string | null {
   const data = notification.data as Record<string, unknown>;
   if (notification.type === "partner_signed_up") {
-    return (data?.partner_photo_url as string) || (data?.agency_logo_url as string) || null;
+    return (data?.partner_photo_key as string) || (data?.agency_logo_key as string) || null;
   }
   // application_stage_changed / new_application both carry the student's photo
-  return (data?.student_photo_url as string) || null;
+  return (data?.student_photo_key as string) || null;
 }
 
 /** The "Stage" / "Status" display-label pair for a notification, if it has

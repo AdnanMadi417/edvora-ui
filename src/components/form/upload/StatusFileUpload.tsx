@@ -2,6 +2,9 @@ import React from "react";
 import { Trash2 } from "lucide-react";
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
+import { useFileDrop } from "./useFileDrop";
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
 interface StatusFileUploadProps {
   label: string;
@@ -32,10 +35,12 @@ export default function StatusFileUpload({
 }: StatusFileUploadProps) {
   const { showToast } = useToast();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0];
-    if (!selected) return;
+  const fail = (msg: string) => {
+    showToast(msg, "error");
+    onError?.(msg);
+  };
 
+  const processFile = (selected: File) => {
     const isAllowed =
       ALLOWED_FILE_TYPES.mimeTypes.includes(selected.type) ||
       ALLOWED_FILE_TYPES.extensions.some((ext) =>
@@ -43,22 +48,35 @@ export default function StatusFileUpload({
       );
 
     if (!isAllowed) {
-      const msg = `Invalid file type "${selected.name}". Only ${ALLOWED_FILE_TYPES.label} files are allowed.`;
-      showToast(msg, "error");
-      onError?.(msg);
-      e.target.value = "";
+      fail(
+        `Invalid file type "${selected.name}". Only ${ALLOWED_FILE_TYPES.label} files are allowed.`
+      );
+      return;
+    }
+    if (selected.size > MAX_FILE_SIZE) {
+      fail(`"${selected.name}" is too large. Maximum file size is 10MB.`);
       return;
     }
 
     onError?.("");
     onFileChange(selected);
-    e.target.value = "";
   };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    e.target.value = "";
+    if (selected) processFile(selected);
+  };
+
+  const { isDragging, dropHandlers } = useFileDrop({
+    onFiles: (files) => processFile(files[0]),
+    disabled,
+  });
 
   return (
     <div className="space-y-2">
       <div>
-        <label className="block text-sm font-medium text-gray-900">
+        <label htmlFor={id} className="block text-sm font-medium text-gray-900">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
         {description && (
@@ -68,7 +86,12 @@ export default function StatusFileUpload({
 
       <label
         htmlFor={id}
-        className="group relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-white px-6 py-10 text-center transition-all duration-200 hover:border-blue-500 hover:bg-blue-50/40"
+        {...dropHandlers}
+        className={`group relative flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-10 text-center transition-all duration-200 ${
+          isDragging
+            ? "border-blue-400 bg-blue-50"
+            : "border-gray-300 bg-white hover:border-blue-500 hover:bg-blue-50/40"
+        }`}
       >
         <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-lg bg-blue-100 text-blue-600 transition">
           <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,8 +104,10 @@ export default function StatusFileUpload({
           </svg>
         </div>
 
-        <p className="text-sm font-semibold text-gray-800">{label}</p>
-        <p className="mt-2 text-xs text-gray-600">{ALLOWED_FILE_TYPES.label} – Max 5MB</p>
+        <p className="text-sm font-semibold text-gray-800">
+          Drag &amp; drop or <span className="text-blue-600 underline">browse</span>
+        </p>
+        <p className="mt-2 text-xs text-gray-600">{ALLOWED_FILE_TYPES.label} – Max 10MB</p>
 
         <input
           id={id}
