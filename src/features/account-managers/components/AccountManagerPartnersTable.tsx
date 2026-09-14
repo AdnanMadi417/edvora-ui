@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowRightLeft, ChevronRight, Users, Mail, BadgeCheck,
-  CheckCircle, XCircle, RefreshCw, Share2, ShieldOff, SlidersHorizontal,
+  CheckCircle, XCircle, RefreshCw, Share2, ShieldOff, SlidersHorizontal, Handshake,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { usePartners } from "features/partners/hooks";
@@ -252,6 +252,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
                   colSpan={4}
                   title="No partners found"
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This manager has no assigned partners yet."}
+                  icon={<Handshake className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button

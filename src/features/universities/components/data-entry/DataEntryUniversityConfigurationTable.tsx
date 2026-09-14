@@ -15,6 +15,7 @@ import {
   BadgeCheck,
   CheckCircle,
   XCircle,
+  SlidersHorizontal,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -186,6 +187,7 @@ const DataEntryUniversityConfigurationTable = () => {
                 colSpan={8}
                 title="No university types found"
                 subtitle="There are currently no university types available."
+                icon={<SlidersHorizontal className="h-8 w-8 text-slate-400" />}
               />
             )}
 

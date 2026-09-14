@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronRight, Users, Mail, BadgeCheck,
-  CheckCircle, XCircle, RefreshCw, FileText, CalendarDays, Share2,
+  CheckCircle, XCircle, RefreshCw, FileText, CalendarDays, Share2, Handshake,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAccountManagerPartners } from "features/partners/hooks";
@@ -142,6 +142,7 @@ export default function AccountManagerPartnersList() {
                   colSpan={6}
                   title="No partners found"
                   subtitle={searchTerm ? "Try adjusting your search." : "You don't have any assigned partners yet."}
+                  icon={<Handshake className="h-8 w-8 text-slate-400" />}
                   action={
                     searchTerm ? (
                       <Button

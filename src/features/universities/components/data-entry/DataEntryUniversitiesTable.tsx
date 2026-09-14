@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Plus, RefreshCw, CheckCircle, XCircle, GraduationCap } from "lucide-react";
+import { Pencil, Plus, RefreshCw, CheckCircle, XCircle, GraduationCap, Landmark } from "lucide-react";
 import PresignedImage from "components/ui/PresignedImage";
 import { monthLabel } from "features/programs/utils/intakeMonths";
 import { useUniversities } from "features/universities/hooks";
@@ -166,6 +166,7 @@ export default function DataEntryUniversitiesTable() {
                   colSpan={5}
                   title="No universities found"
                   subtitle="No universities match your search."
+                  icon={<Landmark className="h-8 w-8 text-slate-400" />}
                 />
               )}
 

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { ArrowRight, ArrowLeft, Award, Send } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Award, Send, GraduationCap } from 'lucide-react';
 import PresignedImage from "components/ui/PresignedImage";
 
 import Loading from "components/loading/Loading";
@@ -195,6 +195,7 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
               <NoMessagesFound
                 title="No programs found"
                 subtitle="Try adjusting your search or filters."
+                icon={<GraduationCap className="h-8 w-8 text-slate-400" />}
               />
             )}
 

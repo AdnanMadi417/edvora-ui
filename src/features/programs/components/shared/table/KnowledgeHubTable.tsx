@@ -221,6 +221,7 @@ export default function KnowledgeHubTable({
               colSpan={7}
               title="No programs found"
               subtitle="There are currently no programs available."
+              icon={<GraduationCap className="h-8 w-8 text-slate-400" />}
             />
           )}
 

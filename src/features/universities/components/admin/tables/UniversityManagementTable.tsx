@@ -17,7 +17,7 @@ import {
   Trash2,
   BadgeCheck,
 } from 'lucide-react';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle, SlidersHorizontal } from 'lucide-react';
 
 import { useUniversityTypes, useDeleteUniversityType } from "features/universities/hooks";
 import DeleteUniversityConfirmation from 'features/universities/components/admin/popups/DeleteUniversityConfirmation';
@@ -236,6 +236,7 @@ const UniversityManagementTable = () => {
                   <NoMessagesFound
                     title="No university types found"
                     subtitle="There are currently no university types available."
+                    icon={<SlidersHorizontal className="h-8 w-8 text-slate-400" />}
                   />
                 </td>
               </tr>
