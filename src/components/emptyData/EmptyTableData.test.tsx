@@ -10,11 +10,21 @@ describe('EmptyTableData Component', () => {
     expect(screen.getByText('There is no data available at the moment')).toBeInTheDocument()
   })
 
-  it('renders the empty data icon', () => {
-    render(<EmptyTableData />)
-    
-    const image = screen.getByAltText('No data')
-    expect(image).toBeInTheDocument()
+  it('renders the default empty-state icon', () => {
+    const { container } = render(<EmptyTableData />)
+
+    // Default icon (SearchX) when no `icon` prop is passed — not the old
+    // raster image, replaced since it read as a chat/notification icon
+    // in some contexts where this component was reused.
+    const icon = container.querySelector('svg')
+    expect(icon).toBeInTheDocument()
+  })
+
+  it('renders a custom icon when provided', () => {
+    const { container } = render(<EmptyTableData icon={<span data-testid="custom-icon" />} />)
+
+    expect(screen.getByTestId('custom-icon')).toBeInTheDocument()
+    expect(container.querySelector('svg')).not.toBeInTheDocument()
   })
 
   it('has the correct structure without card styling', () => {

@@ -9,6 +9,7 @@ import {
   Pencil,
   Trash2,
   Book,
+  Layers,
 } from "lucide-react";
 import { MdLabelOutline } from "react-icons/md";
 
@@ -205,6 +206,7 @@ const FieldsOfStudyTable = () => {
                     <NoMessagesFound
                       title="No fields found"
                       subtitle="There are currently no fields of study available."
+                      icon={<Layers className="h-8 w-8 text-slate-400" />}
                     />
                   </td>
                 </tr>

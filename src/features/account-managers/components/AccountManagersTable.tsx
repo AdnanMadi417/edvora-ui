@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowRightLeft, ChevronRight, User, Mail, CheckCircle, Settings,
-  RefreshCw, Pencil, Share2, Users,
+  RefreshCw, Pencil, Share2, Users, UserCog,
   AlertCircle, Trash2, SlidersHorizontal, Activity, XCircle,
 } from "lucide-react";
 import { MdPersonAdd } from "react-icons/md";
@@ -302,6 +302,7 @@ const AccountManagersTable = () => {
                   colSpan={6}
                   title={activeFiltersCount > 0 ? "No account managers found" : "No account managers yet"}
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Create your first account manager to get started."}
+                  icon={<UserCog className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button

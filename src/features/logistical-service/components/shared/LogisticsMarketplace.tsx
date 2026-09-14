@@ -9,6 +9,7 @@ import {
   CheckCircle,
   Search,
   Lock,
+  Truck,
 } from 'lucide-react';
 import {
   MdOutlineTranslate,
@@ -97,6 +98,7 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
           <NoMessagesFound
             title="No service providers found"
             subtitle="Try adjusting your search or filters."
+            icon={<Truck className="h-8 w-8 text-slate-400" />}
           />
         )}
 

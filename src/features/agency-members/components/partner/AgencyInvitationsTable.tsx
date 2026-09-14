@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   User, Mail, Activity, CalendarDays,
-  RefreshCw, SlidersHorizontal, Send, KeyRound,
+  RefreshCw, SlidersHorizontal, Send, KeyRound, UserPlus,
 } from "lucide-react";
 
 import { useAgencyInvitations, useResendSubmissionLink, useResendAgencyInvitationOtp } from "../../hooks";
@@ -251,6 +251,7 @@ export default function AgencyInvitationsTable() {
                   colSpan={5}
                   title={activeFiltersCount > 0 ? "No invitations found" : "No invitations yet"}
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Invite your first team member to get started."}
+                  icon={<UserPlus className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button

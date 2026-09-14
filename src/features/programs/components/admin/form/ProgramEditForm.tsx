@@ -845,6 +845,7 @@ const EditKnowledgeHubProgramDetails = ({
                   <NoMessagesFound
                     title="No scholarships found"
                     subtitle="There are currently no scholarships available."
+                    icon={<Award className="h-8 w-8 text-slate-400" />}
                   />
                 )}
               </AccordionSection>

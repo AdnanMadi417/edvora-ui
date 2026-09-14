@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   ChevronRight, User, Mail, CheckCircle, Settings,
-  RefreshCw, Users,
+  RefreshCw, Users, UserCog,
   AlertCircle, SlidersHorizontal, Activity, XCircle,
 } from "lucide-react";
 
@@ -214,6 +214,7 @@ const ReviewerAccountManagersTable = () => {
                   colSpan={5}
                   title={activeFiltersCount > 0 ? "No account managers found" : "No account managers yet"}
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No account managers have been added yet."}
+                  icon={<UserCog className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button

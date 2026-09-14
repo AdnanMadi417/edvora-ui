@@ -9,6 +9,7 @@ import {
   Pencil,
   Landmark,
   Trash2,
+  CreditCard,
 } from "lucide-react";
 
 import { useToast } from "components/context/ToastContext";
@@ -775,6 +776,7 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
             <NoMessagesFound
               title="No payment methods assigned"
               subtitle="Assign a payment method to allow universities to accept payments."
+              icon={<CreditCard className="h-8 w-8 text-slate-400" />}
             />
           )}
         </div>

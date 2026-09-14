@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   RefreshCw, Users, UserCog, BadgeCheck, CalendarDays, Pencil,
-  ShieldCheck, CheckCircle, XCircle, Ban, Power, Clock,
+  ShieldCheck, CheckCircle, XCircle, Ban, Power, Clock, Handshake,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
 import { StatusBadge } from "components/ui/badges";
@@ -155,6 +155,7 @@ export default function ReviewerPartnersTable() {
                 colSpan={6}
                 title="No partners found"
                 subtitle="No partners have registered yet."
+                icon={<Handshake className="h-8 w-8 text-slate-400" />}
               />
             )}
 

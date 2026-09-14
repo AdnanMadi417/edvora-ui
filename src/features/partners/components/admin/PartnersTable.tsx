@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
   Pencil, RefreshCw, SlidersHorizontal, Building2,
-  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power, KeyRound, Trash2,
+  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power, KeyRound, Trash2, Handshake,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
 import { StatusBadge } from "components/ui/badges";
@@ -369,6 +369,7 @@ export default function PartnersTable() {
                   colSpan={7}
                   title="No partners found"
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No partners have registered yet."}
+                  icon={<Handshake className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button

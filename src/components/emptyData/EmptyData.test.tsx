@@ -10,11 +10,13 @@ describe('EmptyData Component', () => {
     expect(screen.getByText('There is no data available at the moment')).toBeInTheDocument()
   })
 
-  it('renders the empty data icon', () => {
-    render(<EmptyData />)
-    
-    const image = screen.getByAltText('No data')
-    expect(image).toBeInTheDocument()
+  it('renders the default empty-state icon', () => {
+    const { container } = render(<EmptyData />)
+
+    // Default icon (SearchX) when no `icon` prop is passed — not the old
+    // raster image.
+    const icon = container.querySelector('svg')
+    expect(icon).toBeInTheDocument()
   })
 
   it('has the correct structure', () => {

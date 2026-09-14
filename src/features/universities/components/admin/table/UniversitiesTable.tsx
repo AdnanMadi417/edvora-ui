@@ -18,6 +18,7 @@ import {
   Wallet,
   XCircle,
   SlidersHorizontal,
+  Landmark,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { StatusBadge } from "components/ui/badges";
@@ -396,6 +397,7 @@ const UniversitiesTable = () => {
                     <NoMessagesFound
                       title="No universities found"
                       subtitle="There are currently no universities available."
+                      icon={<Landmark className="h-8 w-8 text-slate-400" />}
                     />
                   </td>
                 </tr>
