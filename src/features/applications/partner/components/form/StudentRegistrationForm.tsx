@@ -445,7 +445,11 @@ export default function StudentRegistrationForm() {
         </div>
 
         <div className="relative mb-8">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-[repeat(auto-fit,_minmax(150px,_1fr))]">
+          <div
+            className={`grid gap-2 sm:grid-cols-[repeat(auto-fit,_minmax(150px,_1fr))] ${
+              visibleStages.length === 3 ? "grid-cols-3" : "grid-cols-4"
+            }`}
+          >
             {visibleStages.map((s, index) => {
               const Icon = s.icon;
               const isActive = s.id === stage;
@@ -455,7 +459,7 @@ export default function StudentRegistrationForm() {
               return (
                 <div
                   key={s.id}
-                  className="group relative flex flex-col items-center"
+                  className="group relative flex min-w-0 flex-col items-center gap-2"
                 >
                   {index < visibleStages.length - 1 && (
                     <div className="absolute left-1/2 top-6 -z-10 hidden h-1 w-full bg-slate-200 sm:block">
@@ -470,7 +474,7 @@ export default function StudentRegistrationForm() {
                   <button
                     onClick={() => canAccess && setStage(s.id)}
                     disabled={!canAccess}
-                    className={`relative mb-3 flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all duration-300
+                    className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 sm:mb-3 sm:h-12 sm:w-12
       ${
         isCompleted
           ? "border-blue-500 bg-blue-500 text-white shadow-md"
@@ -481,14 +485,11 @@ export default function StudentRegistrationForm() {
           : "cursor-not-allowed border-slate-200 bg-slate-50 text-slate-400"
       }`}
                   >
-                    <Icon
-                      size={20}
-                      className="transition-transform duration-300 group-hover:scale-110"
-                    />
+                    <Icon className="h-3.5 w-3.5 shrink-0 transition-transform duration-300 group-hover:scale-110 sm:h-5 sm:w-5" />
                   </button>
 
                   <span
-                    className={`text-center text-xs transition-colors duration-300 sm:text-sm ${
+                    className={`w-full min-w-0 break-words text-center text-xs transition-colors duration-300 sm:text-sm ${
                       isActive
                         ? "font-semibold text-blue-700"
                         : "text-slate-500"
