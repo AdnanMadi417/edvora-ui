@@ -10,7 +10,7 @@ interface FilterChipProps {
 
 export default function FilterChip({ label, onRemove }: FilterChipProps) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 py-1 pl-3 pr-1.5 text-sm font-medium text-blue-700">
+    <span className="inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-blue-200 bg-blue-50 py-1 pl-3 pr-1.5 text-sm font-medium text-blue-700">
       {label}
       <button
         type="button"
