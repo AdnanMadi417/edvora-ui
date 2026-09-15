@@ -1,25 +1,8 @@
 import { useState, useEffect } from "react";
 import api from "lib/useApi";
-import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
+import type { ApplicationDetail } from "features/applications/shared/applicationTypes";
 
-export interface Application {
-  id: string;
-  is_draft: boolean;
-  lifecycle_status: string;
-  intake_date: string;
-  created_at: string;
-  updated_at: string;
-  partner: { id: string; name: string };
-  program: any;
-  student: any;
-  stage: any;
-  documents: any[];
-  commissions: ApplicationCommissionItem[];
-  payment_documents: any[];
-  arrival_documents: any[];
-  offer_letter_document: any;
-  visa_document: any;
-}
+export type Application = ApplicationDetail;
 
 interface UseAccountManagerApplicationProps {
   applicationId: string;
