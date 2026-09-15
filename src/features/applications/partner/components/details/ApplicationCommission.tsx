@@ -33,7 +33,6 @@ export default function ApplicationCommission({
   const commissions: ApplicationCommissionItem[] = Array.isArray(application?.commissions)
     ? application.commissions
     : [];
-  const hasCommissions = commissions.length > 0;
 
   const commissionDocs = Object.values(
     application?.commission_documents || {}
@@ -43,8 +42,6 @@ export default function ApplicationCommission({
     text
       ? text.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
       : "Commission Document";
-
-  if (!hasCommissions && commissionDocs.length === 0) return null;
 
   return (
     <>

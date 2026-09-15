@@ -21,14 +21,10 @@ export default function ApplicationCommissions({
     application?.commission_documents || {}
   ).filter(Boolean) as any[];
 
-  const hasCommissions = commissions.length > 0;
-
   const formatLabel = (text?: string) =>
   text
     ? text.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
     : "Commission Document";
-
-  if (!hasCommissions && commissionDocs.length === 0) return null;
 
   return (
     <>
@@ -70,7 +66,7 @@ export default function ApplicationCommissions({
           ))
         ) : (
           <p className="text-center text-gray-500">
-            No commission records found.
+            No commission documents available.
           </p>
         )}
       </div>
