@@ -252,7 +252,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
     });
 
     lines.push("");
-    lines.push("University fees for this course include 6% tax (SST)");
+    lines.push("University fees for this course exclude 6% tax (SST)");
 
     await navigator.clipboard.writeText(lines.join("\n"));
     setCopied(true);

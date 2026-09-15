@@ -230,7 +230,7 @@ const ProgramDetails = ({ id }: Props) => {
       lines.push(`${item.description ?? 'Fee'} : ${formatFee(item.fee, item.currency)}`);
     });
     lines.push('');
-    lines.push('University fees for this course include 6% tax (SST)');
+    lines.push('University fees for this course exclude 6% tax (SST)');
     await navigator.clipboard.writeText(lines.join('\n'));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -486,14 +486,14 @@ const ProgramDetails = ({ id }: Props) => {
       </div>
 
       <div className="p-6 border-b border-slate-200">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
                 <CreditCard className="h-5 w-5 text-blue-600" />
               </div>
               <h4 className="text-base font-bold text-slate-900">Tuition Fees</h4>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="ml-auto flex shrink-0 items-center gap-2">
               <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
               <Button
                 onClick={handleCopyAll}
