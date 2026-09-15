@@ -230,7 +230,7 @@ const ProgramDetails = ({ id }: Props) => {
       lines.push(`${item.description ?? 'Fee'} : ${formatFee(item.fee, item.currency)}`);
     });
     lines.push('');
-    lines.push('University fees for this course include 6% tax (SST)');
+    lines.push('University fees for this course exclude 6% tax (SST)');
     await navigator.clipboard.writeText(lines.join('\n'));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
