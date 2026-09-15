@@ -1,53 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
+import type { ApplicationDetail } from "features/applications/shared/applicationTypes";
 
-export interface AvailableAction {
-  status: string;
-  next_action: string;
-}
-
-export interface DocumentType {
-  id: string;
-  type: string;
-  code: string;
-  description: string;
-}
-
-export interface StageStatus {
-  id: string;
-  name: string;
-  is_requires_reason: boolean;
-  is_requires_document_selection: boolean;
-  is_triggers_stage_advance: boolean;
-}
-
-export interface PartnerAction {
-  target_status_id: string;
-  target_status_code: string;
-  label: string;
-  is_requires_reason: boolean;
-  is_requires_document_selection: boolean;
-}
-
-export interface ApplicationDetails {
-  id: string;
-  stage: string;
-  status: string;
-  status_code: string;
-  is_draft: boolean;
-  correction_reason: string | null;
-  next_action: string;
-  available_actions: AvailableAction[];
-  document_types: DocumentType[];
-  manager_allowed_next_statuses: StageStatus[];
-  partner_actions: PartnerAction[];
-}
+export type ApplicationDetails = ApplicationDetail;
 
 const useApplicationDetails = (applicationId?: string) => {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<ApplicationDetails | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const token = Cookies.get("token");
 
   const fetchApplicationDetails = useCallback(async () => {
@@ -57,11 +18,11 @@ const useApplicationDetails = (applicationId?: string) => {
     setError(null);
 
     try {
-      const response = await api.get(`/admin/applications/${applicationId}`, {
+      const response = await api.get<ApplicationDetails>(`/admin/applications/${applicationId}`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setData(response.data);
-    } catch (err) {
+    } catch (err: any) {
       console.error("API error:", err);
       setError(err?.response?.data?.message || "Failed to fetch application details");
     } finally {

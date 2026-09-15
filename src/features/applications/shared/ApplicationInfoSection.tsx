@@ -3,6 +3,7 @@ import { MdAssignmentTurnedIn } from "react-icons/md";
 import { AppDate } from "components/ui/date";
 import { SectionIconBadge } from "components/ui/icons";
 import { courseTypeLabel } from "features/programs/utils/courseType";
+import { DetailStatusBadge } from "components/ui/badges";
 
 interface ApplicationInfoSectionProps {
   application: any;
@@ -64,10 +65,28 @@ export default function ApplicationInfoSection({ application }: ApplicationInfoS
           </span>
         </div>
         <div>
+          <span className="block text-p1 font-medium text-slate-900">Arrival Date</span>
+          <span className="text-p2 text-slate-500">
+            <AppDate value={application.arrival_date} format="month" fallback="Not provided" />
+          </span>
+        </div>
+        <div>
           <span className="block text-p1 font-medium text-slate-900">Tuition Fee</span>
           <span className="text-p1 text-green-700">
             RM {program.tuition_fee?.toLocaleString() || "Not provided"}
           </span>
+        </div>
+        <div>
+          <span className="mb-1 block text-p1 font-medium text-slate-900">e-Visa Required</span>
+          <DetailStatusBadge variant={application.is_e_visa_required ? "success" : "neutral"}>
+            {application.is_e_visa_required ? "Yes" : "No"}
+          </DetailStatusBadge>
+        </div>
+        <div>
+          <span className="mb-1 block text-p1 font-medium text-slate-900">Extra Arrival Documents Required</span>
+          <DetailStatusBadge variant={application.is_arrival_extra_docs_required ? "success" : "neutral"}>
+            {application.is_arrival_extra_docs_required ? "Yes" : "No"}
+          </DetailStatusBadge>
         </div>
       </div>
     </div>
