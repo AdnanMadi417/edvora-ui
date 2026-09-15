@@ -1,12 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { Receipt, AlertCircle } from "lucide-react";
+import { Receipt, AlertCircle, Clock } from "lucide-react";
 import type { ApplicationActionsResponse } from "features/applications/hooks";
 import DisputeCommission from "features/applications/partner/components/popups/DisputeCommission";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import Button from "components/ui/buttons/Button";
 import { SectionIconBadge } from "components/ui/icons";
+import { DetailStatusBadge } from "components/ui/badges";
+import { getStatusVariant } from "utils/getStatusVariant";
+import {
+  type ApplicationCommissionItem,
+  formatCommissionAmount,
+  formatCommissionTimeline,
+} from "features/applications/shared/commissionTypes";
 
 interface ApplicationCommissionProps {
   application: any;
@@ -28,9 +35,10 @@ export default function ApplicationCommission({
     (a) => a.target_status_code === "COMMISSION_DISPUTED"
   );
 
-  const hasCommissions =
-    Array.isArray(application?.commissions) &&
-    application.commissions.length > 0;
+  const commissions: ApplicationCommissionItem[] = Array.isArray(application?.commissions)
+    ? application.commissions
+    : [];
+  const hasCommissions = commissions.length > 0;
 
   const commissionDocs = Object.values(
     application?.commission_documents || {}
@@ -75,12 +83,42 @@ export default function ApplicationCommission({
         )}
       </div>
 
+      {hasCommissions && (
+        <div className="space-y-3 border-b border-slate-200 p-6">
+          {commissions.map((c) => {
+            const timeline = formatCommissionTimeline(c.expected_commission_from, c.expected_commission_to);
+            return (
+              <div key={c.id} className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  {c.amount != null && (
+                    <p className="text-lg font-bold text-slate-900">
+                      {formatCommissionAmount(c.amount, c.currency)}
+                      {c.commission_type && (
+                        <span className="ml-2 text-xs font-normal text-slate-400">{c.commission_type}</span>
+                      )}
+                    </p>
+                  )}
+                  {c.notes && <p className="mt-1 text-sm text-slate-500">{c.notes}</p>}
+                  {timeline && (
+                    <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
+                      <Clock className="h-3.5 w-3.5" />
+                      {timeline}
+                    </p>
+                  )}
+                </div>
+                <DetailStatusBadge variant={getStatusVariant(c.status)}>{c.status}</DetailStatusBadge>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <div className="space-y-4 p-6">
         {commissionDocs.length > 0 ? (
           commissionDocs.map((doc: any) => (
             <div
               key={doc.id}
-              className="rounded-lg border border-slate-200 bg-white p-4"
+              className="rounded-lg border border-slate-200 "
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-4">

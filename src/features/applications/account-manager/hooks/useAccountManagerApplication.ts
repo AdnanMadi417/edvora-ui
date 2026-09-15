@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "lib/useApi";
+import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 
 export interface Application {
   id: string;
@@ -13,7 +14,7 @@ export interface Application {
   student: any;
   stage: any;
   documents: any[];
-  commissions: any[];
+  commissions: ApplicationCommissionItem[];
   payment_documents: any[];
   arrival_documents: any[];
   offer_letter_document: any;
