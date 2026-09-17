@@ -3,6 +3,12 @@ import { Handshake, UserCog, Bell } from "lucide-react";
 
 const reviewerRoutes: IRoute[] = [
     {
+        name: "Notifications",
+        layout: "/reviewer",
+        path: "/notifications",
+        icon: Bell,
+    },
+    {
         name: "Partners",
         layout: "/reviewer",
         path: "/partners",
@@ -13,12 +19,6 @@ const reviewerRoutes: IRoute[] = [
         layout: "/reviewer",
         path: "/account-managers",
         icon: UserCog,
-    },
-    {
-        name: "Notifications",
-        layout: "/reviewer",
-        path: "/notifications",
-        icon: Bell,
     },
 ];
 
