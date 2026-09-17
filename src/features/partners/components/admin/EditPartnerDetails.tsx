@@ -34,6 +34,15 @@ const PUBLIC_PROFILE_ERROR_MESSAGES: Record<string, string> = {
   slug_already_exists: "That slug is already taken.",
 };
 
+// PUT /admin/partners/{id} type-conversion errors (UBX-344) — attached to
+// the field the admin has to fix, showing the backend's own message rather
+// than a generic toast.
+const TYPE_CHANGE_ERROR_FIELDS: Record<string, string> = {
+  type_change_not_allowed: "type",
+  agency_member_type_change_not_allowed: "type",
+  company_name_required: "company_name",
+};
+
 interface Props {
   id: string;
 }
@@ -544,6 +553,12 @@ export default function EditPartnerDetails({ id }: Props) {
         scrollToFirstError({ pp_slug: PUBLIC_PROFILE_ERROR_MESSAGES[code] });
         return;
       }
+      if (code && TYPE_CHANGE_ERROR_FIELDS[code]) {
+        const patch = { [TYPE_CHANGE_ERROR_FIELDS[code]]: parseApiError(error, "Update failed. Please try again.") };
+        setErrors((prev) => ({ ...prev, ...patch }));
+        scrollToFirstError(patch);
+        return;
+      }
       if (code === "public_profile_not_found") {
         showToast(parseApiError(error, "This partner has no public profile to update."), "error");
         return;
@@ -557,6 +572,11 @@ export default function EditPartnerDetails({ id }: Props) {
 
   const isIndividual = formData.type === "individual";
   const isCompany = formData.type === "agency";
+  // UBX-344: an admin may convert an individual into an agency, never the
+  // reverse — the backend refuses that (an agency's members would be
+  // stranded), so don't offer it.
+  const isTypeLocked = partner.type === "agency";
+  const isConvertingToAgency = partner.type === "individual" && formData.type === "agency";
 
   const saveDisabledReason = isUpdatingPartner
     ? "Saving..."
@@ -615,7 +635,22 @@ export default function EditPartnerDetails({ id }: Props) {
             <InputField label="Email Address" field="email" type="email" required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("email")} />
             <SearchableDropdown label="Country of Residence" field="country" options={COUNTRIES.map((c) => ({ value: c.code, label: c.name }))} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("country")} />
             <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS} formData={formData} errors={errors} updateFormData={updateFormData} />
-            <SelectField label="Partner Type" field="type" options={PARTNER_TYPE.map((p) => ({ value: p.value, label: p.label }))} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("type")} />
+            <div>
+              <SelectField label="Partner Type" field="type" options={PARTNER_TYPE.map((p) => ({ value: p.value, label: p.label }))} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("type")} disabled={isTypeLocked} />
+              {isTypeLocked && (
+                <p className="-mt-3 mb-4 text-xs text-slate-500">
+                  A company can&apos;t be changed back to an individual partner.
+                </p>
+              )}
+              {isConvertingToAgency && (
+                <p className="-mt-3 mb-4 text-xs text-amber-700">
+                  Saving will convert this partner into a company that can invite team members.
+                  {partner.public_profile
+                    ? " Their public profile will be taken offline — the page and its link are kept, but it can't be published again while they're a company."
+                    : ""}
+                </p>
+              )}
+            </div>
             <PhoneInputField dialCodeField="phone_code" numberField="phone_number" formData={formData} errors={errors} updateFormData={updateFormData} required onBlur={() => validateField("phone_number")} />
             <SelectField label="Assigned Manager" field="manager_id" required={false} options={accountManagers.map((m) => ({ label: m.name, value: m.id }))} formData={formData} errors={errors} updateFormData={updateFormData} />
           </div>
@@ -782,7 +817,7 @@ export default function EditPartnerDetails({ id }: Props) {
               <InputField
                 label="Company Name"
                 field="company_name"
-                required={false}
+                required
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
