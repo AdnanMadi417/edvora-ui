@@ -28,10 +28,18 @@ export interface ApplicationCommissionItem {
   created_at: string;
 }
 
+/** Prefix shown before the amount, per currency, normalized to uppercase
+ *  regardless of how the API cases it (e.g. "rm"/"usd"). */
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  RM: "RM ",
+  USD: "USD ",
+};
+
 /** No currency switcher in this section — shown exactly as the API sends
  *  it, not converted. */
 export function formatCommissionAmount(amount: number, currency: string): string {
-  return `${currency} ${amount.toLocaleString()}`;
+  const prefix = CURRENCY_SYMBOLS[currency?.toUpperCase()] ?? `${currency} `;
+  return `${prefix}${amount.toLocaleString()}`;
 }
 
 /** expected_commission_from/to is a day-count window, not a date — same
