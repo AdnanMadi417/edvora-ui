@@ -45,6 +45,11 @@ const TYPE_CHANGE_ERROR_FIELDS: Record<string, string> = {
 
 interface Props {
   id: string;
+  /** Where "Back" and a successful save navigate to — defaults to the admin
+   *  partner details route. Reviewer reuses this same form/component and
+   *  passes its own base path so navigation doesn't dead-end on a route
+   *  reviewers can't access. */
+  basePath?: string;
 }
 
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
@@ -244,7 +249,7 @@ function AvatarUpload({
   );
 }
 
-export default function EditPartnerDetails({ id }: Props) {
+export default function EditPartnerDetails({ id, basePath = "/admin/partners" }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -545,7 +550,7 @@ export default function EditPartnerDetails({ id }: Props) {
         await assignManager(id, { manager_id: formData.manager_id });
       }
       showToast("Partner updated successfully", "success");
-      router.push(`/admin/partners/${id}`);
+      router.push(`${basePath}/${id}`);
     } catch (error: unknown) {
       const code = getApiErrorCode(error);
       if (code && PUBLIC_PROFILE_ERROR_MESSAGES[code]) {
@@ -870,7 +875,7 @@ export default function EditPartnerDetails({ id }: Props) {
         {/* Footer */}
         <div className="flex justify-end gap-3 px-6 py-5">
           <Button
-            onClick={() => router.push(`/admin/partners/${id}`)}
+            onClick={() => router.push(`${basePath}/${id}`)}
             icon={<ChevronLeft className="h-4 w-4" />}
             text="Back"
             bgColor="bg-white"
