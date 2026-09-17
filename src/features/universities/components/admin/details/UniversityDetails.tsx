@@ -23,12 +23,17 @@ import EmptyData from "components/emptyData/EmptyTableData";
 interface UniversityDetailsProps {
   id: string;
   basePath?: string;
+  /** Partner reuses this same view — no "Edit University" action, and the
+   *  Payment Methods section is skipped entirely rather than fetched: that
+   *  endpoint requires UNIVERSITY_CONFIG/WRITE permission, which partners
+   *  don't have, so calling it would just 403. */
+  readOnly?: boolean;
 }
 
-const UniversityDetails = ({ id, basePath = "/admin/universities" }: UniversityDetailsProps) => {
+const UniversityDetails = ({ id, basePath = "/admin/universities", readOnly = false }: UniversityDetailsProps) => {
   const router = useRouter();
 
-  const { universityPaymentMethods, loading } = useUniversityPaymentMethods(id);
+  const { universityPaymentMethods, loading } = useUniversityPaymentMethods(readOnly ? undefined : id);
 
   const { university, branches, universityLoading } = useUniversityDetails(id);
 
@@ -156,6 +161,7 @@ const UniversityDetails = ({ id, basePath = "/admin/universities" }: UniversityD
             )}
           </div>
 
+          {!readOnly && (
           <div className="border-t border-slate-200 px-6 py-6">
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
               Payment Methods
@@ -213,8 +219,9 @@ const UniversityDetails = ({ id, basePath = "/admin/universities" }: UniversityD
               </div>
             )}
           </div>
+          )}
 
-          <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-4">
             <Button
               onClick={handleBack}
               icon={<ChevronLeft className="h-5 w-5" />}
@@ -224,19 +231,21 @@ const UniversityDetails = ({ id, basePath = "/admin/universities" }: UniversityD
               borderColor="border-slate-300"
               hoverTextColor="hover:text-slate-800"
               hoverBorderColor="hover:border-slate-400"
-              className="flex-1 hover:bg-slate-50"
+              className={`hover:bg-slate-50 ${readOnly ? "" : "flex-1"}`}
             />
-            <Button
-              onClick={() => router.push(`${basePath}/${id}/edit`)}
-              icon={<Pencil className="h-5 w-5" />}
-              text="Edit University"
-              bgColor="bg-blue-600"
-              textColor="text-white"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-white"
-              hoverBorderColor="hover:border-blue-700"
-              className="flex-1 hover:bg-blue-700"
-            />
+            {!readOnly && (
+              <Button
+                onClick={() => router.push(`${basePath}/${id}/edit`)}
+                icon={<Pencil className="h-5 w-5" />}
+                text="Edit University"
+                bgColor="bg-blue-600"
+                textColor="text-white"
+                borderColor="border-blue-600"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-blue-700"
+                className="flex-1 hover:bg-blue-700"
+              />
+            )}
           </div>
         </div>
       </div>

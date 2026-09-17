@@ -1,4 +1,4 @@
-import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2 } from "lucide-react";
+import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2, Landmark, GraduationCap } from "lucide-react";
 
 import type { IRoute } from "../types/navigation";
 
@@ -24,6 +24,20 @@ const partnerRoutes: IRoute[] = [
     layout: "/partner",
     path: "/knowledge-hub",
     icon: BookOpen,
+    children: [
+      {
+        name: "Programs",
+        layout: "/partner",
+        path: "/knowledge-hub",
+        icon: GraduationCap,
+      },
+      {
+        name: "Universities",
+        layout: "/partner",
+        path: "/universities",
+        icon: Landmark,
+      },
+    ],
   },
 
   {
