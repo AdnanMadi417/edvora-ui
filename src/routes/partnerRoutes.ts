@@ -4,6 +4,15 @@ import type { IRoute } from "../types/navigation";
 
 const partnerRoutes: IRoute[] = [
   {
+    // The mandatory partner onboarding tour (PartnerOnboardingTour.tsx) spotlights
+    // this exact nav item via data-tour-id="notifications" as one of its fixed steps.
+    name: "Notifications",
+    layout: "/partner",
+    path: "/notifications",
+    icon: Bell,
+  },
+
+  {
     name: "Applications",
     layout: "/partner",
     path: "/applications",
@@ -18,15 +27,6 @@ const partnerRoutes: IRoute[] = [
   },
 
   {
-    // The mandatory partner onboarding tour (PartnerOnboardingTour.tsx) spotlights
-    // this exact nav item via data-tour-id="notifications" as one of its fixed steps.
-    name: "Notifications",
-    layout: "/partner",
-    path: "/notifications",
-    icon: Bell,
-  },
-
-  {
     name: "Logistics Marketplace",
     layout: "/partner",
     path: "/logistics-marketplace",
@@ -34,7 +34,7 @@ const partnerRoutes: IRoute[] = [
   },
 
   {
-    name: "Team Members",
+    name: "Agency Scaler",
     layout: "/partner",
     path: "/team-members",
     icon: UserPlus,
@@ -43,7 +43,7 @@ const partnerRoutes: IRoute[] = [
   {
     // Individual advisors only — public profiles are individual-only in V1
     // (see partner_public_profiles). Filtered out for agency partners in
-    // app/partner/layout.tsx, mirroring how "Team Members" is filtered out
+    // app/partner/layout.tsx, mirroring how "Agency Scaler" is filtered out
     // for individual partners.
     name: "My Public Profile",
     layout: "/partner",

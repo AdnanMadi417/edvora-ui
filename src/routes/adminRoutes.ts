@@ -18,6 +18,12 @@ import {
 
 const AdminRoutes: IRoute[] = [
   {
+    name: "Notifications",
+    layout: "/admin",
+    path: "/notifications",
+    icon: Bell,
+  },
+  {
     name: "Applications",
     layout: "/admin",
     path: "/applications",
@@ -40,12 +46,6 @@ const AdminRoutes: IRoute[] = [
     layout: "/admin",
     path: "/staff-users",
     icon: Users,
-  },
-  {
-    name: "Notifications",
-    layout: "/admin",
-    path: "/notifications",
-    icon: Bell,
   },
   {
     name: "Knowledge Hub",

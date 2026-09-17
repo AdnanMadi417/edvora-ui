@@ -3,6 +3,12 @@ import { ClipboardList, Handshake, BookOpen, Truck, Bell } from "lucide-react";
 
 const accountManagerRoutes: IRoute[] = [
     {
+        name: "Notifications",
+        layout: "/account-manager",
+        path: "/notifications",
+        icon: Bell,
+    },
+    {
         name: "Applications",
         layout: "/account-manager",
         path: "/applications",
@@ -25,12 +31,6 @@ const accountManagerRoutes: IRoute[] = [
         layout: "/account-manager",
         path: "/partners",
         icon: Handshake,
-    },
-    {
-        name: "Notifications",
-        layout: "/account-manager",
-        path: "/notifications",
-        icon: Bell,
     },
     // {
     //     name: "Commission",
