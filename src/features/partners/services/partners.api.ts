@@ -92,6 +92,15 @@ export const partnersApi = {
   adminResendRegistrationOtp: (email: string) =>
     api.post<{ message: string }>('/admin/partners/register/resend-otp', { email }, { headers: authHeader() }),
 
+  // Accessible with an admin OR reviewer token.
+  getPendingRegistrationOtps: (params?: {
+    search?: string;
+    progress?: string;
+    partner_type?: string;
+    page?: number;
+    page_size?: number;
+  }) => api.get('/admin/partners/register/pending-otps', { params, headers: authHeader() }),
+
   // Account-manager-scoped: only the AM's own assigned partners (AM identified via Bearer token)
   listForAccountManager: (params?: { limit?: number; offset?: number; search?: string }) =>
     api.get('/account-managers/partners', { params, headers: authHeader() }),

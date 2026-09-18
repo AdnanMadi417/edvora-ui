@@ -258,3 +258,37 @@ export interface UpdatePartnerProfilePayload {
   individual_details?: Partial<IndividualDetails>;
   company_details?: Partial<CompanyDetails>;
 }
+
+// ── Pending partner registration OTPs ────────────────────────────────────────
+// GET /admin/partners/register/pending-otps — a registration that hasn't
+// completed email verification yet, so no partner/user row exists for it at
+// all. Distinct from a Partner awaiting admin review (which already has a
+// full account, just not activated).
+
+export type RegistrationOtpProgress =
+  | "otp_pending"
+  | "otp_expired"
+  | "max_resends_reached"
+  | "otp_attempts_exhausted"
+  | "completed";
+
+export interface PendingRegistrationOtp {
+  email: string;
+  full_name: string | null;
+  company_name: string | null;
+  partner_type: "individual" | "agency" | null;
+  created_at: string;
+  expires_at: string;
+  resend_count: number;
+  attempt_count: number;
+  is_used: boolean;
+  progress: RegistrationOtpProgress;
+}
+
+export interface GetPendingRegistrationOtpsParams {
+  search?: string;
+  progress?: RegistrationOtpProgress;
+  partner_type?: "individual" | "agency";
+  page?: number;
+  page_size?: number;
+}
