@@ -19,6 +19,7 @@ import SearchableDropdown from 'components/form/search/SearchableDropdown';
 import Button from "components/ui/buttons/Button";
 import IconButton from 'components/ui/buttons/IconButton';
 import SelectField from 'components/form/fields/SelectField';
+import ToggleInput from 'components/form/toggle/ToggleInput';
 import ImageUploadField from 'components/form/upload/ImageUploadField';
 import { getPresignedUploads, uploadFilesToSpaces } from 'services/uploadService';
 import { validateUniversity, isUniversityComplete, universityFieldMap } from './validateUniversity';
@@ -49,6 +50,9 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
     university_type_id: "",
     description: "",
     intake_months: [] as number[],
+    is_public: false,
+    has_language_center: false,
+    is_hidden: false,
 
     branches: [
       {
@@ -283,6 +287,42 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
             errors={errors}
             updateFormData={updateFormData}
             onBlur={() => validateField('university_type_id')}
+          />
+
+          <ToggleInput
+            label="Institution Type"
+            field="is_public"
+            formData={formData}
+            errors={{}}
+            updateFormData={updateFormData}
+            enabledText="Public"
+            disabledText="Private"
+            enabledDescription="This is a public university."
+            disabledDescription="This is a private university."
+          />
+
+          <ToggleInput
+            label="Language Center"
+            field="has_language_center"
+            formData={formData}
+            errors={{}}
+            updateFormData={updateFormData}
+            enabledText="Yes"
+            disabledText="No"
+            enabledDescription="This university has a language center."
+            disabledDescription="This university does not have a language center."
+          />
+
+          <ToggleInput
+            label="Visibility"
+            field="is_hidden"
+            formData={formData}
+            errors={{}}
+            updateFormData={updateFormData}
+            enabledText="Hidden"
+            disabledText="Visible"
+            enabledDescription="Hidden from partners — only visible to data-entry and admin."
+            disabledDescription="Visible to partners."
           />
 
         </div>
