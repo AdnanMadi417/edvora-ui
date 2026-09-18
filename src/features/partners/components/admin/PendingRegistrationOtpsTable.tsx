@@ -22,8 +22,13 @@ import IconButton from "components/ui/buttons/IconButton";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import ResendRegistrationOtpConfirmation from "./ResendRegistrationOtpConfirmation";
 
 const ITEMS_PER_PAGE = 20;
+
+// Client-side cap on top of whatever the backend enforces — keeps admins
+// from burning through a partner's resend budget one row-click at a time.
+const MAX_RESENDS = 3;
 
 const PROGRESS_OPTIONS: { value: RegistrationOtpProgress; label: string }[] = [
   { value: "otp_pending", label: "Awaiting verification" },
@@ -56,6 +61,7 @@ export default function PendingRegistrationOtpsTable() {
   const [partnerTypeFilter, setPartnerTypeFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [resendingEmail, setResendingEmail] = useState<string | null>(null);
+  const [confirmTarget, setConfirmTarget] = useState<PendingRegistrationOtp | null>(null);
 
   React.useEffect(() => {
     const t = setTimeout(() => {
@@ -111,6 +117,7 @@ export default function PendingRegistrationOtpsTable() {
       }
     } finally {
       setResendingEmail(null);
+      setConfirmTarget(null);
     }
   };
 
@@ -224,6 +231,8 @@ export default function PendingRegistrationOtpsTable() {
               {!loading && !error && items.map((row) => {
                 const config = PROGRESS_CONFIG[row.progress];
                 const isResending = resendingEmail === row.email;
+                const resendsLeft = Math.max(0, MAX_RESENDS - row.resend_count);
+                const canResend = config.canResend && resendsLeft > 0;
                 return (
                   <tr key={row.email} className="transition-colors hover:bg-slate-50">
                     <td className="min-w-[220px] max-w-[300px] px-6 py-4">
@@ -251,9 +260,15 @@ export default function PendingRegistrationOtpsTable() {
                     </td>
                     <td className="px-6 py-4">
                       <IconButton
-                        onClick={() => handleResend(row)}
-                        disabled={!config.canResend || isResending}
-                        title={isResending ? "Sending..." : "Resend verification code"}
+                        onClick={() => setConfirmTarget(row)}
+                        disabled={!canResend || isResending}
+                        title={
+                          isResending
+                            ? "Sending..."
+                            : canResend
+                              ? `Resend verification code (${resendsLeft} left)`
+                              : "Resend limit reached"
+                        }
                         icon={<KeyRound className={`h-4 w-4 ${isResending ? "animate-pulse" : ""}`} />}
                         bgColor="bg-transparent"
                         textColor="text-slate-400"
@@ -270,6 +285,17 @@ export default function PendingRegistrationOtpsTable() {
           </table>
         </TableWrapper>
       </div>
+
+      {confirmTarget && (
+        <ResendRegistrationOtpConfirmation
+          isOpen={!!confirmTarget}
+          onClose={() => setConfirmTarget(null)}
+          onConfirm={() => handleResend(confirmTarget)}
+          isSubmitting={resendingEmail === confirmTarget.email}
+          email={confirmTarget.email}
+          resendsLeft={Math.max(0, MAX_RESENDS - confirmTarget.resend_count)}
+        />
+      )}
     </div>
   );
 }
