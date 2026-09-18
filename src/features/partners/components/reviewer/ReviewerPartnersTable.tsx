@@ -13,6 +13,8 @@ import { usePartners, useUpdatePartner } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import ReviewPartnerPopup from "../admin/ReviewPartnerPopup";
 import SuspendActivatePartner from "../admin/SuspendActivatePartner";
+import PendingRegistrationOtpsTable from "../admin/PendingRegistrationOtpsTable";
+import { Tabs, type TabItem } from "components/ui/tabs";
 import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
@@ -24,6 +26,13 @@ import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 const ITEMS_PER_PAGE = 10;
+
+type ReviewerPartnersTab = "partners" | "pending-otps";
+
+const TABS: TabItem<ReviewerPartnersTab>[] = [
+  { key: "partners", label: "Partners" },
+  { key: "pending-otps", label: "Pending Registrations" },
+];
 
 type StatusFilter = "active" | "inactive" | "individual" | "agency" | null;
 
@@ -44,6 +53,7 @@ export default function ReviewerPartnersTable() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [activeTab, setActiveTab] = useState<ReviewerPartnersTab>("partners");
 
   const { accountManagers } = useAccountManagers();
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
@@ -140,6 +150,12 @@ export default function ReviewerPartnersTable() {
         </div>
       </div>
 
+      <Tabs<ReviewerPartnersTab> tabs={TABS} active={activeTab} onChange={setActiveTab} />
+
+      {activeTab === "pending-otps" && <PendingRegistrationOtpsTable />}
+
+      {activeTab === "partners" && (
+      <>
       {/* Stats Cards */}
       <div className="hidden sm:block p-6 border-b border-slate-200">
         <StatsFilterCards
@@ -391,9 +407,10 @@ export default function ReviewerPartnersTable() {
           </tbody>
         </table>
       </TableWrapper>
-      
-      </div>
 
+      </div>
+      </>
+      )}
 
       {reviewPartner && (
         <ReviewPartnerPopup
