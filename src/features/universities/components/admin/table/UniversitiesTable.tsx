@@ -15,11 +15,9 @@ import {
   GraduationCap,
   Wallet,
   XCircle,
-  SlidersHorizontal,
   Landmark,
   EyeOff,
   Languages,
-  Building2,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { StatusBadge } from "components/ui/badges";
@@ -31,8 +29,7 @@ import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import Link from "components/ui/links/LinkBtn";
 
-import FilterSelectField from "components/form/filter/FilterSelectField";
-import SearchInput from "components/form/filter/SearchInput";
+import UniversityFilterPanel from "features/universities/components/shared/filters/UniversityFilterPanel";
 import { TableWrapper, TableSkeletonRows, TableErrorRow, TableEmptyRow, TablePagination } from "components/ui/table";
 
 import DeleteUniversityConfirmation from "../popups/DeleteUniversityConfirmation";
@@ -42,11 +39,6 @@ import { parseApiError } from "utils/parseApiError";
 import { monthLabel } from "features/programs/utils/intakeMonths";
 
 type TriFilter = "all" | "true" | "false";
-
-const TRI_OPTIONS = [
-  { value: "true", label: "Yes" },
-  { value: "false", label: "No" },
-];
 
 function triToBool(value: TriFilter): boolean | undefined {
   return value === "all" ? undefined : value === "true";
@@ -59,7 +51,6 @@ const UniversitiesTable = () => {
   const [isPublicFilter, setIsPublicFilter] = useState<TriFilter>("all");
   const [hasLanguageCenterFilter, setHasLanguageCenterFilter] = useState<TriFilter>("all");
   const [isHiddenFilter, setIsHiddenFilter] = useState<TriFilter>("all");
-  const [showFilters, setShowFilters] = useState(false);
   const { showToast } = useToast();
 
 
@@ -193,7 +184,6 @@ const UniversitiesTable = () => {
     setHasLanguageCenterFilter("all");
     setIsHiddenFilter("all");
     setCurrentPage(1);
-    setShowFilters(false);
   };
 
 
@@ -245,83 +235,38 @@ const UniversitiesTable = () => {
       </div>
 
       {/* Search & Filters */}
-      <div className="border-y border-slate-200 pt-6 flex flex-wrap items-center gap-3 p-6">
-        <SearchInput
-          value={searchTerm}
-          onChange={handleSearchChange}
-          placeholder="Search by name or country..."
+      <div className="border-y border-slate-200 p-6">
+        <UniversityFilterPanel
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+          searchPlaceholder="Search by name or country..."
+          typeOptions={universityTypes.map((type) => ({
+            value: type.toLowerCase().trim(),
+            label: type,
+          }))}
+          filters={{
+            type: selectedType,
+            isPublic: isPublicFilter,
+            hasLanguageCenter: hasLanguageCenterFilter,
+            isHidden: isHiddenFilter,
+          }}
+          onApplyFilters={(values) => {
+            setSelectedType(values.type);
+            setIsPublicFilter(values.isPublic as TriFilter);
+            setHasLanguageCenterFilter(values.hasLanguageCenter as TriFilter);
+            setIsHiddenFilter(values.isHidden as TriFilter);
+            setCurrentPage(1);
+          }}
+          onRemoveFilter={(key) => {
+            if (key === "type") setSelectedType("all");
+            if (key === "isPublic") setIsPublicFilter("all");
+            if (key === "hasLanguageCenter") setHasLanguageCenterFilter("all");
+            if (key === "isHidden") setIsHiddenFilter("all");
+            setCurrentPage(1);
+          }}
+          onClearAll={clearFilters}
+          resultsCount={sortedUniversities.length}
         />
-
-        <button
-          className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-slate-200 bg-background text-slate-500 hover:bg-slate-50"
-          onClick={() => setShowFilters((v) => !v)}
-        >
-          <SlidersHorizontal className="h-4 w-4" />
-          {activeFiltersCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
-              {activeFiltersCount}
-            </span>
-          )}
-        </button>
-
-        <div className={`${showFilters ? "flex" : "hidden"} w-full items-center gap-3 sm:contents`}>
-          <div className="flex-1 sm:flex-none">
-            <FilterSelectField
-              value={selectedType}
-              onChange={(val: string) => { setSelectedType(val); setCurrentPage(1); }}
-              icon={MdOutlineCategory}
-              defaultOption="All Types"
-              options={universityTypes.map((type) => ({
-                value: type.toLowerCase().trim(),
-                label: type,
-              }))}
-            />
-          </div>
-
-          <div className="flex-1 sm:flex-none">
-            <FilterSelectField
-              value={isPublicFilter}
-              onChange={(val: string) => { setIsPublicFilter(val as TriFilter); setCurrentPage(1); }}
-              icon={Building2}
-              defaultOption="Public: All"
-              options={TRI_OPTIONS}
-            />
-          </div>
-
-          <div className="flex-1 sm:flex-none">
-            <FilterSelectField
-              value={hasLanguageCenterFilter}
-              onChange={(val: string) => { setHasLanguageCenterFilter(val as TriFilter); setCurrentPage(1); }}
-              icon={Languages}
-              defaultOption="Language Center: All"
-              options={TRI_OPTIONS}
-            />
-          </div>
-
-          <div className="flex-1 sm:flex-none">
-            <FilterSelectField
-              value={isHiddenFilter}
-              onChange={(val: string) => { setIsHiddenFilter(val as TriFilter); setCurrentPage(1); }}
-              icon={EyeOff}
-              defaultOption="Hidden: All"
-              options={TRI_OPTIONS}
-            />
-          </div>
-
-          {activeFiltersCount > 0 && (
-            <Button
-              onClick={clearFilters}
-              icon={<RefreshCw className="h-4 w-4" />}
-              text="Clear"
-              bgColor="bg-white"
-              textColor="text-red-600"
-              borderColor="border-red-200"
-              hoverTextColor="hover:text-red-600"
-              hoverBorderColor="hover:border-red-200"
-              className="hover:bg-red-50"
-            />
-          )}
-        </div>
       </div>
 
       <div className="p-6">
