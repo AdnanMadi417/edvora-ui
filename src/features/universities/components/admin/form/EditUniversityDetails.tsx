@@ -64,6 +64,9 @@ type FormData = {
   is_active: boolean;
   university_type_id: string;
   branches: Branch[];
+  is_public: boolean;
+  has_language_center: boolean;
+  is_hidden: boolean;
 };
 
 type PaymentRow = {
@@ -102,6 +105,9 @@ const INITIAL_FORM: FormData = {
   branches: [],
   is_active: true,
   university_type_id: "",
+  is_public: false,
+  has_language_center: false,
+  is_hidden: false,
 };
 
 const INITIAL_LOGO: LogoState = {
@@ -130,6 +136,9 @@ const normalizePayload = (formData: FormData) => ({
   intake_months: formData.intake_months.filter((m) => Number.isInteger(m)),
   is_active: formData.is_active,
   university_type_id: formData.university_type_id,
+  is_public: formData.is_public,
+  has_language_center: formData.has_language_center,
+  is_hidden: formData.is_hidden,
   branches: formData.branches
     .filter((b) => b.name && b.location && b.state_id)
     .map((b) => ({
@@ -215,6 +224,9 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
       university_type_id: university.university_type_id
         ? String(university.university_type_id)
         : "",
+      is_public: university.is_public ?? false,
+      has_language_center: university.has_language_center ?? false,
+      is_hidden: university.is_hidden ?? false,
     };
 
     setFormData(data);
@@ -583,6 +595,42 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
             disabledText="Inactive"
             enabledDescription="This university is visible and available for applications."
             disabledDescription="This university is hidden and unavailable for new applications."
+          />
+
+          <ToggleInput
+            label="Institution Type"
+            field="is_public"
+            formData={formData}
+            errors={{}}
+            updateFormData={updateFormData}
+            enabledText="Public"
+            disabledText="Private"
+            enabledDescription="This is a public university."
+            disabledDescription="This is a private university."
+          />
+
+          <ToggleInput
+            label="Language Center"
+            field="has_language_center"
+            formData={formData}
+            errors={{}}
+            updateFormData={updateFormData}
+            enabledText="Yes"
+            disabledText="No"
+            enabledDescription="This university has a language center."
+            disabledDescription="This university does not have a language center."
+          />
+
+          <ToggleInput
+            label="Visibility"
+            field="is_hidden"
+            formData={formData}
+            errors={{}}
+            updateFormData={updateFormData}
+            enabledText="Hidden"
+            disabledText="Visible"
+            enabledDescription="Hidden from partners — only visible to data-entry and admin."
+            disabledDescription="Visible to partners."
           />
         </div>
       </div>

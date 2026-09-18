@@ -2,7 +2,7 @@
 
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { FileText, BookOpen, Bell, Truck, LucideIcon } from "lucide-react";
+import { FileText, BookOpen, Bell, Truck, Landmark, LucideIcon } from "lucide-react";
 import { useMe } from "hooks/useMe";
 import { useCompleteOnboarding } from "features/partners/hooks";
 import { useToast } from "components/context/ToastContext";
@@ -25,6 +25,14 @@ const STEPS: Step[] = [
     description: "Browse programs and universities to find the right fit, with commission and tuition details up front.",
     bg: "bg-violet-50",
     text: "text-violet-600",
+  },
+  {
+    tourId: "universities",
+    icon: Landmark,
+    title: "Universities",
+    description: "Look up a university's campuses and intake details before recommending it to a student.",
+    bg: "bg-indigo-50",
+    text: "text-indigo-600",
   },
   {
     tourId: "applications",
@@ -133,8 +141,17 @@ function DesktopCoachmarkTour({ stepIndex, setStepIndex, onEnd, ending }: TourVi
       setTargetRect(el ? el.getBoundingClientRect() : null);
     };
     measure();
+    // A step whose target lives inside a collapsible submenu (e.g.
+    // "universities", nested under the "Knowledge Hub" accordion) only
+    // finishes expanding ~300ms after this step's own navigation triggers
+    // it — re-measure once after that so the spotlight lands on the fully
+    // open link instead of its still-collapsing position.
+    const retry = setTimeout(measure, 320);
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    return () => {
+      clearTimeout(retry);
+      window.removeEventListener("resize", measure);
+    };
   }, [stepIndex]);
 
   useLayoutEffect(() => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import UniversityDetails from "features/universities/components/admin/details/UniversityDetails";
+import PartnerUniversityProfile from "features/universities/components/partner/PartnerUniversityProfile";
 
 export default function PartnerUniversityPage() {
   const params = useParams();
@@ -9,5 +9,5 @@ export default function PartnerUniversityPage() {
 
   if (!universityId) return null;
 
-  return <UniversityDetails id={universityId} basePath="/partner/universities" readOnly />;
+  return <PartnerUniversityProfile id={universityId} />;
 }

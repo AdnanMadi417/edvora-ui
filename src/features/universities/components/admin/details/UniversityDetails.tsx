@@ -3,8 +3,11 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import {
+  Building2,
   ChevronLeft,
+  EyeOff,
   GraduationCap,
+  Languages,
   Pencil,
 } from "lucide-react";
 import Button from "components/ui/buttons/Button";
@@ -23,17 +26,12 @@ import EmptyData from "components/emptyData/EmptyTableData";
 interface UniversityDetailsProps {
   id: string;
   basePath?: string;
-  /** Partner reuses this same view — no "Edit University" action, and the
-   *  Payment Methods section is skipped entirely rather than fetched: that
-   *  endpoint requires UNIVERSITY_CONFIG/WRITE permission, which partners
-   *  don't have, so calling it would just 403. */
-  readOnly?: boolean;
 }
 
-const UniversityDetails = ({ id, basePath = "/admin/universities", readOnly = false }: UniversityDetailsProps) => {
+const UniversityDetails = ({ id, basePath = "/admin/universities" }: UniversityDetailsProps) => {
   const router = useRouter();
 
-  const { universityPaymentMethods, loading } = useUniversityPaymentMethods(readOnly ? undefined : id);
+  const { universityPaymentMethods, loading } = useUniversityPaymentMethods(id);
 
   const { university, branches, universityLoading } = useUniversityDetails(id);
 
@@ -124,6 +122,42 @@ const UniversityDetails = ({ id, basePath = "/admin/universities", readOnly = fa
                   </div>
                 </div>
               </div>
+
+              <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 shadow-sm">
+                  <Building2 className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-slate-500">Institution Type</p>
+                  <p className="mt-0.5 text-sm font-medium text-slate-900">
+                    {university.is_public ? "Public" : "Private"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 shadow-sm">
+                  <Languages className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-slate-500">Language Center</p>
+                  <p className="mt-0.5 text-sm font-medium text-slate-900">
+                    {university.has_language_center ? "Yes" : "No"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 shadow-sm">
+                  <EyeOff className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-slate-500">Visibility</p>
+                  <p className="mt-0.5 text-sm font-medium text-slate-900">
+                    {university.is_hidden ? "Hidden from partners" : "Visible to partners"}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -161,7 +195,6 @@ const UniversityDetails = ({ id, basePath = "/admin/universities", readOnly = fa
             )}
           </div>
 
-          {!readOnly && (
           <div className="border-t border-slate-200 px-6 py-6">
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
               Payment Methods
@@ -219,9 +252,8 @@ const UniversityDetails = ({ id, basePath = "/admin/universities", readOnly = fa
               </div>
             )}
           </div>
-          )}
 
-          <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-4">
+          <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
             <Button
               onClick={handleBack}
               icon={<ChevronLeft className="h-5 w-5" />}
@@ -231,21 +263,19 @@ const UniversityDetails = ({ id, basePath = "/admin/universities", readOnly = fa
               borderColor="border-slate-300"
               hoverTextColor="hover:text-slate-800"
               hoverBorderColor="hover:border-slate-400"
-              className={`hover:bg-slate-50 ${readOnly ? "" : "flex-1"}`}
+              className="flex-1 hover:bg-slate-50"
             />
-            {!readOnly && (
-              <Button
-                onClick={() => router.push(`${basePath}/${id}/edit`)}
-                icon={<Pencil className="h-5 w-5" />}
-                text="Edit University"
-                bgColor="bg-blue-600"
-                textColor="text-white"
-                borderColor="border-blue-600"
-                hoverTextColor="hover:text-white"
-                hoverBorderColor="hover:border-blue-700"
-                className="flex-1 hover:bg-blue-700"
-              />
-            )}
+            <Button
+              onClick={() => router.push(`${basePath}/${id}/edit`)}
+              icon={<Pencil className="h-5 w-5" />}
+              text="Edit University"
+              bgColor="bg-blue-600"
+              textColor="text-white"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
+              className="flex-1 hover:bg-blue-700"
+            />
           </div>
         </div>
       </div>

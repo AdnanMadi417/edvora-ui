@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PresignedImage from "components/ui/PresignedImage";
 import {
   RefreshCw,
-  ArrowRight,
-  ArrowLeft,
   Calendar,
   Settings,
   ChevronRight,
@@ -19,6 +17,9 @@ import {
   XCircle,
   SlidersHorizontal,
   Landmark,
+  EyeOff,
+  Languages,
+  Building2,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { StatusBadge } from "components/ui/badges";
@@ -26,33 +27,48 @@ import { StatusBadge } from "components/ui/badges";
 import { useDeleteUniversity, useUniversities } from "features/universities/hooks";
 
 import { useRouter } from "next/navigation";
-import NextButton from "components/ui/buttons/NextButton";
-import PrevButton from "components/ui/buttons/PrevButton";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import Link from "components/ui/links/LinkBtn";
 
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
+import { TableWrapper, TableSkeletonRows, TableErrorRow, TableEmptyRow, TablePagination } from "components/ui/table";
 
 import DeleteUniversityConfirmation from "../popups/DeleteUniversityConfirmation";
 import AssignPaymentUniversity from "../popups/AssignPaymentMethods";
-import Loading from "components/loading/Loading";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { monthLabel } from "features/programs/utils/intakeMonths";
 
+type TriFilter = "all" | "true" | "false";
+
+const TRI_OPTIONS = [
+  { value: "true", label: "Yes" },
+  { value: "false", label: "No" },
+];
+
+function triToBool(value: TriFilter): boolean | undefined {
+  return value === "all" ? undefined : value === "true";
+}
+
 const UniversitiesTable = () => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<"all" | "active" | "inactive">("all");
   const [selectedType, setSelectedType] = useState("all");
+  const [isPublicFilter, setIsPublicFilter] = useState<TriFilter>("all");
+  const [hasLanguageCenterFilter, setHasLanguageCenterFilter] = useState<TriFilter>("all");
+  const [isHiddenFilter, setIsHiddenFilter] = useState<TriFilter>("all");
   const [showFilters, setShowFilters] = useState(false);
   const { showToast } = useToast();
 
 
-  const { universities, loading, error, refetch } = useUniversities({ includeInactive: true });
+  const { universities, loading, error, refetch } = useUniversities({
+    includeInactive: true,
+    isPublic: triToBool(isPublicFilter),
+    hasLanguageCenter: triToBool(hasLanguageCenterFilter),
+    isHidden: triToBool(isHiddenFilter),
+  });
 
   const { deleteUniversity, isDeleting } = useDeleteUniversity();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -70,13 +86,12 @@ const UniversitiesTable = () => {
   const itemsPerPage = 10;
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const activeFiltersCount = (selectedStatus !== "all" ? 1 : 0) + (selectedType !== "all" ? 1 : 0);
-
-  const stats = React.useMemo(() => ({
-    total: universities.length,
-    active: universities.filter((u) => u.is_active).length,
-    inactive: universities.filter((u) => !u.is_active).length,
-  }), [universities]);
+  const activeFiltersCount =
+    (searchTerm.trim() !== "" ? 1 : 0) +
+    (selectedType !== "all" ? 1 : 0) +
+    (isPublicFilter !== "all" ? 1 : 0) +
+    (hasLanguageCenterFilter !== "all" ? 1 : 0) +
+    (isHiddenFilter !== "all" ? 1 : 0);
 
   const universityTypes = React.useMemo(() => {
     const types = universities.map((u) => u.university_type_name).filter(Boolean);
@@ -89,16 +104,12 @@ const UniversitiesTable = () => {
       const matchesSearch = !term ||
         university.name?.toLowerCase().includes(term) ||
         university.country?.toLowerCase().includes(term);
-      const matchesStatus =
-        selectedStatus === "all" ||
-        (selectedStatus === "active" && university.is_active) ||
-        (selectedStatus === "inactive" && !university.is_active);
       const matchesType =
         selectedType === "all" ||
         university.university_type_name?.toLowerCase().trim() === selectedType;
-      return matchesSearch && matchesStatus && matchesType;
+      return matchesSearch && matchesType;
     });
-  }, [universities, searchTerm, selectedStatus, selectedType]);
+  }, [universities, searchTerm, selectedType]);
 
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -175,10 +186,16 @@ const UniversitiesTable = () => {
     setCurrentPage(1);
   };
 
-
-  useEffect(() => {
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedType("all");
+    setIsPublicFilter("all");
+    setHasLanguageCenterFilter("all");
+    setIsHiddenFilter("all");
     setCurrentPage(1);
-  }, [searchTerm]);
+    setShowFilters(false);
+  };
+
 
   useEffect(() => {
     const totalPages = Math.ceil(filteredUniversities.length / itemsPerPage);
@@ -208,9 +225,9 @@ const UniversitiesTable = () => {
   };
 
   return (
-    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white p-6">
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white">
       {/* Header */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6">
         <div>
           <h3 className="text-xl font-semibold text-slate-900">Universities</h3>
           <p className="mt-1 text-sm text-slate-500">Manage university listings and their payment methods</p>
@@ -227,62 +244,8 @@ const UniversitiesTable = () => {
         />
       </div>
 
-      {/* Stats Cards */}
-      <div className="mb-6 border-t border-slate-200 pt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <button
-          onClick={() => { setSelectedStatus("all"); setCurrentPage(1); }}
-          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-            selectedStatus === "all"
-              ? "border-slate-400 bg-slate-100 shadow-sm"
-              : "border-slate-200 bg-white hover:bg-slate-50"
-          }`}
-        >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-            <GraduationCap className="h-5 w-5 text-slate-600" />
-          </div>
-          <div>
-            <p className="text-xl font-bold text-slate-900">{stats.total}</p>
-            <p className="text-xs text-slate-500">Total Universities</p>
-          </div>
-        </button>
-
-        <button
-          onClick={() => { setSelectedStatus("active"); setCurrentPage(1); }}
-          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-            selectedStatus === "active"
-              ? "border-green-300 bg-green-50 shadow-sm"
-              : "border-slate-200 bg-white hover:bg-slate-50"
-          }`}
-        >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-          </div>
-          <div>
-            <p className="text-xl font-bold text-slate-900">{stats.active}</p>
-            <p className="text-xs text-slate-500">Active</p>
-          </div>
-        </button>
-
-        <button
-          onClick={() => { setSelectedStatus("inactive"); setCurrentPage(1); }}
-          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-            selectedStatus === "inactive"
-              ? "border-slate-400 bg-slate-100 shadow-sm"
-              : "border-slate-200 bg-white hover:bg-slate-50"
-          }`}
-        >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-            <XCircle className="h-5 w-5 text-slate-500" />
-          </div>
-          <div>
-            <p className="text-xl font-bold text-slate-900">{stats.inactive}</p>
-            <p className="text-xs text-slate-500">Inactive</p>
-          </div>
-        </button>
-      </div>
-
       {/* Search & Filters */}
-      <div className="mb-4 border-t border-slate-200 pt-6 flex flex-wrap items-center gap-3">
+      <div className="border-y border-slate-200 pt-6 flex flex-wrap items-center gap-3 p-6">
         <SearchInput
           value={searchTerm}
           onChange={handleSearchChange}
@@ -315,25 +278,66 @@ const UniversitiesTable = () => {
             />
           </div>
 
-          <Button
-            onClick={() => { setSearchTerm(""); setSelectedStatus("all"); setSelectedType("all"); setCurrentPage(1); setShowFilters(false); }}
-            icon={<RefreshCw className="h-4 w-4" />}
-            text="Clear"
-            bgColor="bg-white"
-            textColor="text-red-600"
-            borderColor="border-red-200"
-            hoverTextColor="hover:text-red-600"
-            hoverBorderColor="hover:border-red-200"
-            className="hover:bg-red-50"
-          />
+          <div className="flex-1 sm:flex-none">
+            <FilterSelectField
+              value={isPublicFilter}
+              onChange={(val: string) => { setIsPublicFilter(val as TriFilter); setCurrentPage(1); }}
+              icon={Building2}
+              defaultOption="Public: All"
+              options={TRI_OPTIONS}
+            />
+          </div>
+
+          <div className="flex-1 sm:flex-none">
+            <FilterSelectField
+              value={hasLanguageCenterFilter}
+              onChange={(val: string) => { setHasLanguageCenterFilter(val as TriFilter); setCurrentPage(1); }}
+              icon={Languages}
+              defaultOption="Language Center: All"
+              options={TRI_OPTIONS}
+            />
+          </div>
+
+          <div className="flex-1 sm:flex-none">
+            <FilterSelectField
+              value={isHiddenFilter}
+              onChange={(val: string) => { setIsHiddenFilter(val as TriFilter); setCurrentPage(1); }}
+              icon={EyeOff}
+              defaultOption="Hidden: All"
+              options={TRI_OPTIONS}
+            />
+          </div>
+
+          {activeFiltersCount > 0 && (
+            <Button
+              onClick={clearFilters}
+              icon={<RefreshCw className="h-4 w-4" />}
+              text="Clear"
+              bgColor="bg-white"
+              textColor="text-red-600"
+              borderColor="border-red-200"
+              hoverTextColor="hover:text-red-600"
+              hoverBorderColor="hover:border-red-200"
+              className="hover:bg-red-50"
+            />
+          )}
         </div>
       </div>
 
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
-
-        <div className="block">
-
-          <div className="overflow-x-auto rounded-lg rounded-b-none bg-white">
+      <div className="p-6">
+        <TableWrapper
+          footer={
+            <TablePagination
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              itemsPerPage={itemsPerPage}
+              itemCount={currentUniversities.length}
+              totalCount={sortedUniversities.length}
+              itemLabel="universities"
+              loading={loading}
+            />
+          }
+        >
             <table className="w-full">
 
               <thead>
@@ -383,27 +387,37 @@ const UniversitiesTable = () => {
 
               <tbody className="divide-y divide-slate-200 bg-white">
 
-              {loading && (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">
-                    <Loading text="Fetching Universities data..." />
-                  </td>
-                </tr>
+              {loading && <TableSkeletonRows columns={6} rows={itemsPerPage} />}
+
+              {!loading && error && (
+                <TableErrorRow colSpan={6} message={error} onRetry={refetch} />
               )}
 
-              {!error && !loading && currentUniversities.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center">
-                    <NoMessagesFound
-                      title="No universities found"
-                      subtitle="There are currently no universities available."
-                      icon={<Landmark className="h-8 w-8 text-slate-400" />}
-                    />
-                  </td>
-                </tr>
+              {!loading && !error && currentUniversities.length === 0 && (
+                <TableEmptyRow
+                  colSpan={6}
+                  title="No universities found"
+                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "There are currently no universities available."}
+                  icon={<Landmark className="h-8 w-8 text-slate-400" />}
+                  action={
+                    activeFiltersCount > 0 ? (
+                      <Button
+                        onClick={clearFilters}
+                        icon={<RefreshCw className="h-3.5 w-3.5" />}
+                        text="Clear filters"
+                        bgColor="bg-white"
+                        textColor="text-slate-700"
+                        borderColor="border-slate-200"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-slate-200"
+                        className="hover:bg-slate-50"
+                      />
+                    ) : undefined
+                  }
+                />
               )}
 
-              {!error && currentUniversities.map((uni) => (
+              {!loading && !error && currentUniversities.map((uni) => (
                 <tr
                   key={uni.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
@@ -435,6 +449,7 @@ const UniversitiesTable = () => {
                         <h3 className="truncate text-sm font-semibold text-slate-900">
                           {uni.name}
                         </h3>
+                        <p className="text-xs text-slate-500">{uni.is_public ? "Public" : "Private"}</p>
                       </div>
                     </div>
                   </td>
@@ -515,11 +530,19 @@ const UniversitiesTable = () => {
                   </td>
 
                   <td className="px-6 py-4">
-                    {uni.is_active ? (
-                      <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
-                    ) : (
-                      <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
-                    )}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {uni.is_active ? (
+                        <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
+                      ) : (
+                        <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
+                      )}
+                      {uni.is_hidden && (
+                        <StatusBadge variant="warning" icon={<EyeOff className="h-3 w-3" />}>Hidden</StatusBadge>
+                      )}
+                      {uni.has_language_center && (
+                        <StatusBadge variant="info" icon={<Languages className="h-3 w-3" />}>Language Center</StatusBadge>
+                      )}
+                    </div>
                   </td>
 
                   <td className="px-6 py-4">
@@ -580,61 +603,7 @@ const UniversitiesTable = () => {
 
               </tbody>
             </table>
-
-          </div>
-
-          <div className="grid grid-cols-1 items-center gap-4 border-t border-slate-200 p-4 sm:p-6 md:flex  md:justify-between">
-            {universities.length > 0 && (
-              <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
-                Showing
-                <span className="font-medium">
-                      {(currentPage - 1) * itemsPerPage + 1}
-                    </span>
-                to
-                <span className="font-medium">
-                      {Math.min(currentPage * itemsPerPage, universities.length)}
-                    </span>
-                of
-                <span className="font-medium">{universities.length}</span>
-                Universities
-              </div>
-            )}
-
-            <div className="flex justify-end gap-2">
-              <PrevButton
-                onClick={() =>
-                  setCurrentPage((prev) => Math.max(prev - 1, 1))
-                }
-                disabled={currentPage === 1}
-                text="Prev"
-                icon={<ArrowLeft className="h-4 w-4" />}
-              />
-
-              <span className="px-3 py-1 font-medium text-slate-500">
-                    Page {currentPage} of{" "}
-                {Math.ceil(universities.length / itemsPerPage)}
-                  </span>
-
-              <NextButton
-                onClick={() =>
-                  setCurrentPage((prev) =>
-                    Math.min(
-                      prev + 1,
-                      Math.ceil(universities.length / itemsPerPage)
-                    )
-                  )
-                }
-                disabled={
-                  currentPage === Math.ceil(universities.length / itemsPerPage)
-                }
-                text="Next"
-                icon={<ArrowRight className="h-4 w-4" />}
-              />
-            </div>
-          </div>
-
-        </div>
-
+        </TableWrapper>
       </div>
 
       <DeleteUniversityConfirmation

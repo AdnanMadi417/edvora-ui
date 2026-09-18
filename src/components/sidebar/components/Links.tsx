@@ -57,6 +57,7 @@ export default function Links({ routes, onLinkClick }: { routes: IRoute[]; onLin
 
             {hasChildren ? (
               <div
+                data-tour-id={route.path.replace(/^\//, "")}
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 onClick={() => setExpandedIndex(isExpanded ? null : index)}
@@ -131,6 +132,7 @@ export default function Links({ routes, onLinkClick }: { routes: IRoute[]; onLin
                       <Link
                         key={childIndex}
                         href={childPath}
+                        data-tour-id={child.path.replace(/^\//, "")}
                         onClick={onLinkClick}
                         className={`relative flex items-center gap-2 rounded-s p-2 text-sm transition-all
                         ${
