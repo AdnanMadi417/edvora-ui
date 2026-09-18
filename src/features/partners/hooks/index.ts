@@ -13,6 +13,7 @@ export { useCompleteOnboarding } from './useCompleteOnboarding';
 export { useReviewPartner } from './useReviewPartner';
 export { useResendApprovalEmail } from './useResendApprovalEmail';
 export { useAdminResendRegistrationOtp } from './useAdminResendRegistrationOtp';
+export { usePendingRegistrationOtps } from './usePendingRegistrationOtps';
 export { usePartnerRegistration } from './usePartnerRegistration';
 export { useResendRegistrationOtp } from './useResendRegistrationOtp';
 export { useVerifyRegistrationOtp } from './useVerifyRegistrationOtp';
