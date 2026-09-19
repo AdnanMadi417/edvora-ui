@@ -74,12 +74,17 @@ export default function CopyProgramToBranch({
   const [isVisible, setIsVisible] = useState(false);
   const [selectedBranchId, setSelectedBranchId] = useState("");
   const [formError, setFormError] = useState<string | null>(null);
+  // `loading` (from the hook) goes back to false as soon as the request
+  // settles — this covers the gap between that and onClose actually firing,
+  // so a second click during the success delay can't fire a second POST.
+  const [justSucceeded, setJustSucceeded] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
       setSelectedBranchId("");
       setFormError(null);
+      setJustSucceeded(false);
     } else {
       const timer = setTimeout(() => setIsVisible(false), 300);
       return () => clearTimeout(timer);
@@ -88,7 +93,7 @@ export default function CopyProgramToBranch({
 
   const selectedIsTaken = !!options.find((o) => o.value === selectedBranchId)?.disabled;
   const isFormValid =
-    selectedBranchId !== "" && !selectedIsTaken && !loading && !emptyReason;
+    selectedBranchId !== "" && !selectedIsTaken && !loading && !justSucceeded && !emptyReason;
 
   const handleSubmit = async () => {
     setFormError(null);
@@ -96,6 +101,7 @@ export default function CopyProgramToBranch({
       options.find((o) => o.value === selectedBranchId)?.label ?? "the selected branch";
     try {
       const created = await copyProgramToBranch(programId, selectedBranchId);
+      setJustSucceeded(true);
       showToast(`"${programName}" copied to ${branchName}.`, "success");
       setTimeout(() => {
         onClose();
@@ -202,7 +208,7 @@ export default function CopyProgramToBranch({
               onClick={handleSubmit}
               disabled={!isFormValid}
               icon={<CopyPlus className="h-5 w-5" />}
-              text={loading ? "Copying..." : "Copy program"}
+              text={loading ? "Copying..." : justSucceeded ? "Copied" : "Copy program"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"
               borderColor="border-blue-600"
