@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const publicRoutes = ["/auth/sign-in", "/auth/register", "/register/verify", "/auth/forgot-password", "/auth/partner-reset-password", "/auth/staff-invitation", "/team/verify-otp", "/team/accept-invite", "/reset-password", "/unauthorized", "/", "/api/health", "/api/auth/logout", "/university-profile-demo"];
+const publicRoutes = ["/auth/sign-in", "/auth/register", "/register/verify", "/auth/forgot-password", "/auth/partner-reset-password", "/auth/staff-invitation", "/team/verify-otp", "/team/accept-invite", "/reset-password", "/unauthorized", "/", "/api/health", "/api/auth/logout"];
 
 // Prefixes rather than exact paths — for public routes with a dynamic
 // segment (e.g. /p/[slug], the shareable partner profile).

@@ -687,8 +687,8 @@ export const DIAL_CODES = [
 ];
 
 export const BACKGROUND_OPTIONS = [
-  { value: "student", label: "Student in a Malaysian University" },
-  { value: "teacher", label: "Teacher / Educator" },
   { value: "agent",   label: "Education Agent" },
+  { value: "teacher", label: "Teacher / Educator" },
+  { value: "student", label: "Student" },
   { value: "other",   label: "Other" },
 ];

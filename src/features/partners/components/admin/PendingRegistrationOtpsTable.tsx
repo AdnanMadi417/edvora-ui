@@ -53,6 +53,11 @@ const PROGRESS_CONFIG: Record<RegistrationOtpProgress, { label: string; variant:
   completed: { label: "Registered", variant: "success", icon: <CheckCircle2 className="h-3 w-3" />, canResend: false },
 };
 
+// A progress value the backend added after this map was written would
+// otherwise index to `undefined` and throw during render, taking down the
+// whole page (both tabs) — fall back to something renderable instead.
+const UNKNOWN_PROGRESS_CONFIG = { label: "Unknown", variant: "neutral" as const, icon: undefined, canResend: false };
+
 export default function PendingRegistrationOtpsTable() {
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
@@ -229,7 +234,7 @@ export default function PendingRegistrationOtpsTable() {
               )}
 
               {!loading && !error && items.map((row) => {
-                const config = PROGRESS_CONFIG[row.progress];
+                const config = PROGRESS_CONFIG[row.progress] ?? UNKNOWN_PROGRESS_CONFIG;
                 const isResending = resendingEmail === row.email;
                 const resendsLeft = Math.max(0, MAX_RESENDS - row.resend_count);
                 const canResend = config.canResend && resendsLeft > 0;

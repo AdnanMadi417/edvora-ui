@@ -47,9 +47,13 @@ export default function NotificationAvatar({
     setSrc(null);
     setBroken(false);
     if (!photoKey) return;
+    let cancelled = false;
     getDocumentDownloadUrl(photoKey)
-      .then(setSrc)
-      .catch(() => setBroken(true));
+      .then((url) => { if (!cancelled) setSrc(url); })
+      .catch(() => { if (!cancelled) setBroken(true); });
+    return () => {
+      cancelled = true;
+    };
   }, [photoKey]);
 
   if (!photoKey || broken || !src) {
