@@ -2,6 +2,7 @@ export { usePrograms } from "./usePrograms";
 export { useProgram } from "./useProgram";
 export { useCreateProgram } from "./useCreateProgram";
 export { useUpdateProgram } from "./useUpdateProgram";
+export { useSetProgramHidden } from "./useSetProgramHidden";
 export { useDeleteProgram } from "./useDeleteProgram";
 export { useDeletePrograms } from "./useDeletePrograms";
 export { useBatchUpdatePrograms } from "./useBatchUpdatePrograms";

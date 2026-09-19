@@ -17,7 +17,7 @@ import {
 
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import { usePrograms, useStates, useDeletePrograms, useProgramsCopyEligibility } from "features/programs/hooks";
+import { usePrograms, useStates, useDeletePrograms, useSetProgramHidden, useProgramsCopyEligibility } from "features/programs/hooks";
 import { programApi } from "features/programs/services";
 import type { Program } from "features/programs/types";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
@@ -67,6 +67,7 @@ const ProgramsTable = () => {
   const [courseType, setCourseType] = useState<string>(() => searchParams.get("course_type") ?? "all");
   const [classType, setClassType] = useState<string>(() => searchParams.get("class_type") ?? "all");
   const [sortBy, setSortBy] = useState<string>(() => searchParams.get("sort_by") ?? "all");
+  const [hiddenFilter, setHiddenFilter] = useState<string>(() => searchParams.get("is_hidden") ?? "all");
   const [selectedProgramId, setSelectedProgramId] = useState<string | null>(null);
   const [copyTarget, setCopyTarget] = useState<Program | null>(null);
 
@@ -91,11 +92,12 @@ const ProgramsTable = () => {
     if (courseType !== "all") params.set("course_type", courseType);
     if (classType !== "all") params.set("class_type", classType);
     if (sortBy !== "all") params.set("sort_by", sortBy);
+    if (hiddenFilter !== "all") params.set("is_hidden", hiddenFilter);
     if (currentPage > 1) params.set("page", String(currentPage));
 
     const qs = params.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-  }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy, currentPage, pathname, router]);
+  }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy, hiddenFilter, currentPage, pathname, router]);
 
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -122,11 +124,29 @@ const ProgramsTable = () => {
     course_type: courseType !== "all" ? (courseType as "course_work" | "research" | "mixed_mode") : undefined,
     class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
     sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
+    is_hidden: hiddenFilter === "true" ? true : undefined,
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
   });
 
   const copyEligibility = useProgramsCopyEligibility(programs);
+
+  const { setProgramHidden } = useSetProgramHidden();
+  const [togglingHiddenId, setTogglingHiddenId] = useState<string | null>(null);
+
+  const handleToggleHidden = async (program: Program) => {
+    const nextHidden = !program.is_hidden;
+    setTogglingHiddenId(program.id);
+    try {
+      await setProgramHidden(program.id, nextHidden);
+      showToast(nextHidden ? "Program hidden" : "Program is visible again", "success");
+      refetch();
+    } catch (error: unknown) {
+      showToast(parseApiError(error, nextHidden ? "Failed to hide program" : "Failed to unhide program"), "error");
+    } finally {
+      setTogglingHiddenId(null);
+    }
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -179,6 +199,7 @@ const ProgramsTable = () => {
         course_type: courseType !== "all" ? (courseType as "course_work" | "research" | "mixed_mode") : undefined,
         class_type: classType !== "all" ? (classType as "physical" | "online") : undefined,
         sort_by: sortBy !== "all" ? (sortBy as "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc") : undefined,
+        is_hidden: hiddenFilter === "true" ? true : undefined,
       };
       const allIds: string[] = [];
       let page = 1;
@@ -202,7 +223,7 @@ const ProgramsTable = () => {
     setSelectedPrograms((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy]);
+  useEffect(() => { setSelectedPrograms({}); }, [debouncedSearch, selectedState, selectedField, selectedUniversity, selectedQualId, hasScholarship, courseType, classType, sortBy, hiddenFilter]);
 
   const selectedProgramIds = useMemo(
     () => Object.keys(selectedPrograms).filter((id) => selectedPrograms[id]),
@@ -241,6 +262,7 @@ const ProgramsTable = () => {
     setHasScholarship("all");
     setCourseType("all");
     setClassType("all");
+    setHiddenFilter("all");
     setCurrentPage(1);
   };
 
@@ -281,6 +303,7 @@ const ProgramsTable = () => {
             scholarship: hasScholarship,
             courseType,
             classType,
+            hidden: hiddenFilter,
           }}
           onApplyFilters={(values) => {
             setSelectedState(values.state);
@@ -290,6 +313,7 @@ const ProgramsTable = () => {
             setHasScholarship(values.scholarship);
             setCourseType(values.courseType);
             setClassType(values.classType);
+            setHiddenFilter(values.hidden ?? "all");
             setCurrentPage(1);
           }}
           onRemoveFilter={(key) => {
@@ -300,9 +324,11 @@ const ProgramsTable = () => {
             if (key === "scholarship") setHasScholarship("all");
             if (key === "courseType") setCourseType("all");
             if (key === "classType") setClassType("all");
+            if (key === "hidden") setHiddenFilter("all");
             setCurrentPage(1);
           }}
           onClearAll={clearAllFilters}
+          showHiddenFilter
           sortBy={sortBy}
           onSortChange={(value) => { setSortBy(value); setCurrentPage(1); }}
           resultsCount={total}
@@ -401,6 +427,9 @@ const ProgramsTable = () => {
             }}
             onCopyToBranchClick={setCopyTarget}
             copyEligibility={copyEligibility}
+            onToggleHiddenClick={handleToggleHidden}
+            togglingHiddenId={togglingHiddenId}
+            emptySubtitle={hiddenFilter === "true" ? "No hidden programs match your filters." : undefined}
           />
 
         </div>
