@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent, type ComponentType } from "react";
+import { type ComponentType } from "react";
 import {
   TbBrandFacebook,
   TbBrandTiktok,
@@ -83,9 +83,6 @@ const SOCIAL_LINKS: { label: string; href: string; icon: ComponentType<{ classNa
 
 interface SiteFooterProps {
   className?: string;
-  /** Called with the entered email on submit. Left unwired (no-op) until a
-   *  real newsletter endpoint exists — the form still works as a UI. */
-  onSubscribe?: (email: string) => void;
 }
 
 /**
@@ -94,47 +91,18 @@ interface SiteFooterProps {
  * layouts (components/footer/Footer.tsx). Meant to be dropped onto
  * public-facing pages (e.g. the partner public profile at /p/[slug]).
  */
-export default function SiteFooter({ className = "", onSubscribe }: SiteFooterProps) {
-  const [email, setEmail] = useState("");
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    const trimmed = email.trim();
-    if (!trimmed) return;
-    onSubscribe?.(trimmed);
-    setEmail("");
-  };
-
+export default function SiteFooter({ className = "" }: SiteFooterProps) {
   return (
     <footer className={`w-full bg-white ${className}`}>
       <div className="mx-auto max-w-6xl py-16">
         <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
-          {/* Newsletter */}
           <div className="lg:max-w-sm lg:shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={logoImg.src} alt="Unibexs" className="h-16 w-auto" />
 
             <p className="mt-4 text-sm leading-relaxed text-slate-500">
-              Stay ahead with the latest industry insights, product updates, and trends. Delivered
-              straight to your inbox.
+              Connecting students, advisors, and institutions to make studying abroad simple.
             </p>
-
-            <form onSubmit={handleSubmit} className="mt-5 space-y-3">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                aria-label="Email address"
-                className="w-full rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-200 focus:border-blue-400 focus:bg-white focus:ring-2 focus:ring-blue-100"
-              />
-              <button
-                type="submit"
-                className="w-full rounded-full bg-blue-700 px-5 py-3 text-sm font-bold text-white transition-all duration-200 hover:bg-blue-800 motion-safe:hover:scale-[1.02] motion-safe:active:scale-[0.97]"
-              >
-                Join Unibexs Insider
-              </button>
-            </form>
           </div>
 
           {/* Link columns */}
