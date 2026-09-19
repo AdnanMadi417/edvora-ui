@@ -155,12 +155,15 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
   const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [currency, setCurrency] = useState<string | null>(null);
 
+  // The copy action only ever renders under `showActions` below — skip its
+  // fetches entirely for viewers (e.g. partners) who can't see the button.
   const copyTargets = useCopyTargetBranches({
     programId: program?.id ?? "",
     programName: program?.name ?? "",
     qualificationId: program?.qualification_id ?? "",
     universityId: program?.university?.id ?? "",
     currentBranchId: program?.branch?.id,
+    enabled: !!editPath,
   });
   const copyDisabled = !!editPath && !copyTargets.loading && copyTargets.emptyReason !== null;
   const copyDisabledReason =

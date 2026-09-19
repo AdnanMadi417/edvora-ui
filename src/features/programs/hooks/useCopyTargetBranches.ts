@@ -24,6 +24,11 @@ export interface CopyTargetBranches {
  * then applies the shared `resolveCopyTargets` rule. Used by the copy
  * modal and by the program detail pages (to disable the copy action when
  * there's nowhere to copy).
+ *
+ * `enabled` (default true) gates both fetches — pass `false` when the copy
+ * action isn't even rendered for the current viewer (e.g. the partner view
+ * of program details), so partners don't pay for a branch list + up to 100
+ * programs on every page view for a button they can't see.
  */
 export function useCopyTargetBranches(params: {
   programId: string;
@@ -31,16 +36,17 @@ export function useCopyTargetBranches(params: {
   qualificationId: string;
   universityId: string;
   currentBranchId?: string;
+  enabled?: boolean;
 }): CopyTargetBranches {
-  const { programId, programName, qualificationId, universityId, currentBranchId } = params;
+  const { programId, programName, qualificationId, universityId, currentBranchId, enabled = true } = params;
 
-  const { branches, branchesLoading } = useBranches(universityId);
+  const { branches, branchesLoading } = useBranches(enabled ? universityId : undefined);
 
   const [universityPrograms, setUniversityPrograms] = useState<Program[]>([]);
   const [universityProgramsLoading, setUniversityProgramsLoading] = useState(false);
 
   useEffect(() => {
-    if (!universityId) {
+    if (!enabled || !universityId) {
       setUniversityPrograms([]);
       return;
     }
@@ -60,7 +66,7 @@ export function useCopyTargetBranches(params: {
     return () => {
       cancelled = true;
     };
-  }, [universityId]);
+  }, [enabled, universityId]);
 
   const loading = branchesLoading || universityProgramsLoading;
 
