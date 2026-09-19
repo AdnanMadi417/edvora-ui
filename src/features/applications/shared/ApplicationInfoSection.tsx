@@ -67,7 +67,7 @@ export default function ApplicationInfoSection({ application }: ApplicationInfoS
         <div>
           <span className="block text-p1 font-medium text-slate-900">Arrival Date</span>
           <span className="text-p2 text-slate-500">
-            <AppDate value={application.arrival_date} format="month" fallback="Not provided" />
+            <AppDate value={application.arrival_date} format="short" fallback="Not provided" />
           </span>
         </div>
         <div>
