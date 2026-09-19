@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { partnersApi } from "features/partners/services";
@@ -8,15 +9,19 @@ import type { PublicPartnerProfile } from "features/partners/types";
 // app is a client shell reading `useParams()`) — it's the one page meant
 // to be pasted into WhatsApp/social, so link-preview metadata actually
 // matters. Fetched fresh on every request: it's a live, editable profile.
-
-async function fetchProfile(slug: string): Promise<PublicPartnerProfile | null> {
+//
+// generateMetadata and the page component both need this data, and
+// partnersApi uses axios (not the native `fetch` Next.js auto-dedupes) —
+// wrapped in React's cache() so both calls within one request share a
+// single network round-trip instead of firing two.
+const fetchProfile = cache(async (slug: string): Promise<PublicPartnerProfile | null> => {
   try {
     const res = await partnersApi.getPublicProfile(slug);
     return res.data;
   } catch {
     return null;
   }
-}
+});
 
 export async function generateMetadata({
   params,
