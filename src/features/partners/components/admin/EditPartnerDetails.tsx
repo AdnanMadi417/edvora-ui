@@ -13,6 +13,7 @@ import PhoneInputField from "components/form/fields/PhoneInputField";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
+import MultiSelect from "components/form/search/MultiSelect";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import { useToast } from "components/context/ToastContext";
@@ -279,7 +280,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
     nationality: "", date_of_birth: "", passport_number: "",
     pp_slug: "", pp_display_name: "", pp_bio: "",
     pp_whatsapp_code: "+60", pp_whatsapp_number: "",
-    pp_countries_supported: "", pp_is_published: false,
+    pp_countries_supported: [], pp_is_published: false,
   });
 
   const [profilePhoto, setProfilePhoto] = useState<DocState>(EMPTY_DOC);
@@ -324,7 +325,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
         const { code, number } = splitWhatsapp(partner.public_profile?.whatsapp_number);
         return { pp_whatsapp_code: code, pp_whatsapp_number: number };
       })(),
-      pp_countries_supported: (partner.public_profile?.countries_supported ?? []).join(", "),
+      pp_countries_supported: partner.public_profile?.countries_supported ?? [],
       pp_is_published: partner.public_profile?.is_published ?? false,
     });
     if (partner.individual_details) {
@@ -416,7 +417,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
       formData.pp_bio !== (partner.public_profile?.bio ?? "") ||
       combineWhatsapp(formData.pp_whatsapp_code, formData.pp_whatsapp_number) !==
         (partner.public_profile?.whatsapp_number ?? "").replace(/\D/g, "") ||
-      formData.pp_countries_supported !== (partner.public_profile?.countries_supported ?? []).join(", ") ||
+      JSON.stringify(formData.pp_countries_supported) !== JSON.stringify(partner.public_profile?.countries_supported ?? []) ||
       formData.pp_is_published !== (partner.public_profile?.is_published ?? false)
     );
   };
@@ -537,10 +538,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
                 display_name: formData.pp_display_name.trim(),
                 bio: formData.pp_bio.trim(),
                 whatsapp_number: combineWhatsapp(formData.pp_whatsapp_code, formData.pp_whatsapp_number),
-                countries_supported: formData.pp_countries_supported
-                  .split(",")
-                  .map((c: string) => c.trim())
-                  .filter(Boolean),
+                countries_supported: formData.pp_countries_supported,
                 is_published: formData.pp_is_published,
               },
             }
@@ -777,11 +775,12 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
                 errors={errors}
                 updateFormData={updateFormData}
               />
-              <InputField
+              <MultiSelect
                 label="Countries Supported"
                 field="pp_countries_supported"
                 required={false}
-                placeholder="Malaysia, Australia"
+                placeholder="Select countries..."
+                options={COUNTRIES.map((c) => ({ value: c.name, label: c.name }))}
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
