@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { RefreshCw, Settings, Pencil, Book } from "lucide-react";
+import { RefreshCw, Settings, Pencil, Book, Layers } from "lucide-react";
 import { MdLabelOutline } from "react-icons/md";
 
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
@@ -149,6 +149,7 @@ const DataEntryFieldsOfStudyTable = () => {
                 colSpan={3}
                 title="No fields found"
                 subtitle="There are currently no fields of study available."
+                icon={<Layers className="h-8 w-8 text-slate-400" />}
               />
             )}
 

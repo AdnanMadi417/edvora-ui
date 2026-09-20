@@ -20,6 +20,7 @@ import {
   ExternalLink,
   FileText,
   Link2,
+  Pencil,
   ShieldCheck,
   User,
   Users,
@@ -214,17 +215,29 @@ export default function ReviewerPartnerProfile({ id }: Props) {
             </div>
           </div>
 
-          <Button
-            className="shrink-0 self-end sm:self-auto"
-            onClick={() => router.push("/reviewer/partners")}
-            icon={<ChevronLeft className="h-4 w-4" />}
-            text="Back"
-            bgColor="bg-white"
-            textColor="text-slate-700"
-            borderColor="border-slate-200"
-            hoverTextColor="hover:text-slate-900"
-            hoverBorderColor="hover:border-slate-300"
-          />
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 self-end sm:self-auto">
+            <Button
+              onClick={() => router.push("/reviewer/partners")}
+              icon={<ChevronLeft className="h-4 w-4" />}
+              text="Back"
+              bgColor="bg-white"
+              textColor="text-slate-700"
+              borderColor="border-slate-200"
+              hoverTextColor="hover:text-slate-900"
+              hoverBorderColor="hover:border-slate-300"
+            />
+            <Button
+              onClick={() => router.push(`/reviewer/partners/${id}/edit`)}
+              icon={<Pencil className="h-4 w-4" />}
+              text="Edit Partner"
+              bgColor="bg-blue-600"
+              textColor="text-white"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
+              className="hover:bg-blue-700"
+            />
+          </div>
         </div>
 
         <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} />

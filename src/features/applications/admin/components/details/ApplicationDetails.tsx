@@ -30,12 +30,6 @@ export default function ApplicationDetails({
         {/* Hero section */}
         <ApplicationHero application={application} />
 
-        {/* Application Information */}
-        <ApplicationInfoSection application={application} />
-
-        {/* Student Information */}
-        <ApplicationStudentInfoSection application={application} />
-
         {/* Application Timeline */}
         <div className="p-6 border-b border-slate-200">
           <ApplicationTimeline application={application} />
@@ -50,6 +44,12 @@ export default function ApplicationDetails({
         <div className="border-b border-slate-200">
           <OfferLetterCard application={application} onRefetch={onRefetch} />
         </div>
+
+        {/* Application Information */}
+        <ApplicationInfoSection application={application} />
+
+        {/* Student Information */}
+        <ApplicationStudentInfoSection application={application} />
 
         {/* Documents */}
         <ApplicationDocuments application={application} onRefetch={onRefetch} />

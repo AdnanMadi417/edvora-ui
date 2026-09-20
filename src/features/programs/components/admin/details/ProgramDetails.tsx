@@ -20,15 +20,19 @@ import {
   Building2,
   Languages,
   Copy,
+  CopyPlus,
   Layers,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 
-import { useProgram, useDeletePrograms } from 'features/programs/hooks';
+import { useProgram, useDeletePrograms, useCopyTargetBranches, useSetProgramHidden } from 'features/programs/hooks';
 import { getIeltsLabel } from 'constants/lists';
 
 import { useToast } from 'components/context/ToastContext';
 import { parseApiError } from 'utils/parseApiError';
 import DeleteProgramsConfirmation from 'features/programs/components/admin/popups/DeleteProgramsConfirmation';
+import CopyProgramToBranch from 'features/programs/components/admin/popups/CopyProgramToBranch';
 import Loading from 'components/loading/Loading';
 import PresignedImage from 'components/ui/PresignedImage';
 import Button from 'components/ui/buttons/Button';
@@ -155,6 +159,7 @@ const ProgramDetails = ({ id }: Props) => {
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isCopyOpen, setIsCopyOpen] = useState(false);
   const { showToast } = useToast();
 
   const router = useRouter();
@@ -177,7 +182,40 @@ const ProgramDetails = ({ id }: Props) => {
   };
 
   const { program, requiredDocuments, commission, exchangeRates } = useProgram(id);
+
+  const { setProgramHidden, loading: isTogglingHidden } = useSetProgramHidden();
+  // Local override so the badge/button flip immediately without refetching
+  // (which would flash the whole page back to its loading state).
+  const [hiddenOverride, setHiddenOverride] = useState<boolean | null>(null);
+  const isHidden = hiddenOverride ?? program?.is_hidden ?? false;
+
+  const handleToggleHidden = async () => {
+    if (!program) return;
+    const nextHidden = !isHidden;
+    try {
+      await setProgramHidden(program.id, nextHidden);
+      setHiddenOverride(nextHidden);
+      showToast(nextHidden ? 'Program hidden' : 'Program is visible again', 'success');
+    } catch (err: unknown) {
+      showToast(parseApiError(err, nextHidden ? 'Failed to hide program' : 'Failed to unhide program'), 'error');
+    }
+  };
   const [currency, setCurrency] = useState<string | null>(null);
+
+  const copyTargets = useCopyTargetBranches({
+    programId: program?.id ?? '',
+    programName: program?.name ?? '',
+    qualificationId: program?.qualification_id ?? '',
+    universityId: program?.university?.id ?? '',
+    currentBranchId: program?.branch?.id,
+  });
+  const copyDisabled = !copyTargets.loading && copyTargets.emptyReason !== null;
+  const copyDisabledReason =
+    copyTargets.emptyReason === 'single'
+      ? 'This university has only one branch'
+      : copyTargets.emptyReason === 'all-taken'
+      ? 'This program is already in every other branch'
+      : undefined;
 
   const currencyOptions = getCurrencyOptions(exchangeRates);
   const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
@@ -212,7 +250,7 @@ const ProgramDetails = ({ id }: Props) => {
       lines.push(`${item.description ?? 'Fee'} : ${formatFee(item.fee, item.currency)}`);
     });
     lines.push('');
-    lines.push('University fees for this course include 6% tax (SST)');
+    lines.push('University fees for this course exclude 6% tax (SST)');
     await navigator.clipboard.writeText(lines.join('\n'));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -248,6 +286,12 @@ const ProgramDetails = ({ id }: Props) => {
               <h3 className="truncate text-sm font-semibold text-slate-900 sm:text-base">
                 {program?.name ?? 'Not Provided'}
               </h3>
+              {isHidden && (
+                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+                  <EyeOff className="h-3 w-3" />
+                  Hidden
+                </span>
+              )}
               <p className="truncate text-xs text-slate-500 sm:text-sm">
                 {program?.university?.name ?? 'Not Provided'}
               </p>
@@ -280,6 +324,40 @@ const ProgramDetails = ({ id }: Props) => {
                       <Clock className="h-4 w-4" />
                     </div>
                     <span className="font-semibold text-slate-900">Update Details</span>
+                  </button>
+
+                  <button
+                    aria-label="Copy to another branch"
+                    disabled={copyDisabled}
+                    title={copyDisabledReason}
+                    className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-transparent disabled:hover:bg-white disabled:hover:shadow-none"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsCopyOpen(true);
+                      setOpenDropdownId(null);
+                    }}
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
+                      <CopyPlus className="h-4 w-4" />
+                    </div>
+                    <span className="flex flex-col">
+                      <span className="font-semibold text-slate-900">Copy to another branch</span>
+                      {copyDisabled && copyDisabledReason && (
+                        <span className="text-xs font-normal text-slate-500">{copyDisabledReason}</span>
+                      )}
+                    </span>
+                  </button>
+
+                  <button
+                    aria-label={isHidden ? 'Unhide Program' : 'Hide Program'}
+                    disabled={isTogglingHidden}
+                    className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+                    onClick={() => { handleToggleHidden(); setOpenDropdownId(null); }}
+                  >
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
+                      {isHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                    </div>
+                    <span className="font-semibold text-slate-900">{isHidden ? 'Unhide Program' : 'Hide Program'}</span>
                   </button>
 
                   <button
@@ -446,14 +524,14 @@ const ProgramDetails = ({ id }: Props) => {
       </div>
 
       <div className="p-6 border-b border-slate-200">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
                 <CreditCard className="h-5 w-5 text-blue-600" />
               </div>
               <h4 className="text-base font-bold text-slate-900">Tuition Fees</h4>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            <div className="ml-auto flex shrink-0 items-center gap-2">
               <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
               <Button
                 onClick={handleCopyAll}
@@ -665,6 +743,23 @@ const ProgramDetails = ({ id }: Props) => {
         isDeleting={isDeleting}
         programNames={program?.name ? [program.name] : []}
       />
+
+      {program && isCopyOpen && (
+        <CopyProgramToBranch
+          isOpen={isCopyOpen}
+          onClose={() => setIsCopyOpen(false)}
+          programId={program.id}
+          programName={program.name}
+          qualificationId={program.qualification_id}
+          universityId={program.university.id}
+          currentBranchId={program.branch?.id}
+          onCopied={(created) => {
+            const newId = created?.program?.id ?? created?.id;
+            setIsCopyOpen(false);
+            if (newId) router.push(`/admin/knowledge-hub/${newId}`);
+          }}
+        />
+      )}
 
     </div>
   );

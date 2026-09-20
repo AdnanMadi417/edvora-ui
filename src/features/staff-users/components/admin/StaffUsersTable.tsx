@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   User, Mail, ShieldCheck, BadgeCheck, ChevronRight,
   CheckCircle, XCircle, RefreshCw, SlidersHorizontal, Ban, Power,
-  UserPlus, KeyRound, ExternalLink,
+  UserPlus, KeyRound, ExternalLink, Users,
 } from "lucide-react";
 
 import { useStaffUsers, useSuspendStaffUser, useReactivateStaffUser } from "../../hooks";
@@ -264,6 +264,7 @@ export default function StaffUsersTable() {
                   colSpan={6}
                   title={activeFiltersCount > 0 ? "No staff users found" : "No staff users yet"}
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No admin, reviewer, or data entry accounts yet."}
+                  icon={<Users className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button

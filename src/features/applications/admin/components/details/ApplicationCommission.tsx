@@ -4,6 +4,8 @@ import React from "react";
 import { Receipt } from "lucide-react";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { SectionIconBadge } from "components/ui/icons";
+import ApplicationCommissionRecords from "features/applications/shared/ApplicationCommissionRecords";
+import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 
 interface ApplicationCommissionsProps {
   application: any;
@@ -12,21 +14,17 @@ interface ApplicationCommissionsProps {
 export default function ApplicationCommissions({
   application,
 }: ApplicationCommissionsProps) {
-  const commissions = application?.commissions || [];
+  const commissions: ApplicationCommissionItem[] = application?.commissions || [];
   const studentName = application?.student?.name;
 
   const commissionDocs = Object.values(
     application?.commission_documents || {}
   ).filter(Boolean) as any[];
 
-  const hasCommissions = commissions.length > 0;
-
   const formatLabel = (text?: string) =>
   text
     ? text.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
     : "Commission Document";
-
-  if (!hasCommissions && commissionDocs.length === 0) return null;
 
   return (
     <>
@@ -43,6 +41,8 @@ export default function ApplicationCommissions({
 
           </div>
         </div>
+
+        <ApplicationCommissionRecords commissions={commissions} />
 
         <div className="space-y-4 p-6">
           {commissionDocs.length > 0 ? (
@@ -71,7 +71,7 @@ export default function ApplicationCommissions({
             ))
           ) : (
             <p className="text-center text-gray-500">
-              No commission records found.
+              No commission documents available.
             </p>
           )}
         </div>

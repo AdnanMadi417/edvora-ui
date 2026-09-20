@@ -9,13 +9,13 @@ import EmptyData from "components/emptyData/EmptyTableData";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import PhoneInputField from "components/form/fields/PhoneInputField";
-import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
 import { useToast } from "components/context/ToastContext";
 import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
+import { useFileDrop } from "components/form/upload/useFileDrop";
 import { COUNTRIES, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
-import { parseSocialMediaUrl, validateSocialMediaField, isValidPlatformUrl } from "utils/socialMedia";
+import { isValidWebsiteUrl } from "utils/socialMedia";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
@@ -60,6 +60,11 @@ function DocUploadField({
     if (file) onUpload(file);
     e.target.value = "";
   };
+
+  const { isDragging, dropHandlers } = useFileDrop({
+    onFiles: (files) => onUpload(files[0]),
+    disabled: locked,
+  });
 
   const handleView = async () => {
     if (!doc.file_key || downloading) return;
@@ -109,7 +114,13 @@ function DocUploadField({
               className="hover:bg-green-100"
             />
             {!locked && (
-              <label htmlFor={fieldId} className="flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-50">
+              <label
+                htmlFor={fieldId}
+                {...dropHandlers}
+                className={`flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-colors ${
+                  isDragging ? "border-blue-400 bg-blue-50 text-blue-700" : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
+                }`}
+              >
                 <Upload className="h-3.5 w-3.5" /> Replace
                 <input id={fieldId} type="file" accept={ALLOWED_FILE_TYPES.extensions.join(",")} className="hidden" onChange={handleChange} />
               </label>
@@ -117,7 +128,13 @@ function DocUploadField({
           </div>
         </div>
       ) : (
-        <label htmlFor={fieldId} className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-slate-300 bg-white px-4 py-6 text-sm text-slate-500 transition-colors hover:border-blue-400 hover:bg-blue-50/40">
+        <label
+          htmlFor={fieldId}
+          {...dropHandlers}
+          className={`flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-sm transition-colors ${
+            isDragging ? "border-blue-400 bg-blue-50 text-blue-600" : "border-slate-300 bg-white text-slate-500 hover:border-blue-400 hover:bg-blue-50/40"
+          }`}
+        >
           <Upload className="h-4 w-4" /> Upload {label}
           <input id={fieldId} type="file" accept={ALLOWED_FILE_TYPES.extensions.join(",")} className="hidden" onChange={handleChange} />
         </label>
@@ -147,9 +164,19 @@ function AvatarUpload({
     e.target.value = "";
   };
 
+  const { isDragging, dropHandlers } = useFileDrop({
+    onFiles: (files) => onUpload(files[0]),
+  });
+
   return (
-    <div className="relative shrink-0">
-      <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+    // The whole avatar circle is the drop target, not just the small camera
+    // badge — a badge-sized hit area is impractical to drop a file onto.
+    <div className="relative shrink-0" {...dropHandlers}>
+      <div
+        className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700 transition-colors ${
+          isDragging ? "ring-2 ring-blue-400 ring-offset-2" : ""
+        }`}
+      >
         <PresignedImage
           fileKey={doc.file_key}
           alt="Profile"
@@ -188,11 +215,7 @@ export default function EditPartnerProfile() {
     phone_number: "",
     background: "",
     social_media_url: "",
-    social_platform: "",
-    social_username: "",
     linkedin_url: "",
-    linkedin_platform: "linkedin",
-    linkedin_username: "",
     company_name: "",
     website_url: "",
     nationality: "",
@@ -220,8 +243,6 @@ export default function EditPartnerProfile() {
     if (!partner) return;
     const rawPhone = (partner.phone ?? "").replace(/^undefined/, "").trim();
     const phoneMatch = rawPhone.match(/^(\+\d{1,3})\s+(.*)/);
-    const { platform: socialPlatform, username: socialUsername } = parseSocialMediaUrl(partner.individual_details?.social_media_url ?? "");
-    const { username: linkedinUsername } = parseSocialMediaUrl(partner.individual_details?.linkedin_url ?? "");
     setFormData({
       name: partner.name ?? "",
       country: partner.country ?? "",
@@ -229,11 +250,7 @@ export default function EditPartnerProfile() {
       phone_number: phoneMatch ? phoneMatch[2] : rawPhone,
       background: partner.individual_details?.background ?? "",
       social_media_url: partner.individual_details?.social_media_url ?? "",
-      social_platform: socialPlatform,
-      social_username: socialUsername,
       linkedin_url: partner.individual_details?.linkedin_url ?? "",
-      linkedin_platform: "linkedin",
-      linkedin_username: linkedinUsername,
       company_name: partner.company_details?.company_name ?? "",
       website_url: partner.company_details?.website_url ?? "",
       nationality: partner.nationality ?? "",
@@ -296,13 +313,6 @@ export default function EditPartnerProfile() {
     );
   };
 
-  const isValidUrl = (val: string) => {
-    try {
-      const url = new URL(val);
-      return url.protocol === "https:" || url.protocol === "http:";
-    } catch { return false; }
-  };
-
   const computeErrors = () => {
     const e: Record<string, string> = {};
     const type = partner?.type;
@@ -316,18 +326,16 @@ export default function EditPartnerProfile() {
     else if (formData.phone_number.trim().length < 5) e.phone_number = "Phone number must be at least 5 digits";
 
     if (type === "individual") {
-      if (formData.linkedin_url && !isValidPlatformUrl("linkedin", formData.linkedin_url))
-        e.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://linkedin.com/in/yourname)";
-      if (formData.social_platform || formData.social_username) {
-        const socialError = validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" });
-        if (socialError) e.social_media_url = socialError;
-      }
+      if (formData.linkedin_url && !isValidWebsiteUrl(formData.linkedin_url))
+        e.linkedin_url = "Enter a valid URL starting with https://";
+      if (formData.social_media_url && !isValidWebsiteUrl(formData.social_media_url))
+        e.social_media_url = "Enter a valid URL starting with https://";
     }
 
     if (type === "agency") {
       if (!formData.company_name.trim()) e.company_name = "Company name is required";
       else if (formData.company_name.trim().length < 3) e.company_name = "Company name must be at least 3 characters";
-      if (formData.website_url && !isValidUrl(formData.website_url))
+      if (formData.website_url && !isValidWebsiteUrl(formData.website_url))
         e.website_url = "Enter a valid URL starting with https://";
     }
 
@@ -500,24 +508,23 @@ export default function EditPartnerProfile() {
                 errors={errors}
                 updateFormData={updateFormData}
               />
-              <SocialMediaInputField
+              <InputField
                 label="LinkedIn URL"
-                platformField="linkedin_platform"
-                usernameField="linkedin_username"
-                urlField="linkedin_url"
-                lockedPlatform="linkedin"
+                field="linkedin_url"
+                type="url"
                 required={false}
+                placeholder="https://linkedin.com/in/yourname"
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
                 onBlur={() => validateField("linkedin_url")}
               />
-              <SocialMediaInputField
+              <InputField
                 label="Social Media URL"
-                platformField="social_platform"
-                usernameField="social_username"
-                urlField="social_media_url"
+                field="social_media_url"
+                type="url"
                 required={false}
+                placeholder="https://..."
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}

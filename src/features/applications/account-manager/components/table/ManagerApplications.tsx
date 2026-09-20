@@ -11,6 +11,7 @@ import {
   User,
   Building,
   GraduationCap,
+  ClipboardList,
 } from "lucide-react";
 import PipelineCard from "features/applications/partner/components/PipelineCard";
 
@@ -266,7 +267,13 @@ const ModernApplicationsTable = () => {
             </div>
           ))
         ) : paginatedApplications.length === 0 ? (
-          <div className="px-6 py-8 text-center"><EmptyData /></div>
+          <div className="px-6 py-8 text-center">
+            <EmptyData
+              title="No applications found"
+              subtitle="No applications match your current filters."
+              icon={<ClipboardList className="h-8 w-8 text-slate-400" />}
+            />
+          </div>
         ) : (
           paginatedApplications.map((app) => (
             <div
@@ -381,6 +388,7 @@ const ModernApplicationsTable = () => {
                 colSpan={6}
                 title="No applications found"
                 subtitle="No applications match your current filters."
+                icon={<ClipboardList className="h-8 w-8 text-slate-400" />}
               />
             ) : (
               paginatedApplications.map((app) => (

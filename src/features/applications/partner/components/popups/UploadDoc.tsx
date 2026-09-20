@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, AlertCircle, RotateCcw } from "lucide-react";
 import Button from "components/ui/buttons/Button";
+import { useFileDrop } from "components/form/upload/useFileDrop";
 
 interface ResubmitDocProps {
   isOpen: boolean;
@@ -29,6 +30,10 @@ export default function UploadDoc({
       return () => clearTimeout(timer);
     }
   }, [isOpen]);
+
+  const { isDragging, dropHandlers } = useFileDrop({
+    onFiles: (files) => setSelectedFile(files[0]),
+  });
 
   if (!isVisible) return null;
 
@@ -111,7 +116,14 @@ export default function UploadDoc({
                 Upload Document <span className="text-amber-600">*</span>
               </label>
 
-              <label className="flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 px-6 py-8 transition-all duration-200 hover:border-amber-500 hover:bg-amber-50">
+              <label
+                {...dropHandlers}
+                className={`flex w-full cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-8 transition-all duration-200 ${
+                  isDragging
+                    ? "border-amber-500 bg-amber-50"
+                    : "border-gray-300 hover:border-amber-500 hover:bg-amber-50"
+                }`}
+              >
                 <svg
                   className="mb-3 h-10 w-10 text-amber-500"
                   fill="none"

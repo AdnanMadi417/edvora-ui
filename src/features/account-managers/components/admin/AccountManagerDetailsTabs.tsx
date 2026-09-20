@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { AlertCircle, CheckCircle2, Users, XCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2, Share2, Users, XCircle } from "lucide-react";
 import { StatusBadge } from "components/ui/badges";
 import { Tabs, type TabItem } from "components/ui/tabs";
 import type { AccountManager } from "../../types";
@@ -9,6 +9,8 @@ import AccountManagerPartnersTable from "../AccountManagerPartnersTable";
 
 interface Props {
   manager: AccountManager;
+  /** Refetch the manager after something changed its data (e.g. a partner transfer). */
+  onManagerChanged?: () => void;
 }
 
 type DetailsTab = "profile" | "partners";
@@ -18,7 +20,7 @@ const TABS: TabItem<DetailsTab>[] = [
   { key: "partners", label: "Partners" },
 ];
 
-export default function AccountManagerDetailsTabs({ manager }: Props) {
+export default function AccountManagerDetailsTabs({ manager, onManagerChanged }: Props) {
   const [tab, setTab] = useState<DetailsTab>("profile");
 
   return (
@@ -53,23 +55,30 @@ export default function AccountManagerDetailsTabs({ manager }: Props) {
               Assigned Partners
             </span>
 
-            {Number(manager.assigned_partners_count) > 0 ? (
-              <StatusBadge variant="success" icon={<Users className="h-3 w-3" />} className="w-fit">
-                {Number(manager.assigned_partners_count)} Partner
-                {Number(manager.assigned_partners_count) !== 1 && "s"}
-              </StatusBadge>
-            ) : (
-              <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>
-                Needs Partner
-              </StatusBadge>
-            )}
+            <div className="flex flex-wrap items-center gap-1.5">
+              {Number(manager.assigned_partners_count) > 0 ? (
+                <StatusBadge variant="success" icon={<Users className="h-3 w-3" />} className="w-fit">
+                  {Number(manager.assigned_partners_count)} Partner
+                  {Number(manager.assigned_partners_count) !== 1 && "s"}
+                </StatusBadge>
+              ) : (
+                <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>
+                  Needs Partner
+                </StatusBadge>
+              )}
+              {Number(manager.shared_partners_count ?? 0) > 0 && (
+                <StatusBadge variant="info" icon={<Share2 className="h-3 w-3" />} className="w-fit">
+                  {Number(manager.shared_partners_count)} shared
+                </StatusBadge>
+              )}
+            </div>
           </div>
         </div>
       )}
 
       {tab === "partners" && (
         <div key={tab} className="animate-in fade-in duration-200">
-          <AccountManagerPartnersTable managerId={manager.id} />
+          <AccountManagerPartnersTable manager={manager} onTransferred={onManagerChanged} />
         </div>
       )}
     </div>

@@ -20,3 +20,11 @@ export const applicationsRouteMap: Record<string, string> = {
   account_manager: "/account-manager/applications",
   partner: "/partner/applications",
 };
+
+// partner_signed_up notifications link to the partner's detail page instead
+// of an application — only the two roles that actually receive that
+// notification (admin, reviewer) need an entry here.
+export const partnersRouteMap: Record<string, string> = {
+  admin: "/admin/partners",
+  reviewer: "/reviewer/partners",
+};

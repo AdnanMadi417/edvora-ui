@@ -11,12 +11,21 @@ export interface PresignedUpload {
 }
 
 /**
- * Check if a file is allowed (PDF or PNG)
+ * Check if a file is an allowed type for document upload — verified against
+ * the real storage endpoint, which enforces no content-type restriction of
+ * its own, so this list is the only gate.
  */
 export const ALLOWED_FILE_TYPES = {
-  mimeTypes: ["application/pdf", "image/png", "image/jpeg", "image/webp"],
-  extensions: [".pdf", ".png", ".jpg", ".jpeg", ".webp"],
-  label: "PDF, PNG, JPG, or WebP",
+  mimeTypes: [
+    "application/pdf",
+    "image/png",
+    "image/jpeg",
+    "image/webp",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ],
+  extensions: [".pdf", ".png", ".jpg", ".jpeg", ".webp", ".doc", ".docx"],
+  label: "PDF, DOC, PNG, JPG, or WebP",
 };
 
 function isAllowedFile(file: File): boolean {
@@ -65,7 +74,7 @@ export async function getPresignedUploads(
   // Only keep valid files
   const validFiles = files.filter((f) => isAllowedFile(f));
   if (!validFiles.length) {
-    throw new Error("No valid files. Only PDF and PNG are allowed.");
+    throw new Error(`No valid files. Only ${ALLOWED_FILE_TYPES.label} are allowed.`);
   }
 
   const token = Cookies.get("token");

@@ -2,135 +2,153 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Plus, RefreshCw, CheckCircle, XCircle, GraduationCap } from "lucide-react";
+import {
+  Pencil,
+  RefreshCw,
+  Calendar,
+  Settings,
+  ChevronRight,
+  CheckCircle,
+  XCircle,
+  GraduationCap,
+  Landmark,
+  EyeOff,
+  Languages,
+} from "lucide-react";
+import { MdOutlineCategory, MdSchool } from "react-icons/md";
 import PresignedImage from "components/ui/PresignedImage";
 import { monthLabel } from "features/programs/utils/intakeMonths";
 import { useUniversities } from "features/universities/hooks";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
-import SearchInput from "components/form/filter/SearchInput";
+import Link from "components/ui/links/LinkBtn";
+import UniversityFilterPanel from "features/universities/components/shared/filters/UniversityFilterPanel";
 import { StatusBadge } from "components/ui/badges";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 
 const ITEMS_PER_PAGE = 10;
 
+type TriFilter = "all" | "true" | "false";
+
+function triToBool(value: TriFilter): boolean | undefined {
+  return value === "all" ? undefined : value === "true";
+}
+
+// Same color-coded type badge as admin's UniversitiesTable — keep the two
+// tables' "University Type" presentation identical.
+const TYPE_CONFIG: Record<string, { bg: string; text: string; dot: string; label: string }> = {
+  minimal: { bg: "bg-blue-50 border-blue-200", text: "text-blue-700", dot: "bg-blue-600", label: "Minimal" },
+  extended: { bg: "bg-green-50 border-green-200", text: "text-green-700", dot: "bg-green-600", label: "Extended" },
+  conditional: { bg: "bg-orange-50 border-orange-200", text: "text-orange-700", dot: "bg-orange-600", label: "Conditional" },
+};
+
 export default function DataEntryUniversitiesTable() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState<"all" | "active" | "inactive">("all");
+  const [selectedType, setSelectedType] = useState("all");
+  const [isPublicFilter, setIsPublicFilter] = useState<TriFilter>("all");
+  const [hasLanguageCenterFilter, setHasLanguageCenterFilter] = useState<TriFilter>("all");
+  const [isHiddenFilter, setIsHiddenFilter] = useState<TriFilter>("all");
   const [currentPage, setCurrentPage] = useState(1);
-  const { universities, loading, error, refetch } = useUniversities({ includeInactive: true });
 
-  const stats = React.useMemo(() => ({
-    total: universities.length,
-    active: universities.filter((u) => u.is_active).length,
-    inactive: universities.filter((u) => !u.is_active).length,
-  }), [universities]);
+  const { universities, loading, error, refetch } = useUniversities({
+    includeInactive: true,
+    isPublic: triToBool(isPublicFilter),
+    hasLanguageCenter: triToBool(hasLanguageCenterFilter),
+    isHidden: triToBool(isHiddenFilter),
+  });
+
+  const activeFiltersCount =
+    (searchTerm.trim() !== "" ? 1 : 0) +
+    (selectedType !== "all" ? 1 : 0) +
+    (isPublicFilter !== "all" ? 1 : 0) +
+    (hasLanguageCenterFilter !== "all" ? 1 : 0) +
+    (isHiddenFilter !== "all" ? 1 : 0);
+
+  const universityTypes = React.useMemo(() => {
+    const types = universities.map((u) => u.university_type_name).filter(Boolean);
+    return [...new Set(types)] as string[];
+  }, [universities]);
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setSelectedType("all");
+    setIsPublicFilter("all");
+    setHasLanguageCenterFilter("all");
+    setIsHiddenFilter("all");
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
 
   const filtered = universities.filter((u) => {
     const term = searchTerm.trim().toLowerCase();
     const matchesSearch = !term || u.name?.toLowerCase().includes(term) || u.country?.toLowerCase().includes(term);
-    const matchesStatus =
-      selectedStatus === "all" ||
-      (selectedStatus === "active" && u.is_active) ||
-      (selectedStatus === "inactive" && !u.is_active);
-    return matchesSearch && matchesStatus;
+    const matchesType = selectedType === "all" || u.university_type_name?.toLowerCase().trim() === selectedType;
+    return matchesSearch && matchesType;
   });
 
   const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
   return (
-    <div className="mt-6 max-w-5xl mx-auto text-p2 bg-white rounded-lg border border-slate-200">
-
+    <div className="mt-6 max-w-5xl mx-auto overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6">
         <div>
           <h3 className="text-xl font-semibold text-slate-900">Universities</h3>
-          <p className="mt-0.5 text-sm text-slate-500">Create and edit university records</p>
+          <p className="mt-1 text-sm text-slate-500">Create and edit university records</p>
         </div>
-        <Button
-          icon={<Plus className="h-4 w-4" />}
-          text="New University"
+        <Link
+          href="/data-entry/universities/create"
+          icon={<GraduationCap className="h-5 w-5" />}
+          label="New University"
           bgColor="bg-blue-50"
           textColor="text-blue-700"
           borderColor="border-blue-600"
           hoverTextColor="hover:text-blue-800"
           hoverBorderColor="hover:border-blue-700"
-          onClick={() => router.push("/data-entry/universities/create")}
-          className="whitespace-nowrap"
         />
       </div>
 
-      {/* Stats Cards */}
-      <div className="p-6 border-b border-slate-200 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <button
-          onClick={() => { setSelectedStatus("all"); setCurrentPage(1); }}
-          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-            selectedStatus === "all"
-              ? "border-slate-400 bg-slate-100 shadow-sm"
-              : "border-slate-200 bg-white hover:bg-slate-50"
-          }`}
-        >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-            <GraduationCap className="h-5 w-5 text-slate-600" />
-          </div>
-          <div>
-            <p className="text-xl font-bold text-slate-900">{stats.total}</p>
-            <p className="text-xs text-slate-500">Total Universities</p>
-          </div>
-        </button>
-
-        <button
-          onClick={() => { setSelectedStatus("active"); setCurrentPage(1); }}
-          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-            selectedStatus === "active"
-              ? "border-green-300 bg-green-50 shadow-sm"
-              : "border-slate-200 bg-white hover:bg-slate-50"
-          }`}
-        >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-100">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-          </div>
-          <div>
-            <p className="text-xl font-bold text-slate-900">{stats.active}</p>
-            <p className="text-xs text-slate-500">Active</p>
-          </div>
-        </button>
-
-        <button
-          onClick={() => { setSelectedStatus("inactive"); setCurrentPage(1); }}
-          className={`flex items-center gap-3 rounded-xl border p-4 text-left transition-all ${
-            selectedStatus === "inactive"
-              ? "border-slate-400 bg-slate-100 shadow-sm"
-              : "border-slate-200 bg-white hover:bg-slate-50"
-          }`}
-        >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-            <XCircle className="h-5 w-5 text-slate-500" />
-          </div>
-          <div>
-            <p className="text-xl font-bold text-slate-900">{stats.inactive}</p>
-            <p className="text-xs text-slate-500">Inactive</p>
-          </div>
-        </button>
+      {/* Search & Filters */}
+      <div className="border-t border-slate-200 p-6">
+        <UniversityFilterPanel
+          searchTerm={searchTerm}
+          onSearchChange={handleSearchChange}
+          searchPlaceholder="Search by name or country..."
+          typeOptions={universityTypes.map((type) => ({
+            value: type.toLowerCase().trim(),
+            label: type,
+          }))}
+          filters={{
+            type: selectedType,
+            isPublic: isPublicFilter,
+            hasLanguageCenter: hasLanguageCenterFilter,
+            isHidden: isHiddenFilter,
+          }}
+          onApplyFilters={(values) => {
+            setSelectedType(values.type);
+            setIsPublicFilter(values.isPublic as TriFilter);
+            setHasLanguageCenterFilter(values.hasLanguageCenter as TriFilter);
+            setIsHiddenFilter(values.isHidden as TriFilter);
+            setCurrentPage(1);
+          }}
+          onRemoveFilter={(key) => {
+            if (key === "type") setSelectedType("all");
+            if (key === "isPublic") setIsPublicFilter("all");
+            if (key === "hasLanguageCenter") setHasLanguageCenterFilter("all");
+            if (key === "isHidden") setIsHiddenFilter("all");
+            setCurrentPage(1);
+          }}
+          onClearAll={clearFilters}
+          resultsCount={filtered.length}
+        />
       </div>
 
-      {/* Search */}
-      <div className="p-6 border-b border-slate-200">
-        <div className="flex items-center gap-2">
-          <SearchInput
-            value={searchTerm}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-            placeholder="Search by name or country..."
-            className="sm:w-64 sm:flex-none"
-          />
-          {loading && (
-            <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
-          )}
-        </div>
-      </div>
-
-      <div className="p-6">
+      <div className="mb-8">
         <TableWrapper
           footer={
             <TablePagination
@@ -147,92 +165,169 @@ export default function DataEntryUniversitiesTable() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
-                <th className="min-w-[220px] px-6 py-4 text-start text-sm font-semibold text-slate-900">University</th>
-                <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">Country</th>
-                <th className="min-w-[180px] px-6 py-4 text-start text-sm font-semibold text-slate-900">Intake Months</th>
-                <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">Status</th>
-                <th className="px-6 py-4 text-start text-sm font-semibold text-slate-900">Actions</th>
+                <th className="min-w-[250px] px-6 py-4 text-start font-bold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <MdSchool className="h-4 w-4 text-slate-500" />
+                    <span>University Info</span>
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex min-w-[150px] items-center gap-2">
+                    <MdOutlineCategory className="h-4 w-4 text-slate-500" />
+                    <span>Type</span>
+                  </div>
+                </th>
+                <th className="min-w-[250px] px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-slate-500" />
+                    <span>Intake Months</span>
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex min-w-[120px] items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-slate-500" />
+                    Status
+                  </div>
+                </th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">
+                  <div className="flex items-center gap-2">
+                    <Settings className="h-4 w-4 text-slate-500" />
+                    <span>Actions</span>
+                  </div>
+                </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
-              {loading && <TableSkeletonRows columns={5} rows={ITEMS_PER_PAGE} />}
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {loading && <TableSkeletonRows columns={6} rows={ITEMS_PER_PAGE} />}
 
               {!loading && error && (
-                <TableErrorRow colSpan={5} message={error} onRetry={refetch} />
+                <TableErrorRow colSpan={6} message={error} onRetry={refetch} />
               )}
 
               {!loading && !error && paginated.length === 0 && (
                 <TableEmptyRow
-                  colSpan={5}
+                  colSpan={6}
                   title="No universities found"
-                  subtitle="No universities match your search."
+                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No universities have been added yet."}
+                  icon={<Landmark className="h-8 w-8 text-slate-400" />}
+                  action={
+                    activeFiltersCount > 0 ? (
+                      <Button
+                        onClick={clearFilters}
+                        icon={<RefreshCw className="h-3.5 w-3.5" />}
+                        text="Clear filters"
+                        bgColor="bg-white"
+                        textColor="text-slate-700"
+                        borderColor="border-slate-200"
+                        hoverTextColor="hover:text-slate-700"
+                        hoverBorderColor="hover:border-slate-200"
+                        className="hover:bg-slate-50"
+                      />
+                    ) : undefined
+                  }
                 />
               )}
 
-              {!loading && !error && paginated.map((uni) => (
-                <tr
-                  key={uni.id}
-                  className="cursor-pointer transition-colors hover:bg-slate-100/50"
-                  onClick={() => router.push(`/data-entry/universities/${uni.id}`)}
-                >
-                  <td className="min-w-[220px] max-w-[300px] px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <PresignedImage
-                        fileKey={uni.logo_file_key}
-                        alt={uni.name}
-                        className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-slate-200 ring-offset-2"
-                        fallback={
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                            {uni.name?.slice(0, 2).toUpperCase() || "NA"}
-                          </div>
-                        }
-                      />
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-slate-900" title={uni.name}>{uni.name}</div>
+              {!loading && !error && paginated.map((uni) => {
+                const normalizedType = uni.university_type_name?.toLowerCase().trim().replace(/\s+/g, "_") ?? "";
+                const typeConfig = TYPE_CONFIG[normalizedType] ?? {
+                  bg: "bg-gray-100 border-slate-200",
+                  text: "text-gray-700",
+                  dot: "bg-gray-400",
+                  label: uni.university_type_name || "Not Provided",
+                };
+
+                return (
+                  <tr
+                    key={uni.id}
+                    className="group cursor-pointer transition-colors hover:bg-slate-100/50"
+                    onClick={() => router.push(`/data-entry/universities/${uni.id}`)}
+                  >
+                    <td className="min-w-[200px] max-w-[300px] px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <PresignedImage
+                          fileKey={uni.logo_file_key}
+                          alt={uni.name}
+                          className="h-10 w-10 shrink-0 rounded-full object-cover ring-2 ring-slate-200 ring-offset-2 shadow-sm"
+                          fallback={
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent-light text-h6 font-medium text-blue-700">
+                              {uni.name?.slice(0, 2).toUpperCase()}
+                            </div>
+                          }
+                        />
+                        <div className="w-full min-w-0">
+                          <h3 className="truncate text-sm font-semibold text-slate-900">{uni.name}</h3>
+                          <p className="text-xs text-slate-500">{uni.is_public ? "Public" : "Private"}</p>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="max-w-[160px] px-6 py-4">
-                    <div className="truncate text-sm text-slate-900" title={uni.country || undefined}>{uni.country || "—"}</div>
-                  </td>
-                  <td className="min-w-[180px] px-6 py-4">
-                    <div className="flex flex-wrap gap-2">
-                      {uni.intake_months && uni.intake_months.length > 0 ? (
-                        uni.intake_months.map((month: number, index: number) => (
-                          <span
-                            key={index}
-                            className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
-                          >
-                            {monthLabel(month)}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-sm text-slate-400">TBA</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    {uni.is_active ? (
-                      <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
-                    ) : (
-                      <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
-                    )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <IconButton
-                      onClick={(e) => { e.stopPropagation(); router.push(`/data-entry/universities/${uni.id}/edit`); }}
-                      title="Edit university"
-                      icon={<Pencil className="h-4 w-4" />}
-                      bgColor="bg-transparent"
-                      textColor="text-slate-400"
-                      borderColor="border-transparent"
-                      hoverTextColor="hover:text-slate-700"
-                      hoverBorderColor="hover:border-transparent"
-                      className="hover:bg-slate-100"
-                    />
-                  </td>
-                </tr>
-              ))}
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <div className="flex justify-start">
+                        <span
+                          className={`inline-flex items-center gap-2 rounded-md border px-3 py-1 text-xs font-semibold ${typeConfig.bg} ${typeConfig.text}`}
+                          title={typeConfig.label}
+                        >
+                          <span className={`h-2 w-2 rounded-md ${typeConfig.dot}`} />
+                          <span className="truncate">{typeConfig.label}</span>
+                        </span>
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-2">
+                        {uni.intake_months && uni.intake_months.length > 0 ? (
+                          uni.intake_months.map((month: number, index: number) => (
+                            <span
+                              key={index}
+                              className="inline-flex items-center rounded-lg border border-slate-200 bg-white px-3 py-1 text-xs text-slate-700"
+                            >
+                              {monthLabel(month)}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-sm text-slate-400">TBA</span>
+                        )}
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {uni.is_active ? (
+                          <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
+                        ) : (
+                          <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
+                        )}
+                        {uni.is_hidden && (
+                          <StatusBadge variant="warning" icon={<EyeOff className="h-3 w-3" />}>Hidden</StatusBadge>
+                        )}
+                        {uni.has_language_center && (
+                          <StatusBadge variant="info" icon={<Languages className="h-3 w-3" />}>Language Center</StatusBadge>
+                        )}
+                      </div>
+                    </td>
+
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <IconButton
+                          onClick={(e) => { e.stopPropagation(); router.push(`/data-entry/universities/${uni.id}/edit`); }}
+                          title="Edit university"
+                          icon={<Pencil className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-700"
+                          borderColor="border-transparent"
+                          hoverTextColor="hover:text-slate-700"
+                          hoverBorderColor="hover:border-transparent"
+                          className="hover:bg-slate-100 focus:outline-none"
+                        />
+                      </div>
+                    </td>
+                    <td className="w-8 pr-4 py-4">
+                      <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </TableWrapper>

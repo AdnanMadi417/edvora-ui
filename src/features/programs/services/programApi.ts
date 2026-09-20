@@ -3,7 +3,9 @@ import Cookies from "js-cookie";
 import type {
   CreateProgramPayload,
   UpdateProgramPayload,
+  SetProgramHiddenPayload,
   BatchUpdateProgramPayload,
+  CopyProgramToBranchPayload,
   UpdateDefaultVisaFeePayload,
   GetProgramsParams,
 } from "../types";
@@ -21,7 +23,7 @@ export const programApi = {
       api.get(`/knowledge-hub/programs/${id}`, { headers: authHeader() }),
     create: (data: CreateProgramPayload) =>
       api.post("/knowledge-hub/programs", data),
-    update: (id: string, data: UpdateProgramPayload) =>
+    update: (id: string, data: UpdateProgramPayload | SetProgramHiddenPayload) =>
       api.put(`/knowledge-hub/programs/${id}`, data),
     delete: (id: string) =>
       api.delete(`/knowledge-hub/programs/${id}`, { headers: authHeader() }),
@@ -32,6 +34,10 @@ export const programApi = {
       }),
     batchUpdate: (data: BatchUpdateProgramPayload) =>
       api.put("/knowledge-hub/programs-batch", data, { headers: authHeader() }),
+    copyToBranch: (id: string, branchId: string) =>
+      api.post(`/knowledge-hub/programs/${id}/copy`, {
+        branch_id: branchId,
+      } satisfies CopyProgramToBranchPayload),
   },
 
   states: {

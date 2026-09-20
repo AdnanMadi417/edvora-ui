@@ -20,6 +20,7 @@ import {
   Trophy,
   Info,
   UploadCloud,
+  UserPlus,
   type LucideIcon,
 } from "lucide-react";
 import type { Notification } from "../types";
@@ -128,6 +129,11 @@ export function getNotificationIconConfig(notification: Notification): Notificat
     return (statusId && STATUS_ICON_MAP[statusId]) || FALLBACK;
   }
 
+  // A partner (individual or agency) just signed up
+  if (notification.type === "partner_signed_up") {
+    return { icon: UserPlus, bg: "bg-indigo-100", iconColor: "text-indigo-600", badgeBg: "bg-indigo-500" };
+  }
+
   return FALLBACK;
 }
 
@@ -140,4 +146,38 @@ export function getSenderName(notification: Notification): string {
     (data?.student_name as string) ||
     "System"
   );
+}
+
+/**
+ * The storage key for the photo/logo to show as the notification's avatar,
+ * if any. The API also sends a `*_url` sibling field claimed to be
+ * "ready-to-use" — checked against a real payload and that isn't true: it's
+ * a bare bucket URL with no signature, and 403s directly. The `*_key` is
+ * what actually works, resolved the same way as every other photo in this
+ * app (NotificationAvatar → getDocumentDownloadUrl). Returns null when the
+ * notification type carries no such image, or nothing's been uploaded yet.
+ */
+export function getNotificationPhotoKey(notification: Notification): string | null {
+  const data = notification.data as Record<string, unknown>;
+  if (notification.type === "partner_signed_up") {
+    return (data?.partner_photo_key as string) || (data?.agency_logo_key as string) || null;
+  }
+  // application_stage_changed / new_application both carry the student's photo
+  return (data?.student_photo_key as string) || null;
+}
+
+/** The "Stage" / "Status" display-label pair for a notification, if it has
+ *  one — application_stage_changed and new_application each carry these
+ *  under different field names for the same concept (current stage/status). */
+export function getNotificationStageStatus(
+  notification: Notification
+): { stage?: string; status?: string } {
+  const data = notification.data as Record<string, unknown>;
+  if (notification.type === "application_stage_changed") {
+    return { stage: data?.to_stage_name as string, status: data?.to_status_name as string };
+  }
+  if (notification.type === "new_application") {
+    return { stage: data?.stage_name as string, status: data?.status_name as string };
+  }
+  return {};
 }

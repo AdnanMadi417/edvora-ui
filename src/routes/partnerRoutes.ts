@@ -1,8 +1,17 @@
-import { ClipboardList, BookOpen, Bell, Truck, UserPlus } from "lucide-react";
+import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2, Landmark, GraduationCap } from "lucide-react";
 
 import type { IRoute } from "../types/navigation";
 
 const partnerRoutes: IRoute[] = [
+  {
+    // The mandatory partner onboarding tour (PartnerOnboardingTour.tsx) spotlights
+    // this exact nav item via data-tour-id="notifications" as one of its fixed steps.
+    name: "Notifications",
+    layout: "/partner",
+    path: "/notifications",
+    icon: Bell,
+  },
+
   {
     name: "Applications",
     layout: "/partner",
@@ -15,15 +24,20 @@ const partnerRoutes: IRoute[] = [
     layout: "/partner",
     path: "/knowledge-hub",
     icon: BookOpen,
-  },
-
-  {
-    // The mandatory partner onboarding tour (PartnerOnboardingTour.tsx) spotlights
-    // this exact nav item via data-tour-id="notifications" as one of its fixed steps.
-    name: "Notifications",
-    layout: "/partner",
-    path: "/notifications",
-    icon: Bell,
+    children: [
+      {
+        name: "Programs",
+        layout: "/partner",
+        path: "/knowledge-hub",
+        icon: GraduationCap,
+      },
+      {
+        name: "Universities",
+        layout: "/partner",
+        path: "/universities",
+        icon: Landmark,
+      },
+    ],
   },
 
   {
@@ -34,10 +48,21 @@ const partnerRoutes: IRoute[] = [
   },
 
   {
-    name: "Team Members",
+    name: "Agency Scaler",
     layout: "/partner",
     path: "/team-members",
     icon: UserPlus,
+  },
+
+  {
+    // Individual advisors only — public profiles are individual-only in V1
+    // (see partner_public_profiles). Filtered out for agency partners in
+    // app/partner/layout.tsx, mirroring how "Agency Scaler" is filtered out
+    // for individual partners.
+    name: "My Public Profile",
+    layout: "/partner",
+    path: "/public-profile",
+    icon: Globe2,
   },
 ];
 

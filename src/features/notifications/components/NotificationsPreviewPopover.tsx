@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { CheckCheck } from "lucide-react";
 
 import { useAllNotifications, useMarkAsRead, useMarkAllAsRead } from "../hooks";
-import { getNotificationIconConfig, getSenderName } from "../utils/notificationIcons";
+import { getNotificationIconConfig, getSenderName, getNotificationPhotoKey } from "../utils/notificationIcons";
+import type { Notification } from "../types";
+import NotificationAvatar from "./NotificationAvatar";
 
 const PREVIEW_LIMIT = 5;
 const CLOSE_DELAY_MS = 150;
@@ -24,15 +26,33 @@ interface NotificationsPreviewPopoverProps {
   notificationsPath: string;
   /** When set, clicking a notification navigates to `${applicationBasePath}/${application_id}`. */
   applicationBasePath?: string;
+  /** When set, a `partner_signed_up` notification navigates to
+   * `${partnerBasePath}/${data.partner_id}` instead. */
+  partnerBasePath?: string;
   /** Called after a notification is marked read (individually or via "mark all"), so the caller can refresh its own unread badge. */
   onNotificationHandled?: () => void;
   /** The bell trigger element (icon + unread badge). */
   children: React.ReactNode;
 }
 
+function getNotificationHref(
+  notification: Notification,
+  applicationBasePath?: string,
+  partnerBasePath?: string
+): string | undefined {
+  if (notification.type === "partner_signed_up") {
+    const partnerId = notification.data?.partner_id;
+    return partnerBasePath && partnerId ? `${partnerBasePath}/${partnerId}` : undefined;
+  }
+  return applicationBasePath && notification.application_id
+    ? `${applicationBasePath}/${notification.application_id}`
+    : undefined;
+}
+
 export default function NotificationsPreviewPopover({
   notificationsPath,
   applicationBasePath,
+  partnerBasePath,
   onNotificationHandled,
   children,
 }: NotificationsPreviewPopoverProps) {
@@ -60,6 +80,7 @@ export default function NotificationsPreviewPopover({
             <PreviewContent
               notificationsPath={notificationsPath}
               applicationBasePath={applicationBasePath}
+              partnerBasePath={partnerBasePath}
               onNavigate={() => setOpen(false)}
               onNotificationHandled={onNotificationHandled}
             />
@@ -73,11 +94,13 @@ export default function NotificationsPreviewPopover({
 function PreviewContent({
   notificationsPath,
   applicationBasePath,
+  partnerBasePath,
   onNavigate,
   onNotificationHandled,
 }: {
   notificationsPath: string;
   applicationBasePath?: string;
+  partnerBasePath?: string;
   onNavigate: () => void;
   onNotificationHandled?: () => void;
 }) {
@@ -113,9 +136,7 @@ function PreviewContent({
       console.error("Failed to mark notification as read", err);
     }
     onNavigate();
-    const href = applicationBasePath && notification.application_id
-      ? `${applicationBasePath}/${notification.application_id}`
-      : notificationsPath;
+    const href = getNotificationHref(notification, applicationBasePath, partnerBasePath) ?? notificationsPath;
     router.push(href);
   };
 
@@ -156,7 +177,6 @@ function PreviewContent({
         ) : (
           notifications.map((notification, index) => {
             const config = getNotificationIconConfig(notification);
-            const Icon = config.icon;
             const sender = getSenderName(notification);
             return (
               <button
@@ -167,9 +187,14 @@ function PreviewContent({
                   index !== notifications.length - 1 ? "border-b border-slate-50" : ""
                 }`}
               >
-                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md ${config.bg}`}>
-                  <Icon className={`h-4 w-4 ${config.iconColor}`} />
-                </div>
+                <NotificationAvatar
+                  photoKey={getNotificationPhotoKey(notification)}
+                  icon={config.icon}
+                  bg={config.bg}
+                  iconColor={config.iconColor}
+                  badgeBg={config.badgeBg}
+                  size="sm"
+                />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm leading-snug text-slate-900">
                     <span className="font-semibold">{sender}</span>

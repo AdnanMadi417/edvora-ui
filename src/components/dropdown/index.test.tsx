@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Dropdown from './index'
 
@@ -7,65 +7,60 @@ describe('Dropdown Component', () => {
   const mockButton = <button>Click me</button>
   const mockChildren = <div>Dropdown Content</div>
 
-  it('renders button and children', () => {
+  it('renders the trigger button', () => {
     render(
       <Dropdown button={mockButton} classNames="test-class">
         {mockChildren}
       </Dropdown>
     )
-    
+
     expect(screen.getByText('Click me')).toBeInTheDocument()
-    expect(screen.getByText('Dropdown Content')).toBeInTheDocument()
   })
 
-  it('dropdown is hidden by default', () => {
-    const { container } = render(
+  it('dropdown content is not rendered by default', () => {
+    render(
       <Dropdown button={mockButton} classNames="test-class">
         {mockChildren}
       </Dropdown>
     )
-    
-    const dropdown = container.querySelector('.scale-0')
-    expect(dropdown).toBeInTheDocument()
+
+    expect(screen.queryByText('Dropdown Content')).not.toBeInTheDocument()
   })
 
   it('opens dropdown when button is clicked', async () => {
     const user = userEvent.setup()
-    const { container } = render(
+    render(
       <Dropdown button={mockButton} classNames="test-class">
         {mockChildren}
       </Dropdown>
     )
-    
-    const button = screen.getByText('Click me')
-    await user.click(button)
-    
-    const dropdown = container.querySelector('.scale-100')
-    expect(dropdown).toBeInTheDocument()
+
+    await user.click(screen.getByText('Click me'))
+
+    expect(await screen.findByText('Dropdown Content')).toBeInTheDocument()
   })
 
   it('closes dropdown when button is clicked again', async () => {
     const user = userEvent.setup()
-    const { container } = render(
+    render(
       <Dropdown button={mockButton} classNames="test-class">
         {mockChildren}
       </Dropdown>
     )
-    
+
     const button = screen.getByText('Click me')
-    
-    // Open dropdown
     await user.click(button)
-    expect(container.querySelector('.scale-100')).toBeInTheDocument()
-    
-    // Close dropdown
+    expect(await screen.findByText('Dropdown Content')).toBeInTheDocument()
+
     await user.click(button)
-    expect(container.querySelector('.scale-0')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.queryByText('Dropdown Content')).not.toBeInTheDocument()
+    })
   })
 
   it('closes dropdown when clicking outside', async () => {
     const user = userEvent.setup()
-    const { container } = render(
+    render(
       <div>
         <Dropdown button={mockButton} classNames="test-class">
           {mockChildren}
@@ -73,78 +68,42 @@ describe('Dropdown Component', () => {
         <div data-testid="outside">Outside Element</div>
       </div>
     )
-    
-    const button = screen.getByText('Click me')
-    
-    // Open dropdown
-    await user.click(button)
-    expect(container.querySelector('.scale-100')).toBeInTheDocument()
-    
-    // Click outside
-    const outsideElement = screen.getByTestId('outside')
-    await user.click(outsideElement)
-    
-    expect(container.querySelector('.scale-0')).toBeInTheDocument()
+
+    await user.click(screen.getByText('Click me'))
+    expect(await screen.findByText('Dropdown Content')).toBeInTheDocument()
+
+    await user.click(screen.getByTestId('outside'))
+    await waitFor(() => {
+      expect(screen.queryByText('Dropdown Content')).not.toBeInTheDocument()
+    })
   })
 
-  it('applies custom classNames', () => {
+  it('applies custom classNames to the dropdown panel', async () => {
+    const user = userEvent.setup()
     const { container } = render(
       <Dropdown button={mockButton} classNames="custom-dropdown-class">
         {mockChildren}
       </Dropdown>
     )
-    
-    const dropdown = container.querySelector('.custom-dropdown-class')
-    expect(dropdown).toBeInTheDocument()
-  })
 
-  it('applies custom animation class', () => {
-    const { container } = render(
-      <Dropdown 
-        button={mockButton} 
-        classNames="test-class"
-        animation="custom-animation"
-      >
-        {mockChildren}
-      </Dropdown>
-    )
-    
-    const dropdown = container.querySelector('.custom-animation')
-    expect(dropdown).toBeInTheDocument()
-  })
-
-  it('uses default animation when not provided', () => {
-    const { container } = render(
-      <Dropdown button={mockButton} classNames="test-class">
-        {mockChildren}
-      </Dropdown>
-    )
-    
-    const dropdown = container.querySelector('.origin-top-right')
-    expect(dropdown).toBeInTheDocument()
-    expect(dropdown).toHaveClass('transition-all', 'duration-300', 'ease-in-out')
+    await user.click(screen.getByText('Click me'))
+    expect(await screen.findByText('Dropdown Content')).toBeInTheDocument()
+    expect(container.querySelector('.custom-dropdown-class')).toBeInTheDocument()
   })
 
   it('does not close when clicking inside dropdown', async () => {
     const user = userEvent.setup()
-    const { container } = render(
+    render(
       <Dropdown button={mockButton} classNames="test-class">
         <div data-testid="dropdown-content">Dropdown Content</div>
       </Dropdown>
     )
-    
-    const button = screen.getByText('Click me')
-    
-    // Open dropdown
-    await user.click(button)
-    expect(container.querySelector('.scale-100')).toBeInTheDocument()
-    
-    // Click inside dropdown
-    const dropdownContent = screen.getByTestId('dropdown-content')
+
+    await user.click(screen.getByText('Click me'))
+    const dropdownContent = await screen.findByTestId('dropdown-content')
+
     await user.click(dropdownContent)
-    
-    // Should still be open
-    expect(container.querySelector('.scale-100')).toBeInTheDocument()
+
+    expect(screen.getByTestId('dropdown-content')).toBeInTheDocument()
   })
 })
-

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ChevronRight, Users, Mail, BadgeCheck,
-  CheckCircle, XCircle, RefreshCw, SlidersHorizontal,
+  CheckCircle, XCircle, RefreshCw, SlidersHorizontal, Handshake,
 } from "lucide-react";
 import { usePartners } from "features/partners/hooks";
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -196,6 +196,7 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
                   colSpan={4}
                   title="No partners found"
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This manager has no assigned partners yet."}
+                  icon={<Handshake className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button

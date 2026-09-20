@@ -3,8 +3,11 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import {
+  Building2,
   ChevronLeft,
+  EyeOff,
   GraduationCap,
+  Languages,
   Pencil,
 } from "lucide-react";
 import Button from "components/ui/buttons/Button";
@@ -117,6 +120,42 @@ const UniversityDetails = ({ id, basePath = "/admin/universities" }: UniversityD
                       </span>
                     )}
                   </div>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 shadow-sm">
+                  <Building2 className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-slate-500">Institution Type</p>
+                  <p className="mt-0.5 text-sm font-medium text-slate-900">
+                    {university.is_public ? "Public" : "Private"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 shadow-sm">
+                  <Languages className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-slate-500">Language Center</p>
+                  <p className="mt-0.5 text-sm font-medium text-slate-900">
+                    {university.has_language_center ? "Yes" : "No"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 shadow-sm">
+                  <EyeOff className="h-4 w-4" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs text-slate-500">Visibility</p>
+                  <p className="mt-0.5 text-sm font-medium text-slate-900">
+                    {university.is_hidden ? "Hidden from partners" : "Visible to partners"}
+                  </p>
                 </div>
               </div>
             </div>

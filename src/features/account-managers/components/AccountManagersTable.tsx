@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ChevronRight, User, Mail, CheckCircle, Settings,
-  RefreshCw, Pencil, Users,
+  ArrowRightLeft, ChevronRight, User, Mail, CheckCircle, Settings,
+  RefreshCw, Pencil, Share2, Users, UserCog,
   AlertCircle, Trash2, SlidersHorizontal, Activity, XCircle,
 } from "lucide-react";
 import { MdPersonAdd } from "react-icons/md";
@@ -11,9 +11,11 @@ import { MdPersonAdd } from "react-icons/md";
 import { useAccountManagers } from "../hooks/useAccountManagers";
 import { useDeleteAccountManager } from "../hooks/useDeleteAccountManager";
 import DeleteAccountManagerModal from "./DeleteAccountManagerModal";
+import TransferPartnersModal from "./TransferPartnersModal";
+import type { AccountManager } from "../types";
 
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { getApiErrorCode, getApiErrorDetails, parseApiError } from "utils/parseApiError";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
@@ -43,6 +45,14 @@ const AccountManagersTable = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedManagerId, setSelectedManagerId] = useState<string | null>(null);
   const [selectedManagerName, setSelectedManagerName] = useState<string>("");
+  const [selectedManager, setSelectedManager] = useState<AccountManager | null>(null);
+  // Deletion is blocked while the manager still has partners — pre-checked
+  // from the row's count, and re-checked from the backend's 409 (UBX-318).
+  const [deleteBlockedCount, setDeleteBlockedCount] = useState<number | null>(null);
+
+  const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [transferSource, setTransferSource] = useState<AccountManager | null>(null);
+  const [resumeDeleteAfterTransfer, setResumeDeleteAfterTransfer] = useState(false);
 
   const { showToast } = useToast();
   const { deleteAccountManager, loading: deleteLoading } = useDeleteAccountManager();
@@ -82,6 +92,20 @@ const AccountManagersTable = () => {
     searchTerm !== "",
   ].filter(Boolean).length;
 
+  const openDelete = (m: AccountManager) => {
+    setSelectedManagerId(m.id);
+    setSelectedManagerName(m.name);
+    setSelectedManager(m);
+    const count = Number(m.assigned_partners_count) || 0;
+    setDeleteBlockedCount(count > 0 ? count : null);
+    setIsDeleteOpen(true);
+  };
+
+  const openTransfer = (m: AccountManager) => {
+    setTransferSource(m);
+    setIsTransferOpen(true);
+  };
+
   const handleDelete = async () => {
     if (!selectedManagerId) return;
     try {
@@ -90,9 +114,36 @@ const AccountManagersTable = () => {
       setIsDeleteOpen(false);
       setSelectedManagerId(null);
       setSelectedManagerName("");
+      setSelectedManager(null);
+      setDeleteBlockedCount(null);
       refetch();
     } catch (err: unknown) {
+      if (getApiErrorCode(err) === "manager_has_assigned_partners") {
+        // The row's count was stale: the backend refuses until the partners
+        // are transferred. Keep the modal open and show the transfer path.
+        const fromApi = Number(getApiErrorDetails(err)?.assigned_partners_count);
+        setDeleteBlockedCount(Number.isFinite(fromApi) && fromApi > 0 ? fromApi : 1);
+        return;
+      }
       showToast(parseApiError(err, "Failed to delete Account Manager. Please try again."), "error");
+    }
+  };
+
+  // From the blocked delete modal: hand the partners over first, then come
+  // back to the (now unblocked) delete confirmation.
+  const handleTransferFromDelete = () => {
+    if (!selectedManager) return;
+    setIsDeleteOpen(false);
+    setResumeDeleteAfterTransfer(true);
+    openTransfer(selectedManager);
+  };
+
+  const handleTransferred = () => {
+    refetch();
+    if (resumeDeleteAfterTransfer && selectedManager) {
+      setResumeDeleteAfterTransfer(false);
+      setDeleteBlockedCount(null);
+      setIsDeleteOpen(true);
     }
   };
 
@@ -251,6 +302,7 @@ const AccountManagersTable = () => {
                   colSpan={6}
                   title={activeFiltersCount > 0 ? "No account managers found" : "No account managers yet"}
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Create your first account manager to get started."}
+                  icon={<UserCog className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button
@@ -299,13 +351,20 @@ const AccountManagersTable = () => {
                   </td>
 
                   <td className="px-6 py-4">
-                    {Number(m.assigned_partners_count) > 0 ? (
-                      <StatusBadge variant="success" icon={<Users className="h-3 w-3" />}>
-                        {Number(m.assigned_partners_count)} Partner{Number(m.assigned_partners_count) !== 1 && "s"}
-                      </StatusBadge>
-                    ) : (
-                      <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>Needs Partner</StatusBadge>
-                    )}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {Number(m.assigned_partners_count) > 0 ? (
+                        <StatusBadge variant="success" icon={<Users className="h-3 w-3" />}>
+                          {Number(m.assigned_partners_count)} Partner{Number(m.assigned_partners_count) !== 1 && "s"}
+                        </StatusBadge>
+                      ) : (
+                        <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>Needs Partner</StatusBadge>
+                      )}
+                      {Number(m.shared_partners_count ?? 0) > 0 && (
+                        <StatusBadge variant="info" icon={<Share2 className="h-3 w-3" />}>
+                          {Number(m.shared_partners_count)} shared
+                        </StatusBadge>
+                      )}
+                    </div>
                   </td>
 
                   <td className="px-6 py-4">
@@ -329,9 +388,23 @@ const AccountManagersTable = () => {
                       <IconButton
                         onClick={(e) => {
                           e.stopPropagation();
-                          setSelectedManagerId(m.id);
-                          setSelectedManagerName(m.name);
-                          setIsDeleteOpen(true);
+                          openTransfer(m);
+                        }}
+                        disabled={(Number(m.assigned_partners_count) || 0) === 0}
+                        title={(Number(m.assigned_partners_count) || 0) === 0 ? "No partners to transfer or share" : "Transfer or share partners"}
+                        icon={<ArrowRightLeft className="h-4 w-4" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-400"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-blue-600"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-blue-50"
+                      />
+                      <div className="h-5 border-l border-slate-200" />
+                      <IconButton
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openDelete(m);
                         }}
                         icon={<Trash2 className="h-4 w-4" />}
                         bgColor="bg-transparent"
@@ -362,6 +435,20 @@ const AccountManagersTable = () => {
         onConfirm={handleDelete}
         isDeleting={deleteLoading}
         AccountManager={selectedManagerName}
+        blockedPartnersCount={deleteBlockedCount}
+        onTransferPartners={handleTransferFromDelete}
+      />
+
+      <TransferPartnersModal
+        isOpen={isTransferOpen}
+        onClose={() => {
+          setIsTransferOpen(false);
+          setResumeDeleteAfterTransfer(false);
+        }}
+        sourceManager={transferSource}
+        onTransferred={handleTransferred}
+        // From the blocked-delete path only a move unblocks the deletion.
+        allowShare={!resumeDeleteAfterTransfer}
       />
     </div>
   );

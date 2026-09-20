@@ -19,11 +19,13 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const { partner } = usePartnerProfile();
 
-  // "Team Members" (agency invitations) only applies to agency/company
-  // partners — individual advisors have no team to manage.
+  // "Agency Scaler" (agency invitations) only applies to agency/company
+  // partners — individual advisors have no team to manage. "My Public
+  // Profile" is the mirror image — public profiles are individual-only
+  // in V1, so agency partners don't get that item.
   const visibleRoutes = partner && partner.type !== "agency"
-    ? partnerRoutes.filter((route) => route.name !== "Team Members")
-    : partnerRoutes;
+    ? partnerRoutes.filter((route) => route.name !== "Agency Scaler")
+    : partnerRoutes.filter((route) => route.name !== "My Public Profile");
 
   return (
     <RoleGuard allowedRoles={PARTNER_ROLES}>

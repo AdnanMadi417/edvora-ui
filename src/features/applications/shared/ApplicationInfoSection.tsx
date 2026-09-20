@@ -58,15 +58,9 @@ export default function ApplicationInfoSection({ application }: ApplicationInfoS
           <span className="text-p2 text-slate-500">{currentStatus.name || "Not provided"}</span>
         </div>
         <div>
-          <span className="block text-p1 font-medium text-slate-900">Intake Date</span>
+          <span className="block text-p1 font-medium text-slate-900">Arrival Date</span>
           <span className="text-p2 text-slate-500">
-            <AppDate value={application.intake_date} format="month" fallback="Not provided" />
-          </span>
-        </div>
-        <div>
-          <span className="block text-p1 font-medium text-slate-900">Tuition Fee</span>
-          <span className="text-p1 text-green-700">
-            RM {program.tuition_fee?.toLocaleString() || "Not provided"}
+            <AppDate value={application.arrival_date} format="short" fallback="Not provided" />
           </span>
         </div>
       </div>

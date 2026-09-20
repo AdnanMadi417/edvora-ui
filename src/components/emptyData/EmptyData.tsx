@@ -1,6 +1,5 @@
 import React from "react";
-import emptyPng from "/public/img/dashboards/empty-data-icon.png";
-import Image from "next/image";
+import { SearchX } from "lucide-react";
 import type { SectionIconBadgeColor } from "components/ui/icons/SectionIconBadge";
 
 const COLOR_CLASSES: Record<SectionIconBadgeColor, string> = {
@@ -27,7 +26,7 @@ interface EmptyDataProps {
 export default function EmptyData({
   title = "No data found",
   subtitle = "There is no data available at the moment",
-  icon: Icon,
+  icon: Icon = SearchX,
   color = "slate",
   action,
 }: EmptyDataProps) {
@@ -36,11 +35,7 @@ export default function EmptyData({
       <div className="bg-white p-10 text-center">
         <div className="flex flex-col items-center gap-3">
           <div className={`flex h-16 w-16 items-center justify-center rounded-full ${COLOR_CLASSES[color]}`}>
-            {Icon ? (
-              <Icon className="h-7 w-7" />
-            ) : (
-              <Image width={40} height={40} src={emptyPng} alt="No data" className="h-9 w-9 opacity-70" />
-            )}
+            <Icon className="h-7 w-7" />
           </div>
 
           <div className="space-y-1">

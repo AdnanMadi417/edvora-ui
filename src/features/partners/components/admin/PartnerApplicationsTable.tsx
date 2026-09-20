@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { ChevronRight, User, GraduationCap, Clock, RefreshCw, SlidersHorizontal } from "lucide-react";
+import { ChevronRight, User, GraduationCap, Clock, RefreshCw, SlidersHorizontal, ClipboardList } from "lucide-react";
 import { usePartnerApplications } from "features/applications/hooks";
 import PresignedImage from "components/ui/PresignedImage";
 import SearchInput from "components/form/filter/SearchInput";
@@ -180,6 +180,7 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                   colSpan={4}
                   title="No applications found"
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This partner hasn't submitted any applications yet."}
+                  icon={<ClipboardList className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button
