@@ -5,6 +5,7 @@ import {
   CheckCircle,
   XCircle,
   FilePlus,
+  FilePlus2,
   Send,
   RefreshCw,
   FileText,
@@ -121,6 +122,11 @@ export function getNotificationIconConfig(notification: Notification): Notificat
   // Account manager re-uploaded a document on behalf of the partner
   if (notification.type === "manager_file_reuploaded") {
     return { icon: UploadCloud, bg: "bg-violet-100", iconColor: "text-violet-600", badgeBg: "bg-violet-500" };
+  }
+
+  // A manager added more required documents to an open correction request
+  if (notification.type === "correction_request_updated") {
+    return { icon: FilePlus2, bg: "bg-orange-100", iconColor: "text-orange-600", badgeBg: "bg-orange-500" };
   }
 
   // Stage changes → look up the destination status UUID

@@ -2,9 +2,11 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Clock, RefreshCw } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, FilePlus2, RefreshCw } from "lucide-react";
 import HoldPopup from "features/applications/account-manager/components/popups/Hold";
 import UpdateStatus from "features/applications/account-manager/components/popups/UpdateStatus";
+import UpdateCorrectionRequest from "features/applications/shared/UpdateCorrectionRequest";
+import { useApplicationActions } from "features/applications/hooks";
 import Button from "components/ui/buttons/Button";
 
 interface Props {
@@ -17,11 +19,22 @@ export default function AccountManagerTopBar({ application, onRefetch }: Props) 
 
   const [showHoldPopup, setShowHoldPopup] = useState(false);
   const [showUpdatePopup, setShowUpdatePopup] = useState(false);
+  const [showCorrectionPopup, setShowCorrectionPopup] = useState(false);
+
+  // can_update_correction_request is computed by the backend from the same
+  // rules the PATCH enforces — just read it, don't re-derive it here.
+  const { actions, refetch: refetchActions } = useApplicationActions(application?.id);
 
   const studentName = application?.student?.name ?? "Application";
 
   const handleConfirmUpdate = () => {
     setShowUpdatePopup(false);
+    refetchActions();
+    onRefetch?.();
+  };
+
+  const handleCorrectionUpdated = () => {
+    refetchActions();
     onRefetch?.();
   };
 
@@ -45,6 +58,20 @@ export default function AccountManagerTopBar({ application, onRefetch }: Props) 
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          {actions?.can_update_correction_request && (
+            <Button
+              onClick={() => setShowCorrectionPopup(true)}
+              icon={<FilePlus2 className="h-4 w-4" />}
+              text="Update Request"
+              bgColor="bg-white"
+              textColor="text-slate-700"
+              borderColor="border-slate-200"
+              hoverTextColor="hover:text-slate-700"
+              hoverBorderColor="hover:border-slate-300"
+              className="hover:bg-slate-50"
+            />
+          )}
+
           <Button
             onClick={() => setShowHoldPopup(true)}
             icon={<Clock className="h-4 w-4" />}
@@ -79,6 +106,18 @@ export default function AccountManagerTopBar({ application, onRefetch }: Props) 
         currentStatus={application?.lifecycle_status}
         onRefetch={onRefetch}
       />
+
+      {actions && showCorrectionPopup && (
+        <UpdateCorrectionRequest
+          isOpen={showCorrectionPopup}
+          onClose={() => setShowCorrectionPopup(false)}
+          applicationId={application.id}
+          statusName={actions.status}
+          currentReason={actions.correction_reason}
+          documentTypes={actions.document_types ?? []}
+          onUpdated={handleCorrectionUpdated}
+        />
+      )}
 
       {application && showUpdatePopup && (
         <UpdateStatus

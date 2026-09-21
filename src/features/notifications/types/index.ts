@@ -29,6 +29,12 @@ export interface Notification {
     to_status_name?: string;
     /** Display label for the current/new stage, e.g. "Application Review". */
     to_stage_name?: string;
+    // correction_request_updated — only the newly added document types, not
+    // the full merged list on the correction.
+    status_id?: string;
+    status_code?: string;
+    newly_required_document_type_ids?: string[];
+    reason_updated?: boolean;
     // student/university context — present on application_stage_changed and
     // new_application; *_url is a ready-to-render image URL, *_key is the
     // raw storage key (ignored for display, kept for parity with the rest
