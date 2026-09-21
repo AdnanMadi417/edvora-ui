@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { partnersApi } from "features/partners/services";
 import PartnerPublicProfile from "features/partners/components/public/PartnerPublicProfile";
 import type { PublicPartnerProfile } from "features/partners/types";
+import { FEATURES } from "config/featureFlags";
 
 // This one page is deliberately server-rendered (every other page in this
 // app is a client shell reading `useParams()`) — it's the one page meant
@@ -28,6 +29,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  if (!FEATURES.partnerPublicProfile) return { title: "Advisor not found | Unibexs" };
+
   const { slug } = await params;
   const profile = await fetchProfile(slug);
   if (!profile) return { title: "Advisor not found | Unibexs" };
@@ -57,6 +60,11 @@ export default async function PartnerPublicProfilePage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  // Public profiles are switched off ahead of release. Already-shared links
+  // get the same 404 an unpublished profile gets, rather than a distinct
+  // "coming soon" page that would advertise the unfinished feature.
+  if (!FEATURES.partnerPublicProfile) notFound();
+
   const { slug } = await params;
   const profile = await fetchProfile(slug);
   if (!profile) notFound();
