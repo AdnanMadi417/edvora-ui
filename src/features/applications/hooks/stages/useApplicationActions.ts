@@ -55,6 +55,9 @@ export type ApplicationActionsResponse = {
   is_draft: boolean;
   is_arrival_extra_docs_required?: boolean;
   correction_reason: string | null;
+  /** Backend-computed: whether PATCH .../correction-request would currently
+   *  succeed for this user — drives the edit action, don't re-derive it. */
+  can_update_correction_request?: boolean;
   next_action: string;
   available_actions: AvailableAction[];
   document_types: DocumentType[];
