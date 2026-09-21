@@ -7,6 +7,7 @@ import { useMe } from "hooks/useMe";
 import { useCompleteOnboarding } from "features/partners/hooks";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { FEATURES } from "config/featureFlags";
 
 interface Step {
   tourId: string;
@@ -26,14 +27,23 @@ const STEPS: Step[] = [
     bg: "bg-violet-50",
     text: "text-violet-600",
   },
-  {
-    tourId: "universities",
-    icon: Landmark,
-    title: "Universities",
-    description: "Look up a university's campuses and intake details before recommending it to a student.",
-    bg: "bg-indigo-50",
-    text: "text-indigo-600",
-  },
+  // Hidden while the partner Universities page is off (config/featureFlags.ts).
+  // This step navigates to /partner/universities and spotlights that sidebar
+  // link — with the feature disabled the route redirects and the link isn't
+  // rendered, and a step whose target is missing collapses the whole tour to
+  // null with no way to advance. So it ships or hides together with the page.
+  ...(FEATURES.partnerUniversities
+    ? [
+        {
+          tourId: "universities",
+          icon: Landmark,
+          title: "Universities",
+          description: "Look up a university's campuses and intake details before recommending it to a student.",
+          bg: "bg-indigo-50",
+          text: "text-indigo-600",
+        },
+      ]
+    : []),
   {
     tourId: "applications",
     icon: FileText,

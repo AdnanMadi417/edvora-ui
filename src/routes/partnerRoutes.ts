@@ -1,6 +1,7 @@
 import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2, Landmark, GraduationCap } from "lucide-react";
 
 import type { IRoute } from "../types/navigation";
+import { FEATURES } from "../config/featureFlags";
 
 const partnerRoutes: IRoute[] = [
   {
@@ -24,20 +25,27 @@ const partnerRoutes: IRoute[] = [
     layout: "/partner",
     path: "/knowledge-hub",
     icon: BookOpen,
-    children: [
-      {
-        name: "Programs",
-        layout: "/partner",
-        path: "/knowledge-hub",
-        icon: GraduationCap,
-      },
-      {
-        name: "Universities",
-        layout: "/partner",
-        path: "/universities",
-        icon: Landmark,
-      },
-    ],
+    // Programs and the partner Universities list are the only two entries in
+    // this group, so with Universities hidden the group collapses back to the
+    // flat link it was before that page landed — no one-item dropdown.
+    ...(FEATURES.partnerUniversities
+      ? {
+          children: [
+            {
+              name: "Programs",
+              layout: "/partner",
+              path: "/knowledge-hub",
+              icon: GraduationCap,
+            },
+            {
+              name: "Universities",
+              layout: "/partner",
+              path: "/universities",
+              icon: Landmark,
+            },
+          ],
+        }
+      : {}),
   },
 
   {
@@ -54,16 +62,21 @@ const partnerRoutes: IRoute[] = [
     icon: UserPlus,
   },
 
-  {
-    // Individual advisors only — public profiles are individual-only in V1
-    // (see partner_public_profiles). Filtered out for agency partners in
-    // app/partner/layout.tsx, mirroring how "Agency Scaler" is filtered out
-    // for individual partners.
-    name: "My Public Profile",
-    layout: "/partner",
-    path: "/public-profile",
-    icon: Globe2,
-  },
+  // Individual advisors only — public profiles are individual-only in V1
+  // (see partner_public_profiles). Filtered out for agency partners in
+  // app/partner/layout.tsx, mirroring how "Agency Scaler" is filtered out
+  // for individual partners. Gated on top of that while the feature is
+  // unreleased; middleware.ts blocks the route itself.
+  ...(FEATURES.partnerPublicProfile
+    ? [
+        {
+          name: "My Public Profile",
+          layout: "/partner",
+          path: "/public-profile",
+          icon: Globe2,
+        },
+      ]
+    : []),
 ];
 
 export default partnerRoutes;
