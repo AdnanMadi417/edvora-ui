@@ -29,3 +29,30 @@ export interface ApplicationDetail {
   emgs_evaluation_document: any;
   commission_documents: Record<string, any>;
 }
+
+// GET /applications/{id}/timeline — newest first. `status_transition` items
+// populate the top-level from/to/reason/notes fields; every other entry_type
+// populates only `detail`, whose shape varies by type (and for
+// document_upload, by call site) — read it defensively.
+export interface ApplicationTimelineItem {
+  id: string;
+  application_id: string;
+  entry_type: string;
+  actor_id: string | null;
+  actor_name: string | null;
+  from_stage: string | null;
+  from_status: string | null;
+  to_stage: string | null;
+  to_status: string | null;
+  reason_text: string | null;
+  notes: string | null;
+  detail: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface PaginatedApplicationTimeline {
+  items: ApplicationTimelineItem[];
+  total: number;
+  page: number;
+  page_size: number;
+}
