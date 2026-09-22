@@ -60,7 +60,9 @@ const FORMAT_OPTIONS: Record<Exclude<DateFormat, "relative">, Intl.DateTimeForma
 export function formatDate(date: Date, format: DateFormat, locale: string): string {
   if (format === "relative") return formatRelative(date, locale);
 
-  return new Intl.DateTimeFormat(locale, FORMAT_OPTIONS[format]).format(date);
+  const formatted = new Intl.DateTimeFormat(locale, FORMAT_OPTIONS[format]).format(date);
+  // en-GB (and most locales) render the am/pm marker lowercase — capitalize it.
+  return FORMAT_OPTIONS[format].hour12 ? formatted.replace(/\b(am|pm)\b/i, (m) => m.toUpperCase()) : formatted;
 }
 
 // ─── Machine-readable ISO string for <time datetime="..."> ───────────────────

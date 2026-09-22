@@ -254,13 +254,13 @@ export default function PendingRegistrationOtpsTable() {
                       <StatusBadge variant={config.variant} icon={config.icon}>{config.label}</StatusBadge>
                     </td>
                     <td className="px-6 py-4">
-                      <AppDate value={row.created_at} format="short" fallback="—" />
+                      <AppDate value={row.created_at} format="datetime" fallback="—" />
                     </td>
                     <td className="px-6 py-4">
                       {row.progress === "completed" ? (
                         <span className="text-sm text-slate-400">—</span>
                       ) : (
-                        <AppDate value={row.expires_at} format="short" fallback="—" />
+                        <AppDate value={row.expires_at} format="datetime" fallback="—" />
                       )}
                     </td>
                     <td className="px-6 py-4">

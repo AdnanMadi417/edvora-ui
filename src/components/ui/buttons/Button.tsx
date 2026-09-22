@@ -11,6 +11,8 @@ type ButtonProps = {
   hoverTextColor?: string;
   hoverBorderColor?: string;
   className?: string;
+  /** Extra classes for the label span, e.g. "hidden sm:inline" for icon-only on mobile. */
+  textClassName?: string;
   title?: string;
   type?: "button" | "submit" | "reset";
 };
@@ -26,6 +28,7 @@ const Button: React.FC<ButtonProps> = ({
                                          hoverTextColor = "hover:text-blue-700",
                                          hoverBorderColor = "hover:border-blue-700",
                                          className,
+                                         textClassName,
                                          title,
                                          type = "button",
                                        }) => {
@@ -40,7 +43,7 @@ const Button: React.FC<ButtonProps> = ({
         ${className || ""}`}
     >
       {icon && <span className="flex shrink-0 items-center">{icon}</span>}
-      {text && <span className="truncate">{text}</span>}
+      {text && <span className={`truncate ${textClassName || ""}`}>{text}</span>}
     </button>
   );
 };

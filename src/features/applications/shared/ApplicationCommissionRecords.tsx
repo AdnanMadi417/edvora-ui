@@ -1,14 +1,16 @@
 "use client";
 
 import React from "react";
-import { Clock, Calendar } from "lucide-react";
+// `Clock` is only used by the hidden payout-timeline line below.
+// import { Clock, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { DetailStatusBadge } from "components/ui/badges";
 import AppDate from "components/ui/date/AppDate";
 import { getStatusVariant } from "utils/getStatusVariant";
 import {
   type ApplicationCommissionItem,
   formatCommissionAmount,
-  formatCommissionTimeline,
+  // formatCommissionTimeline,
 } from "features/applications/shared/commissionTypes";
 
 interface ApplicationCommissionRecordsProps {
@@ -23,7 +25,10 @@ export default function ApplicationCommissionRecords({
   return (
     <div className="space-y-3 border-b border-slate-200 p-6">
       {commissions.map((c) => {
-        const timeline = formatCommissionTimeline(c.expected_commission_from, c.expected_commission_to);
+        // Payout timeline intentionally hidden: the window is set by the
+        // university, not by us, so we must not present it as a commitment.
+        // Backend still sends expected_commission_from/to; left in the type.
+        // const timeline = formatCommissionTimeline(c.expected_commission_from, c.expected_commission_to);
         return (
           <div key={c.id} className="flex flex-wrap items-start justify-between gap-3">
             <div>
@@ -36,12 +41,14 @@ export default function ApplicationCommissionRecords({
                 </p>
               )}
               {c.notes && <p className="mt-1 text-sm text-slate-500">{c.notes}</p>}
+              {/* Hidden — see note above.
               {timeline && (
                 <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
                   <Clock className="h-3.5 w-3.5" />
                   {timeline}
                 </p>
               )}
+              */}
               <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
                 <Calendar className="h-3.5 w-3.5" />
                 Added on <AppDate value={c.created_at} format="short" />
