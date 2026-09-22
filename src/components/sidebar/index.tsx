@@ -112,16 +112,14 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
         </button>
 
         <header className="mb-3 mt-3 flex items-center justify-center gap-2 px-6 py-6">
-          <a href="https://www.unibexs.com" target="_blank" rel="noopener noreferrer">
-            <Image
-              src={logoImg}
-              alt="Unibexs"
-              width={140}
-              height={70}
-              className="object-contain"
-              priority
-            />
-          </a>
+          <Image
+            src={logoImg}
+            alt="Unibexs Logo"
+            width={140}
+            height={70}
+            className="object-contain"
+            priority
+          />
           {user?.role === "partner" && (
             <div className="relative">
               <span

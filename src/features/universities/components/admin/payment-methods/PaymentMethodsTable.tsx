@@ -221,6 +221,7 @@ const PaymentMethodsTable = () => {
                   <NoMessagesFound
                     title="No Payment Methods found"
                     subtitle="There are currently no Payment Methods available."
+                    icon={<CreditCard className="h-8 w-8 text-slate-400" />}
                   />
                 </td>
               </tr>

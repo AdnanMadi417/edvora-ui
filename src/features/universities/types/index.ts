@@ -11,6 +11,11 @@ export interface University {
   university_type_id: string;
   university_type_name: string;
   intake_months: number[];
+  /** true = public university, false = private. */
+  is_public: boolean;
+  has_language_center: boolean;
+  /** Data-entry/admin only — never sent to the partner-facing endpoints. */
+  is_hidden: boolean;
 }
 
 export interface UniversityDetails {
@@ -22,7 +27,11 @@ export interface UniversityDetails {
   logo_file_url: string;
   description?: string;
   university_type_id: string;
+  university_type_name: string;
   intake_months?: number[];
+  is_public: boolean;
+  has_language_center: boolean;
+  is_hidden: boolean;
 }
 
 export interface UniversityResponse {
@@ -40,6 +49,10 @@ export interface CreateUniversityPayload {
   description: string;
   intake_months: number[];
   branches: CreateBranchPayload[];
+  /** Optional — all default to false if omitted. */
+  is_public?: boolean;
+  has_language_center?: boolean;
+  is_hidden?: boolean;
 }
 
 export interface UpdateUniversityPayload {
@@ -52,6 +65,11 @@ export interface UpdateUniversityPayload {
   intake_months?: number[];
   university_type_id: string;
   branches: UpdateBranchPayload[];
+  /** Optional, partial-update semantics — omit to leave unchanged. Don't
+   *  send `false` just to "reset" it: false is a real value that applies. */
+  is_public?: boolean;
+  has_language_center?: boolean;
+  is_hidden?: boolean;
 }
 
 // ── Branch ────────────────────────────────────────────────────────────────────
@@ -60,6 +78,7 @@ export interface Branch {
   id: string;
   name: string;
   location: string;
+  state_id: string;
   state: string;
 }
 

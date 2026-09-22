@@ -8,7 +8,7 @@ import Link from "next/link";
 import api, { setLoggingOut, SIGN_IN_URL } from "../../lib/useApi";
 
 import { useMe } from "hooks/useMe";
-import { profileRouteMap, notificationsRouteMap, applicationsRouteMap } from "components/navbar/config/navigation";
+import { profileRouteMap, notificationsRouteMap, applicationsRouteMap, partnersRouteMap } from "components/navbar/config/navigation";
 import { useUnreadCount } from "features/notifications/hooks";
 import NotificationsPreviewPopover from "features/notifications/components/NotificationsPreviewPopover";
 import { useToast } from "components/context/ToastContext";
@@ -69,6 +69,8 @@ const Navbar = ({
   };
 
   const getApplicationsBasePath = (role?: string) => (role ? applicationsRouteMap[role] : undefined);
+
+  const getPartnersBasePath = (role?: string) => (role ? partnersRouteMap[role] : undefined);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -147,6 +149,7 @@ const Navbar = ({
         <NotificationsPreviewPopover
           notificationsPath={getNotificationsRoute(user?.role)}
           applicationBasePath={getApplicationsBasePath(user?.role)}
+          partnerBasePath={getPartnersBasePath(user?.role)}
           onNotificationHandled={refetchUnreadCount}
         >
           <Link href={getNotificationsRoute(user?.role)} className="relative flex items-center justify-center">

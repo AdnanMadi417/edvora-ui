@@ -2,7 +2,13 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
+import { DISABLED_ROUTE_PREFIXES } from "./config/featureFlags";
+
 const publicRoutes = ["/auth/sign-in", "/auth/register", "/register/verify", "/auth/forgot-password", "/auth/partner-reset-password", "/auth/staff-invitation", "/team/verify-otp", "/team/accept-invite", "/reset-password", "/unauthorized", "/", "/api/health", "/api/auth/logout"];
+
+// Prefixes rather than exact paths — for public routes with a dynamic
+// segment (e.g. /p/[slug], the shareable partner profile).
+const publicRoutePrefixes = ["/p/"];
 
 const protectedPrefixes: Record<string, string[]> = {
   "/admin": ["admin"],
@@ -87,7 +93,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectTo(req, destination));
   }
 
-  if (publicRoutes.includes(pathname)) {
+  if (publicRoutes.includes(pathname) || publicRoutePrefixes.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 
@@ -102,6 +108,18 @@ export async function middleware(req: NextRequest) {
       }
       break;
     }
+  }
+
+  // Features that are merged but not released yet. Checked after the role
+  // loop so a wrong-role request still gets the honest "unauthorized"
+  // answer; an allowed user just lands back on their home page. See
+  // config/featureFlags.ts.
+  if (
+    DISABLED_ROUTE_PREFIXES.some(
+      (prefix) => pathname === prefix || pathname.startsWith(prefix + "/"),
+    )
+  ) {
+    return NextResponse.redirect(redirectTo(req, roleHomePaths[role] ?? "/unauthorized"));
   }
 
   return NextResponse.next();

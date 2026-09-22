@@ -33,6 +33,31 @@ export function parseApiError(err: unknown, fallback: string): string {
   return fallback;
 }
 
+/**
+ * The backend's stable error `code` (e.g. "manager_has_assigned_partners")
+ * from a caught request error, or null when the error has no such shape.
+ * Use it to branch on a specific business error instead of matching text.
+ */
+export function getApiErrorCode(err: unknown): string | null {
+  if (!isAxiosError(err)) return null;
+  const code = err.response?.data?.code;
+  return typeof code === "string" ? code : null;
+}
+
+/**
+ * The backend's optional `details` object from a caught request error (e.g.
+ * `{ assigned_partners_count: 3 }`), or null when absent or not an object.
+ * Validation errors carry an array there instead — see parseFieldErrors.
+ */
+export function getApiErrorDetails(err: unknown): Record<string, unknown> | null {
+  if (!isAxiosError(err)) return null;
+  const details = err.response?.data?.details;
+  if (details && typeof details === "object" && !Array.isArray(details)) {
+    return details as Record<string, unknown>;
+  }
+  return null;
+}
+
 export interface FieldError {
   /** The LAST segment of the `loc` path — the leaf field name, e.g. "email". */
   field: string;

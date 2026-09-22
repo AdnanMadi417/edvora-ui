@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   User, Mail, Percent, BadgeCheck, ChevronRight,
-  CheckCircle, XCircle, RefreshCw, SlidersHorizontal, Ban, Power, Settings,
+  CheckCircle, XCircle, RefreshCw, SlidersHorizontal, Ban, Power, Settings, UserPlus,
 } from "lucide-react";
 
 import { useAgencyMembers, useSuspendMember, useReactivateMember } from "../../hooks";
@@ -234,6 +234,7 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
                   colSpan={7}
                   title={activeFiltersCount > 0 ? "No members found" : "No members yet"}
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Invite your first team member to get started."}
+                  icon={<UserPlus className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button

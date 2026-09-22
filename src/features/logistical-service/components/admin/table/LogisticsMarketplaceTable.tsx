@@ -13,6 +13,7 @@ import {
   BookOpen,
   Trash2,
   RefreshCw,
+  Truck,
 } from 'lucide-react';
 import { MdAddBusiness } from "react-icons/md";
 
@@ -185,6 +186,7 @@ const LogisticsMarketplaceTable = () => {
                         colSpan={8}
                         title="No service providers found"
                         subtitle={searchTerm ? "Try adjusting your search." : "No service providers have been added yet."}
+                        icon={<Truck className="h-8 w-8 text-slate-400" />}
                         action={
                           searchTerm ? (
                             <Button

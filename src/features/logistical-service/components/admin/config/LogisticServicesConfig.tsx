@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Pencil, Check, X, Settings, Plus, Tag, Trash2 } from "lucide-react";
+import { Pencil, Check, X, Settings, Plus, Tag, Trash2, Truck } from "lucide-react";
 
 import { useLogisticServices, useEditLogisticService, useDeleteLogisticService } from "features/logistical-service/hooks";
 import { useToast } from "components/context/ToastContext";
@@ -130,6 +130,7 @@ const LogisticsMarketplaceServicesConfig = () => {
                   colSpan={2}
                   title="No logistic services found"
                   subtitle="No services have been added yet."
+                  icon={<Truck className="h-8 w-8 text-slate-400" />}
                 />
               )}
 

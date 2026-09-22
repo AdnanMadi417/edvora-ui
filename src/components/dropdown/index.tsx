@@ -1,11 +1,14 @@
+"use client";
+
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
 
 function useOutsideAlerter(ref: any, setX: any): void {
   React.useEffect(() => {
     /**
      * Alert if clicked on outside of element
      */
-    // function handleClickOutside(event: React.MouseEvent<HTMLElement>) {
     function handleClickOutside(event: any) {
       if (ref.current && !ref.current.contains(event.target)) {
         setX(false);
@@ -24,9 +27,8 @@ const Dropdown = (props: {
   button: JSX.Element;
   children: JSX.Element;
   classNames: string;
-  animation?: string;
 }) => {
-  const { button, children, classNames, animation } = props;
+  const { button, children, classNames } = props;
   const wrapperRef = React.useRef(null);
   const [openWrapper, setOpenWrapper] = React.useState(false);
   useOutsideAlerter(wrapperRef, setOpenWrapper);
@@ -36,15 +38,19 @@ const Dropdown = (props: {
       <div className="flex" onMouseDown={() => setOpenWrapper(!openWrapper)}>
         {button}
       </div>
-      <div
-        className={`${classNames} absolute z-10 ${
-          animation
-            ? animation
-            : "origin-top-right transition-all duration-300 ease-in-out"
-        } ${openWrapper ? "scale-100" : "scale-0"}`}
-      >
-        {children}
-      </div>
+      <AnimatePresence>
+        {openWrapper && (
+          <motion.div
+            className={`${classNames} absolute z-10 origin-top-right`}
+            initial={{ opacity: 0, scale: 0.95, y: -4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -4 }}
+            transition={{ duration: MICRO_DURATION, ease: EASE }}
+          >
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

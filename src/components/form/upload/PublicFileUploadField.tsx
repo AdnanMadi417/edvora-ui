@@ -5,6 +5,7 @@ import { AlertCircle, CloudUpload, FileCheck, Trash2 } from "lucide-react";
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
 import { parseApiError } from "utils/parseApiError";
+import { useFileDrop } from "./useFileDrop";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -30,12 +31,10 @@ export default function PublicFileUploadField({
   label, fieldId, field, required, result, fileName, onUpload, onRemove, error,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const dragCounter = useRef(0);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [uploadError, setUploadError] = useState("");
   const [localFileName, setLocalFileName] = useState("");
-  const [isDragging, setIsDragging] = useState(false);
 
   const processFile = async (file: File) => {
     if (!ALLOWED_FILE_TYPES.mimeTypes.includes(file.type)) {
@@ -67,27 +66,9 @@ export default function PublicFileUploadField({
     await processFile(file);
   };
 
-  const handleDragEnter = (e: React.DragEvent) => {
-    e.preventDefault();
-    dragCounter.current++;
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    dragCounter.current--;
-    if (dragCounter.current === 0) setIsDragging(false);
-  };
-
-  const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); };
-
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    dragCounter.current = 0;
-    setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) await processFile(file);
-  };
+  const { isDragging, dropHandlers } = useFileDrop({
+    onFiles: (files) => processFile(files[0]),
+  });
 
   const handleRemove = () => {
     setLocalFileName("");
@@ -144,10 +125,7 @@ export default function PublicFileUploadField({
                 ? "border-red-300 bg-red-50/40"
                 : "border-slate-200 bg-slate-100 hover:border-blue-400 hover:bg-blue-50"
           }`}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
+          {...dropHandlers}
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white transition-colors duration-200 group-hover:border-blue-200 group-hover:bg-blue-50">
             <CloudUpload className="h-6 w-6 text-slate-400 transition-colors duration-200 group-hover:text-blue-500" />

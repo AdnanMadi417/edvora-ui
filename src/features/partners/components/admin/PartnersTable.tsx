@@ -4,16 +4,17 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
   Pencil, RefreshCw, SlidersHorizontal, Building2,
-  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power, KeyRound, Trash2,
+  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power, Trash2, Handshake,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
 import { StatusBadge } from "components/ui/badges";
+import { Tabs, type TabItem } from "components/ui/tabs";
 import { useRouter } from "next/navigation";
 import { usePartners, useDeletePartner, useUpdatePartner, useResendApprovalEmail } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import ResendApprovalEmailConfirmation from "./ResendApprovalEmailConfirmation";
-import ResendRegistrationOtpModal from "./ResendRegistrationOtpModal";
+import PendingRegistrationOtpsTable from "./PendingRegistrationOtpsTable";
 import SuspendActivatePartner from "./SuspendActivatePartner";
 import DeletePartner from "./DeletePartner";
 import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
@@ -27,6 +28,13 @@ import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 const ITEMS_PER_PAGE = 10;
+
+type PartnersTab = "partners" | "pending-otps";
+
+const TABS: TabItem<PartnersTab>[] = [
+  { key: "partners", label: "Partners" },
+  { key: "pending-otps", label: "Pending Registrations" },
+];
 
 type StatusFilter = "active" | "inactive" | "individual" | "agency" | null;
 
@@ -42,6 +50,7 @@ export default function PartnersTable() {
   const router = useRouter();
   const { showToast } = useToast();
 
+  const [activeTab, setActiveTab] = useState<PartnersTab>("partners");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedManager, setSelectedManager] = useState("all");
@@ -54,7 +63,6 @@ export default function PartnersTable() {
   const { resendApprovalEmail, loading: isResendingEmail } = useResendApprovalEmail();
   const { deletePartner, loading: isDeletingPartner } = useDeletePartner();
 
-  const [isResendOtpOpen, setIsResendOtpOpen] = useState(false);
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [reviewPartner, setReviewPartner] = useState<{ id: string; name: string; assignedManagerId?: string } | null>(null);
   const [isResendOpen, setIsResendOpen] = useState(false);
@@ -217,19 +225,14 @@ export default function PartnersTable() {
           <h3 className="text-xl font-semibold text-slate-900">Partners</h3>
           <p className="mt-0.5 text-sm text-slate-500">Manage and view all partner organizations</p>
         </div>
-        <Button
-          icon={<KeyRound className="h-4 w-4" />}
-          text="Resend Verification Code"
-          bgColor="bg-blue-50"
-          textColor="text-blue-700"
-          borderColor="border-blue-600"
-          hoverTextColor="hover:text-blue-800"
-          hoverBorderColor="hover:border-blue-700"
-          onClick={() => setIsResendOtpOpen(true)}
-          className="whitespace-nowrap"
-        />
       </div>
 
+      <Tabs<PartnersTab> tabs={TABS} active={activeTab} onChange={setActiveTab} />
+
+      {activeTab === "pending-otps" && <PendingRegistrationOtpsTable />}
+
+      {activeTab === "partners" && (
+      <>
       {/* Stats Cards */}
       <div className="hidden sm:block p-6 border-b border-slate-200">
         <StatsFilterCards
@@ -369,6 +372,7 @@ export default function PartnersTable() {
                   colSpan={7}
                   title="No partners found"
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No partners have registered yet."}
+                  icon={<Handshake className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button
@@ -525,11 +529,8 @@ export default function PartnersTable() {
         </TableWrapper>
 
       </div>
-
-      <ResendRegistrationOtpModal
-        isOpen={isResendOtpOpen}
-        onClose={() => setIsResendOtpOpen(false)}
-      />
+      </>
+      )}
 
       {reviewPartner && (
         <ReviewPartnerPopup

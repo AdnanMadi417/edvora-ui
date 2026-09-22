@@ -20,6 +20,8 @@ export type GetPartnersParams = {
   is_active?: boolean;
   type?: string;
   assigned_manager_id?: string;
+  /** Primary OR shared access (UBX-324); assigned_manager_id stays primary-only. */
+  manager_id?: string;
 };
 
 export function usePartners(params: GetPartnersParams = {}) {

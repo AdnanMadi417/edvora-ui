@@ -12,11 +12,12 @@ import Loading from "components/loading/Loading";
 
 import ApplicationDetails from "features/applications/partner/components/details/ApplicationDetails";
 import { ApplicationChat as AgentPartnerChat, useUnreadCount } from "features/chat";
+import type { ApplicationDetail } from "features/applications/shared/applicationTypes";
 
 export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();
 
-  const [application, setApplication] = useState<any>(null);
+  const [application, setApplication] = useState<ApplicationDetail | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [chatOpen, setChatOpen] = useState(false);
@@ -31,7 +32,7 @@ export default function ApplicationPage() {
       const partnerId = localStorage.getItem("partnerId");
       if (!token || !partnerId) return;
 
-      const res = await api.get(
+      const res = await api.get<ApplicationDetail>(
         `/partners/${partnerId}/applications/${applicationId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );

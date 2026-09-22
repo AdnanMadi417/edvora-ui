@@ -122,6 +122,9 @@ export interface Program {
   field_of_study: FieldOfStudy;
   university: ProgramUniversity;
 
+  // Hidden programs drop out of the default list but stay viewable/editable by id.
+  is_hidden: boolean;
+
   required_documents?: {
     id: string;
     type: string;
@@ -145,6 +148,8 @@ export interface GetProgramsParams {
   course_type?: CourseType;
   class_type?: "physical" | "online";
   sort_by?: "commission_asc" | "commission_desc" | "tuition_asc" | "tuition_desc";
+  // Omitted/false = visible programs only (server default); true = hidden only.
+  is_hidden?: boolean;
   page?: number;
   page_size?: number;
 }
@@ -245,6 +250,12 @@ export interface UpdateProgramPayload {
   }>;
 }
 
+// PUT /knowledge-hub/programs/{id} is a partial update — sending only this
+// leaves every other field untouched.
+export interface SetProgramHiddenPayload {
+  is_hidden: boolean;
+}
+
 export interface BatchUpdateProgramPayload {
   program_ids: string[];
 
@@ -284,6 +295,14 @@ export interface BatchUpdateProgramPayload {
   }>;
 
   branch_id?: string | null;
+}
+
+// POST /knowledge-hub/programs/{id}/copy — deep-copies the program into
+// another branch of the SAME university. 201 returns the same wrapped shape
+// as the program-detail GET ({ program, required_documents, commission,
+// exchange_rates }).
+export interface CopyProgramToBranchPayload {
+  branch_id: string;
 }
 
 export interface UpdateDefaultVisaFeePayload {

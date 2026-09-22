@@ -19,10 +19,15 @@ import {
   Languages,
   Clock,
   Pencil,
+  CopyPlus,
+  MoreVertical,
+  Trash2,
   Layers,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 
-import { useProgram } from "features/programs/hooks";
+import { useProgram, useCopyTargetBranches, useDeletePrograms, useSetProgramHidden } from "features/programs/hooks";
 import { getIeltsLabel } from "constants/lists";
 
 import Link from "next/link";
@@ -32,6 +37,10 @@ import Button from "components/ui/buttons/Button";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 import CurrencySelector from "features/programs/components/shared/CurrencySelector";
 import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
+import CopyProgramToBranch from "features/programs/components/admin/popups/CopyProgramToBranch";
+import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
+import { useToast } from "components/context/ToastContext";
+import { parseApiError } from "utils/parseApiError";
 import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate, formatFeeAmount } from "features/programs/utils/exchangeRate";
 import { monthLabel, nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
 import { courseTypeLabel } from "features/programs/utils/courseType";
@@ -145,7 +154,71 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
 
   const { program, requiredDocuments, commission, exchangeRates, loading, error } = useProgram(id);
   const [copied, setCopied] = useState(false);
+  const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [currency, setCurrency] = useState<string | null>(null);
+
+  // The copy action only ever renders under `showActions` below — skip its
+  // fetches entirely for viewers (e.g. partners) who can't see the button.
+  const copyTargets = useCopyTargetBranches({
+    programId: program?.id ?? "",
+    programName: program?.name ?? "",
+    qualificationId: program?.qualification_id ?? "",
+    universityId: program?.university?.id ?? "",
+    currentBranchId: program?.branch?.id,
+    enabled: !!editPath,
+  });
+  const copyDisabled = !!editPath && !copyTargets.loading && copyTargets.emptyReason !== null;
+  const copyDisabledReason =
+    copyTargets.emptyReason === "single"
+      ? "This university has only one branch"
+      : copyTargets.emptyReason === "all-taken"
+      ? "This program is already in every other branch"
+      : undefined;
+
+  // Admin-style Actions dropdown, shown only for the management view
+  // (data-entry passes `editPath`; the partner view does not).
+  const showActions = !!editPath;
+  const { showToast } = useToast();
+  const { deletePrograms } = useDeletePrograms();
+  const [openActions, setOpenActions] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const { setProgramHidden, loading: isTogglingHidden } = useSetProgramHidden();
+  // Local override so the badge/button flip immediately without refetching
+  // (which would flash the whole page back to its loading state).
+  const [hiddenOverride, setHiddenOverride] = useState<boolean | null>(null);
+  const isHidden = hiddenOverride ?? program?.is_hidden ?? false;
+
+  const handleToggleHidden = async () => {
+    if (!program) return;
+    const nextHidden = !isHidden;
+    try {
+      await setProgramHidden(program.id, nextHidden);
+      setHiddenOverride(nextHidden);
+      showToast(nextHidden ? "Program hidden" : "Program is visible again", "success");
+    } catch (err: unknown) {
+      showToast(parseApiError(err, nextHidden ? "Failed to hide program" : "Failed to unhide program"), "error");
+    }
+  };
+
+  const handleUpdate = () => {
+    if (editPath) router.push(editPath);
+  };
+  const handleDelete = async () => {
+    if (!program) return;
+    try {
+      setIsDeleting(true);
+      await deletePrograms([program.id]);
+      showToast("Deleted successfully", "success");
+      setIsDeleteOpen(false);
+      router.push(`${basePath}/knowledge-hub`);
+    } catch (err: unknown) {
+      showToast(`Delete failed. ${parseApiError(err, "Please try again.")}`, "error");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const currencyOptions = getCurrencyOptions(exchangeRates);
   const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
@@ -202,7 +275,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
     });
 
     lines.push("");
-    lines.push("University fees for this course include 6% tax (SST)");
+    lines.push("University fees for this course exclude 6% tax (SST)");
 
     await navigator.clipboard.writeText(lines.join("\n"));
     setCopied(true);
@@ -240,12 +313,105 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
               <h3 className="truncate text-sm font-semibold text-slate-900 sm:text-base">
                 {program?.name ?? "Not Provided"}
               </h3>
+              {showActions && isHidden && (
+                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
+                  <EyeOff className="h-3 w-3" />
+                  Hidden
+                </span>
+              )}
               <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 sm:text-sm">
                 <Building2 className="h-3.5 w-3.5 shrink-0" />
                 {program?.university?.name ?? "Not Provided"}
               </p>
             </div>
           </div>
+
+          {showActions && (
+            <div className="flex shrink-0 items-center gap-2">
+              <div className="relative">
+                <Button
+                  onClick={() => setOpenActions((v) => !v)}
+                  icon={<MoreVertical className="h-4 w-4" />}
+                  text="Actions"
+                  bgColor="bg-white"
+                  textColor="text-slate-700"
+                  borderColor="border-slate-200"
+                  hoverTextColor="hover:text-slate-700"
+                  hoverBorderColor="hover:border-slate-300"
+                  className="h-10 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-400"
+                />
+
+                {openActions && (
+                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-lg border border-slate-200 bg-white ring-1 ring-black/5">
+                    <div className="space-y-2 p-2">
+                      <button
+                        aria-label="Update Program Details"
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:shadow-sm"
+                        onClick={() => { handleUpdate(); setOpenActions(false); }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
+                          <Clock className="h-4 w-4" />
+                        </div>
+                        <span className="font-semibold text-slate-900">Update Details</span>
+                      </button>
+
+                      <button
+                        aria-label="Copy to another branch"
+                        disabled={copyDisabled}
+                        title={copyDisabledReason}
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-transparent disabled:hover:bg-white disabled:hover:shadow-none"
+                        onClick={() => { setIsCopyOpen(true); setOpenActions(false); }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
+                          <CopyPlus className="h-4 w-4" />
+                        </div>
+                        <span className="flex flex-col">
+                          <span className="font-semibold text-slate-900">Copy to another branch</span>
+                          {copyDisabled && copyDisabledReason && (
+                            <span className="text-xs font-normal text-slate-500">{copyDisabledReason}</span>
+                          )}
+                        </span>
+                      </button>
+
+                      <button
+                        aria-label={isHidden ? "Unhide Program" : "Hide Program"}
+                        disabled={isTogglingHidden}
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+                        onClick={() => { handleToggleHidden(); setOpenActions(false); }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
+                          {isHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                        </div>
+                        <span className="font-semibold text-slate-900">{isHidden ? "Unhide Program" : "Hide Program"}</span>
+                      </button>
+
+                      <button
+                        aria-label="Delete Program"
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-red-200 hover:bg-red-50 hover:shadow-sm"
+                        onClick={() => { setIsDeleteOpen(true); setOpenActions(false); }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
+                          <Trash2 className="h-4 w-4" />
+                        </div>
+                        <span className="font-semibold text-red-700">Delete Program</span>
+                      </button>
+
+                      <button
+                        aria-label="Back to Knowledge Hub"
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
+                        onClick={() => { handleBack(); setOpenActions(false); }}
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
+                          <ChevronLeft className="h-4 w-4" />
+                        </div>
+                        <span className="font-semibold text-slate-900">Back to Knowledge Hub</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
         </div>
 
@@ -384,14 +550,14 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
 
         {/* Tuition Fees */}
         <div className="p-6 border-b border-slate-200">
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
                 <CreditCard className="h-5 w-5 text-blue-600" />
               </div>
               <h4 className="text-base font-bold text-slate-900">Tuition Fees</h4>
             </div>
-            <div className="flex shrink-0 items-center gap-2.5">
+            <div className="ml-auto flex shrink-0 items-center gap-2.5">
               <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
               <Button
                 onClick={handleCopyAll}
@@ -601,7 +767,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
               }}
               className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
             >
-              Apply for This Program
+              Apply Now 
             </Link>
           )}
           {editPath && (
@@ -620,6 +786,33 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
         </div>
 
       </div>
+
+      {program && isCopyOpen && (
+        <CopyProgramToBranch
+          isOpen={isCopyOpen}
+          onClose={() => setIsCopyOpen(false)}
+          programId={program.id}
+          programName={program.name}
+          qualificationId={program.qualification_id}
+          universityId={program.university.id}
+          currentBranchId={program.branch?.id}
+          onCopied={(created) => {
+            const newId = created?.program?.id ?? created?.id;
+            setIsCopyOpen(false);
+            if (newId) router.push(`${basePath}/knowledge-hub/${newId}`);
+          }}
+        />
+      )}
+
+      {program && showActions && (
+        <DeleteProgramsConfirmation
+          isOpen={isDeleteOpen}
+          onClose={() => setIsDeleteOpen(false)}
+          onConfirm={handleDelete}
+          isDeleting={isDeleting}
+          programNames={program.name ? [program.name] : []}
+        />
+      )}
     </div>
   );
 };

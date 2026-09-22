@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   RefreshCw, Users, UserCog, BadgeCheck, CalendarDays, Pencil,
-  ShieldCheck, CheckCircle, XCircle, Ban, Power, Clock,
+  ShieldCheck, CheckCircle, XCircle, Ban, Power, Clock, Handshake,
+  SlidersHorizontal, Building2, User,
 } from "lucide-react";
 import { AppDate } from "components/ui/date";
 import { StatusBadge } from "components/ui/badges";
@@ -12,21 +13,47 @@ import { usePartners, useUpdatePartner } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import ReviewPartnerPopup from "../admin/ReviewPartnerPopup";
 import SuspendActivatePartner from "../admin/SuspendActivatePartner";
+import PendingRegistrationOtpsTable from "../admin/PendingRegistrationOtpsTable";
+import { Tabs, type TabItem } from "components/ui/tabs";
+import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsFilterCards";
+import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import PresignedImage from "components/ui/PresignedImage";
+import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 const ITEMS_PER_PAGE = 10;
 
+type ReviewerPartnersTab = "partners" | "pending-otps";
+
+const TABS: TabItem<ReviewerPartnersTab>[] = [
+  { key: "partners", label: "Partners" },
+  { key: "pending-otps", label: "Pending Registrations" },
+];
+
+type StatusFilter = "active" | "inactive" | "individual" | "agency" | null;
+
+function statusToParams(status: StatusFilter): { is_active?: boolean; type?: string } {
+  if (status === "active")     return { is_active: true };
+  if (status === "inactive")   return { is_active: false };
+  if (status === "individual") return { type: "individual" };
+  if (status === "agency")     return { type: "agency" };
+  return {};
+}
+
 export default function ReviewerPartnersTable() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedManager, setSelectedManager] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>(null);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+  const [activeTab, setActiveTab] = useState<ReviewerPartnersTab>("partners");
 
   const { accountManagers } = useAccountManagers();
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
@@ -64,10 +91,12 @@ export default function ReviewerPartnersTable() {
     return () => clearTimeout(t);
   }, [searchTerm]);
 
-  const { partners, total, loading, error, refetch } = usePartners({
+  const { partners, total, stats, loading, error, refetch } = usePartners({
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
     search: debouncedSearch || undefined,
+    assigned_manager_id: selectedManager !== "all" ? selectedManager : undefined,
+    ...statusToParams(selectedStatus),
   });
 
   const loadingStartedRef = React.useRef(false);
@@ -82,6 +111,34 @@ export default function ReviewerPartnersTable() {
   const isInitialLoad = !hasLoadedOnce;
   const isRefetching = loading && hasLoadedOnce;
 
+  const statsCards = useMemo<FilterCardItem[]>(() => [
+    { id: "active",      label: "Active",     count: stats?.active     ?? 0, icon: CheckCircle, colorScheme: "emerald" },
+    { id: "inactive",    label: "Suspended",  count: stats?.inactive   ?? 0, icon: XCircle,     colorScheme: "rose" },
+    { id: "individual",  label: "Individual", count: stats?.individual ?? 0, icon: User,        colorScheme: "violet" },
+    { id: "agency",      label: "Company",    count: stats?.agency     ?? 0, icon: Building2,   colorScheme: "cyan" },
+  ], [stats]);
+
+  const displayTotal = partners.length < ITEMS_PER_PAGE
+    ? (currentPage - 1) * ITEMS_PER_PAGE + partners.length
+    : total;
+
+  const activeFiltersCount = [
+    selectedManager !== "all",
+    searchTerm !== "",
+  ].filter(Boolean).length;
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setDebouncedSearch("");
+    setSelectedManager("all");
+    setCurrentPage(1);
+  };
+
+  const handleCardSelect = (id: string | null) => {
+    setSelectedStatus((prev) => (prev === id ? null : (id as StatusFilter)));
+    setCurrentPage(1);
+  };
+
   return (
     <div className="mt-6 max-w-5xl mx-auto text-p2 bg-white rounded-lg border border-slate-200">
 
@@ -93,18 +150,98 @@ export default function ReviewerPartnersTable() {
         </div>
       </div>
 
-      {/* Search */}
+      <Tabs<ReviewerPartnersTab> tabs={TABS} active={activeTab} onChange={setActiveTab} />
+
+      {activeTab === "pending-otps" && <PendingRegistrationOtpsTable />}
+
+      {activeTab === "partners" && (
+      <>
+      {/* Stats Cards */}
+      <div className="hidden sm:block p-6 border-b border-slate-200">
+        <StatsFilterCards
+          cards={statsCards}
+          selectedId={selectedStatus}
+          onSelect={handleCardSelect}
+        />
+      </div>
+
+      {/* Filter Bar */}
       <div className="p-6 border-b border-slate-200">
-        <div className="flex items-center gap-2">
-          <SearchInput
-            value={searchTerm}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-            placeholder="Search by name or email..."
-            className="sm:w-64 sm:flex-none"
-          />
-          {isRefetching && (
-            <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
-          )}
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+
+          {/* Search + mobile toggle */}
+          <div className="flex items-center gap-2 sm:contents">
+            <SearchInput
+              value={searchTerm}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              placeholder="Search by name or email..."
+              className="sm:w-64 sm:flex-none"
+            />
+            {isRefetching && (
+              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
+            )}
+            <button
+              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+              onClick={() => setShowMobileFilters((v) => !v)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {activeFiltersCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
+            {activeFiltersCount > 0 && (
+              <div className="sm:hidden">
+                <IconButton
+                  onClick={clearFilters}
+                  icon={<RefreshCw className="h-4 w-4" />}
+                  bgColor="bg-white"
+                  textColor="text-red-500"
+                  borderColor="border-red-200"
+                  hoverTextColor="hover:text-red-500"
+                  hoverBorderColor="hover:border-red-200"
+                  className="hover:bg-red-50"
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Collapsible dropdowns */}
+          <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
+            <div className="w-full sm:w-44 flex-shrink-0">
+              <FilterSelectField
+                value={selectedManager}
+                onChange={(v: string) => { setSelectedManager(v); setCurrentPage(1); }}
+                options={managerOptions}
+                icon={UserCog}
+                defaultOption="All Managers"
+              />
+            </div>
+
+            {(activeFiltersCount > 0 || debouncedSearch !== "") && (
+              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
+                {displayTotal.toLocaleString()}
+                <span className="font-normal text-blue-500">results</span>
+              </span>
+            )}
+
+            {activeFiltersCount > 0 && (
+              <div className="hidden sm:block">
+                <Button
+                  onClick={clearFilters}
+                  icon={<RefreshCw className="h-4 w-4" />}
+                  text="Clear"
+                  bgColor="bg-white"
+                  textColor="text-red-600"
+                  borderColor="border-red-200"
+                  hoverTextColor="hover:text-red-600"
+                  hoverBorderColor="hover:border-red-200"
+                  className="hover:bg-red-50"
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -154,7 +291,23 @@ export default function ReviewerPartnersTable() {
               <TableEmptyRow
                 colSpan={6}
                 title="No partners found"
-                subtitle="No partners have registered yet."
+                subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No partners have registered yet."}
+                icon={<Handshake className="h-8 w-8 text-slate-400" />}
+                action={
+                  activeFiltersCount > 0 ? (
+                    <Button
+                      onClick={clearFilters}
+                      icon={<RefreshCw className="h-3.5 w-3.5" />}
+                      text="Clear filters"
+                      bgColor="bg-white"
+                      textColor="text-slate-700"
+                      borderColor="border-slate-200"
+                      hoverTextColor="hover:text-slate-700"
+                      hoverBorderColor="hover:border-slate-200"
+                      className="hover:bg-slate-50"
+                    />
+                  ) : undefined
+                }
               />
             )}
 
@@ -254,9 +407,10 @@ export default function ReviewerPartnersTable() {
           </tbody>
         </table>
       </TableWrapper>
-      
-      </div>
 
+      </div>
+      </>
+      )}
 
       {reviewPartner && (
         <ReviewPartnerPopup

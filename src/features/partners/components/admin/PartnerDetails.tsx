@@ -45,6 +45,7 @@ import { StatusBadge } from "components/ui/badges";
 import { Tabs, type TabItem } from "components/ui/tabs";
 import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import PartnerApplicationsTable from "./PartnerApplicationsTable";
+import AdditionalManagersSection from "./AdditionalManagersSection";
 import { parseDate, formatDate } from "components/ui/date/utils";
 
 interface Props {
@@ -358,6 +359,9 @@ export default function PartnerDetails({ id }: Props) {
             )}
           </div>
         </div>
+
+        {/* Additional (shared) managers — UBX-324 */}
+        <AdditionalManagersSection partner={partner} accountManagers={accountManagers} onChanged={refetch} />
 
         {/* Individual Details */}
         {isIndividual && (

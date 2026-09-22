@@ -108,13 +108,13 @@ export default function ApplicationHero({ application, children }: ApplicationHe
           <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Current Status</p>
           <div className="flex flex-wrap gap-2">
             {currentStatus.name && (
-              <DetailStatusBadge variant={getStatusVariant(currentStatus.name)}>
-                {currentStatus.name}
+              <DetailStatusBadge variant={getStatusVariant(currentStatus.name)} className="min-w-0 max-w-full">
+                <span className="truncate" title={currentStatus.name}>{currentStatus.name}</span>
               </DetailStatusBadge>
             )}
             {stage.name && (
-              <DetailStatusBadge variant="neutral">
-                {stage.name}
+              <DetailStatusBadge variant="neutral" className="min-w-0 max-w-full">
+                <span className="truncate" title={stage.name}>{stage.name}</span>
               </DetailStatusBadge>
             )}
             <p className="inline-flex items-center text-xs font-normal text-slate-600">

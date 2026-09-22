@@ -14,6 +14,12 @@ import {
 
 const dataEntryRoutes: IRoute[] = [
   {
+    name: "Notifications",
+    layout: "/data-entry",
+    path: "/notifications",
+    icon: Bell,
+  },
+  {
     name: "Knowledge Hub",
     layout: "/data-entry",
     path: "/knowledge-hub",
@@ -70,12 +76,6 @@ const dataEntryRoutes: IRoute[] = [
         icon: Tag,
       },
     ],
-  },
-  {
-    name: "Notifications",
-    layout: "/data-entry",
-    path: "/notifications",
-    icon: Bell,
   },
 ];
 

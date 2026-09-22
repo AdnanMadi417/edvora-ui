@@ -12,8 +12,7 @@ import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 import PhoneInputField from "components/form/fields/PhoneInputField";
-import SocialMediaInputField from "components/form/fields/SocialMediaInputField";
-import { validateSocialMediaField, isValidPlatformUrl } from "utils/socialMedia";
+import { isValidWebsiteUrl } from "utils/socialMedia";
 import PublicFileUploadField, { type PublicUploadResult } from "components/form/upload/PublicFileUploadField";
 import ImageUploadField from "components/form/upload/ImageUploadField";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
@@ -106,8 +105,8 @@ export default function AgencyMemberSubmitProfile() {
     phone_code: "+60", phone_number: "",
     country: "", nationality: "", background: "",
     date_of_birth: "", passport_number: "",
-    social_platform: "instagram", social_username: "", social_media_url: "",
-    linkedin_platform: "linkedin", linkedin_username: "", linkedin_url: "",
+    social_media_url: "",
+    linkedin_url: "",
   });
   const [passportPhoto, setPassportPhoto] = useState<PublicUploadResult | null>(null);
   const [passportPhotoName, setPassportPhotoName] = useState("");
@@ -128,10 +127,10 @@ export default function AgencyMemberSubmitProfile() {
     if (!formData.passport_number.trim()) e.passport_number = "Passport number is required";
     if (!profilePhoto.fileKey) e.profile_photo = "Profile photo is required";
     if (!passportPhoto) e.passport_photo = "Please upload your passport photo";
-    const socialError = validateSocialMediaField(formData, { platformField: "social_platform", usernameField: "social_username" });
-    if (socialError) e.social_media_url = socialError;
-    if (formData.linkedin_url && !isValidPlatformUrl("linkedin", formData.linkedin_url))
-      e.linkedin_url = "Enter a valid LinkedIn URL (e.g. https://www.linkedin.com/in/yourname)";
+    if (!formData.social_media_url.trim()) e.social_media_url = "Social media URL is required";
+    else if (!isValidWebsiteUrl(formData.social_media_url)) e.social_media_url = "Enter a valid URL starting with https://";
+    if (formData.linkedin_url && !isValidWebsiteUrl(formData.linkedin_url))
+      e.linkedin_url = "Enter a valid URL starting with https://";
     return e;
   };
 
@@ -152,8 +151,6 @@ export default function AgencyMemberSubmitProfile() {
   const handleSubmit = async () => {
     if (!validate()) return;
 
-    const socialField = formData.social_platform === "linkedin" ? "linkedin_url" : "social_media_url";
-
     try {
       await submitProfile({
         submission_token: submissionToken,
@@ -165,7 +162,7 @@ export default function AgencyMemberSubmitProfile() {
         ...(passportPhoto && { passport_photo_file_key: passportPhoto.file_key, passport_photo_file_url: passportPhoto.file_url }),
         ...(profilePhoto.fileKey && { profile_photo_file_key: profilePhoto.fileKey, profile_photo_file_url: profilePhoto.fileUrl }),
         background: formData.background,
-        ...(formData.social_media_url && { [socialField]: formData.social_media_url }),
+        ...(formData.social_media_url && { social_media_url: formData.social_media_url }),
         ...(formData.linkedin_url && { linkedin_url: formData.linkedin_url }),
       });
       setSubmitted(true);
@@ -301,13 +298,12 @@ export default function AgencyMemberSubmitProfile() {
               error={errors.passport_photo}
             />
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-              <SocialMediaInputField label="Social Media Account"
-                platformField="social_platform" usernameField="social_username" urlField="social_media_url"
+              <InputField label="Social Media Account" field="social_media_url" type="url"
+                placeholder="https://..."
                 formData={formData} errors={errors} updateFormData={updateForm}
                 onBlur={() => validateField("social_media_url")} />
-              <SocialMediaInputField label="LinkedIn Profile"
-                platformField="linkedin_platform" usernameField="linkedin_username" urlField="linkedin_url"
-                lockedPlatform="linkedin" required={false}
+              <InputField label="LinkedIn Profile" field="linkedin_url" type="url"
+                required={false} placeholder="https://linkedin.com/in/yourname"
                 formData={formData} errors={errors} updateFormData={updateForm}
                 onBlur={() => validateField("linkedin_url")} />
             </div>

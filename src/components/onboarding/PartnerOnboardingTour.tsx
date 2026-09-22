@@ -2,11 +2,12 @@
 
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { FileText, BookOpen, Bell, Truck, LucideIcon } from "lucide-react";
+import { FileText, BookOpen, Bell, Truck, Landmark, LucideIcon } from "lucide-react";
 import { useMe } from "hooks/useMe";
 import { useCompleteOnboarding } from "features/partners/hooks";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { FEATURES } from "config/featureFlags";
 
 interface Step {
   tourId: string;
@@ -26,6 +27,23 @@ const STEPS: Step[] = [
     bg: "bg-violet-50",
     text: "text-violet-600",
   },
+  // Hidden while the partner Universities page is off (config/featureFlags.ts).
+  // This step navigates to /partner/universities and spotlights that sidebar
+  // link — with the feature disabled the route redirects and the link isn't
+  // rendered, and a step whose target is missing collapses the whole tour to
+  // null with no way to advance. So it ships or hides together with the page.
+  ...(FEATURES.partnerUniversities
+    ? [
+        {
+          tourId: "universities",
+          icon: Landmark,
+          title: "Universities",
+          description: "Look up a university's campuses and intake details before recommending it to a student.",
+          bg: "bg-indigo-50",
+          text: "text-indigo-600",
+        },
+      ]
+    : []),
   {
     tourId: "applications",
     icon: FileText,
@@ -133,8 +151,17 @@ function DesktopCoachmarkTour({ stepIndex, setStepIndex, onEnd, ending }: TourVi
       setTargetRect(el ? el.getBoundingClientRect() : null);
     };
     measure();
+    // A step whose target lives inside a collapsible submenu (e.g.
+    // "universities", nested under the "Knowledge Hub" accordion) only
+    // finishes expanding ~300ms after this step's own navigation triggers
+    // it — re-measure once after that so the spotlight lands on the fully
+    // open link instead of its still-collapsing position.
+    const retry = setTimeout(measure, 320);
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    return () => {
+      clearTimeout(retry);
+      window.removeEventListener("resize", measure);
+    };
   }, [stepIndex]);
 
   useLayoutEffect(() => {

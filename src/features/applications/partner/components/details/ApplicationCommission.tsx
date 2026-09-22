@@ -7,6 +7,8 @@ import DisputeCommission from "features/applications/partner/components/popups/D
 import DocumentActions from "features/applications/shared/DocumentActions";
 import Button from "components/ui/buttons/Button";
 import { SectionIconBadge } from "components/ui/icons";
+import ApplicationCommissionRecords from "features/applications/shared/ApplicationCommissionRecords";
+import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 
 interface ApplicationCommissionProps {
   application: any;
@@ -28,9 +30,9 @@ export default function ApplicationCommission({
     (a) => a.target_status_code === "COMMISSION_DISPUTED"
   );
 
-  const hasCommissions =
-    Array.isArray(application?.commissions) &&
-    application.commissions.length > 0;
+  const commissions: ApplicationCommissionItem[] = Array.isArray(application?.commissions)
+    ? application.commissions
+    : [];
 
   const commissionDocs = Object.values(
     application?.commission_documents || {}
@@ -40,8 +42,6 @@ export default function ApplicationCommission({
     text
       ? text.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
       : "Commission Document";
-
-  if (!hasCommissions && commissionDocs.length === 0) return null;
 
   return (
     <>
@@ -75,12 +75,14 @@ export default function ApplicationCommission({
         )}
       </div>
 
+      <ApplicationCommissionRecords commissions={commissions} />
+
       <div className="space-y-4 p-6">
         {commissionDocs.length > 0 ? (
           commissionDocs.map((doc: any) => (
             <div
               key={doc.id}
-              className="rounded-lg border border-slate-200 bg-white p-4"
+              className="rounded-lg border border-slate-200 "
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-4">

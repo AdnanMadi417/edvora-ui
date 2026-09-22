@@ -1,27 +1,69 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   FolderOpen,
   ChevronDown,
   Clock,
   CheckCircle,
   XCircle,
-  RotateCcw,
   UploadCloud,
 } from "lucide-react";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import HoldPopup from "features/applications/account-manager/components/popups/ResubmitDoc";
 import EmptyData from "components/emptyData/EmptyData";
 import { AppDate } from "components/ui/date";
 import { useManagerReuploadDocument } from "features/applications/hooks";
 import { SectionIconBadge } from "components/ui/icons";
 import { SolidBadge } from "components/ui/badges";
-import api from "lib/useApi"
+import { ALLOWED_FILE_TYPES } from "services/uploadService";
+import { useFileDrop } from "components/form/upload/useFileDrop";
 
 interface ApplicationDocumentsProps {
   application: any;
   onRefetch?: () => void;
+}
+
+// A real component (not an inline render function) so useFileDrop's state
+// is correctly isolated per row, since this is rendered once per document.
+function ReuploadButton({
+  doc,
+  disabled,
+  onClick,
+  onUpload,
+}: {
+  doc: any;
+  disabled: boolean;
+  onClick: (docId: string) => void;
+  onUpload: (file: File, docId: string) => void;
+}) {
+  const eligible = Boolean(doc?.can_manager_reupload);
+  const { isDragging, dropHandlers } = useFileDrop({
+    onFiles: (files) => onUpload(files[0], doc.id),
+    disabled: disabled || !eligible,
+  });
+
+  if (!eligible) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick(doc.id);
+      }}
+      disabled={disabled}
+      {...dropHandlers}
+      className={`group rounded-lg cursor-pointer border p-2 transition-all duration-200 focus-visible:ring-2 focus-visible:ring-violet-400 disabled:opacity-50 ${
+        isDragging
+          ? "border-violet-300 bg-violet-100 text-violet-700"
+          : "border-transparent bg-violet-50 text-violet-600 hover:border-violet-200 hover:bg-violet-100 hover:text-violet-700"
+      }`}
+      title="Re-upload Document (or drop a file here)"
+      aria-label="Re-upload Document"
+    >
+      <UploadCloud className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
+    </button>
+  );
 }
 
 export default function ApplicationDocuments({
@@ -29,9 +71,6 @@ export default function ApplicationDocuments({
                                                onRefetch,
                                              }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
-  const [selectedDoc, setSelectedDoc] = useState<any>(null);
-  const [showResubmitPopup, setShowResubmitPopup] = useState(false);
-  const [correctionStatusId, setCorrectionStatusId] = useState<string | null>(null);
   const [reuploadTargetDocId, setReuploadTargetDocId] = useState<string | null>(null);
   const reuploadInputRef = useRef<HTMLInputElement>(null);
   const { reuploadDocument, isUploading: isReuploading } = useManagerReuploadDocument();
@@ -41,57 +80,25 @@ export default function ApplicationDocuments({
     reuploadInputRef.current?.click();
   };
 
+  // Shared by the click-to-browse input (via reuploadTargetDocId) and each
+  // row's own drop target below — the latter calls this directly with its
+  // own doc id, bypassing the single shared input entirely.
+  const performReupload = async (file: File, docId: string) => {
+    try {
+      await reuploadDocument(file, application.id, docId);
+      onRefetch?.();
+    } catch (err) {
+      console.error("Re-upload failed:", err);
+    }
+  };
+
   const handleReuploadFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file || !reuploadTargetDocId) return;
-
-    try {
-      await reuploadDocument(file, application.id, reuploadTargetDocId);
-      onRefetch?.();
-    } catch (err) {
-      console.error("Re-upload failed:", err);
-    } finally {
-      setReuploadTargetDocId(null);
-    }
+    await performReupload(file, reuploadTargetDocId);
+    setReuploadTargetDocId(null);
   };
-
-  const renderReuploadButton = (doc: any) => {
-    if (!doc?.can_manager_reupload) return null;
-    return (
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          triggerReupload(doc.id);
-        }}
-        disabled={isReuploading}
-        className="group rounded-lg cursor-pointer border border-transparent bg-violet-50 p-2 text-violet-600 transition-all duration-200 hover:border-violet-200 hover:bg-violet-100 hover:text-violet-700 focus-visible:ring-2 focus-visible:ring-violet-400 disabled:opacity-50"
-        title="Re-upload Document"
-        aria-label="Re-upload Document"
-      >
-        <UploadCloud className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-      </button>
-    );
-  };
-
-  useEffect(() => {
-    const fetchApplicationDetails = async () => {
-      try {
-        const response = await api.get(`/applications/${application.id}`);
-        const appData = response.data;
-
-        const correctionStatus = appData.manager_allowed_next_statuses?.find(
-          (s) => s.name === "Correction Requested by Admin"
-        );
-
-        setCorrectionStatusId(correctionStatus?.id || null);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    if (application?.id) fetchApplicationDetails();
-  }, [application?.id]);
 
   const studentName = application?.student?.name;
 
@@ -135,7 +142,7 @@ export default function ApplicationDocuments({
       <input
         ref={reuploadInputRef}
         type="file"
-        accept=".pdf,.png,.jpg,.jpeg,.webp"
+        accept={ALLOWED_FILE_TYPES.extensions.join(",")}
         className="hidden"
         onChange={handleReuploadFileChange}
       />
@@ -258,20 +265,7 @@ export default function ApplicationDocuments({
                 <div className="ml-4 flex flex-wrap gap-2">
                   <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedDoc(doc);
-                      setShowResubmitPopup(true);
-                    }}
-                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
-                    title="Resubmit Document"
-                    aria-label="Resubmit Document"
-                  >
-                    <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
-
-                  {renderReuploadButton(doc)}
+                  <ReuploadButton doc={doc} disabled={isReuploading} onClick={triggerReupload} onUpload={performReupload} />
                 </div>
               </div>
             ))}
@@ -340,19 +334,6 @@ export default function ApplicationDocuments({
 
                 <div className="ml-4 flex flex-wrap gap-2">
                   <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedDoc(doc);
-                      setShowResubmitPopup(true);
-                    }}
-                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
-                    title="Resubmit Document"
-                    aria-label="Resubmit Document"
-                  >
-                    <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
                 </div>
 
               </div>
@@ -421,19 +402,6 @@ export default function ApplicationDocuments({
 
                 <div className="ml-4 flex flex-wrap gap-2">
                   <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedDoc(doc);
-                      setShowResubmitPopup(true);
-                    }}
-                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
-                    title="Resubmit Document"
-                    aria-label="Resubmit Document"
-                  >
-                    <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
                 </div>
 
               </div>
@@ -472,7 +440,7 @@ export default function ApplicationDocuments({
                 <div className="ml-4 flex flex-wrap gap-2">
                   <DocumentActions fileKey={offerLetterDoc.file_key} label={offerLetterDoc.document_type} personName={studentName} />
 
-                  {renderReuploadButton(offerLetterDoc)}
+                  <ReuploadButton doc={offerLetterDoc} disabled={isReuploading} onClick={triggerReupload} onUpload={performReupload} />
                 </div>
               </div>
             </div>
@@ -556,7 +524,7 @@ export default function ApplicationDocuments({
                 <div className="ml-4 flex flex-wrap gap-2">
                   <DocumentActions fileKey={visaDoc.file_key} label={visaDoc.document_type} personName={studentName} />
 
-                  {renderReuploadButton(visaDoc)}
+                  <ReuploadButton doc={visaDoc} disabled={isReuploading} onClick={triggerReupload} onUpload={performReupload} />
                 </div>
               </div>
             </div>
@@ -593,24 +561,13 @@ export default function ApplicationDocuments({
                   <div className="ml-4 flex flex-wrap gap-2">
                     <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
 
-                    {renderReuploadButton(doc)}
+                    <ReuploadButton doc={doc} disabled={isReuploading} onClick={triggerReupload} onUpload={performReupload} />
                   </div>
                 </div>
               ))}
             </div>
           )}
         </div>
-
-        {showResubmitPopup && selectedDoc && (
-          <HoldPopup
-            isOpen={showResubmitPopup}
-            onClose={() => setShowResubmitPopup(false)}
-            applicationId={application.id}
-            docId={selectedDoc.document_type_id}
-            statusId={correctionStatusId}
-            onRefetch={onRefetch}
-          />
-        )}
       </div>
 
       <style jsx>{`

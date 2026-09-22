@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { SlidersHorizontal, Globe, GraduationCap, Award, Layers, MonitorSmartphone, X, RotateCcw } from "lucide-react";
+import { SlidersHorizontal, Globe, GraduationCap, Award, Layers, MonitorSmartphone, X, RotateCcw, EyeOff } from "lucide-react";
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -27,6 +27,8 @@ const CLASS_TYPE_OPTIONS: Option[] = [
   { label: "Online", value: "online" },
 ];
 
+const HIDDEN_OPTIONS: Option[] = [{ label: "Hidden programs only", value: "true" }];
+
 export interface ProgramFilterValues {
   state: string;
   field: string;
@@ -35,6 +37,9 @@ export interface ProgramFilterValues {
   scholarship: string;
   courseType: string;
   classType: string;
+  // Only used by roles that manage hidden programs — "all" (or absent) means
+  // the default visible-only list, "true" means hidden only.
+  hidden?: string;
 }
 
 const DEFAULT_FILTERS: ProgramFilterValues = {
@@ -45,6 +50,7 @@ const DEFAULT_FILTERS: ProgramFilterValues = {
   scholarship: "all",
   courseType: "all",
   classType: "all",
+  hidden: "all",
 };
 
 interface ProgramFilterPanelProps {
@@ -64,6 +70,9 @@ interface ProgramFilterPanelProps {
 
   sortBy: string;
   onSortChange: (value: string) => void;
+
+  /** Shows the "Hidden programs only" filter — for roles that can unhide. */
+  showHiddenFilter?: boolean;
 
   resultsCount?: number;
 
@@ -88,6 +97,7 @@ export default function ProgramFilterPanel({
   onClearAll,
   sortBy,
   onSortChange,
+  showHiddenFilter = false,
   resultsCount,
   children,
 }: ProgramFilterPanelProps) {
@@ -133,6 +143,7 @@ export default function ProgramFilterPanel({
     filters.scholarship !== "all",
     filters.courseType !== "all",
     filters.classType !== "all",
+    showHiddenFilter && (filters.hidden ?? "all") !== "all",
   ].filter(Boolean).length;
 
   const chips: { key: keyof ProgramFilterValues; label: string }[] = [];
@@ -143,6 +154,7 @@ export default function ProgramFilterPanel({
   if (filters.scholarship !== "all") chips.push({ key: "scholarship", label: findLabel(SCHOLARSHIP_OPTIONS, filters.scholarship) });
   if (filters.courseType !== "all") chips.push({ key: "courseType", label: findLabel(COURSE_TYPE_FILTER_OPTIONS, filters.courseType) });
   if (filters.classType !== "all") chips.push({ key: "classType", label: findLabel(CLASS_TYPE_OPTIONS, filters.classType) });
+  if (showHiddenFilter && (filters.hidden ?? "all") !== "all") chips.push({ key: "hidden", label: findLabel(HIDDEN_OPTIONS, filters.hidden ?? "all") });
 
   const handleApply = () => {
     onApplyFilters(draft);
@@ -157,14 +169,21 @@ export default function ProgramFilterPanel({
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3">
+      {/* Search on its own row, filters/sort/results on a second row —
+          mobile only. sm:contents unwraps each row div at that breakpoint
+          so its children rejoin the outer sm:flex-row as one row, same as
+          before this split (desktop is unchanged). */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
+      <div className="flex items-center gap-3 sm:contents">
         <SearchInput
           value={searchTerm}
           onChange={onSearchChange}
           placeholder={searchPlaceholder}
           className="flex-1"
         />
+      </div>
 
+      <div className="flex items-center gap-3 sm:contents">
         <div className="relative" ref={ref}>
           <button
             type="button"
@@ -253,6 +272,15 @@ export default function ProgramFilterPanel({
                     icon={MonitorSmartphone}
                     defaultOption="All Delivery Modes"
                   />
+                  {showHiddenFilter && (
+                    <FilterSelectField
+                      value={draft.hidden ?? "all"}
+                      onChange={(val: string) => setDraft((d) => ({ ...d, hidden: val }))}
+                      options={HIDDEN_OPTIONS}
+                      icon={EyeOff}
+                      defaultOption="Visible programs"
+                    />
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
@@ -286,9 +314,16 @@ export default function ProgramFilterPanel({
           </span>
         )}
       </div>
+      </div>
 
       {chips.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
+        // Mobile: one scrollable row (chips are shrink-0/nowrap so they
+        // stay compact pills instead of each claiming a near-full-width
+        // row) — several active filters were stacking one per line and
+        // eating most of the visible screen before any results appeared.
+        // Desktop keeps the original wrapping layout, where there's
+        // enough width for that to look fine.
+        <div className="-mx-6 flex items-center gap-2 overflow-x-auto px-6 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
           {chips.map((chip) => (
             <FilterChip key={chip.key} label={chip.label} onRemove={() => onRemoveFilter(chip.key)} />
           ))}
@@ -296,7 +331,7 @@ export default function ProgramFilterPanel({
             <button
               type="button"
               onClick={onClearAll}
-              className="text-sm font-medium text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline"
+              className="shrink-0 whitespace-nowrap text-sm font-medium text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline"
             >
               Clear all
             </button>

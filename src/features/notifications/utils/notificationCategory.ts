@@ -48,6 +48,10 @@ export function getNotificationCategory(notification: Notification): Notificatio
   if (notification.type === "application_message_received") return "action_required";
   if (notification.type === "new_application") return "action_required";
   if (notification.type === "manager_file_reuploaded") return "info";
+  // More documents were requested on an open correction — the partner has to act.
+  if (notification.type === "correction_request_updated") return "action_required";
+  // A new partner sign-up needs Admin/Reviewer to look it over.
+  if (notification.type === "partner_signed_up") return "action_required";
 
   if (notification.type === "application_stage_changed") {
     const statusId = notification.data?.to_status_id as string | undefined;

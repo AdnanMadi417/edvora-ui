@@ -8,16 +8,20 @@ import {
   XCircle,
   Trash2,
   Share2,
+  CopyPlus,
   ChevronRight,
   Calendar,
   DollarSign,
   GraduationCap,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
 import PresignedImage from "components/ui/PresignedImage";
 import { getIeltsLabel } from "constants/lists";
 import IconButton from "components/ui/buttons/IconButton";
+import { Tooltip } from "components/ui/tooltip";
 import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { StatusBadge } from "components/ui/badges";
 import { useToast } from "components/context/ToastContext";
@@ -91,6 +95,16 @@ interface KnowledgeHubTableProps {
 
   hideDelete?: boolean;
   onDeleteClick?: (program: Program) => void;
+  /** When set, shows a "Copy to another branch" row action. */
+  onCopyToBranchClick?: (program: Program) => void;
+  /** Per-row copy state — used to disable the action for a program that's
+   *  already in every branch. */
+  copyEligibility?: (program: Program) => { disabled: boolean; title: string };
+  /** When set, shows a Hide/Unhide row action (reversible — no confirmation). */
+  onToggleHiddenClick?: (program: Program) => void;
+  /** Id of the program whose hide/unhide request is in flight. */
+  togglingHiddenId?: string | null;
+  emptySubtitle?: string;
 }
 
 export default function KnowledgeHubTable({
@@ -112,6 +126,11 @@ export default function KnowledgeHubTable({
   editHref,
   hideDelete = false,
   onDeleteClick,
+  onCopyToBranchClick,
+  copyEligibility,
+  onToggleHiddenClick,
+  togglingHiddenId = null,
+  emptySubtitle = "There are currently no programs available.",
 }: KnowledgeHubTableProps) {
   const { showToast } = useToast();
 
@@ -211,7 +230,8 @@ export default function KnowledgeHubTable({
             <TableEmptyRow
               colSpan={7}
               title="No programs found"
-              subtitle="There are currently no programs available."
+              subtitle={emptySubtitle}
+              icon={<GraduationCap className="h-8 w-8 text-slate-400" />}
             />
           )}
 
@@ -258,6 +278,11 @@ export default function KnowledgeHubTable({
                     <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900" title={program.name}>
                       {program.name}
                     </h3>
+                    {program.is_hidden && (
+                      <div className="mt-1">
+                        <StatusBadge variant="warning" icon={<EyeOff className="h-3 w-3" />}>Hidden</StatusBadge>
+                      </div>
+                    )}
                     <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
                       <span className="font-medium capitalize text-slate-700">{program.qualification_level}</span>
                       {program.course_type && (
@@ -367,6 +392,52 @@ export default function KnowledgeHubTable({
                     hoverBorderColor="hover:border-transparent"
                     className="hover:bg-blue-50 focus:outline-none"
                   />
+
+                  {onToggleHiddenClick && (
+                    <Tooltip content={program.is_hidden ? "Unhide program" : "Hide program"} position="left">
+                      <IconButton
+                        aria-label={program.is_hidden ? "Unhide Program" : "Hide Program"}
+                        disabled={togglingHiddenId === program.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onToggleHiddenClick(program);
+                        }}
+                        icon={program.is_hidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                        bgColor="bg-transparent"
+                        textColor="text-slate-400"
+                        borderColor="border-transparent"
+                        hoverTextColor="hover:text-blue-600"
+                        hoverBorderColor="hover:border-transparent"
+                        className="hover:bg-blue-50 focus:outline-none"
+                      />
+                    </Tooltip>
+                  )}
+
+                  {onCopyToBranchClick && (() => {
+                    const copy = copyEligibility?.(program) ?? {
+                      disabled: false,
+                      title: "Copy to another branch",
+                    };
+                    return (
+                      <Tooltip content={copy.title} position="left">
+                        <IconButton
+                          aria-label="Copy to another branch"
+                          disabled={copy.disabled}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onCopyToBranchClick(program);
+                          }}
+                          icon={<CopyPlus className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-400"
+                          borderColor="border-transparent"
+                          hoverTextColor="hover:text-blue-600"
+                          hoverBorderColor="hover:border-transparent"
+                          className="hover:bg-blue-50 focus:outline-none"
+                        />
+                      </Tooltip>
+                    );
+                  })()}
 
                   {!hideDelete && (
                     <>

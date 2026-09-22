@@ -151,6 +151,7 @@ export default function RolesTable() {
                   colSpan={4}
                   title={searchTerm ? "No roles found" : "No roles yet"}
                   subtitle={searchTerm ? "Try adjusting your search." : "Create your first custom role to get started."}
+                  icon={<ShieldCheck className="h-8 w-8 text-slate-400" />}
                 />
               )}
 

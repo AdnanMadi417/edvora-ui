@@ -4,7 +4,9 @@ import type {
   CreatePartnerPayload,
   UpdatePartnerPayload,
   AssignManagerPayload,
+  AdditionalManagersResult,
   UpdatePartnerProfilePayload,
+  PublicPartnerProfile,
 } from '../types';
 
 const authHeader = () => {
@@ -21,6 +23,8 @@ export const partnersApi = {
     is_active?: boolean;
     type?: string;
     assigned_manager_id?: string;
+    /** Primary OR shared access (UBX-324); assigned_manager_id stays primary-only. */
+    manager_id?: string;
   }) => api.get('/admin/partners', { params, headers: authHeader() }),
 
   get: (id: string) =>
@@ -59,6 +63,20 @@ export const partnersApi = {
       headers: authHeader(),
     }),
 
+  // Shared (additional, non-primary) managers on one partner — UBX-324.
+  addAdditionalManager: (id: string, managerId: string) =>
+    api.post<AdditionalManagersResult>(
+      `/admin/partners/${id}/additional-managers`,
+      { manager_id: managerId },
+      { headers: authHeader() }
+    ),
+
+  removeAdditionalManager: (id: string, managerId: string) =>
+    api.delete<AdditionalManagersResult>(
+      `/admin/partners/${id}/additional-managers/${managerId}`,
+      { headers: authHeader() }
+    ),
+
   review: (id: string, payload: { decision: "approved" | "rejected"; rejection_reason?: string }) =>
     api.patch(`/admin/partners/${id}/review`, payload, { headers: authHeader() }),
 
@@ -73,6 +91,15 @@ export const partnersApi = {
 
   adminResendRegistrationOtp: (email: string) =>
     api.post<{ message: string }>('/admin/partners/register/resend-otp', { email }, { headers: authHeader() }),
+
+  // Accessible with an admin OR reviewer token.
+  getPendingRegistrationOtps: (params?: {
+    search?: string;
+    progress?: string;
+    partner_type?: string;
+    page?: number;
+    page_size?: number;
+  }) => api.get('/admin/partners/register/pending-otps', { params, headers: authHeader() }),
 
   // Account-manager-scoped: only the AM's own assigned partners (AM identified via Bearer token)
   listForAccountManager: (params?: { limit?: number; offset?: number; search?: string }) =>
@@ -99,4 +126,8 @@ export const partnersApi = {
 
   registerVerifyOtp: (email: string, otp: string) =>
     publicApi.post<{ message: string; reference_id: string }>('/partners/register/verify-otp', { email, otp }),
+
+  // Public profile (UBX-??? — sub-feature, more endpoints expected later).
+  getPublicProfile: (slug: string) =>
+    publicApi.get<PublicPartnerProfile>(`/partners/public/${slug}`),
 };
