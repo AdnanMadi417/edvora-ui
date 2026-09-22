@@ -5,6 +5,7 @@ import { Eye, Download } from "lucide-react";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import { useToast } from "components/context/ToastContext";
+import IconButton from "components/ui/buttons/IconButton";
 
 interface DocumentActionsProps {
   /** Storage file_key for the document. Buttons are disabled when missing. */
@@ -58,26 +59,30 @@ export default function DocumentActions({ fileKey, label, personName }: Document
 
   return (
     <>
-      <button
-        type="button"
+      <IconButton
         onClick={handleView}
         disabled={disabled}
-        className="group rounded-md cursor-pointer border border-transparent bg-slate-100 p-2 text-slate-600 transition-all duration-200 hover:border-slate-200 hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-50"
         title="View Document"
-        aria-label="View Document"
-      >
-        <Eye className={`h-4 w-4 transition-transform duration-200 group-hover:scale-110 ${loading === "view" ? "animate-pulse" : ""}`} />
-      </button>
-      <button
-        type="button"
+        icon={<Eye className={`h-4 w-4 transition-transform duration-200 group-hover:scale-110 ${loading === "view" ? "animate-pulse" : ""}`} />}
+        bgColor="bg-slate-100"
+        textColor="text-slate-600"
+        borderColor="border-transparent"
+        hoverTextColor="hover:text-slate-600"
+        hoverBorderColor="hover:border-slate-200"
+        className="group cursor-pointer hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-slate-400"
+      />
+      <IconButton
         onClick={handleDownload}
         disabled={disabled}
-        className="group rounded-md cursor-pointer border border-transparent bg-blue-50 p-2 text-blue-600 transition-all duration-200 hover:border-blue-200 hover:bg-blue-100 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
         title="Download Document"
-        aria-label="Download Document"
-      >
-        <Download className={`h-4 w-4 transition-transform duration-200 group-hover:scale-110 ${loading === "download" ? "animate-pulse" : ""}`} />
-      </button>
+        icon={<Download className={`h-4 w-4 transition-transform duration-200 group-hover:scale-110 ${loading === "download" ? "animate-pulse" : ""}`} />}
+        bgColor="bg-blue-50"
+        textColor="text-blue-600"
+        borderColor="border-transparent"
+        hoverTextColor="hover:text-blue-700"
+        hoverBorderColor="hover:border-blue-200"
+        className="group cursor-pointer hover:bg-blue-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+      />
     </>
   );
 }
