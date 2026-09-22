@@ -1,21 +1,18 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   FolderOpen,
   ChevronDown,
   Clock,
   CheckCircle,
   XCircle,
-  RotateCcw,
 } from "lucide-react";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import HoldPopup from "features/applications/admin/components/popups/ResubmitDoc";
 import EmptyData from "components/emptyData/EmptyData";
 import { AppDate } from "components/ui/date";
 import { SectionIconBadge } from "components/ui/icons";
 import { SolidBadge } from "components/ui/badges";
-import api from "lib/useApi"
 
 interface ApplicationDocumentsProps {
   application: any;
@@ -27,30 +24,7 @@ export default function ApplicationDocuments({
   onRefetch,
 }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
-  const [selectedDoc, setSelectedDoc] = useState<any>(null);
-  const [showResubmitPopup, setShowResubmitPopup] = useState(false);
-  const [correctionStatusId, setCorrectionStatusId] = useState<string | null>(null);
   const studentName = application?.student?.name;
-
-
-  useEffect(() => {
-    const fetchApplicationDetails = async () => {
-      try {
-        const response = await api.get(`/applications/${application.id}`);
-        const appData = response.data;
-
-        const correctionStatus = appData.manager_allowed_next_statuses?.find(
-          (s) => s.name === "Correction Requested by Admin"
-        );
-
-        setCorrectionStatusId(correctionStatus?.id || null);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    if (application?.id) fetchApplicationDetails();
-  }, [application?.id]);
 
   const allDocs = application?.documents || [];
   const documents = allDocs;
@@ -207,19 +181,6 @@ export default function ApplicationDocuments({
 
                 <div className="ml-4 flex flex-wrap gap-2">
                   <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedDoc(doc);
-                      setShowResubmitPopup(true);
-                    }}
-                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
-                    title="Resubmit Document"
-                    aria-label="Resubmit Document"
-                  >
-                    <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
                 </div>
               </div>
             ))}
@@ -288,19 +249,6 @@ export default function ApplicationDocuments({
 
                 <div className="ml-4 flex flex-wrap gap-2">
                   <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedDoc(doc);
-                      setShowResubmitPopup(true);
-                    }}
-                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
-                    title="Resubmit Document"
-                    aria-label="Resubmit Document"
-                  >
-                    <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
                 </div>
               </div>
             ))}
@@ -368,19 +316,6 @@ export default function ApplicationDocuments({
 
                 <div className="ml-4 flex flex-wrap gap-2">
                   <DocumentActions fileKey={doc.file_key} label={doc.document_type} personName={studentName} />
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedDoc(doc);
-                      setShowResubmitPopup(true);
-                    }}
-                    className="group rounded-md border border-transparent bg-amber-100 p-2 text-amber-700 transition-all duration-200 hover:border-amber-300 hover:bg-amber-200 hover:text-amber-800 focus-visible:ring-2 focus-visible:ring-amber-500"
-                    title="Resubmit Document"
-                    aria-label="Resubmit Document"
-                  >
-                    <RotateCcw className="h-4 w-4 transition-transform duration-200 group-hover:scale-110" />
-                  </button>
                 </div>
               </div>
             ))}
@@ -540,17 +475,6 @@ export default function ApplicationDocuments({
             </div>
           )}
         </div>
-
-        {showResubmitPopup && selectedDoc && (
-          <HoldPopup
-            isOpen={showResubmitPopup}
-            onClose={() => setShowResubmitPopup(false)}
-            applicationId={application.id}
-            docId={selectedDoc.document_type_id}
-            statusId={correctionStatusId}
-            onRefetch={onRefetch}
-          />
-        )}
       </div>
 
       <style jsx>{`
