@@ -30,10 +30,25 @@ export interface ApplicationDetail {
   commission_documents: Record<string, any>;
 }
 
+export interface TimelineDocumentTypeRef {
+  id: string;
+  // display name, e.g. "Passport" — null if the document type was later deleted
+  type: string | null;
+  // stable code, e.g. "passport" — null under the same condition
+  code: string | null;
+}
+
 // GET /applications/{id}/timeline — newest first. `status_transition` items
 // populate the top-level from/to/reason/notes fields; every other entry_type
 // populates only `detail`, whose shape varies by type (and for
 // document_upload, by call site) — read it defensively.
+//
+// required_document_types populates on status_transition (from the
+// transition's required_document_type_ids) and correction_request_updated
+// (from detail.required_document_type_ids). requested_document_types and
+// uploaded_document_types populate together on the bulk document_upload
+// variant (from detail.requested_document_type_ids / .uploaded_document_type_ids).
+// All three are null for every other entry_type.
 export interface ApplicationTimelineItem {
   id: string;
   application_id: string;
@@ -47,6 +62,9 @@ export interface ApplicationTimelineItem {
   reason_text: string | null;
   notes: string | null;
   detail: Record<string, unknown> | null;
+  required_document_types: TimelineDocumentTypeRef[] | null;
+  requested_document_types: TimelineDocumentTypeRef[] | null;
+  uploaded_document_types: TimelineDocumentTypeRef[] | null;
   created_at: string;
 }
 
