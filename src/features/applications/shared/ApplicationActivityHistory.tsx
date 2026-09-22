@@ -17,7 +17,7 @@ import { AppDate } from "components/ui/date";
 import { SectionIconBadge } from "components/ui/icons";
 import Button from "components/ui/buttons/Button";
 import { useApplicationTimeline } from "features/applications/hooks";
-import type { ApplicationTimelineItem } from "features/applications/shared/applicationTypes";
+import type { ApplicationTimelineItem, TimelineDocumentTypeRef } from "features/applications/shared/applicationTypes";
 
 type Category = "status" | "documents" | "correction" | "visa" | "program" | "message" | "other";
 
@@ -51,8 +51,14 @@ const humanize = (code: string) =>
     .replace(/\b\w/g, (c) => c.toUpperCase());
 
 const asString = (v: unknown): string | null => (typeof v === "string" && v.trim() ? v : null);
-const asStringArray = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x) => typeof x === "string") : []);
 const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+// type/code are both null only when the document type was deleted after this
+// log entry was written — fall back to the raw id rather than render null.
+const formatDocType = (ref: TimelineDocumentTypeRef): string =>
+  ref.type ?? ref.code ?? `Unknown document type (${ref.id})`;
+const formatDocTypeList = (refs: TimelineDocumentTypeRef[] | null): string | null =>
+  refs && refs.length > 0 ? refs.map(formatDocType).join(", ") : null;
 
 interface Described {
   category: Category;
@@ -71,6 +77,8 @@ function describe(item: ApplicationTimelineItem): Described {
   switch (item.entry_type) {
     case "status_transition": {
       if (item.to_stage) details.push({ label: "Stage", text: item.to_stage });
+      const requiredDocs = formatDocTypeList(item.required_document_types);
+      if (requiredDocs) details.push({ label: "Requested", text: requiredDocs });
       if (item.reason_text) details.push({ label: "Reason", text: item.reason_text });
       if (item.notes) details.push({ label: "Notes", text: item.notes });
       const title =
@@ -84,16 +92,18 @@ function describe(item: ApplicationTimelineItem): Described {
 
     case "document_upload": {
       const code = asString(d.document_type_code);
-      const bulkCount = asStringArray(d.uploaded_document_type_ids).length;
-      const label = code ? humanize(code) : bulkCount > 0 ? plural(bulkCount, "document") : "a document";
+      const uploaded = formatDocTypeList(item.uploaded_document_types);
+      const label = code ? humanize(code) : (uploaded ?? "a document");
+      const requested = formatDocTypeList(item.requested_document_types);
+      if (requested) details.push({ label: "Requested", text: requested });
       return { category, title: `${actor} ${d.reupload === true ? "re-uploaded" : "uploaded"} ${label}`, details };
     }
 
     case "correction_request_updated": {
       const reason = asString(d.reason_text);
-      const docCount = asStringArray(d.required_document_type_ids).length;
+      const requested = formatDocTypeList(item.required_document_types);
       if (reason) details.push({ label: "Reason", text: reason });
-      if (docCount > 0) details.push({ label: "Requested", text: plural(docCount, "document") });
+      if (requested) details.push({ label: "Requested", text: requested });
       return { category, title: `${actor} updated the correction request`, details };
     }
 
