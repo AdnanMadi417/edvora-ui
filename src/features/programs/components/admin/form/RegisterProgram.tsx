@@ -100,7 +100,7 @@ const emptyFormData: FormData = {
   tuition_fee: 0,
   intake_months: [],
   duration: 0,
-  english_required_score: '',
+  english_required_score: '0',
   overview: '',
   curriculum: '',
   is_on_campus: true,
