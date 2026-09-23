@@ -418,7 +418,7 @@ export const DURATION = [
 ];
 
 export const IELTS_BANDS = [
-  { score: 0, label: "Not Required" },
+  { score: 0, label: "Not Available" },
   { score: 4, label: "Band 4" },
   { score: 4.5, label: "Band 4.5" },
   { score: 5.0, label: "Band 5" },
