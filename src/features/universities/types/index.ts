@@ -39,6 +39,12 @@ export interface UniversityResponse {
   branches: Branch[];
 }
 
+// PUT /knowledge-hub/universities/{id} is a partial update — sending only
+// this leaves every other field untouched.
+export interface SetUniversityHiddenPayload {
+  is_hidden: boolean;
+}
+
 export interface CreateUniversityPayload {
   name: string;
   country: string;

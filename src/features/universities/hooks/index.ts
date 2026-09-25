@@ -2,6 +2,7 @@ export { useUniversities } from "./useUniversities";
 export { useUniversityDetails } from "./useUniversityDetails";
 export { useCreateUniversity } from "./useCreateUniversity";
 export { useUpdateUniversity } from "./useUpdateUniversity";
+export { useSetUniversityHidden } from "./useSetUniversityHidden";
 export { useDeleteUniversity } from "./useDeleteUniversity";
 
 export { useBranches } from "./useBranches";

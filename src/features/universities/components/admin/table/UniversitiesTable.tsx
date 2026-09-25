@@ -16,18 +16,20 @@ import {
   Wallet,
   XCircle,
   Landmark,
+  Eye,
   EyeOff,
   Languages,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
 import { StatusBadge } from "components/ui/badges";
 
-import { useDeleteUniversity, useUniversities } from "features/universities/hooks";
+import { useDeleteUniversity, useSetUniversityHidden, useUniversities } from "features/universities/hooks";
 
 import { useRouter } from "next/navigation";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import Link from "components/ui/links/LinkBtn";
+import { Tooltip } from "components/ui/tooltip";
 
 import UniversityFilterPanel from "features/universities/components/shared/filters/UniversityFilterPanel";
 import { TableWrapper, TableSkeletonRows, TableErrorRow, TableEmptyRow, TablePagination } from "components/ui/table";
@@ -63,6 +65,9 @@ const UniversitiesTable = () => {
 
   const { deleteUniversity, isDeleting } = useDeleteUniversity();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const { setUniversityHidden } = useSetUniversityHidden();
+  const [togglingHiddenId, setTogglingHiddenId] = useState<string | null>(null);
 
   const [isAssignPaymentOpen, setIsAssignPaymentOpen] = useState(false);
   const [assignPaymentUniversityId, setAssignPaymentUniversityId] = useState<string>("");
@@ -211,6 +216,20 @@ const UniversitiesTable = () => {
     catch (error: any) {
       const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to delete university. ${backendMessage}`, "error");
+    }
+  };
+
+  const handleToggleHidden = async (uni: { id: string; is_hidden: boolean }) => {
+    const nextHidden = !uni.is_hidden;
+    setTogglingHiddenId(uni.id);
+    try {
+      await setUniversityHidden(uni.id, nextHidden);
+      showToast(nextHidden ? "University hidden" : "University is visible again", "success");
+      refetch();
+    } catch (error: unknown) {
+      showToast(parseApiError(error, nextHidden ? "Failed to hide university" : "Failed to unhide university"), "error");
+    } finally {
+      setTogglingHiddenId(null);
     }
   };
 
@@ -507,6 +526,26 @@ const UniversitiesTable = () => {
                         hoverBorderColor="hover:border-transparent"
                         className="hover:bg-slate-100 focus:outline-none"
                       />
+
+                      <div className="h-6 border-l border-slate-200" />
+
+                      <Tooltip content={uni.is_hidden ? "Unhide university" : "Hide university"} position="left">
+                        <IconButton
+                          aria-label={uni.is_hidden ? "Unhide University" : "Hide University"}
+                          disabled={togglingHiddenId === uni.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleToggleHidden(uni);
+                          }}
+                          icon={uni.is_hidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                          bgColor="bg-transparent"
+                          textColor="text-slate-700"
+                          borderColor="border-transparent"
+                          hoverTextColor="hover:text-slate-700"
+                          hoverBorderColor="hover:border-transparent"
+                          className="hover:bg-slate-100 focus:outline-none"
+                        />
+                      </Tooltip>
 
                       <div className="h-6 border-l border-slate-200" />
 

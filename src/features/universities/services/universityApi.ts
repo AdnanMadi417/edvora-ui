@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 import type {
   CreateUniversityPayload,
   UpdateUniversityPayload,
+  SetUniversityHiddenPayload,
   CreateBranchPayload,
   AssignPaymentMethodPayload,
   UpdatePaymentMethodPayload,
@@ -23,7 +24,7 @@ export const universityApi = {
     get: (id: string) => api.get(`/knowledge-hub/universities/${id}`),
     create: (data: CreateUniversityPayload) =>
       api.post("/knowledge-hub/universities", data, { headers: authHeader() }),
-    update: (id: string, data: UpdateUniversityPayload) =>
+    update: (id: string, data: UpdateUniversityPayload | SetUniversityHiddenPayload) =>
       api.put(`/knowledge-hub/universities/${id}`, data),
     delete: (id: string) =>
       api.delete(`/knowledge-hub/universities/${id}`, { headers: authHeader() }),
