@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
+import { normalizeCommissionCurrency } from 'features/programs/utils/commissionCurrency';
 
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -210,7 +211,9 @@ const EditKnowledgeHubProgramDetails = ({
       is_online: program.is_online ?? false,
       has_scholarship: program.has_scholarship ?? false,
       commission_amount: Number(program.commission_amount) || 0,
-      commission_currency: program.commission_currency || "rm",
+      // Upper-cased so a legacy "rm"/"usd" row still matches the select
+      // options (UBX-395) -- an unmatched value used to render as USD.
+      commission_currency: normalizeCommissionCurrency(program.commission_currency),
       commission_type_id: String(commissionTypes[0]?.id || ""),
       commission_notes: commission?.notes ?? "",
       expected_commission_from: commission?.expected_commission_from ?? "",
@@ -282,7 +285,7 @@ const EditKnowledgeHubProgramDetails = ({
         has_scholarship: Boolean(formData.has_scholarship),
 
         commission_amount: Number(formData.commission_amount) || 0,
-        commission_currency: formData.commission_currency || "rm",
+        commission_currency: normalizeCommissionCurrency(formData.commission_currency),
         commission_type_id: String(formData.commission_type_id || commissionTypes[0]?.id || ""),
         commission_notes: String(formData.commission_notes || ""),
         expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,

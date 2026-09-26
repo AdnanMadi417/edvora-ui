@@ -7,6 +7,7 @@ import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
 
 import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
+import { DEFAULT_COMMISSION_CURRENCY, normalizeCommissionCurrency } from 'features/programs/utils/commissionCurrency';
 import { type Currency, type CourseType } from 'features/programs/types';
 
 import { useCreateProgram } from 'features/programs/hooks';
@@ -107,7 +108,7 @@ const emptyFormData: FormData = {
   is_online: false,
   has_scholarship: false,
   commission_type_id: '',
-  commission_currency: 'rm',
+  commission_currency: DEFAULT_COMMISSION_CURRENCY,
   commission_notes: '',
   commission_amount: 0,
   expected_commission_from: '',
@@ -229,7 +230,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
     // formData alone — e.g. a restored draft could carry a stale pairing.
     course_type: isMasterOrPhd(selectedQualification?.name) ? formData.course_type : null,
     commission_amount: Number(formData.commission_amount || 0),
-    commission_currency: formData.commission_currency || 'rm',
+    commission_currency: normalizeCommissionCurrency(formData.commission_currency),
     expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
     expected_commission_to: formData.expected_commission_to ? Number(formData.expected_commission_to) : null,
     yearly_fee_currency: (formData.yearly_fee_currency || 'MYR') as Currency,
@@ -279,7 +280,8 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
 
   const restoreDraft = () => {
     const draft = readDraft();
-    if (draft) setFormData(draft);
+    // A draft saved by a build predating UBX-395 carries the old lower-case code.
+    if (draft) setFormData({ ...draft, commission_currency: normalizeCommissionCurrency(draft.commission_currency) });
     dismissDraft();
   };
 

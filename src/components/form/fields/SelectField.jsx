@@ -10,6 +10,14 @@ const getNestedValue = (obj, path) => {
 
 const SelectField = ({ label, field, options, required = true, formData, errors, updateFormData, onBlur = undefined, disabled = false }) => {
   const value = getNestedValue(formData, field) ?? "";
+  // A controlled <select> whose value matches no option makes React select the
+  // first enabled option instead, silently showing the wrong choice (UBX-395:
+  // "RM" programs rendered as USD). Surface the raw value as a disabled option
+  // so the mismatch is visible and the user has to pick a real option to move on.
+  const hasMatchingOption = options.some(
+    (opt) => String(typeof opt === "object" && opt !== null ? opt.value ?? "" : opt) === String(value)
+  );
+  const showUnmatched = value !== "" && !hasMatchingOption;
 
   return (
     <div className="mb-4" data-field={field}>
@@ -27,6 +35,11 @@ const SelectField = ({ label, field, options, required = true, formData, errors,
         }`}
       >
         <option value="" disabled>Select ...</option>
+        {showUnmatched && (
+          <option value={value} disabled>
+            {`${value} (not an available option)`}
+          </option>
+        )}
         {options.map((opt, index) =>
           typeof opt === "object" && opt !== null ? (
             <option key={opt.value ?? index} value={opt.value ?? ""} disabled={opt.disabled}>
