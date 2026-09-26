@@ -248,7 +248,8 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
         university_id: m.university_id,
         payment_method_id: m.payment_method_id,
         instructions: m.instructions,
-        currency: m.currency,
+        // Upper-cased to match the CURRENCY option values (UBX-395).
+        currency: (m.currency ?? "").toUpperCase(),
         is_active: m.is_active,
       }))
     );
@@ -386,7 +387,7 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
       await updateUniversityPaymentMethod(method.university_id, method.id, {
         payment_method_id: method.payment_method_id,
         instructions: method.instructions ?? "",
-        currency: method.currency ?? "",
+        currency: (method.currency ?? "").toUpperCase(),
         is_active: method.is_active ?? true,
       });
     } catch {

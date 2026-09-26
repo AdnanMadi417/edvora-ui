@@ -39,6 +39,12 @@ export default function SelectInput({
 }: SelectInputProps) {
   const value = getNestedValue(formData, field) ?? "";
   const hasError = Boolean(errors?.[field]);
+  // Same guard as SelectField: an unmatched value would otherwise make React
+  // show the first option as if it were selected (UBX-395).
+  const hasMatchingOption = options.some(
+    (opt) => String(typeof opt === "object" ? opt.value : opt) === String(value)
+  );
+  const showUnmatched = value !== "" && !hasMatchingOption;
 
   return (
     <select
@@ -50,6 +56,11 @@ export default function SelectInput({
         hasError ? "border-red-500 bg-red-50" : "border-slate-200 bg-white hover:bg-slate-50"
       } ${className}`}
     >
+      {showUnmatched && (
+        <option value={value} disabled>
+          {`${value} (not an available option)`}
+        </option>
+      )}
       {options.map((opt, index) => {
         const optValue = typeof opt === "object" ? opt.value : opt;
         const optLabel = typeof opt === "object" ? opt.label : opt;

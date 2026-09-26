@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { XCircle, Percent } from "lucide-react";
 
 import { MONTHS, CURRENCY } from "constants/lists";
+import { DEFAULT_COMMISSION_CURRENCY, normalizeCommissionCurrency } from "features/programs/utils/commissionCurrency";
 
 import { useBatchUpdatePrograms } from "features/programs/hooks";
 
@@ -35,7 +36,7 @@ export default function BatchCommissionPrograms({
 
   const [formData, setFormData] = useState({
     commission_amount: "",
-    commission_currency: "rm",
+    commission_currency: DEFAULT_COMMISSION_CURRENCY,
     commission_notes: "",
     expected_commission_from: "",
     expected_commission_to: "",
@@ -67,7 +68,7 @@ export default function BatchCommissionPrograms({
     if (isOpen) {
       setFormData({
         commission_amount: "",
-        commission_currency: "rm",
+        commission_currency: DEFAULT_COMMISSION_CURRENCY,
         commission_notes: "",
         expected_commission_from: "",
         expected_commission_to: "",
@@ -96,7 +97,7 @@ export default function BatchCommissionPrograms({
       await batchUpdatePrograms({
         program_ids: selectedProgramIds,
         commission_amount: formData.commission_amount !== "" ? Number(formData.commission_amount) : undefined,
-        commission_currency: formData.commission_currency || undefined,
+        commission_currency: normalizeCommissionCurrency(formData.commission_currency),
         commission_notes: formData.commission_notes.trim() || undefined,
         expected_commission_from: formData.expected_commission_from !== "" ? Number(formData.expected_commission_from) : undefined,
         expected_commission_to: formData.expected_commission_to !== "" ? Number(formData.expected_commission_to) : undefined,

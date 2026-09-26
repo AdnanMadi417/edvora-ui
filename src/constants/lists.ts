@@ -450,9 +450,13 @@ export const PARTNER_TYPE = [
   { value: "agency", label: "Company" },
 ];
 
+// Commission / payment-method currency codes. Values are the canonical
+// upper-case codes the API stores (UBX-395): the backend upper-cases input,
+// and forms normalise a stored value before seeding a select so an older
+// lower-case row still matches an option instead of silently showing USD.
 export const CURRENCY = [
-  { value: "usd", label: "USD" },
-  { value: "rm", label: "RM" },
+  { value: "USD", label: "USD" },
+  { value: "RM", label: "RM" },
 ];
 
 export const MONTHS = [
