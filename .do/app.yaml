@@ -11,17 +11,38 @@
 name: unibexs-frontend-production
 region: sgp1
 
+# Buildpack stack, as set on the live app.
+features:
+  - buildpack-stack=ubuntu-22
+
+# App-level alert policies. Email-only by default; Slack routing is configured
+# through DigitalOcean's Slack integration, not the CI webhook.
+alerts:
+  - rule: DEPLOYMENT_FAILED
+  - rule: DOMAIN_FAILED
+
+# Cloudflare-proxied hostname. Add the DNS record DNS-only (grey) first so
+# DigitalOcean can validate and issue the certificate, then switch it to Proxied.
+domains:
+  - domain: app.unibexs.com
+    type: PRIMARY
+
 envs:
   - key: SIGNOZ_INGESTION_KEY
     scope: RUN_TIME
     type: SECRET
 
+  # Plain value on the live app, not a secret - it is a public ingest endpoint.
   - key: SIGNOZ_ENDPOINT
+    scope: RUN_TIME
+    value: "https://ingest.eu2.signoz.cloud"
+
+  - key: AUTH_SECRET_KEY
     scope: RUN_TIME
     type: SECRET
 
 services:
-  - name: frontend
+  - name: unibexs-frontend-production
     image:
       deploy_on_push:
         enabled: false
