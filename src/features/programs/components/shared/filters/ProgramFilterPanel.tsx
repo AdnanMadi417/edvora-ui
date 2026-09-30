@@ -183,14 +183,14 @@ export default function ProgramFilterPanel({
         />
       </div>
 
-      <div className="flex items-center gap-3 sm:contents">
-        <div className="relative" ref={ref}>
+      <div className="flex items-center gap-4 sm:contents">
+        <div className="relative flex-1 sm:flex-none" ref={ref}>
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-haspopup="true"
-            className={`relative flex h-10 shrink-0 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition ${
+            className={`relative flex h-10 w-full items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition sm:w-auto ${
               open
                 ? "border-blue-300 bg-blue-50 text-blue-700"
                 : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
