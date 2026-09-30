@@ -46,6 +46,9 @@ export interface Scholarship {
 export interface Commission {
   amount: number | null;
   currency?: string | null;
+  // commission_types.id of the program's current commission (or the
+  // university default it inherits).
+  type_id?: string | null;
   type: string | null;
   notes: string | null;
   expected_commission_from: string;

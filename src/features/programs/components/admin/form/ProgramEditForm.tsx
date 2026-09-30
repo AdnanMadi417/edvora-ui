@@ -214,7 +214,10 @@ const EditKnowledgeHubProgramDetails = ({
       // Upper-cased so a legacy "rm"/"usd" row still matches the select
       // options (UBX-395) -- an unmatched value used to render as USD.
       commission_currency: normalizeCommissionCurrency(program.commission_currency),
-      commission_type_id: String(commissionTypes[0]?.id || ""),
+      // The program's own commission type. Seeding this from the first type
+      // in the list meant every save reset the type of any program that used
+      // a different one; the first type is only a fallback for "none set".
+      commission_type_id: String(commission?.type_id || commissionTypes[0]?.id || ""),
       commission_notes: commission?.notes ?? "",
       expected_commission_from: commission?.expected_commission_from ?? "",
       expected_commission_to: commission?.expected_commission_to ?? "",
@@ -236,9 +239,9 @@ const EditKnowledgeHubProgramDetails = ({
   }, [program, commission]);
 
   useEffect(() => {
-    // Only backfills once the real baseline has loaded — if commissionTypes
-    // resolves first, the initial-load effect above already reads
-    // commissionTypes[0]?.id directly, so there's nothing to reconcile;
+    // Only backfills a program with no commission type of its own, and only
+    // once the real baseline has loaded — if commissionTypes resolves first,
+    // the initial-load effect above already falls back to commissionTypes[0];
     // touching initialFormData here while it's still null would fake a
     // loaded baseline and defeat useIsFormDirty's "not ready yet" guard.
     if (commissionTypes.length > 0 && initialFormData && !initialFormData.commission_type_id) {
