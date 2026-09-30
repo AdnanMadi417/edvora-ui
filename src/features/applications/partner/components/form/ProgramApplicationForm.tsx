@@ -477,7 +477,7 @@ export default function StudentRegistrationForm() {
                   {index < visibleStages.length - 1 && (
                     <div className="absolute left-1/2 top-6 -z-10 hidden h-1 w-full bg-slate-200 sm:block">
                       <div
-                        className={`h-full rounded-md transition-all duration-300 ${
+                        className={`h-full rounded-full transition-all duration-300 ${
                           isCompleted ? "w-full bg-blue-500" : "w-0"
                         }`}
                       />

@@ -40,7 +40,7 @@ export default function StageReview({
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition">
         <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">
           <Building2 className="h-4 w-4 text-blue-600" />
           <h5 className="text-sm font-semibold text-slate-800 md:text-base">
@@ -86,7 +86,7 @@ export default function StageReview({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition">
         <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">
           <User className="h-4 w-4 text-blue-600" />
           <h5 className="text-sm font-semibold text-slate-800 md:text-base">
@@ -182,7 +182,7 @@ export default function StageReview({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition">
         <div className="flex items-center gap-2 border-b border-slate-100 bg-blue-50 px-5 py-4">
           <FileText className="h-4 w-4 text-blue-600" />
           <h5 className="text-sm font-semibold text-slate-800 md:text-base">
