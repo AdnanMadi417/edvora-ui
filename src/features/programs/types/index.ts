@@ -46,6 +46,9 @@ export interface Scholarship {
 export interface Commission {
   amount: number | null;
   currency?: string | null;
+  // commission_types.id of the program's current commission (or the
+  // university default it inherits).
+  type_id?: string | null;
   type: string | null;
   notes: string | null;
   expected_commission_from: string;
@@ -124,6 +127,10 @@ export interface Program {
 
   // Hidden programs drop out of the default list but stay viewable/editable by id.
   is_hidden: boolean;
+
+  // Echo back as expected_updated_at on update: the API rejects the save
+  // with 409 program_modified if the program changed after it was loaded.
+  updated_at?: string | null;
 
   required_documents?: {
     id: string;
@@ -249,6 +256,12 @@ export interface UpdateProgramPayload {
     conditions: string[];
   }>;
 }
+
+// What the edit form actually sends: only the fields that changed, plus the
+// updated_at it loaded so a save can't overwrite someone else's newer change.
+export type UpdateProgramRequest = Partial<UpdateProgramPayload> & {
+  expected_updated_at?: string | null;
+};
 
 // PUT /knowledge-hub/programs/{id} is a partial update — sending only this
 // leaves every other field untouched.

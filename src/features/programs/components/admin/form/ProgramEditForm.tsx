@@ -19,6 +19,7 @@ import {
 
 import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
 import { normalizeCommissionCurrency } from 'features/programs/utils/commissionCurrency';
+import { pickChangedFields } from 'features/programs/utils/changedFields';
 
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -59,6 +60,17 @@ const toScholarshipTypeInt = (t: any): number | null => {
   if (typeof t === "string") return SCHOLARSHIP_TYPE_MAP[t.toLowerCase()] ?? null;
   return null;
 };
+
+// Saved together as one versioned Commission row by the API, so a change to
+// any of them sends all of them (see handleUpdate).
+const COMMISSION_FIELDS: ReadonlyArray<keyof UpdateProgramPayload> = [
+  'commission_amount',
+  'commission_currency',
+  'commission_type_id',
+  'commission_notes',
+  'expected_commission_from',
+  'expected_commission_to',
+];
 
 type SectionKey = 'details' | 'university' | 'fees' | 'intakes' | 'scholarship';
 
@@ -214,7 +226,10 @@ const EditKnowledgeHubProgramDetails = ({
       // Upper-cased so a legacy "rm"/"usd" row still matches the select
       // options (UBX-395) -- an unmatched value used to render as USD.
       commission_currency: normalizeCommissionCurrency(program.commission_currency),
-      commission_type_id: String(commissionTypes[0]?.id || ""),
+      // The program's own commission type. Seeding this from the first type
+      // in the list meant every save reset the type of any program that used
+      // a different one; the first type is only a fallback for "none set".
+      commission_type_id: String(commission?.type_id || commissionTypes[0]?.id || ""),
       commission_notes: commission?.notes ?? "",
       expected_commission_from: commission?.expected_commission_from ?? "",
       expected_commission_to: commission?.expected_commission_to ?? "",
@@ -236,9 +251,9 @@ const EditKnowledgeHubProgramDetails = ({
   }, [program, commission]);
 
   useEffect(() => {
-    // Only backfills once the real baseline has loaded — if commissionTypes
-    // resolves first, the initial-load effect above already reads
-    // commissionTypes[0]?.id directly, so there's nothing to reconcile;
+    // Only backfills a program with no commission type of its own, and only
+    // once the real baseline has loaded — if commissionTypes resolves first,
+    // the initial-load effect above already falls back to commissionTypes[0];
     // touching initialFormData here while it's still null would fake a
     // loaded baseline and defeat useIsFormDirty's "not ready yet" guard.
     if (commissionTypes.length > 0 && initialFormData && !initialFormData.commission_type_id) {
@@ -258,6 +273,75 @@ const EditKnowledgeHubProgramDetails = ({
     }
   };
 
+  // Normalised request shape for a given form state. Built for both the
+  // current form and the loaded baseline so the diff in handleUpdate compares
+  // like with like (trimmed strings, numbers, recomputed course_type).
+  const buildPayload = (data: any): UpdateProgramPayload => {
+    const qualification = qualifications?.find((q) => String(q.id) === String(data.qualification_id));
+    return {
+      uni_id: String(data.uni_id),
+      branch_id: String(data.branch_id),
+      field_of_study_id: String(data.field_of_study_id),
+
+      name: String(data.name || "").trim(),
+      overview: String(data.overview || "").trim(),
+      curriculum: String(data.curriculum || "").trim(),
+
+      tuition_fee: Number(data.tuition_fee) || 0,
+      duration: Number(data.duration) || 0,
+      english_required_score: String(data.english_required_score || ""),
+
+      is_on_campus: Boolean(data.is_on_campus),
+      is_online: Boolean(data.is_online),
+      has_scholarship: Boolean(data.has_scholarship),
+
+      commission_amount: Number(data.commission_amount) || 0,
+      commission_currency: normalizeCommissionCurrency(data.commission_currency),
+      commission_type_id: String(data.commission_type_id || commissionTypes[0]?.id || ""),
+      commission_notes: String(data.commission_notes || ""),
+      expected_commission_from: data.expected_commission_from ? Number(data.expected_commission_from) : null,
+      expected_commission_to: data.expected_commission_to ? Number(data.expected_commission_to) : null,
+
+      qualification_id: String(data.qualification_id),
+      // Recomputed from the current qualification rather than trusted
+      // as-is — guards against a stale pairing surviving a qualification change.
+      course_type: isMasterOrPhd(qualification?.name) ? data.course_type : null,
+
+      intake_months: Array.isArray(data.intake_months)
+        ? data.intake_months.filter((m: number) => m != null)
+        : [],
+
+      yearly_fee_currency: data.yearly_fee_currency || "MYR",
+      yearly_fees: Array.isArray(data.yearly_fees)
+        ? data.yearly_fees.map((f: any) => ({
+          year: Number(f.year) || 0,
+          fee: Number(f.fee) || 0,
+        }))
+        : [],
+
+      one_time_fees: Array.isArray(data.one_time_fees)
+        ? data.one_time_fees.map((f: any) => ({
+          description: String(f.description || ""),
+          fee: Number(f.fee) || 0,
+          currency: f.currency || "MYR",
+        }))
+        : [],
+
+      scholarships: data.has_scholarship
+        ? Array.isArray(data.scholarships)
+          ? data.scholarships.map((s: any) => ({
+            type: toScholarshipTypeInt(s.type),
+            coverage_percent: Number(s.coverage_percent) || 0,
+            max_amount: Number(s.max_amount) || 0,
+            name: String(s.name || ""),
+            description: String(s.description || ""),
+            conditions: Array.isArray(s.conditions) ? s.conditions : [],
+          }))
+          : []
+        : [],
+    };
+  };
+
   const handleUpdate = async () => {
     const { isValid, errors: validationErrors } = validateProgram(formData as ProgramFormData);
     if (!isValid) {
@@ -267,70 +351,22 @@ const EditKnowledgeHubProgramDetails = ({
       return;
     }
     try {
-      const payload: UpdateProgramPayload = {
-        uni_id: String(formData.uni_id),
-        branch_id: String(formData.branch_id),
-        field_of_study_id: String(formData.field_of_study_id),
+      // Send only what the user changed, so a save can't write back fields
+      // they never touched over a colleague's newer edit. The commission is
+      // one versioned row on the backend, so its fields go as a unit.
+      const current = buildPayload(formData);
+      const changes = initialFormData
+        ? pickChangedFields(current, buildPayload(initialFormData), [COMMISSION_FIELDS])
+        : current;
 
-        name: String(formData.name || "").trim(),
-        overview: String(formData.overview || "").trim(),
-        curriculum: String(formData.curriculum || "").trim(),
+      if (Object.keys(changes).length === 0) {
+        showToast("No changes to save.", "info");
+        return;
+      }
 
-        tuition_fee: Number(formData.tuition_fee) || 0,
-        duration: Number(formData.duration) || 0,
-        english_required_score: String(formData.english_required_score || ""),
-
-        is_on_campus: Boolean(formData.is_on_campus),
-        is_online: Boolean(formData.is_online),
-        has_scholarship: Boolean(formData.has_scholarship),
-
-        commission_amount: Number(formData.commission_amount) || 0,
-        commission_currency: normalizeCommissionCurrency(formData.commission_currency),
-        commission_type_id: String(formData.commission_type_id || commissionTypes[0]?.id || ""),
-        commission_notes: String(formData.commission_notes || ""),
-        expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
-        expected_commission_to: formData.expected_commission_to ? Number(formData.expected_commission_to) : null,
-
-        qualification_id: String(formData.qualification_id),
-        // Recomputed from the current qualification rather than trusted
-        // as-is — guards against a stale pairing surviving a qualification change.
-        course_type: isMasterOrPhd(selectedQualification?.name) ? formData.course_type : null,
-
-        intake_months: Array.isArray(formData.intake_months)
-          ? formData.intake_months.filter((m: number) => m != null)
-          : [],
-
-        yearly_fee_currency: formData.yearly_fee_currency || "MYR",
-        yearly_fees: Array.isArray(formData.yearly_fees)
-          ? formData.yearly_fees.map((f: any) => ({
-            year: Number(f.year) || 0,
-            fee: Number(f.fee) || 0,
-          }))
-          : [],
-
-        one_time_fees: Array.isArray(formData.one_time_fees)
-          ? formData.one_time_fees.map((f: any) => ({
-            description: String(f.description || ""),
-            fee: Number(f.fee) || 0,
-            currency: f.currency || "MYR",
-          }))
-          : [],
-
-        scholarships: formData.has_scholarship
-          ? Array.isArray(formData.scholarships)
-            ? formData.scholarships.map((s: any) => ({
-              type: toScholarshipTypeInt(s.type),
-              coverage_percent: Number(s.coverage_percent) || 0,
-              max_amount: Number(s.max_amount) || 0,
-              name: String(s.name || ""),
-              description: String(s.description || ""),
-              conditions: Array.isArray(s.conditions) ? s.conditions : [],
-            }))
-            : []
-          : [],
-      };
-
-      await updateProgram(id, payload);
+      // The API rejects the save with 409 program_modified if the program
+      // changed after this form loaded it, instead of overwriting that change.
+      await updateProgram(id, { ...changes, expected_updated_at: program?.updated_at ?? null });
 
       showToast("Program updated successfully", "success");
 
