@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "lib/useApi";
-
-interface User {
-  id: string;
-  partner_id: string;
-  name: string;
-  email: string;
-  role: string;
-}
+import { useMe } from "hooks/useMe";
 
 interface Program {
   id: string;
@@ -24,30 +17,39 @@ export interface University {
 }
 
 export function useUniversities() {
+  const { user, loading: userLoading, error: userError } = useMe();
+  const partnerId = user?.partner_id ?? null;
   const [universities, setUniversities] = useState<University[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // The partner id comes from the shared session instead of a second
+    // /auth/me call. Nothing to fetch until it is known.
+    if (!partnerId) {
+      if (userError) setError(userError);
+      return;
+    }
+    let cancelled = false;
     const fetchUniversities = async () => {
       setLoading(true);
       setError(null);
 
       try {
-        const userRes = await api.get("/auth/me");
-        const userData: User = userRes.data;
-
-        const uniRes = await api.get(`/partners/${userData.partner_id}/universities`);
-        setUniversities(uniRes.data.items || []);
+        const uniRes = await api.get(`/partners/${partnerId}/universities`);
+        if (!cancelled) setUniversities(uniRes.data.items || []);
       } catch (err: any) {
-        setError(err.message || "Failed to fetch universities");
+        if (!cancelled) setError(err.message || "Failed to fetch universities");
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchUniversities();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [partnerId, userError]);
 
-  return { universities, loading, error };
+  return { universities, loading: loading || userLoading, error };
 }

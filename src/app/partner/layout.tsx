@@ -15,6 +15,16 @@ import { usePartnerProfile } from "features/partners/hooks";
 const PARTNER_ROLES = ["partner"];
 
 export default function PartnerLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <RoleGuard allowedRoles={PARTNER_ROLES}>
+      <PartnerShell>{children}</PartnerShell>
+    </RoleGuard>
+  );
+}
+
+// Rendered inside RoleGuard so the partner profile comes from the shared
+// session (one /partners/profile per page) rather than a separate fetch.
+function PartnerShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const { partner } = usePartnerProfile();
@@ -28,39 +38,35 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
     : partnerRoutes.filter((route) => route.name !== "My Public Profile");
 
   return (
-    <RoleGuard allowedRoles={PARTNER_ROLES}>
-
-      <ToastProvider>
-        <PartnerOnboardingTour />
-        <div className="relative flex min-h-screen w-full bg-slate-50">
-          <div className="z-[60]">
-            <Sidebar
-              routes={visibleRoutes}
-              open={open}
-              setOpen={setOpen}
-              variant="admin"
-            />
-          </div>
-
-          <div className="relative h-full w-full dark:bg-navy-900">
-            <main className="mx-2.5 flex-none transition-all md:pr-2 xl:ml-[300px]">
-              <Navbar
-                onOpenSidenav={() => setOpen(!open)}
-                brandText={getActiveRoute(visibleRoutes, pathname)}
-                secondary={getActiveNavbar(visibleRoutes, pathname)}
-              />
-              <div className="mx-auto min-h-screen p-2 !pt-[10px] md:p-2">
-                {children}
-              </div>
-              <div className="p-3">
-                <Footer />
-              </div>
-            </main>
-
-          </div>
+    <ToastProvider>
+      <PartnerOnboardingTour />
+      <div className="relative flex min-h-screen w-full bg-slate-50">
+        <div className="z-[60]">
+          <Sidebar
+            routes={visibleRoutes}
+            open={open}
+            setOpen={setOpen}
+            variant="admin"
+          />
         </div>
-      </ToastProvider>
 
-    </RoleGuard>
+        <div className="relative h-full w-full dark:bg-navy-900">
+          <main className="mx-2.5 flex-none transition-all md:pr-2 xl:ml-[300px]">
+            <Navbar
+              onOpenSidenav={() => setOpen(!open)}
+              brandText={getActiveRoute(visibleRoutes, pathname)}
+              secondary={getActiveNavbar(visibleRoutes, pathname)}
+            />
+            <div className="mx-auto min-h-screen p-2 !pt-[10px] md:p-2">
+              {children}
+            </div>
+            <div className="p-3">
+              <Footer />
+            </div>
+          </main>
+
+        </div>
+      </div>
+    </ToastProvider>
   );
 }
