@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { logs, SeverityNumber } from "@opentelemetry/api-logs";
+import { jwtVerify } from "jose";
 
 /**
  * Receives best-effort client events (see lib/clientTelemetry.ts) and emits
@@ -64,6 +65,26 @@ function clientIp(req: NextRequest): string {
 
 type Primitive = string | number | boolean;
 
+type TokenState = "ok" | "missing" | "invalid" | "unverifiable";
+
+// Who sent the event, from the session cookie the browser attaches to this
+// same-origin request. The signature is checked with the same secret the
+// middleware uses, so `enduser.id` in the log is the real user id (the
+// token's `sub`), not something the client typed. The client-supplied
+// `*_hint` attributes are kept separately and are not verified.
+async function verifiedUser(req: NextRequest): Promise<{ id: string | null; token: TokenState }> {
+  const token = req.cookies.get("token")?.value;
+  if (!token) return { id: null, token: "missing" };
+  const secret = process.env.AUTH_SECRET_KEY;
+  if (!secret) return { id: null, token: "unverifiable" };
+  try {
+    const { payload } = await jwtVerify(token, new TextEncoder().encode(secret));
+    return typeof payload.sub === "string" && payload.sub ? { id: payload.sub, token: "ok" } : { id: null, token: "invalid" };
+  } catch {
+    return { id: null, token: "invalid" };
+  }
+}
+
 function sanitizeAttributes(input: unknown): Record<string, Primitive> {
   const out: Record<string, Primitive> = {};
   if (!input || typeof input !== "object") return out;
@@ -108,10 +129,13 @@ export async function POST(req: NextRequest) {
   }
 
   const attributes = sanitizeAttributes(body.attributes);
-  const record = {
+  const user = await verifiedUser(req);
+  const record: Record<string, Primitive> = {
     "event.name": name,
     "client.ip": ip,
     "user_agent.original": (req.headers.get("user-agent") ?? "").slice(0, MAX_VALUE_LENGTH),
+    "auth.token": user.token,
+    ...(user.id ? { "enduser.id": user.id } : {}),
     ...Object.fromEntries(Object.entries(attributes).map(([k, v]) => [`client.${k}`, v])),
   };
 

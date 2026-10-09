@@ -11,12 +11,34 @@ export type ClientEventName = "auth_guard_error_state" | "auth_loop_breaker_trip
 
 export type ClientEventAttributes = Record<string, string | number | boolean | null | undefined>;
 
+// Sign-in (features/auth/hooks/useSignIn.ts) stores these in localStorage.
+// They are sent as *_hint because the browser can edit them; the server
+// route adds the verified user id from the session cookie alongside.
+const HINT_KEYS: Array<[storageKey: string, attribute: string]> = [
+  ["partnerId", "partner_id_hint"],
+  ["userId", "user_id_hint"],
+  ["userRole", "role_hint"],
+];
+
+export function identityHints(): ClientEventAttributes {
+  const hints: ClientEventAttributes = {};
+  try {
+    for (const [storageKey, attribute] of HINT_KEYS) {
+      const value = localStorage.getItem(storageKey);
+      if (value) hints[attribute] = value;
+    }
+  } catch {
+    // Storage unavailable: no hints.
+  }
+  return hints;
+}
+
 export function reportClientEvent(name: ClientEventName, attributes: ClientEventAttributes = {}): void {
   if (typeof window === "undefined") return;
   const payload = {
     name,
     ts: Date.now(),
-    attributes: { path: window.location.pathname, ...attributes },
+    attributes: { path: window.location.pathname, ...identityHints(), ...attributes },
   };
   console.warn(`[client-event] ${name}`, payload.attributes);
   try {
