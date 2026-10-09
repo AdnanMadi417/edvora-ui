@@ -69,6 +69,7 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --write .",
     "test": "jest",
+    "check": "next lint && tsc --noEmit && jest --ci",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:watch": "jest --watch",
