@@ -11,6 +11,9 @@ definitions:
         script:
           - set +e
           - TEST_STATUS=success
+          # node:20-slim ships corepack but no pnpm; corepack installs the
+          # version pinned by "packageManager" in package.json.
+          - export COREPACK_ENABLE_DOWNLOAD_PROMPT=0 && corepack enable
           - pnpm install --frozen-lockfile
           - INSTALL_EXIT_CODE=$?
           - |
@@ -35,6 +38,7 @@ definitions:
     - step: &test-pr
         name: Test (pull request)
         script:
+          - export COREPACK_ENABLE_DOWNLOAD_PROMPT=0 && corepack enable
           - pnpm install --frozen-lockfile
           - pnpm run check
 
