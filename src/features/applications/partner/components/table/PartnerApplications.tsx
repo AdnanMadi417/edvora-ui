@@ -17,6 +17,7 @@ import PipelineCard from 'features/applications/partner/components/PipelineCard'
 
 import { useRouter } from 'next/navigation';
 import api from 'lib/useApi';
+import { useMe } from 'hooks/useMe';
 
 import EmptyData from 'components/emptyData/EmptyTableData';
 import Button from 'components/ui/buttons/Button';
@@ -59,6 +60,7 @@ const PartnerApplications = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  const { user } = useMe();
   const { universities } = useUniversities();
   const { stages } = useAllStages();
   const { stageStatuses, stageStatusesLoading } = useAllStageStatuses();
@@ -82,17 +84,16 @@ const PartnerApplications = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    const resolvePartner = async () => {
-      let id = localStorage.getItem('partnerId');
-      if (!id) {
-        const meRes = await api.get('/auth/me');
-        id = meRes.data.partner_id ?? meRes.data.id;
-        if (id) localStorage.setItem('partnerId', id);
-      }
-      if (id) setPartnerId(id);
-    };
-    resolvePartner();
-  }, []);
+    // The partner id comes from localStorage (set at sign-in) or the shared
+    // session, never from a fresh /auth/me call here.
+    let id: string | null = null;
+    try { id = localStorage.getItem('partnerId'); } catch { /* storage unavailable */ }
+    if (!id && user) {
+      id = user.partner_id ?? user.id ?? null;
+      if (id) { try { localStorage.setItem('partnerId', id); } catch { /* ignore */ } }
+    }
+    if (id) setPartnerId(id);
+  }, [user]);
 
   useEffect(() => {
     if (stages.length === 0 || !partnerId) return;

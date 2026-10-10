@@ -9,25 +9,19 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useEffect, useState, useCallback } from "react";
-import api from "lib/useApi";
+import { useMe } from "hooks/useMe";
 import { usePartnerProfile } from "features/partners/hooks";
 import { formatAgencyRole } from "features/partners/utils";
 import PresignedImage from "components/ui/PresignedImage";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  agency_role?: string | null;
-}
 
 function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
 
 
-  const [user, setUser] = useState<User | null>(null);
-  const [userError, setUserError] = useState(false);
+  // The session comes from the role layout's SessionProvider (via RoleGuard),
+  // so the sidebar no longer makes its own /auth/me call on every mount.
+  const { user, error: userFetchError } = useMe();
+  const userError = !!userFetchError;
   const [showBetaTooltip, setShowBetaTooltip] = useState(false);
   const { partner } = usePartnerProfile({ enabled: user?.role === "partner" });
   const isAgencyPartner = partner?.type === "agency";
@@ -53,20 +47,6 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
     account_manager: "/account-manager/profile",
   };
   const profilePath = user?.role ? PROFILE_PATHS[user.role] : undefined;
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get("/auth/me");
-        setUser(res.data);
-        setUserError(false);
-      } catch (err) {
-        console.error("Failed to fetch user", err);
-        setUserError(true);
-      }
-    };
-    fetchUser();
-  }, []);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

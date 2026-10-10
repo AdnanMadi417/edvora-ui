@@ -1,44 +1,56 @@
 import { useState, useEffect } from "react";
 import api from "lib/useApi";
+import { useSession, SessionUser, AgencyMembership } from "components/context/SessionContext";
 
-interface AgencyMembership {
-  agency_id: string;
-  agency_name: string;
+export type { AgencyMembership };
+export type User = SessionUser;
+
+interface MeState {
+  user: User | null;
+  loading: boolean;
+  error: string | null;
 }
 
-interface User {
-  id: string;
-  partner_id: string;
-  name: string;
-  email: string;
-  role: string;
-  has_completed_onboarding?: boolean;
-  agency_role?: string | null;
-  agency_membership?: AgencyMembership | null;
-}
+const FAILURE_MESSAGE: Record<string, string> = {
+  unauthenticated: "Your session has expired",
+  forbidden: "You are not allowed to access this page",
+  unavailable: "Failed to fetch user data",
+};
 
+/**
+ * The signed-in user. Inside a role layout this reads the shared session
+ * (one /auth/me per page, see SessionContext); outside one it falls back to
+ * fetching on its own so the hook keeps working anywhere.
+ */
 export function useMe() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const session = useSession();
+  const hasProvider = session !== null;
+  const [standalone, setStandalone] = useState<MeState>({ user: null, loading: false, error: null });
 
   useEffect(() => {
+    if (hasProvider) return;
+    let cancelled = false;
     const fetchUser = async () => {
-      setLoading(true);
-      setError(null);
-
+      setStandalone({ user: null, loading: true, error: null });
       try {
         const response = await api.get("/auth/me");
-        setUser(response.data); // store fetched user
+        if (!cancelled) setStandalone({ user: response.data, loading: false, error: null });
       } catch (err: any) {
-        setError(err.message || "Failed to fetch user data");
-      } finally {
-        setLoading(false);
+        if (!cancelled) setStandalone({ user: null, loading: false, error: err?.message || "Failed to fetch user data" });
       }
     };
-
     fetchUser();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [hasProvider]);
 
-  return { user, loading, error };
+  if (session) {
+    return {
+      user: session.user,
+      loading: session.status === "loading",
+      error: session.status === "ready" || session.status === "loading" ? null : FAILURE_MESSAGE[session.status] ?? "Failed to fetch user data",
+    };
+  }
+  return standalone;
 }

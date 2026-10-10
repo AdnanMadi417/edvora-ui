@@ -8,6 +8,8 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  // tsconfig baseUrl is src, so source files import e.g. "lib/useApi"; let jest (and jest.mock) resolve those too.
+  modulePaths: ['<rootDir>/src'],
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
     // Handle module aliases (this will be automatically configured for you based on your tsconfig.json paths)
@@ -19,7 +21,8 @@ const customJestConfig = {
     // Handle image imports
     '^.+\\.(png|jpg|jpeg|gif|webp|avif|ico|bmp|svg)$/i': '<rootDir>/__mocks__/fileMock.js',
   },
-  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
+  // tests/e2e holds Playwright specs, which jest cannot run.
+  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/tests/e2e/'],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
     '!src/**/*.d.ts',

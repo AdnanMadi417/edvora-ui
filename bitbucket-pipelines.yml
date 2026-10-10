@@ -11,16 +11,36 @@ definitions:
         script:
           - set +e
           - TEST_STATUS=success
+          # node:20-slim ships corepack but no pnpm; corepack installs the
+          # version pinned by "packageManager" in package.json.
+          - export COREPACK_ENABLE_DOWNLOAD_PROMPT=0 && corepack enable
           - pnpm install --frozen-lockfile
           - INSTALL_EXIT_CODE=$?
           - |
             if [ "$INSTALL_EXIT_CODE" -ne 0 ]; then
               TEST_STATUS=failure
             fi
-          - echo "No tests configured yet — skipping test run"
+          # Lint, type-check and unit tests (the "check" script in package.json).
+          # The Playwright specs in tests/e2e need a browser and a backend, so
+          # they are not part of this. The outcome is recorded for the Slack
+          # summary; the gate step at the end turns it into the build result.
+          - |
+            if [ "$TEST_STATUS" = "success" ]; then
+              pnpm run check || TEST_STATUS=failure
+            fi
           - echo "$TEST_STATUS" > test_status.txt
         artifacts:
           - test_status.txt
+
+    # Pull requests: same checks, but a failure fails the step immediately so
+    # the PR shows a red build and cannot be merged while it is red (with the
+    # "successful build" merge check enabled in the repository settings).
+    - step: &test-pr
+        name: Test (pull request)
+        script:
+          - export COREPACK_ENABLE_DOWNLOAD_PROMPT=0 && corepack enable
+          - pnpm install --frozen-lockfile
+          - pnpm run check
 
     - step: &build-and-push-staging
         name: Build and Push Docker Image (Staging)
@@ -345,7 +365,32 @@ definitions:
               WEBHOOK_URL: $WEBHOOK_URL
               MESSAGE: "$NOTIFY_MESSAGE"
 
+    - step: &gate-build-status
+        name: Gate on step statuses
+        script:
+          # Every step above runs with `set +e` and records its own outcome in a
+          # status file so the Slack step can report all of them together. The side
+          # effect is that a failed step still leaves the build green. This step turns
+          # those recorded statuses back into a real build result, and runs after the
+          # Slack notification so the summary is always delivered first.
+          - |
+            FAILED=""
+            for f in test_status.txt build_status.txt deploy_status.txt smoke_status.txt; do
+              if [ -f "$f" ] && [ "$(cat "$f")" = "failure" ]; then
+                FAILED="$FAILED $f"
+              fi
+            done
+            if [ -n "$FAILED" ]; then
+              echo "Failed steps:$FAILED"
+              exit 1
+            fi
+            echo "All steps reported success."
+
 pipelines:
+  pull-requests:
+    '**':
+      - step: *test-pr
+
   branches:
     release/staging:
       - step: *test
@@ -353,6 +398,7 @@ pipelines:
       - step: *deploy-staging
       - step: *smoke-test-staging
       - step: *notify-slack-staging
+      - step: *gate-build-status
 
     release/prod:
       - step: *test
@@ -360,23 +406,10 @@ pipelines:
       - step: *deploy-prod
       - step: *smoke-test-prod
       - step: *notify-slack-prod
+      - step: *gate-build-status
 
     main:
-      - step:
-          name: Test
-          script:
-            - set +e
-            - TEST_STATUS=success
-            - pnpm install --frozen-lockfile
-            - INSTALL_EXIT_CODE=$?
-            - |
-              if [ "$INSTALL_EXIT_CODE" -ne 0 ]; then
-                TEST_STATUS=failure
-              fi
-            - echo "No tests configured yet — skipping test run"
-            - echo "$TEST_STATUS" > test_status.txt
-          artifacts:
-            - test_status.txt
+      - step: *test
       - step:
           name: Notify Slack
           script:
@@ -394,3 +427,4 @@ pipelines:
               variables:
                 WEBHOOK_URL: $WEBHOOK_URL
                 MESSAGE: "$NOTIFY_MESSAGE"
+      - step: *gate-build-status
