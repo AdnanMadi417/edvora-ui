@@ -157,6 +157,10 @@ module.exports = {
         accent: 'var(--accent-color)',
         'accent-light': 'var(--accent-light)',
 
+        // WhatsApp brand green (official dark shade; white icon on it passes
+        // the 3:1 non-text contrast rule, the bright #25D366 does not).
+        whatsapp: { DEFAULT: '#128C7E', dark: '#075E54' },
+
         success: 'var(--success-color)',
         failed: 'var(--failed-color)',
         'failed-hover': 'var(--failed-color-hover)',
