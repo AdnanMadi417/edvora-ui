@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { ArrowRight, ArrowLeft, Award, Send, GraduationCap } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Award, Send, GraduationCap, AlertCircle } from 'lucide-react';
 import PresignedImage from "components/ui/PresignedImage";
 
 import Loading from "components/loading/Loading";
 import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import EmptyData from "components/emptyData/EmptyData";
+import CatalogueQuotaNotice from "features/programs/components/shared/CatalogueQuotaNotice";
 
 import { usePrograms, useStates } from "features/programs/hooks";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
@@ -89,6 +91,8 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
     loading: programsLoading,
     isFetching: programsFetching,
     error: programsError,
+    quota: programsQuota,
+    refetch: refetchPrograms,
   } = usePrograms({
     search: debouncedSearch || undefined,
     field_of_study_id: selectedField !== "all" ? selectedField : undefined,
@@ -188,6 +192,27 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
 
         <div className="block">
           {programsLoading && <Loading text="Fetching programs data..." />}
+
+          {/* The partner's daily catalogue quota is used up (UBX-425): a limit, not a failure. */}
+          {programsQuota && !programsLoading && <CatalogueQuotaNotice quota={programsQuota} />}
+
+          {programsError && !programsQuota && !programsLoading && (
+            <EmptyData
+              icon={AlertCircle}
+              color="red"
+              title="Couldn't load programs"
+              subtitle={programsError}
+              action={
+                <button
+                  type="button"
+                  onClick={refetchPrograms}
+                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                >
+                  Try again
+                </button>
+              }
+            />
+          )}
 
           {!programsError &&
             !programsLoading &&

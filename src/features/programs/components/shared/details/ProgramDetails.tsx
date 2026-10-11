@@ -32,6 +32,7 @@ import { getIeltsLabel } from "constants/lists";
 
 import Link from "next/link";
 import Loading from "components/loading/Loading";
+import CatalogueQuotaNotice from "features/programs/components/shared/CatalogueQuotaNotice";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import RichTextDisplay from "components/ui/RichTextDisplay";
@@ -152,7 +153,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
   const router = useRouter();
   const handleBack = () => router.push(`${basePath}/knowledge-hub/`);
 
-  const { program, requiredDocuments, commission, exchangeRates, loading, error } = useProgram(id);
+  const { program, requiredDocuments, commission, exchangeRates, loading, error, quota } = useProgram(id);
   const [copied, setCopied] = useState(false);
   const [isCopyOpen, setIsCopyOpen] = useState(false);
   const [currency, setCurrency] = useState<string | null>(null);
@@ -283,6 +284,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
   };
 
   if (loading) return <Loading text="Loading program details..." />;
+  if (quota) return <CatalogueQuotaNotice quota={quota} />;
   if (error || !program) return <div className="mt-10 text-center text-sm text-slate-500">{error ?? "Program not found."}</div>;
 
   return (
