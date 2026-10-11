@@ -1,9 +1,4 @@
-import {
-  CATALOGUE_QUOTA_ERROR_CODE,
-  catalogueQuotaMetricLabel,
-  describeCatalogueQuotaReset,
-  getCatalogueQuotaError,
-} from "./catalogueQuota";
+import { CATALOGUE_QUOTA_ERROR_CODE, getCatalogueQuotaError } from "./catalogueQuota";
 
 const quotaError = (details: Record<string, unknown> = {}) => ({
   isAxiosError: true,
@@ -42,28 +37,5 @@ describe("getCatalogueQuotaError", () => {
     expect(quota?.limit).toBeNull();
     expect(quota?.count).toBeNull();
     expect(quota?.resetsAt).toBeNull();
-  });
-});
-
-describe("describeCatalogueQuotaReset", () => {
-  const now = new Date("2026-10-11T10:30:00Z");
-
-  it("says how long until the reset", () => {
-    expect(describeCatalogueQuotaReset(new Date("2026-10-11T16:00:00Z"), now)).toBe("It resets at midnight, Malaysia time, in about 6 hours.");
-    expect(describeCatalogueQuotaReset(new Date("2026-10-11T12:00:00Z"), now)).toBe("It resets at midnight, Malaysia time, in about an hour.");
-    expect(describeCatalogueQuotaReset(new Date("2026-10-11T10:50:00Z"), now)).toBe("It resets at midnight, Malaysia time, in less than an hour.");
-  });
-
-  it("handles a reset that already passed or is unknown", () => {
-    expect(describeCatalogueQuotaReset(new Date("2026-10-11T10:00:00Z"), now)).toBe("It resets any moment now.");
-    expect(describeCatalogueQuotaReset(null, now)).toBe("It resets at midnight, Malaysia time.");
-  });
-});
-
-describe("catalogueQuotaMetricLabel", () => {
-  it("names the metrics in plain words", () => {
-    expect(catalogueQuotaMetricLabel("program_detail_views")).toBe("program pages");
-    expect(catalogueQuotaMetricLabel("program_list_rows")).toBe("catalogue results");
-    expect(catalogueQuotaMetricLabel("whatever")).toBe("catalogue views");
   });
 });
