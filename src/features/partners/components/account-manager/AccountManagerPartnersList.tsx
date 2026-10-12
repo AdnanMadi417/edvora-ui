@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-  ChevronRight, Users, Mail, BadgeCheck,
+  ChevronRight, Users, Mail, BadgeCheck, Building2,
   CheckCircle, XCircle, RefreshCw, FileText, CalendarDays, Share2, Handshake,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -24,7 +24,8 @@ export default function AccountManagerPartnersList() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
+      // Trim so a pasted email with a stray space still matches.
+      setDebouncedSearch(searchTerm.trim());
       setCurrentPage(1);
     }, 400);
     return () => clearTimeout(t);
@@ -78,7 +79,7 @@ export default function AccountManagerPartnersList() {
           {isRefetching && (
             <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
           )}
-          {searchTerm !== "" && (
+          {searchTerm.trim() !== "" && (
             <Button
               onClick={clearFilters}
               icon={<RefreshCw className="h-4 w-4" />}
@@ -141,10 +142,10 @@ export default function AccountManagerPartnersList() {
                 <TableEmptyRow
                   colSpan={6}
                   title="No partners found"
-                  subtitle={searchTerm ? "Try adjusting your search." : "You don't have any assigned partners yet."}
+                  subtitle={searchTerm.trim() ? "Try adjusting your search." : "You don't have any assigned partners yet."}
                   icon={<Handshake className="h-8 w-8 text-slate-400" />}
                   action={
-                    searchTerm ? (
+                    searchTerm.trim() ? (
                       <Button
                         onClick={clearFilters}
                         icon={<RefreshCw className="h-3.5 w-3.5" />}
@@ -200,6 +201,11 @@ export default function AccountManagerPartnersList() {
                       )}
                       {partner.is_shared && (
                         <StatusBadge variant="info" icon={<Share2 className="h-3 w-3" />}>Shared</StatusBadge>
+                      )}
+                      {partner.agency_membership && (
+                        <StatusBadge variant="info" icon={<Building2 className="h-3 w-3" />}>
+                          Member of {partner.agency_membership.agency_name}
+                        </StatusBadge>
                       )}
                     </div>
                   </td>

@@ -85,7 +85,8 @@ export default function ReviewerPartnersTable() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
+      // Trim so a pasted email with a stray space still matches.
+      setDebouncedSearch(searchTerm.trim());
       setCurrentPage(1);
     }, 400);
     return () => clearTimeout(t);
@@ -122,15 +123,20 @@ export default function ReviewerPartnersTable() {
     ? (currentPage - 1) * ITEMS_PER_PAGE + partners.length
     : total;
 
+  // The stats card is a real filter too: it narrows every search, so it has
+  // to count here and be reset by Clear, or a search can come back empty
+  // with no visible reason.
   const activeFiltersCount = [
     selectedManager !== "all",
-    searchTerm !== "",
+    searchTerm.trim() !== "",
+    selectedStatus !== null,
   ].filter(Boolean).length;
 
   const clearFilters = () => {
     setSearchTerm("");
     setDebouncedSearch("");
     setSelectedManager("all");
+    setSelectedStatus(null);
     setCurrentPage(1);
   };
 
@@ -354,13 +360,20 @@ export default function ReviewerPartnersTable() {
                   </td>
 
                   <td className="px-6 py-4">
-                    {isPending ? (
-                      <StatusBadge variant="warning" icon={<Clock className="h-3 w-3" />}>Pending Review</StatusBadge>
-                    ) : partner.is_active ? (
-                      <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
-                    ) : (
-                      <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
-                    )}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {isPending ? (
+                        <StatusBadge variant="warning" icon={<Clock className="h-3 w-3" />}>Pending Review</StatusBadge>
+                      ) : partner.is_active ? (
+                        <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
+                      ) : (
+                        <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
+                      )}
+                      {partner.agency_membership && (
+                        <StatusBadge variant="info" icon={<Building2 className="h-3 w-3" />}>
+                          Member of {partner.agency_membership.agency_name}
+                        </StatusBadge>
+                      )}
+                    </div>
                   </td>
 
                   <td className="hidden px-6 py-4 lg:table-cell">
