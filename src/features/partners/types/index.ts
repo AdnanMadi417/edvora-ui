@@ -55,6 +55,10 @@ export type Partner = {
   created_at: string;
   updated_at: string;
   last_login: string | null;
+  /** "admin" for an agency, "member" for an individual linked under one, null when independent. */
+  agency_role?: "admin" | "member" | null;
+  /** Set only when agency_role is "member" — the agency this partner belongs to. */
+  agency_membership?: AgencyMembership | null;
 };
 
 export interface AgencyMembership {
@@ -153,6 +157,10 @@ export type AccountManagerPartnerListItem = {
   updated_at: string;
   /** True when the signed-in manager reaches this partner through a share, not as primary — UBX-324. */
   is_shared?: boolean;
+  /** "admin" for an agency, "member" for an individual linked under one, null when independent. */
+  agency_role?: "admin" | "member" | null;
+  /** Set only when agency_role is "member" — the agency this partner belongs to. */
+  agency_membership?: AgencyMembership | null;
 };
 
 export type AccountManagerPartnerDetails = {

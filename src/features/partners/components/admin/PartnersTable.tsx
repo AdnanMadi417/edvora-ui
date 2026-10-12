@@ -99,7 +99,8 @@ export default function PartnersTable() {
 
   useEffect(() => {
     const t = setTimeout(() => {
-      setDebouncedSearch(searchTerm);
+      // Trim so a pasted email with a stray space still matches.
+      setDebouncedSearch(searchTerm.trim());
       setCurrentPage(1);
     }, 400);
     return () => clearTimeout(t);
@@ -136,9 +137,13 @@ export default function PartnersTable() {
     ? (currentPage - 1) * ITEMS_PER_PAGE + partners.length
     : total;
 
+  // The stats card is a real filter too: it narrows every search, so it has
+  // to count here and be reset by Clear, or a search can come back empty
+  // with no visible reason.
   const activeFiltersCount = [
     selectedManager !== "all",
-    searchTerm !== "",
+    searchTerm.trim() !== "",
+    selectedStatus !== null,
   ].filter(Boolean).length;
 
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
@@ -147,6 +152,7 @@ export default function PartnersTable() {
     setSearchTerm("");
     setDebouncedSearch("");
     setSelectedManager("all");
+    setSelectedStatus(null);
     setCurrentPage(1);
   };
 
@@ -437,6 +443,11 @@ export default function PartnersTable() {
                           <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                         ) : (
                           <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
+                        )}
+                        {partner.agency_membership && (
+                          <StatusBadge variant="info" icon={<Building2 className="h-3 w-3" />}>
+                            Member of {partner.agency_membership.agency_name}
+                          </StatusBadge>
                         )}
                       </div>
                     </td>

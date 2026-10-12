@@ -18,20 +18,31 @@ export function useAccountManagerPartners(params: UseAccountManagerPartnersParam
   const refetch = () => setRefetchCounter((c) => c + 1);
 
   useEffect(() => {
+    // Only the latest request may touch state. Without this, a slower
+    // response for an earlier search term could land after the newer one
+    // and overwrite it with stale rows.
+    const controller = new AbortController();
+    let stale = false;
     const fetch = async () => {
       setLoading(true);
       setError('');
       try {
-        const res = await partnersApi.listForAccountManager(params);
+        const res = await partnersApi.listForAccountManager(params, controller.signal);
+        if (stale) return;
         setPartners(res.data?.items ?? []);
         setTotal(res.data?.total ?? 0);
       } catch {
+        if (stale) return;
         setError('Failed to fetch partners');
       } finally {
-        setLoading(false);
+        if (!stale) setLoading(false);
       }
     };
     fetch();
+    return () => {
+      stale = true;
+      controller.abort();
+    };
   }, [JSON.stringify(params), refetchCounter]);
 
   return { partners, total, loading, error, refetch };

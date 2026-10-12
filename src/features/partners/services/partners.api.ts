@@ -25,7 +25,7 @@ export const partnersApi = {
     assigned_manager_id?: string;
     /** Primary OR shared access (UBX-324); assigned_manager_id stays primary-only. */
     manager_id?: string;
-  }) => api.get('/admin/partners', { params, headers: authHeader() }),
+  }, signal?: AbortSignal) => api.get('/admin/partners', { params, headers: authHeader(), signal }),
 
   get: (id: string) =>
     api.get(`/admin/partners/${id}`, { headers: authHeader() }),
@@ -102,8 +102,8 @@ export const partnersApi = {
   }) => api.get('/admin/partners/register/pending-otps', { params, headers: authHeader() }),
 
   // Account-manager-scoped: only the AM's own assigned partners (AM identified via Bearer token)
-  listForAccountManager: (params?: { limit?: number; offset?: number; search?: string }) =>
-    api.get('/account-managers/partners', { params, headers: authHeader() }),
+  listForAccountManager: (params?: { limit?: number; offset?: number; search?: string }, signal?: AbortSignal) =>
+    api.get('/account-managers/partners', { params, headers: authHeader(), signal }),
 
   getForAccountManager: (id: string) =>
     api.get(`/account-managers/partners/${id}`, { headers: authHeader() }),
