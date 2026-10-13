@@ -1,0 +1,1 @@
+export { partnerBankAccountsApi } from './bankAccountsApi';
