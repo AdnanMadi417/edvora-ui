@@ -10,6 +10,7 @@ import {
   Layers,
   CreditCard,
   Banknote,
+  Wallet,
   Truck,
   Building2,
   Tag,
@@ -35,6 +36,26 @@ const AdminRoutes: IRoute[] = [
     layout: "/admin",
     path: "/partners",
     icon: Handshake,
+    children: [
+      {
+        name: "Partners",
+        layout: "/admin",
+        path: "/partners",
+        icon: Handshake,
+      },
+      {
+        name: "Banks",
+        layout: "/admin/partners",
+        path: "/banks",
+        icon: Banknote,
+      },
+      {
+        name: "Bank Accounts",
+        layout: "/admin/partners",
+        path: "/bank-accounts",
+        icon: Wallet,
+      },
+    ],
   },
   {
     name: "Account Managers",
@@ -83,12 +104,6 @@ const AdminRoutes: IRoute[] = [
         layout: "/admin/config-universities",
         path: "/payment-methods",
         icon: CreditCard,
-      },
-      {
-        name: "Banks",
-        layout: "/admin/config-universities",
-        path: "/banks",
-        icon: Banknote,
       },
     ],
   },

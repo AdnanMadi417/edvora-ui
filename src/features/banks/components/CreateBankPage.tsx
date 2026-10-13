@@ -47,7 +47,7 @@ function validateName(value: string): string {
 // Add-a-bank page — admin/data-entry only. Adds a new entry to the Banks
 // reference list (GET /banks, used to populate the bank picker on a
 // partner's account form).
-export default function CreateBankPage({ basePath = "/admin/config-universities/banks" }: Props) {
+export default function CreateBankPage({ basePath = "/admin/partners/banks" }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const { createBank, loading } = useCreateBank();

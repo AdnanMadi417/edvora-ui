@@ -52,7 +52,7 @@ function validateName(value: string): string {
 // a bank is toggling is_active here: there's no delete endpoint, the DB
 // RESTRICTs deleting a bank that still has partner_bank_accounts pointing
 // at it).
-export default function EditBankDetails({ id, basePath = "/admin/config-universities/banks" }: Props) {
+export default function EditBankDetails({ id, basePath = "/admin/partners/banks" }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const { bank, loading: loadingBank } = useBank(id);

@@ -46,6 +46,7 @@ import { Tabs, type TabItem } from "components/ui/tabs";
 import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import PartnerApplicationsTable from "./PartnerApplicationsTable";
 import AdditionalManagersSection from "./AdditionalManagersSection";
+import { PartnerBankAccountSection } from "features/partners/bank-accounts";
 import { parseDate, formatDate } from "components/ui/date/utils";
 
 interface Props {
@@ -362,6 +363,9 @@ export default function PartnerDetails({ id }: Props) {
 
         {/* Additional (shared) managers — UBX-324 */}
         <AdditionalManagersSection partner={partner} accountManagers={accountManagers} onChanged={refetch} />
+
+        {/* Payout bank account */}
+        <PartnerBankAccountSection partner={partner} />
 
         {/* Individual Details */}
         {isIndividual && (

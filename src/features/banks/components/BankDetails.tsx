@@ -28,7 +28,7 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
 
 // View page for a single bank. There's no GET /banks/{id} endpoint — useBank
 // finds the record within the already-fetched list (see hooks/useBank.ts).
-export default function BankDetails({ id, basePath = "/admin/config-universities/banks" }: Props) {
+export default function BankDetails({ id, basePath = "/admin/partners/banks" }: Props) {
   const router = useRouter();
   const { bank, loading } = useBank(id);
 
