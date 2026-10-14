@@ -7,6 +7,7 @@ import {
   ShieldCheck, CheckCircle, XCircle, Ban, Power, Clock, Handshake,
   SlidersHorizontal, Building2, User,
 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { AppDate } from "components/ui/date";
 import { StatusBadge } from "components/ui/badges";
 import { usePartners, useUpdatePartner } from "features/partners/hooks";
@@ -19,6 +20,7 @@ import StatsFilterCards, { type FilterCardItem } from "components/filters/StatsF
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
@@ -317,10 +319,11 @@ export default function ReviewerPartnersTable() {
               />
             )}
 
+            <AnimatePresence>
             {!isInitialLoad && !error && partners.map((partner) => {
               const isPending = !partner.is_verified && !partner.is_active;
               return (
-                <tr
+                <AnimatedTableRow
                   key={partner.id}
                   className="cursor-pointer transition-colors hover:bg-slate-100/50"
                   onClick={() => router.push(`/reviewer/partners/${partner.id}`)}
@@ -414,9 +417,10 @@ export default function ReviewerPartnersTable() {
                       />
                     </div>
                   </td>
-                </tr>
+                </AnimatedTableRow>
               );
             })}
+            </AnimatePresence>
           </tbody>
         </table>
       </TableWrapper>

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
 import {
   ChevronRight, Users, Mail, BadgeCheck,
   CheckCircle, XCircle, RefreshCw, SlidersHorizontal, Handshake,
@@ -10,6 +11,7 @@ import { usePartners } from "features/partners/hooks";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { StatusBadge } from "components/ui/badges";
 import PresignedImage from "components/ui/PresignedImage";
 import Button from "components/ui/buttons/Button";
@@ -215,8 +217,9 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
                 />
               )}
 
+              <AnimatePresence>
               {!isInitialLoad && !error && partners.map((partner) => (
-                <tr
+                <AnimatedTableRow
                   key={partner.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-50/50"
                   onClick={() => router.push(`/reviewer/partners/${partner.id}`)}
@@ -255,8 +258,9 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
                   <td className="px-4 py-4">
                     <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
-                </tr>
+                </AnimatedTableRow>
               ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </TableWrapper>

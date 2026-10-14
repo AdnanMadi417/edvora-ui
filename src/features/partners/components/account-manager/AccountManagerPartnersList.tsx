@@ -6,9 +6,11 @@ import {
   CheckCircle, XCircle, RefreshCw, FileText, CalendarDays, Share2, Handshake,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
 import { useAccountManagerPartners } from "features/partners/hooks";
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { AppDate } from "components/ui/date";
 import { StatusBadge } from "components/ui/badges";
 import Button from "components/ui/buttons/Button";
@@ -162,8 +164,9 @@ export default function AccountManagerPartnersList() {
                 />
               )}
 
+              <AnimatePresence>
               {!isInitialLoad && !error && partners.map((partner) => (
-                <tr
+                <AnimatedTableRow
                   key={partner.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                   onClick={() => router.push(`/account-manager/partners/${partner.id}`)}
@@ -219,8 +222,9 @@ export default function AccountManagerPartnersList() {
                   <td className="px-4 py-4">
                     <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
-                </tr>
+                </AnimatedTableRow>
               ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </TableWrapper>

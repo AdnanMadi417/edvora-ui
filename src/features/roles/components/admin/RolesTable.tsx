@@ -4,12 +4,14 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ShieldCheck, KeyRound, BadgeCheck, Trash2, Plus,
 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 
 import { useRoles, useDeleteRole } from "../../hooks";
 import type { Role } from "../../types";
 
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { StatusBadge } from "components/ui/badges";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
@@ -155,8 +157,9 @@ export default function RolesTable() {
                 />
               )}
 
+              <AnimatePresence>
               {!isInitialLoad && !error && pagedRoles.map((role) => (
-                <tr key={role.id} className="transition-colors hover:bg-slate-50/50">
+                <AnimatedTableRow key={role.id} className="transition-colors hover:bg-slate-50/50">
                   <td className="min-w-[200px] px-6 py-4">
                     <div className="truncate text-sm font-medium text-slate-900">{role.name}</div>
                   </td>
@@ -188,8 +191,9 @@ export default function RolesTable() {
                       />
                     )}
                   </td>
-                </tr>
+                </AnimatedTableRow>
               ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </TableWrapper>

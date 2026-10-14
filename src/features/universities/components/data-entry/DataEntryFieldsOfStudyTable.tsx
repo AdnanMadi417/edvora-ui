@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { RefreshCw, Settings, Pencil, Book, Layers } from "lucide-react";
 import { MdLabelOutline } from "react-icons/md";
 
@@ -14,6 +15,7 @@ import UpdateField from "features/universities/components/admin/fields-of-study/
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -153,8 +155,9 @@ const DataEntryFieldsOfStudyTable = () => {
               />
             )}
 
+            <AnimatePresence>
             {!fieldsLoading && !fieldsError && currentFieldOfStudy.map((field) => (
-              <tr key={field.id} className="transition-colors hover:bg-slate-100/50">
+              <AnimatedTableRow key={field.id} className="transition-colors hover:bg-slate-100/50">
                 <td className="min-w-[200px] max-w-[300px] px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-light text-blue-700">
@@ -183,8 +186,9 @@ const DataEntryFieldsOfStudyTable = () => {
                     className="hover:bg-slate-100 focus:outline-none"
                   />
                 </td>
-              </tr>
+              </AnimatedTableRow>
             ))}
+            </AnimatePresence>
           </tbody>
         </table>
       </TableWrapper>

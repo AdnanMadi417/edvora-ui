@@ -16,8 +16,10 @@ import {
   Truck,
 } from 'lucide-react';
 import { MdAddBusiness } from "react-icons/md";
+import { AnimatePresence } from "framer-motion";
 
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { StatusBadge } from "components/ui/badges";
 import SearchInput from "components/form/filter/SearchInput";
 import { useToast } from 'components/context/ToastContext';
@@ -205,9 +207,10 @@ const LogisticsMarketplaceTable = () => {
                       />
                     )}
 
+                    <AnimatePresence>
                     {!isInitialLoad && !error &&
                       currentServiceProviders.map((provider) => (
-                        <tr
+                        <AnimatedTableRow
                           key={provider.id}
                           className="group cursor-pointer transition-colors hover:bg-slate-50"
                           onClick={() => router.push(`/admin/logistics-marketplace/${provider.id}`)}
@@ -310,8 +313,9 @@ const LogisticsMarketplaceTable = () => {
                           <td className="px-4 py-4">
                             <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                           </td>
-                        </tr>
+                        </AnimatedTableRow>
                       ))}
+                    </AnimatePresence>
                   </tbody>
                 </table>
         </TableWrapper>

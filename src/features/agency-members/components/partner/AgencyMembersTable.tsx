@@ -6,6 +6,7 @@ import {
   User, Mail, Percent, BadgeCheck, ChevronRight,
   CheckCircle, XCircle, RefreshCw, SlidersHorizontal, Ban, Power, Settings, UserPlus,
 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 
 import { useAgencyMembers, useSuspendMember, useReactivateMember } from "../../hooks";
 import type { AgencyMember } from "../../types";
@@ -13,6 +14,7 @@ import type { AgencyMember } from "../../types";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { StatusBadge } from "components/ui/badges";
 import { Tooltip } from "components/ui/tooltip";
 import Button from "components/ui/buttons/Button";
@@ -253,8 +255,9 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
                 />
               )}
 
+              <AnimatePresence>
               {!isInitialLoad && !error && members.map((member) => (
-                <tr
+                <AnimatedTableRow
                   key={member.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                   onClick={() => router.push(`/partner/team-members/${member.partner_id}`)}
@@ -328,8 +331,9 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
                   <td className="px-4 py-4">
                     <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
-                </tr>
+                </AnimatedTableRow>
               ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </TableWrapper>

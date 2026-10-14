@@ -11,6 +11,7 @@ import {
   UserPlus,
   Building2,
 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { usePendingRegistrationOtps, useAdminResendRegistrationOtp } from "features/partners/hooks";
 import type { RegistrationOtpProgress, PendingRegistrationOtp } from "features/partners/types";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
@@ -22,6 +23,7 @@ import IconButton from "components/ui/buttons/IconButton";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import ResendRegistrationOtpConfirmation from "./ResendRegistrationOtpConfirmation";
 
 const ITEMS_PER_PAGE = 20;
@@ -233,13 +235,14 @@ export default function PendingRegistrationOtpsTable() {
                 />
               )}
 
+              <AnimatePresence>
               {!loading && !error && items.map((row) => {
                 const config = PROGRESS_CONFIG[row.progress] ?? UNKNOWN_PROGRESS_CONFIG;
                 const isResending = resendingEmail === row.email;
                 const resendsLeft = Math.max(0, MAX_RESENDS - row.resend_count);
                 const canResend = config.canResend && resendsLeft > 0;
                 return (
-                  <tr key={row.email} className="transition-colors hover:bg-slate-50">
+                  <AnimatedTableRow key={row.email} className="transition-colors hover:bg-slate-50">
                     <td className="min-w-[220px] max-w-[300px] px-6 py-4">
                       <div className="truncate text-sm font-medium text-slate-900">{row.full_name || "—"}</div>
                       <div className="truncate text-xs text-slate-500">{row.email}</div>
@@ -283,9 +286,10 @@ export default function PendingRegistrationOtpsTable() {
                         className="hover:bg-blue-50"
                       />
                     </td>
-                  </tr>
+                  </AnimatedTableRow>
                 );
               })}
+              </AnimatePresence>
             </tbody>
           </table>
         </TableWrapper>

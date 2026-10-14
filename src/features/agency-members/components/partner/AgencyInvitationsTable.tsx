@@ -5,6 +5,7 @@ import {
   User, Mail, Activity, CalendarDays,
   RefreshCw, SlidersHorizontal, Send, KeyRound, UserPlus,
 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 
 import { useAgencyInvitations, useResendSubmissionLink, useResendAgencyInvitationOtp } from "../../hooks";
 import type { AgencyInvitation, InvitationProgress } from "../../types";
@@ -13,6 +14,7 @@ import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { AppDate } from "components/ui/date";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { StatusBadge, type StatusBadgeVariant } from "components/ui/badges";
 import { Tooltip } from "components/ui/tooltip";
 import Button from "components/ui/buttons/Button";
@@ -270,8 +272,9 @@ export default function AgencyInvitationsTable() {
                 />
               )}
 
+              <AnimatePresence>
               {!isInitialLoad && !error && invitations.map((invitation) => (
-                <tr key={invitation.id} className="transition-colors hover:bg-slate-50/50">
+                <AnimatedTableRow key={invitation.id} className="transition-colors hover:bg-slate-50/50">
                   <td className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
                     <div className="truncate text-sm font-medium text-slate-900">{invitation.name}</div>
                   </td>
@@ -322,8 +325,9 @@ export default function AgencyInvitationsTable() {
                       />
                     )}
                   </td>
-                </tr>
+                </AnimatedTableRow>
               ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </TableWrapper>

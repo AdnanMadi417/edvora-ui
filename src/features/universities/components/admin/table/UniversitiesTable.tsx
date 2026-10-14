@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { AnimatePresence } from "framer-motion";
 import PresignedImage from "components/ui/PresignedImage";
 import {
   RefreshCw,
@@ -33,6 +34,7 @@ import { Tooltip } from "components/ui/tooltip";
 
 import UniversityFilterPanel from "features/universities/components/shared/filters/UniversityFilterPanel";
 import { TableWrapper, TableSkeletonRows, TableErrorRow, TableEmptyRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 
 import DeleteUniversityConfirmation from "../popups/DeleteUniversityConfirmation";
 import AssignPaymentUniversity from "../popups/AssignPaymentMethods";
@@ -381,8 +383,9 @@ const UniversitiesTable = () => {
                 />
               )}
 
+              <AnimatePresence>
               {!loading && !error && currentUniversities.map((uni) => (
-                <tr
+                <AnimatedTableRow
                   key={uni.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                   onClick={() => router.push(`/admin/universities/${uni.id}`)}
@@ -582,8 +585,9 @@ const UniversitiesTable = () => {
                   <td className="w-8 pr-4 py-4">
                     <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
-                </tr>
+                </AnimatedTableRow>
               ))}
+              </AnimatePresence>
 
               </tbody>
             </table>
