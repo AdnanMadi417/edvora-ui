@@ -2,15 +2,13 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, ChevronRight, Eye, EyeOff, Landmark, Pencil, RefreshCw, SlidersHorizontal } from "lucide-react";
+import { ChevronRight, Eye, EyeOff, Landmark, Pencil, RefreshCw, SlidersHorizontal } from "lucide-react";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
-import PrevButton from "components/ui/buttons/PrevButton";
-import NextButton from "components/ui/buttons/NextButton";
-import Loading from "components/loading/Loading";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { getAsyncStatus } from "components/ui/async";
 import { StatusBadge } from "components/ui/badges";
 import { Tooltip } from "components/ui/tooltip";
 import { useToast } from "components/context/ToastContext";
@@ -84,6 +82,7 @@ export default function BanksTable({ basePath = "/admin/partners/banks" }: Props
     });
   }, [banks, searchTerm, statusFilter]);
 
+  const status = getAsyncStatus(loading, error, filteredBanks, (b) => b.length === 0);
   const activeFiltersCount = (searchTerm.trim() ? 1 : 0) + (countryFilter.trim() ? 1 : 0) + (statusFilter !== "all" ? 1 : 0);
   const clearFilters = () => {
     setSearchTerm("");
@@ -127,7 +126,7 @@ export default function BanksTable({ basePath = "/admin/partners/banks" }: Props
       </div>
 
       {/* Search & Filters */}
-      <div className=" border-y border-slate-200 pt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center p-6">
+      <div className=" border-y border-slate-200 pt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center p-6">
         <div className="flex items-center gap-2 sm:contents">
           <SearchInput
             value={searchTerm}
@@ -150,7 +149,7 @@ export default function BanksTable({ basePath = "/admin/partners/banks" }: Props
         </div>
 
         <div
-          className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${
+          className={`flex w-full flex-col gap-2 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${
             showMobileFilters ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"
           }`}
         >
@@ -189,9 +188,19 @@ export default function BanksTable({ basePath = "/admin/partners/banks" }: Props
       {/* Table */}
 
       <div className="p-6 ">
-        
-         <div className="overflow-hidden rounded-lg border border-slate-200">
-        <div className="overflow-x-auto">
+        <TableWrapper
+          footer={
+            <TablePagination
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              itemsPerPage={itemsPerPage}
+              itemCount={currentBanks.length}
+              totalCount={filteredBanks.length}
+              itemLabel="banks"
+              loading={status === "loading"}
+            />
+          }
+        >
           <table className="w-full">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
@@ -205,36 +214,20 @@ export default function BanksTable({ basePath = "/admin/partners/banks" }: Props
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 bg-white">
-              {loading && (
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center">
-                    <Loading text="Fetching banks..." />
-                  </td>
-                </tr>
+              {status === "loading" && <TableSkeletonRows columns={7} rows={5} />}
+
+              {status === "error" && <TableErrorRow colSpan={7} message={error ?? undefined} onRetry={refetch} />}
+
+              {status === "empty" && (
+                <TableEmptyRow
+                  colSpan={7}
+                  title="No banks found"
+                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No banks have been added yet."}
+                  icon={<Landmark className="h-8 w-8 text-slate-400" />}
+                />
               )}
 
-              {!loading && error && (
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center text-sm text-red-600">
-                    {error}
-                  </td>
-                </tr>
-              )}
-
-              {!loading && !error && filteredBanks.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-6 py-8 text-center">
-                    <NoMessagesFound
-                      title="No banks found"
-                      subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No banks have been added yet."}
-                      icon={<Landmark className="h-8 w-8 text-slate-400" />}
-                    />
-                  </td>
-                </tr>
-              )}
-
-              {!loading &&
-                !error &&
+              {status === "success" &&
                 currentBanks.map((bank) => (
                   <tr
                     key={bank.id}
@@ -297,44 +290,8 @@ export default function BanksTable({ basePath = "/admin/partners/banks" }: Props
                 ))}
             </tbody>
           </table>
-        </div>
-
-        {/* Pagination */}
-        <div className="grid grid-cols-1 items-center gap-4 border-t border-slate-200 p-4 sm:p-6 md:flex md:justify-between">
-          {filteredBanks.length > 0 && (
-            <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
-              Showing
-              <span className="font-medium">{indexOfFirstItem + 1}</span>
-              to
-              <span className="font-medium">{Math.min(indexOfLastItem, filteredBanks.length)}</span>
-              of
-              <span className="font-medium">{filteredBanks.length}</span>
-              Banks
-            </div>
-          )}
-
-          <div className="flex justify-end gap-2">
-            <PrevButton
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              text="Prev"
-              icon={<ArrowLeft className="h-4 w-4" />}
-            />
-            <span className="px-3 py-1 font-medium text-slate-500">
-              Page {currentPage} of {totalPages}
-            </span>
-            <NextButton
-              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={currentPage === totalPages}
-              text="Next"
-              icon={<ArrowRight className="h-4 w-4" />}
-            />
-          </div>
-        </div>
+        </TableWrapper>
       </div>
-
-      </div>
-
     </div>
   );
 }

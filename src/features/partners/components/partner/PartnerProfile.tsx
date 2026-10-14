@@ -57,7 +57,7 @@ function formatDateOfBirth(value?: string | null): string | undefined {
 
 function InfoRow({ icon, label, value, href }: { icon: React.ReactNode; label: string; value?: string | null; href?: string }) {
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+    <div className="flex items-start gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500">
         {icon}
       </div>
@@ -111,8 +111,8 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex min-w-0 items-center gap-3 sm:flex-1">
+    <div className="flex flex-col gap-2 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 items-center gap-2 sm:flex-1">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
           <FileText className="h-5 w-5" />
         </div>
@@ -291,9 +291,9 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
           {/* Account Overview */}
           {(!isCompany || tab === "profile") && (
           <div key={tab} className="animate-in fade-in duration-200">
-          <div className="border-b border-slate-200 p-6">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Account Overview</p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Account Overview</p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
               <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Country of Residence" value={partner.country} />
               <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Nationality" value={partner.nationality} />
               <InfoRow icon={<MdPhone className="h-4 w-4" />} label="Phone Number" value={partner.phone} />
@@ -308,19 +308,19 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
 
           {/* Individual Details */}
           {isIndividual && (
-            <div className="border-b border-slate-200 p-6">
-              <div className="mb-4 flex items-center gap-2">
+            <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
+              <div className="flex items-center gap-2">
                 <User className="h-4 w-4 text-slate-500" />
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Individual Details</p>
               </div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <InfoRow icon={<Briefcase className="h-4 w-4" />} label="Background" value={partner.individual_details?.background} />
                 <InfoRow icon={<Link2 className="h-4 w-4" />} label="LinkedIn" value={partner.individual_details?.linkedin_url} href={partner.individual_details?.linkedin_url || undefined} />
                 <InfoRow icon={<Link2 className="h-4 w-4" />} label="Social Media" value={partner.individual_details?.social_media_url} href={partner.individual_details?.social_media_url || undefined} />
                 <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Date of Birth" value={formatDateOfBirth(partner.individual_details?.date_of_birth)} />
                 <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Passport Number" value={partner.individual_details?.passport_number} />
               </div>
-              <div className="mt-3 space-y-2">
+              <div className="flex flex-col gap-2">
                 <DocRow label="Passport Photo" fileKey={partner.individual_details?.passport_photo_file_key} personName={partner.name} />
               </div>
             </div>
@@ -328,18 +328,18 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
 
           {/* Company Details */}
           {isCompany && (
-            <div className="border-b border-slate-200 p-6">
-              <div className="mb-4 flex items-center gap-2">
+            <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
+              <div className="flex items-center gap-2">
                 <Briefcase className="h-4 w-4 text-slate-500" />
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Company Details</p>
               </div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <InfoRow icon={<Briefcase className="h-4 w-4" />} label="Company Name" value={partner.company_details?.company_name} />
                 <InfoRow icon={<Link2 className="h-4 w-4" />} label="Website" value={partner.company_details?.website_url} href={partner.company_details?.website_url || undefined} />
                 <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Date of Birth" value={formatDateOfBirth(partner.company_details?.date_of_birth)} />
                 <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Passport Number" value={partner.company_details?.passport_number} />
               </div>
-              <div className="mt-3 space-y-2">
+              <div className="flex flex-col gap-2">
                 <DocRow label="Company Registration Document" fileKey={partner.company_details?.company_registration_doc_file_key} personName={partner.name} />
                 <DocRow label="Passport Photo" fileKey={partner.company_details?.passport_photo_file_key} personName={partner.name} />
                 <DocRow label="Agency Logo" fileKey={partner.company_details?.logo_file_key} personName={partner.name} />
@@ -351,8 +351,8 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
 
           {/* Team Members */}
           {isCompany && tab === "team" && (
-            <div key={tab} className="animate-in fade-in duration-200 p-6">
-              <div className="mb-4 flex items-center justify-between">
+            <div key={tab} className="flex flex-col gap-4 p-6 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-slate-500" />
                   <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Team Members</p>
@@ -370,7 +370,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                   No team members yet. Invite one from the full Team Members page.
                 </p>
               ) : (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 {partner.agency_members.map((member) => (
                   <div
                     key={member.id}

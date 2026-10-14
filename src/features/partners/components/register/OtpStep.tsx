@@ -79,7 +79,7 @@ export default function OtpStep({ email, onSuccess, onRestart }: Props) {
           className="w-full py-3 hover:bg-blue-700"
         />
 
-        <div className="mt-4 space-y-2 text-center">
+        <div className="mt-4 flex flex-col items-center gap-2 text-center">
           {resendSuccess && !maxResendsReached && (
             <p className="text-sm text-green-600">Code resent — check your inbox.</p>
           )}

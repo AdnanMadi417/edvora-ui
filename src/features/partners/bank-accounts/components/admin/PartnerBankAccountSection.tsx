@@ -6,6 +6,8 @@ import Button from "components/ui/buttons/Button";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import ToggleInput from "components/form/toggle/ToggleInput";
+import { Skeleton } from "components/ui/skeleton";
+import { AsyncStateView, getAsyncStatus } from "components/ui/async";
 import { useToast } from "components/context/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
@@ -78,6 +80,21 @@ function DetailRow({ label, value }: { label: string; value?: React.ReactNode })
   );
 }
 
+// Mirrors the 6-cell detail grid below so loading doesn't shift the layout
+// once the real account (or lack of one) arrives.
+function BankAccountSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-2 p-6 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i}>
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="mt-1.5 h-4 w-32" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /**
  * Partner Bank Account — the partner's payout account. At most one active
  * account per partner: a read-only summary with "Edit", or an "Add Bank
@@ -87,7 +104,7 @@ function DetailRow({ label, value }: { label: string; value?: React.ReactNode })
  */
 export default function PartnerBankAccountSection({ partner }: Props) {
   const { showToast } = useToast();
-  const { account, loading, refetch } = usePartnerBankAccount(partner.id);
+  const { account, loading, error, refetch } = usePartnerBankAccount(partner.id);
   const { banks: allBanks } = useBanks({ include_inactive: true });
   const { createAccount, loading: creating } = useCreatePartnerBankAccount();
   const { updateAccount, loading: updating } = useUpdatePartnerBankAccount();
@@ -99,6 +116,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
 
   const isMalaysia = partner.country.trim().toLowerCase() === "malaysia";
   const saving = creating || updating;
+  const status = getAsyncStatus(loading, error, account, (a) => a === null);
 
   const bankLookup = useMemo(() => new Map(allBanks.map((b) => [b.id, b])), [allBanks]);
   const bankOptions = useMemo(
@@ -164,7 +182,10 @@ export default function PartnerBankAccountSection({ partner }: Props) {
     if (!formData.account_holder_name.trim()) next.account_holder_name = "Account holder name is required";
     if (!formData.account_number.trim()) next.account_number = "Account number is required";
     if (!formData.currency) next.currency = "Currency is required";
-    if (!isMalaysia) {
+    // Only a manually-entered international bank needs wire details — a
+    // curated bank (Malaysia today) never does, regardless of the
+    // partner's own country.
+    if (!isMalaysia && !formData.useCuratedBank) {
       if (!formData.beneficiary_address.trim()) next.beneficiary_address = "Required for international accounts";
       if (!formData.beneficiary_phone.trim()) next.beneficiary_phone = "Required for international accounts";
       if (!formData.bank_branch_address.trim()) next.bank_branch_address = "Required for international accounts";
@@ -256,65 +277,68 @@ export default function PartnerBankAccountSection({ partner }: Props) {
   const bankDisplaySwift = account?.bank_id ? bankLookup.get(account.bank_id)?.swift_code : account?.intl_bank_swift;
 
   return (
-    <div className="border-b border-slate-200 p-6" data-testid="partner-bank-account">
-      <div className="mb-1 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Landmark className="h-4 w-4 text-slate-500" />
-          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bank Account</p>
-        </div>
-        {mode === "view" && account && (
-          <Button
-            onClick={openEdit}
-            icon={<Pencil className="h-4 w-4" />}
-            text="Edit"
-            bgColor="bg-white"
-            textColor="text-slate-600"
-            borderColor="border-slate-300"
-            hoverTextColor="hover:text-slate-800"
-            hoverBorderColor="hover:border-slate-400"
-          />
-        )}
+    <div className="" data-testid="partner-bank-account">
+      <div className="mb-1 flex items-center gap-2 px-6 pt-6">
+        <Landmark className="h-4 w-4 text-slate-500" />
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bank Account</p>
       </div>
 
-      {loading && <p className="text-sm text-slate-500">Loading bank account...</p>}
+      {mode === "view" && (
+        <AsyncStateView
+          status={status}
+          skeleton={<BankAccountSkeleton />}
+          errorMessage={error ?? undefined}
+          onRetry={refetch}
+          emptyTitle="No payout bank account yet"
+          emptySubtitle="Add one so this partner can be paid."
+          emptyIcon={Landmark}
+          emptyAction={
+            <Button
+              onClick={openAdd}
+              icon={<Plus className="h-4 w-4" />}
+              text="Add Bank Account"
+              bgColor="bg-blue-50"
+              textColor="text-blue-700"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-blue-800"
+              hoverBorderColor="hover:border-blue-700"
+            />
+          }
+        >
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 p-6">
+            <DetailRow label="Bank" value={bankDisplayName} />
+            <DetailRow label="SWIFT Code" value={bankDisplaySwift} />
+            <DetailRow label="Account Holder" value={account?.account_holder_name} />
+            <DetailRow label="Account Number" value={account?.account_number} />
+            <DetailRow label="IBAN" value={account?.iban} />
+            <DetailRow label="Currency" value={account?.currency} />
+            {!isMalaysia && account && !account.bank_id && (
+              <>
+                <DetailRow label="Beneficiary Address" value={account.beneficiary_address} />
+                <DetailRow label="Beneficiary Phone" value={account.beneficiary_phone} />
+                <DetailRow label="Bank Branch Address" value={account.bank_branch_address} />
+                <DetailRow label="Bank Branch Code" value={account.bank_branch_code} />
+              </>
+            )}
+          </div>
 
-      {!loading && mode === "view" && !account && (
-        <div className="flex flex-col items-end gap-3">
-          <p className="w-full text-sm text-slate-500">No payout bank account on file yet.</p>
-          <Button
-            onClick={openAdd}
-            icon={<Plus className="h-4 w-4" />}
-            text="Add Bank Account"
-            bgColor="bg-blue-50"
-            textColor="text-blue-700"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-blue-800"
-            hoverBorderColor="hover:border-blue-700"
-          />
-        </div>
-      )}
-
-      {!loading && mode === "view" && account && (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          <DetailRow label="Bank" value={bankDisplayName} />
-          <DetailRow label="SWIFT Code" value={bankDisplaySwift} />
-          <DetailRow label="Account Holder" value={account.account_holder_name} />
-          <DetailRow label="Account Number" value={account.account_number} />
-          <DetailRow label="IBAN" value={account.iban} />
-          <DetailRow label="Currency" value={account.currency} />
-          {!isMalaysia && (
-            <>
-              <DetailRow label="Beneficiary Address" value={account.beneficiary_address} />
-              <DetailRow label="Beneficiary Phone" value={account.beneficiary_phone} />
-              <DetailRow label="Bank Branch Address" value={account.bank_branch_address} />
-              <DetailRow label="Bank Branch Code" value={account.bank_branch_code} />
-            </>
-          )}
-        </div>
+          <div className="flex justify-end border-t border-slate-200 p-6">
+            <Button
+              onClick={openEdit}
+              icon={<Pencil className="h-4 w-4" />}
+              text="Edit"
+              bgColor="bg-white"
+              textColor="text-slate-600"
+              borderColor="border-slate-300"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-400"
+            />
+          </div>
+        </AsyncStateView>
       )}
 
       {mode === "form" && (
-        <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-4 p-6 md:grid-cols-2">
           <div className="md:col-span-2">
             <ToggleInput
               label="Bank Selection"
@@ -349,7 +373,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
           )}
 
           {bankSuggestion && (
-            <div className="mb-4 flex items-center justify-between gap-3 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 md:col-span-2">
+            <div className="mb-4 flex items-center justify-between gap-2 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 md:col-span-2">
               <span>&quot;{bankSuggestion.bank_name}&quot; is already in the curated bank list.</span>
               <Button
                 onClick={applySuggestion}
@@ -376,7 +400,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
             updateFormData={updateFormData}
           />
 
-          {!isMalaysia && (
+          {!isMalaysia && !formData.useCuratedBank && (
             <>
               <InputField label="Beneficiary Address" field="beneficiary_address" formData={formData} errors={errors} updateFormData={updateFormData} />
               <InputField label="Beneficiary Phone" field="beneficiary_phone" formData={formData} errors={errors} updateFormData={updateFormData} />
@@ -409,7 +433,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
             </>
           )}
 
-          <div className="flex justify-end gap-3 pt-2 md:col-span-2">
+          <div className="flex justify-end gap-2 border-t border-slate-200 pt-4 md:col-span-2">
             <Button
               onClick={() => setMode("view")}
               disabled={saving}

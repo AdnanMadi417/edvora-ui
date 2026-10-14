@@ -152,7 +152,7 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
               onBlur={() => validateField("confirm_password")}
             />
 
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button
                 type="button"
                 onClick={handleClose}

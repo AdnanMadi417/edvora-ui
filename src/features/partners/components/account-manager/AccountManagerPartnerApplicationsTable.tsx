@@ -83,7 +83,7 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
 
       {/* Filter Bar */}
       <div className="border-b border-slate-200 p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
           <div className="flex items-center gap-2 sm:contents">
             <SearchInput
               value={searchTerm}
@@ -107,7 +107,7 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
             </button>
           </div>
 
-          <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
+          <div className={`flex w-full flex-col gap-2 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
             <div className="w-full sm:w-44 flex-shrink-0">
               <FilterSelectField
                 value={selectedLifecycle}
@@ -208,7 +208,7 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
                     onClick={() => window.open(`/account-manager/applications/${app.id}`, "_blank")}
                   >
                     <td className="min-w-[160px] max-w-[160px] px-6 py-4 sm:min-w-[220px] sm:max-w-[220px]">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <PresignedImage
                           fileKey={app.student_photo_file_key}
                           alt={app.student_name}

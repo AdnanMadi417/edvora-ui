@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Landmark, Pencil, XCircle } from "lucide-react";
-import Loading from "components/loading/Loading";
-import EmptyData from "components/emptyData/EmptyTableData";
+import { Skeleton } from "components/ui/skeleton";
+import { AsyncStateView, getAsyncStatus } from "components/ui/async";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import ToggleInput from "components/form/toggle/ToggleInput";
@@ -47,6 +47,22 @@ function validateName(value: string): string {
   return "";
 }
 
+// Mirrors the field block below (4 inputs + a toggle) so loading doesn't
+// shift the layout once the bank (or the "not found" state) arrives.
+function EditBankFormSkeleton() {
+  return (
+    <div className="space-y-4 border-t border-slate-200 px-6 py-6">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <div key={i}>
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="mt-2 h-10 w-full rounded-lg" />
+        </div>
+      ))}
+      <Skeleton className="h-16 w-full rounded-lg" />
+    </div>
+  );
+}
+
 // Edit page for a single bank (PATCH /banks/{id}, a true partial update —
 // this form always sends every field though, since the only way to retire
 // a bank is toggling is_active here: there's no delete endpoint, the DB
@@ -55,7 +71,8 @@ function validateName(value: string): string {
 export default function EditBankDetails({ id, basePath = "/admin/partners/banks" }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
-  const { bank, loading: loadingBank } = useBank(id);
+  const { bank, loading: loadingBank, error: bankError, refetch } = useBank(id);
+  const status = getAsyncStatus(loadingBank, bankError, bank, (b) => b === null);
   const { updateBank, loading } = useUpdateBank();
 
   const [formData, setFormData] = useState<FormData>({ country: "", code: "", swift_code: "", name: "", is_active: true });
@@ -130,9 +147,6 @@ export default function EditBankDetails({ id, basePath = "/admin/partners/banks"
     }
   };
 
-  if (loadingBank) return <Loading text="Loading bank details..." />;
-  if (!bank) return <EmptyData />;
-
   return (
     <div className="mt-6 max-w-5xl mx-auto">
       <div className="rounded-md border bg-card shadow-sm">
@@ -149,6 +163,27 @@ export default function EditBankDetails({ id, basePath = "/admin/partners/banks"
           </div>
         </div>
 
+        <AsyncStateView
+          status={status}
+          skeleton={<EditBankFormSkeleton />}
+          errorMessage={bankError ?? undefined}
+          onRetry={refetch}
+          emptyTitle="Bank not found"
+          emptySubtitle="It may have been removed, or the link is out of date."
+          emptyIcon={Landmark}
+          emptyAction={
+            <Button
+              onClick={handleBack}
+              icon={<ChevronLeft className="h-4 w-4" />}
+              text="Back to Banks"
+              bgColor="bg-white"
+              textColor="text-slate-600"
+              borderColor="border-slate-300"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-400"
+            />
+          }
+        >
         <div className="space-y-4 border-t border-slate-200 px-6 py-6">
           <SelectField
             label="Country"
@@ -200,7 +235,7 @@ export default function EditBankDetails({ id, basePath = "/admin/partners/banks"
           />
 
           {apiError && (
-            <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4">
+            <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-4">
               <XCircle className="mt-0.5 h-5 w-5 text-red-600" />
               <div>
                 <p className="text-sm font-semibold text-red-800">Failed to update bank</p>
@@ -209,32 +244,35 @@ export default function EditBankDetails({ id, basePath = "/admin/partners/banks"
             </div>
           )}
         </div>
+        </AsyncStateView>
 
-        <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
-          <Button
-            onClick={handleBack}
-            icon={<ChevronLeft className="h-5 w-5" />}
-            text="Back"
-            bgColor="bg-white"
-            textColor="text-slate-600"
-            borderColor="border-slate-300"
-            hoverTextColor="hover:text-slate-800"
-            hoverBorderColor="hover:border-slate-400"
-            className="flex-1 hover:bg-slate-50"
-          />
-          <Button
-            onClick={handleSave}
-            disabled={loading || !isChanged || !isFormValid}
-            icon={<Pencil className="h-5 w-5" />}
-            text={loading ? "Saving..." : "Save Changes"}
-            bgColor="bg-blue-600"
-            textColor="text-white"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-white"
-            hoverBorderColor="hover:border-blue-700"
-            className="flex-1 hover:bg-blue-700"
-          />
-        </div>
+        {status === "success" && (
+          <div className="flex gap-2 border-t border-slate-200 px-6 py-4">
+            <Button
+              onClick={handleBack}
+              icon={<ChevronLeft className="h-5 w-5" />}
+              text="Back"
+              bgColor="bg-white"
+              textColor="text-slate-600"
+              borderColor="border-slate-300"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-400"
+              className="flex-1 hover:bg-slate-50"
+            />
+            <Button
+              onClick={handleSave}
+              disabled={loading || !isChanged || !isFormValid}
+              icon={<Pencil className="h-5 w-5" />}
+              text={loading ? "Saving..." : "Save Changes"}
+              bgColor="bg-blue-600"
+              textColor="text-white"
+              borderColor="border-blue-600"
+              hoverTextColor="hover:text-white"
+              hoverBorderColor="hover:border-blue-700"
+              className="flex-1 hover:bg-blue-700"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

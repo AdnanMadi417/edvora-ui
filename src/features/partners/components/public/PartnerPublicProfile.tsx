@@ -176,7 +176,7 @@ export default function PartnerPublicProfile({ profile }: Props) {
     );
 
   const verifiedBadgeRow = (
-    <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-6 py-4">
+    <div className="flex items-center justify-between gap-2 border-t border-slate-100 px-6 py-4">
       <p className="text-xs text-slate-400">Unibexs</p>
       {profile.is_verified && (
         <Tooltip content={VERIFIED_EXPLANATION} position="left">
@@ -204,7 +204,7 @@ export default function PartnerPublicProfile({ profile }: Props) {
         <FadeIn className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="h-28 w-full sm:h-36" style={BANNER_STYLE} role="presentation" />
 
-          <div className="flex flex-col items-center gap-3 border-b border-slate-100 px-6 pb-6 text-center sm:flex-row sm:items-end sm:gap-4 sm:text-left">
+          <div className="flex flex-col items-center gap-4 border-b border-slate-100 px-6 pb-6 text-center sm:flex-row sm:items-end sm:text-left">
             <div className="-mt-12 h-24 w-24 shrink-0 overflow-hidden rounded-full bg-white p-1 shadow-md sm:-mt-10 sm:h-28 sm:w-28">
               <Avatar
                 src={profile.profile_photo_file_url}
@@ -231,7 +231,7 @@ export default function PartnerPublicProfile({ profile }: Props) {
                 </Tooltip>
               </div>
 
-              <div className="mt-1 flex flex-col items-center gap-1 sm:flex-row sm:items-center sm:gap-3 sm:justify-start">
+              <div className="mt-1 flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:justify-start">
                 {country && (
                   <p className="flex items-center gap-1.5 text-sm text-slate-500">
                     <MapPin className="h-3.5 w-3.5 shrink-0" />
@@ -269,8 +269,8 @@ export default function PartnerPublicProfile({ profile }: Props) {
               )}
 
               {hasCountries && (
-                <div className="p-6">
-                  <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <div className="flex flex-col gap-4 p-6">
+                  <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
                     <Globe2 className="h-3.5 w-3.5" />
                     Supports students applying to
                   </p>
@@ -285,9 +285,9 @@ export default function PartnerPublicProfile({ profile }: Props) {
               )}
 
               {hasSocial && (
-                <div className="p-6">
-                  <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">Connect</p>
-                  <div className="flex flex-wrap gap-3">
+                <div className="flex flex-col gap-4 p-6">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Connect</p>
+                  <div className="flex flex-wrap gap-2">
                     {profile.linkedin_url && (
                       <a
                         href={profile.linkedin_url}

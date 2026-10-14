@@ -6,6 +6,8 @@ import {
   Pencil, RefreshCw, SlidersHorizontal, Building2,
   UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power, Trash2, Handshake,
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
 import { AppDate } from "components/ui/date";
 import { StatusBadge } from "components/ui/badges";
 import { Tabs, type TabItem } from "components/ui/tabs";
@@ -235,6 +237,14 @@ export default function PartnersTable() {
 
       <Tabs<PartnersTab> tabs={TABS} active={activeTab} onChange={setActiveTab} />
 
+      <AnimatePresence mode="wait">
+      <motion.div
+        key={activeTab}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: MICRO_DURATION, ease: EASE }}
+      >
       {activeTab === "pending-otps" && <PendingRegistrationOtpsTable />}
 
       {activeTab === "partners" && (
@@ -250,7 +260,7 @@ export default function PartnersTable() {
 
       {/* Filter Bar */}
       <div className="p-6 border-b border-slate-200">
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
 
           {/* Search + mobile toggle */}
           <div className="flex items-center gap-2 sm:contents">
@@ -291,7 +301,7 @@ export default function PartnersTable() {
           </div>
 
           {/* Collapsible dropdowns */}
-          <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
+          <div className={`flex w-full flex-col gap-2 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
             <div className="w-full sm:w-44 flex-shrink-0">
               <FilterSelectField
                 value={selectedManager}
@@ -404,7 +414,7 @@ export default function PartnersTable() {
                     onClick={() => router.push(`/admin/partners/${partner.id}`)}
                   >
                     <td className="min-w-[180px] max-w-[180px] px-6 py-4 sm:min-w-[250px] sm:max-w-[250px]">
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2">
                         <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                           <PresignedImage
                             fileKey={(partner.type === "individual" ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
@@ -438,7 +448,7 @@ export default function PartnersTable() {
                     </td>
 
                     <td className="px-6 py-4">
-                      <div className="flex flex-wrap items-center gap-1.5">
+                      <div className="flex flex-wrap items-center gap-2">
                         {partner.is_active ? (
                           <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                         ) : (
@@ -542,6 +552,8 @@ export default function PartnersTable() {
       </div>
       </>
       )}
+      </motion.div>
+      </AnimatePresence>
 
       {reviewPartner && (
         <ReviewPartnerPopup

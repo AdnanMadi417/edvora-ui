@@ -130,7 +130,7 @@ export default function PendingRegistrationOtpsTable() {
     <div className="text-p2">
       {/* Search + filters */}
       <div className="p-6 border-b border-slate-200">
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <SearchInput
             value={searchTerm}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}

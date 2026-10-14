@@ -56,7 +56,7 @@ export default function ResendApprovalEmailConfirmation({ isOpen, onClose, onCon
             onClose={onClose}
           />
 
-          <div className="space-y-4 px-7 py-6">
+          <div className="flex flex-col gap-4 px-7 py-6">
             <div>
               <h3 className="text-lg font-semibold text-slate-900">Confirm Resend</h3>
               <p className="text-sm text-slate-500">
@@ -70,7 +70,7 @@ export default function ResendApprovalEmailConfirmation({ isOpen, onClose, onCon
             )}
           </div>
 
-          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-2 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
             <Button
               className="w-full sm:w-auto"
               onClick={onClose}

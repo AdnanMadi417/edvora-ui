@@ -173,7 +173,7 @@ export default function ReviewerPartnersTable() {
 
       {/* Filter Bar */}
       <div className="p-6 border-b border-slate-200">
-        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
 
           {/* Search + mobile toggle */}
           <div className="flex items-center gap-2 sm:contents">
@@ -214,7 +214,7 @@ export default function ReviewerPartnersTable() {
           </div>
 
           {/* Collapsible dropdowns */}
-          <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
+          <div className={`flex w-full flex-col gap-2 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
             <div className="w-full sm:w-44 flex-shrink-0">
               <FilterSelectField
                 value={selectedManager}
@@ -326,7 +326,7 @@ export default function ReviewerPartnersTable() {
                   onClick={() => router.push(`/reviewer/partners/${partner.id}`)}
                 >
                   <td className="min-w-[180px] max-w-[180px] px-6 py-4 sm:min-w-[250px] sm:max-w-[250px]">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                         <PresignedImage
                           fileKey={(partner.type === "individual" ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
@@ -360,7 +360,7 @@ export default function ReviewerPartnersTable() {
                   </td>
 
                   <td className="px-6 py-4">
-                    <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
                       {isPending ? (
                         <StatusBadge variant="warning" icon={<Clock className="h-3 w-3" />}>Pending Review</StatusBadge>
                       ) : partner.is_active ? (
