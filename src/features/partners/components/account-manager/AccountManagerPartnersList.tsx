@@ -169,7 +169,7 @@ export default function AccountManagerPartnersList() {
                   onClick={() => router.push(`/account-manager/partners/${partner.id}`)}
                 >
                   <td className="min-w-[160px] max-w-[160px] px-6 py-4 sm:min-w-[220px] sm:max-w-[220px]">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
                       <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                         {partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
                         <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
@@ -193,7 +193,7 @@ export default function AccountManagerPartnersList() {
                   </td>
 
                   <td className="px-6 py-4">
-                    <div className="flex flex-wrap items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
                       {partner.is_active ? (
                         <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                       ) : (

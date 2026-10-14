@@ -310,7 +310,7 @@ export default function PartnerRegisterPage() {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
         <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white px-7 py-10 text-center shadow-sm">
-          <div className="mb-5 flex justify-center">
+          <div className="mb-4 flex justify-center">
             <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
           </div>
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
@@ -339,18 +339,18 @@ export default function PartnerRegisterPage() {
           className="pointer-events-none absolute left-0 top-0 opacity-60" />
         <Image src={registrationIconImg} alt="" width={250} height={250}
           className="pointer-events-none absolute right-0 top-0 opacity-60" />
-        <div className="relative text-center">
+        <div className="relative flex flex-col items-center gap-4 text-center">
           <h1 className="text-5xl text-slate-900 sm:text-6xl">
             Ready to <span className="text-blue-600">connect?</span>
           </h1>
-          <Image src={crosshairIconImg} alt="" width={80} height={80} className="mx-auto my-3" />
+          <Image src={crosshairIconImg} alt="" width={80} height={80} className="mx-auto" />
           <p className="text-base text-slate-500">
             Ready to connect? Drop us a message and we'll get back fast.
           </p>
           <button
             type="button"
             onClick={() => setShowCodeEntry(true)}
-            className="mt-3 text-sm font-medium text-blue-600 underline-offset-2 transition hover:text-blue-700 hover:underline"
+            className="text-sm font-medium text-blue-600 underline-offset-2 transition hover:text-blue-700 hover:underline"
           >
             Already have a verification code?
           </button>
@@ -457,10 +457,10 @@ export default function PartnerRegisterPage() {
                   </SectionCard>
 
                   <SectionCard title="Background" subtitle="Which best describes you?">
-                    <div className="space-y-2" data-field="background">
+                    <div className="flex flex-col gap-2" data-field="background">
                       {BACKGROUND_OPTIONS.map((opt) => (
                         <label key={opt.value}
-                          className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition ${
+                          className={`flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-3 transition ${
                             indForm.background === opt.value
                               ? "border-blue-500 bg-blue-50"
                               : "border-slate-200 bg-white hover:bg-slate-50"
@@ -587,7 +587,7 @@ export default function PartnerRegisterPage() {
 
               {/* T&C */}
               <div className="border-y border-slate-200 p-6" data-field="agreed">
-                <label className="flex cursor-pointer items-center gap-3">
+                <label className="flex cursor-pointer items-center gap-2">
                   <input
                     type="checkbox"
                     checked={partnerType === "individual" ? indForm.agreed : compForm.agreed}
@@ -607,7 +607,7 @@ export default function PartnerRegisterPage() {
                 {errors.agreed && <p className="mt-2 text-xs text-red-600">{errors.agreed}</p>}
               </div>
 
-              <div className="space-y-3 p-6">
+              <div className="flex flex-col gap-2 p-6">
                 {apiError && !hasFieldLevelApiError && (
                   <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <AlertCircle className="h-4 w-4 shrink-0" />

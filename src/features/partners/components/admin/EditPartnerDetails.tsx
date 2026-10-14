@@ -142,8 +142,8 @@ function DocUploadField({
           </div>
         </div>
       ) : doc.file_key ? (
-        <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 items-center gap-3 sm:flex-1">
+        <div className="flex flex-col gap-2 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-2 sm:flex-1">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
               <FileText className="h-5 w-5" />
             </div>
@@ -806,7 +806,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
               enabledDescription="This partner's profile is live and publicly visible."
               disabledDescription="This partner's profile is hidden from the public."
             />
-            <p className="mt-3 text-xs text-slate-400">
+            <p className="mt-4 text-xs text-slate-400">
               Verification is granted automatically when a student this partner supported gets
               their visa approved — there&apos;s no manual control for it.
             </p>
@@ -872,7 +872,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
         )}
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 px-6 py-5">
+        <div className="flex justify-end gap-2 px-6 py-5">
           <Button
             onClick={() => router.push(`${basePath}/${id}`)}
             icon={<ChevronLeft className="h-4 w-4" />}

@@ -63,7 +63,7 @@ export default function ResendRegistrationOtpConfirmation({ isOpen, onClose, onC
             </div>
           </div>
 
-          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-2 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
             <Button
               className="w-full sm:w-auto"
               onClick={onClose}

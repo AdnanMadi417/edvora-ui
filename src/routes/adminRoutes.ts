@@ -10,7 +10,6 @@ import {
   Layers,
   CreditCard,
   Banknote,
-  Wallet,
   Truck,
   Building2,
   Tag,
@@ -49,12 +48,9 @@ const AdminRoutes: IRoute[] = [
         path: "/banks",
         icon: Banknote,
       },
-      {
-        name: "Bank Accounts",
-        layout: "/admin/partners",
-        path: "/bank-accounts",
-        icon: Wallet,
-      },
+      // "Bank Accounts" (admin-wide list, /admin/partners/bank-accounts)
+      // hidden from the sidebar for now — not needed yet. Page/route still
+      // exist, just unlinked.
     ],
   },
   {

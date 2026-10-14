@@ -93,8 +93,8 @@ function DocUploadField({
           </div>
         </div>
       ) : doc.file_key ? (
-        <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 items-center gap-3 sm:flex-1">
+        <div className="flex flex-col gap-2 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-2 sm:flex-1">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
               <FileText className="h-5 w-5" />
             </div>
@@ -625,7 +625,7 @@ export default function EditPartnerProfile() {
         )}
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 px-6 py-5">
+        <div className="flex justify-end gap-2 px-6 py-5">
           <Button
             type="button"
             onClick={() => router.push("/partner/profile")}

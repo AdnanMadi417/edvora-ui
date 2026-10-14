@@ -138,11 +138,11 @@ export default function ReviewPartnerPopup({
             onClose={onClose}
           />
 
-          <div className="space-y-5 px-6 py-6">
+          <div className="flex flex-col gap-4 px-6 py-6">
             {/* Account Manager */}
             <div className="rounded-xl border border-slate-200 bg-white p-4">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
+              <div className="mb-4 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
                     <UserCog className="h-4 w-4 text-slate-500" />
                   </div>
@@ -202,7 +202,7 @@ export default function ReviewPartnerPopup({
 
             {/* Decision */}
             <div className="rounded-xl border border-slate-200 bg-white p-4">
-              <div className="mb-3 flex items-center gap-3">
+              <div className="mb-4 flex items-center gap-2">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
                   <ClipboardCheck className="h-4 w-4 text-slate-500" />
                 </div>
@@ -225,7 +225,7 @@ export default function ReviewPartnerPopup({
               )}
 
               {/* Rejection reason */}
-              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${decision === "rejected" ? "mt-3 max-h-48 opacity-100" : "max-h-0 opacity-0"}`}>
+              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${decision === "rejected" ? "mt-4 max-h-48 opacity-100" : "max-h-0 opacity-0"}`}>
                 <div>
                   <label className="mb-1.5 block text-xs font-medium text-slate-900">
                     Rejection Reason <span className="text-red-500">*</span>
@@ -243,7 +243,7 @@ export default function ReviewPartnerPopup({
             </div>
           </div>
 
-          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-end">
+          <div className="flex flex-col-reverse gap-2 border-t border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-end">
             <Button
               className="w-full sm:w-auto"
               text="Cancel"

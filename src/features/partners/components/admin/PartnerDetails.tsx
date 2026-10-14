@@ -21,12 +21,15 @@ import {
   ExternalLink,
   FileText,
   Link2,
+  MoreVertical,
   Pencil,
   Power,
   ShieldCheck,
   User,
   Users,
 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
 import { usePartnerDetails, useUpdateAgencyMemberStatus } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import SuspendReactivateMemberModal from "features/agency-members/components/partner/SuspendReactivateMemberModal";
@@ -53,7 +56,7 @@ interface Props {
   id: string;
 }
 
-type DetailsTab = "profile" | "team" | "applications";
+type DetailsTab = "profile" | "team" | "bank-account" | "applications";
 
 function formatDateOfBirth(value?: string | null): string | undefined {
   const date = parseDate(value);
@@ -77,7 +80,7 @@ function InfoRow({
   href?: string;
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+    <div className="flex items-start gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500">
         {icon}
       </div>
@@ -133,8 +136,8 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex min-w-0 items-center gap-3 sm:flex-1">
+    <div className="flex flex-col gap-2 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 items-center gap-2 sm:flex-1">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
           <FileText className="h-5 w-5" />
         </div>
@@ -180,6 +183,7 @@ export default function PartnerDetails({ id }: Props) {
   const { partner, isPartnerLoading, refetch } = usePartnerDetails(id);
   const [showReview, setShowReview] = useState(false);
   const [tab, setTab] = useState<DetailsTab>("profile");
+  const [openActions, setOpenActions] = useState(false);
   const { accountManagers } = useAccountManagers();
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
 
@@ -211,10 +215,12 @@ export default function PartnerDetails({ id }: Props) {
     ? [
         { key: "profile", label: "Profile" },
         { key: "team", label: "Team" },
+        { key: "bank-account", label: "Bank Account" },
         { key: "applications", label: "Applications" },
       ]
     : [
         { key: "profile", label: "Profile" },
+        { key: "bank-account", label: "Bank Account" },
         { key: "applications", label: "Applications" },
       ];
 
@@ -284,31 +290,71 @@ export default function PartnerDetails({ id }: Props) {
                 hoverBorderColor="hover:border-amber-400"
               />
             )}
-            <Button
-              onClick={() => router.push(`/admin/partners/${id}/edit`)}
-              icon={<Pencil className="h-4 w-4" />}
-              text="Edit Partner"
-              bgColor="bg-blue-600"
-              textColor="text-white"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-white"
-              hoverBorderColor="hover:border-blue-700"
-              className="hover:bg-blue-700"
-            />
+            <div className="relative">
+              <Button
+                onClick={() => setOpenActions((v) => !v)}
+                icon={<MoreVertical className="h-4 w-4" />}
+                text="Actions"
+                bgColor="bg-white"
+                textColor="text-slate-700"
+                borderColor="border-slate-200"
+                hoverTextColor="hover:text-slate-700"
+                hoverBorderColor="hover:border-slate-300"
+                className="hover:bg-slate-50"
+              />
+
+              {openActions && (
+                <div className="absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-lg border border-slate-200 bg-white ring-1 ring-black/5">
+                  <div className="flex flex-col gap-2 p-2">
+                    <button
+                      type="button"
+                      aria-label="Edit Partner Details"
+                      className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm"
+                      onClick={() => { router.push(`/admin/partners/${id}/edit`); setOpenActions(false); }}
+                    >
+                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
+                        <Pencil className="h-4 w-4" />
+                      </div>
+                      <span className="font-semibold text-slate-900">Edit Details</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      aria-label="Back to Partners"
+                      className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
+                      onClick={() => { router.push("/admin/partners"); setOpenActions(false); }}
+                    >
+                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
+                        <ChevronLeft className="h-4 w-4" />
+                      </div>
+                      <span className="font-semibold text-slate-900">Back to Partners</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} />
 
+        <AnimatePresence mode="wait">
+        <motion.div
+          key={tab}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: MICRO_DURATION, ease: EASE }}
+        >
         {tab === "profile" && (
-        <div key={tab} className="animate-in fade-in duration-200">
+        <>
 
         {/* Account Overview */}
-        <div className="border-b border-slate-200 p-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Account Overview
           </p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Country of Residence" value={partner.country} />
             <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Nationality" value={partner.nationality} />
             <InfoRow icon={<MdPhone className="h-4 w-4" />} label="Phone Number" value={partner.phone} />
@@ -364,19 +410,16 @@ export default function PartnerDetails({ id }: Props) {
         {/* Additional (shared) managers — UBX-324 */}
         <AdditionalManagersSection partner={partner} accountManagers={accountManagers} onChanged={refetch} />
 
-        {/* Payout bank account */}
-        <PartnerBankAccountSection partner={partner} />
-
         {/* Individual Details */}
         {isIndividual && (
-          <div className="border-b border-slate-200 p-6">
-            <div className="mb-4 flex items-center gap-2">
+          <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
+            <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-slate-500" />
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Individual Details
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <InfoRow
                 icon={<Briefcase className="h-4 w-4" />}
                 label="Background"
@@ -405,7 +448,7 @@ export default function PartnerDetails({ id }: Props) {
                 value={partner.individual_details?.passport_number}
               />
             </div>
-            <div className="mt-3 space-y-2">
+            <div className="flex flex-col gap-2">
               <DocRow
                 label="Passport Photo"
                 fileKey={partner.individual_details?.passport_photo_file_key}
@@ -417,14 +460,14 @@ export default function PartnerDetails({ id }: Props) {
 
         {/* Company Info */}
         {isCompany && (
-          <div className="border-b border-slate-200 p-6">
-            <div className="mb-4 flex items-center gap-2">
+          <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
+            <div className="flex items-center gap-2">
               <Briefcase className="h-4 w-4 text-slate-500" />
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Company Info
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <InfoRow
                 icon={<Briefcase className="h-4 w-4" />}
                 label="Company Name"
@@ -437,7 +480,7 @@ export default function PartnerDetails({ id }: Props) {
                 href={partner.company_details?.website_url || undefined}
               />
             </div>
-            <div className="mt-3 space-y-2">
+            <div className="flex flex-col gap-2">
               <DocRow
                 label="Company Registration Document"
                 fileKey={partner.company_details?.company_registration_doc_file_key}
@@ -454,14 +497,14 @@ export default function PartnerDetails({ id }: Props) {
 
         {/* Personal Info — the company's contact person */}
         {isCompany && (
-          <div className="border-b border-slate-200 p-6">
-            <div className="mb-4 flex items-center gap-2">
+          <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
+            <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-slate-500" />
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Personal Info
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <InfoRow
                 icon={<MdCategory className="h-4 w-4" />}
                 label="Date of Birth"
@@ -473,7 +516,7 @@ export default function PartnerDetails({ id }: Props) {
                 value={partner.company_details?.passport_number}
               />
             </div>
-            <div className="mt-3 space-y-2">
+            <div className="flex flex-col gap-2">
               <DocRow
                 label="Passport Photo"
                 fileKey={partner.company_details?.passport_photo_file_key}
@@ -483,13 +526,13 @@ export default function PartnerDetails({ id }: Props) {
           </div>
         )}
 
-        </div>
+        </>
         )}
 
         {/* Team Members */}
         {isCompany && tab === "team" && (
-          <div key={tab} className="animate-in fade-in duration-200 p-6">
-            <div className="mb-4 flex items-center gap-2">
+          <div className="flex flex-col gap-4 p-6">
+            <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-slate-500" />
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Team Members
@@ -498,7 +541,7 @@ export default function PartnerDetails({ id }: Props) {
             {!partner.agency_members?.length ? (
               <p className="py-8 text-center text-sm text-slate-500">No team members yet.</p>
             ) : (
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
               {partner.agency_members.map((member) => (
                 <div
                   key={member.id}
@@ -509,7 +552,7 @@ export default function PartnerDetails({ id }: Props) {
                     <p className="truncate text-sm font-medium text-slate-900">{member.name}</p>
                     <p className="truncate text-xs text-slate-500">{member.email}</p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-3">
+                  <div className="flex shrink-0 items-center gap-2">
                     {member.is_active ? (
                       <StatusBadge variant="success">Active</StatusBadge>
                     ) : (
@@ -534,37 +577,13 @@ export default function PartnerDetails({ id }: Props) {
           </div>
         )}
 
-        {/* Applications */}
-        {tab === "applications" && (
-          <div key={tab} className="animate-in fade-in duration-200">
-            <PartnerApplicationsTable partnerId={id} />
-          </div>
-        )}
+        {/* Bank Account */}
+        {tab === "bank-account" && <PartnerBankAccountSection partner={partner} />}
 
-        {/* Footer */}
-        <div className="flex justify-end gap-3 px-6 py-5">
-          <Button
-            onClick={() => router.push("/admin/partners")}
-            icon={<ChevronLeft className="h-4 w-4" />}
-            text="Back"
-            bgColor="bg-white"
-            textColor="text-slate-700"
-            borderColor="border-slate-200"
-            hoverTextColor="hover:text-slate-900"
-            hoverBorderColor="hover:border-slate-300"
-          />
-          <Button
-            onClick={() => router.push(`/admin/partners/${id}/edit`)}
-            icon={<Pencil className="h-4 w-4" />}
-            text="Edit Partner"
-            bgColor="bg-blue-600"
-            textColor="text-white"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-white"
-            hoverBorderColor="hover:border-blue-700"
-            className="hover:bg-blue-700"
-          />
-        </div>
+        {/* Applications */}
+        {tab === "applications" && <PartnerApplicationsTable partnerId={id} />}
+        </motion.div>
+        </AnimatePresence>
       </div>
     </div>
     </>

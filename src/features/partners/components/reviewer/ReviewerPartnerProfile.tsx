@@ -67,7 +67,7 @@ function InfoRow({
   href?: string;
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
+    <div className="flex items-start gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500">
         {icon}
       </div>
@@ -123,8 +123,8 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex min-w-0 items-center gap-3 sm:flex-1">
+    <div className="flex flex-col gap-2 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex min-w-0 items-center gap-2 sm:flex-1">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
           <FileText className="h-5 w-5" />
         </div>
@@ -246,11 +246,11 @@ export default function ReviewerPartnerProfile({ id }: Props) {
         <div key={tab} className="animate-in fade-in duration-200">
 
         {/* Account Overview */}
-        <div className="border-b border-slate-200 p-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
+          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
             Account Overview
           </p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Country of Residence" value={partner.country} />
             <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Nationality" value={partner.nationality} />
             <InfoRow icon={<MdPhone className="h-4 w-4" />} label="Phone Number" value={partner.phone} />
@@ -290,14 +290,14 @@ export default function ReviewerPartnerProfile({ id }: Props) {
 
         {/* Individual Details */}
         {isIndividual && (
-          <div className="border-b border-slate-200 p-6">
-            <div className="mb-4 flex items-center gap-2">
+          <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
+            <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-slate-500" />
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Individual Details
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <InfoRow
                 icon={<MdCake className="h-4 w-4" />}
                 label="Date of Birth"
@@ -326,7 +326,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
                 value={partner.individual_details?.passport_number}
               />
             </div>
-            <div className="mt-3 space-y-2">
+            <div className="flex flex-col gap-2">
               <DocRow
                 label="Profile Photo"
                 fileKey={partner.individual_details?.profile_photo_file_key}
@@ -343,14 +343,14 @@ export default function ReviewerPartnerProfile({ id }: Props) {
 
         {/* Company Details */}
         {isCompany && (
-          <div className="border-b border-slate-200 p-6">
-            <div className="mb-4 flex items-center gap-2">
+          <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
+            <div className="flex items-center gap-2">
               <Briefcase className="h-4 w-4 text-slate-500" />
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Company Details
               </p>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <InfoRow
                 icon={<Briefcase className="h-4 w-4" />}
                 label="Company Name"
@@ -373,7 +373,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
                 value={partner.company_details?.passport_number}
               />
             </div>
-            <div className="mt-3 space-y-2">
+            <div className="flex flex-col gap-2">
               <DocRow
                 label="Company Registration Document"
                 fileKey={partner.company_details?.company_registration_doc_file_key}
@@ -398,8 +398,8 @@ export default function ReviewerPartnerProfile({ id }: Props) {
 
         {/* Team Members */}
         {isCompany && tab === "team" && (
-          <div key={tab} className="animate-in fade-in duration-200 p-6">
-            <div className="mb-4 flex items-center gap-2">
+          <div key={tab} className="flex flex-col gap-4 p-6 animate-in fade-in duration-200">
+            <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-slate-500" />
               <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                 Team Members
@@ -408,7 +408,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
             {!partner.agency_members?.length ? (
               <p className="py-8 text-center text-sm text-slate-500">No team members yet.</p>
             ) : (
-              <div className="space-y-2">
+              <div className="flex flex-col gap-2">
                 {partner.agency_members.map((member) => (
                   <div
                     key={member.id}

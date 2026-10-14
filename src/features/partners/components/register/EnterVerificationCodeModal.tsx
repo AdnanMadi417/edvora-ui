@@ -77,7 +77,7 @@ export default function EnterVerificationCodeModal({ isOpen, onClose, onContinue
             onClose={onClose}
           />
 
-          <div className="space-y-4 px-7 py-6">
+          <div className="flex flex-col gap-4 px-7 py-6">
             <p className="text-sm text-slate-500">
               Enter the email address you registered with, and we'll take you to where you
               can enter the verification code from your email.
@@ -94,7 +94,7 @@ export default function EnterVerificationCodeModal({ isOpen, onClose, onContinue
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-2 border-t border-gray-200 px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}

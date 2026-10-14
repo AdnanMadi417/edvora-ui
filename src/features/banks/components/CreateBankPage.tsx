@@ -173,7 +173,7 @@ export default function CreateBankPage({ basePath = "/admin/partners/banks" }: P
           />
 
           {apiError && (
-            <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4">
+            <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-4">
               <XCircle className="mt-0.5 h-5 w-5 text-red-600" />
               <div>
                 <p className="text-sm font-semibold text-red-800">Failed to create bank</p>
@@ -183,7 +183,7 @@ export default function CreateBankPage({ basePath = "/admin/partners/banks" }: P
           )}
         </div>
 
-        <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
+        <div className="flex gap-2 border-t border-slate-200 px-6 py-4">
           <Button
             onClick={handleBack}
             disabled={loading}
