@@ -7,6 +7,7 @@ import {
   CheckCircle, XCircle, RefreshCw, SlidersHorizontal, Ban, Power,
   UserPlus, KeyRound, ExternalLink, Users,
 } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 
 import { useStaffUsers, useSuspendStaffUser, useReactivateStaffUser } from "../../hooks";
 import type { StaffUser } from "../../types";
@@ -14,6 +15,7 @@ import type { StaffUser } from "../../types";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { StatusBadge } from "components/ui/badges";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
@@ -283,8 +285,9 @@ export default function StaffUsersTable() {
                 />
               )}
 
+              <AnimatePresence>
               {!isInitialLoad && !error && staffUsers.map((user) => (
-                <tr
+                <AnimatedTableRow
                   key={user.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                   onClick={() => router.push(`/admin/staff-users/${user.id}`)}
@@ -333,8 +336,9 @@ export default function StaffUsersTable() {
                   <td className="px-4 py-4">
                     <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
-                </tr>
+                </AnimatedTableRow>
               ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </TableWrapper>

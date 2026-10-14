@@ -2,11 +2,13 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { ChevronRight, User, GraduationCap, Clock, RefreshCw, SlidersHorizontal, ClipboardList } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
 import { useAccountManagerApplications } from "features/applications/hooks";
 import PresignedImage from "components/ui/PresignedImage";
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { StatusBadge } from "components/ui/badges";
 import { getStatusVariant } from "utils/getStatusVariant";
 import Button from "components/ui/buttons/Button";
@@ -199,10 +201,11 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
                 />
               )}
 
+              <AnimatePresence>
               {!isInitialLoad && !error && applications.map((app) => {
                 const statusVariant = getStatusVariant(app.status?.toLowerCase().replace(/\s+/g, "_") ?? "");
                 return (
-                  <tr
+                  <AnimatedTableRow
                     key={app.id}
                     className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                     onClick={() => window.open(`/account-manager/applications/${app.id}`, "_blank")}
@@ -240,9 +243,10 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
                     <td className="px-4 py-4">
                       <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                     </td>
-                  </tr>
+                  </AnimatedTableRow>
                 );
               })}
+              </AnimatePresence>
             </tbody>
           </table>
         </TableWrapper>

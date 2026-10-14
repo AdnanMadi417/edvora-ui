@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { RefreshCw, ChevronRight, Pencil, Settings, CreditCard } from "lucide-react";
 import { MdOutlineCategory } from "react-icons/md";
 import { useRouter } from "next/navigation";
@@ -11,6 +12,7 @@ import SearchInput from "components/form/filter/SearchInput";
 import CreatePayment from "features/universities/components/admin/payment-methods/popups/CreatePayment";
 import Button from "components/ui/buttons/Button";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -161,8 +163,9 @@ const DataEntryPaymentMethodsTable = () => {
               />
             )}
 
+            <AnimatePresence>
             {!loading && !error && currentPaymentMethods.map((payment) => (
-              <tr
+              <AnimatedTableRow
                 key={payment.id}
                 className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                 onClick={() => router.push(`/data-entry/payment-methods/${payment.id}/edit`)}
@@ -201,8 +204,9 @@ const DataEntryPaymentMethodsTable = () => {
                 <td className="w-8 pr-4 py-4">
                   <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                 </td>
-              </tr>
+              </AnimatedTableRow>
             ))}
+            </AnimatePresence>
           </tbody>
         </table>
       </TableWrapper>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   Pencil,
@@ -27,6 +28,7 @@ import UniversityFilterPanel from "features/universities/components/shared/filte
 import { StatusBadge } from "components/ui/badges";
 import { Tooltip } from "components/ui/tooltip";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
@@ -250,6 +252,7 @@ export default function DataEntryUniversitiesTable() {
                 />
               )}
 
+              <AnimatePresence>
               {!loading && !error && paginated.map((uni) => {
                 const normalizedType = uni.university_type_name?.toLowerCase().trim().replace(/\s+/g, "_") ?? "";
                 const typeConfig = TYPE_CONFIG[normalizedType] ?? {
@@ -260,7 +263,7 @@ export default function DataEntryUniversitiesTable() {
                 };
 
                 return (
-                  <tr
+                  <AnimatedTableRow
                     key={uni.id}
                     className="group cursor-pointer transition-colors hover:bg-slate-100/50"
                     onClick={() => router.push(`/data-entry/universities/${uni.id}`)}
@@ -367,9 +370,10 @@ export default function DataEntryUniversitiesTable() {
                     <td className="w-8 pr-4 py-4">
                       <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                     </td>
-                  </tr>
+                  </AnimatedTableRow>
                 );
               })}
+              </AnimatePresence>
             </tbody>
           </table>
         </TableWrapper>

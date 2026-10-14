@@ -12,6 +12,7 @@ import {
   ClipboardList,
 } from "lucide-react";
 import PipelineCard from "features/applications/partner/components/PipelineCard";
+import { AnimatePresence } from "framer-motion";
 
 import { useAdminApplications } from "features/applications/admin/hooks/useAdminApplications";
 import { useUniversities } from "features/universities/hooks";
@@ -20,6 +21,7 @@ import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 import EmptyData from "components/emptyData/EmptyTableData";
 import ApplicationFilterBar from "components/filters/ApplicationFilterBar";
 import { TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { StatusBadge } from "components/ui/badges";
 import { getStatusVariant } from "utils/getStatusVariant";
 import api from "lib/useApi";
@@ -389,9 +391,12 @@ const ModernApplicationsTable = () => {
                 subtitle="No applications match your current filters."
                 icon={<ClipboardList className="h-8 w-8 text-slate-400" />}
               />
-            ) : (
+            ) : null}
+
+            <AnimatePresence>
+            {!loading && !error && paginatedApplications.length > 0 &&
               paginatedApplications.map((app) => (
-                <tr
+                <AnimatedTableRow
                   key={app.id}
                   className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${
                     needsAction(app.status) ? 'border-l-2 border-l-blue-400 bg-blue-50/30' : ''
@@ -453,9 +458,9 @@ const ModernApplicationsTable = () => {
                   <td className="px-4 py-4">
                     <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
-                </tr>
-              ))
-            )}
+                </AnimatedTableRow>
+              ))}
+            </AnimatePresence>
           </tbody>
         </table>
       </div>

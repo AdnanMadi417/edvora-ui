@@ -18,11 +18,13 @@ import {
 } from "lucide-react";
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
+import { AnimatePresence } from "framer-motion";
 import PresignedImage from "components/ui/PresignedImage";
 import { getIeltsLabel } from "constants/lists";
 import IconButton from "components/ui/buttons/IconButton";
 import { Tooltip } from "components/ui/tooltip";
 import { TableWrapper, TableLoadingRow, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { StatusBadge } from "components/ui/badges";
 import { useToast } from "components/context/ToastContext";
 import type { Program } from "features/programs/types";
@@ -235,8 +237,9 @@ export default function KnowledgeHubTable({
             />
           )}
 
+          <AnimatePresence>
           {!loading && !error && programs.map((program) => (
-            <tr
+            <AnimatedTableRow
               key={program.id}
               className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${selectedPrograms[program.id] ? "bg-slate-50" : ""}`}
               onClick={() => onRowClick(program)}
@@ -463,8 +466,9 @@ export default function KnowledgeHubTable({
                   <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                 </div>
               </td>
-            </tr>
+            </AnimatedTableRow>
           ))}
+          </AnimatePresence>
         </tbody>
       </table>
     </TableWrapper>
