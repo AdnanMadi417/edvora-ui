@@ -6,13 +6,15 @@ import { MdPersonAdd } from "react-icons/md";
 
 import InputField from "components/form/fields/InputField";
 import PasswordField from "components/form/fields/PasswordField";
+import PasswordRequirementsChecklist from "components/form/fields/PasswordRequirementsChecklist";
+import PasswordMatchIndicator from "components/form/fields/PasswordMatchIndicator";
 import Button from "components/ui/buttons/Button";
 
 import { useCreateAccountManager } from "../hooks/useCreateAccountManager";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { useRouter } from "next/navigation";
-import { validateNewPassword } from "utils/passwordValidation";
+import { validateNewPassword, isPasswordValid } from "utils/passwordValidation";
 
 interface FormData {
   name: string;
@@ -48,8 +50,9 @@ export default function CreateAccountManager() {
   const isFormValid =
     !!formData.name.trim() &&
     !!formData.email.trim() &&
-    !!formData.password.trim() &&
-    !!formData.confirm_password.trim();
+    isPasswordValid(formData.password) &&
+    !!formData.confirm_password.trim() &&
+    formData.password === formData.confirm_password;
 
   const handleSubmit = async () => {
     const newErrors: FormErrors = {};
@@ -139,25 +142,31 @@ export default function CreateAccountManager() {
             updateFormData={updateFormData}
           />
 
-          <PasswordField
-            label="Password"
-            field="password"
-            placeholder="At least 8 characters, letters & numbers"
-            required
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
+          <div>
+            <PasswordField
+              label="Password"
+              field="password"
+              placeholder="At least 12 characters, letters & numbers"
+              required
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+            />
+            <PasswordRequirementsChecklist password={formData.password} />
+          </div>
 
-          <PasswordField
-            label="Confirm Password"
-            field="confirm_password"
-            placeholder="Repeat your password"
-            required
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
+          <div>
+            <PasswordField
+              label="Confirm Password"
+              field="confirm_password"
+              placeholder="Repeat your password"
+              required
+              formData={formData}
+              errors={errors}
+              updateFormData={updateFormData}
+            />
+            <PasswordMatchIndicator password={formData.password} confirmPassword={formData.confirm_password} />
+          </div>
 
           {errorCreateAccountManager && (
             <p className="text-sm text-red-600">{errorCreateAccountManager}</p>

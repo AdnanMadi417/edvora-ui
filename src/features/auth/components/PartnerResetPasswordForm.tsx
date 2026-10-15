@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { KeyRound } from "lucide-react";
+import { AlertTriangle, KeyRound } from "lucide-react";
 import { usePartnerResetPassword } from "../hooks";
 import AuthLayout from "./AuthLayout";
 import PasswordField from "components/form/fields/PasswordField";
-import { validateNewPassword } from "utils/passwordValidation";
+import PasswordRequirementsChecklist from "components/form/fields/PasswordRequirementsChecklist";
+import PasswordMatchIndicator from "components/form/fields/PasswordMatchIndicator";
+import { validateNewPassword, isPasswordValid } from "utils/passwordValidation";
 
 export default function PartnerResetPasswordForm() {
   const { resetPassword, loading, error, success } = usePartnerResetPassword();
@@ -48,7 +50,11 @@ export default function PartnerResetPasswordForm() {
   };
 
   const isDisabled =
-    loading || !formData.current_password || !formData.new_password || !formData.confirm_password;
+    loading ||
+    !formData.current_password ||
+    !isPasswordValid(formData.new_password) ||
+    !formData.confirm_password ||
+    formData.new_password !== formData.confirm_password;
 
   if (success) {
     return (
@@ -88,11 +94,12 @@ export default function PartnerResetPasswordForm() {
         <PasswordField
           label="New Password"
           field="new_password"
-          placeholder="Min. 8 characters, 1 letter & 1 number"
+          placeholder="Min. 12 characters, 1 letter & 1 number"
           formData={formData}
           errors={errors}
           updateFormData={updateFormData}
         />
+        <PasswordRequirementsChecklist password={formData.new_password} />
         <PasswordField
           label="Confirm New Password"
           field="confirm_password"
@@ -101,10 +108,12 @@ export default function PartnerResetPasswordForm() {
           errors={errors}
           updateFormData={updateFormData}
         />
+        <PasswordMatchIndicator password={formData.new_password} confirmPassword={formData.confirm_password} />
 
         {error && (
-          <p className="mb-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-            {error}
+          <p className="mb-2 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{error}</span>
           </p>
         )}
 

@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 
 import InputField from "components/form/fields/InputField";
 import PasswordField from "components/form/fields/PasswordField";
+import PasswordRequirementsChecklist from "components/form/fields/PasswordRequirementsChecklist";
+import PasswordMatchIndicator from "components/form/fields/PasswordMatchIndicator";
 import ToggleInput from "components/form/toggle/ToggleInput";
 import Button from "components/ui/buttons/Button";
 import { StatusBadge } from "components/ui/badges";
@@ -14,7 +16,7 @@ import { parseApiError } from "utils/parseApiError";
 import { useEditAccountManager } from "../hooks/useEditAccountManager";
 import type { AccountManager } from "../types";
 import { useRouter } from "next/navigation";
-import { validateNewPassword } from "utils/passwordValidation";
+import { validateNewPassword, isPasswordValid } from "utils/passwordValidation";
 
 interface EditAccountManagerProps {
   manager: AccountManager;
@@ -180,25 +182,33 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3">
-            <PasswordField
-              label="Password"
-              field="password"
-              placeholder="Leave blank to keep current password"
-              required={false}
-              formData={formData}
-              errors={errors}
-              updateFormData={updateField}
-            />
+            <div>
+              <PasswordField
+                label="Password"
+                field="password"
+                placeholder="Leave blank to keep current password"
+                required={false}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateField}
+              />
+              <PasswordRequirementsChecklist password={formData.password} />
+            </div>
 
-            <PasswordField
-              label="Confirm Password"
-              field="confirm_password"
-              placeholder="Repeat your new password"
-              required={false}
-              formData={formData}
-              errors={errors}
-              updateFormData={updateField}
-            />
+            <div>
+              <PasswordField
+                label="Confirm Password"
+                field="confirm_password"
+                placeholder="Repeat your new password"
+                required={false}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateField}
+              />
+              {formData.password && (
+                <PasswordMatchIndicator password={formData.password} confirmPassword={formData.confirm_password} />
+              )}
+            </div>
           </div>
         </div>
 
@@ -223,7 +233,12 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
             hoverTextColor="hover:text-blue-800"
             hoverBorderColor="hover:border-blue-700"
             onClick={handleSubmit}
-            disabled={loading || !isFormChanged()}
+            disabled={
+              loading ||
+              !isFormChanged() ||
+              (!!formData.password &&
+                (!isPasswordValid(formData.password) || formData.password !== formData.confirm_password))
+            }
           />
         </div>
       </div>

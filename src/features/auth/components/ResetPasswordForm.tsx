@@ -7,7 +7,9 @@ import { KeyRound, CheckCircle, AlertTriangle } from "lucide-react";
 import { useResetPassword } from "../hooks";
 import AuthLayout from "./AuthLayout";
 import PasswordField from "components/form/fields/PasswordField";
-import { validateNewPassword } from "utils/passwordValidation";
+import PasswordRequirementsChecklist from "components/form/fields/PasswordRequirementsChecklist";
+import PasswordMatchIndicator from "components/form/fields/PasswordMatchIndicator";
+import { validateNewPassword, isPasswordValid } from "utils/passwordValidation";
 
 export default function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -111,7 +113,7 @@ export default function ResetPasswordForm() {
         </div>
         <h1 className="text-xl font-bold text-slate-900">Set new password</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Choose a strong password — at least 8 characters, with a letter and a number.
+          Choose a strong password — at least 12 characters, with a letter and a number.
         </p>
       </div>
 
@@ -119,11 +121,12 @@ export default function ResetPasswordForm() {
         <PasswordField
           label="New Password"
           field="new_password"
-          placeholder="Min. 8 characters, 1 letter & 1 number"
+          placeholder="Min. 12 characters, 1 letter & 1 number"
           formData={formData}
           errors={errors}
           updateFormData={updateFormData}
         />
+        <PasswordRequirementsChecklist password={formData.new_password} />
         <PasswordField
           label="Confirm Password"
           field="confirm_password"
@@ -132,16 +135,23 @@ export default function ResetPasswordForm() {
           errors={errors}
           updateFormData={updateFormData}
         />
+        <PasswordMatchIndicator password={formData.new_password} confirmPassword={formData.confirm_password} />
 
         {error && (
-          <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
-            {error}
+          <p className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-600">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+            <span>{error}</span>
           </p>
         )}
 
         <button
           type="submit"
-          disabled={loading || !formData.new_password || !formData.confirm_password}
+          disabled={
+            loading ||
+            !isPasswordValid(formData.new_password) ||
+            !formData.confirm_password ||
+            formData.new_password !== formData.confirm_password
+          }
           className="mt-2 flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? "Resetting…" : "Reset password"}
