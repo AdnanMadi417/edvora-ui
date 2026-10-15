@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
-import { CheckCircle, CreditCard } from 'lucide-react';
+import { CheckCircle, CreditCard, Download } from 'lucide-react';
 import { submitOfferLetterDecision } from "services/offerLetterService";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -9,6 +9,12 @@ import DocumentActions from "features/applications/shared/DocumentActions";
 import { AppDate } from "components/ui/date";
 import Button from "components/ui/buttons/Button";
 import { SectionIconBadge } from "components/ui/icons";
+
+// Official "Lampiran B" Health Declaration Form, required for visa
+// processing — a static government PDF, not an app-hosted document, so it
+// just links out directly rather than going through getDocumentDownloadUrl.
+const HEALTH_DECLARATION_FORM_URL =
+  "https://visa.educationmalaysia.gov.my/media/cms_upload/Lampiran_B_-_Health_Declaration_Form_For_ApplicantV2.pdf";
 
 interface OfferLetterDecisionProps {
   application: any;
@@ -106,7 +112,7 @@ export default function OfferLetterDecision({
           </p>
         </div>
 
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-white px-4 py-3">
           <div className="flex items-center gap-3">
             <FaFilePdf className="text-2xl text-red-500" />
             <div className="min-w-0">
@@ -121,6 +127,28 @@ export default function OfferLetterDecision({
           <div className="flex items-center gap-2">
             <DocumentActions fileKey={offerLetter.file_key} label="Offer Letter" personName={studentName} />
           </div>
+        </div>
+
+        <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-white px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-blue-50">
+              <FaFilePdf className="h-4 w-4 text-blue-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-800">Health Declaration Form</p>
+              <p className="text-xs text-slate-400">Required for visa processing (Lampiran B)</p>
+            </div>
+          </div>
+          <a
+            href={HEALTH_DECLARATION_FORM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Download Health Declaration Form"
+            title="Download Health Declaration Form"
+            className="ml-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100"
+          >
+            <Download className="h-4 w-4" />
+          </a>
         </div>
 
         {isUniversityApproved && (
