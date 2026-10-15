@@ -4,9 +4,11 @@ import React, { useState, useEffect } from "react";
 import { KeyRound } from "lucide-react";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import PasswordField from "components/form/fields/PasswordField";
+import PasswordRequirementsChecklist from "components/form/fields/PasswordRequirementsChecklist";
+import PasswordMatchIndicator from "components/form/fields/PasswordMatchIndicator";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
-import { validateNewPassword } from "utils/passwordValidation";
+import { validateNewPassword, isPasswordValid } from "utils/passwordValidation";
 import Button from "components/ui/buttons/Button";
 import { parseApiError } from "utils/parseApiError";
 
@@ -98,8 +100,9 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
   const isDisabled =
     loading ||
     !formData.current_password ||
-    !formData.new_password ||
-    !formData.confirm_password;
+    !isPasswordValid(formData.new_password) ||
+    !formData.confirm_password ||
+    formData.new_password !== formData.confirm_password;
 
   return (
     <div
@@ -136,12 +139,13 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
             <PasswordField
               label="New Password"
               field="new_password"
-              placeholder="Min. 8 characters, 1 letter & 1 number"
+              placeholder="Min. 12 characters, 1 letter & 1 number"
               formData={formData}
               errors={errors}
               updateFormData={updateFormData}
               onBlur={() => validateField("new_password")}
             />
+            <PasswordRequirementsChecklist password={formData.new_password} />
             <PasswordField
               label="Confirm New Password"
               field="confirm_password"
@@ -151,6 +155,7 @@ export default function ChangePasswordPopup({ isOpen, onClose }: Props) {
               updateFormData={updateFormData}
               onBlur={() => validateField("confirm_password")}
             />
+            <PasswordMatchIndicator password={formData.new_password} confirmPassword={formData.confirm_password} />
 
             <div className="flex gap-2">
               <Button
