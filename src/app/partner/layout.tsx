@@ -41,14 +41,12 @@ function PartnerShell({ children }: { children: React.ReactNode }) {
     <ToastProvider>
       <PartnerOnboardingTour />
       <div className="relative flex min-h-screen w-full bg-slate-50">
-        <div className="z-[60]">
-          <Sidebar
-            routes={visibleRoutes}
-            open={open}
-            setOpen={setOpen}
-            variant="admin"
-          />
-        </div>
+        <Sidebar
+          routes={visibleRoutes}
+          open={open}
+          setOpen={setOpen}
+          variant="admin"
+        />
 
         <div className="relative h-full w-full dark:bg-navy-900">
           <main className="mx-2.5 flex-none transition-all md:pr-2 xl:ml-[300px]">

@@ -117,7 +117,7 @@ const Navbar = ({
       <ChangePasswordPopup isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
     )}
     <nav
-      className={`sticky z-40 flex flex-wrap items-center justify-between rounded-md bg-brand-50/10 p-2 backdrop-blur-xl transition-all duration-300 ${
+      className={`sticky flex flex-wrap items-center justify-between rounded-md bg-brand-50/10 p-2 backdrop-blur-xl transition-all duration-300 ${
         isScrolled ? "top-0" : "top-4"
       }`}
     >
