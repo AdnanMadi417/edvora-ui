@@ -82,3 +82,43 @@ export interface PaymentMethod {
   name: string;
   description: string | null;
 }
+
+export type WaitingOn = "us" | "university" | "nobody" | "disputed";
+
+/** A row in the admin Finance Queue — one per `ApplicationCommission`. Three
+ *  independent amounts: `commission_*` is the agreed figure (fixed at
+ *  application creation), `received_*` is what the university actually sent
+ *  (null until a pay-in is recorded), `paid_*` is what we actually
+ *  transferred to the partner (null until a payout is recorded). Both are
+ *  independent of `waiting_on` — a settled or disputed row can still show
+ *  them. */
+export interface CommissionQueueItem {
+  application_commission_id: string;
+  application_id: string;
+  reference: string;
+  student_name: string;
+  partner_id: string;
+  partner_name: string | null;
+  university_name: string;
+  program_name: string;
+  commission_amount: number | null;
+  commission_currency: string;
+  received_amount: number | null;
+  received_currency: string | null;
+  paid_amount: number | null;
+  paid_currency: string | null;
+  waiting_on: WaitingOn;
+  days_waiting: number | null;
+  typical_days_from: number | null;
+  typical_days_to: number | null;
+  last_fact_type: "pay_in" | "arrival" | "payout" | "dispute" | null;
+  last_fact_date: string | null;
+  last_fact_reference: string | null;
+}
+
+export interface CommissionQueueResponse {
+  items: CommissionQueueItem[];
+  total: number;
+  page: number;
+  page_size: number;
+}

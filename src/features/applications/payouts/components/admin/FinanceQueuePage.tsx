@@ -1,438 +1,434 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Wallet, Search, X, Receipt, AlertCircle, CheckCircle } from "lucide-react";
+import { AnimatePresence } from "framer-motion";
+import { Wallet, X, SlidersHorizontal, Receipt, RefreshCw } from "lucide-react";
 
 import SearchInput from "components/form/filter/SearchInput";
-import { InputField, SelectField, SearchableDropdown } from "components/form";
-import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import FilterSelectField from "components/form/filter/FilterSelectField";
 import Button from "components/ui/buttons/Button";
-import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow } from "components/ui/table";
+import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { getAsyncStatus } from "components/ui/async";
-import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
-import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
+import { StatusBadge, type StatusBadgeVariant } from "components/ui/badges";
+import AppDate from "components/ui/date/AppDate";
+import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
 
 import { usePartners } from "features/partners/hooks/usePartners";
 import type { Partner } from "features/partners/types";
-import { usePartnerBankAccount } from "features/partners/bank-accounts";
-import { useAllStageStatuses } from "features/applications/hooks";
-import { useAdminApplications } from "features/applications/admin/hooks/useAdminApplications";
-import { useRecordBulkPayout, usePaymentMethods } from "../../hooks";
+import { RecordPayIn, type RecordPayInRow } from "features/applications/pay-ins";
+import { useCommissionQueue } from "../../hooks";
+import type { CommissionQueueItem, WaitingOn } from "../../types";
+import BatchPayout, { type BatchPayoutLine } from "./BatchPayout";
+
+const PAGE_SIZE = 20;
+
+const WAITING_ON_VARIANT: Record<WaitingOn, StatusBadgeVariant> = {
+  university: "info",
+  us: "attention",
+  nobody: "success",
+  disputed: "danger",
+};
+
+const WAITING_ON_LABEL: Record<WaitingOn, string> = {
+  university: "Waiting on University",
+  us: "Waiting on Us",
+  nobody: "Settled",
+  disputed: "Disputed",
+};
+
+const WAITING_ON_OPTIONS = [
+  { value: "university", label: "Waiting on University" },
+  { value: "us", label: "Waiting on Us" },
+  { value: "disputed", label: "Disputed" },
+  { value: "nobody", label: "Settled" },
+];
 
 export default function FinanceQueuePage() {
-  const { showToast } = useToast();
-
-  // --- Partner picker ---
+  // --- Filters ---
   const [partnerSearch, setPartnerSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [debouncedPartnerSearch, setDebouncedPartnerSearch] = useState("");
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+  const [waitingOnFilter, setWaitingOnFilter] = useState<WaitingOn | undefined>(undefined);
+  const [hideSettled, setHideSettled] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(partnerSearch.trim()), 400);
+    const t = setTimeout(() => setDebouncedPartnerSearch(partnerSearch.trim()), 400);
     return () => clearTimeout(t);
   }, [partnerSearch]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedPartner?.id, waitingOnFilter, hideSettled]);
+
   const { partners, loading: partnersLoading } = usePartners(
-    debouncedSearch.length >= 2 && !selectedPartner ? { search: debouncedSearch, page_size: 10 } : {}
+    debouncedPartnerSearch.length >= 2 && !selectedPartner ? { search: debouncedPartnerSearch, page_size: 10 } : {}
   );
-  const showPartnerResults = !selectedPartner && debouncedSearch.length >= 2;
+  const showPartnerResults = !selectedPartner && debouncedPartnerSearch.length >= 2;
 
-  // --- Commission-ready applications for the selected partner ---
-  const { stageStatuses } = useAllStageStatuses();
-  const commissionReadyStatus = stageStatuses.find((s) => s.name === "Commission Ready");
-
-  const {
-    items: applications,
-    loading: appsLoading,
-    error: appsError,
-    refetch: refetchApplications,
-  } = useAdminApplications({
-    status: "all",
+  const { items, total, loading, error, refetch } = useCommissionQueue({
+    page: currentPage,
+    page_size: PAGE_SIZE,
     partner_id: selectedPartner?.id,
-    stage_status_id: commissionReadyStatus?.id,
-    limit: 100,
+    waiting_on: waitingOnFilter,
+    hide_settled: hideSettled,
   });
 
-  // Defensive client-side filter — the list endpoint may not yet support
-  // partner_id/stage_status_id filtering server-side.
-  const readyApplications = applications.filter(
-    (a) => a.partner_id === selectedPartner?.id && a.status === "Commission Ready"
-  );
+  const status = getAsyncStatus(loading, error, items, (r) => r.length === 0);
+  const activeFiltersCount =
+    (selectedPartner ? 1 : 0) + (waitingOnFilter ? 1 : 0) + (hideSettled ? 1 : 0);
+  const clearFilters = () => {
+    setSelectedPartner(null);
+    setPartnerSearch("");
+    setWaitingOnFilter(undefined);
+    setHideSettled(false);
+  };
 
+  // --- Record Pay-In ---
+  const [recordPayInRow, setRecordPayInRow] = useState<RecordPayInRow | null>(null);
+
+  // --- Batch Payout selection (locked to one partner + one currency) ---
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [lineAmounts, setLineAmounts] = useState<Record<string, string>>({});
+  const [showBatchPayout, setShowBatchPayout] = useState(false);
+  const selectedItems = items.filter((i) => selectedIds.has(i.application_commission_id));
+  const lockedPartnerId = selectedItems[0]?.partner_id;
+  const lockedCurrency = selectedItems[0]?.commission_currency;
 
   useEffect(() => {
     setSelectedIds(new Set());
-    setLineAmounts({});
-  }, [selectedPartner?.id]);
+  }, [selectedPartner?.id, waitingOnFilter, hideSettled, currentPage]);
 
-  const toggleSelected = (id: string) => {
+  const toggleSelected = (item: CommissionQueueItem) => {
+    if (item.waiting_on !== "us") return;
     setSelectedIds((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(item.application_commission_id)) next.delete(item.application_commission_id);
+      else next.add(item.application_commission_id);
       return next;
     });
   };
 
-  const toggleSelectAll = () => {
-    if (selectedIds.size === readyApplications.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(readyApplications.map((a) => a.id)));
-    }
+  const batchPayoutLines: BatchPayoutLine[] = selectedItems.map((i) => ({
+    application_id: i.application_id,
+    reference: i.reference,
+    student_name: i.student_name,
+    commission_amount: i.commission_amount,
+  }));
+
+  const handleActionSuccess = () => {
+    setSelectedIds(new Set());
+    refetch();
   };
-
-  const status = getAsyncStatus(appsLoading, appsError, readyApplications, (r) => r.length === 0);
-
-  // --- Bulk payout form ---
-  const { account: partnerBankAccount } = usePartnerBankAccount(selectedPartner?.id ?? "");
-  const { recordBulkPayout, loading: recording } = useRecordBulkPayout();
-  const { paymentMethods } = usePaymentMethods();
-  const paymentMethodOptions = paymentMethods.map((m) => ({ value: m.id, label: m.name }));
-
-  const [formData, setFormData] = useState({
-    payment_method_id: "",
-    bank_reference: "",
-    paid_at: "",
-    currency: "RM",
-  });
-  const [formErrors, setFormErrors] = useState<any>({});
-  const [receiptFile, setReceiptFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-
-  const updateFormData = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    setFormErrors((prev: any) => ({ ...prev, [field]: undefined }));
-  };
-
-  const selectedApplications = readyApplications.filter((a) => selectedIds.has(a.id));
-
-  const validate = () => {
-    const errors: any = {};
-    if (!formData.payment_method_id.trim()) errors.payment_method_id = "Payment method is required";
-    if (!formData.bank_reference.trim()) errors.bank_reference = "Bank reference is required";
-    if (!formData.paid_at) errors.paid_at = "Payment date is required";
-
-    const badLine = selectedApplications.some((a) => {
-      const amount = lineAmounts[a.id];
-      return !amount || Number(amount) <= 0;
-    });
-
-    setFormErrors(errors);
-    if (Object.keys(errors).length > 0) return false;
-    if (selectedApplications.length === 0) {
-      showToast("Select at least one application.", "error");
-      return false;
-    }
-    if (badLine) {
-      showToast("Enter a valid amount for every selected application.", "error");
-      return false;
-    }
-    if (!partnerBankAccount) {
-      showToast("This partner has no active bank account on file.", "error");
-      return false;
-    }
-    if (!receiptFile) {
-      showToast("Please upload the payout receipt.", "error");
-      return false;
-    }
-    return true;
-  };
-
-  const handleSubmit = async () => {
-    if (!selectedPartner || !validate() || !partnerBankAccount || !receiptFile) return;
-
-    try {
-      setUploading(true);
-      const [presigned] = await getPresignedUploads([receiptFile], "finance-payouts");
-      const [uploaded] = await uploadFilesToSpaces([receiptFile], [presigned], (_, percent) =>
-        setUploadProgress(percent)
-      );
-      setUploading(false);
-
-      await recordBulkPayout(selectedPartner.id, {
-        bank_account_id: partnerBankAccount.id,
-        payment_method_id: formData.payment_method_id.trim(),
-        bank_reference: formData.bank_reference.trim(),
-        paid_at: formData.paid_at,
-        currency: formData.currency,
-        receipt_file_key: uploaded.file_key,
-        receipt_file_url: uploaded.public_url,
-        lines: selectedApplications.map((a) => ({
-          application_id: a.id,
-          paid_amount: lineAmounts[a.id],
-        })),
-      });
-
-      showToast("Payout recorded successfully.", "success");
-      setSelectedIds(new Set());
-      setLineAmounts({});
-      setFormData({ payment_method_id: "", bank_reference: "", paid_at: "", currency: "RM" });
-      setReceiptFile(null);
-      setUploadProgress(0);
-      refetchApplications();
-    } catch (err: unknown) {
-      setUploading(false);
-      showToast(parseApiError(err, "Failed to record payout."), "error");
-    }
-  };
-
-  const isSubmitting = recording || uploading;
 
   return (
-    <section className="mx-auto mt-5 max-w-5xl">
-      <div className="rounded-2xl border bg-white shadow-sm">
-        <div className="flex items-center gap-x-4 rounded-t-xl border-b px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-            <Wallet className="text-blue-700" size={24} />
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold text-slate-900">Finance Queue</h3>
-            <p className="text-sm text-slate-500">
-              Pick a partner, select their Commission Ready applications, and pay them out together.
-            </p>
-          </div>
+    <div className="mx-auto mt-5 max-w-6xl overflow-hidden rounded-lg border border-slate-200 bg-white text-p2">
+      {/* Header */}
+      <div className="flex items-center gap-x-4 border-b border-slate-200 p-6">
+        <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
+          <Wallet className="text-blue-700" size={24} />
         </div>
+        <div>
+          <h3 className="text-xl font-semibold text-slate-900">Finance Queue</h3>
+          <p className="text-sm text-slate-500">
+            Every commission, who's waiting on it, and how to settle it.
+          </p>
+        </div>
+      </div>
 
-        <div className="space-y-6 p-6">
-          {/* Partner picker */}
-          {!selectedPartner ? (
-            <div className="relative">
+      {/* Filters */}
+      <div className="flex flex-col gap-2 border-b border-slate-200 p-6 sm:flex-row sm:flex-wrap sm:items-center">
+        <div className="relative flex items-center gap-2 sm:contents">
+          <div className="relative w-full sm:w-64 sm:flex-none">
+            {selectedPartner ? (
+              <div className="flex h-10 items-center justify-between rounded-lg border border-blue-200 bg-blue-50 px-3">
+                <span className="truncate text-sm font-medium text-slate-900">{selectedPartner.name}</span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedPartner(null)}
+                  className="ml-2 shrink-0 text-slate-500 hover:text-slate-700"
+                  aria-label="Clear partner filter"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
               <SearchInput
                 value={partnerSearch}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPartnerSearch(e.target.value)}
-                placeholder="Search for a partner by name or email..."
+                placeholder="Filter by partner..."
               />
-              {showPartnerResults && (
-                <div className="absolute z-10 mt-2 w-full max-h-72 overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
-                  {partnersLoading ? (
-                    <p className="p-4 text-sm text-slate-500">Searching...</p>
-                  ) : partners.length === 0 ? (
-                    <p className="p-4 text-sm text-slate-500">No partners found.</p>
-                  ) : (
-                    partners.map((p) => (
-                      <button
-                        key={p.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedPartner(p);
-                          setPartnerSearch("");
-                        }}
-                        className="flex w-full flex-col items-start px-4 py-3 text-left hover:bg-slate-50"
-                      >
-                        <span className="text-sm font-medium text-slate-900">{p.name}</span>
-                        <span className="text-xs text-slate-500">{p.email}</span>
-                      </button>
-                    ))
-                  )}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-blue-50 px-4 py-3">
-              <div>
-                <p className="text-sm font-semibold text-slate-900">{selectedPartner.name}</p>
-                <p className="text-xs text-slate-500">{selectedPartner.email}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedPartner(null)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 hover:bg-blue-100"
-                aria-label="Change partner"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-          )}
-
-          {!selectedPartner && !showPartnerResults && (
-            <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-slate-200 py-12 text-center">
-              <Search className="h-8 w-8 text-slate-300" />
-              <p className="text-sm text-slate-500">Search for a partner to see their Commission Ready applications.</p>
-            </div>
-          )}
-
-          {/* Commission-ready applications table */}
-          {selectedPartner && (
-            <>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-p2 font-semibold text-slate-900">Commission Ready Applications</p>
-                  {readyApplications.length > 0 && (
+            )}
+            {showPartnerResults && (
+              <div className="absolute z-10 mt-2 max-h-72 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
+                {partnersLoading ? (
+                  <p className="p-4 text-sm text-slate-500">Searching...</p>
+                ) : partners.length === 0 ? (
+                  <p className="p-4 text-sm text-slate-500">No partners found.</p>
+                ) : (
+                  partners.map((p) => (
                     <button
+                      key={p.id}
                       type="button"
-                      onClick={toggleSelectAll}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                      onClick={() => {
+                        setSelectedPartner(p);
+                        setPartnerSearch("");
+                      }}
+                      className="flex w-full flex-col items-start px-4 py-3 text-left hover:bg-slate-50"
                     >
-                      {selectedIds.size === readyApplications.length ? "Deselect all" : "Select all"}
+                      <span className="text-sm font-medium text-slate-900">{p.name}</span>
+                      <span className="text-xs text-slate-500">{p.email}</span>
                     </button>
-                  )}
-                </div>
-
-                <TableWrapper>
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-slate-200 bg-slate-50">
-                        <th className="w-10 px-6 py-4" />
-                        <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Student</th>
-                        <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Program</th>
-                        <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">University</th>
-                        <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Paid Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 bg-white">
-                      {status === "loading" && <TableSkeletonRows columns={5} rows={3} />}
-                      {status === "error" && (
-                        <TableErrorRow colSpan={5} message={appsError ?? undefined} onRetry={refetchApplications} />
-                      )}
-                      {status === "empty" && (
-                        <TableEmptyRow
-                          colSpan={5}
-                          title="No Commission Ready applications"
-                          subtitle="This partner has no applications waiting to be paid out."
-                          icon={<Wallet className="h-8 w-8 text-slate-400" />}
-                        />
-                      )}
-                      {status === "success" &&
-                        readyApplications.map((a) => {
-                          const isSelected = selectedIds.has(a.id);
-                          return (
-                            <tr key={a.id} className={isSelected ? "bg-blue-50/50" : undefined}>
-                              <td className="px-6 py-4">
-                                <input
-                                  type="checkbox"
-                                  checked={isSelected}
-                                  onChange={() => toggleSelected(a.id)}
-                                  className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                />
-                              </td>
-                              <td className="px-6 py-4 text-sm font-medium text-slate-900">{a.student_name}</td>
-                              <td className="px-6 py-4 text-sm text-slate-700">{a.program_name}</td>
-                              <td className="px-6 py-4 text-sm text-slate-700">{a.university_name}</td>
-                              <td className="px-6 py-4">
-                                <input
-                                  type="number"
-                                  disabled={!isSelected}
-                                  value={lineAmounts[a.id] ?? ""}
-                                  onChange={(e) =>
-                                    setLineAmounts((prev) => ({ ...prev, [a.id]: e.target.value }))
-                                  }
-                                  placeholder="Amount"
-                                  className="h-9 w-28 rounded-lg border border-slate-200 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:bg-slate-50"
-                                />
-                              </td>
-                            </tr>
-                          );
-                        })}
-                    </tbody>
-                  </table>
-                </TableWrapper>
+                  ))
+                )}
               </div>
+            )}
+          </div>
 
-              {/* Bulk payout form */}
-              {selectedIds.size > 0 && (
-                <div className="space-y-4 rounded-lg border border-slate-200 p-5">
-                  <div className="flex items-center gap-2">
-                    <Receipt className="h-4 w-4 text-slate-400" />
-                    <p className="text-p2 font-semibold text-slate-900">
-                      Record Payout for {selectedIds.size} {selectedIds.size === 1 ? "Application" : "Applications"}
-                    </p>
-                  </div>
+          <button
+            type="button"
+            onClick={() => setShowMobileFilters((v) => !v)}
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 sm:hidden"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            {activeFiltersCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                {activeFiltersCount}
+              </span>
+            )}
+          </button>
+        </div>
 
-                  <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
-                    {partnerBankAccount ? (
-                      <>
-                        <span className="font-medium text-slate-900">Paying to:</span>{" "}
-                        {partnerBankAccount.intl_bank_name} · {partnerBankAccount.account_number}
-                      </>
-                    ) : (
-                      <span className="text-red-600">This partner has no active bank account on file.</span>
-                    )}
-                  </div>
+        <div
+          className={`flex w-full flex-col gap-2 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${
+            showMobileFilters ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"
+          }`}
+        >
+          <div className="w-full sm:w-56 sm:flex-none">
+            <FilterSelectField
+              value={waitingOnFilter ?? "all"}
+              onChange={(v: string) => setWaitingOnFilter(v === "all" ? undefined : (v as WaitingOn))}
+              options={WAITING_ON_OPTIONS}
+              defaultOption="All States"
+            />
+          </div>
 
-                  <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                    <SearchableDropdown
-                      label="Payment Method"
-                      field="payment_method_id"
-                      placeholder="Search for a payment method..."
-                      options={paymentMethodOptions}
-                      formData={formData}
-                      errors={formErrors}
-                      updateFormData={updateFormData}
-                    />
-                    <InputField
-                      label="Bank Reference"
-                      field="bank_reference"
-                      placeholder="e.g. BULK-REF-001"
-                      formData={formData}
-                      errors={formErrors}
-                      updateFormData={updateFormData}
-                    />
-                    <InputField
-                      label="Payment Date"
-                      field="paid_at"
-                      type="date"
-                      formData={formData}
-                      errors={formErrors}
-                      updateFormData={updateFormData}
-                    />
-                    <SelectField
-                      label="Currency"
-                      field="currency"
-                      options={[
-                        { value: "RM", label: "RM" },
-                        { value: "USD", label: "USD" },
-                      ]}
-                      formData={formData}
-                      errors={formErrors}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
+          {waitingOnFilter !== "nobody" && (
+            <label className="flex h-10 w-full shrink-0 cursor-pointer items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 sm:w-auto">
+              <input
+                type="checkbox"
+                checked={hideSettled}
+                onChange={(e) => setHideSettled(e.target.checked)}
+                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              />
+              Hide settled
+            </label>
+          )}
 
-                  <StatusFileUpload
-                    id="finance-queue-receipt"
-                    label="Upload Payout Receipt"
-                    description="Upload proof of payment (receipt or transfer confirmation)"
-                    file={receiptFile}
-                    onFileChange={setReceiptFile}
-                    onRemove={() => setReceiptFile(null)}
-                    uploading={uploading}
-                    progress={uploadProgress}
-                    disabled={isSubmitting}
-                    required
-                  />
-
-                  <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
-                    <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-                    <p className="text-xs leading-relaxed text-amber-800">
-                      All-or-nothing — if any application is invalid, nothing is recorded.
-                    </p>
-                  </div>
-
-                  <div className="flex justify-end">
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={isSubmitting}
-                      icon={<CheckCircle className="h-4 w-4" />}
-                      text={isSubmitting ? "Recording..." : "Record Payout"}
-                      bgColor="bg-blue-100"
-                      textColor="text-blue-700"
-                      borderColor="border-blue-600"
-                      hoverTextColor="hover:text-blue-700"
-                      hoverBorderColor="hover:border-blue-700"
-                      className="hover:bg-blue-200"
-                    />
-                  </div>
-                </div>
-              )}
-            </>
+          {activeFiltersCount > 0 && (
+            <Button
+              onClick={clearFilters}
+              icon={<RefreshCw className="h-4 w-4" />}
+              text="Clear"
+              bgColor="bg-white"
+              textColor="text-red-600"
+              borderColor="border-red-200"
+              hoverTextColor="hover:text-red-600"
+              hoverBorderColor="hover:border-red-200"
+              className="hover:bg-red-50"
+            />
           )}
         </div>
       </div>
-    </section>
+
+      {/* Batch payout bar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center justify-between gap-3 border-b border-blue-200 bg-blue-50 px-6 py-3">
+          <p className="text-sm font-medium text-slate-900">
+            {selectedIds.size} selected · {lockedCurrency}
+          </p>
+          <Button
+            onClick={() => setShowBatchPayout(true)}
+            icon={<Wallet className="h-4 w-4" />}
+            text={`Pay Selected (${selectedIds.size})`}
+            bgColor="bg-blue-600"
+            textColor="text-white"
+            borderColor="border-blue-600"
+            hoverTextColor="hover:text-white"
+            hoverBorderColor="hover:border-blue-700"
+            className="hover:bg-blue-700"
+          />
+        </div>
+      )}
+
+      {/* Table */}
+      <div className="p-6">
+        <TableWrapper
+          footer={
+            <TablePagination
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+              itemsPerPage={PAGE_SIZE}
+              itemCount={items.length}
+              totalCount={total}
+              itemLabel="commissions"
+              loading={status === "loading"}
+            />
+          }
+        >
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-slate-200 bg-slate-50">
+                <th className="w-10 px-6 py-4" />
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Reference</th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Student</th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Partner</th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">University / Program</th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Commission</th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Waiting On</th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Days Waiting</th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-200 bg-white">
+              {status === "loading" && <TableSkeletonRows columns={9} rows={5} />}
+
+              {status === "error" && <TableErrorRow colSpan={9} message={error ?? undefined} onRetry={refetch} />}
+
+              {status === "empty" && (
+                <TableEmptyRow
+                  colSpan={9}
+                  title="No commissions found"
+                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Nothing in the queue yet."}
+                  icon={<Wallet className="h-8 w-8 text-slate-400" />}
+                />
+              )}
+
+              <AnimatePresence>
+                {status === "success" &&
+                  items.map((item) => {
+                    const isSelectable = item.waiting_on === "us";
+                    const isSelected = selectedIds.has(item.application_commission_id);
+                    const isLocked = selectedIds.size > 0;
+                    const matchesLock =
+                      !isLocked ||
+                      (item.partner_id === lockedPartnerId && item.commission_currency === lockedCurrency);
+                    const checkboxDisabled = !isSelectable || (!isSelected && !matchesLock);
+                    const overdue =
+                      item.days_waiting != null &&
+                      item.typical_days_to != null &&
+                      item.days_waiting > item.typical_days_to;
+
+                    return (
+                      <AnimatedTableRow key={item.application_commission_id}>
+                        <td className="px-6 py-4">
+                          {isSelectable && (
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              disabled={checkboxDisabled}
+                              onChange={() => toggleSelected(item)}
+                              title={
+                                checkboxDisabled && !isSelected
+                                  ? "Batch payout is limited to one partner and one currency at a time"
+                                  : undefined
+                              }
+                              className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+                            />
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm font-medium text-slate-900">{item.reference}</td>
+                        <td className="px-6 py-4 text-sm text-slate-700">{item.student_name}</td>
+                        <td className="px-6 py-4 text-sm text-slate-700">{item.partner_name ?? "—"}</td>
+                        <td className="px-6 py-4 text-sm text-slate-700">
+                          <p>{item.university_name}</p>
+                          <p className="text-xs text-slate-400">{item.program_name}</p>
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <p className="font-medium text-slate-900">
+                            {item.commission_amount != null
+                              ? formatCommissionAmount(item.commission_amount, item.commission_currency)
+                              : "—"}
+                          </p>
+                          {item.received_amount != null && (
+                            <p className="text-xs text-slate-400">
+                              Received: {formatCommissionAmount(item.received_amount, item.received_currency ?? item.commission_currency)}
+                            </p>
+                          )}
+                          {item.paid_amount != null && (
+                            <p className="text-xs text-slate-400">
+                              Paid: {formatCommissionAmount(item.paid_amount, item.paid_currency ?? item.commission_currency)}
+                            </p>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          <StatusBadge variant={WAITING_ON_VARIANT[item.waiting_on]}>
+                            {WAITING_ON_LABEL[item.waiting_on]}
+                          </StatusBadge>
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          {item.days_waiting != null ? (
+                            <p className={overdue ? "font-medium text-amber-600" : "text-slate-700"}>
+                              {item.days_waiting} day{item.days_waiting === 1 ? "" : "s"}
+                            </p>
+                          ) : (
+                            <p className="text-slate-400">—</p>
+                          )}
+                          {item.last_fact_date && (
+                            <p className="text-xs text-slate-400">
+                              <AppDate value={item.last_fact_date} format="short" />
+                              {item.last_fact_reference ? ` · ${item.last_fact_reference}` : ""}
+                            </p>
+                          )}
+                        </td>
+                        <td className="px-6 py-4">
+                          {item.waiting_on === "university" && (
+                            <Button
+                              onClick={() =>
+                                setRecordPayInRow({
+                                  application_id: item.application_id,
+                                  reference: item.reference,
+                                  student_name: item.student_name,
+                                })
+                              }
+                              icon={<Receipt className="h-4 w-4" />}
+                              text="Record Pay-In"
+                              bgColor="bg-white"
+                              textColor="text-blue-600"
+                              borderColor="border-blue-200"
+                              hoverTextColor="hover:text-blue-700"
+                              hoverBorderColor="hover:border-blue-300"
+                              className="hover:bg-blue-50"
+                            />
+                          )}
+                        </td>
+                      </AnimatedTableRow>
+                    );
+                  })}
+              </AnimatePresence>
+            </tbody>
+          </table>
+        </TableWrapper>
+      </div>
+
+      <RecordPayIn
+        isOpen={!!recordPayInRow}
+        onClose={() => setRecordPayInRow(null)}
+        row={recordPayInRow}
+        onSuccess={handleActionSuccess}
+      />
+
+      {lockedPartnerId && lockedCurrency && (
+        <BatchPayout
+          isOpen={showBatchPayout}
+          onClose={() => setShowBatchPayout(false)}
+          partnerId={lockedPartnerId}
+          currency={lockedCurrency}
+          lines={batchPayoutLines}
+          onSuccess={handleActionSuccess}
+        />
+      )}
+    </div>
   );
 }

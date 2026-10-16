@@ -22,3 +22,11 @@ export interface VoidPayInPayload {
   new_currency: string;
   new_payment_reference: string;
 }
+
+export interface CreatePayInPayload {
+  application_id: string;
+  payment_date: string;
+  amount: string;
+  currency: string;
+  payment_reference: string;
+}
