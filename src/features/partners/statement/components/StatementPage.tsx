@@ -1,11 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { Receipt, SlidersHorizontal } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
+import { Receipt, SlidersHorizontal, ChevronRight } from "lucide-react";
 
+import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import { SearchableDropdown } from "components/form";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
+import { AnimatedTableRow } from "components/ui/motion";
 import { getAsyncStatus } from "components/ui/async";
 import { StatusBadge, type StatusBadgeVariant } from "components/ui/badges";
 import AppDate from "components/ui/date/AppDate";
@@ -40,6 +44,7 @@ const WAITING_ON_OPTIONS = [
 ];
 
 export default function StatementPage() {
+  const router = useRouter();
   const { partner } = usePartnerProfile();
   const isAgencyAdmin = partner?.type === "agency" && partner?.agency_role === "admin";
 
@@ -51,6 +56,7 @@ export default function StatementPage() {
 
   const [waitingOnFilter, setWaitingOnFilter] = useState<WaitingOn | undefined>(undefined);
   const [memberFilter, setMemberFilter] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -65,7 +71,19 @@ export default function StatementPage() {
     member_partner_id: memberFilter || undefined,
   });
 
-  const status = getAsyncStatus(loading, error, items, (r) => r.length === 0);
+  const filteredItems = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return items;
+    return items.filter(
+      (item) =>
+        item.reference.toLowerCase().includes(term) ||
+        item.student_name.toLowerCase().includes(term) ||
+        item.university_name.toLowerCase().includes(term) ||
+        item.program_name.toLowerCase().includes(term)
+    );
+  }, [items, searchTerm]);
+
+  const status = getAsyncStatus(loading, error, filteredItems, (r) => r.length === 0);
   const activeFiltersCount = (waitingOnFilter ? 1 : 0) + (memberFilter ? 1 : 0);
 
   return (
@@ -85,11 +103,17 @@ export default function StatementPage() {
 
       {/* Filters */}
       <div className="flex flex-col gap-2 border-b border-slate-200 p-6 sm:flex-row sm:flex-wrap sm:items-center">
-        <div className="flex items-center gap-2 sm:hidden">
+        <div className="flex items-center gap-2 sm:contents">
+          <SearchInput
+            value={searchTerm}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+            placeholder="Search by reference, student, or university..."
+            className="sm:w-80 sm:flex-none"
+          />
           <button
             type="button"
             onClick={() => setShowMobileFilters((v) => !v)}
-            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 sm:hidden"
           >
             <SlidersHorizontal className="h-4 w-4" />
             {activeFiltersCount > 0 && (
@@ -117,7 +141,7 @@ export default function StatementPage() {
           {isAgencyAdmin && (
             <div className="w-full sm:w-56 sm:flex-none">
               <SearchableDropdown
-                label="Member"
+                compact
                 field="member_partner_id"
                 required={false}
                 placeholder="Search for a team member..."
@@ -139,7 +163,7 @@ export default function StatementPage() {
               currentPage={currentPage}
               onPageChange={setCurrentPage}
               itemsPerPage={PAGE_SIZE}
-              itemCount={items.length}
+              itemCount={filteredItems.length}
               totalCount={total}
               itemLabel="commissions"
               loading={status === "loading"}
@@ -156,45 +180,59 @@ export default function StatementPage() {
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Status</th>
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Since</th>
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Reference</th>
+                <th className="w-8" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 bg-white">
-              {status === "loading" && <TableSkeletonRows columns={7} rows={5} />}
+              {status === "loading" && <TableSkeletonRows columns={8} rows={5} />}
 
-              {status === "error" && <TableErrorRow colSpan={7} message={error ?? undefined} onRetry={refetch} />}
+              {status === "error" && <TableErrorRow colSpan={8} message={error ?? undefined} onRetry={refetch} />}
 
               {status === "empty" && (
                 <TableEmptyRow
-                  colSpan={7}
+                  colSpan={8}
                   title="No commissions found"
-                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Nothing on your statement yet."}
+                  subtitle={
+                    activeFiltersCount > 0 || searchTerm
+                      ? "Try adjusting your filters."
+                      : "Nothing on your statement yet."
+                  }
                   icon={<Receipt className="h-8 w-8 text-slate-400" />}
                 />
               )}
 
-              {status === "success" &&
-                items.map((item) => (
-                  <tr key={item.application_commission_id}>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-900">{item.reference}</td>
-                    <td className="px-6 py-4 text-sm text-slate-700">{item.student_name}</td>
-                    <td className="px-6 py-4 text-sm text-slate-700">
-                      <p>{item.university_name}</p>
-                      <p className="text-xs text-slate-400">{item.program_name}</p>
-                    </td>
-                    <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                      {formatCommissionAmount(item.commission_amount, item.commission_currency)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <StatusBadge variant={WAITING_ON_VARIANT[item.waiting_on]}>
-                        {WAITING_ON_LABEL[item.waiting_on]}
-                      </StatusBadge>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-700">
-                      <AppDate value={item.since_date} format="short" />
-                    </td>
-                    <td className="px-6 py-4 text-sm text-slate-700">{item.payout_reference ?? "—"}</td>
-                  </tr>
-                ))}
+              <AnimatePresence>
+                {status === "success" &&
+                  filteredItems.map((item) => (
+                    <AnimatedTableRow
+                      key={item.application_commission_id}
+                      className="group cursor-pointer transition-colors hover:bg-slate-100/50"
+                      onClick={() => router.push(`/partner/applications/${item.application_id}`)}
+                    >
+                      <td className="px-6 py-4 text-sm font-medium text-slate-900">{item.reference}</td>
+                      <td className="px-6 py-4 text-sm text-slate-700">{item.student_name}</td>
+                      <td className="px-6 py-4 text-sm text-slate-700">
+                        <p>{item.university_name}</p>
+                        <p className="text-xs text-slate-400">{item.program_name}</p>
+                      </td>
+                      <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                        {formatCommissionAmount(item.commission_amount, item.commission_currency)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <StatusBadge variant={WAITING_ON_VARIANT[item.waiting_on]}>
+                          {WAITING_ON_LABEL[item.waiting_on]}
+                        </StatusBadge>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-700">
+                        <AppDate value={item.since_date} format="short" />
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-700">{item.payout_reference ?? "—"}</td>
+                      <td className="w-8 pr-4 py-4">
+                        <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </td>
+                    </AnimatedTableRow>
+                  ))}
+              </AnimatePresence>
             </tbody>
           </table>
         </TableWrapper>

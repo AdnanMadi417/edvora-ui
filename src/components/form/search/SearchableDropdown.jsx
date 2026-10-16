@@ -12,7 +12,7 @@ const getNestedValue = (obj, path) => {
 };
 
 const CreatableSelectField = ({
-                                label,
+                                label = "",
                                 field,
                                 dataField = undefined,
                                 options = [],
@@ -24,6 +24,13 @@ const CreatableSelectField = ({
                                 disabledOptions = [],
                                 onSelect = undefined,
                                 onBlur = undefined,
+                                // Matches the plain <select>-based FilterSelectField's height/padding
+                                // (h-10, py-2.5) for use alongside it in a filter/toolbar row, instead
+                                // of the taller h-12 sizing that matches InputField/SelectField in a
+                                // full form. Also drops the outer mb-4 and the trigger's mt-2, which
+                                // exist to space a field from its label/neighbors inside a form but
+                                // double up on the gap a filter row's own flex/gap already provides.
+                                compact = false,
                               }) => {
   const containerRef = useRef(null);
 
@@ -71,16 +78,18 @@ const CreatableSelectField = ({
   };
 
   return (
-    <div className="mb-4" ref={containerRef} data-field={dataField ?? field}>
+    <div className={compact ? "" : "mb-4"} ref={containerRef} data-field={dataField ?? field}>
 
-      <label className="block text-sm font-medium text-slate-900">
-        {label} {required && <span className="text-red-600">*</span>}
-      </label>
+      {label && (
+        <label className="block text-sm font-medium text-slate-900">
+          {label} {required && <span className="text-red-600">*</span>}
+        </label>
+      )}
 
       <div
         onClick={() => setIsOpen((prev) => !prev)}
 
-        className={`mt-2 flex h-12 w-full items-center justify-between rounded-lg border p-3 px-3 py-2 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+        className={`${compact ? "h-10 py-2.5" : "mt-2 h-12 p-3 py-2"} flex w-full items-center justify-between rounded-lg border px-3 text-p2 text-sm outline-none transition-colors focus:outline-none focus:ring-1 focus:ring-blue-500 ${
           errors?.[field] ? "border-red-500 bg-red-50" : "border-slate-200 bg-white hover:bg-slate-50"
         }`}
 
