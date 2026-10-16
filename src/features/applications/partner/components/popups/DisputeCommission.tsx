@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { XCircle, AlertCircle } from "lucide-react";
 
 import { useRaiseDispute } from "features/applications/disputes";
@@ -73,7 +74,7 @@ export default function DisputeCommission({ isOpen, onClose, applicationId, onSu
 
   if (!isVisible) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
       onClick={onClose}
@@ -147,6 +148,7 @@ export default function DisputeCommission({ isOpen, onClose, applicationId, onSu
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
