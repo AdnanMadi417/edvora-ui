@@ -18,9 +18,9 @@ import {
   useVisaSetup,
   useStatusUpdate,
   useApplicationActions,
-  useCommissionPaymentUpload,
   useApplicationVisaFee,
 } from "features/applications/hooks";
+import { usePartnerBankAccount } from "features/partners/bank-accounts";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
@@ -268,10 +268,24 @@ export default function UpdateStatusPopup({
 
   const [formErrors, setFormErrors] = useState<any>({});
 
-  const [commissionPaymentFile, setCommissionPaymentFile] =
-    useState<File | null>(null);
-
   const isCommissionPaid = selectedOption?.label === "Commission Paid";
+
+  const [payoutFormData, setPayoutFormData] = useState({
+    payment_method_id: "",
+    bank_reference: "",
+    paid_at: "",
+    currency: "RM",
+    paid_amount: "",
+  });
+  const [payoutFormErrors, setPayoutFormErrors] = useState<any>({});
+  const [payoutReceiptFile, setPayoutReceiptFile] = useState<File | null>(null);
+
+  const updatePayoutFormData = (field: string, value: any) => {
+    setPayoutFormData((prev) => ({ ...prev, [field]: value }));
+    setPayoutFormErrors((prev: any) => ({ ...prev, [field]: undefined }));
+  };
+
+  const { account: partnerBankAccount } = usePartnerBankAccount(application?.partner?.id ?? "");
 
   const isCommissionReady = selectedOption?.label === "Commission Ready";
 
@@ -350,6 +364,18 @@ export default function UpdateStatusPopup({
       arrivalFormTemplateFileUrl = uploaded.public_url;
     }
 
+    let payoutReceiptFileKey: string | undefined;
+    let payoutReceiptFileUrl: string | undefined;
+
+    if (isCommissionPaid && payoutReceiptFile) {
+      const presigned = await getPresignedUploads([payoutReceiptFile], "finance-payouts");
+      const results = await uploadFilesToSpaces([payoutReceiptFile], presigned);
+      const uploaded = results?.[0];
+      if (!uploaded?.file_key || !uploaded?.public_url) throw new Error("Payout receipt upload failed");
+      payoutReceiptFileKey = uploaded.file_key;
+      payoutReceiptFileUrl = uploaded.public_url;
+    }
+
     await updateStatus({
       applicationId: application.id,
       statusId: selectedStatus,
@@ -367,19 +393,19 @@ export default function UpdateStatusPopup({
             paymentReference: payInFormData.payment_reference,
           }
         : undefined,
+      payoutDetails: isCommissionPaid
+        ? {
+            bankAccountId: partnerBankAccount?.id ?? "",
+            paymentMethodId: payoutFormData.payment_method_id,
+            bankReference: payoutFormData.bank_reference,
+            paidAt: payoutFormData.paid_at,
+            currency: payoutFormData.currency,
+            paidAmount: payoutFormData.paid_amount,
+            receiptFileKey: payoutReceiptFileKey,
+            receiptFileUrl: payoutReceiptFileUrl,
+          }
+        : undefined,
     });
-  };
-
-  const { uploadCommissionPayment, } =
-    useCommissionPaymentUpload();
-
-  const handleCommissionPaymentUpload = async () => {
-    if (!commissionPaymentFile || !application?.id) return;
-
-    await uploadCommissionPayment(
-      commissionPaymentFile,
-      application.id
-    );
   };
 
   const updateFormData = (field: string, value: any) => {
@@ -438,9 +464,27 @@ export default function UpdateStatusPopup({
       return false;
     }
 
-    if (isCommissionPaid && !commissionPaymentFile) {
-      setError("Please upload commission payment proof");
-      return false;
+    if (isCommissionPaid) {
+      const errors: any = {};
+      if (!partnerBankAccount) {
+        setError("This partner has no active bank account on file");
+        return false;
+      }
+      if (!payoutFormData.payment_method_id.trim()) errors.payment_method_id = "Payment method is required";
+      if (!payoutFormData.bank_reference.trim()) errors.bank_reference = "Bank reference is required";
+      if (!payoutFormData.paid_at) errors.paid_at = "Payment date is required";
+      if (!payoutFormData.paid_amount || Number(payoutFormData.paid_amount) <= 0) {
+        errors.paid_amount = "Enter a valid amount";
+      }
+      if (!payoutReceiptFile) {
+        setError("Please upload the payout receipt");
+        return false;
+      }
+      if (Object.keys(errors).length > 0) {
+        setPayoutFormErrors(errors);
+        setError("Please fill in the payout details");
+        return false;
+      }
     }
 
     if (isCommissionReady) {
@@ -505,16 +549,6 @@ export default function UpdateStatusPopup({
         await handleVisaSetup();
         if (offerLetterFile) await handleOfferLetterUpload();
         if (visaDocumentFile) await handleVisaIssuedUpload();
-      } else if (isCommissionPaid) {
-        if (!commissionPaymentFile) {
-          setError("Please upload commission payment proof");
-          showToast("Commission payment proof is required.", "error");
-          setIsSubmitting(false);
-          return;
-        }
-
-        await handleCommissionPaymentUpload();
-        await handleStatusUpdate();
       } else {
         await handleStatusUpdate();
 
@@ -542,6 +576,9 @@ export default function UpdateStatusPopup({
     setFormData({ visa_fee_amount: "", show_visa_invoice: false, show_app_form_template: false });
     setPayInFormData({ payment_date: "", amount: "", currency: "RM", payment_reference: "" });
     setPayInFormErrors({});
+    setPayoutFormData({ payment_method_id: "", bank_reference: "", paid_at: "", currency: "RM", paid_amount: "" });
+    setPayoutFormErrors({});
+    setPayoutReceiptFile(null);
     onClose();
   };
 
@@ -817,17 +854,79 @@ export default function UpdateStatusPopup({
           )}
 
           {isCommissionPaid && (
-            <StatusFileUpload
-              label="Upload Commission Payment Proof"
-              description="Upload proof of commission payment (receipt or transfer confirmation)"
-              id="commission-payment"
-              file={commissionPaymentFile}
-              onFileChange={setCommissionPaymentFile}
-              onRemove={() => setCommissionPaymentFile(null)}
-              onError={setError}
-              disabled={isSubmitting}
-              required
-            />
+            <div className="space-y-2">
+              <p className="text-p2 font-semibold text-gray-900">Payout Details</p>
+
+              <div className="rounded-md border border-slate-200 bg-card p-3 text-sm text-slate-600">
+                {partnerBankAccount ? (
+                  <>
+                    <span className="font-medium text-gray-900">Paying to:</span>{" "}
+                    {partnerBankAccount.intl_bank_name} · {partnerBankAccount.account_number}
+                  </>
+                ) : (
+                  <span className="text-red-600">This partner has no active bank account on file.</span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                <InputField
+                  label="Payment Method ID"
+                  field="payment_method_id"
+                  placeholder="Enter payment method"
+                  formData={payoutFormData}
+                  errors={payoutFormErrors}
+                  updateFormData={updatePayoutFormData}
+                />
+                <InputField
+                  label="Bank Reference"
+                  field="bank_reference"
+                  placeholder="e.g. BANK-REF-001"
+                  formData={payoutFormData}
+                  errors={payoutFormErrors}
+                  updateFormData={updatePayoutFormData}
+                />
+                <InputField
+                  label="Payment Date"
+                  field="paid_at"
+                  type="date"
+                  formData={payoutFormData}
+                  errors={payoutFormErrors}
+                  updateFormData={updatePayoutFormData}
+                />
+                <SelectField
+                  label="Currency"
+                  field="currency"
+                  options={[
+                    { value: "RM", label: "RM" },
+                    { value: "USD", label: "USD" },
+                  ]}
+                  formData={payoutFormData}
+                  errors={payoutFormErrors}
+                  updateFormData={updatePayoutFormData}
+                />
+                <InputField
+                  label="Paid Amount"
+                  field="paid_amount"
+                  type="number"
+                  placeholder="Enter amount"
+                  formData={payoutFormData}
+                  errors={payoutFormErrors}
+                  updateFormData={updatePayoutFormData}
+                />
+              </div>
+
+              <StatusFileUpload
+                label="Upload Payout Receipt"
+                description="Upload proof of payment (receipt or transfer confirmation)"
+                id="payout-receipt"
+                file={payoutReceiptFile}
+                onFileChange={setPayoutReceiptFile}
+                onRemove={() => setPayoutReceiptFile(null)}
+                onError={setError}
+                disabled={isSubmitting}
+                required
+              />
+            </div>
           )}
 
           {isCommissionReady && (
@@ -910,7 +1009,13 @@ export default function UpdateStatusPopup({
               (requiresReason && !reason.trim()) ||
               (isUniversityApproved && !offerLetterFile) ||
               (isVisaIssued && !visaDocumentFile) ||
-              (isCommissionPaid && !commissionPaymentFile) ||
+              (isCommissionPaid &&
+                (!partnerBankAccount ||
+                  !payoutFormData.payment_method_id.trim() ||
+                  !payoutFormData.bank_reference.trim() ||
+                  !payoutFormData.paid_at ||
+                  !payoutFormData.paid_amount ||
+                  !payoutReceiptFile)) ||
               (hasArrivalFormSelected && !arrivalFormTemplateFile) ||
               (isCommissionReady &&
                 (!payInFormData.payment_date ||

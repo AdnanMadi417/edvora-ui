@@ -13,10 +13,12 @@ export interface UniversityPayIn {
   created_at: string;
 }
 
+/** Void always replaces — there is no "just undo it" mode. All 5 fields
+ *  are required every time. */
 export interface VoidPayInPayload {
   void_reason: string;
-  new_payment_date?: string;
-  new_amount?: string;
-  new_currency?: string;
-  new_payment_reference?: string;
+  new_payment_date: string;
+  new_amount: string;
+  new_currency: string;
+  new_payment_reference: string;
 }

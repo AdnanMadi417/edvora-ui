@@ -8,7 +8,7 @@ import { useVoidPayIn } from "../../hooks";
 import type { UniversityPayIn } from "../../types";
 import { useToast } from "components/context/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
-import { InputField, SelectField, SettingToggleInput, TextareaField } from "components/form";
+import { InputField, SelectField, TextareaField } from "components/form";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 
@@ -24,13 +24,12 @@ const VOID_ERROR_MESSAGES: Record<string, string> = {
   pay_in_already_voided: "This pay-in has already been voided.",
   pay_in_void_wrong_state:
     "A payout already exists against this commission. That payout must be voided first.",
-  pay_in_details_required: "All 4 corrected pay-in fields are required when correcting a pay-in.",
+  pay_in_details_required: "All 5 corrected pay-in fields are required.",
   pay_in_currency_invalid: "Currency must be RM or USD.",
 };
 
 const INITIAL_FORM_DATA = {
   void_reason: "",
-  should_correct: false,
   new_payment_date: "",
   new_amount: "",
   new_currency: "RM",
@@ -63,26 +62,27 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
 
   if (!isVisible || !payIn) return null;
 
-  const shouldCorrect = formData.should_correct;
-
   const validate = () => {
     const errors: any = {};
 
     if (!formData.void_reason.trim()) errors.void_reason = "Void reason is required";
-
-    if (shouldCorrect) {
-      if (!formData.new_payment_date) errors.new_payment_date = "Payment date is required";
-      if (!formData.new_amount || Number(formData.new_amount) <= 0) {
-        errors.new_amount = "Enter a valid amount";
-      }
-      if (!formData.new_payment_reference.trim()) {
-        errors.new_payment_reference = "Payment reference is required";
-      }
+    if (!formData.new_payment_date) errors.new_payment_date = "Payment date is required";
+    if (!formData.new_amount || Number(formData.new_amount) <= 0) {
+      errors.new_amount = "Enter a valid amount";
+    }
+    if (!formData.new_payment_reference.trim()) {
+      errors.new_payment_reference = "Payment reference is required";
     }
 
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
+
+  const isFormValid =
+    !!formData.void_reason.trim() &&
+    !!formData.new_payment_date &&
+    !!formData.new_amount &&
+    !!formData.new_payment_reference.trim();
 
   const handleSubmit = async () => {
     if (!validate()) return;
@@ -90,15 +90,13 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
     try {
       await voidPayIn(payIn.id, {
         void_reason: formData.void_reason.trim(),
-        ...(shouldCorrect && {
-          new_payment_date: formData.new_payment_date,
-          new_amount: formData.new_amount,
-          new_currency: formData.new_currency,
-          new_payment_reference: formData.new_payment_reference.trim(),
-        }),
+        new_payment_date: formData.new_payment_date,
+        new_amount: formData.new_amount,
+        new_currency: formData.new_currency,
+        new_payment_reference: formData.new_payment_reference.trim(),
       });
 
-      showToast(shouldCorrect ? "Pay-in voided and corrected." : "Pay-in voided.", "success");
+      showToast("Pay-in voided and corrected.", "success");
       onClose();
       onSuccess?.();
     } catch (err: unknown) {
@@ -123,8 +121,8 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
       >
         <div className="overflow-hidden rounded-2xl bg-card shadow-2xl ring-1 ring-black/5">
           <ModalHeader
-            title="Void Pay-In"
-            description="Reverts the application to Awaiting Commission, unless you also record a correction below."
+            title="Void & Correct Pay-In"
+            description="Every void must include the corrected replacement — the application stays at Commission Ready throughout."
             icon={Ban}
             iconBg="bg-red-50"
             iconColor="text-red-600"
@@ -149,15 +147,10 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
               updateFormData={updateFormData}
             />
 
-            <SettingToggleInput
-              label="Also record a corrected pay-in"
-              field="should_correct"
-              formData={formData}
-              errors={formErrors}
-              updateFormData={updateFormData}
-            />
-
-            {shouldCorrect && (
+            <div className="space-y-2">
+              <p className="text-p2 font-medium text-slate-900">
+                Corrected Pay-In <span className="text-red-600">*</span>
+              </p>
               <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                 <InputField
                   label="Payment Date"
@@ -196,14 +189,13 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
                   updateFormData={updateFormData}
                 />
               </div>
-            )}
+            </div>
 
             <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
               <p className="text-xs leading-relaxed text-amber-800">
-                {shouldCorrect
-                  ? "The void only commits if the replacement is valid — a bad replacement leaves the original pay-in untouched."
-                  : "This cannot be undone from here. To fix a mistake instead of just voiding it, turn on \"Also record a corrected pay-in\" above."}
+                The void only commits if the replacement is valid — a bad replacement leaves the original
+                pay-in completely untouched.
               </p>
             </div>
           </div>
@@ -222,9 +214,9 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
             />
             <Button
               onClick={handleSubmit}
-              disabled={loading || !formData.void_reason.trim()}
+              disabled={loading || !isFormValid}
               icon={<Ban className="h-4 w-4" />}
-              text={loading ? "Submitting..." : shouldCorrect ? "Void & Correct" : "Void Pay-In"}
+              text={loading ? "Submitting..." : "Void & Correct"}
               bgColor="bg-red-50"
               textColor="text-red-700"
               borderColor="border-red-600"

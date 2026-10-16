@@ -50,7 +50,7 @@ export default function UniversityPayInSection({ payIn, onRefetch }: UniversityP
             <Button
               onClick={() => setShowVoidModal(true)}
               icon={<Ban className="h-4 w-4" />}
-              text="Void"
+              text="Void & Correct"
               bgColor="bg-white"
               textColor="text-red-600"
               borderColor="border-red-200"
