@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { XCircle, AlertCircle, Ban } from "lucide-react";
+import { XCircle, Ban } from "lucide-react";
 
 import { useVoidPayout, usePaymentMethods } from "../../hooks";
 import type { Payout } from "../../types";
@@ -10,10 +10,9 @@ import { usePartnerBankAccount } from "features/partners/bank-accounts";
 import { useToast } from "components/context/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import { InputField, SelectField, TextareaField, SearchableDropdown } from "components/form";
-import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
+import PayoutCorrectionFields from "./PayoutCorrectionFields";
 
 interface VoidPayoutProps {
   isOpen: boolean;
@@ -172,117 +171,21 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
           />
 
           <div className="max-h-[65vh] space-y-5 overflow-y-auto px-6 py-5">
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-              <p>
-                <span className="font-medium text-slate-900">Current payout:</span>{" "}
-                {payout.currency} · {payout.bank_reference} · {payout.items.length}{" "}
-                {payout.items.length === 1 ? "application" : "applications"}
-              </p>
-            </div>
-
-            <TextareaField
-              label="Void Reason"
-              field="void_reason"
-              placeholder="Explain why this payout is being voided..."
+            <PayoutCorrectionFields
+              payout={payout}
+              account={account}
+              paymentMethodOptions={paymentMethodOptions}
               formData={formData}
-              errors={formErrors}
+              formErrors={formErrors}
               updateFormData={updateFormData}
-            />
-
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
-              {account ? (
-                <>
-                  <span className="font-medium text-slate-900">Paying to:</span> {account.intl_bank_name} ·{" "}
-                  {account.account_number}
-                </>
-              ) : (
-                <span className="text-red-600">This partner has no active bank account on file.</span>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-              <SearchableDropdown
-                label="Payment Method"
-                field="new_payment_method_id"
-                placeholder="Search for a payment method..."
-                options={paymentMethodOptions}
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
-              <InputField
-                label="Bank Reference"
-                field="new_bank_reference"
-                placeholder="e.g. BANK-REF-CORRECTED"
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
-              <InputField
-                label="Payment Date"
-                field="new_paid_at"
-                type="date"
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
-              <SelectField
-                label="Currency"
-                field="new_currency"
-                options={[
-                  { value: "RM", label: "RM" },
-                  { value: "USD", label: "USD" },
-                ]}
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <p className="text-p2 font-medium text-slate-900">
-                Corrected Amounts <span className="text-red-600">*</span>
-              </p>
-              <div className="space-y-2">
-                {payout.items.map((item) => (
-                  <div key={item.application_id} className="flex items-center gap-3">
-                    <span className="flex-1 truncate text-sm text-slate-600">
-                      Application {item.application_id.slice(0, 8)}
-                    </span>
-                    <input
-                      type="number"
-                      value={lineAmounts[item.application_id] ?? ""}
-                      onChange={(e) => updateLineAmount(item.application_id, e.target.value)}
-                      className="h-10 w-32 rounded-lg border border-slate-200 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                  </div>
-                ))}
-              </div>
-              {formErrors.lines && <p className="text-xs text-red-600">{formErrors.lines}</p>}
-            </div>
-
-            <StatusFileUpload
-              id="void-payout-receipt"
-              label="Corrected Receipt"
-              description="Upload the corrected proof of payment"
-              file={receiptFile}
-              onFileChange={setReceiptFile}
-              onRemove={() => setReceiptFile(null)}
+              lineAmounts={lineAmounts}
+              updateLineAmount={updateLineAmount}
+              receiptFile={receiptFile}
+              setReceiptFile={setReceiptFile}
               uploading={uploading}
-              progress={uploadProgress}
-              disabled={isSubmitting}
-              required
+              uploadProgress={uploadProgress}
+              isSubmitting={isSubmitting}
             />
-            {formErrors.receipt && <p className="-mt-3 text-xs text-red-600">{formErrors.receipt}</p>}
-
-            <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-              <p className="text-xs leading-relaxed text-amber-800">
-                The void only commits if the replacement is valid — a bad replacement leaves the original
-                payout untouched. The corrected amounts must cover exactly the same applications as the
-                original payout.
-              </p>
-            </div>
           </div>
 
           <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">

@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { Receipt, AlertCircle } from "lucide-react";
+import { Receipt, AlertCircle, CheckCircle } from "lucide-react";
 import type { ApplicationActionsResponse } from "features/applications/hooks";
 import DisputeCommission from "features/applications/partner/components/popups/DisputeCommission";
+import ConfirmReceived from "features/applications/partner/components/popups/ConfirmReceived";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import Button from "components/ui/buttons/Button";
 import { SectionIconBadge } from "components/ui/icons";
 import ApplicationCommissionRecords from "features/applications/shared/ApplicationCommissionRecords";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 import { PartnerPayoutSection } from "features/applications/payouts";
+import { DisputeSection } from "features/applications/disputes";
 
 interface ApplicationCommissionProps {
   application: any;
@@ -23,13 +25,13 @@ export default function ApplicationCommission({
   onRefetch,
 }: ApplicationCommissionProps) {
   const [isDisputeOpen, setIsDisputeOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const studentName = application?.student?.name;
 
-  const { status: statusLabel, partner_actions } = actions || {};
+  const { status: statusLabel, status_code: statusCode } = actions || {};
 
-  const canDispute = partner_actions?.some(
-    (a) => a.target_status_code === "COMMISSION_DISPUTED"
-  );
+  const canActOnCommission =
+    statusCode === "COMMISSION_PAID" || statusCode === "DISPUTE_RESPONSE_RECEIVED";
 
   const commissions: ApplicationCommissionItem[] = Array.isArray(application?.commissions)
     ? application.commissions
@@ -61,24 +63,39 @@ export default function ApplicationCommission({
           </div>
         </div>
 
-        {canDispute && (
-          <Button
-            onClick={() => setIsDisputeOpen(true)}
-            icon={<AlertCircle className="h-4 w-4" />}
-            text="Dispute Commission"
-            bgColor="bg-red-50"
-            textColor="text-red-700"
-            borderColor="border-red-500"
-            hoverTextColor="hover:text-red-700"
-            hoverBorderColor="hover:border-red-600"
-            className="shrink-0 hover:bg-red-100"
-          />
+        {canActOnCommission && (
+          <div className="flex shrink-0 gap-2">
+            <Button
+              onClick={() => setIsConfirmOpen(true)}
+              icon={<CheckCircle className="h-4 w-4" />}
+              text="Confirm Received"
+              bgColor="bg-green-50"
+              textColor="text-green-700"
+              borderColor="border-green-500"
+              hoverTextColor="hover:text-green-700"
+              hoverBorderColor="hover:border-green-600"
+              className="hover:bg-green-100"
+            />
+            <Button
+              onClick={() => setIsDisputeOpen(true)}
+              icon={<AlertCircle className="h-4 w-4" />}
+              text="Dispute Commission"
+              bgColor="bg-red-50"
+              textColor="text-red-700"
+              borderColor="border-red-500"
+              hoverTextColor="hover:text-red-700"
+              hoverBorderColor="hover:border-red-600"
+              className="hover:bg-red-100"
+            />
+          </div>
         )}
       </div>
 
       <ApplicationCommissionRecords commissions={commissions} />
 
       <PartnerPayoutSection payout={application?.partner_payout ?? null} studentName={studentName} />
+
+      <DisputeSection dispute={application?.dispute ?? null} />
 
       <div className="space-y-4 p-6">
         {commissionDocs.length > 0 ? (
@@ -113,6 +130,13 @@ export default function ApplicationCommission({
       <DisputeCommission
         isOpen={isDisputeOpen}
         onClose={() => setIsDisputeOpen(false)}
+        applicationId={application?.id}
+        onSuccess={onRefetch}
+      />
+
+      <ConfirmReceived
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
         applicationId={application?.id}
         onSuccess={onRefetch}
       />

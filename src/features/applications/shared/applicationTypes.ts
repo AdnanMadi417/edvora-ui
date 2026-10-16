@@ -28,6 +28,25 @@ export interface ApplicationDetail {
   visa_document: any;
   emgs_evaluation_document: any;
   commission_documents: Record<string, any>;
+  dispute: Dispute | null;
+}
+
+/** The most recent dispute raised against this application's commission —
+ *  not full history. `report` stays null on the partner-facing endpoint
+ *  until resolved; `old_partner_payout_id`/`new_partner_payout_id` are only
+ *  set once resolved via the correction path, never before. No resolved
+ *  name for `reported_by_user_id`/`resolved_by_user_id` is exposed. */
+export interface Dispute {
+  id: string;
+  status: "open" | "pending" | "resolved";
+  justification: string;
+  report: string | null;
+  reported_by_user_id: string | null;
+  resolved_by_user_id: string | null;
+  old_partner_payout_id: string | null;
+  new_partner_payout_id: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface TimelineDocumentTypeRef {
