@@ -27,9 +27,10 @@ import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 
-import { InputField, SelectField } from "components/form";
+import { InputField, SelectField, TextareaField } from "components/form";
 import Button from "components/ui/buttons/Button";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
+import UpdateStatusHeader from "features/applications/shared/UpdateStatusHeader";
 
 const DocumentRequestList = ({
   documents,
@@ -593,44 +594,11 @@ export default function UpdateStatusPopup({
         className="w-full max-w-2xl transform rounded-md bg-card shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-100">
-                <Clock className="h-6 w-6 text-blue-600" strokeWidth={2.5} />
-              </div>
-              <div>
-                <h5 className="text-lg font-bold text-gray-900">
-                  Update Application Status
-                </h5>
-
-                <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
-                  <CheckCircle className="h-4 w-4" />
-                  <span className="font-medium">Stage:</span>
-                  <span className="font-normal">
-                    {application?.stage?.name || "No Stage"}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 text-caption text-slate-500">
-                  <AlertCircle className="h-4 w-4 " />
-                  <span className="font-medium">Status:</span>
-                  <span className="font-normal">
-                    {application?.stage?.statuses?.[0]?.name || "No Status"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={handleClose}
-              aria-label="Close dialog"
-              className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              <XCircle className="h-5 w-5" strokeWidth={2} />
-            </button>
-          </div>
-        </div>
+        <UpdateStatusHeader
+          stageName={application?.stage?.name}
+          statusName={application?.stage?.statuses?.[0]?.name}
+          onClose={handleClose}
+        />
 
         <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
           {error && (
@@ -796,24 +764,21 @@ export default function UpdateStatusPopup({
           )}
 
           {requiresReason && (
-            <div className="space-y-2">
-              <label className="block text-p2 font-medium text-slate-500">
-                Reason <span className="ml-1 text-red-500">*</span>
-              </label>
-              <textarea
-                value={reason}
-                onChange={(e) => { setReason(e.target.value); if (reasonError) setReasonError(""); }}
-                onBlur={() => {
-                  const trimmed = reason.trim();
-                  if (trimmed && trimmed.length < 10)
-                    setReasonError("Reason must be at least 10 characters");
-                }}
-                placeholder="Please provide a detailed reason..."
-                rows={4}
-                className={`w-full rounded-md border px-4 py-3 text-p2 outline-none transition-colors resize-y placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-500 ${reasonError ? "border-red-500 bg-red-50" : "border-slate-200 bg-white hover:bg-slate-50"}`}
-              />
-              {reasonError && <p className="mt-1 text-xs text-red-600">{reasonError}</p>}
-            </div>
+            <TextareaField
+              label="Reason"
+              field="reason"
+              placeholder="Please provide a detailed reason..."
+              formData={{ reason }}
+              errors={{ reason: reasonError }}
+              updateFormData={(_, value) => {
+                setReason(value);
+                if (reasonError) setReasonError("");
+              }}
+              onBlur={() => {
+                const trimmed = reason.trim();
+                if (trimmed && trimmed.length < 10) setReasonError("Reason must be at least 10 characters");
+              }}
+            />
           )}
 
           {isVisaSetupSelected && (

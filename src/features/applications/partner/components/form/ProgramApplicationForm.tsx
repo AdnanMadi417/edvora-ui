@@ -60,6 +60,7 @@ export default function StudentRegistrationForm() {
   const {
     universities,
     loading: universitiesLoading,
+    error: universitiesError,
   } = useUniversities();
 
   const {
@@ -109,7 +110,7 @@ export default function StudentRegistrationForm() {
     is_draft: false,
   });
 
-  const { documentTypes, loading: documentTypesLoading } = useDocumentType({
+  const { documentTypes, loading: documentTypesLoading, error: documentTypesError } = useDocumentType({
     initOnly: true,
     programId: formData.program_id || undefined,
     nationality: formData.student.nationality || undefined,
@@ -122,7 +123,7 @@ export default function StudentRegistrationForm() {
       ?.filter((f: any) => f.is_required)
       ?.map((f: any) => f.field_key) || [];
 
-  const { intakeMonths, loading: loadingIntakeMonths } = usePartnerProgramIntakeMonths(formData.program_id, partnerId);
+  const { intakeMonths, loading: loadingIntakeMonths, error: intakeMonthsError } = usePartnerProgramIntakeMonths(formData.program_id, partnerId);
 
   // Resolves intake_date to one of the program's actual recurring months
   // even when the month picker never renders — e.g. a program with only
@@ -135,6 +136,18 @@ export default function StudentRegistrationForm() {
     if (!month) return;
     setFormData((prev) => ({ ...prev, intake_date: resolveIntakeDate(month) }));
   }, [intakeMonths, loadingIntakeMonths]);
+
+  // These dropdowns' own fetches fail silently otherwise — the picker just
+  // renders empty with no indication anything went wrong.
+  useEffect(() => {
+    if (universitiesError) showToast(universitiesError, "error");
+  }, [universitiesError]);
+  useEffect(() => {
+    if (documentTypesError) showToast(documentTypesError, "error");
+  }, [documentTypesError]);
+  useEffect(() => {
+    if (intakeMonthsError) showToast(intakeMonthsError, "error");
+  }, [intakeMonthsError]);
 
   const shouldShowStage3 = requiredFieldKeys.length > 0;
   const visibleStages = shouldShowStage3

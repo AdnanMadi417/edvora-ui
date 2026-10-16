@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Check, Clock } from "lucide-react";
+import { Check, Clock, AlertCircle } from "lucide-react";
 import { useAllStages } from "features/applications/hooks";
 import { SectionIconBadge } from "components/ui/icons";
 
@@ -10,7 +10,7 @@ interface ApplicationTimelineProps {
 }
 
 const ApplicationTimeline = ({ application }: ApplicationTimelineProps) => {
-  const { stages, stagesLoading } = useAllStages();
+  const { stages, stagesLoading, stagesError } = useAllStages();
 
   const currentStageName: string = application?.stage?.name || "";
 
@@ -25,7 +25,21 @@ const ApplicationTimeline = ({ application }: ApplicationTimelineProps) => {
     return "pending";
   };
 
-  if (stagesLoading || sortedStages.length === 0) return null;
+  if (stagesLoading) return null;
+
+  if (stagesError && sortedStages.length === 0) {
+    return (
+      <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+        <div>
+          <p className="text-sm font-medium text-red-800">Couldn&apos;t load the application timeline</p>
+          <p className="mt-0.5 text-xs text-red-700">{stagesError}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (sortedStages.length === 0) return null;
 
   const totalStages = sortedStages.length;
 
