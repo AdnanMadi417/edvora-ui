@@ -35,9 +35,6 @@ export default function ApplicationCommissionRecords({
               {c.amount != null && (
                 <p className="text-lg font-bold text-slate-900">
                   {formatCommissionAmount(c.amount, c.currency)}
-                  {c.commission_type && (
-                    <span className="ml-2 text-xs font-normal text-slate-400">{c.commission_type}</span>
-                  )}
                 </p>
               )}
               {c.notes && <p className="mt-1 text-sm text-slate-500">{c.notes}</p>}
