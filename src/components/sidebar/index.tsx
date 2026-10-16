@@ -73,9 +73,9 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
       )}
 
       <div
-        className={`fixed left-0 top-0 z-50 flex h-screen w-[280px] flex-col 
+        className={`fixed left-0 top-0 z-50 flex h-screen w-[280px] flex-col
     border-r border-gray-200 bg-white shadow-md
-    transition-transform duration-300 ease-in-out xl:z-0 xl:translate-x-0 
+    transition-transform duration-300 ease-in-out xl:z-[60] xl:translate-x-0
     ${open ? "translate-x-0" : "-translate-x-full"}`}
         role="navigation"
         aria-label="Main navigation"
