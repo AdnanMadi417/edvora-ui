@@ -56,7 +56,7 @@ export default function ApplicationDetails({
 
         {/* Commission Details */}
         <div className="border-b border-slate-200">
-          <ApplicationCommission application={application} />
+          <ApplicationCommission application={application} onRefetch={onRefetch} />
         </div>
 
         {/* Offer Letter + Visa Payment */}

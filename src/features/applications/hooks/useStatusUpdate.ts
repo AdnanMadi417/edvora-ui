@@ -14,6 +14,12 @@ interface UseStatusUpdateReturn {
     requiredDocumentTypeIds?: string[];
     arrivalFormTemplateFileKey?: string;
     arrivalFormTemplateFileUrl?: string;
+    payInDetails?: {
+      paymentDate: string;
+      amount: string;
+      currency: string;
+      paymentReference: string;
+    };
   }) => Promise<void>;
   isUpdating: boolean;
 }
@@ -30,6 +36,7 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
     requiredDocumentTypeIds = [],
     arrivalFormTemplateFileKey,
     arrivalFormTemplateFileUrl,
+    payInDetails,
   }: {
     applicationId: string;
     statusId: string;
@@ -38,6 +45,12 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
     requiredDocumentTypeIds?: string[];
     arrivalFormTemplateFileKey?: string;
     arrivalFormTemplateFileUrl?: string;
+    payInDetails?: {
+      paymentDate: string;
+      amount: string;
+      currency: string;
+      paymentReference: string;
+    };
   }) => {
     try {
       setIsUpdating(true);
@@ -48,6 +61,12 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
         required_document_type_ids: requiredDocumentTypeIds,
         ...(arrivalFormTemplateFileKey && { arrival_form_template_file_key: arrivalFormTemplateFileKey }),
         ...(arrivalFormTemplateFileUrl && { arrival_form_template_file_url: arrivalFormTemplateFileUrl }),
+        ...(payInDetails && {
+          payment_date: payInDetails.paymentDate,
+          amount: payInDetails.amount,
+          currency: payInDetails.currency,
+          payment_reference: payInDetails.paymentReference,
+        }),
       });
       showToast("Status updated successfully.", "success");
     } catch (err: any) {
