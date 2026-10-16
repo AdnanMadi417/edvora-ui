@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FileText, Calendar, XCircle } from "lucide-react";
+import { FileText, Calendar, XCircle, AlertCircle } from "lucide-react";
 
 import { useVisaPayments } from "hooks/useVisaPayments";
 import DocumentActions from "features/applications/shared/DocumentActions";
@@ -14,7 +14,7 @@ interface VisaTrackingTimelineProps {
 export default function VisaTrackingTimeline({
   application,
 }: VisaTrackingTimelineProps) {
-  const { payments: visaPayments, loading: paymentsLoading } = useVisaPayments(
+  const { payments: visaPayments, loading: paymentsLoading, error: paymentsError } = useVisaPayments(
     application?.id || ""
   );
   const studentName = application?.student?.name;
@@ -25,6 +25,19 @@ export default function VisaTrackingTimeline({
   const hasPayments = visaPayments.length > 0;
 
   if (paymentsLoading) return null;
+
+  if (paymentsError && !hasEmgs && !hasVisaDoc && !hasArrivalDocs && !hasPayments) {
+    return (
+      <div className="flex items-start gap-3 border-t border-slate-200 bg-red-50 p-6">
+        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+        <div>
+          <p className="text-sm font-medium text-red-800">Couldn&apos;t load visa tracking details</p>
+          <p className="mt-0.5 text-xs text-red-700">{paymentsError}</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!hasEmgs && !hasVisaDoc && !hasArrivalDocs && !hasPayments) return null;
 
   return (
