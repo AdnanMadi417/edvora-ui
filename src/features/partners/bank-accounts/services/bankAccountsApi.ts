@@ -14,4 +14,9 @@ export const partnerBankAccountsApi = {
     api.post<PartnerBankAccount>(`/partners/${partnerId}/bank-accounts`, payload, { headers: authHeader() }),
   update: (partnerId: string, accountId: string, payload: UpdatePartnerBankAccountPayload) =>
     api.patch<PartnerBankAccount>(`/partners/${partnerId}/bank-accounts/${accountId}`, payload, { headers: authHeader() }),
+  history: (partnerId: string, currency?: string) =>
+    api.get<PartnerBankAccount[]>(`/partners/${partnerId}/bank-accounts/history`, {
+      params: currency ? { currency } : undefined,
+      headers: authHeader(),
+    }),
 };

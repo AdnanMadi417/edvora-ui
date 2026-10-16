@@ -29,15 +29,23 @@ export interface PartnerBankAccount {
   intermediary_bank_name: string | null;
   intermediary_bank_swift: string | null;
   is_active: boolean;
+  recorded_by_user_id: string;
+  recorded_by_name: string;
+  recorded_by_email: string;
   created_at: string;
-  updated_at: string;
 }
 
 export interface CreatePartnerBankAccountPayload {
   bank_id?: string;
-  intl_bank_name?: string;
-  intl_bank_country?: string;
-  intl_bank_swift?: string;
+  /** Explicitly null these (don't just omit them) when submitting a
+   *  bank_id — PATCH treats an omitted field as "leave unchanged", so an
+   *  account that was previously manually-entered still has these set on
+   *  the existing row; omitting them here would make the backend see
+   *  "both bank_id and intl_bank_name present" after the merge and reject
+   *  it with bank_selection_invalid. */
+  intl_bank_name?: string | null;
+  intl_bank_country?: string | null;
+  intl_bank_swift?: string | null;
   account_holder_name: string;
   account_number: string;
   iban?: string;
