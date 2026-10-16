@@ -8,12 +8,15 @@ interface EmptyDataProps {
    *  has a more specific message (e.g. "No applications found"), so the
    *  icon matches instead of defaulting to a generic empty-box graphic. */
   icon?: ReactNode;
+  /** Extra control under the subtitle, e.g. a Retry button for an error state. */
+  action?: ReactNode;
 }
 
 export default function EmptyData({
   title = "No data found",
   subtitle = "There is no data available at the moment",
   icon,
+  action,
 }: EmptyDataProps) {
   return (
     <section>
@@ -26,6 +29,8 @@ export default function EmptyData({
           <p className="text-p2 font-medium text-slate-900">{title}</p>
 
           <p className="text-caption font-normal text-slate-600">{subtitle}</p>
+
+          {action}
         </div>
       </div>
     </section>

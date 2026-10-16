@@ -26,9 +26,11 @@ export default function ApplicationPage() {
   const [application, setApplication] = useState<ApplicationDetail | null>(null);
 
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchApplication = async () => {
     try {
+      setError(null);
       const token = Cookies.get("token");
       const partnerId = localStorage.getItem("partnerId");
       if (!token || !partnerId) return;
@@ -39,8 +41,9 @@ export default function ApplicationPage() {
       );
 
       setApplication(res.data);
-    } catch (error) {
-      console.error("Error fetching application:", error);
+    } catch (err: any) {
+      console.error("Error fetching application:", err);
+      setError(err?.response?.data?.message || "Failed to fetch application details");
     } finally {
       setLoading(false);
     }
@@ -51,6 +54,7 @@ export default function ApplicationPage() {
   }, [applicationId]);
 
   if (loading) return <Loading text="Fetching application data..." />;
+  if (error) return <p className="text-red-500">Error: {error}</p>;
   if (!application) return <EmptyData />;
 
   return (

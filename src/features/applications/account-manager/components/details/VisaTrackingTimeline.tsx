@@ -6,6 +6,7 @@ import {
   Calendar,
   XCircle,
   Receipt,
+  AlertCircle,
 } from "lucide-react";
 import { useVisaCase } from "hooks/useVisaCase";
 import { useVisaPayments } from "hooks/useVisaPayments";
@@ -21,12 +22,24 @@ export default function VisaTrackingTimeline({
   application,
 }: VisaTrackingTimelineProps) {
   const isVisaStageOrLater = (application?.stage?.name || "").toLowerCase().includes("visa");
-  const { visaCase } = useVisaCase(isVisaStageOrLater ? application?.id || "" : "");
-  const { payments: visaPayments } = useVisaPayments(application?.id || "");
+  const { visaCase, error: visaError } = useVisaCase(isVisaStageOrLater ? application?.id || "" : "");
+  const { payments: visaPayments, error: paymentsError } = useVisaPayments(application?.id || "");
 
   const hasVisaPayments = Array.isArray(visaPayments) && visaPayments.length > 0;
   const hasVisaCase = !!visaCase;
   const studentName = application?.student?.name;
+
+  if ((visaError || paymentsError) && !hasVisaCase && !hasVisaPayments) {
+    return (
+      <div className="flex items-start gap-3 border-t border-slate-200 bg-red-50 p-6">
+        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
+        <div>
+          <p className="text-sm font-medium text-red-800">Couldn&apos;t load visa tracking details</p>
+          <p className="mt-0.5 text-xs text-red-700">{visaError || paymentsError}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!hasVisaCase && !hasVisaPayments) return null;
 

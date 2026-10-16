@@ -12,6 +12,8 @@ import {
   GraduationCap,
   FilePlus,
   ClipboardList,
+  AlertCircle,
+  RefreshCw,
 } from 'lucide-react';
 import PipelineCard from 'features/applications/partner/components/PipelineCard';
 
@@ -23,6 +25,7 @@ import EmptyData from 'components/emptyData/EmptyTableData';
 import Button from 'components/ui/buttons/Button';
 import ApplicationFilterBar from 'components/filters/ApplicationFilterBar';
 import { TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from 'components/ui/table';
+import { getAsyncStatus } from 'components/ui/async';
 import { StatusBadge } from 'components/ui/badges';
 import { getStatusVariant } from 'utils/getStatusVariant';
 
@@ -182,6 +185,8 @@ const PartnerApplications = () => {
     ? (currentPage - 1) * itemsPerPage + paginatedApplications.length
     : grandTotal;
 
+  const status = getAsyncStatus(loading, error, paginatedApplications, (r) => r.length === 0);
+
   const ApplicationStatusBadge = ({ status }: { status: string }) => {
     const normalized = status?.toLowerCase().replace(/\s+/g, '_') ?? '';
     const match = stageStatuses.find((s) => s.name.toLowerCase().replace(/\s+/g, '_') === normalized);
@@ -287,7 +292,7 @@ const PartnerApplications = () => {
       <div className="overflow-hidden rounded-lg border border-slate-200">
 
       <div className="md:hidden divide-y divide-slate-100">
-        {loading ? (
+        {status === 'loading' ? (
           Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-3.5">
               <div className="h-11 w-11 shrink-0 animate-pulse rounded-md bg-gray-200" />
@@ -301,7 +306,28 @@ const PartnerApplications = () => {
               </div>
             </div>
           ))
-        ) : paginatedApplications.length === 0 ? (
+        ) : status === 'error' ? (
+          <div className="px-6 py-8 text-center">
+            <EmptyData
+              title="Something went wrong"
+              subtitle={error || 'Please try again.'}
+              icon={<AlertCircle className="h-8 w-8 text-red-400" />}
+              action={
+                <Button
+                  onClick={refetch}
+                  icon={<RefreshCw className="h-4 w-4" />}
+                  text="Retry"
+                  bgColor="bg-white"
+                  textColor="text-red-600"
+                  borderColor="border-red-200"
+                  hoverTextColor="hover:text-red-600"
+                  hoverBorderColor="hover:border-red-200"
+                  className="hover:bg-red-50"
+                />
+              }
+            />
+          </div>
+        ) : status === 'empty' ? (
           <div className="px-6 py-8 text-center">
             <EmptyData
               title="No applications found"
@@ -402,18 +428,20 @@ const PartnerApplications = () => {
           </thead>
 
           <tbody className="divide-y divide-slate-100 bg-white">
-            {loading ? (
-              <TableSkeletonRows columns={5} rows={5} />
-            ) : error ? (
-              <TableErrorRow colSpan={5} message={error} onRetry={refetch} />
-            ) : paginatedApplications.length === 0 ? (
+            {status === 'loading' && <TableSkeletonRows columns={5} rows={5} />}
+
+            {status === 'error' && <TableErrorRow colSpan={5} message={error ?? undefined} onRetry={refetch} />}
+
+            {status === 'empty' && (
               <TableEmptyRow
                 colSpan={5}
                 title="No applications found"
                 subtitle="No applications match your current filters."
                 icon={<ClipboardList className="h-8 w-8 text-slate-400" />}
               />
-            ) : (
+            )}
+
+            {status === 'success' &&
               paginatedApplications.map((app) => (
                 <tr
                   key={app.id}
@@ -473,8 +501,7 @@ const PartnerApplications = () => {
                     <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
                 </tr>
-              ))
-            )}
+              ))}
           </tbody>
         </table>
       </div>
