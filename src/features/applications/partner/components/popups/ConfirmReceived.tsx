@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { XCircle, CheckCircle } from "lucide-react";
 
 import { useConfirmReceived } from "features/applications/disputes";
@@ -56,7 +57,7 @@ export default function ConfirmReceived({ isOpen, onClose, applicationId, onSucc
     }
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
       onClick={onClose}
@@ -112,6 +113,7 @@ export default function ConfirmReceived({ isOpen, onClose, applicationId, onSucc
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
