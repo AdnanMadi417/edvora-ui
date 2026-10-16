@@ -1,9 +1,9 @@
 /** The commission payout covering a single application — shown on
  *  `GET .../applications/{id}` as `partner_payout`. Intentionally a subset
- *  of the full `Payout` record (no bank_account_id/payment_method_id/
- *  receipt fields) — the backend already redacts `paid_amount` to null for
- *  a restricted agency member, same as `ApplicationCommissionItem.amount`;
- *  there's no separate client-side hide/show logic for that. */
+ *  of the full `Payout` record (no bank_account_id/payment_method_id) — the
+ *  backend already redacts `paid_amount` to null for a restricted agency
+ *  member, same as `ApplicationCommissionItem.amount`; there's no separate
+ *  client-side hide/show logic for that. */
 export interface PartnerPayout {
   id: string;
   bank_reference: string;
@@ -15,6 +15,8 @@ export interface PartnerPayout {
   voided_at: string | null;
   void_reason: string | null;
   created_at: string;
+  receipt_file_key: string | null;
+  receipt_file_url: string | null;
 }
 
 export interface PayoutItem {

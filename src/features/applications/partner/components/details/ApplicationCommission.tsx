@@ -78,7 +78,7 @@ export default function ApplicationCommission({
 
       <ApplicationCommissionRecords commissions={commissions} />
 
-      <PartnerPayoutSection payout={application?.partner_payout ?? null} />
+      <PartnerPayoutSection payout={application?.partner_payout ?? null} studentName={studentName} />
 
       <div className="space-y-4 p-6">
         {commissionDocs.length > 0 ? (

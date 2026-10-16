@@ -8,6 +8,7 @@ import { formatCommissionAmount } from "features/applications/shared/commissionT
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import Button from "components/ui/buttons/Button";
+import DocumentActions from "features/applications/shared/DocumentActions";
 import { payoutsApi } from "../services";
 import type { PartnerPayout, Payout } from "../types";
 
@@ -20,9 +21,15 @@ interface PartnerPayoutSectionProps {
   payout: PartnerPayout | null;
   canVoid?: boolean;
   onRefetch?: () => void;
+  studentName?: string | null;
 }
 
-export default function PartnerPayoutSection({ payout, canVoid = false, onRefetch }: PartnerPayoutSectionProps) {
+export default function PartnerPayoutSection({
+  payout,
+  canVoid = false,
+  onRefetch,
+  studentName,
+}: PartnerPayoutSectionProps) {
   const { showToast } = useToast();
   const [fullPayout, setFullPayout] = useState<Payout | null>(null);
   const [loadingFull, setLoadingFull] = useState(false);
@@ -65,6 +72,12 @@ export default function PartnerPayoutSection({ payout, canVoid = false, onRefetc
           </p>
           {isVoided && payout.void_reason && (
             <p className="mt-2 text-xs text-red-600">Void reason: {payout.void_reason}</p>
+          )}
+          {payout.receipt_file_key && (
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-xs text-slate-500">Receipt</span>
+              <DocumentActions fileKey={payout.receipt_file_key} label="Payout Receipt" personName={studentName} />
+            </div>
           )}
         </div>
 

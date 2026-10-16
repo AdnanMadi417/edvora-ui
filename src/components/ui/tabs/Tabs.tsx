@@ -23,13 +23,13 @@ export default function Tabs<T extends string>({ tabs, active, onChange, classNa
   const layoutId = `tabs-indicator-${useId()}`;
 
   return (
-    <div className={`relative flex items-center gap-6 border-b border-slate-200 px-6 ${className ?? ""}`}>
+    <div className={`relative flex items-center gap-6 overflow-x-auto border-b border-slate-200 px-6 ${className ?? ""}`}>
       {tabs.map(({ key, label }) => (
         <button
           key={key}
           type="button"
           onClick={() => onChange(key)}
-          className={`relative py-3 text-sm font-medium transition-colors duration-200 ${
+          className={`relative shrink-0 whitespace-nowrap py-3 text-sm font-medium transition-colors duration-200 ${
             active === key ? "text-blue-700" : "text-slate-500 hover:text-slate-700"
           }`}
         >
