@@ -1,0 +1,1 @@
+export { payInsApi } from "./payInsApi";

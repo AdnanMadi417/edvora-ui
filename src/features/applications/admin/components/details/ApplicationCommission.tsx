@@ -6,13 +6,16 @@ import DocumentActions from "features/applications/shared/DocumentActions";
 import { SectionIconBadge } from "components/ui/icons";
 import ApplicationCommissionRecords from "features/applications/shared/ApplicationCommissionRecords";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
+import { UniversityPayInSection } from "features/applications/pay-ins";
 
 interface ApplicationCommissionsProps {
   application: any;
+  onRefetch?: () => void;
 }
 
 export default function ApplicationCommissions({
   application,
+  onRefetch,
 }: ApplicationCommissionsProps) {
   const commissions: ApplicationCommissionItem[] = application?.commissions || [];
   const studentName = application?.student?.name;
@@ -43,6 +46,8 @@ export default function ApplicationCommissions({
         </div>
 
         <ApplicationCommissionRecords commissions={commissions} />
+
+        <UniversityPayInSection payIn={application?.university_pay_in ?? null} onRefetch={onRefetch} />
 
         <div className="space-y-4 p-6">
           {commissionDocs.length > 0 ? (

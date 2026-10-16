@@ -27,7 +27,7 @@ import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 
-import { InputField } from "components/form";
+import { InputField, SelectField } from "components/form";
 import Button from "components/ui/buttons/Button";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
 
@@ -273,6 +273,21 @@ export default function UpdateStatusPopup({
 
   const isCommissionPaid = selectedOption?.label === "Commission Paid";
 
+  const isCommissionReady = selectedOption?.label === "Commission Ready";
+
+  const [payInFormData, setPayInFormData] = useState({
+    payment_date: "",
+    amount: "",
+    currency: "RM",
+    payment_reference: "",
+  });
+  const [payInFormErrors, setPayInFormErrors] = useState<any>({});
+
+  const updatePayInFormData = (field: string, value: any) => {
+    setPayInFormData((prev) => ({ ...prev, [field]: value }));
+    setPayInFormErrors((prev: any) => ({ ...prev, [field]: undefined }));
+  };
+
   const [arrivalFormTemplateFile, setArrivalFormTemplateFile] = useState<File | null>(null);
 
   const safeDocumentTypes = documentTypes ?? [];
@@ -344,6 +359,14 @@ export default function UpdateStatusPopup({
         : [],
       arrivalFormTemplateFileKey,
       arrivalFormTemplateFileUrl,
+      payInDetails: isCommissionReady
+        ? {
+            paymentDate: payInFormData.payment_date,
+            amount: payInFormData.amount,
+            currency: payInFormData.currency,
+            paymentReference: payInFormData.payment_reference,
+          }
+        : undefined,
     });
   };
 
@@ -418,6 +441,22 @@ export default function UpdateStatusPopup({
     if (isCommissionPaid && !commissionPaymentFile) {
       setError("Please upload commission payment proof");
       return false;
+    }
+
+    if (isCommissionReady) {
+      const errors: any = {};
+      if (!payInFormData.payment_date) errors.payment_date = "Payment date is required";
+      if (!payInFormData.amount || Number(payInFormData.amount) <= 0) {
+        errors.amount = "Enter a valid amount";
+      }
+      if (!payInFormData.payment_reference.trim()) {
+        errors.payment_reference = "Payment reference is required";
+      }
+      if (Object.keys(errors).length > 0) {
+        setPayInFormErrors(errors);
+        setError("Please fill in the pay-in details");
+        return false;
+      }
     }
 
     setError("");
@@ -501,6 +540,8 @@ export default function UpdateStatusPopup({
     setOfferLetterVisaInvoiceFile(null);
     setOfferLetterAppFormTemplateFile(null);
     setFormData({ visa_fee_amount: "", show_visa_invoice: false, show_app_form_template: false });
+    setPayInFormData({ payment_date: "", amount: "", currency: "RM", payment_reference: "" });
+    setPayInFormErrors({});
     onClose();
   };
 
@@ -789,6 +830,50 @@ export default function UpdateStatusPopup({
             />
           )}
 
+          {isCommissionReady && (
+            <div className="space-y-2">
+              <p className="text-p2 font-semibold text-gray-900">Pay-In Details</p>
+              <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
+                <InputField
+                  label="Payment Date"
+                  field="payment_date"
+                  type="date"
+                  formData={payInFormData}
+                  errors={payInFormErrors}
+                  updateFormData={updatePayInFormData}
+                />
+                <InputField
+                  label="Amount"
+                  field="amount"
+                  type="number"
+                  placeholder="Enter amount"
+                  formData={payInFormData}
+                  errors={payInFormErrors}
+                  updateFormData={updatePayInFormData}
+                />
+                <SelectField
+                  label="Currency"
+                  field="currency"
+                  options={[
+                    { value: "RM", label: "RM" },
+                    { value: "USD", label: "USD" },
+                  ]}
+                  formData={payInFormData}
+                  errors={payInFormErrors}
+                  updateFormData={updatePayInFormData}
+                />
+                <InputField
+                  label="Payment Reference"
+                  field="payment_reference"
+                  placeholder="e.g. UNI-REF-001"
+                  formData={payInFormData}
+                  errors={payInFormErrors}
+                  updateFormData={updatePayInFormData}
+                />
+              </div>
+            </div>
+          )}
+
           {hasArrivalFormSelected && (
             <StatusFileUpload
               label="Upload Arrival Form Template"
@@ -826,7 +911,11 @@ export default function UpdateStatusPopup({
               (isUniversityApproved && !offerLetterFile) ||
               (isVisaIssued && !visaDocumentFile) ||
               (isCommissionPaid && !commissionPaymentFile) ||
-              (hasArrivalFormSelected && !arrivalFormTemplateFile)
+              (hasArrivalFormSelected && !arrivalFormTemplateFile) ||
+              (isCommissionReady &&
+                (!payInFormData.payment_date ||
+                  !payInFormData.amount ||
+                  !payInFormData.payment_reference.trim()))
             }
             icon={<CheckCircle className="h-4 w-4" />}
             text={isSubmitting ? "Updating..." : "Update Status"}
