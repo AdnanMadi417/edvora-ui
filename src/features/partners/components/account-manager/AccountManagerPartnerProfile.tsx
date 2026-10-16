@@ -38,6 +38,7 @@ import { StatusBadge } from "components/ui/badges";
 import { Tabs, type TabItem } from "components/ui/tabs";
 import { parseDate, formatDate } from "components/ui/date/utils";
 import AccountManagerPartnerApplicationsTable from "./AccountManagerPartnerApplicationsTable";
+import { PayoutStatementSection } from "features/applications/payouts";
 
 function formatDateOfBirth(value?: string | null): string | undefined {
   const date = parseDate(value);
@@ -53,7 +54,7 @@ interface Props {
   id: string;
 }
 
-type DetailsTab = "profile" | "team" | "applications";
+type DetailsTab = "profile" | "team" | "applications" | "statement";
 
 function InfoRow({
   icon,
@@ -180,10 +181,12 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
         { key: "profile", label: "Profile" },
         { key: "team", label: "Team" },
         { key: "applications", label: "Applications" },
+        { key: "statement", label: "Statement" },
       ]
     : [
         { key: "profile", label: "Profile" },
         { key: "applications", label: "Applications" },
+        { key: "statement", label: "Statement" },
       ];
 
   return (
@@ -427,6 +430,13 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
         {tab === "applications" && (
           <div key={tab} className="animate-in fade-in duration-200">
             <AccountManagerPartnerApplicationsTable partnerId={id} />
+          </div>
+        )}
+
+        {/* Statement */}
+        {tab === "statement" && (
+          <div key={tab} className="animate-in fade-in duration-200">
+            <PayoutStatementSection partnerId={id} />
           </div>
         )}
       </div>

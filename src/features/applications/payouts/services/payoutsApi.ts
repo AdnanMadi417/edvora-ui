@@ -1,5 +1,5 @@
 import api from "lib/useApi";
-import type { Payout, VoidPayoutPayload, RecordBulkPayoutPayload } from "../types";
+import type { Payout, VoidPayoutPayload, RecordBulkPayoutPayload, PayoutStatementResponse } from "../types";
 
 export const payoutsApi = {
   list: (partnerId: string, params?: { activeOnly?: boolean; latest?: boolean }) =>
@@ -14,4 +14,6 @@ export const payoutsApi = {
     api.post<Payout>(`/admin/partners/${partnerId}/payouts`, payload),
   void: (payoutId: string, payload: VoidPayoutPayload) =>
     api.post(`/admin/payouts/${payoutId}/void`, payload),
+  statement: (partnerId: string, params?: { page?: number; page_size?: number; active_only?: boolean }) =>
+    api.get<PayoutStatementResponse>(`/admin/partners/${partnerId}/statement`, { params }),
 };

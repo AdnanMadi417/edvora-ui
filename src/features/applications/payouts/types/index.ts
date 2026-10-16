@@ -122,3 +122,42 @@ export interface CommissionQueueResponse {
   page: number;
   page_size: number;
 }
+
+export interface PayoutStatementApplication {
+  application_id: string;
+  student_name: string;
+}
+
+export interface AgreedTotal {
+  currency: string;
+  amount: number;
+}
+
+/** One row per payout (covering 1+ applications) on a partner's admin
+ *  Statement tab — the admin counterpart of the partner self-service
+ *  Statement, shaped around payouts rather than commissions. `can_void`
+ *  already accounts for role (always false for an account manager) and
+ *  the void endpoint's own guards — use it directly, never re-derive it. */
+export interface PayoutStatementItem {
+  payout_id: string;
+  bank_reference: string;
+  payment_method_name: string;
+  paid_at: string;
+  currency: string;
+  applications: PayoutStatementApplication[];
+  amount_sent: number;
+  agreed_totals: AgreedTotal[];
+  recorded_by_name: string;
+  voided_at: string | null;
+  void_reason: string | null;
+  voided_by_name: string | null;
+  receipt_file_url: string | null;
+  can_void: boolean;
+}
+
+export interface PayoutStatementResponse {
+  items: PayoutStatementItem[];
+  total: number;
+  page: number;
+  page_size: number;
+}

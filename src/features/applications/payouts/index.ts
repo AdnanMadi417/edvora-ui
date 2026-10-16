@@ -6,3 +6,5 @@ export { default as VoidPayout } from './components/admin/VoidPayout';
 export { default as BatchPayout } from './components/admin/BatchPayout';
 export type { BatchPayoutLine } from './components/admin/BatchPayout';
 export { default as FinanceQueuePage } from './components/admin/FinanceQueuePage';
+export { default as PayoutStatementSection } from './components/admin/PayoutStatementSection';
+export { default as PayoutDetailPage } from './components/admin/PayoutDetailPage';
