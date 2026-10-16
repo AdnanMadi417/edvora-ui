@@ -50,7 +50,12 @@ export default function ApplicationCommissions({
 
         <UniversityPayInSection payIn={application?.university_pay_in ?? null} onRefetch={onRefetch} />
 
-        <PartnerPayoutSection payout={application?.partner_payout ?? null} canVoid onRefetch={onRefetch} />
+        <PartnerPayoutSection
+          payout={application?.partner_payout ?? null}
+          canVoid
+          onRefetch={onRefetch}
+          studentName={studentName}
+        />
 
         <div className="space-y-4 p-6">
           {commissionDocs.length > 0 ? (
