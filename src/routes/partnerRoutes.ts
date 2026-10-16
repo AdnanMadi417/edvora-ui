@@ -1,4 +1,4 @@
-import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2, Landmark, GraduationCap } from "lucide-react";
+import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2, Landmark, GraduationCap, Receipt } from "lucide-react";
 
 import type { IRoute } from "../types/navigation";
 import { FEATURES } from "../config/featureFlags";
@@ -46,6 +46,13 @@ const partnerRoutes: IRoute[] = [
           ],
         }
       : {}),
+  },
+
+  {
+    name: "Statement",
+    layout: "/partner",
+    path: "/statement",
+    icon: Receipt,
   },
 
   {
