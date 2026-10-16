@@ -21,13 +21,14 @@ import {
   useApplicationVisaFee,
 } from "features/applications/hooks";
 import { usePartnerBankAccount } from "features/partners/bank-accounts";
+import { usePaymentMethods } from "features/applications/payouts";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 
-import { InputField, SelectField } from "components/form";
+import { InputField, SelectField, SearchableDropdown } from "components/form";
 import Button from "components/ui/buttons/Button";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
 
@@ -286,6 +287,8 @@ export default function UpdateStatusPopup({
   };
 
   const { account: partnerBankAccount } = usePartnerBankAccount(application?.partner?.id ?? "");
+  const { paymentMethods } = usePaymentMethods();
+  const paymentMethodOptions = paymentMethods.map((m) => ({ value: m.id, label: m.name }));
 
   const isCommissionReady = selectedOption?.label === "Commission Ready";
 
@@ -869,10 +872,11 @@ export default function UpdateStatusPopup({
               </div>
 
               <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                <InputField
-                  label="Payment Method ID"
+                <SearchableDropdown
+                  label="Payment Method"
                   field="payment_method_id"
-                  placeholder="Enter payment method"
+                  placeholder="Search for a payment method..."
+                  options={paymentMethodOptions}
                   formData={payoutFormData}
                   errors={payoutFormErrors}
                   updateFormData={updatePayoutFormData}

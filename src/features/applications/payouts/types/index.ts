@@ -74,3 +74,9 @@ export interface RecordBulkPayoutPayload {
   receipt_file_url: string;
   lines: PayoutLine[];
 }
+
+export interface PaymentMethod {
+  id: string;
+  name: string;
+  description: string | null;
+}

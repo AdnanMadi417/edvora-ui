@@ -4,13 +4,13 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { XCircle, AlertCircle, Ban } from "lucide-react";
 
-import { useVoidPayout } from "../../hooks";
+import { useVoidPayout, usePaymentMethods } from "../../hooks";
 import type { Payout } from "../../types";
 import { usePartnerBankAccount } from "features/partners/bank-accounts";
 import { useToast } from "components/context/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import { InputField, SelectField, TextareaField } from "components/form";
+import { InputField, SelectField, TextareaField, SearchableDropdown } from "components/form";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
@@ -38,6 +38,8 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
   const { voidPayout, loading } = useVoidPayout();
   const { showToast } = useToast();
   const { account } = usePartnerBankAccount(payout?.partner_id ?? "");
+  const { paymentMethods } = usePaymentMethods();
+  const paymentMethodOptions = paymentMethods.map((m) => ({ value: m.id, label: m.name }));
 
   const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({
@@ -199,10 +201,11 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
             </div>
 
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-              <InputField
-                label="Payment Method ID"
+              <SearchableDropdown
+                label="Payment Method"
                 field="new_payment_method_id"
-                placeholder="Enter payment method"
+                placeholder="Search for a payment method..."
+                options={paymentMethodOptions}
                 formData={formData}
                 errors={formErrors}
                 updateFormData={updateFormData}

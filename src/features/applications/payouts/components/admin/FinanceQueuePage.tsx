@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Wallet, Search, X, Receipt, AlertCircle, CheckCircle } from "lucide-react";
 
 import SearchInput from "components/form/filter/SearchInput";
-import { InputField, SelectField } from "components/form";
+import { InputField, SelectField, SearchableDropdown } from "components/form";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import Button from "components/ui/buttons/Button";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow } from "components/ui/table";
@@ -18,7 +18,7 @@ import type { Partner } from "features/partners/types";
 import { usePartnerBankAccount } from "features/partners/bank-accounts";
 import { useAllStageStatuses } from "features/applications/hooks";
 import { useAdminApplications } from "features/applications/admin/hooks/useAdminApplications";
-import { useRecordBulkPayout } from "../../hooks";
+import { useRecordBulkPayout, usePaymentMethods } from "../../hooks";
 
 export default function FinanceQueuePage() {
   const { showToast } = useToast();
@@ -90,6 +90,8 @@ export default function FinanceQueuePage() {
   // --- Bulk payout form ---
   const { account: partnerBankAccount } = usePartnerBankAccount(selectedPartner?.id ?? "");
   const { recordBulkPayout, loading: recording } = useRecordBulkPayout();
+  const { paymentMethods } = usePaymentMethods();
+  const paymentMethodOptions = paymentMethods.map((m) => ({ value: m.id, label: m.name }));
 
   const [formData, setFormData] = useState({
     payment_method_id: "",
@@ -353,10 +355,11 @@ export default function FinanceQueuePage() {
                   </div>
 
                   <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                    <InputField
-                      label="Payment Method ID"
+                    <SearchableDropdown
+                      label="Payment Method"
                       field="payment_method_id"
-                      placeholder="Enter payment method"
+                      placeholder="Search for a payment method..."
+                      options={paymentMethodOptions}
                       formData={formData}
                       errors={formErrors}
                       updateFormData={updateFormData}
