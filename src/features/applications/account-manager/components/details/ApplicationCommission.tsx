@@ -6,6 +6,7 @@ import DocumentActions from "features/applications/shared/DocumentActions";
 import { SectionIconBadge } from "components/ui/icons";
 import ApplicationCommissionRecords from "features/applications/shared/ApplicationCommissionRecords";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
+import { PartnerPayoutSection } from "features/applications/payouts";
 
 interface ApplicationCommissionsProps {
   application: any;
@@ -41,6 +42,8 @@ export default function ApplicationCommissions({
       </div>
 
       <ApplicationCommissionRecords commissions={commissions} />
+
+      <PartnerPayoutSection payout={application?.partner_payout ?? null} />
 
       <div className="space-y-4 p-6">
         {commissionDocs.length > 0 ? (

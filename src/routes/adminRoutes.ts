@@ -15,6 +15,7 @@ import {
   Tag,
   Users,
   Bell,
+  Wallet,
 } from "lucide-react";
 
 const AdminRoutes: IRoute[] = [
@@ -29,6 +30,12 @@ const AdminRoutes: IRoute[] = [
     layout: "/admin",
     path: "/applications",
     icon: ClipboardList,
+  },
+  {
+    name: "Finance Queue",
+    layout: "/admin",
+    path: "/finance-queue",
+    icon: Wallet,
   },
   {
     name: "Partners",

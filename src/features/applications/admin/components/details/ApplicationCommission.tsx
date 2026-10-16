@@ -7,6 +7,7 @@ import { SectionIconBadge } from "components/ui/icons";
 import ApplicationCommissionRecords from "features/applications/shared/ApplicationCommissionRecords";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 import { UniversityPayInSection } from "features/applications/pay-ins";
+import { PartnerPayoutSection } from "features/applications/payouts";
 
 interface ApplicationCommissionsProps {
   application: any;
@@ -48,6 +49,8 @@ export default function ApplicationCommissions({
         <ApplicationCommissionRecords commissions={commissions} />
 
         <UniversityPayInSection payIn={application?.university_pay_in ?? null} onRefetch={onRefetch} />
+
+        <PartnerPayoutSection payout={application?.partner_payout ?? null} canVoid onRefetch={onRefetch} />
 
         <div className="space-y-4 p-6">
           {commissionDocs.length > 0 ? (

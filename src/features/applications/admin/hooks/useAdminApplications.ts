@@ -34,6 +34,7 @@ export type UseAdminApplicationsParams = {
   status?: "active" | "hold" | "cancel" | "all";
   stage_id?: string;
   stage_status_id?: string;
+  partner_id?: string;
   search?: string;
 };
 
@@ -44,6 +45,7 @@ export function useAdminApplications({
                                        status = "active",
                                        stage_id,
                                        stage_status_id,
+                                       partner_id,
                                        search,
                                      }: UseAdminApplicationsParams = {}) {
   const [data, setData] = useState<AdminApplicationsResponse | null>(null);
@@ -64,6 +66,7 @@ export function useAdminApplications({
             limit, offset, status,
             ...(stage_id ? { stage_id } : {}),
             ...(stage_status_id ? { stage_status_id } : {}),
+            ...(partner_id ? { partner_id } : {}),
             ...(search ? { search } : {}),
           },
           headers: token
@@ -83,7 +86,7 @@ export function useAdminApplications({
 
   useEffect(() => {
     fetchApplications();
-  }, [limit, offset, status, stage_id, stage_status_id, search]);
+  }, [limit, offset, status, stage_id, stage_status_id, partner_id, search]);
 
   return {
     items: data?.items ?? [],

@@ -20,6 +20,16 @@ interface UseStatusUpdateReturn {
       currency: string;
       paymentReference: string;
     };
+    payoutDetails?: {
+      bankAccountId: string;
+      paymentMethodId: string;
+      bankReference: string;
+      paidAt: string;
+      currency: string;
+      paidAmount: string;
+      receiptFileKey?: string;
+      receiptFileUrl?: string;
+    };
   }) => Promise<void>;
   isUpdating: boolean;
 }
@@ -37,6 +47,7 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
     arrivalFormTemplateFileKey,
     arrivalFormTemplateFileUrl,
     payInDetails,
+    payoutDetails,
   }: {
     applicationId: string;
     statusId: string;
@@ -50,6 +61,16 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
       amount: string;
       currency: string;
       paymentReference: string;
+    };
+    payoutDetails?: {
+      bankAccountId: string;
+      paymentMethodId: string;
+      bankReference: string;
+      paidAt: string;
+      currency: string;
+      paidAmount: string;
+      receiptFileKey?: string;
+      receiptFileUrl?: string;
     };
   }) => {
     try {
@@ -66,6 +87,16 @@ export const useStatusUpdate = (): UseStatusUpdateReturn => {
           amount: payInDetails.amount,
           currency: payInDetails.currency,
           payment_reference: payInDetails.paymentReference,
+        }),
+        ...(payoutDetails && {
+          bank_account_id: payoutDetails.bankAccountId,
+          payment_method_id: payoutDetails.paymentMethodId,
+          bank_reference: payoutDetails.bankReference,
+          paid_at: payoutDetails.paidAt,
+          currency: payoutDetails.currency,
+          paid_amount: payoutDetails.paidAmount,
+          ...(payoutDetails.receiptFileKey && { receipt_file_key: payoutDetails.receiptFileKey }),
+          ...(payoutDetails.receiptFileUrl && { receipt_file_url: payoutDetails.receiptFileUrl }),
         }),
       });
       showToast("Status updated successfully.", "success");
