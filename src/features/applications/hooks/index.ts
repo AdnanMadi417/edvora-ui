@@ -9,7 +9,6 @@ export { useCreatePartnerApplication } from "features/applications/partner/hooks
 export { useGetApplicationRequiredFields } from "features/applications/partner/hooks/useApplicationRequiredFields";
 export { useUniversityRequiredFields } from "./useUniversityRequiredFields";
 export { useVisaSetup } from "./useVisaSetup";
-export { useDisputeCommission } from "./useDisputeCommission";
 
 export { useApplicationActions } from "./stages/useApplicationActions";
 export type { ApplicationActionsResponse, PartnerAction, AvailableAction, StageStatus } from "./stages/useApplicationActions";

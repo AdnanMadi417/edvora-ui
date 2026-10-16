@@ -50,13 +50,14 @@ import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import PartnerApplicationsTable from "./PartnerApplicationsTable";
 import AdditionalManagersSection from "./AdditionalManagersSection";
 import { PartnerBankAccountSection } from "features/partners/bank-accounts";
+import { PayoutStatementSection } from "features/applications/payouts";
 import { parseDate, formatDate } from "components/ui/date/utils";
 
 interface Props {
   id: string;
 }
 
-type DetailsTab = "profile" | "team" | "bank-account" | "applications";
+type DetailsTab = "profile" | "team" | "bank-account" | "applications" | "statement";
 
 function formatDateOfBirth(value?: string | null): string | undefined {
   const date = parseDate(value);
@@ -217,11 +218,13 @@ export default function PartnerDetails({ id }: Props) {
         { key: "team", label: "Team" },
         { key: "bank-account", label: "Bank Account" },
         { key: "applications", label: "Applications" },
+        { key: "statement", label: "Statement" },
       ]
     : [
         { key: "profile", label: "Profile" },
         { key: "bank-account", label: "Bank Account" },
         { key: "applications", label: "Applications" },
+        { key: "statement", label: "Statement" },
       ];
 
   return (
@@ -582,6 +585,9 @@ export default function PartnerDetails({ id }: Props) {
 
         {/* Applications */}
         {tab === "applications" && <PartnerApplicationsTable partnerId={id} />}
+
+        {/* Statement */}
+        {tab === "statement" && <PayoutStatementSection partnerId={id} />}
         </motion.div>
         </AnimatePresence>
       </div>

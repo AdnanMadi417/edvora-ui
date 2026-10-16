@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
-import { Wallet, X, SlidersHorizontal, Receipt, RefreshCw } from "lucide-react";
+import { Wallet, X, SlidersHorizontal, Receipt, RefreshCw, ChevronRight } from "lucide-react";
 
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
@@ -45,6 +46,7 @@ const WAITING_ON_OPTIONS = [
 ];
 
 export default function FinanceQueuePage() {
+  const router = useRouter();
   // --- Filters ---
   const [partnerSearch, setPartnerSearch] = useState("");
   const [debouncedPartnerSearch, setDebouncedPartnerSearch] = useState("");
@@ -289,16 +291,17 @@ export default function FinanceQueuePage() {
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Waiting On</th>
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Days Waiting</th>
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Actions</th>
+                <th className="w-8" />
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 bg-white">
-              {status === "loading" && <TableSkeletonRows columns={9} rows={5} />}
+              {status === "loading" && <TableSkeletonRows columns={10} rows={5} />}
 
-              {status === "error" && <TableErrorRow colSpan={9} message={error ?? undefined} onRetry={refetch} />}
+              {status === "error" && <TableErrorRow colSpan={10} message={error ?? undefined} onRetry={refetch} />}
 
               {status === "empty" && (
                 <TableEmptyRow
-                  colSpan={9}
+                  colSpan={10}
                   title="No commissions found"
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Nothing in the queue yet."}
                   icon={<Wallet className="h-8 w-8 text-slate-400" />}
@@ -321,8 +324,12 @@ export default function FinanceQueuePage() {
                       item.days_waiting > item.typical_days_to;
 
                     return (
-                      <AnimatedTableRow key={item.application_commission_id}>
-                        <td className="px-6 py-4">
+                      <AnimatedTableRow
+                        key={item.application_commission_id}
+                        className="group cursor-pointer transition-colors hover:bg-slate-100/50"
+                        onClick={() => router.push(`/admin/applications/${item.application_id}`)}
+                      >
+                        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                           {isSelectable && (
                             <input
                               type="checkbox"
@@ -382,7 +389,7 @@ export default function FinanceQueuePage() {
                             </p>
                           )}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                           {item.waiting_on === "university" && (
                             <Button
                               onClick={() =>
@@ -402,6 +409,9 @@ export default function FinanceQueuePage() {
                               className="hover:bg-blue-50"
                             />
                           )}
+                        </td>
+                        <td className="w-8 pr-4 py-4">
+                          <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
                         </td>
                       </AnimatedTableRow>
                     );

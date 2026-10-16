@@ -8,6 +8,7 @@ import ApplicationCommissionRecords from "features/applications/shared/Applicati
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 import { UniversityPayInSection } from "features/applications/pay-ins";
 import { PartnerPayoutSection } from "features/applications/payouts";
+import { DisputeSection } from "features/applications/disputes";
 
 interface ApplicationCommissionsProps {
   application: any;
@@ -55,6 +56,13 @@ export default function ApplicationCommissions({
           canVoid
           onRefetch={onRefetch}
           studentName={studentName}
+        />
+
+        <DisputeSection
+          dispute={application?.dispute ?? null}
+          partnerPayoutId={application?.partner_payout?.id}
+          canManageDispute
+          onRefetch={onRefetch}
         />
 
         <div className="space-y-4 p-6">
