@@ -1,28 +1,28 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Landmark, Pencil, Plus, XCircle } from "lucide-react";
+import { History, Landmark, Pencil, Plus, XCircle } from "lucide-react";
 import Button from "components/ui/buttons/Button";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
-import ToggleInput from "components/form/toggle/ToggleInput";
+import SearchableDropdown from "components/form/search/SearchableDropdown";
 import { Skeleton } from "components/ui/skeleton";
 import { AsyncStateView, getAsyncStatus } from "components/ui/async";
 import { useToast } from "components/context/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
-import { getApiErrorCode, getApiErrorDetails } from "utils/parseApiError";
+import { getApiErrorCode } from "utils/parseApiError";
 import { useBanks } from "features/banks/hooks";
 import type { PartnerDetails } from "features/partners/types";
 import { usePartnerBankAccount, useCreatePartnerBankAccount, useUpdatePartnerBankAccount } from "../../hooks";
 import type { CreatePartnerBankAccountPayload } from "../../types";
-import { ISO_COUNTRIES } from "constants/lists";
+import PartnerBankAccountHistory from "./PartnerBankAccountHistory";
+import { validateAccountNumber, validateIban } from "../../constants/accountNumberRules";
 
 const CURRENCY_OPTIONS = [
   { value: "RM", label: "RM — Malaysian Ringgit" },
   { value: "USD", label: "USD — US Dollar" },
 ];
-const COUNTRY_OPTIONS = ISO_COUNTRIES.map((c) => ({ value: c.code, label: `${c.name} (${c.code})` }));
 
 const ERROR_MESSAGES: Record<string, string> = {
   bank_account_not_found: "This bank account no longer exists — it may have been removed elsewhere.",
@@ -34,11 +34,7 @@ interface Props {
 }
 
 interface FormData {
-  useCuratedBank: boolean;
   bank_id: string;
-  intl_bank_name: string;
-  intl_bank_country: string;
-  intl_bank_swift: string;
   account_holder_name: string;
   account_number: string;
   iban: string;
@@ -53,11 +49,7 @@ interface FormData {
 }
 
 const EMPTY_FORM: FormData = {
-  useCuratedBank: true,
   bank_id: "",
-  intl_bank_name: "",
-  intl_bank_country: "",
-  intl_bank_swift: "",
   account_holder_name: "",
   account_number: "",
   iban: "",
@@ -110,9 +102,9 @@ export default function PartnerBankAccountSection({ partner }: Props) {
   const { updateAccount, loading: updating } = useUpdatePartnerBankAccount();
 
   const [mode, setMode] = useState<"view" | "form">("view");
+  const [showHistory, setShowHistory] = useState(false);
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [bankSuggestion, setBankSuggestion] = useState<{ bank_id: string; bank_name: string } | null>(null);
 
   const isMalaysia = partner.country.trim().toLowerCase() === "malaysia";
   const saving = creating || updating;
@@ -135,24 +127,18 @@ export default function PartnerBankAccountSection({ partner }: Props) {
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
-    setBankSuggestion(null);
   };
 
   const openAdd = () => {
     setFormData(EMPTY_FORM);
     setErrors({});
-    setBankSuggestion(null);
     setMode("form");
   };
 
   const openEdit = () => {
     if (!account) return;
     setFormData({
-      useCuratedBank: !!account.bank_id,
       bank_id: account.bank_id ?? "",
-      intl_bank_name: account.intl_bank_name ?? "",
-      intl_bank_country: account.intl_bank_country ?? "",
-      intl_bank_swift: account.intl_bank_swift ?? "",
       account_holder_name: account.account_holder_name,
       account_number: account.account_number,
       iban: account.iban ?? "",
@@ -166,26 +152,27 @@ export default function PartnerBankAccountSection({ partner }: Props) {
       intermediary_bank_swift: account.intermediary_bank_swift ?? "",
     });
     setErrors({});
-    setBankSuggestion(null);
     setMode("form");
   };
 
   const validate = (): Record<string, string> => {
     const next: Record<string, string> = {};
-    if (formData.useCuratedBank) {
-      if (!formData.bank_id) next.bank_id = "Select a bank";
-    } else {
-      if (!formData.intl_bank_name.trim()) next.intl_bank_name = "Bank name is required";
-      if (!formData.intl_bank_country.trim()) next.intl_bank_country = "Bank country is required";
-      if (!formData.intl_bank_swift.trim()) next.intl_bank_swift = "SWIFT code is required";
-    }
+    if (!formData.bank_id) next.bank_id = "Select a bank";
     if (!formData.account_holder_name.trim()) next.account_holder_name = "Account holder name is required";
-    if (!formData.account_number.trim()) next.account_number = "Account number is required";
+
+    const selectedBankCode = bankLookup.get(formData.bank_id)?.code;
+    const accountNumberError = validateAccountNumber(formData.account_number, selectedBankCode);
+    if (accountNumberError) next.account_number = accountNumberError;
+
+    const ibanError = validateIban(formData.iban);
+    if (ibanError) next.iban = ibanError;
+
     if (!formData.currency) next.currency = "Currency is required";
-    // Only a manually-entered international bank needs wire details — a
-    // curated bank (Malaysia today) never does, regardless of the
-    // partner's own country.
-    if (!isMalaysia && !formData.useCuratedBank) {
+    // Wire details are required whenever the PARTNER is international,
+    // regardless of whether the bank itself is curated or manually
+    // entered — the curated list isn't Malaysia-only, and the backend
+    // requires these fields for any non-Malaysian partner either way.
+    if (!isMalaysia) {
       if (!formData.beneficiary_address.trim()) next.beneficiary_address = "Required for international accounts";
       if (!formData.beneficiary_phone.trim()) next.beneficiary_phone = "Required for international accounts";
       if (!formData.bank_branch_address.trim()) next.bank_branch_address = "Required for international accounts";
@@ -195,13 +182,13 @@ export default function PartnerBankAccountSection({ partner }: Props) {
   };
 
   const buildPayload = (): CreatePartnerBankAccountPayload => ({
-    ...(formData.useCuratedBank
-      ? { bank_id: formData.bank_id }
-      : {
-          intl_bank_name: formData.intl_bank_name.trim(),
-          intl_bank_country: formData.intl_bank_country.trim().toUpperCase(),
-          intl_bank_swift: formData.intl_bank_swift.trim(),
-        }),
+    bank_id: formData.bank_id,
+    // Explicitly cleared, not omitted — an account that was previously
+    // manually-entered still has these set on the existing row, and PATCH
+    // leaves an omitted field untouched (see type comment).
+    intl_bank_name: null,
+    intl_bank_country: null,
+    intl_bank_swift: null,
     account_holder_name: formData.account_holder_name.trim(),
     account_number: formData.account_number.trim(),
     iban: formData.iban.trim() || undefined,
@@ -214,19 +201,6 @@ export default function PartnerBankAccountSection({ partner }: Props) {
     intermediary_bank_name: formData.intermediary_bank_name.trim() || undefined,
     intermediary_bank_swift: formData.intermediary_bank_swift.trim() || undefined,
   });
-
-  const applySuggestion = () => {
-    if (!bankSuggestion) return;
-    setFormData((prev) => ({
-      ...prev,
-      useCuratedBank: true,
-      bank_id: bankSuggestion.bank_id,
-      intl_bank_name: "",
-      intl_bank_country: "",
-      intl_bank_swift: "",
-    }));
-    setBankSuggestion(null);
-  };
 
   const handleSave = async () => {
     const validationErrors = validate();
@@ -250,13 +224,6 @@ export default function PartnerBankAccountSection({ partner }: Props) {
     } catch (err: unknown) {
       const code = getApiErrorCode(err);
 
-      if (code === "bank_already_curated") {
-        const details = getApiErrorDetails(err) as { bank_id?: string; bank_name?: string } | null;
-        if (details?.bank_id) {
-          setBankSuggestion({ bank_id: details.bank_id, bank_name: details.bank_name || "this bank" });
-          return;
-        }
-      }
       if (code === "bank_account_already_active") {
         showToast("This partner already has an active bank account — showing it now.", "error");
         setMode("view");
@@ -312,7 +279,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
             <DetailRow label="Account Number" value={account?.account_number} />
             <DetailRow label="IBAN" value={account?.iban} />
             <DetailRow label="Currency" value={account?.currency} />
-            {!isMalaysia && account && !account.bank_id && (
+            {!isMalaysia && account && (
               <>
                 <DetailRow label="Beneficiary Address" value={account.beneficiary_address} />
                 <DetailRow label="Beneficiary Phone" value={account.beneficiary_phone} />
@@ -322,7 +289,17 @@ export default function PartnerBankAccountSection({ partner }: Props) {
             )}
           </div>
 
-          <div className="flex justify-end border-t border-slate-200 p-6">
+          <div className="flex justify-end gap-2 border-t border-slate-200 p-6">
+            <Button
+              onClick={() => setShowHistory(true)}
+              icon={<History className="h-4 w-4" />}
+              text="History"
+              bgColor="bg-white"
+              textColor="text-slate-600"
+              borderColor="border-slate-300"
+              hoverTextColor="hover:text-slate-800"
+              hoverBorderColor="hover:border-slate-400"
+            />
             <Button
               onClick={openEdit}
               icon={<Pencil className="h-4 w-4" />}
@@ -340,52 +317,16 @@ export default function PartnerBankAccountSection({ partner }: Props) {
       {mode === "form" && (
         <div className="grid grid-cols-1 gap-x-4 p-6 md:grid-cols-2">
           <div className="md:col-span-2">
-            <ToggleInput
-              label="Bank Selection"
-              field="useCuratedBank"
+            <SearchableDropdown
+              label="Bank"
+              field="bank_id"
+              placeholder="Search for a bank..."
+              options={bankOptions}
               formData={formData}
-              errors={{}}
+              errors={errors}
               updateFormData={updateFormData}
-              enabledText="Pick from list"
-              disabledText="Bank isn't listed"
-              enabledDescription="Choose a bank from the curated list."
-              disabledDescription="Enter the bank's details manually."
             />
           </div>
-
-          {formData.useCuratedBank ? (
-            <div className="md:col-span-2">
-              <SelectField label="Bank" field="bank_id" options={bankOptions} formData={formData} errors={errors} updateFormData={updateFormData} />
-            </div>
-          ) : (
-            <>
-              <InputField label="Bank Name" field="intl_bank_name" formData={formData} errors={errors} updateFormData={updateFormData} />
-              <SelectField
-                label="Bank Country"
-                field="intl_bank_country"
-                options={COUNTRY_OPTIONS}
-                formData={formData}
-                errors={errors}
-                updateFormData={updateFormData}
-              />
-              <InputField label="SWIFT Code" field="intl_bank_swift" formData={formData} errors={errors} updateFormData={updateFormData} />
-            </>
-          )}
-
-          {bankSuggestion && (
-            <div className="mb-4 flex items-center justify-between gap-2 rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 md:col-span-2">
-              <span>&quot;{bankSuggestion.bank_name}&quot; is already in the curated bank list.</span>
-              <Button
-                onClick={applySuggestion}
-                text={`Use ${bankSuggestion.bank_name}`}
-                bgColor="bg-white"
-                textColor="text-blue-700"
-                borderColor="border-blue-600"
-                hoverTextColor="hover:text-blue-800"
-                hoverBorderColor="hover:border-blue-700"
-              />
-            </div>
-          )}
 
           <InputField label="Account Holder Name" field="account_holder_name" formData={formData} errors={errors} updateFormData={updateFormData} />
           <InputField label="Account Number" field="account_number" formData={formData} errors={errors} updateFormData={updateFormData} />
@@ -400,7 +341,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
             updateFormData={updateFormData}
           />
 
-          {!isMalaysia && !formData.useCuratedBank && (
+          {!isMalaysia && (
             <>
               <InputField label="Beneficiary Address" field="beneficiary_address" formData={formData} errors={errors} updateFormData={updateFormData} />
               <InputField label="Beneficiary Phone" field="beneficiary_phone" formData={formData} errors={errors} updateFormData={updateFormData} />
@@ -460,6 +401,12 @@ export default function PartnerBankAccountSection({ partner }: Props) {
           </div>
         </div>
       )}
+
+      <PartnerBankAccountHistory
+        isOpen={showHistory}
+        onClose={() => setShowHistory(false)}
+        partnerId={partner.id}
+      />
     </div>
   );
 }
