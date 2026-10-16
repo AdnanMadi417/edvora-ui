@@ -88,7 +88,7 @@ export default function DisputeSection({
       )}
 
       {canManageDispute && isActionable && (
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap justify-end gap-3">
           {dispute.status === "open" && (
             <Button
               onClick={handleClaim}

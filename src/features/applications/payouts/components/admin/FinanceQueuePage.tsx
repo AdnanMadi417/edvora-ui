@@ -8,10 +8,12 @@ import { Wallet, X, SlidersHorizontal, Receipt, RefreshCw, ChevronRight } from "
 import SearchInput from "components/form/filter/SearchInput";
 import FilterSelectField from "components/form/filter/FilterSelectField";
 import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
 import { AnimatedTableRow } from "components/ui/motion";
 import { getAsyncStatus } from "components/ui/async";
 import { StatusBadge, type StatusBadgeVariant } from "components/ui/badges";
+import { Tooltip } from "components/ui/tooltip";
 import AppDate from "components/ui/date/AppDate";
 import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
 
@@ -391,23 +393,25 @@ export default function FinanceQueuePage() {
                         </td>
                         <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                           {item.waiting_on === "university" && (
-                            <Button
-                              onClick={() =>
-                                setRecordPayInRow({
-                                  application_id: item.application_id,
-                                  reference: item.reference,
-                                  student_name: item.student_name,
-                                })
-                              }
-                              icon={<Receipt className="h-4 w-4" />}
-                              text="Record Pay-In"
-                              bgColor="bg-white"
-                              textColor="text-blue-600"
-                              borderColor="border-blue-200"
-                              hoverTextColor="hover:text-blue-700"
-                              hoverBorderColor="hover:border-blue-300"
-                              className="hover:bg-blue-50"
-                            />
+                            <Tooltip content="Record pay-in" position="left">
+                              <IconButton
+                                onClick={() =>
+                                  setRecordPayInRow({
+                                    application_id: item.application_id,
+                                    reference: item.reference,
+                                    student_name: item.student_name,
+                                  })
+                                }
+                                aria-label="Record pay-in"
+                                icon={<Receipt className="h-4 w-4" />}
+                                bgColor="bg-transparent"
+                                textColor="text-blue-600"
+                                borderColor="border-transparent"
+                                hoverTextColor="hover:text-blue-700"
+                                hoverBorderColor="hover:border-transparent"
+                                className="hover:bg-blue-50"
+                              />
+                            </Tooltip>
                           )}
                         </td>
                         <td className="w-8 pr-4 py-4">
