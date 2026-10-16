@@ -8,6 +8,7 @@ import {
   AlertCircle,
   Pause,
   CheckCircle,
+  ListX,
 } from "lucide-react";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -559,6 +560,7 @@ export default function UpdateStatusPopup({
               <NoDocumentsRequired
                 title="No status"
                 subtitle="There are no status options available at the moment."
+                icon={<ListX className="h-10 w-10 text-slate-400" />}
               />
             ) : (
               statusOptions.map((option) => {
