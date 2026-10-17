@@ -2,12 +2,14 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ExternalLink, Ban, Wallet } from "lucide-react";
+import { ChevronLeft, Ban, Wallet } from "lucide-react";
 
 import { Skeleton } from "components/ui/skeleton";
 import { AsyncStateView, getAsyncStatus } from "components/ui/async";
 import { StatusBadge } from "components/ui/badges";
 import Button from "components/ui/buttons/Button";
+import ActionsDropdown from "components/ui/buttons/ActionsDropdown";
+import DocumentActions from "features/applications/shared/DocumentActions";
 import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
 import AppDate from "components/ui/date/AppDate";
 
@@ -24,7 +26,7 @@ function DetailRow({ label, value }: { label: string; value: React.ReactNode }) 
   return (
     <div>
       <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="mt-1 text-sm text-slate-900">{value}</p>
+      <div className="mt-1 flex items-center gap-2 text-sm text-slate-900">{value}</div>
     </div>
   );
 }
@@ -113,6 +115,18 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
             ) : (
               <StatusBadge variant="success">Active</StatusBadge>
             )}
+            {!isVoided && (
+              <ActionsDropdown
+                items={[
+                  {
+                    label: "Void & Correct Payout",
+                    icon: Ban,
+                    color: "red",
+                    onClick: () => setShowVoidModal(true),
+                  },
+                ]}
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-1 gap-4 border-t border-slate-200 px-6 py-6 sm:grid-cols-2">
@@ -133,6 +147,15 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
               }
             />
             {isVoided && <DetailRow label="Void Reason" value={payout?.void_reason ?? "—"} />}
+            <DetailRow
+              label="Receipt"
+              value={
+                <DocumentActions
+                  fileKey={payout?.receipt_file_key}
+                  label="Payout Receipt"
+                />
+              }
+            />
           </div>
 
           <div className="border-t border-slate-200 px-6 py-6">
@@ -171,48 +194,6 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
             </div>
           </div>
         </AsyncStateView>
-
-        {status === "success" && (
-          <div className="flex gap-2 border-t border-slate-200 px-6 py-4">
-            <Button
-              onClick={handleBack}
-              icon={<ChevronLeft className="h-5 w-5" />}
-              text="Back"
-              bgColor="bg-white"
-              textColor="text-slate-600"
-              borderColor="border-slate-300"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-400"
-              className="flex-1 hover:bg-slate-50"
-            />
-            {payout?.receipt_file_url && (
-              <Button
-                onClick={() => window.open(payout.receipt_file_url as string, "_blank")}
-                icon={<ExternalLink className="h-5 w-5" />}
-                text="Proof"
-                bgColor="bg-white"
-                textColor="text-slate-600"
-                borderColor="border-slate-300"
-                hoverTextColor="hover:text-slate-800"
-                hoverBorderColor="hover:border-slate-400"
-                className="flex-1 hover:bg-slate-50"
-              />
-            )}
-            {!isVoided && (
-              <Button
-                onClick={() => setShowVoidModal(true)}
-                icon={<Ban className="h-5 w-5" />}
-                text="Void & Correct"
-                bgColor="bg-red-50"
-                textColor="text-red-700"
-                borderColor="border-red-600"
-                hoverTextColor="hover:text-red-700"
-                hoverBorderColor="hover:border-red-700"
-                className="flex-1 hover:bg-red-100"
-              />
-            )}
-          </div>
-        )}
       </div>
 
       {payout && (
