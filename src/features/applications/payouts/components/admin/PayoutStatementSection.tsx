@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
-import { Receipt, ExternalLink, Ban, ChevronRight } from "lucide-react";
+import { Receipt, Eye, Download, Ban, ChevronRight } from "lucide-react";
 
 import SearchInput from "components/form/filter/SearchInput";
 import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
@@ -16,6 +16,8 @@ import IconButton from "components/ui/buttons/IconButton";
 import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { getDocumentDownloadUrl } from "services/documentService";
+import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 
 import { payoutsApi } from "../../services";
 import { usePayoutStatement } from "../../hooks";
@@ -69,6 +71,34 @@ export default function PayoutStatementSection({ partnerId }: PayoutStatementSec
       showToast(parseApiError(err, "Failed to load payout details."), "error");
     } finally {
       setLoadingVoidId(null);
+    }
+  };
+
+  // Proof is resolved the same way DocumentActions does everywhere else --
+  // via a signed URL from file_key, never the raw stored receipt_file_url.
+  // The statement endpoint doesn't return receipt_file_key, so fetch the
+  // full payout first (same lookup openVoidModal already does).
+  const [loadingProof, setLoadingProof] = useState<{ id: string; action: "view" | "download" } | null>(null);
+
+  const handleProof = async (item: PayoutStatementItem, action: "view" | "download") => {
+    setLoadingProof({ id: item.payout_id, action });
+    try {
+      const res = await payoutsApi.get(item.payout_id);
+      const fileKey = res.data.receipt_file_key;
+      if (!fileKey) {
+        showToast("No receipt on file for this payout.", "error");
+        return;
+      }
+      const url = await getDocumentDownloadUrl(fileKey);
+      if (action === "view") {
+        window.open(url, "_blank");
+      } else {
+        await downloadFileAs(url, buildDocumentFileName("", "Payout Receipt", fileKey));
+      }
+    } catch (err: unknown) {
+      showToast(parseApiError(err, "Failed to load receipt."), "error");
+    } finally {
+      setLoadingProof(null);
     }
   };
 
@@ -172,22 +202,58 @@ export default function PayoutStatementSection({ partnerId }: PayoutStatementSec
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           {item.receipt_file_url && (
-                            <Tooltip content="View proof" position="left">
-                              <IconButton
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  window.open(item.receipt_file_url as string, "_blank");
-                                }}
-                                aria-label="View proof"
-                                icon={<ExternalLink className="h-4 w-4" />}
-                                bgColor="bg-transparent"
-                                textColor="text-slate-500"
-                                borderColor="border-transparent"
-                                hoverTextColor="hover:text-slate-700"
-                                hoverBorderColor="hover:border-transparent"
-                                className="hover:bg-slate-100"
-                              />
-                            </Tooltip>
+                            <>
+                              <Tooltip content="View Receipt" position="left">
+                                <IconButton
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleProof(item, "view");
+                                  }}
+                                  disabled={loadingProof?.id === item.payout_id}
+                                  aria-label="View Receipt"
+                                  icon={
+                                    <Eye
+                                      className={`h-4 w-4 ${
+                                        loadingProof?.id === item.payout_id && loadingProof.action === "view"
+                                          ? "animate-pulse"
+                                          : ""
+                                      }`}
+                                    />
+                                  }
+                                  bgColor="bg-slate-100"
+                                  textColor="text-slate-600"
+                                  borderColor="border-transparent"
+                                  hoverTextColor="hover:text-slate-600"
+                                  hoverBorderColor="hover:border-slate-200"
+                                  className="hover:bg-slate-200"
+                                />
+                              </Tooltip>
+                              <Tooltip content="Download Receipt" position="left">
+                                <IconButton
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleProof(item, "download");
+                                  }}
+                                  disabled={loadingProof?.id === item.payout_id}
+                                  aria-label="Download Receipt"
+                                  icon={
+                                    <Download
+                                      className={`h-4 w-4 ${
+                                        loadingProof?.id === item.payout_id && loadingProof.action === "download"
+                                          ? "animate-pulse"
+                                          : ""
+                                      }`}
+                                    />
+                                  }
+                                  bgColor="bg-blue-50"
+                                  textColor="text-blue-600"
+                                  borderColor="border-transparent"
+                                  hoverTextColor="hover:text-blue-700"
+                                  hoverBorderColor="hover:border-blue-200"
+                                  className="hover:bg-blue-100"
+                                />
+                              </Tooltip>
+                            </>
                           )}
                           {item.can_void && (
                             <Tooltip content="Void & correct" position="left">
