@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 import { useSubmitAgencyMemberProfile } from "features/agency-members/hooks";
-import { COUNTRIES, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
+import { COUNTRY_OPTIONS, isKnownCountry, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
@@ -22,7 +22,6 @@ import { scrollToFirstError } from "utils/scrollToError";
 import Button from "components/ui/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 
-const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
 
 const SUBMIT_PROFILE_FIELD_MAP: Record<string, string> = {
@@ -121,6 +120,7 @@ export default function AgencyMemberSubmitProfile() {
     const e: Record<string, string> = {};
     if (!formData.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!formData.country) e.country = "Country is required";
+    else if (!isKnownCountry(formData.country)) e.country = "Select a country from the list";
     if (!formData.nationality) e.nationality = "Nationality is required";
     if (!formData.background) e.background = "Please select your background";
     if (!formData.date_of_birth) e.date_of_birth = "Date of birth is required";

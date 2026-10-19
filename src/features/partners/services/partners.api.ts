@@ -41,6 +41,7 @@ export const partnersApi = {
           is_active: payload.is_active,
         },
         type: payload.type,
+        country: payload.country.trim(),
       },
       { headers: authHeader() }
     ),

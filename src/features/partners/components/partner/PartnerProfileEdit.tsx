@@ -14,7 +14,7 @@ import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "se
 import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
 import { useFileDrop } from "components/form/upload/useFileDrop";
-import { COUNTRIES, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
+import { COUNTRY_OPTIONS, isKnownCountry, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
 import { isValidWebsiteUrl } from "utils/socialMedia";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
@@ -22,7 +22,6 @@ import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
 
-const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
 
 const PROFILE_UPDATE_FIELD_MAP: Record<string, string> = {
@@ -321,6 +320,7 @@ export default function EditPartnerProfile() {
     else if (formData.name.trim().length < 3) e.name = "Name must be at least 3 characters";
 
     if (!formData.country) e.country = "Country is required";
+    else if (!isKnownCountry(formData.country)) e.country = "Select a country from the list";
 
     if (!formData.phone_number.trim()) e.phone_number = "Phone number is required";
     else if (formData.phone_number.trim().length < 5) e.phone_number = "Phone number must be at least 5 digits";

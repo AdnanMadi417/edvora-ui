@@ -9,7 +9,7 @@ import { usePartnerRegistration } from "features/partners/hooks";
 import OtpStep from "./OtpStep";
 import EnterVerificationCodeModal from "./EnterVerificationCodeModal";
 import { AnimatePresence, motion } from "framer-motion";
-import { COUNTRIES, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
+import { COUNTRY_OPTIONS, isKnownCountry, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
@@ -30,7 +30,6 @@ import PublicNavbar from "components/navbar/PublicNavbar";
 type Step = "form" | "otp" | "success"; // "otp" rendered by OtpStep
 type PartnerType = "individual" | "agency";
 
-const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));
 
 // Maps this backend endpoint's field names (from a 422 validation error's
@@ -188,6 +187,7 @@ export default function PartnerRegisterPage() {
     if (!indForm.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(indForm.email)) e.email = "Enter a valid email";
     if (!indForm.phone_number.trim()) e.phone_number = "Phone number is required";
     if (!indForm.country) e.country = "Country is required";
+    else if (!isKnownCountry(indForm.country)) e.country = "Select a country from the list";
     if (!indForm.nationality) e.nationality = "Nationality is required";
     if (!indForm.background) e.background = "Please select your background";
     if (!indForm.date_of_birth) e.date_of_birth = "Date of birth is required";
@@ -219,6 +219,7 @@ export default function PartnerRegisterPage() {
     if (!compForm.company_name.trim()) e.company_name = "Agency name is required";
     else if (compForm.company_name.trim().length < 3) e.company_name = "Agency name must be at least 3 characters";
     if (!compForm.country) e.country = "Country is required";
+    else if (!isKnownCountry(compForm.country)) e.country = "Select a country from the list";
     if (!compLogo.fileKey) e.comp_logo = "Agency logo is required";
     if (!compForm.website_url.trim()) e.website_url = "Website URL is required";
     else if (!isValidWebsiteUrl(compForm.website_url)) e.website_url = "Enter a valid URL starting with https://";

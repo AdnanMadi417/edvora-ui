@@ -21,7 +21,7 @@ import { getPresignedUploads, uploadFilesToSpaces, ALLOWED_FILE_TYPES } from "se
 import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ui/PresignedImage";
 import { useFileDrop } from "components/form/upload/useFileDrop";
-import { COUNTRIES, NATIONALITIES, PARTNER_TYPE, BACKGROUND_OPTIONS, DIAL_CODES } from "constants/lists";
+import { COUNTRIES, COUNTRY_OPTIONS, isKnownCountry, NATIONALITIES, PARTNER_TYPE, BACKGROUND_OPTIONS, DIAL_CODES } from "constants/lists";
 import { isValidWebsiteUrl } from "utils/socialMedia";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
@@ -432,6 +432,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Enter a valid email address";
 
     if (!formData.country) newErrors.country = "Country is required";
+    else if (!isKnownCountry(formData.country)) newErrors.country = "Select a country from the list";
     // Not just a truthiness check — a value that isn't "individual" or
     // "agency" (e.g. a stale/legacy value carried over from partner.type)
     // must also be rejected here, not silently sent to the update endpoint,
@@ -636,7 +637,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <InputField label="Partner Name" field="name" required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("name")} />
             <InputField label="Email Address" field="email" type="email" required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("email")} />
-            <SearchableDropdown label="Country of Residence" field="country" options={COUNTRIES.map((c) => ({ value: c.code, label: c.name }))} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("country")} />
+            <SearchableDropdown label="Country of Residence" field="country" options={COUNTRY_OPTIONS} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("country")} />
             <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS} formData={formData} errors={errors} updateFormData={updateFormData} />
             <div>
               <SelectField label="Partner Type" field="type" options={PARTNER_TYPE.map((p) => ({ value: p.value, label: p.label }))} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("type")} disabled={isTypeLocked} />
