@@ -36,7 +36,11 @@ const Navbar = ({
   const { user, loading } = useMe();
   const { showToast } = useToast();
   const { partner } = usePartnerProfile({ enabled: user?.role === "partner" });
-  const photoFileKey = partner?.individual_details?.profile_photo_file_key;
+  const isAgencyPartner = partner?.type === "agency";
+  const photoFileKey = isAgencyPartner
+    ? partner?.company_details?.logo_file_key
+    : partner?.individual_details?.profile_photo_file_key;
+  const avatarDisplayName = (isAgencyPartner && partner?.company_details?.company_name) || user?.name || "";
 
   const handleSendResetLink = async () => {
     if (!user?.email || isSendingReset) return;
@@ -174,9 +178,9 @@ const Navbar = ({
                 {user ? (
                   <PresignedImage
                     fileKey={photoFileKey ?? undefined}
-                    alt={user.name}
+                    alt={avatarDisplayName}
                     className="h-full w-full object-cover"
-                    fallback={user.name[0].toUpperCase()}
+                    fallback={avatarDisplayName ? avatarDisplayName[0].toUpperCase() : "?"}
                   />
                 ) : (
                   <div className="h-5 w-5 animate-pulse rounded-md" />
