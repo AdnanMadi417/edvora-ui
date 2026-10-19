@@ -198,6 +198,26 @@ export const COUNTRIES = [
   { name: "Zimbabwe", code: "zimbabwe" },
 ];
 
+/**
+ * Canonical options for every dropdown that writes `partners.country`.
+ * The stored value is the title-case `name` ("Malaysia"), never the
+ * lowercased `code`: the admin edit form used `code` for months and left
+ * "malaysia" rows behind (UBX-456). Build country selects from this list
+ * instead of mapping COUNTRIES by hand so no form can drift again.
+ */
+export const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
+
+const COUNTRY_NAMES = new Set<string>(COUNTRIES.map((c) => c.name));
+
+/**
+ * True only for an exact canonical country name. Case-sensitive on purpose:
+ * a stale "malaysia" loaded from the DB must fail validation so the user
+ * re-selects it, which is how such a row gets corrected on its next edit.
+ */
+export function isKnownCountry(value: string | null | undefined): boolean {
+  return !!value && COUNTRY_NAMES.has(value);
+}
+
 // Real ISO 3166-1 alpha-2 codes (unlike COUNTRIES above, whose `code` is a
 // lowercased full name) — for anything that needs the actual standard code,
 // e.g. the Banks reference list's `country` field.

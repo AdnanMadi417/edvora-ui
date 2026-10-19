@@ -98,6 +98,7 @@ export interface CreatePartnerPayload {
   password: string;
   is_active: boolean;
   type: string;
+  country: string;
 }
 
 export interface UpdatePartnerPayload {
