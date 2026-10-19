@@ -48,7 +48,7 @@ export default function ApplicationCommission({
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3 border-b border-slate-200 p-6">
+      <div className="flex flex-col items-start gap-3 border-b border-slate-200 p-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 items-center gap-3">
           <SectionIconBadge icon={Receipt} color="blue" />
           <div>
@@ -64,7 +64,7 @@ export default function ApplicationCommission({
         </div>
 
         {canActOnCommission && (
-          <div className="flex shrink-0 gap-2">
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:shrink-0">
             <Button
               onClick={() => setIsConfirmOpen(true)}
               icon={<CheckCircle className="h-4 w-4" />}
