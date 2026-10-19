@@ -112,7 +112,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
 
   const bankLookup = useMemo(() => new Map(allBanks.map((b) => [b.id, b])), [allBanks]);
   const bankOptions = useMemo(
-    () => allBanks.filter((b) => b.is_active).map((b) => ({ value: b.id, label: `${b.name} (${b.code})` })),
+    () => allBanks.filter((b) => b.is_active).map((b) => ({ value: b.id, label: b.name })),
     [allBanks]
   );
 

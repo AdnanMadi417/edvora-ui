@@ -25,6 +25,7 @@ import {
 import { StatusBadge } from "components/ui/badges";
 import { Tabs, type TabItem } from "components/ui/tabs";
 import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners";
+import { PartnerBankAccountSection } from "features/partners/bank-accounts";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import ChangePasswordPopup from "./ChangePasswordPopup";
@@ -43,12 +44,7 @@ interface PartnerDetailsProps {
   id: string;
 }
 
-type ProfileTab = "profile" | "team";
-
-const PROFILE_TABS: TabItem<ProfileTab>[] = [
-  { key: "profile", label: "Profile" },
-  { key: "team", label: "Team" },
-];
+type ProfileTab = "profile" | "team" | "bank";
 
 function formatDateOfBirth(value?: string | null): string | undefined {
   const date = parseDate(value);
@@ -213,6 +209,12 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
   const isIndividual = partner.type === "individual";
   const isCompany = partner.type === "agency";
 
+  const profileTabs: TabItem<ProfileTab>[] = [
+    { key: "profile", label: "Profile" },
+    ...(isCompany ? [{ key: "team" as const, label: "Team" }] : []),
+    { key: "bank", label: "Bank Account" },
+  ];
+
   return (
     <>
       <ChangePasswordPopup isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
@@ -286,10 +288,10 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
             </div>
           </div>
 
-          {isCompany && <Tabs<ProfileTab> tabs={PROFILE_TABS} active={tab} onChange={setTab} />}
+          <Tabs<ProfileTab> tabs={profileTabs} active={tab} onChange={setTab} />
 
           {/* Account Overview */}
-          {(!isCompany || tab === "profile") && (
+          {tab === "profile" && (
           <div key={tab} className="animate-in fade-in duration-200">
           <div className="flex flex-col gap-4 border-b border-slate-200 p-6">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Account Overview</p>
@@ -390,6 +392,13 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
                 ))}
               </div>
               )}
+            </div>
+          )}
+
+          {/* Bank Account */}
+          {tab === "bank" && (
+            <div key={tab} className="animate-in fade-in duration-200">
+              <PartnerBankAccountSection partner={partner} />
             </div>
           )}
 
