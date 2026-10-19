@@ -6,8 +6,7 @@ import type { ApplicationActionsResponse } from "features/applications/hooks";
 import DisputeCommission from "features/applications/partner/components/popups/DisputeCommission";
 import ConfirmReceived from "features/applications/partner/components/popups/ConfirmReceived";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import IconButton from "components/ui/buttons/IconButton";
-import { Tooltip } from "components/ui/tooltip";
+import Button from "components/ui/buttons/Button";
 import { SectionIconBadge } from "components/ui/icons";
 import ApplicationCommissionRecords from "features/applications/shared/ApplicationCommissionRecords";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
@@ -66,32 +65,28 @@ export default function ApplicationCommission({
 
         {canActOnCommission && (
           <div className="flex shrink-0 gap-2">
-            <Tooltip content="Confirm Received" position="left">
-              <IconButton
-                onClick={() => setIsConfirmOpen(true)}
-                aria-label="Confirm Received"
-                icon={<CheckCircle className="h-4 w-4" />}
-                bgColor="bg-green-50"
-                textColor="text-green-700"
-                borderColor="border-green-500"
-                hoverTextColor="hover:text-green-700"
-                hoverBorderColor="hover:border-green-600"
-                className="hover:bg-green-100"
-              />
-            </Tooltip>
-            <Tooltip content="Dispute Commission" position="left">
-              <IconButton
-                onClick={() => setIsDisputeOpen(true)}
-                aria-label="Dispute Commission"
-                icon={<AlertCircle className="h-4 w-4" />}
-                bgColor="bg-red-50"
-                textColor="text-red-700"
-                borderColor="border-red-500"
-                hoverTextColor="hover:text-red-700"
-                hoverBorderColor="hover:border-red-600"
-                className="hover:bg-red-100"
-              />
-            </Tooltip>
+            <Button
+              onClick={() => setIsConfirmOpen(true)}
+              icon={<CheckCircle className="h-4 w-4" />}
+              text="Confirm Received"
+              bgColor="bg-green-50"
+              textColor="text-green-700"
+              borderColor="border-green-500"
+              hoverTextColor="hover:text-green-700"
+              hoverBorderColor="hover:border-green-600"
+              className="hover:bg-green-100"
+            />
+            <Button
+              onClick={() => setIsDisputeOpen(true)}
+              icon={<AlertCircle className="h-4 w-4" />}
+              text="Dispute Commission"
+              bgColor="bg-red-50"
+              textColor="text-red-700"
+              borderColor="border-red-500"
+              hoverTextColor="hover:text-red-700"
+              hoverBorderColor="hover:border-red-600"
+              className="hover:bg-red-100"
+            />
           </div>
         )}
       </div>
