@@ -26,6 +26,7 @@ import { StatusBadge } from "components/ui/badges";
 import { Tabs, type TabItem } from "components/ui/tabs";
 import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners";
 import { PartnerBankAccountSection } from "features/partners/bank-accounts";
+import { PartnerAgreementSection } from "features/partners/agreement";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import ChangePasswordPopup from "./ChangePasswordPopup";
@@ -348,6 +349,9 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
               </div>
             </div>
           )}
+
+          <PartnerAgreementSection partnerId={partner.id} partnerName={partner.name} />
+
           </div>
           )}
 

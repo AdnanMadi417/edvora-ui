@@ -1,0 +1,1 @@
+export { partnerAgreementApi } from "./partnerAgreementApi";

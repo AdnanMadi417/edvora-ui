@@ -2,8 +2,10 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { AlertTriangle, ArrowRight, Bell, CheckCheck, ExternalLink, RefreshCw } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
 
 import { useAllNotifications, useUnreadCount, useMarkAsRead, useMarkAllAsRead } from "../hooks";
 import {
@@ -248,7 +250,14 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
       )}
 
       {/* List */}
-      <div>
+      <AnimatePresence mode="wait">
+      <motion.div
+        key={`${filter}-${unreadCategory}`}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: MICRO_DURATION, ease: EASE }}
+      >
         {showFullSkeleton ? (
           <div className="flex flex-col">
             {[1, 2, 3].map((i) => (
@@ -377,7 +386,8 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
             })}
           </div>
         )}
-      </div>
+      </motion.div>
+      </AnimatePresence>
 
       {!error && hasMoreUnread && (
         <div className="border-t border-slate-100 p-3 text-center">
