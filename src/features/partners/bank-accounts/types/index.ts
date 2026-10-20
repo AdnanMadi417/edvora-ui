@@ -36,7 +36,11 @@ export interface PartnerBankAccount {
 }
 
 export interface CreatePartnerBankAccountPayload {
-  bank_id?: string;
+  /** Explicitly null this (don't omit it) when submitting intl_bank_name
+   *  instead — same reasoning as the comment below, symmetric: an account
+   *  that was previously curated still has bank_id set on the existing
+   *  row, and an omitted field is left unchanged by PATCH. */
+  bank_id?: string | null;
   /** Explicitly null these (don't just omit them) when submitting a
    *  bank_id — PATCH treats an omitted field as "leave unchanged", so an
    *  account that was previously manually-entered still has these set on

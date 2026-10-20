@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   XCircle,
   Clock,
@@ -21,7 +22,7 @@ import {
   useApplicationActions,
   useApplicationVisaFee,
 } from "features/applications/hooks";
-import { usePartnerBankAccount } from "features/partners/bank-accounts";
+import { usePartnerBankAccount, BankAccountPayoutSummary } from "features/partners/bank-accounts";
 import { usePaymentMethods } from "features/applications/payouts";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
@@ -828,13 +829,14 @@ export default function UpdateStatusPopup({
               <p className="text-p2 font-semibold text-gray-900">Payout Details</p>
 
               <div className="rounded-md border border-slate-200 bg-card p-3 text-sm text-slate-600">
-                {partnerBankAccount ? (
-                  <>
-                    <span className="font-medium text-gray-900">Paying to:</span>{" "}
-                    {partnerBankAccount.intl_bank_name} · {partnerBankAccount.account_number}
-                  </>
-                ) : (
-                  <span className="text-red-600">This partner has no active bank account on file.</span>
+                <BankAccountPayoutSummary account={partnerBankAccount} />
+                {!partnerBankAccount && application?.partner?.id && (
+                  <Link
+                    href={`/admin/partners/${application.partner.id}?tab=bank-account`}
+                    className="mt-1 block font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    Add a bank account →
+                  </Link>
                 )}
               </div>
 

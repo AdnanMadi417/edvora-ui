@@ -13,6 +13,7 @@ export { default as MultiSelect } from "./search/MultiSelect";
 export { default as SearchableSelect } from "./search/SearchableSelect";
 export { default as ToggleInput } from "./toggle/ToggleInput";
 export { default as SettingToggleInput } from "./toggle/SettingToggleInput";
+export { default as SegmentedToggleField } from "./toggle/SegmentedToggleField";
 export { default as StatusFileUpload } from "./upload/StatusFileUpload";
 export { default as ImageUploadField } from "./upload/ImageUploadField";
 export { default as IntakeDatePicker } from "./date/IntakeDatePicker";
