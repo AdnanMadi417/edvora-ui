@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   MdCategory,
   MdEmail,
@@ -178,12 +178,20 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
   );
 }
 
+const VALID_TABS: DetailsTab[] = ["profile", "team", "bank-account", "applications", "statement"];
+
 export default function PartnerDetails({ id }: Props) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { showToast } = useToast();
   const { partner, isPartnerLoading, refetch } = usePartnerDetails(id);
   const [showReview, setShowReview] = useState(false);
-  const [tab, setTab] = useState<DetailsTab>("profile");
+  // Lets a link from elsewhere (e.g. "Add a bank account" from a payout
+  // flow with no account on file) land straight on the right tab.
+  const requestedTab = searchParams.get("tab") as DetailsTab | null;
+  const [tab, setTab] = useState<DetailsTab>(
+    requestedTab && VALID_TABS.includes(requestedTab) ? requestedTab : "profile"
+  );
   const [openActions, setOpenActions] = useState(false);
   const { accountManagers } = useAccountManagers();
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));

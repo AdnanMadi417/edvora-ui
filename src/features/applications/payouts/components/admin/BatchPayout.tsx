@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import { createPortal } from "react-dom";
 import { XCircle, AlertCircle, CheckCircle, Wallet } from "lucide-react";
 
 import { useRecordBulkPayout, usePaymentMethods } from "../../hooks";
-import { usePartnerBankAccount } from "features/partners/bank-accounts";
+import { usePartnerBankAccount, BankAccountPayoutSummary } from "features/partners/bank-accounts";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
@@ -134,6 +135,7 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
   };
 
   const isSubmitting = recording || uploading;
+  const canSubmit = !isSubmitting && !!partnerBankAccount;
 
   return createPortal(
     <div
@@ -161,13 +163,14 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
 
           <div className="max-h-[65vh] space-y-5 overflow-y-auto px-6 py-5">
             <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
-              {partnerBankAccount ? (
-                <>
-                  <span className="font-medium text-slate-900">Paying to:</span>{" "}
-                  {partnerBankAccount.intl_bank_name} · {partnerBankAccount.account_number}
-                </>
-              ) : (
-                <span className="text-red-600">This partner has no active bank account on file.</span>
+              <BankAccountPayoutSummary account={partnerBankAccount} />
+              {!partnerBankAccount && (
+                <Link
+                  href={`/admin/partners/${partnerId}?tab=bank-account`}
+                  className="mt-1 block font-medium text-blue-600 hover:text-blue-700"
+                >
+                  Add a bank account →
+                </Link>
               )}
             </div>
 
@@ -257,7 +260,7 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
             />
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={!canSubmit}
               icon={<CheckCircle className="h-4 w-4" />}
               text={isSubmitting ? "Recording..." : "Record Payout"}
               bgColor="bg-blue-100"

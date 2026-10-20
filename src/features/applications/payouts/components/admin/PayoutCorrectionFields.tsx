@@ -7,6 +7,7 @@ import { InputField, SelectField, TextareaField, SearchableDropdown } from "comp
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import type { Payout } from "../../types";
 import type { PartnerBankAccount } from "features/partners/bank-accounts";
+import { BankAccountPayoutSummary } from "features/partners/bank-accounts";
 
 export interface PayoutCorrectionFormData {
   void_reason: string;
@@ -78,14 +79,7 @@ export default function PayoutCorrectionFields({
       />
 
       <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
-        {account ? (
-          <>
-            <span className="font-medium text-slate-900">Paying to:</span> {account.intl_bank_name} ·{" "}
-            {account.account_number}
-          </>
-        ) : (
-          <span className="text-red-600">This partner has no active bank account on file.</span>
-        )}
+        <BankAccountPayoutSummary account={account} />
       </div>
 
       <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">

@@ -1,18 +1,20 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { History, Landmark, Pencil, Plus, XCircle } from "lucide-react";
+import { History, Landmark, List, Pencil, PenLine, Plus, XCircle } from "lucide-react";
 import Button from "components/ui/buttons/Button";
 import InputField from "components/form/fields/InputField";
 import SelectField from "components/form/fields/SelectField";
 import SearchableDropdown from "components/form/search/SearchableDropdown";
+import SegmentedToggleField from "components/form/toggle/SegmentedToggleField";
 import { Skeleton } from "components/ui/skeleton";
 import { AsyncStateView, getAsyncStatus } from "components/ui/async";
 import { useToast } from "components/context/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
-import { getApiErrorCode } from "utils/parseApiError";
+import { getApiErrorCode, getApiErrorDetails } from "utils/parseApiError";
 import { useBanks } from "features/banks/hooks";
+import { ISO_COUNTRIES, getCountryName } from "constants/lists";
 import type { PartnerDetails } from "features/partners/types";
 import { usePartnerBankAccount, useCreatePartnerBankAccount, useUpdatePartnerBankAccount } from "../../hooks";
 import type { CreatePartnerBankAccountPayload } from "../../types";
@@ -24,6 +26,8 @@ const CURRENCY_OPTIONS = [
   { value: "USD", label: "USD — US Dollar" },
 ];
 
+const COUNTRY_OPTIONS = ISO_COUNTRIES.map((c) => ({ value: c.code, label: `${c.name} (${c.code})` }));
+
 const ERROR_MESSAGES: Record<string, string> = {
   bank_account_not_found: "This bank account no longer exists — it may have been removed elsewhere.",
   bank_account_not_current: "This account was changed elsewhere — refresh and try again.",
@@ -34,7 +38,11 @@ interface Props {
 }
 
 interface FormData {
+  isManualBank: boolean;
   bank_id: string;
+  intl_bank_name: string;
+  intl_bank_country: string;
+  intl_bank_swift: string;
   account_holder_name: string;
   account_number: string;
   iban: string;
@@ -49,7 +57,11 @@ interface FormData {
 }
 
 const EMPTY_FORM: FormData = {
+  isManualBank: false,
   bank_id: "",
+  intl_bank_name: "",
+  intl_bank_country: "",
+  intl_bank_swift: "",
   account_holder_name: "",
   account_number: "",
   iban: "",
@@ -105,6 +117,10 @@ export default function PartnerBankAccountSection({ partner }: Props) {
   const [showHistory, setShowHistory] = useState(false);
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Set when a free-text bank submission is rejected because it's already
+  // in the curated list (bank_already_curated) -- offers a one-click switch
+  // to bank_id instead of just surfacing the raw error.
+  const [curatedSuggestion, setCuratedSuggestion] = useState<{ bankId: string; bankName: string } | null>(null);
 
   const isMalaysia = partner.country.trim().toLowerCase() === "malaysia";
   const saving = creating || updating;
@@ -132,13 +148,18 @@ export default function PartnerBankAccountSection({ partner }: Props) {
   const openAdd = () => {
     setFormData(EMPTY_FORM);
     setErrors({});
+    setCuratedSuggestion(null);
     setMode("form");
   };
 
   const openEdit = () => {
     if (!account) return;
     setFormData({
+      isManualBank: !account.bank_id && !!account.intl_bank_name,
       bank_id: account.bank_id ?? "",
+      intl_bank_name: account.intl_bank_name ?? "",
+      intl_bank_country: account.intl_bank_country ?? "",
+      intl_bank_swift: account.intl_bank_swift ?? "",
       account_holder_name: account.account_holder_name,
       account_number: account.account_number,
       iban: account.iban ?? "",
@@ -152,12 +173,32 @@ export default function PartnerBankAccountSection({ partner }: Props) {
       intermediary_bank_swift: account.intermediary_bank_swift ?? "",
     });
     setErrors({});
+    setCuratedSuggestion(null);
     setMode("form");
+  };
+
+  const useCuratedSuggestion = () => {
+    if (!curatedSuggestion) return;
+    setFormData((prev) => ({ ...prev, isManualBank: false, bank_id: curatedSuggestion.bankId }));
+    setCuratedSuggestion(null);
+    setErrors((prev) => ({ ...prev, intl_bank_name: "" }));
+  };
+
+  const toggleBankMode = (field: string, value: boolean) => {
+    updateFormData(field, value);
+    setCuratedSuggestion(null);
+    setErrors((prev) => ({ ...prev, bank_id: "", intl_bank_name: "", intl_bank_country: "", intl_bank_swift: "" }));
   };
 
   const validate = (): Record<string, string> => {
     const next: Record<string, string> = {};
-    if (!formData.bank_id) next.bank_id = "Select a bank";
+    if (formData.isManualBank) {
+      if (!formData.intl_bank_name.trim()) next.intl_bank_name = "Bank name is required";
+      if (!formData.intl_bank_country) next.intl_bank_country = "Country is required";
+      if (!formData.intl_bank_swift.trim()) next.intl_bank_swift = "SWIFT/BIC code is required";
+    } else if (!formData.bank_id) {
+      next.bank_id = "Select a bank";
+    }
     if (!formData.account_holder_name.trim()) next.account_holder_name = "Account holder name is required";
 
     const selectedBankCode = bankLookup.get(formData.bank_id)?.code;
@@ -182,13 +223,13 @@ export default function PartnerBankAccountSection({ partner }: Props) {
   };
 
   const buildPayload = (): CreatePartnerBankAccountPayload => ({
-    bank_id: formData.bank_id,
-    // Explicitly cleared, not omitted — an account that was previously
-    // manually-entered still has these set on the existing row, and PATCH
-    // leaves an omitted field untouched (see type comment).
-    intl_bank_name: null,
-    intl_bank_country: null,
-    intl_bank_swift: null,
+    // Exactly one side is ever sent — the other is explicitly null, not
+    // omitted, so switching an existing account between curated and
+    // free-text actually clears the side being replaced (see type comment).
+    bank_id: formData.isManualBank ? null : formData.bank_id,
+    intl_bank_name: formData.isManualBank ? formData.intl_bank_name.trim() : null,
+    intl_bank_country: formData.isManualBank ? formData.intl_bank_country : null,
+    intl_bank_swift: formData.isManualBank ? formData.intl_bank_swift.trim() : null,
     account_holder_name: formData.account_holder_name.trim(),
     account_number: formData.account_number.trim(),
     iban: formData.iban.trim() || undefined,
@@ -210,6 +251,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
       return;
     }
 
+    setCuratedSuggestion(null);
     try {
       if (account) {
         const { currency, ...payload } = buildPayload();
@@ -229,6 +271,16 @@ export default function PartnerBankAccountSection({ partner }: Props) {
         setMode("view");
         refetch();
         return;
+      }
+      if (code === "bank_already_curated") {
+        const details = getApiErrorDetails(err);
+        const bankId = typeof details?.bank_id === "string" ? details.bank_id : null;
+        const bankName = typeof details?.bank_name === "string" ? details.bank_name : null;
+        if (bankId && bankName) {
+          setCuratedSuggestion({ bankId, bankName });
+          setErrors((prev) => ({ ...prev, intl_bank_name: `This bank is already in our list as "${bankName}".` }));
+          return;
+        }
       }
       if (code && ERROR_MESSAGES[code]) {
         showToast(ERROR_MESSAGES[code], "error");
@@ -275,6 +327,9 @@ export default function PartnerBankAccountSection({ partner }: Props) {
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 p-6">
             <DetailRow label="Bank" value={bankDisplayName} />
             <DetailRow label="SWIFT Code" value={bankDisplaySwift} />
+            {!account?.bank_id && account?.intl_bank_country && (
+              <DetailRow label="Bank Country" value={getCountryName(account.intl_bank_country)} />
+            )}
             <DetailRow label="Account Holder" value={account?.account_holder_name} />
             <DetailRow label="Account Number" value={account?.account_number} />
             <DetailRow label="IBAN" value={account?.iban} />
@@ -316,21 +371,79 @@ export default function PartnerBankAccountSection({ partner }: Props) {
 
       {mode === "form" && (
         <div className="grid grid-cols-1 gap-x-4 p-6 md:grid-cols-2">
-          <div className="md:col-span-2">
-            <SearchableDropdown
-              label="Bank"
-              field="bank_id"
-              placeholder="Search for a bank..."
-              options={bankOptions}
+          <div className="md:col-span-2 mb-2 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p className="whitespace-nowrap text-sm font-medium text-slate-700">
+              {formData.isManualBank ? "Bank details" : "Bank"}
+            </p>
+            <SegmentedToggleField
+              field="isManualBank"
+              leftText="Pick from list"
+              rightText="Bank isn't listed"
+              leftIcon={List}
+              rightIcon={PenLine}
               formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
+              updateFormData={toggleBankMode}
             />
           </div>
 
-          <InputField label="Account Holder Name" field="account_holder_name" formData={formData} errors={errors} updateFormData={updateFormData} />
-          <InputField label="Account Number" field="account_number" formData={formData} errors={errors} updateFormData={updateFormData} />
-          <InputField label="IBAN" field="iban" required={false} formData={formData} errors={errors} updateFormData={updateFormData} />
+          {formData.isManualBank ? (
+            <>
+              {curatedSuggestion && (
+                <div className="md:col-span-2 mb-2 flex items-center justify-between gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                  <span>
+                    &ldquo;{curatedSuggestion.bankName}&rdquo; is already in our bank list.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={useCuratedSuggestion}
+                    className="shrink-0 font-medium text-blue-600 hover:text-blue-700"
+                  >
+                    Use it instead
+                  </button>
+                </div>
+              )}
+              <InputField
+                label="Bank Name"
+                field="intl_bank_name"
+                placeholder="e.g. Standard Chartered Bank"
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+              <SelectField
+                label="Bank Country"
+                field="intl_bank_country"
+                options={COUNTRY_OPTIONS}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+              <InputField
+                label="SWIFT / BIC Code"
+                field="intl_bank_swift"
+                placeholder="e.g. SCBLMYKX"
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+            </>
+          ) : (
+            <div className="md:col-span-2">
+              <SearchableDropdown
+                label="Bank"
+                field="bank_id"
+                placeholder="Search for a bank..."
+                options={bankOptions}
+                formData={formData}
+                errors={errors}
+                updateFormData={updateFormData}
+              />
+            </div>
+          )}
+
+          <InputField label="Account Holder Name" field="account_holder_name" placeholder="Name as it appears on the account" formData={formData} errors={errors} updateFormData={updateFormData} />
+          <InputField label="Account Number" field="account_number" placeholder="e.g. 1234567890" formData={formData} errors={errors} updateFormData={updateFormData} />
+          <InputField label="IBAN" field="iban" required={false} placeholder="e.g. GB29 NWBK 6016 1331 9268 19" formData={formData} errors={errors} updateFormData={updateFormData} />
           <SelectField
             label="Currency"
             field="currency"
@@ -343,22 +456,24 @@ export default function PartnerBankAccountSection({ partner }: Props) {
 
           {!isMalaysia && (
             <>
-              <InputField label="Beneficiary Address" field="beneficiary_address" formData={formData} errors={errors} updateFormData={updateFormData} />
-              <InputField label="Beneficiary Phone" field="beneficiary_phone" formData={formData} errors={errors} updateFormData={updateFormData} />
+              <InputField label="Beneficiary Address" field="beneficiary_address" placeholder="Street, city, postal code, country" formData={formData} errors={errors} updateFormData={updateFormData} />
+              <InputField label="Beneficiary Phone" field="beneficiary_phone" placeholder="e.g. +60 12-345 6789" formData={formData} errors={errors} updateFormData={updateFormData} />
               <InputField
                 label="Beneficiary ID Number"
                 field="beneficiary_id_number"
                 required={false}
+                placeholder="Passport or national ID number"
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
               />
-              <InputField label="Bank Branch Address" field="bank_branch_address" formData={formData} errors={errors} updateFormData={updateFormData} />
-              <InputField label="Bank Branch Code" field="bank_branch_code" formData={formData} errors={errors} updateFormData={updateFormData} />
+              <InputField label="Bank Branch Address" field="bank_branch_address" placeholder="Street, city, postal code, country" formData={formData} errors={errors} updateFormData={updateFormData} />
+              <InputField label="Bank Branch Code" field="bank_branch_code" placeholder="e.g. 001" formData={formData} errors={errors} updateFormData={updateFormData} />
               <InputField
                 label="Intermediary Bank Name"
                 field="intermediary_bank_name"
                 required={false}
+                placeholder="Only if your bank requires one"
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
@@ -367,6 +482,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
                 label="Intermediary Bank SWIFT"
                 field="intermediary_bank_swift"
                 required={false}
+                placeholder="e.g. SCBLMYKX"
                 formData={formData}
                 errors={errors}
                 updateFormData={updateFormData}
