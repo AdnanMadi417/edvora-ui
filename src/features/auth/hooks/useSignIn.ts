@@ -33,14 +33,14 @@ export function useSignIn() {
         );
       } else if (role === "account_manager") {
         localStorage.setItem("managerId", user.id);
-        router.replace("/account-manager/applications");
+        router.replace(password_reset_required ? "/auth/forgot-password" : "/account-manager/applications");
       } else if (role === "admin") {
         localStorage.setItem("adminId", user.id);
-        router.replace("/admin/applications");
+        router.replace(password_reset_required ? "/auth/forgot-password" : "/admin/applications");
       } else if (role === "reviewer") {
-        router.replace("/reviewer/partners");
+        router.replace(password_reset_required ? "/auth/forgot-password" : "/reviewer/partners");
       } else if (role === "data_entry") {
-        router.replace("/data-entry/knowledge-hub");
+        router.replace(password_reset_required ? "/auth/forgot-password" : "/data-entry/knowledge-hub");
       } else {
         setError("Unauthorized role");
       }
