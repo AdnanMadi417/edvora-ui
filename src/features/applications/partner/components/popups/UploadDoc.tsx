@@ -68,7 +68,7 @@ export default function UploadDoc({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-card">
+        <div className="relative overflow-hidden rounded-2xl bg-white">
           <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">
@@ -163,7 +163,7 @@ export default function UploadDoc({
               <Button
                 onClick={handleClose}
                 text="Cancel"
-                bgColor="bg-card"
+                bgColor="bg-white"
                 textColor="text-gray-700"
                 borderColor="border-slate-200"
                 hoverTextColor="hover:text-gray-700"

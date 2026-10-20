@@ -99,7 +99,7 @@ export default function HoldPopup({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-card">
+        <div className="relative overflow-hidden rounded-2xl bg-white">
           <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3">

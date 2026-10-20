@@ -45,6 +45,9 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const PROFILE_PATHS: Record<string, string> = {
     partner: "/partner/profile",
     account_manager: "/account-manager/profile",
+    admin: "/admin/profile",
+    reviewer: "/reviewer/profile",
+    data_entry: "/data-entry/profile",
   };
   const profilePath = user?.role ? PROFILE_PATHS[user.role] : undefined;
 
@@ -157,43 +160,64 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
                 Retry
               </button>
             </div>
+          ) : profilePath ? (
+            <Link
+              href={profilePath}
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-3"
+            >
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center
+          overflow-hidden rounded-full bg-accent-light text-h5 font-medium text-blue-700"
+              >
+                {user ? (
+                  <PresignedImage
+                    fileKey={photoFileKey ?? undefined}
+                    alt={sidebarDisplayName}
+                    className="h-full w-full object-cover"
+                    fallback={sidebarDisplayName ? sidebarDisplayName[0].toUpperCase() : "?"}
+                  />
+                ) : (
+                  <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                {user ? (
+                  <>
+                    <p className="truncate text-p2 font-semibold text-slate-900">
+                      {sidebarDisplayName}
+                    </p>
+                    <p className="truncate text-caption text-slate-500">
+                      {user.role === "partner" && user.agency_role
+                        ? formatAgencyRole(user.agency_role)
+                        : getRoleLabel(user.role)}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="mb-2 h-4 w-32 animate-pulse rounded bg-gray-300" />
+                    <div className="h-3 w-20 animate-pulse rounded bg-gray-300" />
+                  </>
+                )}
+              </div>
+            </Link>
           ) : (
             <div className="flex items-center gap-3">
-              {profilePath ? (
-                <Link
-                  href={profilePath}
-                  onClick={() => setOpen(false)}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center
+              <div
+                className="flex h-10 w-10 shrink-0 items-center justify-center
           overflow-hidden rounded-full bg-accent-light text-h5 font-medium text-blue-700"
-                >
-                  {user ? (
-                    <PresignedImage
-                      fileKey={photoFileKey ?? undefined}
-                      alt={sidebarDisplayName}
-                      className="h-full w-full object-cover"
-                      fallback={sidebarDisplayName ? sidebarDisplayName[0].toUpperCase() : "?"}
-                    />
-                  ) : (
-                    <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
-                  )}
-                </Link>
-              ) : (
-                <div
-                  className="flex h-10 w-10 shrink-0 items-center justify-center
-          overflow-hidden rounded-full bg-accent-light text-h5 font-medium text-blue-700"
-                >
-                  {user ? (
-                    <PresignedImage
-                      fileKey={photoFileKey ?? undefined}
-                      alt={sidebarDisplayName}
-                      className="h-full w-full object-cover"
-                      fallback={sidebarDisplayName ? sidebarDisplayName[0].toUpperCase() : "?"}
-                    />
-                  ) : (
-                    <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
-                  )}
-                </div>
-              )}
+              >
+                {user ? (
+                  <PresignedImage
+                    fileKey={photoFileKey ?? undefined}
+                    alt={sidebarDisplayName}
+                    className="h-full w-full object-cover"
+                    fallback={sidebarDisplayName ? sidebarDisplayName[0].toUpperCase() : "?"}
+                  />
+                ) : (
+                  <div className="h-5 w-5 animate-pulse rounded-md bg-gray-300" />
+                )}
+              </div>
               <div className="min-w-0 flex-1">
                 {user ? (
                   <>

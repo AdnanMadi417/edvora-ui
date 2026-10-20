@@ -1,8 +1,10 @@
 
 export const profileRouteMap: Record<string, string> = {
-  admin: "/admin/applications",
-  account_manager: "/account-manager/applications",
+  admin: "/admin/profile",
+  account_manager: "/account-manager/profile",
   partner: "/partner/profile",
+  reviewer: "/reviewer/profile",
+  data_entry: "/data-entry/profile",
 };
 
 export const notificationsRouteMap: Record<string, string> = {

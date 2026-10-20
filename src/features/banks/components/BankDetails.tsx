@@ -63,7 +63,7 @@ export default function BankDetails({ id, basePath = "/admin/partners/banks" }: 
 
   return (
     <div className="mt-6 max-w-5xl mx-auto">
-      <div className="rounded-md border bg-card shadow-sm">
+      <div className="rounded-md border bg-white shadow-sm">
         <AsyncStateView
           status={status}
           skeleton={<BankDetailsSkeleton />}

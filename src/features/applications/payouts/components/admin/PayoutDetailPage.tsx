@@ -78,7 +78,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
 
   return (
     <div className="mx-auto mt-6 max-w-5xl">
-      <div className="rounded-md border bg-card shadow-sm">
+      <div className="rounded-md border bg-white shadow-sm">
         <AsyncStateView
           status={status}
           skeleton={<PayoutDetailSkeleton />}

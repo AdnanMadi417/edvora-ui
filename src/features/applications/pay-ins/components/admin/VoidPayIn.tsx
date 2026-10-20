@@ -119,7 +119,7 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="overflow-hidden rounded-2xl bg-card shadow-2xl ring-1 ring-black/5">
+        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
             title="Void & Correct Pay-In"
             description="Every void must include the corrected replacement — the application stays at Commission Ready throughout."

@@ -59,7 +59,7 @@ export default function PartnerBankAccountHistory({ isOpen, onClose, partnerId }
       aria-modal="true"
     >
       <div className="w-full max-w-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="overflow-hidden rounded-2xl bg-card shadow-2xl ring-1 ring-black/5">
+        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
             title="Bank Account History"
             description="Every version ever recorded for this partner — editing always creates a new row and retires the old one."

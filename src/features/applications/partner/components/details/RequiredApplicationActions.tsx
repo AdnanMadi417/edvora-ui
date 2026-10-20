@@ -77,7 +77,7 @@ export default function RequiredApplicationActions({
 
   return (
     <section className="max-w-5xl mx-auto">
-      <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-card p-6">
+      <div className="mb-6 mt-6 space-y-6 rounded-xl border border-gray-200 bg-white p-6">
         <h3 className="text-p3 mb-6 flex items-center gap-3 font-semibold text-slate-900">
           <span className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <MdAssignment className="text-xl text-blue-700" />

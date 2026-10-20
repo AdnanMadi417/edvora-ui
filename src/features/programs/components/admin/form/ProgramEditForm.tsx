@@ -415,7 +415,7 @@ const EditKnowledgeHubProgramDetails = ({
 
   return (
     <>
-      <div className="mt-6 max-w-6xl mx-auto rounded-md border bg-card shadow-sm">
+      <div className="mt-6 max-w-6xl mx-auto rounded-md border bg-white shadow-sm">
           <div className="flex justify-between border-b p-6">
             <div className="flex items-center gap-4">
               <div className="flex h-14 w-14 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-700">
