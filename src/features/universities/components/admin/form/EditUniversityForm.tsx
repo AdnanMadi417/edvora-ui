@@ -182,7 +182,7 @@ const UniversityDetails = ({
   return (
     <>
       <div className="mt-6 max-w-5xl mx-auto">
-        <div className="rounded-md border bg-card shadow-sm">
+        <div className="rounded-md border bg-white shadow-sm">
           <div className="flex justify-between rounded-tl-md rounded-tr-md border-b  p-6">
             <div className="block">
               <h2 className="text-lg font-semibold">

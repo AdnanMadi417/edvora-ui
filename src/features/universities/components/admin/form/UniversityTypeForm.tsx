@@ -124,7 +124,7 @@ export default function UniversityTypeForm({ basePath = "/admin/config-universit
   if (fieldsLoading) {
     return (
       <section className="mx-auto mt-5 max-w-5xl">
-        <div className="rounded-lg border border-slate-200 bg-card p-6">
+        <div className="rounded-lg border border-slate-200 bg-white p-6">
           <Loading text="Fetching application fields..." />
         </div>
       </section>

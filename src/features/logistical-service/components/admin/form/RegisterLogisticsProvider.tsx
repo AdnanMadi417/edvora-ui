@@ -262,7 +262,7 @@ export default function RegisterLogisticsMarketplaceProvider({ basePath = "/admi
   if (loadingLogisticServices || loadingLogisticLanguage || loadingLogisticUniversity) {
     return (
       <section className="mx-auto mt-5 max-w-5xl">
-        <div className="rounded-lg border border-slate-200 bg-card p-6">
+        <div className="rounded-lg border border-slate-200 bg-white p-6">
           <Loading text="Fetching Logistic Services data..." />
         </div>
       </section>

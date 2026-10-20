@@ -446,7 +446,7 @@ export default function StudentRegistrationForm() {
   if (universitiesLoading) {
     return (
       <section className="mx-auto mt-5 max-w-5xl">
-        <div className="rounded-lg border border-slate-200 bg-card p-6">
+        <div className="rounded-lg border border-slate-200 bg-white p-6">
           <Loading text="Fetching application data..." />
         </div>
       </section>
@@ -455,7 +455,7 @@ export default function StudentRegistrationForm() {
 
   return (
     <section className="mx-auto mt-5 max-w-5xl">
-      <div className="rounded-lg border border-slate-200 bg-card p-6">
+      <div className="rounded-lg border border-slate-200 bg-white p-6">
         <div className="mb-6 flex items-start gap-x-3 border-b-2 border-slate-100 pb-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
             <FileText className="text-blue-700" size={24} />

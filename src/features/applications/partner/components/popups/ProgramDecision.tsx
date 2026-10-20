@@ -61,7 +61,7 @@ export default function ProgramDecisionModal({
         className="w-full max-w-lg transform transition-all"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative overflow-visible rounded-2xl bg-card shadow-lg">
+        <div className="relative overflow-visible rounded-2xl bg-white shadow-lg">
           <div className="flex items-start justify-between border-b border-slate-200 px-6 pb-4 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-md border border-blue-200 bg-blue-50">

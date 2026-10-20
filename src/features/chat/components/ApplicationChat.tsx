@@ -95,7 +95,7 @@ export default function AgentPartnerChat({
   }
 
   return (
-    <div className="flex h-[70vh] max-h-[600px] min-h-[320px] flex-col bg-card">
+    <div className="flex h-[70vh] max-h-[600px] min-h-[320px] flex-col bg-white">
       <header className="bg-blue-600 px-3 py-3 text-white">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
@@ -129,7 +129,7 @@ export default function AgentPartnerChat({
                   className={`relative max-w-[75%] break-words rounded-md px-3 py-2 text-sm ${
                     isMine
                       ? "ml-auto rounded-br-none bg-gray-200/50"
-                      : "mr-auto rounded-bl-none border border-slate-200 bg-card"
+                      : "mr-auto rounded-bl-none border border-slate-200 bg-white"
                   }`}
                 >
                   {!isMine && (
@@ -149,7 +149,7 @@ export default function AgentPartnerChat({
         <div ref={bottomRef} />
       </main>
 
-      <footer className="border-t border-slate-200 bg-card p-2 sm:p-3">
+      <footer className="border-t border-slate-200 bg-white p-2 sm:p-3">
         <ChatInput onSend={handleSendMessage} sending={sending} />
       </footer>
 

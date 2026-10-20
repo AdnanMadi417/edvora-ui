@@ -183,7 +183,7 @@ export default function ResolveDisputeCorrection({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="overflow-hidden rounded-2xl bg-card shadow-2xl ring-1 ring-black/5">
+        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
             title="Resolve Dispute: Correction"
             description="Voids the current payout and records a corrected one — resolves the dispute atomically."

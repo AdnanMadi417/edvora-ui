@@ -18,7 +18,7 @@ export default function EmptyData({
 }: EmptyDataProps) {
   return (
     <section>
-      <div className="mt-5 rounded-md border border-slate-200 bg-card p-10 text-center">
+      <div className="mt-5 rounded-md border border-slate-200 bg-white p-10 text-center">
         <div className="flex flex-col items-center gap-2">
           <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-muted">
             {icon ?? (

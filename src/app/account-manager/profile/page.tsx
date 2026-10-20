@@ -1,11 +1,5 @@
-"use client";
+import { StaffProfile } from "features/profile";
 
-const AccountManagersOverview = () => {
-  return (
-    <div>
-      Welcome to Account manager overview page
-    </div>
-  );
-};
-
-export default AccountManagersOverview;
+export default function AccountManagerProfilePage() {
+  return <StaffProfile />;
+}

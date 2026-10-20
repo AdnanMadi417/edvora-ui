@@ -53,7 +53,7 @@ export default function StaffUserDetails({ userId }: StaffUserDetailsProps) {
 
   return (
     <section className="mx-auto mt-6 max-w-5xl">
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-card shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         {/* Header */}
         <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-5">
@@ -106,7 +106,7 @@ export default function StaffUserDetails({ userId }: StaffUserDetailsProps) {
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-slate-200 bg-card px-6 py-4">
+        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-slate-200 bg-white px-6 py-4">
           <Button
             onClick={() => setIsSuspendOpen(true)}
             icon={staffUser.is_active ? <Ban className="h-4 w-4" /> : <Power className="h-4 w-4" />}

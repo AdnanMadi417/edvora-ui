@@ -329,7 +329,7 @@ const EditLogisticsMarketplaceDetails = ({
 
   return (
     <div className="mt-6 max-w-5xl mx-auto">
-      <div className="rounded-md border border-slate-200 bg-card shadow-sm">
+      <div className="rounded-md border border-slate-200 bg-white shadow-sm">
         <div className="flex justify-between border-b border-gray-200 p-6">
           <div className="flex items-center gap-4">
             <div className="shrink-0">

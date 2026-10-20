@@ -70,7 +70,7 @@ const DocumentRequestList = ({
       {documents.map((doc) => (
         <div
           key={doc.id}
-          className="relative space-y-3 rounded-md border bg-card p-4"
+          className="relative space-y-3 rounded-md border bg-white p-4"
         >
           {documents.length > 1 && (
             <button
@@ -516,7 +516,7 @@ export default function UpdateStatusPopup({
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-2xl transform rounded-md bg-card shadow-xl"
+        className="w-full max-w-2xl transform rounded-md bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <UpdateStatusHeader
@@ -584,7 +584,7 @@ export default function UpdateStatusPopup({
         ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60"
         : isSelected
         ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
-        : "cursor-pointer border-slate-200 bg-card hover:border-gray-300 hover:shadow"
+        : "cursor-pointer border-slate-200 bg-white hover:border-gray-300 hover:shadow"
     }
   `}
                   >

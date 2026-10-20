@@ -90,7 +90,7 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
   };
 
   return (
-    <div className="mb-5 max-w-5xl mx-auto rounded-lg border border-slate-200 bg-card">
+    <div className="mb-5 max-w-5xl mx-auto rounded-lg border border-slate-200 bg-white">
       {/* Header */}
       <div className="flex flex-col gap-4 border-b border-slate-200 p-6 sm:flex-row sm:items-center sm:justify-between">
         <div>

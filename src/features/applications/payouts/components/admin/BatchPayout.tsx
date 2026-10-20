@@ -150,7 +150,7 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="overflow-hidden rounded-2xl bg-card shadow-2xl ring-1 ring-black/5">
+        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
             title="Batch Payout"
             description="One bank reference and one receipt cover every selected application."

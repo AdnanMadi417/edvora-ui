@@ -120,7 +120,7 @@ export default function RecordPayIn({ isOpen, onClose, row, onSuccess }: RecordP
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="overflow-hidden rounded-2xl bg-card shadow-2xl ring-1 ring-black/5">
+        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
             title="Record Pay-In"
             description="Record the university's payment for this application's commission."
