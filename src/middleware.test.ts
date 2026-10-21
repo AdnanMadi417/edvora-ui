@@ -138,7 +138,7 @@ describe("middleware", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it.each(["/auth/register", "/auth/forgot-password", "/api/health", "/api/auth/logout", "/api/telemetry/client-event", "/p/some-partner"])(
+  it.each(["/apply-as-adviser", "/auth/forgot-password", "/api/health", "/api/auth/logout", "/api/telemetry/client-event", "/p/some-partner"])(
     "never calls the backend for the public route %s, even with a token",
     async (path) => {
       const res = await middleware(request(path, await token()));

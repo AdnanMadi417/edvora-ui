@@ -9,7 +9,7 @@ function RedirectToRegisterOtp() {
 
   useEffect(() => {
     const email = searchParams.get("email");
-    router.replace(`/auth/register?step=otp${email ? `&email=${encodeURIComponent(email)}` : ""}`);
+    router.replace(`/apply-as-adviser?step=otp${email ? `&email=${encodeURIComponent(email)}` : ""}`);
   }, [router, searchParams]);
 
   return null;

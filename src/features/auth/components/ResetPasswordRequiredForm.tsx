@@ -2,15 +2,15 @@
 
 import React, { useState } from "react";
 import { AlertTriangle, KeyRound } from "lucide-react";
-import { usePartnerResetPassword } from "../hooks";
+import { useResetCurrentPassword } from "../hooks";
 import AuthLayout from "./AuthLayout";
 import PasswordField from "components/form/fields/PasswordField";
 import PasswordRequirementsChecklist from "components/form/fields/PasswordRequirementsChecklist";
 import PasswordMatchIndicator from "components/form/fields/PasswordMatchIndicator";
 import { validateNewPassword, isPasswordValid } from "utils/passwordValidation";
 
-export default function PartnerResetPasswordForm() {
-  const { resetPassword, loading, error, success } = usePartnerResetPassword();
+export default function ResetPasswordRequiredForm() {
+  const { resetPassword, loading, error, success } = useResetCurrentPassword();
 
   const [formData, setFormData] = useState({
     current_password: "",
