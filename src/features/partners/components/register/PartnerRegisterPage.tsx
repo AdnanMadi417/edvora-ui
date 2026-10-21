@@ -123,7 +123,7 @@ export default function PartnerRegisterPage() {
   const goToOtpStep = (email: string) => {
     setRegistrationEmail(email);
     setStep("otp");
-    router.replace(`/auth/register?step=otp&email=${encodeURIComponent(email)}`);
+    router.replace(`/apply-as-adviser?step=otp&email=${encodeURIComponent(email)}`);
     setShowCodeEntry(false);
   };
 
@@ -301,8 +301,8 @@ export default function PartnerRegisterPage() {
     return (
       <OtpStep
         email={registrationEmail}
-        onSuccess={() => { setStep("success"); router.replace("/auth/register?step=success"); }}
-        onRestart={() => { setStep("form"); router.replace("/auth/register"); }}
+        onSuccess={() => { setStep("success"); router.replace("/apply-as-adviser?step=success"); }}
+        onRestart={() => { setStep("form"); router.replace("/apply-as-adviser"); }}
       />
     );
   }

@@ -76,7 +76,7 @@ export default function SignInForm() {
               Forgot password?
             </Link>
             <Link
-              href="/auth/register?showCodeEntry=1"
+              href="/apply-as-adviser?showCodeEntry=1"
               className="text-xs font-medium text-slate-400 hover:text-blue-600 hover:underline"
             >
               Already have a verification code?
@@ -100,7 +100,7 @@ export default function SignInForm() {
 
         <p className="text-center text-sm text-slate-500">
           Want to become a partner?{" "}
-          <Link href="/auth/register" className="font-medium text-blue-600 hover:underline">
+          <Link href="/apply-as-adviser" className="font-medium text-blue-600 hover:underline">
             Join Now
           </Link>
         </p>

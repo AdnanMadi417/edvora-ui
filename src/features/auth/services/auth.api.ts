@@ -14,7 +14,11 @@ export const authService = {
   me: (token: string) =>
     api.get("/auth/me", { headers: { Authorization: `Bearer ${token}` } }),
 
-  partnerResetPassword: (currentPassword: string, newPassword: string) =>
+  // The URL still says "partners" since that's the real backend route, but
+  // the handler has no role check -- it just operates on whoever the token
+  // belongs to. Used as the universal "I have a temp password, set a real
+  // one" flow for every role, not just partners.
+  resetCurrentPassword: (currentPassword: string, newPassword: string) =>
     api.post("/partners/reset-password", {
       current_password: currentPassword,
       new_password: newPassword,

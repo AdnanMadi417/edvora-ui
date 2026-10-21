@@ -5,7 +5,7 @@ import { jwtVerify } from "jose";
 import { DISABLED_ROUTE_PREFIXES } from "./config/featureFlags";
 import { classifyAuthFailure } from "./lib/authFailure";
 
-const publicRoutes = ["/auth/sign-in", "/auth/register", "/register/verify", "/auth/forgot-password", "/auth/partner-reset-password", "/auth/staff-invitation", "/team/verify-otp", "/team/accept-invite", "/reset-password", "/unauthorized", "/", "/api/health", "/api/auth/logout", "/api/telemetry/client-event"];
+const publicRoutes = ["/auth/sign-in", "/apply-as-adviser", "/apply-as-adviser/verify", "/auth/forgot-password", "/auth/reset-password", "/auth/staff-invitation", "/team/verify-otp", "/team/accept-invite", "/reset-password", "/unauthorized", "/", "/api/health", "/api/auth/logout", "/api/telemetry/client-event"];
 
 // Prefixes rather than exact paths — for public routes with a dynamic
 // segment (e.g. /p/[slug], the shareable partner profile).
