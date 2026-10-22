@@ -151,7 +151,7 @@ export default function PayoutStatementSection({ partnerId }: PayoutStatementSec
                 subtitle={
                   searchTerm
                     ? "Try adjusting your search."
-                    : "No payouts have been recorded for this partner yet."
+                    : "No payouts have been recorded for this advisor yet."
                 }
                 icon={<Receipt className="h-8 w-8 text-slate-400" />}
               />
@@ -167,7 +167,7 @@ export default function PayoutStatementSection({ partnerId }: PayoutStatementSec
                       className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${
                         isVoided ? "opacity-60" : ""
                       }`}
-                      onClick={() => router.push(`/admin/partners/${partnerId}/payouts/${item.payout_id}`)}
+                      onClick={() => router.push(`/admin/advisors/${partnerId}/payouts/${item.payout_id}`)}
                     >
                       <td className="px-6 py-4 text-sm">
                         <p className="font-medium text-slate-900">{item.bank_reference}</p>

@@ -321,8 +321,8 @@ export default function RegisterUniversity({ basePath = "/admin/universities" }:
             updateFormData={updateFormData}
             enabledText="Hidden"
             disabledText="Visible"
-            enabledDescription="Hidden from partners — only visible to data-entry and admin."
-            disabledDescription="Visible to partners."
+            enabledDescription="Hidden from advisors — only visible to data-entry and admin."
+            disabledDescription="Visible to advisors."
           />
 
         </div>

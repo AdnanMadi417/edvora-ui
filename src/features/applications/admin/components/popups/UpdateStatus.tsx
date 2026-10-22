@@ -473,7 +473,7 @@ export default function UpdateStatusPopup({
     if (isCommissionPaid) {
       const errors: any = {};
       if (!partnerBankAccount) {
-        setError("This partner has no active bank account on file");
+        setError("This advisor has no active bank account on file");
         return false;
       }
       if (!payoutFormData.payment_method_id.trim()) errors.payment_method_id = "Payment method is required";
@@ -832,7 +832,7 @@ export default function UpdateStatusPopup({
                 <BankAccountPayoutSummary account={partnerBankAccount} />
                 {!partnerBankAccount && application?.partner?.id && (
                   <Link
-                    href={`/admin/partners/${application.partner.id}?tab=bank-account`}
+                    href={`/admin/advisors/${application.partner.id}?tab=bank-account`}
                     className="mt-1 block font-medium text-blue-600 hover:text-blue-700"
                   >
                     Add a bank account →

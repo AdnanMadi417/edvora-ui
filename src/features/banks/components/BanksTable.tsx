@@ -38,7 +38,7 @@ interface Props {
 // navigated to from the Knowledge Hub sidebar section but not nested under
 // it — gated the same way every other Knowledge Hub page is: by the
 // role-based /admin and /data-entry layouts, not a separate permission flag.
-export default function BanksTable({ basePath = "/admin/partners/banks" }: Props) {
+export default function BanksTable({ basePath = "/admin/advisors/banks" }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");

@@ -107,14 +107,14 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
       {/* Header */}
       <div className="flex flex-col gap-4 border-b border-slate-200 p-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">Assigned Partners</h3>
-          <p className="mt-0.5 text-sm text-slate-500">Partners managed by this account manager</p>
+          <h3 className="text-base font-semibold text-slate-900">Assigned Advisors</h3>
+          <p className="mt-0.5 text-sm text-slate-500">Advisors managed by this account manager</p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Button
             onClick={() => setIsUnshareOpen(true)}
             disabled={assignedCount === 0}
-            title="Stop another account manager from seeing this manager's partners"
+            title="Stop another account manager from seeing this manager's advisors"
             icon={<ShieldOff className="h-4 w-4" />}
             text="Remove shared access"
             bgColor="bg-white"
@@ -129,11 +129,11 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
             disabled={assignedCount === 0}
             title={
               assignedCount === 0
-                ? "No partners to transfer or share"
-                : "Move all of this manager's partners to another account manager, or share them"
+                ? "No advisors to transfer or share"
+                : "Move all of this manager's advisors to another account manager, or share them"
             }
             icon={<ArrowRightLeft className="h-4 w-4" />}
-            text="Transfer or share partners"
+            text="Transfer or share advisors"
             bgColor="bg-white"
             textColor="text-slate-700"
             borderColor="border-slate-300"
@@ -218,7 +218,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
               itemsPerPage={ITEMS_PER_PAGE}
               itemCount={partners.length}
               totalCount={total}
-              itemLabel="partners"
+              itemLabel="advisors"
               loading={loading}
             />
           }
@@ -227,7 +227,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: Users,      label: "Partner",      minW: "min-w-[220px]" },
+                  { icon: Users,      label: "Advisor",      minW: "min-w-[220px]" },
                   { icon: Mail,       label: "Contact Info", minW: "min-w-[200px]" },
                   { icon: BadgeCheck, label: "Status" },
                 ].map(({ icon: Icon, label, minW }) => (
@@ -252,8 +252,8 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
               {!isInitialLoad && !error && partners.length === 0 && (
                 <TableEmptyRow
                   colSpan={4}
-                  title="No partners found"
-                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This manager has no assigned partners yet."}
+                  title="No advisors found"
+                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This manager has no assigned advisors yet."}
                   icon={<Handshake className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
@@ -278,7 +278,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
                 <AnimatedTableRow
                   key={partner.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
-                  onClick={() => router.push(`/admin/partners/${partner.id}`)}
+                  onClick={() => router.push(`/admin/advisors/${partner.id}`)}
                 >
                   <td className="min-w-[220px] px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -292,7 +292,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
                         <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
                       </div>
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-slate-900">{partner.name || "Unknown Partner"}</div>
+                        <div className="truncate text-sm font-medium text-slate-900">{partner.name || "Unknown Advisor"}</div>
                         <div className="truncate text-xs text-slate-500 capitalize">{partner.type || "—"} · {partner.country || "—"}</div>
                       </div>
                     </div>

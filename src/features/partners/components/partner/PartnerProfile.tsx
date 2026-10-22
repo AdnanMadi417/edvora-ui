@@ -204,7 +204,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
     disabled: avatarUploading,
   });
 
-  if (isPartnerLoading) return <Loading text="Loading partner profile details..." />;
+  if (isPartnerLoading) return <Loading text="Loading advisor profile details..." />;
   if (!partner) return <EmptyData />;
 
   const isIndividual = partner.type === "individual";
@@ -301,7 +301,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
               <InfoRow icon={<MdPublic className="h-4 w-4" />} label="Nationality" value={partner.nationality} />
               <InfoRow icon={<MdPhone className="h-4 w-4" />} label="Phone Number" value={partner.phone} />
               <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={partner.email} />
-              <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Partner Type" value={partner.type === "individual" ? "Individual Advisor" : "Agency / Company"} />
+              <InfoRow icon={<MdCategory className="h-4 w-4" />} label="Advisor Type" value={partner.type === "individual" ? "Individual Advisor" : "Agency / Company"} />
               <InfoRow icon={<MdSupervisorAccount className="h-4 w-4" />} label="Assigned Manager" value={partner.assigned_manager_name} />
               {partner.agency_membership && (
                 <InfoRow icon={<Users className="h-4 w-4" />} label="Member Of" value={partner.agency_membership.agency_name} />

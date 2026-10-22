@@ -46,7 +46,7 @@ export default function ApplicationInfoSection({ application }: ApplicationInfoS
           </div>
         )}
         <div className="min-w-0">
-          <span className="block text-p1 font-medium text-slate-900">Partner</span>
+          <span className="block text-p1 font-medium text-slate-900">Advisor</span>
           <span className="block truncate text-p2 text-slate-500" title={partner.name}>{partner.name || "Not provided"}</span>
         </div>
         <div className="min-w-0">

@@ -17,7 +17,7 @@ type DetailsTab = "profile" | "partners";
 
 const TABS: TabItem<DetailsTab>[] = [
   { key: "profile", label: "Profile" },
-  { key: "partners", label: "Partners" },
+  { key: "partners", label: "Advisors" },
 ];
 
 export default function AccountManagerDetailsTabs({ manager, onManagerChanged }: Props) {
@@ -52,18 +52,18 @@ export default function AccountManagerDetailsTabs({ manager, onManagerChanged }:
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <span className="flex items-center gap-2 text-slate-600">
               <Users className="h-4 w-4" />
-              Assigned Partners
+              Assigned Advisors
             </span>
 
             <div className="flex flex-wrap items-center gap-1.5">
               {Number(manager.assigned_partners_count) > 0 ? (
                 <StatusBadge variant="success" icon={<Users className="h-3 w-3" />} className="w-fit">
-                  {Number(manager.assigned_partners_count)} Partner
+                  {Number(manager.assigned_partners_count)} Advisor
                   {Number(manager.assigned_partners_count) !== 1 && "s"}
                 </StatusBadge>
               ) : (
                 <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>
-                  Needs Partner
+                  Needs Advisor
                 </StatusBadge>
               )}
               {Number(manager.shared_partners_count ?? 0) > 0 && (

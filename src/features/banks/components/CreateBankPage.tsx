@@ -47,7 +47,7 @@ function validateName(value: string): string {
 // Add-a-bank page — admin/data-entry only. Adds a new entry to the Banks
 // reference list (GET /banks, used to populate the bank picker on a
 // partner's account form).
-export default function CreateBankPage({ basePath = "/admin/partners/banks" }: Props) {
+export default function CreateBankPage({ basePath = "/admin/advisors/banks" }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const { createBank, loading } = useCreateBank();
@@ -168,7 +168,7 @@ export default function CreateBankPage({ basePath = "/admin/partners/banks" }: P
             updateFormData={updateFormData}
             enabledText="Active"
             disabledText="Inactive"
-            enabledDescription="Shown in the bank picker on partner account forms."
+            enabledDescription="Shown in the bank picker on advisor account forms."
             disabledDescription="Hidden from the bank picker."
           />
 

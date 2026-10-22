@@ -152,7 +152,7 @@ export default function FinanceQueuePage() {
                   type="button"
                   onClick={() => setSelectedPartner(null)}
                   className="ml-2 shrink-0 text-slate-500 hover:text-slate-700"
-                  aria-label="Clear partner filter"
+                  aria-label="Clear advisor filter"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -161,7 +161,7 @@ export default function FinanceQueuePage() {
               <SearchInput
                 value={partnerSearch}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPartnerSearch(e.target.value)}
-                placeholder="Filter by partner..."
+                placeholder="Filter by advisor..."
               />
             )}
             {showPartnerResults && (
@@ -169,7 +169,7 @@ export default function FinanceQueuePage() {
                 {partnersLoading ? (
                   <p className="p-4 text-sm text-slate-500">Searching...</p>
                 ) : partners.length === 0 ? (
-                  <p className="p-4 text-sm text-slate-500">No partners found.</p>
+                  <p className="p-4 text-sm text-slate-500">No advisors found.</p>
                 ) : (
                   partners.map((p) => (
                     <button
@@ -287,7 +287,7 @@ export default function FinanceQueuePage() {
                 <th className="w-10 px-6 py-4" />
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Reference</th>
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Student</th>
-                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Partner</th>
+                <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Advisor</th>
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">University / Program</th>
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Commission</th>
                 <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Waiting On</th>
@@ -340,7 +340,7 @@ export default function FinanceQueuePage() {
                               onChange={() => toggleSelected(item)}
                               title={
                                 checkboxDisabled && !isSelected
-                                  ? "Batch payout is limited to one partner and one currency at a time"
+                                  ? "Batch payout is limited to one advisor and one currency at a time"
                                   : undefined
                               }
                               className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-40"

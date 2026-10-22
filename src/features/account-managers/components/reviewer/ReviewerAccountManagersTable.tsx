@@ -191,7 +191,7 @@ const ReviewerAccountManagersTable = () => {
                 {[
                   { icon: User,         label: "Name",              minW: "min-w-[200px]" },
                   { icon: Mail,         label: "Email",             minW: "min-w-[200px]" },
-                  { icon: Users,        label: "Assigned Partners", minW: "min-w-[180px]" },
+                  { icon: Users,        label: "Assigned Advisors", minW: "min-w-[180px]" },
                   { icon: CheckCircle,  label: "Status",            minW: "min-w-[120px]" },
                 ].map(({ icon: Icon, label, minW }) => (
                   <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
@@ -261,10 +261,10 @@ const ReviewerAccountManagersTable = () => {
                   <td className="px-6 py-4">
                     {Number(m.assigned_partners_count) > 0 ? (
                       <StatusBadge variant="success" icon={<Users className="h-3 w-3" />}>
-                        {Number(m.assigned_partners_count)} Partner{Number(m.assigned_partners_count) !== 1 && "s"}
+                        {Number(m.assigned_partners_count)} Advisor{Number(m.assigned_partners_count) !== 1 && "s"}
                       </StatusBadge>
                     ) : (
-                      <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>Needs Partner</StatusBadge>
+                      <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>Needs Advisor</StatusBadge>
                     )}
                   </td>
 

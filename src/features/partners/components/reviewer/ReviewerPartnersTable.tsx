@@ -32,7 +32,7 @@ const ITEMS_PER_PAGE = 10;
 type ReviewerPartnersTab = "partners" | "pending-otps";
 
 const TABS: TabItem<ReviewerPartnersTab>[] = [
-  { key: "partners", label: "Partners" },
+  { key: "partners", label: "Advisors" },
   { key: "pending-otps", label: "Pending Registrations" },
 ];
 
@@ -76,7 +76,7 @@ export default function ReviewerPartnersTable() {
       await updatePartner(suspendTarget.id, {
         is_active: !suspendTarget.is_active,
       });
-      showToast(suspendTarget.is_active ? "Partner account suspended" : "Partner account activated", "success");
+      showToast(suspendTarget.is_active ? "Advisor account suspended" : "Advisor account activated", "success");
       setIsSuspendOpen(false);
       refetch();
     } catch (err: unknown) {
@@ -153,7 +153,7 @@ export default function ReviewerPartnersTable() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
         <div>
-          <h3 className="text-xl font-semibold text-slate-900">Partner Registrations</h3>
+          <h3 className="text-xl font-semibold text-slate-900">Advisor Registrations</h3>
           <p className="mt-0.5 text-sm text-slate-500">Review and approve or reject partner registrations</p>
         </div>
       </div>
@@ -262,7 +262,7 @@ export default function ReviewerPartnersTable() {
             itemsPerPage={ITEMS_PER_PAGE}
             itemCount={partners.length}
             totalCount={total}
-            itemLabel="partners"
+            itemLabel="advisors"
             loading={loading}
           />
         }
@@ -271,7 +271,7 @@ export default function ReviewerPartnersTable() {
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50">
               {[
-                { icon: Users,      label: "Partner",          minW: "min-w-[180px] sm:min-w-[250px]" },
+                { icon: Users,      label: "Advisor",          minW: "min-w-[180px] sm:min-w-[250px]" },
                 { icon: Users,      label: "Contact Info",     minW: "min-w-[160px] sm:min-w-[220px]", hide: "hidden sm:table-cell" },
                 { icon: UserCog,    label: "Assigned Manager", minW: "min-w-[130px] sm:min-w-[180px]", hide: "hidden md:table-cell" },
                 { icon: BadgeCheck, label: "Status" },
@@ -298,8 +298,8 @@ export default function ReviewerPartnersTable() {
             {!isInitialLoad && !error && partners.length === 0 && (
               <TableEmptyRow
                 colSpan={6}
-                title="No partners found"
-                subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No partners have registered yet."}
+                title="No advisors found"
+                subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No advisors have registered yet."}
                 icon={<Handshake className="h-8 w-8 text-slate-400" />}
                 action={
                   activeFiltersCount > 0 ? (
@@ -326,7 +326,7 @@ export default function ReviewerPartnersTable() {
                 <AnimatedTableRow
                   key={partner.id}
                   className="cursor-pointer transition-colors hover:bg-slate-100/50"
-                  onClick={() => router.push(`/reviewer/partners/${partner.id}`)}
+                  onClick={() => router.push(`/reviewer/advisors/${partner.id}`)}
                 >
                   <td className="min-w-[180px] max-w-[180px] px-6 py-4 sm:min-w-[250px] sm:max-w-[250px]">
                     <div className="flex items-center gap-2">
@@ -341,7 +341,7 @@ export default function ReviewerPartnersTable() {
                       </div>
                       <div className="min-w-0">
                         <div className="truncate text-sm font-medium text-slate-900">
-                          {partner.type === "agency" ? partner.company_details?.company_name || partner.name || "Unknown Partner" : partner.name || "Unknown Partner"}
+                          {partner.type === "agency" ? partner.company_details?.company_name || partner.name || "Unknown Advisor" : partner.name || "Unknown Advisor"}
                         </div>
                         <div className="truncate text-xs text-slate-500 capitalize">
                           {partner.type === "agency" && partner.company_details?.company_name ? `${partner.name} · ` : ""}

@@ -58,7 +58,7 @@ export default function PartnerPayoutSection({
         <div>
           <p className="flex items-center gap-2 text-sm font-semibold text-slate-900">
             <Wallet className="h-4 w-4 text-slate-400" />
-            Partner Payout
+            Advisor Payout
           </p>
           {payout.paid_amount != null && (
             <p className={`mt-1 text-lg font-bold ${isVoided ? "text-slate-400 line-through" : "text-slate-900"}`}>

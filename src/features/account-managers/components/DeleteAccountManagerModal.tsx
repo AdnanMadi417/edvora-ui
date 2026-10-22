@@ -77,13 +77,13 @@ export default function DeleteAccountManagerModal({
                 <div className="space-y-3">
                   <p className="text-sm text-amber-900">
                     This account manager still has {blockedPartnersCount} assigned{" "}
-                    {blockedPartnersCount === 1 ? "partner" : "partners"}. Transfer them before deleting.
+                    {blockedPartnersCount === 1 ? "advisor" : "advisors"}. Transfer them before deleting.
                   </p>
                   {onTransferPartners && (
                     <Button
                       onClick={onTransferPartners}
                       icon={<ArrowRightLeft className="h-4 w-4" />}
-                      text="Transfer partners"
+                      text="Transfer advisors"
                       bgColor="bg-white"
                       textColor="text-amber-800"
                       borderColor="border-amber-400"
@@ -137,7 +137,7 @@ export default function DeleteAccountManagerModal({
               hoverBorderColor="hover:border-red-700"
               onClick={onConfirm}
               disabled={isDeleting || isBlocked}
-              title={isBlocked ? "Transfer this manager's partners first" : undefined}
+              title={isBlocked ? "Transfer this manager's advisors first" : undefined}
             />
           </div>
         </div>

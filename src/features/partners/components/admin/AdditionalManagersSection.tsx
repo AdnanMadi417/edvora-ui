@@ -18,7 +18,7 @@ interface Props {
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
-  manager_is_primary: "That manager is already this partner's primary manager.",
+  manager_is_primary: "That manager is already this advisor's primary manager.",
   target_manager_inactive: "That account manager is inactive. Choose an active one.",
   agency_member_manager_not_editable: "Team members inherit their agency's managers. Change the agency instead.",
   manager_not_found: "That account manager no longer exists. Refresh the page and try again.",
@@ -57,7 +57,7 @@ export default function AdditionalManagersSection({ partner, accountManagers, on
     const name = accountManagers.find((m) => m.id === selectedId)?.name ?? "The manager";
     try {
       await addManager(partner.id, selectedId);
-      showToast(`${name} now shares access to ${partner.name || "this partner"}`, "success");
+      showToast(`${name} now shares access to ${partner.name || "this advisor"}`, "success");
       setSelectedId("");
       onChanged();
     } catch (err: unknown) {
@@ -69,7 +69,7 @@ export default function AdditionalManagersSection({ partner, accountManagers, on
     setPendingRemoveId(manager.id);
     try {
       await removeManager(partner.id, manager.id);
-      showToast(`${manager.name || manager.email} no longer shares access to ${partner.name || "this partner"}`, "success");
+      showToast(`${manager.name || manager.email} no longer shares access to ${partner.name || "this advisor"}`, "success");
       onChanged();
     } catch (err: unknown) {
       fail(err, "Failed to remove the manager. Please try again.");
@@ -87,7 +87,7 @@ export default function AdditionalManagersSection({ partner, accountManagers, on
       <p className="mb-4 text-xs text-slate-500">
         {isMember
           ? "Inherited from the agency — change them on the agency's page."
-          : "Account managers who can see and manage this partner alongside the assigned manager."}
+          : "Account managers who can see and manage this advisor alongside the assigned manager."}
       </p>
 
       <div className="flex flex-wrap items-center gap-2">

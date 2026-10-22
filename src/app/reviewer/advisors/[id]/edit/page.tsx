@@ -9,5 +9,5 @@ export default function ReviewerPartnerEditPage() {
 
   if (!partnerId) return null;
 
-  return <EditPartnerDetails id={partnerId} basePath="/reviewer/partners" />;
+  return <EditPartnerDetails id={partnerId} basePath="/reviewer/advisors" />;
 }

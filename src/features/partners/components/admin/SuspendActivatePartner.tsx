@@ -52,7 +52,7 @@ export default function SuspendActivatePartner({ isOpen, onClose, onConfirm, isS
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
             title={`${action} Account`}
-            description={isActive ? "Suspend this partner's account access." : "Restore this partner's account access."}
+            description={isActive ? "Suspend this advisor's account access." : "Restore this advisor's account access."}
             icon={Icon}
             iconBg={colorClasses.iconBg}
             iconColor={colorClasses.iconColor}

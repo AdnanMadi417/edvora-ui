@@ -63,7 +63,7 @@ export default function UnsharePartnersModal({ isOpen, onClose, sourceManager, o
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
             title="Remove Shared Access"
-            description="Stop another account manager from seeing this manager's partners."
+            description="Stop another account manager from seeing this manager's advisors."
             icon={ShieldOff}
             iconBg="bg-amber-50"
             iconColor="text-amber-600"
@@ -110,8 +110,8 @@ function UnsharePartnersBody({ sourceManager, onClose, onUnshared }: BodyProps) 
       const result = await unsharePartners(sourceManager.id, { target_manager_id: targetId });
       showToast(
         result.unshared_partners_count === 0
-          ? `${targetName} had no shared access to ${sourceName}'s partners`
-          : `Shared access removed: ${targetName} no longer sees ${pluralize(result.unshared_partners_count, "partner")} of ${sourceName}`,
+          ? `${targetName} had no shared access to ${sourceName}'s advisors`
+          : `Shared access removed: ${targetName} no longer sees ${pluralize(result.unshared_partners_count, "advisor")} of ${sourceName}`,
         "success"
       );
       onUnshared?.(result);
@@ -127,7 +127,7 @@ function UnsharePartnersBody({ sourceManager, onClose, onUnshared }: BodyProps) 
       <div className="space-y-5 px-7 py-6">
         <p className="text-sm text-slate-600">
           Choose the account manager who should no longer see{" "}
-          <span className="font-medium text-slate-900">{sourceName}</span>&apos;s partners.{" "}
+          <span className="font-medium text-slate-900">{sourceName}</span>&apos;s advisors.{" "}
           {sourceName} stays their primary manager; nothing else changes.
         </p>
 

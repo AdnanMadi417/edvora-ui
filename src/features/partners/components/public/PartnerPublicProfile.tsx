@@ -52,9 +52,9 @@ const BANNER_STYLE = {
 };
 
 const VERIFIED_EXPLANATION =
-  "This partner has successfully supported at least one student through visa approval. Verification is granted and managed by Unibexs.";
+  "This advisor has successfully supported at least one student through visa approval. Verification is granted and managed by Unibexs.";
 const NOT_VERIFIED_EXPLANATION =
-  "This partner hasn't yet supported a student through visa approval. Verification is granted automatically by Unibexs once they do.";
+  "This advisor hasn't yet supported a student through visa approval. Verification is granted automatically by Unibexs once they do.";
 
 // countries_supported holds ISO-2 codes (e.g. "MY") — short enough that
 // upper-casing them reads as a code, not as shouting. Used only for that

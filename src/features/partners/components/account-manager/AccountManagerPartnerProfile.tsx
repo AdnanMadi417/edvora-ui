@@ -171,7 +171,7 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
   const { partner, isPartnerLoading } = useAccountManagerPartnerDetails(id);
   const [tab, setTab] = useState<DetailsTab>("profile");
 
-  if (isPartnerLoading) return <Loading text="Loading partner details..." />;
+  if (isPartnerLoading) return <Loading text="Loading advisor details..." />;
   if (!partner) return <EmptyData />;
 
   const isIndividual = partner.type === "individual";
@@ -214,7 +214,7 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
             </div>
             <div className="min-w-0">
               <h2 className="truncate text-lg font-semibold text-slate-900">
-                {isCompany ? partner.company_details?.company_name || partner.name || "Unknown Partner" : partner.name || "Unknown Partner"}
+                {isCompany ? partner.company_details?.company_name || partner.name || "Unknown Advisor" : partner.name || "Unknown Advisor"}
               </h2>
               <p className="truncate text-sm text-slate-500">
                 {isCompany && partner.company_details?.company_name ? `${partner.name} • ` : ""}
@@ -225,7 +225,7 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
 
           <Button
             className="shrink-0 self-end sm:self-auto"
-            onClick={() => router.push("/account-manager/partners")}
+            onClick={() => router.push("/account-manager/advisors")}
             icon={<ChevronLeft className="h-4 w-4" />}
             text="Back"
             bgColor="bg-white"
@@ -253,7 +253,7 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
             <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={partner.email} />
             <InfoRow
               icon={<MdCategory className="h-4 w-4" />}
-              label="Partner Type"
+              label="Advisor Type"
               value={isIndividual ? "Individual Advisor" : "Agency / Company"}
             />
             <InfoRow
@@ -410,7 +410,7 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
               {partner.agency_members.map((member) => (
                 <div
                   key={member.id}
-                  onClick={() => router.push(`/account-manager/partners/${member.partner_id}`)}
+                  onClick={() => router.push(`/account-manager/advisors/${member.partner_id}`)}
                   className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 p-3 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
                 >
                   <div className="min-w-0">

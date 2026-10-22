@@ -62,7 +62,7 @@ export default function PartnerBankAccountHistory({ isOpen, onClose, partnerId }
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
             title="Bank Account History"
-            description="Every version ever recorded for this partner — editing always creates a new row and retires the old one."
+            description="Every version ever recorded for this advisor — editing always creates a new row and retires the old one."
             icon={HistoryIcon}
             iconBg="bg-blue-50"
             iconColor="text-blue-600"
@@ -77,7 +77,7 @@ export default function PartnerBankAccountHistory({ isOpen, onClose, partnerId }
               errorMessage={error ?? undefined}
               onRetry={() => fetchHistory(partnerId)}
               emptyTitle="No history yet"
-              emptySubtitle="This partner has never had a bank account recorded."
+              emptySubtitle="This advisor has never had a bank account recorded."
               emptyIcon={HistoryIcon}
             >
               <div className="space-y-3 px-6 py-5">

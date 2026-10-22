@@ -215,7 +215,7 @@ export default function PartnerDetails({ id }: Props) {
     }
   };
 
-  if (isPartnerLoading) return <Loading text="Loading partner details..." />;
+  if (isPartnerLoading) return <Loading text="Loading advisor details..." />;
   if (!partner) return <EmptyData />;
 
   const isIndividual = partner.type === "individual";
@@ -320,9 +320,9 @@ export default function PartnerDetails({ id }: Props) {
                   <div className="flex flex-col gap-2 p-2">
                     <button
                       type="button"
-                      aria-label="Edit Partner Details"
+                      aria-label="Edit Advisor Details"
                       className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm"
-                      onClick={() => { router.push(`/admin/partners/${id}/edit`); setOpenActions(false); }}
+                      onClick={() => { router.push(`/admin/advisors/${id}/edit`); setOpenActions(false); }}
                     >
                       <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
                         <Pencil className="h-4 w-4" />
@@ -332,14 +332,14 @@ export default function PartnerDetails({ id }: Props) {
 
                     <button
                       type="button"
-                      aria-label="Back to Partners"
+                      aria-label="Back to Advisors"
                       className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
-                      onClick={() => { router.push("/admin/partners"); setOpenActions(false); }}
+                      onClick={() => { router.push("/admin/advisors"); setOpenActions(false); }}
                     >
                       <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
                         <ChevronLeft className="h-4 w-4" />
                       </div>
-                      <span className="font-semibold text-slate-900">Back to Partners</span>
+                      <span className="font-semibold text-slate-900">Back to Advisors</span>
                     </button>
                   </div>
                 </div>
@@ -373,7 +373,7 @@ export default function PartnerDetails({ id }: Props) {
             <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={partner.email} />
             <InfoRow
               icon={<MdCategory className="h-4 w-4" />}
-              label="Partner Type"
+              label="Advisor Type"
               value={isIndividual ? "Individual Advisor" : "Agency / Company"}
             />
             <InfoRow
@@ -559,7 +559,7 @@ export default function PartnerDetails({ id }: Props) {
               {partner.agency_members.map((member) => (
                 <div
                   key={member.id}
-                  onClick={() => router.push(`/admin/partners/${member.partner_id}`)}
+                  onClick={() => router.push(`/admin/advisors/${member.partner_id}`)}
                   className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 p-3 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
                 >
                   <div className="min-w-0">

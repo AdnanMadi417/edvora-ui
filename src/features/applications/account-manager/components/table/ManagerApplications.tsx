@@ -376,7 +376,7 @@ const ModernApplicationsTable = () => {
               >
                 <div className="flex min-w-0 items-center gap-2">
                   <Building className="h-4 w-4 shrink-0 text-slate-400" />
-                  <span className="truncate">Partner</span>
+                  <span className="truncate">Advisor</span>
                   <SortIndicator field="partner_name" />
                 </div>
               </th>

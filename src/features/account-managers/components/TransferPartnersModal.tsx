@@ -38,7 +38,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   same_manager: "Choose a different account manager.",
   target_required_for_copy: "Choose the account manager to share with.",
   partner_not_assigned_to_source:
-    "Some of these partners changed while you were on this screen. Refresh the page and try again.",
+    "Some of these advisors changed while you were on this screen. Refresh the page and try again.",
 };
 
 function pluralize(count: number, noun: string) {
@@ -94,11 +94,11 @@ export default function TransferPartnersModal({
       >
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
-            title={allowShare ? "Transfer or Share Partners" : "Transfer Partners"}
+            title={allowShare ? "Transfer or Share Advisors" : "Transfer Advisors"}
             description={
               allowShare
-                ? "Hand this manager's partners over to another account manager, or give another manager shared access."
-                : "Hand this manager's partners over to another account manager."
+                ? "Hand this manager's advisors over to another account manager, or give another manager shared access."
+                : "Hand this manager's advisors over to another account manager."
             }
             icon={ArrowRightLeft}
             iconBg="bg-blue-50"
@@ -164,8 +164,8 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
     if (!targetId) {
       setFormError(
         isShare
-          ? "Select the account manager to share these partners with."
-          : "Select the account manager who will receive these partners."
+          ? "Select the account manager to share these advisors with."
+          : "Select the account manager who will receive these advisors."
       );
       return;
     }
@@ -179,7 +179,7 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
       const code = getApiErrorCode(err);
       setFormError(
         (code && ERROR_MESSAGES[code]) ??
-          parseApiError(err, isShare ? "Failed to share partners. Please try again." : "Failed to transfer partners. Please try again.")
+          parseApiError(err, isShare ? "Failed to share advisors. Please try again." : "Failed to transfer advisors. Please try again.")
       );
     }
   };
@@ -223,20 +223,20 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
 
         {count === 0 ? (
           <p className="text-sm text-slate-600">
-            <span className="font-medium text-slate-900">{sourceName}</span> has no partners to {verb.toLowerCase()}.
+            <span className="font-medium text-slate-900">{sourceName}</span> has no advisors to {verb.toLowerCase()}.
           </p>
         ) : isShare ? (
           <p className="text-sm text-slate-600">
-            {count === 1 ? "Share the only partner assigned to " : `Share all ${count} partners of `}
+            {count === 1 ? "Share the only advisor assigned to " : `Share all ${count} advisors of `}
             <span className="font-medium text-slate-900">{sourceName}</span> with another account manager.{" "}
-            {sourceFirst} keeps {count === 1 ? "this partner" : "these partners"}; the other manager will also see and
-            manage {count === 1 ? "it" : "them"}. Partners assigned to {sourceFirst} later are not shared automatically.
+            {sourceFirst} keeps {count === 1 ? "this advisor" : "these advisors"}; the other manager will also see and
+            manage {count === 1 ? "it" : "them"}. Advisors assigned to {sourceFirst} later are not shared automatically.
           </p>
         ) : (
           <p className="text-sm text-slate-600">
-            {count === 1 ? "Move the only partner assigned to " : `Move all ${count} partners from `}
+            {count === 1 ? "Move the only advisor assigned to " : `Move all ${count} advisors from `}
             <span className="font-medium text-slate-900">{sourceName}</span> to another account manager.{" "}
-            {sourceFirst} will no longer see {count === 1 ? "this partner" : "these partners"}.
+            {sourceFirst} will no longer see {count === 1 ? "this advisor" : "these advisors"}.
           </p>
         )}
 
@@ -250,7 +250,7 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
             >
               <span className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-slate-400" />
-                {showList ? "Hide partners" : "Show partners"} ({partners.length})
+                {showList ? "Hide advisors" : "Show advisors"} ({partners.length})
               </span>
               {showList ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </button>
@@ -258,7 +258,7 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
               <ul className="max-h-40 overflow-y-auto border-t border-slate-200 px-4 py-2 text-sm text-slate-700">
                 {partners.map((p) => (
                   <li key={p.id} className="truncate py-1">
-                    {p.name || "Unnamed partner"}
+                    {p.name || "Unnamed advisor"}
                   </li>
                 ))}
               </ul>
@@ -318,7 +318,7 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
           text={
             submitting
               ? isShare ? "Sharing..." : "Transferring..."
-              : `${verb} ${pluralize(count, "partner")}`
+              : `${verb} ${pluralize(count, "advisor")}`
           }
           bgColor="bg-blue-50"
           textColor="text-blue-700"
@@ -334,12 +334,12 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
 function successMessage(result: TransferPartnersResult, targetName: string): string {
   if (result.mode === "copy") {
     if (result.shared_partners_count === 0 && result.already_shared_count > 0) {
-      return `${targetName} already had access to ${pluralize(result.already_shared_count, "partner")}`;
+      return `${targetName} already had access to ${pluralize(result.already_shared_count, "advisor")}`;
     }
-    const base = `${pluralize(result.shared_partners_count, "partner")} shared with ${targetName}`;
+    const base = `${pluralize(result.shared_partners_count, "advisor")} shared with ${targetName}`;
     return result.already_shared_count > 0
       ? `${base} (${result.already_shared_count} already had access)`
       : base;
   }
-  return `${pluralize(result.moved_partners_count, "partner")} transferred to ${targetName}`;
+  return `${pluralize(result.moved_partners_count, "advisor")} transferred to ${targetName}`;
 }

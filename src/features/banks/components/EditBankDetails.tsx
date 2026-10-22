@@ -68,7 +68,7 @@ function EditBankFormSkeleton() {
 // a bank is toggling is_active here: there's no delete endpoint, the DB
 // RESTRICTs deleting a bank that still has partner_bank_accounts pointing
 // at it).
-export default function EditBankDetails({ id, basePath = "/admin/partners/banks" }: Props) {
+export default function EditBankDetails({ id, basePath = "/admin/advisors/banks" }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const { bank, loading: loadingBank, error: bankError, refetch } = useBank(id);
@@ -230,7 +230,7 @@ export default function EditBankDetails({ id, basePath = "/admin/partners/banks"
             updateFormData={updateFormData}
             enabledText="Active"
             disabledText="Inactive"
-            enabledDescription="Shown in the bank picker on partner account forms."
+            enabledDescription="Shown in the bank picker on advisor account forms."
             disabledDescription="Hidden from the bank picker."
           />
 

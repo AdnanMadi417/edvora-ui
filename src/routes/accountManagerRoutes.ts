@@ -27,9 +27,9 @@ const accountManagerRoutes: IRoute[] = [
         icon: Truck,
     },
     {
-        name: "Partners",
+        name: "Advisors",
         layout: "/account-manager",
-        path: "/partners",
+        path: "/advisors",
         icon: Handshake,
     },
     // {

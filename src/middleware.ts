@@ -23,7 +23,7 @@ const roleHomePaths: Record<string, string> = {
   admin: "/admin/applications",
   partner: "/partner/applications",
   account_manager: "/account-manager/applications",
-  reviewer: "/reviewer/partners",
+  reviewer: "/reviewer/advisors",
   data_entry: "/data-entry/knowledge-hub",
 };
 

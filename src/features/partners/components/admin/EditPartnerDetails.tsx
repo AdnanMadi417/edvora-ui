@@ -250,7 +250,7 @@ function AvatarUpload({
   );
 }
 
-export default function EditPartnerDetails({ id, basePath = "/admin/partners" }: Props) {
+export default function EditPartnerDetails({ id, basePath = "/admin/advisors" }: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -437,7 +437,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
     // "agency" (e.g. a stale/legacy value carried over from partner.type)
     // must also be rejected here, not silently sent to the update endpoint,
     // which only accepts those two and 422s on anything else.
-    if (!PARTNER_TYPE.some((t) => t.value === formData.type)) newErrors.type = "Partner type is required";
+    if (!PARTNER_TYPE.some((t) => t.value === formData.type)) newErrors.type = "Advisor type is required";
 
     if (!formData.phone_number.trim()) newErrors.phone_number = "Phone number is required";
     else if (formData.phone_number.trim().length < 5) newErrors.phone_number = "Phone number must be at least 5 digits";
@@ -548,7 +548,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
       if (formData.manager_id) {
         await assignManager(id, { manager_id: formData.manager_id });
       }
-      showToast("Partner updated successfully", "success");
+      showToast("Advisor updated successfully", "success");
       router.push(`${basePath}/${id}`);
     } catch (error: unknown) {
       const code = getApiErrorCode(error);
@@ -564,14 +564,14 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
         return;
       }
       if (code === "public_profile_not_found") {
-        showToast(parseApiError(error, "This partner has no public profile to update."), "error");
+        showToast(parseApiError(error, "This advisor has no public profile to update."), "error");
         return;
       }
       handleApiError(error, "Update failed. Please try again.");
     }
   };
 
-  if (isPartnerLoading || assignLoading) return <Loading text="Loading partner details..." />;
+  if (isPartnerLoading || assignLoading) return <Loading text="Loading advisor details..." />;
   if (!partner || assignError) return <EmptyData />;
 
   const isIndividual = formData.type === "individual";
@@ -633,14 +633,14 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
 
         {/* Partner Details */}
         <div className="border-b border-slate-200 p-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Partner Details</p>
+          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Advisor Details</p>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <InputField label="Partner Name" field="name" required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("name")} />
+            <InputField label="Advisor Name" field="name" required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("name")} />
             <InputField label="Email Address" field="email" type="email" required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("email")} />
             <SearchableDropdown label="Country of Residence" field="country" options={COUNTRY_OPTIONS} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("country")} />
             <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITY_OPTIONS} formData={formData} errors={errors} updateFormData={updateFormData} />
             <div>
-              <SelectField label="Partner Type" field="type" options={PARTNER_TYPE.map((p) => ({ value: p.value, label: p.label }))} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("type")} disabled={isTypeLocked} />
+              <SelectField label="Advisor Type" field="type" options={PARTNER_TYPE.map((p) => ({ value: p.value, label: p.label }))} formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("type")} disabled={isTypeLocked} />
               {isTypeLocked && (
                 <p className="-mt-3 mb-4 text-xs text-slate-500">
                   A company can&apos;t be changed back to an individual partner.
@@ -648,7 +648,7 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
               )}
               {isConvertingToAgency && (
                 <p className="-mt-3 mb-4 text-xs text-amber-700">
-                  Saving will convert this partner into a company that can invite team members.
+                  Saving will convert this advisor into a company that can invite team members.
                   {partner.public_profile
                     ? " Their public profile will be taken offline — the page and its link are kept, but it can't be published again while they're a company."
                     : ""}
@@ -671,8 +671,8 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
             updateFormData={updateFormData}
             enabledText="Active"
             disabledText="Suspended"
-            enabledDescription="This partner can log in and access the platform."
-            disabledDescription="This partner cannot log in until reactivated."
+            enabledDescription="This advisor can log in and access the platform."
+            disabledDescription="This advisor cannot log in until reactivated."
           />
         </div>
 
@@ -804,11 +804,11 @@ export default function EditPartnerDetails({ id, basePath = "/admin/partners" }:
               updateFormData={updateFormData}
               enabledText="Published"
               disabledText="Unpublished"
-              enabledDescription="This partner's profile is live and publicly visible."
-              disabledDescription="This partner's profile is hidden from the public."
+              enabledDescription="This advisor's profile is live and publicly visible."
+              disabledDescription="This advisor's profile is hidden from the public."
             />
             <p className="mt-4 text-xs text-slate-400">
-              Verification is granted automatically when a student this partner supported gets
+              Verification is granted automatically when a student this advisor supported gets
               their visa approved — there&apos;s no manual control for it.
             </p>
           </div>

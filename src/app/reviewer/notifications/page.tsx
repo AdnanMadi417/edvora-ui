@@ -5,7 +5,7 @@ import Notification from "features/notifications/components/Notifications";
 const Dashboard = () => {
   return (
     <div>
-      <Notification partnerBasePath="/reviewer/partners" />
+      <Notification partnerBasePath="/reviewer/advisors" />
     </div>
   );
 };

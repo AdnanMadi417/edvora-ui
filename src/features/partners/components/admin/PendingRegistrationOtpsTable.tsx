@@ -112,10 +112,10 @@ export default function PendingRegistrationOtpsTable() {
       if (code === "otp_recently_sent") {
         showToast("A code was just sent — please wait a minute before resending.", "error");
       } else if (code === "otp_max_resends" || code === "max_resends_reached") {
-        showToast("Resend budget spent — the partner needs to fill out the registration form again.", "error");
+        showToast("Resend budget spent — the advisor needs to fill out the registration form again.", "error");
         refetch();
       } else if (code === "email_already_registered") {
-        showToast("This partner has already completed registration.", "error");
+        showToast("This advisor has already completed registration.", "error");
         refetch();
       } else if (code === "otp_email_failed") {
         showToast("Failed to send the email — please try again.", "error");

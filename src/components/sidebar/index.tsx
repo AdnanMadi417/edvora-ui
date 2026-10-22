@@ -33,7 +33,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const ROLE_LABELS: Record<string, string> = {
     admin: "Admin",
     account_manager: "Account Manager",
-    partner: "Partner",
+    partner: "Advisor",
     data_entry: "Data Entry",
     reviewer: "Reviewer",
   };
