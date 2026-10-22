@@ -2,6 +2,6 @@
 
 import { StatementPage } from 'features/partners/statement';
 
-export default function Statement() {
+export default function CommissionTracker() {
   return <StatementPage />;
 }

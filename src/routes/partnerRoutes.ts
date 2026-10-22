@@ -49,9 +49,9 @@ const partnerRoutes: IRoute[] = [
   },
 
   {
-    name: "Statement",
+    name: "Commission Tracker",
     layout: "/partner",
-    path: "/statement",
+    path: "/commission-tracker",
     icon: Receipt,
   },
 

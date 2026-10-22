@@ -182,12 +182,12 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
         { key: "profile", label: "Profile" },
         { key: "team", label: "Team" },
         { key: "applications", label: "Applications" },
-        { key: "statement", label: "Statement" },
+        { key: "statement", label: "Commission Tracker" },
       ]
     : [
         { key: "profile", label: "Profile" },
         { key: "applications", label: "Applications" },
-        { key: "statement", label: "Statement" },
+        { key: "statement", label: "Commission Tracker" },
       ];
 
   return (
