@@ -11,6 +11,8 @@ interface OfferLetterExtras {
   applicationFormTemplateFile?: File | null;
   applicationForm2TemplateFile?: File | null;
   healthDeclarationFormRequired?: boolean;
+  signedOfferLetterRequired?: boolean;
+  englishFormTemplateFile?: File | null;
 }
 
 interface UseOfferLetterUploadReturn {
@@ -36,6 +38,7 @@ export const useOfferLetterUpload = (): UseOfferLetterUploadReturn => {
       if (extras.visaInvoiceFile) filesToUpload.push(extras.visaInvoiceFile);
       if (extras.applicationFormTemplateFile) filesToUpload.push(extras.applicationFormTemplateFile);
       if (extras.applicationForm2TemplateFile) filesToUpload.push(extras.applicationForm2TemplateFile);
+      if (extras.englishFormTemplateFile) filesToUpload.push(extras.englishFormTemplateFile);
 
       const presigned = await getPresignedUploads(filesToUpload, "documents");
       const results = await uploadFilesToSpaces(filesToUpload, presigned);
@@ -75,6 +78,18 @@ export const useOfferLetterUpload = (): UseOfferLetterUploadReturn => {
 
       if (extras.healthDeclarationFormRequired !== undefined) {
         payload.health_declaration_form_required = extras.healthDeclarationFormRequired;
+      }
+
+      if (extras.signedOfferLetterRequired !== undefined) {
+        payload.signed_offer_letter_required = extras.signedOfferLetterRequired;
+      }
+
+      if (extras.englishFormTemplateFile) {
+        const r = results[resultIndex++];
+        if (r?.file_key && r?.public_url) {
+          payload.english_form_template_file_key = r.file_key;
+          payload.english_form_template_file_url = r.public_url;
+        }
       }
 
       await api.post(`/applications/${applicationId}/offer-letter`, payload);

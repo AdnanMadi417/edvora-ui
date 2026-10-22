@@ -22,6 +22,8 @@ import EVisaUpload from "features/applications/partner/components/popups/EVisaUp
 import ApplicationFormReupload from "features/applications/partner/components/popups/ApplicationFormReupload";
 import ApplicationForm2Reupload from "features/applications/partner/components/popups/ApplicationForm2Reupload";
 import HealthDeclarationReupload from "features/applications/partner/components/popups/HealthDeclarationReupload";
+import SignedOfferLetterReupload from "features/applications/partner/components/popups/SignedOfferLetterReupload";
+import EnglishFormReupload from "features/applications/partner/components/popups/EnglishFormReupload";
 import ApplicationCommission from './ApplicationCommission';
 import ApplicationDocuments from './ApplicationDocuments';
 import { useToast } from 'components/context/ToastContext';
@@ -111,6 +113,8 @@ export default function ApplicationDetails({
   const showApplicationFormReupload = currentStatusCode === "APPLICATION_FORM_REJECTED";
   const showApplicationForm2Reupload = currentStatusCode === "APPLICATION_FORM_2_REJECTED";
   const showHealthDeclarationReupload = currentStatusCode === "HEALTH_DECLARATION_REJECTED";
+  const showSignedOfferLetterReupload = currentStatusCode === "SIGNED_OFFER_LETTER_REJECTED";
+  const showEnglishFormReupload = currentStatusCode === "ENGLISH_FORM_REJECTED";
 
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
   const [downloadingTemplate, setDownloadingTemplate] = useState(false);
@@ -133,6 +137,8 @@ export default function ApplicationDetails({
   const [showApplicationFormReuploadPopup, setShowApplicationFormReuploadPopup] = useState(false);
   const [showApplicationForm2ReuploadPopup, setShowApplicationForm2ReuploadPopup] = useState(false);
   const [showHealthDeclarationReuploadPopup, setShowHealthDeclarationReuploadPopup] = useState(false);
+  const [showSignedOfferLetterReuploadPopup, setShowSignedOfferLetterReuploadPopup] = useState(false);
+  const [showEnglishFormReuploadPopup, setShowEnglishFormReuploadPopup] = useState(false);
 
   const showArrivalConfirmation = currentStatusCode === "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE";
 
@@ -462,6 +468,36 @@ export default function ApplicationDetails({
               />
             )}
 
+            {showSignedOfferLetterReupload && (
+              <Button
+                type="button"
+                onClick={() => setShowSignedOfferLetterReuploadPopup(true)}
+                icon={<FileUp className="h-4 w-4" />}
+                text="Re-upload Signed Offer Letter"
+                bgColor="bg-red-600"
+                textColor="text-white"
+                borderColor="border-red-600"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-red-700"
+                className="w-full hover:bg-red-700"
+              />
+            )}
+
+            {showEnglishFormReupload && (
+              <Button
+                type="button"
+                onClick={() => setShowEnglishFormReuploadPopup(true)}
+                icon={<FileUp className="h-4 w-4" />}
+                text="Re-upload English Form"
+                bgColor="bg-red-600"
+                textColor="text-white"
+                borderColor="border-red-600"
+                hoverTextColor="hover:text-white"
+                hoverBorderColor="hover:border-red-700"
+                className="w-full hover:bg-red-700"
+              />
+            )}
+
             {showAwaitingArrival && (
               <Button
                 type="button"
@@ -679,6 +715,24 @@ export default function ApplicationDetails({
         <HealthDeclarationReupload
           isOpen={showHealthDeclarationReuploadPopup}
           onClose={() => setShowHealthDeclarationReuploadPopup(false)}
+          applicationId={application.id}
+          onRefetch={handleRefetch}
+        />
+      )}
+
+      {showSignedOfferLetterReuploadPopup && (
+        <SignedOfferLetterReupload
+          isOpen={showSignedOfferLetterReuploadPopup}
+          onClose={() => setShowSignedOfferLetterReuploadPopup(false)}
+          applicationId={application.id}
+          onRefetch={handleRefetch}
+        />
+      )}
+
+      {showEnglishFormReuploadPopup && (
+        <EnglishFormReupload
+          isOpen={showEnglishFormReuploadPopup}
+          onClose={() => setShowEnglishFormReuploadPopup(false)}
           applicationId={application.id}
           onRefetch={handleRefetch}
         />
