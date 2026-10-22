@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
-import { useHealthDeclarationFormUrl } from "features/applications/shared/useHealthDeclarationFormUrl";
+import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import RichTextDisplay from "components/ui/RichTextDisplay";
@@ -43,7 +43,8 @@ export default function VisaPaymentConfirmation({
   const { methods, loading: paymentLoading, error: paymentError } = useVisaPaymentMethods(applicationId);
   const { visaFeeAmount } = useApplicationVisaFee(applicationId);
   const { uploadVisaPayment, isUploading } = useVisaPaymentUpload();
-  const healthDeclarationFormUrl = useHealthDeclarationFormUrl();
+  const { download: downloadHealthDeclarationForm, downloading: downloadingHealthDeclarationForm } =
+    useHealthDeclarationFormDownload();
 
   const firstMethod = methods[0] ?? null;
   const hasAppFormTemplate = !!application?.documents?.find(
@@ -227,14 +228,14 @@ export default function VisaPaymentConfirmation({
 
             {healthDeclarationRequired && (
               <div className="space-y-2">
-                <a
-                  href={healthDeclarationFormUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+                <button
+                  type="button"
+                  onClick={downloadHealthDeclarationForm}
+                  disabled={downloadingHealthDeclarationForm}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Download blank Health Declaration Form template
-                </a>
+                  {downloadingHealthDeclarationForm ? "Opening..." : "Download blank Health Declaration Form template"}
+                </button>
                 <StatusFileUpload
                   label="Upload Health Declaration Form"
                   description="Download the blank template above, complete it, and upload the filled form here."

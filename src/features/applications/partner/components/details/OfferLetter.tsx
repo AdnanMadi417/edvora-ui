@@ -4,11 +4,12 @@ import { CheckCircle, CreditCard, Download } from 'lucide-react';
 import { submitOfferLetterDecision } from "services/offerLetterService";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import { useHealthDeclarationFormUrl } from "features/applications/shared/useHealthDeclarationFormUrl";
+import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { AppDate } from "components/ui/date";
 import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 import { SectionIconBadge } from "components/ui/icons";
 
 interface OfferLetterDecisionProps {
@@ -32,7 +33,8 @@ export default function OfferLetterDecision({
 
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
-  const healthDeclarationFormUrl = useHealthDeclarationFormUrl();
+  const { download: downloadHealthDeclarationForm, downloading: downloadingHealthDeclarationForm } =
+    useHealthDeclarationFormDownload();
 
   const currentStatus = application?.stage?.statuses?.[0]?.name;
   const isUniversityApproved = currentStatus === "University Approved";
@@ -135,16 +137,18 @@ export default function OfferLetterDecision({
               <p className="text-xs text-slate-400">Required for visa processing (Lampiran B)</p>
             </div>
           </div>
-          <a
-            href={healthDeclarationFormUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Download Health Declaration Form"
+          <IconButton
+            onClick={downloadHealthDeclarationForm}
+            disabled={downloadingHealthDeclarationForm}
             title="Download Health Declaration Form"
-            className="ml-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100"
-          >
-            <Download className="h-4 w-4" />
-          </a>
+            icon={<Download className={`h-4 w-4 ${downloadingHealthDeclarationForm ? "animate-pulse" : ""}`} />}
+            bgColor="bg-blue-50"
+            textColor="text-blue-600"
+            borderColor="border-transparent"
+            hoverTextColor="hover:text-blue-600"
+            hoverBorderColor="hover:border-blue-200"
+            className="ml-3 shrink-0 hover:bg-blue-100"
+          />
         </div>
 
         {isUniversityApproved && (
