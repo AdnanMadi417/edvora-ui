@@ -11,6 +11,8 @@ interface VisaPaymentPayload {
   applicationFormFile?: File | null;
   applicationForm2File?: File | null;
   healthDeclarationFormFile?: File | null;
+  signedOfferLetterFile?: File | null;
+  englishFormFile?: File | null;
 }
 
 export const useVisaPaymentUpload = () => {
@@ -31,6 +33,8 @@ export const useVisaPaymentUpload = () => {
         ...(payload.applicationFormFile ? [payload.applicationFormFile] : []),
         ...(payload.applicationForm2File ? [payload.applicationForm2File] : []),
         ...(payload.healthDeclarationFormFile ? [payload.healthDeclarationFormFile] : []),
+        ...(payload.signedOfferLetterFile ? [payload.signedOfferLetterFile] : []),
+        ...(payload.englishFormFile ? [payload.englishFormFile] : []),
       ];
       const presigned = await getPresignedUploads(filesToUpload, "documents");
       const results = await uploadFilesToSpaces(filesToUpload, presigned);
@@ -71,6 +75,22 @@ export const useVisaPaymentUpload = () => {
         if (healthDeclarationResult?.file_key && healthDeclarationResult?.public_url) {
           body.health_declaration_form_file_key = healthDeclarationResult.file_key;
           body.health_declaration_form_file_url = healthDeclarationResult.public_url;
+        }
+      }
+
+      if (payload.signedOfferLetterFile) {
+        const signedOfferLetterResult = results[resultIndex++];
+        if (signedOfferLetterResult?.file_key && signedOfferLetterResult?.public_url) {
+          body.signed_offer_letter_file_key = signedOfferLetterResult.file_key;
+          body.signed_offer_letter_file_url = signedOfferLetterResult.public_url;
+        }
+      }
+
+      if (payload.englishFormFile) {
+        const englishFormResult = results[resultIndex++];
+        if (englishFormResult?.file_key && englishFormResult?.public_url) {
+          body.english_form_file_key = englishFormResult.file_key;
+          body.english_form_file_url = englishFormResult.public_url;
         }
       }
 

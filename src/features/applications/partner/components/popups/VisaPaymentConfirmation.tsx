@@ -14,6 +14,8 @@ import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 const VISA_PAYMENT_ERROR_MESSAGES: Record<string, string> = {
   application_form_2_required: "A completed second application form is required — please upload it.",
   health_declaration_form_required: "A completed health declaration form is required — please upload it.",
+  signed_offer_letter_required: "A signed copy of the offer letter is required — please upload it.",
+  english_form_required: "A completed English form is required — please upload it.",
 };
 
 interface VisaPaymentConfirmationProps {
@@ -39,6 +41,8 @@ export default function VisaPaymentConfirmation({
   const [appFormFile, setAppFormFile] = useState<File | null>(null);
   const [appForm2File, setAppForm2File] = useState<File | null>(null);
   const [healthDeclarationFile, setHealthDeclarationFile] = useState<File | null>(null);
+  const [signedOfferLetterFile, setSignedOfferLetterFile] = useState<File | null>(null);
+  const [englishFormFile, setEnglishFormFile] = useState<File | null>(null);
 
   const { methods, loading: paymentLoading, error: paymentError } = useVisaPaymentMethods(applicationId);
   const { visaFeeAmount } = useApplicationVisaFee(applicationId);
@@ -56,6 +60,10 @@ export default function VisaPaymentConfirmation({
     (d: any) => d.document_type === "Application Form 2 Template"
   );
   const healthDeclarationRequired = !!application?.offer_letter_document?.health_declaration_form_required;
+  const signedOfferLetterRequired = !!application?.offer_letter_document?.signed_offer_letter_required;
+  const hasEnglishFormTemplate = !!application?.documents?.find(
+    (d: any) => d.document_type === "English Form Template"
+  );
 
   useEffect(() => {
     if (isOpen) setIsVisible(true);
@@ -70,6 +78,8 @@ export default function VisaPaymentConfirmation({
     if (hasAppFormTemplate && !appFormFile) return;
     if (hasAppForm2Template && !appForm2File) return;
     if (healthDeclarationRequired && !healthDeclarationFile) return;
+    if (signedOfferLetterRequired && !signedOfferLetterFile) return;
+    if (hasEnglishFormTemplate && !englishFormFile) return;
 
     setUploadError("");
     try {
@@ -80,6 +90,8 @@ export default function VisaPaymentConfirmation({
         applicationFormFile: showAppFormUpload ? appFormFile : null,
         applicationForm2File: hasAppForm2Template ? appForm2File : null,
         healthDeclarationFormFile: healthDeclarationRequired ? healthDeclarationFile : null,
+        signedOfferLetterFile: signedOfferLetterRequired ? signedOfferLetterFile : null,
+        englishFormFile: hasEnglishFormTemplate ? englishFormFile : null,
       });
 
       handleClose();
@@ -99,6 +111,8 @@ export default function VisaPaymentConfirmation({
     setAppFormToggle({ show_app_form: false });
     setAppForm2File(null);
     setHealthDeclarationFile(null);
+    setSignedOfferLetterFile(null);
+    setEnglishFormFile(null);
     onClose();
   };
 
@@ -250,6 +264,34 @@ export default function VisaPaymentConfirmation({
               </div>
             )}
 
+            {signedOfferLetterRequired && (
+              <StatusFileUpload
+                label="Upload Signed Offer Letter"
+                description="Download your offer letter above, sign it, and upload the signed copy here."
+                id="signed_offer_letter_document"
+                file={signedOfferLetterFile}
+                onFileChange={setSignedOfferLetterFile}
+                onRemove={() => setSignedOfferLetterFile(null)}
+                onError={setFileError}
+                disabled={isUploading}
+                required
+              />
+            )}
+
+            {hasEnglishFormTemplate && (
+              <StatusFileUpload
+                label="Upload English Form"
+                description="Your manager has provided a template. Download it, complete it, and upload the filled form here."
+                id="english_form_document"
+                file={englishFormFile}
+                onFileChange={setEnglishFormFile}
+                onRemove={() => setEnglishFormFile(null)}
+                onError={setFileError}
+                disabled={isUploading}
+                required
+              />
+            )}
+
             {fileError && (
               <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
@@ -286,7 +328,9 @@ export default function VisaPaymentConfirmation({
                   paymentLoading ||
                   (hasAppFormTemplate && !appFormFile) ||
                   (hasAppForm2Template && !appForm2File) ||
-                  (healthDeclarationRequired && !healthDeclarationFile)
+                  (healthDeclarationRequired && !healthDeclarationFile) ||
+                  (signedOfferLetterRequired && !signedOfferLetterFile) ||
+                  (hasEnglishFormTemplate && !englishFormFile)
                 }
                 onClick={handleConfirmUpload}
                 icon={<CheckCircle className="h-4 w-4" />}

@@ -19,6 +19,8 @@ export { useChangeProgram } from "./stages/useChangeProgram";
 export { useApplicationFormDocumentUpload } from "./files/useApplicationFormDocumentUpload";
 export { useApplicationForm2DocumentUpload } from "./files/useApplicationForm2DocumentUpload";
 export { useHealthDeclarationDocumentUpload } from "./files/useHealthDeclarationDocumentUpload";
+export { useSignedOfferLetterDocumentUpload } from "./files/useSignedOfferLetterDocumentUpload";
+export { useEnglishFormDocumentUpload } from "./files/useEnglishFormDocumentUpload";
 export { useArrivalDateUpload } from "./files/useArrivalDateUpload";
 export { useCommissionPaymentUpload } from "./files/useCommissionPaymentUpload";
 export { useEVisaUpload } from "./files/useEVisaUpload";

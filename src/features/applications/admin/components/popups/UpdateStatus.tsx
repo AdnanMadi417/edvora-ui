@@ -263,6 +263,7 @@ export default function UpdateStatusPopup({
   const [offerLetterVisaInvoiceFile, setOfferLetterVisaInvoiceFile] = useState<File | null>(null);
   const [offerLetterAppFormTemplateFile, setOfferLetterAppFormTemplateFile] = useState<File | null>(null);
   const [offerLetterAppForm2TemplateFile, setOfferLetterAppForm2TemplateFile] = useState<File | null>(null);
+  const [offerLetterEnglishFormTemplateFile, setOfferLetterEnglishFormTemplateFile] = useState<File | null>(null);
 
   const isVisaSetupSelected = selectedOption?.label === "Visa Setup";
 
@@ -275,6 +276,8 @@ export default function UpdateStatusPopup({
     show_app_form_template: false,
     show_app_form_2_template: false,
     health_declaration_form_required: false,
+    signed_offer_letter_required: false,
+    show_english_form_template: false,
   });
 
   const [formErrors, setFormErrors] = useState<any>({});
@@ -342,6 +345,8 @@ export default function UpdateStatusPopup({
       applicationFormTemplateFile: formData.show_app_form_template ? (offerLetterAppFormTemplateFile ?? undefined) : undefined,
       applicationForm2TemplateFile: formData.show_app_form_2_template ? (offerLetterAppForm2TemplateFile ?? undefined) : undefined,
       healthDeclarationFormRequired: formData.health_declaration_form_required,
+      signedOfferLetterRequired: formData.signed_offer_letter_required,
+      englishFormTemplateFile: formData.show_english_form_template ? (offerLetterEnglishFormTemplateFile ?? undefined) : undefined,
     });
   };
 
@@ -591,12 +596,15 @@ export default function UpdateStatusPopup({
     setOfferLetterVisaInvoiceFile(null);
     setOfferLetterAppFormTemplateFile(null);
     setOfferLetterAppForm2TemplateFile(null);
+    setOfferLetterEnglishFormTemplateFile(null);
     setFormData({
       visa_fee_amount: "",
       show_visa_invoice: false,
       show_app_form_template: false,
       show_app_form_2_template: false,
       health_declaration_form_required: false,
+      signed_offer_letter_required: false,
+      show_english_form_template: false,
     });
     setPayInFormData({ payment_date: "", amount: "", currency: "RM", payment_reference: "" });
     setPayInFormErrors({});
@@ -813,6 +821,35 @@ export default function UpdateStatusPopup({
                 updateFormData={updateFormData}
                 errors={formErrors}
               />
+              <SettingToggleInput
+                label="Signed Offer Letter Required"
+                field="signed_offer_letter_required"
+                formData={formData}
+                updateFormData={updateFormData}
+                errors={formErrors}
+              />
+              <SettingToggleInput
+                label="Attach English Form Template (optional)"
+                field="show_english_form_template"
+                formData={formData}
+                updateFormData={(field, value) => {
+                  updateFormData(field, value);
+                  if (!value) setOfferLetterEnglishFormTemplateFile(null);
+                }}
+                errors={formErrors}
+              />
+              {formData.show_english_form_template && (
+                <StatusFileUpload
+                  label="Upload English Form Template"
+                  description="Upload the blank English proficiency form template for the student"
+                  id="offer-letter-english-form-template"
+                  file={offerLetterEnglishFormTemplateFile}
+                  onFileChange={setOfferLetterEnglishFormTemplateFile}
+                  onRemove={() => setOfferLetterEnglishFormTemplateFile(null)}
+                  onError={setError}
+                  disabled={isSubmitting}
+                />
+              )}
             </>
           )}
 
