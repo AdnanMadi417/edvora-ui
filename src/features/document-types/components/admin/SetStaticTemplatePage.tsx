@@ -10,6 +10,7 @@ import Button from "components/ui/buttons/Button";
 import { useToast } from "components/context/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
+import { getDocumentDownloadUrl } from "services/documentService";
 
 const ERROR_MESSAGES: Record<string, string> = {
   forbidden_admin_only: "Only admins can set a document template.",
@@ -25,11 +26,25 @@ const SetStaticTemplatePage = () => {
   const [documentTypeId, setDocumentTypeId] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
+  const [downloadingCurrent, setDownloadingCurrent] = useState(false);
 
   const templatableTypes = documentTypes.filter((dt) => dt.has_static_template);
   const selectedType = templatableTypes.find((dt) => dt.id === documentTypeId) ?? null;
 
   const isFormValid = !!documentTypeId && !!file;
+
+  const handleDownloadCurrent = async () => {
+    if (!selectedType?.static_template_file_key || downloadingCurrent) return;
+    try {
+      setDownloadingCurrent(true);
+      const url = await getDocumentDownloadUrl(selectedType.static_template_file_key);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (error: unknown) {
+      showToast(parseApiError(error, "Failed to open current template."), "error");
+    } finally {
+      setDownloadingCurrent(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!isFormValid || !file) return;
@@ -80,16 +95,16 @@ const SetStaticTemplatePage = () => {
             options={templatableTypes.map((dt) => ({ value: dt.id, label: dt.type }))}
           />
 
-          {selectedType?.static_template_file_url && (
-            <a
-              href={selectedType.static_template_file_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mb-4 -mt-2 inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+          {selectedType?.static_template_file_key && (
+            <button
+              type="button"
+              onClick={handleDownloadCurrent}
+              disabled={downloadingCurrent}
+              className="mb-4 -mt-2 inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
             >
               <Download className="h-3 w-3" />
-              Currently configured template — view
-            </a>
+              {downloadingCurrent ? "Opening..." : "Currently configured template — view"}
+            </button>
           )}
 
           {documentTypeId && (

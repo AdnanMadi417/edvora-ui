@@ -6,11 +6,12 @@ import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import DocumentUploadList from "features/applications/partner/components/form/stages/DocumentUploadList";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { useApplicationActions } from "features/applications/hooks";
-import { useHealthDeclarationFormUrl } from "features/applications/shared/useHealthDeclarationFormUrl";
+import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
 import Button from "components/ui/buttons/Button";
+import IconButton from "components/ui/buttons/IconButton";
 import { parseApiError } from "utils/parseApiError";
 import { DocumentItem, DocumentType, FormDataType } from "features/applications/partner/components/form/utility-functions/types";
 
@@ -37,7 +38,8 @@ export default function RequiredAction({
 
   const { actions, loading } = useApplicationActions(applicationId);
   const { showToast } = useToast();
-  const healthDeclarationFormUrl = useHealthDeclarationFormUrl();
+  const { download: downloadHealthDeclarationForm, downloading: downloadingHealthDeclarationForm } =
+    useHealthDeclarationFormDownload();
 
   const formData = { documents } as FormDataType;
 
@@ -269,16 +271,18 @@ export default function RequiredAction({
                         <p className="text-xs text-blue-600">Required for visa processing (Lampiran B)</p>
                       </div>
                     </div>
-                    <a
-                      href={healthDeclarationFormUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Download Health Declaration Form"
+                    <IconButton
+                      onClick={downloadHealthDeclarationForm}
+                      disabled={downloadingHealthDeclarationForm}
                       title="Download Health Declaration Form"
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 transition-colors hover:bg-blue-200"
-                    >
-                      <Download className="h-4 w-4" />
-                    </a>
+                      icon={<Download className={`h-4 w-4 ${downloadingHealthDeclarationForm ? "animate-pulse" : ""}`} />}
+                      bgColor="bg-blue-100"
+                      textColor="text-blue-600"
+                      borderColor="border-transparent"
+                      hoverTextColor="hover:text-blue-600"
+                      hoverBorderColor="hover:border-blue-200"
+                      className="shrink-0 hover:bg-blue-200"
+                    />
                   </div>
                 )}
                 <DocumentUploadList
