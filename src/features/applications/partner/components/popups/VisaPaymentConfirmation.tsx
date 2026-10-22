@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
-import { useDocumentType } from "hooks/useDocumentType";
+import { useHealthDeclarationFormUrl } from "features/applications/shared/useHealthDeclarationFormUrl";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import RichTextDisplay from "components/ui/RichTextDisplay";
@@ -43,7 +43,7 @@ export default function VisaPaymentConfirmation({
   const { methods, loading: paymentLoading, error: paymentError } = useVisaPaymentMethods(applicationId);
   const { visaFeeAmount } = useApplicationVisaFee(applicationId);
   const { uploadVisaPayment, isUploading } = useVisaPaymentUpload();
-  const { documentTypes } = useDocumentType();
+  const healthDeclarationFormUrl = useHealthDeclarationFormUrl();
 
   const firstMethod = methods[0] ?? null;
   const hasAppFormTemplate = !!application?.documents?.find(
@@ -55,7 +55,6 @@ export default function VisaPaymentConfirmation({
     (d: any) => d.document_type === "Application Form 2 Template"
   );
   const healthDeclarationRequired = !!application?.offer_letter_document?.health_declaration_form_required;
-  const healthDeclarationTemplate = documentTypes.find((dt) => dt.code === "health_declaration_form");
 
   useEffect(() => {
     if (isOpen) setIsVisible(true);
@@ -228,16 +227,14 @@ export default function VisaPaymentConfirmation({
 
             {healthDeclarationRequired && (
               <div className="space-y-2">
-                {healthDeclarationTemplate?.static_template_file_url && (
-                  <a
-                    href={healthDeclarationTemplate.static_template_file_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
-                  >
-                    Download blank Health Declaration Form template
-                  </a>
-                )}
+                <a
+                  href={healthDeclarationFormUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+                >
+                  Download blank Health Declaration Form template
+                </a>
                 <StatusFileUpload
                   label="Upload Health Declaration Form"
                   description="Download the blank template above, complete it, and upload the filled form here."
