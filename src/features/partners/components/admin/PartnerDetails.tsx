@@ -227,13 +227,13 @@ export default function PartnerDetails({ id }: Props) {
         { key: "team", label: "Team" },
         { key: "bank-account", label: "Bank Account" },
         { key: "applications", label: "Applications" },
-        { key: "statement", label: "Statement" },
+        { key: "statement", label: "Commission Tracker" },
       ]
     : [
         { key: "profile", label: "Profile" },
         { key: "bank-account", label: "Bank Account" },
         { key: "applications", label: "Applications" },
-        { key: "statement", label: "Statement" },
+        { key: "statement", label: "Commission Tracker" },
       ];
 
   return (
