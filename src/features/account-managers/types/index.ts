@@ -1,6 +1,10 @@
 export interface AssignedPartner {
   id: string;
   name: string;
+  /** Login email; searched by the transfer/share picker (UBX-467). Absent on older payloads. */
+  email?: string | null;
+  /** "agency" rows carry their team members along on transfer/share. */
+  type?: "individual" | "agency" | null;
 }
 
 export interface AccountManager {

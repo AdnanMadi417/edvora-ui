@@ -2,13 +2,14 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  AlertTriangle, ArrowRightLeft, ChevronDown, ChevronUp, Share2, Users, XCircle,
+  AlertTriangle, ArrowRightLeft, ChevronDown, ChevronUp, ListChecks, Share2, Users, XCircle,
 } from "lucide-react";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 import SelectField from "components/form/fields/SelectField";
+import SearchableChecklist, { type SearchableChecklistItem } from "components/form/search/SearchableChecklist";
 import { useToast } from "components/context/ToastContext";
-import { getApiErrorCode, parseApiError } from "utils/parseApiError";
+import { getApiErrorCode, getApiErrorDetails, parseApiError } from "utils/parseApiError";
 import { useAccountManagers } from "../hooks/useAccountManagers";
 import { useTransferPartners } from "../hooks/useTransferPartners";
 import type { AccountManager, TransferPartnersMode, TransferPartnersResult } from "../types";
@@ -50,8 +51,9 @@ function firstName(fullName: string | null | undefined) {
 }
 
 /**
- * "Transfer or Share Partners" dialog (UBX-318 / UBX-324). Same entry point
- * for both operations on a manager's whole portfolio:
+ * "Transfer or Share Advisors" dialog (UBX-318 / UBX-324). Same entry point
+ * for both operations on a manager's whole portfolio, or on a ticked subset
+ * chosen from a searchable list (UBX-469):
  * - Transfer (move): the source ends up with none; the target becomes primary.
  * - Share (copy): the source keeps everything; the target is added as an
  *   additional manager with identical access. A snapshot, not a mirror.
@@ -135,8 +137,24 @@ const MODE_OPTIONS: { value: TransferPartnersMode; label: string; hint: string; 
   { value: "copy", label: "Share", hint: "Copy access. Both managers see them.", icon: Share2 },
 ];
 
+/** "all" keeps the original whole-portfolio behaviour; "selected" sends only the ticked partner_ids (UBX-469). */
+type TransferScope = "all" | "selected";
+
+const SCOPE_OPTIONS: { value: TransferScope; label: string; hint: (count: number) => string; icon: typeof Users }[] = [
+  { value: "all", label: "All advisors", hint: (n) => `Every advisor currently assigned (${n}).`, icon: Users },
+  { value: "selected", label: "Selected advisors", hint: () => "Pick them from a searchable list.", icon: ListChecks },
+];
+
+/** Partner ids the backend named in a `partner_not_assigned_to_source` rejection. */
+function rejectedPartnerIds(err: unknown): string[] {
+  const ids = getApiErrorDetails(err)?.partner_ids;
+  return Array.isArray(ids) ? ids.filter((id): id is string => typeof id === "string") : [];
+}
+
 function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose, onTransferred }: BodyProps) {
   const [mode, setMode] = useState<TransferPartnersMode>(initialMode);
+  const [scope, setScope] = useState<TransferScope>("all");
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [targetId, setTargetId] = useState("");
   const [showList, setShowList] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -154,11 +172,28 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
   );
 
   const count = Number(sourceManager.assigned_partners_count) || 0;
-  const partners = sourceManager.assigned_partners ?? [];
+  const partners = useMemo(() => sourceManager.assigned_partners ?? [], [sourceManager.assigned_partners]);
   const sourceName = sourceManager.name || "this manager";
   const sourceFirst = firstName(sourceManager.name);
   const targetName = targets.find((m) => m.id === targetId)?.name ?? "the selected manager";
   const isShare = mode === "copy";
+  // From the blocked-delete flow (allowShare=false) only moving everything
+  // unblocks the deletion, so the scope choice is not offered there.
+  const canPickSubset = allowShare && partners.length > 0;
+  const isSubset = canPickSubset && scope === "selected";
+  const effectiveCount = isSubset ? selectedIds.size : count;
+
+  const checklistItems = useMemo<SearchableChecklistItem[]>(
+    () =>
+      partners.map((p) => ({
+        id: p.id,
+        label: p.name || "Unnamed advisor",
+        sublabel: p.email ?? null,
+        badge: p.type === "agency" ? "Company" : null,
+        hint: p.type === "agency" ? "Includes the agency's team members" : null,
+      })),
+    [partners]
+  );
 
   const handleConfirm = async () => {
     if (!targetId) {
@@ -171,12 +206,30 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
     }
     setFormError(null);
     try {
-      const result = await transferPartners(sourceManager.id, { target_manager_id: targetId, mode });
+      const result = await transferPartners(sourceManager.id, {
+        target_manager_id: targetId,
+        mode,
+        // Omitted in "all" mode so the backend keeps acting on whatever it
+        // currently holds for the source (idempotent re-runs included).
+        ...(isSubset ? { partner_ids: Array.from(selectedIds) } : {}),
+      });
       showToast(successMessage(result, targetName), "success");
       onTransferred?.(result);
       onClose();
     } catch (err: unknown) {
       const code = getApiErrorCode(err);
+      if (code === "partner_not_assigned_to_source") {
+        // Someone else moved them meanwhile: drop the stale ticks so a retry
+        // after refresh can succeed with the rest.
+        const stale = rejectedPartnerIds(err);
+        if (stale.length) {
+          setSelectedIds((prev) => {
+            const next = new Set(prev);
+            stale.forEach((id) => next.delete(id));
+            return next;
+          });
+        }
+      }
       setFormError(
         (code && ERROR_MESSAGES[code]) ??
           parseApiError(err, isShare ? "Failed to share advisors. Please try again." : "Failed to transfer advisors. Please try again.")
@@ -184,7 +237,8 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
     }
   };
 
-  const confirmDisabled = submitting || managersLoading || count === 0 || !targetId;
+  const confirmDisabled =
+    submitting || managersLoading || count === 0 || !targetId || (isSubset && selectedIds.size === 0);
   const verb = isShare ? "Share" : "Transfer";
 
   return (
@@ -221,10 +275,53 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
           </div>
         )}
 
+        {canPickSubset && (
+          <div role="radiogroup" aria-label="Which advisors?" className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {SCOPE_OPTIONS.map(({ value, label, hint, icon: Icon }) => {
+              const active = scope === value;
+              return (
+                <button
+                  key={value}
+                  type="button"
+                  role="radio"
+                  aria-checked={active}
+                  onClick={() => {
+                    setScope(value);
+                    setFormError(null);
+                  }}
+                  className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-left transition ${
+                    active
+                      ? "border-blue-600 bg-blue-50 ring-1 ring-blue-600"
+                      : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                  }`}
+                >
+                  <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${active ? "text-blue-600" : "text-slate-400"}`} />
+                  <span>
+                    <span className={`block text-sm font-medium ${active ? "text-blue-800" : "text-slate-900"}`}>{label}</span>
+                    <span className="block text-xs text-slate-500">{hint(count)}</span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {count === 0 ? (
           <p className="text-sm text-slate-600">
             <span className="font-medium text-slate-900">{sourceName}</span> has no advisors to {verb.toLowerCase()}.
           </p>
+        ) : isSubset ? (
+          isShare ? (
+            <p className="text-sm text-slate-600">
+              Share only the advisors you tick below with another account manager. {sourceFirst} keeps them; the other
+              manager will also see and manage them. Advisors assigned to {sourceFirst} later are not shared automatically.
+            </p>
+          ) : (
+            <p className="text-sm text-slate-600">
+              Move only the advisors you tick below from <span className="font-medium text-slate-900">{sourceName}</span>{" "}
+              to another account manager. {sourceFirst} will no longer see them.
+            </p>
+          )
         ) : isShare ? (
           <p className="text-sm text-slate-600">
             {count === 1 ? "Share the only advisor assigned to " : `Share all ${count} advisors of `}
@@ -240,7 +337,18 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
           </p>
         )}
 
-        {count > 0 && partners.length > 0 && (
+        {isSubset && (
+          <SearchableChecklist
+            items={checklistItems}
+            selected={selectedIds}
+            onChange={setSelectedIds}
+            itemNoun="advisors"
+            label={isShare ? "advisors to share" : "advisors to transfer"}
+            disabled={submitting}
+          />
+        )}
+
+        {!isSubset && count > 0 && partners.length > 0 && (
           <div className="rounded-md border border-slate-200 bg-slate-50">
             <button
               type="button"
@@ -318,7 +426,7 @@ function TransferPartnersBody({ sourceManager, initialMode, allowShare, onClose,
           text={
             submitting
               ? isShare ? "Sharing..." : "Transferring..."
-              : `${verb} ${pluralize(count, "advisor")}`
+              : `${verb} ${pluralize(effectiveCount, "advisor")}`
           }
           bgColor="bg-blue-50"
           textColor="text-blue-700"
