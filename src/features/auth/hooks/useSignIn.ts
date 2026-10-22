@@ -36,7 +36,7 @@ export function useSignIn() {
         localStorage.setItem("adminId", user.id);
         router.replace(password_reset_required ? "/auth/reset-password" : "/admin/applications");
       } else if (role === "reviewer") {
-        router.replace(password_reset_required ? "/auth/reset-password" : "/reviewer/partners");
+        router.replace(password_reset_required ? "/auth/reset-password" : "/reviewer/advisors");
       } else if (role === "data_entry") {
         router.replace(password_reset_required ? "/auth/reset-password" : "/data-entry/knowledge-hub");
       } else {

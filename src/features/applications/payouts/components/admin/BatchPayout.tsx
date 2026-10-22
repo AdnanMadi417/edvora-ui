@@ -90,7 +90,7 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
       return false;
     }
     if (!partnerBankAccount) {
-      showToast("This partner has no active bank account on file.", "error");
+      showToast("This advisor has no active bank account on file.", "error");
       return false;
     }
     if (!receiptFile) {
@@ -166,7 +166,7 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
               <BankAccountPayoutSummary account={partnerBankAccount} />
               {!partnerBankAccount && (
                 <Link
-                  href={`/admin/partners/${partnerId}?tab=bank-account`}
+                  href={`/admin/advisors/${partnerId}?tab=bank-account`}
                   className="mt-1 block font-medium text-blue-600 hover:text-blue-700"
                 >
                   Add a bank account →

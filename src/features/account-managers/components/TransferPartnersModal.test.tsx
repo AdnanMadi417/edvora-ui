@@ -93,16 +93,16 @@ describe("TransferPartnersModal", () => {
     mockedUseTransferPartners.mockReset();
   });
 
-  it("defaults to Transfer, explains the move, previews the partners, and excludes the source", async () => {
+  it("defaults to Transfer, explains the move, previews the advisors, and excludes the source", async () => {
     const user = userEvent.setup();
     setup();
 
-    expect(screen.getByText("Transfer or Share Partners")).toBeInTheDocument();
+    expect(screen.getByText("Transfer or Share Advisors")).toBeInTheDocument();
     expect(screen.getByRole("radio", { name: /Transfer/ })).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByText(/Move all 2 partners from/)).toBeInTheDocument();
-    expect(screen.getByText(/Sarah will no longer see these partners/)).toBeInTheDocument();
+    expect(screen.getByText(/Move all 2 advisors from/)).toBeInTheDocument();
+    expect(screen.getByText(/Sarah will no longer see these advisors/)).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: /Show partners \(2\)/ }));
+    await user.click(screen.getByRole("button", { name: /Show advisors \(2\)/ }));
     expect(screen.getByText("Acme Agency")).toBeInTheDocument();
     expect(screen.getByText("John Doe")).toBeInTheDocument();
 
@@ -115,7 +115,7 @@ describe("TransferPartnersModal", () => {
     const user = userEvent.setup();
     setup();
 
-    const confirm = screen.getByRole("button", { name: /Transfer 2 partners/ });
+    const confirm = screen.getByRole("button", { name: /Transfer 2 advisors/ });
     expect(confirm).toBeDisabled();
 
     await user.selectOptions(screen.getByRole("combobox"), "manager-b");
@@ -127,11 +127,11 @@ describe("TransferPartnersModal", () => {
     const { transfer, onClose, onTransferred } = setup({ transfer: jest.fn().mockResolvedValue(MOVE_RESULT) });
 
     await user.selectOptions(screen.getByRole("combobox"), "manager-b");
-    await user.click(screen.getByRole("button", { name: /Transfer 2 partners/ }));
+    await user.click(screen.getByRole("button", { name: /Transfer 2 advisors/ }));
 
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(transfer).toHaveBeenCalledWith("manager-a", { target_manager_id: "manager-b", mode: "move" });
-    expect(mockShowToast).toHaveBeenCalledWith("2 partners transferred to Ahmad Razak", "success");
+    expect(mockShowToast).toHaveBeenCalledWith("2 advisors transferred to Ahmad Razak", "success");
     expect(onTransferred).toHaveBeenCalledWith(MOVE_RESULT);
   });
 
@@ -142,40 +142,40 @@ describe("TransferPartnersModal", () => {
 
     await user.click(screen.getByRole("radio", { name: /Share/ }));
 
-    expect(screen.getByText(/Share all 2 partners of/)).toBeInTheDocument();
-    expect(screen.getByText(/Sarah keeps these partners/)).toBeInTheDocument();
+    expect(screen.getByText(/Share all 2 advisors of/)).toBeInTheDocument();
+    expect(screen.getByText(/Sarah keeps these advisors/)).toBeInTheDocument();
     expect(screen.getByText(/not shared automatically/)).toBeInTheDocument();
     expect(screen.getByText("Share with account manager")).toBeInTheDocument();
 
     await user.selectOptions(screen.getByRole("combobox"), "manager-b");
-    await user.click(screen.getByRole("button", { name: /Share 2 partners/ }));
+    await user.click(screen.getByRole("button", { name: /Share 2 advisors/ }));
 
     await waitFor(() =>
       expect(transfer).toHaveBeenCalledWith("manager-a", { target_manager_id: "manager-b", mode: "copy" })
     );
-    expect(mockShowToast).toHaveBeenCalledWith("2 partners shared with Ahmad Razak", "success");
+    expect(mockShowToast).toHaveBeenCalledWith("2 advisors shared with Ahmad Razak", "success");
   });
 
-  it("mentions partners the target already had when sharing", async () => {
+  it("mentions advisors the target already had when sharing", async () => {
     const user = userEvent.setup();
     const shareResult = { ...MOVE_RESULT, mode: "copy" as const, moved_partners_count: 0, shared_partners_count: 1, already_shared_count: 1 };
     setup({ transfer: jest.fn().mockResolvedValue(shareResult) });
 
     await user.click(screen.getByRole("radio", { name: /Share/ }));
     await user.selectOptions(screen.getByRole("combobox"), "manager-b");
-    await user.click(screen.getByRole("button", { name: /Share 2 partners/ }));
+    await user.click(screen.getByRole("button", { name: /Share 2 advisors/ }));
 
     await waitFor(() =>
-      expect(mockShowToast).toHaveBeenCalledWith("1 partner shared with Ahmad Razak (1 already had access)", "success")
+      expect(mockShowToast).toHaveBeenCalledWith("1 advisor shared with Ahmad Razak (1 already had access)", "success")
     );
   });
 
   it("hides the Share option when allowShare is false", () => {
     setup({ allowShare: false });
 
-    expect(screen.getByText("Transfer Partners")).toBeInTheDocument();
+    expect(screen.getByText("Transfer Advisors")).toBeInTheDocument();
     expect(screen.queryByRole("radio")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Transfer 2 partners/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Transfer 2 advisors/ })).toBeInTheDocument();
   });
 
   it("maps a known backend code to admin-facing copy and stays open", async () => {
@@ -185,7 +185,7 @@ describe("TransferPartnersModal", () => {
     });
 
     await user.selectOptions(screen.getByRole("combobox"), "manager-b");
-    await user.click(screen.getByRole("button", { name: /Transfer 2 partners/ }));
+    await user.click(screen.getByRole("button", { name: /Transfer 2 advisors/ }));
 
     expect(
       await screen.findByText("The selected account manager is inactive. Choose an active one.")
@@ -199,7 +199,7 @@ describe("TransferPartnersModal", () => {
     setup({ transfer: jest.fn().mockRejectedValue(apiError(500, "something_else")) });
 
     await user.selectOptions(screen.getByRole("combobox"), "manager-b");
-    await user.click(screen.getByRole("button", { name: /Transfer 2 partners/ }));
+    await user.click(screen.getByRole("button", { name: /Transfer 2 advisors/ }));
 
     expect(await screen.findByText("backend message")).toBeInTheDocument();
   });
@@ -210,7 +210,7 @@ describe("TransferPartnersModal", () => {
     expect(
       screen.getByText("There is no other active account manager to transfer to.")
     ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Transfer 2 partners/ })).toBeDisabled();
+    expect(screen.getByRole("button", { name: /Transfer 2 advisors/ })).toBeDisabled();
   });
 
   it("renders nothing when closed", () => {
@@ -219,6 +219,6 @@ describe("TransferPartnersModal", () => {
 
     render(<TransferPartnersModal isOpen={false} onClose={jest.fn()} sourceManager={SOURCE} />);
 
-    expect(screen.queryByText("Transfer or Share Partners")).not.toBeInTheDocument();
+    expect(screen.queryByText("Transfer or Share Advisors")).not.toBeInTheDocument();
   });
 });

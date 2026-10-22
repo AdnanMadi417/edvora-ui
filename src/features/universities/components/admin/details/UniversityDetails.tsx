@@ -154,7 +154,7 @@ const UniversityDetails = ({ id, basePath = "/admin/universities" }: UniversityD
                 <div className="min-w-0">
                   <p className="text-xs text-slate-500">Visibility</p>
                   <p className="mt-0.5 text-sm font-medium text-slate-900">
-                    {university.is_hidden ? "Hidden from partners" : "Visible to partners"}
+                    {university.is_hidden ? "Hidden from advisors" : "Visible to advisors"}
                   </p>
                 </div>
               </div>

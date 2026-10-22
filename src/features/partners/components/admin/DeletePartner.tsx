@@ -41,8 +41,8 @@ export default function DeletePartner({ isOpen, onClose, onConfirm, isDeleting }
       >
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
           <ModalHeader
-            title="Delete Partner"
-            description="This action will permanently delete this Partner and all related data."
+            title="Delete Advisor"
+            description="This action will permanently delete this Advisor and all related data."
             icon={Trash2}
             iconBg="bg-red-50"
             iconColor="text-red-600"
@@ -55,7 +55,7 @@ export default function DeletePartner({ isOpen, onClose, onConfirm, isDeleting }
             <div>
               <h3 className="text-lg font-semibold text-slate-900">Confirm Deletion</h3>
               <p className="text-sm text-slate-500">
-                Are you sure you want to remove this partner from the system?
+                Are you sure you want to remove this advisor from the system?
               </p>
             </div>
           </div>
@@ -77,7 +77,7 @@ export default function DeletePartner({ isOpen, onClose, onConfirm, isDeleting }
             <Button
               className="w-full sm:w-auto"
               icon={<Trash2 className="h-5 w-5" />}
-              text={isDeleting ? "Deleting..." : "Delete Partner"}
+              text={isDeleting ? "Deleting..." : "Delete Advisor"}
               bgColor="bg-red-50"
               textColor="text-red-700"
               borderColor="border-red-600"

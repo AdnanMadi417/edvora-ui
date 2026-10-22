@@ -62,7 +62,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
 
   const status = getAsyncStatus(loading, error, payout, (p) => p === null);
 
-  const handleBack = () => router.push(`/admin/partners/${partnerId}`);
+  const handleBack = () => router.push(`/admin/advisors/${partnerId}`);
 
   const paymentMethodName =
     paymentMethods.find((m) => m.id === payout?.payment_method_id)?.name ?? "—";

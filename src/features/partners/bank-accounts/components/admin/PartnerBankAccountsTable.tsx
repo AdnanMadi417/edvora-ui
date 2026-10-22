@@ -89,7 +89,7 @@ export default function PartnerBankAccountsTable() {
           <SearchInput
             value={searchTerm}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-            placeholder="Search by partner, bank, or account..."
+            placeholder="Search by advisor, bank, or account..."
             className="sm:w-64 sm:flex-none"
           />
           <button
@@ -153,7 +153,7 @@ export default function PartnerBankAccountsTable() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50">
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Partner</th>
+                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Advisor</th>
                   <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Bank</th>
                   <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Account Holder</th>
                   <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Account Number</th>
@@ -170,7 +170,7 @@ export default function PartnerBankAccountsTable() {
                   <TableEmptyRow
                     colSpan={6}
                     title="No bank accounts found"
-                    subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No partner has added a payout account yet."}
+                    subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No advisor has added a payout account yet."}
                     icon={<Wallet className="h-8 w-8 text-slate-400" />}
                   />
                 )}
@@ -183,7 +183,7 @@ export default function PartnerBankAccountsTable() {
                       <AnimatedTableRow
                         key={row.id}
                         className="group cursor-pointer transition-colors hover:bg-slate-100/50"
-                        onClick={() => router.push(`/admin/partners/${row.partner_id}`)}
+                        onClick={() => router.push(`/admin/advisors/${row.partner_id}`)}
                       >
                         <td className="px-6 py-4 text-sm font-medium text-slate-900">
                           <p>{row.partner_name}</p>

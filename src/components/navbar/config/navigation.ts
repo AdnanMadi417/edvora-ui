@@ -27,6 +27,6 @@ export const applicationsRouteMap: Record<string, string> = {
 // of an application — only the two roles that actually receive that
 // notification (admin, reviewer) need an entry here.
 export const partnersRouteMap: Record<string, string> = {
-  admin: "/admin/partners",
-  reviewer: "/reviewer/partners",
+  admin: "/admin/advisors",
+  reviewer: "/reviewer/advisors",
 };

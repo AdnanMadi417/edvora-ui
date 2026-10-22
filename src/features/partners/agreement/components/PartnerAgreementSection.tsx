@@ -26,7 +26,7 @@ interface PartnerAgreementSectionProps {
 }
 
 const STATUS_LABEL: Record<AgreementStatus, string> = {
-  sent: "Awaiting partner signature",
+  sent: "Awaiting advisor signature",
   partner_signed: "Finalizing…",
   completed: "Completed",
   declined: "Declined",
@@ -42,8 +42,8 @@ const STATUS_VARIANT: Record<AgreementStatus, StatusBadgeVariant> = {
 };
 
 const START_ERROR_MESSAGES: Record<string, string> = {
-  agreement_already_pending: "An agreement is already in progress for this partner.",
-  forbidden_partner_access: "You don't have access to this partner's agreement.",
+  agreement_already_pending: "An agreement is already in progress for this advisor.",
+  forbidden_partner_access: "You don't have access to this advisor's agreement.",
   docuseal_not_configured: "Something went wrong. Please try again later.",
   docuseal_request_failed: "Something went wrong. Please try again later.",
 };
@@ -56,11 +56,11 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
   const handleStart = async () => {
     try {
       await startAgreement(partnerId);
-      showToast("Partner agreement sent for signature.", "success");
+      showToast("Advisor agreement sent for signature.", "success");
       refetch();
     } catch (err: unknown) {
       const code = getApiErrorCode(err);
-      showToast((code && START_ERROR_MESSAGES[code]) || "Failed to send partner agreement.", "error");
+      showToast((code && START_ERROR_MESSAGES[code]) || "Failed to send advisor agreement.", "error");
       // A 409 means one's already in flight server-side even though we
       // thought there wasn't -- refetch so the UI catches up either way.
       if (code === "agreement_already_pending") refetch();
@@ -94,7 +94,7 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
       <div className="flex items-center gap-3">
         <SectionIconBadge icon={FileSignature} color="violet" />
         <div className="flex-1">
-          <p className="text-p3 font-semibold text-slate-900">Partner Agreement</p>
+          <p className="text-p3 font-semibold text-slate-900">Advisor Agreement</p>
           {agreement && (
             <span className="text-sm text-slate-500">
               Sent <AppDate value={agreement.sent_at} format="short" />
@@ -110,13 +110,13 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
 
       {!agreement && (
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm text-slate-500">No agreement has been sent to this partner yet.</p>
+          <p className="text-sm text-slate-500">No agreement has been sent to this advisor yet.</p>
           {canManage && (
             <Button
               onClick={handleStart}
               disabled={starting}
               icon={<Send className="h-4 w-4" />}
-              text={starting ? "Sending..." : "Sign Partner Agreement"}
+              text={starting ? "Sending..." : "Sign Advisor Agreement"}
               bgColor="bg-blue-50"
               textColor="text-blue-700"
               borderColor="border-blue-600"
@@ -133,7 +133,7 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
             Signed <AppDate value={agreement.completed_at} format="short" />
           </span>
           <div className="flex items-center gap-2">
-            <DocumentActions fileKey={agreement.file_key} label="Partner Agreement" personName={partnerName} />
+            <DocumentActions fileKey={agreement.file_key} label="Advisor Agreement" personName={partnerName} />
           </div>
         </div>
       )}

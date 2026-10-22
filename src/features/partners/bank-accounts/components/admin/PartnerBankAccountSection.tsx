@@ -267,7 +267,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
       const code = getApiErrorCode(err);
 
       if (code === "bank_account_already_active") {
-        showToast("This partner already has an active bank account — showing it now.", "error");
+        showToast("This advisor already has an active bank account — showing it now.", "error");
         setMode("view");
         refetch();
         return;
@@ -309,7 +309,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
           errorMessage={error ?? undefined}
           onRetry={refetch}
           emptyTitle="No payout bank account yet"
-          emptySubtitle="Add one so this partner can be paid."
+          emptySubtitle="Add one so this advisor can be paid."
           emptyIcon={Landmark}
           emptyAction={
             <Button

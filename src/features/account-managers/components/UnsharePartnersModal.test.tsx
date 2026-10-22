@@ -66,7 +66,7 @@ describe("UnsharePartnersModal", () => {
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(unshare).toHaveBeenCalledWith("manager-a", { target_manager_id: "manager-b" });
     expect(mockShowToast).toHaveBeenCalledWith(
-      "Shared access removed: Ahmad Razak no longer sees 3 partners of Sarah Lim",
+      "Shared access removed: Ahmad Razak no longer sees 3 advisors of Sarah Lim",
       "success"
     );
     expect(onUnshared).toHaveBeenCalledWith(result);
@@ -88,7 +88,7 @@ describe("UnsharePartnersModal", () => {
     await user.click(screen.getByRole("button", { name: /Remove shared access/ }));
 
     await waitFor(() =>
-      expect(mockShowToast).toHaveBeenCalledWith("Ahmad Razak had no shared access to Sarah Lim's partners", "success")
+      expect(mockShowToast).toHaveBeenCalledWith("Ahmad Razak had no shared access to Sarah Lim's advisors", "success")
     );
   });
 });

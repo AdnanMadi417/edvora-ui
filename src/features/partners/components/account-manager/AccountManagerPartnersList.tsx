@@ -64,8 +64,8 @@ export default function AccountManagerPartnersList() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
         <div>
-          <h3 className="text-xl font-semibold text-slate-900">Partners</h3>
-          <p className="mt-0.5 text-sm text-slate-500">Partners assigned to you</p>
+          <h3 className="text-xl font-semibold text-slate-900">Advisors</h3>
+          <p className="mt-0.5 text-sm text-slate-500">Advisors assigned to you</p>
         </div>
       </div>
 
@@ -107,7 +107,7 @@ export default function AccountManagerPartnersList() {
               itemsPerPage={ITEMS_PER_PAGE}
               itemCount={partners.length}
               totalCount={total}
-              itemLabel="partners"
+              itemLabel="advisors"
               loading={loading}
             />
           }
@@ -116,7 +116,7 @@ export default function AccountManagerPartnersList() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: Users,      label: "Partner",      minW: "min-w-[160px] sm:min-w-[220px]" },
+                  { icon: Users,      label: "Advisor",      minW: "min-w-[160px] sm:min-w-[220px]" },
                   { icon: Mail,       label: "Contact Info", minW: "min-w-[150px] sm:min-w-[200px]", hide: "hidden sm:table-cell" },
                   { icon: FileText,   label: "Applications" },
                   { icon: BadgeCheck, label: "Status" },
@@ -143,7 +143,7 @@ export default function AccountManagerPartnersList() {
               {!isInitialLoad && !error && partners.length === 0 && (
                 <TableEmptyRow
                   colSpan={6}
-                  title="No partners found"
+                  title="No advisors found"
                   subtitle={searchTerm.trim() ? "Try adjusting your search." : "You don't have any assigned partners yet."}
                   icon={<Handshake className="h-8 w-8 text-slate-400" />}
                   action={
@@ -169,7 +169,7 @@ export default function AccountManagerPartnersList() {
                 <AnimatedTableRow
                   key={partner.id}
                   className="group cursor-pointer transition-colors hover:bg-slate-100/50"
-                  onClick={() => router.push(`/account-manager/partners/${partner.id}`)}
+                  onClick={() => router.push(`/account-manager/advisors/${partner.id}`)}
                 >
                   <td className="min-w-[160px] max-w-[160px] px-6 py-4 sm:min-w-[220px] sm:max-w-[220px]">
                     <div className="flex items-center gap-2">
@@ -178,7 +178,7 @@ export default function AccountManagerPartnersList() {
                         <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
                       </div>
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-slate-900">{partner.name || "Unknown Partner"}</div>
+                        <div className="truncate text-sm font-medium text-slate-900">{partner.name || "Unknown Advisor"}</div>
                         <div className="truncate text-xs text-slate-500 capitalize">{partner.type || "—"} · {partner.country || "—"}</div>
                       </div>
                     </div>

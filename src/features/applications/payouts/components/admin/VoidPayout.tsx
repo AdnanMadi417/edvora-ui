@@ -29,7 +29,7 @@ const VOID_ERROR_MESSAGES: Record<string, string> = {
   payout_replace_lines_mismatch: "The corrected payout must cover exactly the same applications as the original.",
   bank_account_not_found: "That bank account could not be found.",
   payment_method_not_found: "That payment method could not be found.",
-  payout_bank_reference_already_used: "That bank reference is already used by another active payout for this partner.",
+  payout_bank_reference_already_used: "That bank reference is already used by another active payout for this advisor.",
   payout_currency_invalid: "Currency must be RM or USD.",
 };
 
@@ -94,7 +94,7 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
     if (!formData.new_payment_method_id.trim()) errors.new_payment_method_id = "Payment method is required";
     if (!formData.new_bank_reference.trim()) errors.new_bank_reference = "Bank reference is required";
     if (!formData.new_paid_at) errors.new_paid_at = "Payment date is required";
-    if (!account) errors.new_bank_account_id = "This partner has no active bank account on file";
+    if (!account) errors.new_bank_account_id = "This advisor has no active bank account on file";
     if (!receiptFile) errors.receipt = "A corrected receipt is required";
 
     const badLine = payout.items.some((item) => {

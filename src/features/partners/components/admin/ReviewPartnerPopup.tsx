@@ -96,7 +96,7 @@ export default function ReviewPartnerPopup({
       }
       await reviewPartner(partnerId, decision, rejectionReason.trim() || undefined);
       showToast(
-        decision === "approved" ? "Partner approved successfully" : "Partner rejected successfully",
+        decision === "approved" ? "Advisor approved successfully" : "Advisor rejected successfully",
         "success",
       );
       onClose();
@@ -128,7 +128,7 @@ export default function ReviewPartnerPopup({
       >
         <div className="relative overflow-hidden rounded-2xl bg-white text-sm shadow-2xl ring-1 ring-black/5">
           <ModalHeader
-            title="Review Partner"
+            title="Review Advisor"
             description={`Review registration for ${partnerName}`}
             icon={ShieldCheck}
             iconBg="bg-amber-50"
@@ -259,7 +259,7 @@ export default function ReviewPartnerPopup({
               {decision === "approved" ? (
                 <Button
                   icon={<CheckCircle className="h-5 w-5" />}
-                  text={loading ? "Approving..." : "Approve Partner"}
+                  text={loading ? "Approving..." : "Approve Advisor"}
                   onClick={handleSubmit}
                   disabled={managerBusy}
                   bgColor="bg-emerald-50"
@@ -272,7 +272,7 @@ export default function ReviewPartnerPopup({
               ) : (
                 <Button
                   icon={<XCircle className="h-5 w-5" />}
-                  text={loading ? "Rejecting..." : "Reject Partner"}
+                  text={loading ? "Rejecting..." : "Reject Advisor"}
                   onClick={handleSubmit}
                   disabled={managerBusy}
                   bgColor="bg-red-50"

@@ -170,7 +170,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
   const { partner, isPartnerLoading } = usePartnerDetails(id);
   const [tab, setTab] = useState<DetailsTab>("profile");
 
-  if (isPartnerLoading) return <Loading text="Loading partner details..." />;
+  if (isPartnerLoading) return <Loading text="Loading advisor details..." />;
   if (!partner) return <EmptyData />;
 
   const isIndividual = partner.type === "individual";
@@ -207,7 +207,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
             </div>
             <div className="min-w-0">
               <h2 className="truncate text-lg font-semibold text-slate-900">
-                {isCompany ? partner.company_details?.company_name || partner.name || "Unknown Partner" : partner.name || "Unknown Partner"}
+                {isCompany ? partner.company_details?.company_name || partner.name || "Unknown Advisor" : partner.name || "Unknown Advisor"}
               </h2>
               <p className="truncate text-sm text-slate-500">
                 {isCompany && partner.company_details?.company_name ? `${partner.name} • ` : ""}
@@ -218,7 +218,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
 
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 self-end sm:self-auto">
             <Button
-              onClick={() => router.push("/reviewer/partners")}
+              onClick={() => router.push("/reviewer/advisors")}
               icon={<ChevronLeft className="h-4 w-4" />}
               text="Back"
               bgColor="bg-white"
@@ -228,9 +228,9 @@ export default function ReviewerPartnerProfile({ id }: Props) {
               hoverBorderColor="hover:border-slate-300"
             />
             <Button
-              onClick={() => router.push(`/reviewer/partners/${id}/edit`)}
+              onClick={() => router.push(`/reviewer/advisors/${id}/edit`)}
               icon={<Pencil className="h-4 w-4" />}
-              text="Edit Partner"
+              text="Edit Advisor"
               bgColor="bg-blue-600"
               textColor="text-white"
               borderColor="border-blue-600"
@@ -258,7 +258,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
             <InfoRow icon={<MdEmail className="h-4 w-4" />} label="Email" value={partner.email} />
             <InfoRow
               icon={<MdCategory className="h-4 w-4" />}
-              label="Partner Type"
+              label="Advisor Type"
               value={isIndividual ? "Individual Advisor" : "Agency / Company"}
             />
             <InfoRow
@@ -415,7 +415,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
                 {partner.agency_members.map((member) => (
                   <div
                     key={member.id}
-                    onClick={() => router.push(`/reviewer/partners/${member.partner_id}`)}
+                    onClick={() => router.push(`/reviewer/advisors/${member.partner_id}`)}
                     className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 p-3 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
                   >
                     <div className="min-w-0">

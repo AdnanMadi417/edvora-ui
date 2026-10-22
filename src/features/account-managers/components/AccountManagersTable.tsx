@@ -277,7 +277,7 @@ const AccountManagersTable = () => {
                 {[
                   { icon: User,         label: "Name",              minW: "min-w-[200px]" },
                   { icon: Mail,         label: "Email",             minW: "min-w-[200px]" },
-                  { icon: Users,        label: "Assigned Partners", minW: "min-w-[180px]" },
+                  { icon: Users,        label: "Assigned Advisors", minW: "min-w-[180px]" },
                   { icon: CheckCircle,  label: "Status",            minW: "min-w-[120px]" },
                   { icon: Settings,     label: "Actions" },
                 ].map(({ icon: Icon, label, minW }) => (
@@ -357,10 +357,10 @@ const AccountManagersTable = () => {
                     <div className="flex flex-wrap items-center gap-1.5">
                       {Number(m.assigned_partners_count) > 0 ? (
                         <StatusBadge variant="success" icon={<Users className="h-3 w-3" />}>
-                          {Number(m.assigned_partners_count)} Partner{Number(m.assigned_partners_count) !== 1 && "s"}
+                          {Number(m.assigned_partners_count)} Advisor{Number(m.assigned_partners_count) !== 1 && "s"}
                         </StatusBadge>
                       ) : (
-                        <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>Needs Partner</StatusBadge>
+                        <StatusBadge variant="danger" icon={<AlertCircle className="h-3 w-3" />}>Needs Advisor</StatusBadge>
                       )}
                       {Number(m.shared_partners_count ?? 0) > 0 && (
                         <StatusBadge variant="info" icon={<Share2 className="h-3 w-3" />}>
@@ -394,7 +394,7 @@ const AccountManagersTable = () => {
                           openTransfer(m);
                         }}
                         disabled={(Number(m.assigned_partners_count) || 0) === 0}
-                        title={(Number(m.assigned_partners_count) || 0) === 0 ? "No partners to transfer or share" : "Transfer or share partners"}
+                        title={(Number(m.assigned_partners_count) || 0) === 0 ? "No advisors to transfer or share" : "Transfer or share advisors"}
                         icon={<ArrowRightLeft className="h-4 w-4" />}
                         bgColor="bg-transparent"
                         textColor="text-slate-400"

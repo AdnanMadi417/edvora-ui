@@ -38,24 +38,24 @@ const AdminRoutes: IRoute[] = [
     icon: Wallet,
   },
   {
-    name: "Partners",
+    name: "Advisors",
     layout: "/admin",
-    path: "/partners",
+    path: "/advisors",
     icon: Handshake,
     children: [
       {
-        name: "Partners",
+        name: "Advisors",
         layout: "/admin",
-        path: "/partners",
+        path: "/advisors",
         icon: Handshake,
       },
       {
         name: "Banks",
-        layout: "/admin/partners",
+        layout: "/admin/advisors",
         path: "/banks",
         icon: Banknote,
       },
-      // "Bank Accounts" (admin-wide list, /admin/partners/bank-accounts)
+      // "Bank Accounts" (admin-wide list, /admin/advisors/bank-accounts)
       // hidden from the sidebar for now — not needed yet. Page/route still
       // exist, just unlinked.
     ],

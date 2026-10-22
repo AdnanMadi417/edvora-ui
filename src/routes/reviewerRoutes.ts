@@ -9,9 +9,9 @@ const reviewerRoutes: IRoute[] = [
         icon: Bell,
     },
     {
-        name: "Partners",
+        name: "Advisors",
         layout: "/reviewer",
-        path: "/partners",
+        path: "/advisors",
         icon: Handshake,
     },
     {

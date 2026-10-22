@@ -54,7 +54,7 @@ function BankDetailsSkeleton() {
 
 // View page for a single bank. There's no GET /banks/{id} endpoint — useBank
 // finds the record within the already-fetched list (see hooks/useBank.ts).
-export default function BankDetails({ id, basePath = "/admin/partners/banks" }: Props) {
+export default function BankDetails({ id, basePath = "/admin/advisors/banks" }: Props) {
   const router = useRouter();
   const { bank, loading, error, refetch } = useBank(id);
   const status = getAsyncStatus(loading, error, bank, (b) => b === null);

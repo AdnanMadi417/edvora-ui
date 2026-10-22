@@ -45,12 +45,12 @@ describe("DeleteAccountManagerModal", () => {
     );
 
     expect(
-      screen.getByText(/still has 3 assigned partners\. Transfer them before deleting\./)
+      screen.getByText(/still has 3 assigned advisors\. Transfer them before deleting\./)
     ).toBeInTheDocument();
     expect(screen.queryByText("Confirm Deletion")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Delete Manager/ })).toBeDisabled();
 
-    await user.click(screen.getByRole("button", { name: /Transfer partners/ }));
+    await user.click(screen.getByRole("button", { name: /Transfer advisors/ }));
     expect(onTransferPartners).toHaveBeenCalledTimes(1);
     expect(onConfirm).not.toHaveBeenCalled();
   });
@@ -66,6 +66,6 @@ describe("DeleteAccountManagerModal", () => {
       />
     );
 
-    expect(screen.getByText(/still has 1 assigned partner\./)).toBeInTheDocument();
+    expect(screen.getByText(/still has 1 assigned advisor\./)).toBeInTheDocument();
   });
 });

@@ -79,7 +79,7 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
       <div className="flex flex-col gap-4 border-b border-slate-200 sm:flex-row sm:items-center sm:justify-between p-6">
         <div>
           <h3 className="text-base font-semibold text-slate-900">Applications</h3>
-          <p className="mt-0.5 text-sm text-slate-500">Student applications submitted by this partner</p>
+          <p className="mt-0.5 text-sm text-slate-500">Student applications submitted by this advisor</p>
         </div>
       </div>
 
@@ -181,7 +181,7 @@ export default function AccountManagerPartnerApplicationsTable({ partnerId }: Ac
                 <TableEmptyRow
                   colSpan={4}
                   title="No applications found"
-                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This partner hasn't submitted any applications yet."}
+                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This advisor hasn't submitted any applications yet."}
                   icon={<ClipboardList className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
