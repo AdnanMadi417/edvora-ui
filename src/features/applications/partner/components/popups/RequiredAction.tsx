@@ -6,6 +6,7 @@ import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import DocumentUploadList from "features/applications/partner/components/form/stages/DocumentUploadList";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { useApplicationActions } from "features/applications/hooks";
+import { useHealthDeclarationFormUrl } from "features/applications/shared/useHealthDeclarationFormUrl";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/context/ToastContext";
 import api from "lib/useApi";
@@ -36,6 +37,7 @@ export default function RequiredAction({
 
   const { actions, loading } = useApplicationActions(applicationId);
   const { showToast } = useToast();
+  const healthDeclarationFormUrl = useHealthDeclarationFormUrl();
 
   const formData = { documents } as FormDataType;
 
@@ -177,6 +179,9 @@ export default function RequiredAction({
 
   const docTypes: DocumentType[] = actions?.document_types ?? [];
   const arrivalFormTemplate = (actions as any)?.arrival_documents?.find((d: any) => d.document_type === "Arrival Form Template");
+  const requiresMedicalReportEmgs = docTypes.some(
+    (d) => d.code === "medical_report_emgs" && d.is_required_for_current_upload
+  );
   const freeUpload = docTypes.length === 0 && !!actions?.manager_allowed_next_statuses?.[0]?.is_requires_document_selection;
   const requiredDocTypes = docTypes.filter((d) => d.is_required_for_current_upload);
   const uploadedDocs = documents.filter((d) => d.file_url && !d.uploading);
@@ -253,6 +258,27 @@ export default function RequiredAction({
                     <div className="flex items-center gap-2">
                       <DocumentActions fileKey={arrivalFormTemplate.file_key} label="Arrival Form Template" />
                     </div>
+                  </div>
+                )}
+                {requiresMedicalReportEmgs && (
+                  <div className="flex items-center justify-between rounded-md border border-blue-200 bg-blue-50 px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <Download className="h-4 w-4 text-blue-600" />
+                      <div>
+                        <p className="text-sm font-medium text-blue-800">Health Declaration Form</p>
+                        <p className="text-xs text-blue-600">Required for visa processing (Lampiran B)</p>
+                      </div>
+                    </div>
+                    <a
+                      href={healthDeclarationFormUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Download Health Declaration Form"
+                      title="Download Health Declaration Form"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 transition-colors hover:bg-blue-200"
+                    >
+                      <Download className="h-4 w-4" />
+                    </a>
                   </div>
                 )}
                 <DocumentUploadList

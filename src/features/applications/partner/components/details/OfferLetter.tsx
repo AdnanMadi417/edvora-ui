@@ -4,17 +4,12 @@ import { CheckCircle, CreditCard, Download } from 'lucide-react';
 import { submitOfferLetterDecision } from "services/offerLetterService";
 import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { useHealthDeclarationFormUrl } from "features/applications/shared/useHealthDeclarationFormUrl";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { AppDate } from "components/ui/date";
 import Button from "components/ui/buttons/Button";
 import { SectionIconBadge } from "components/ui/icons";
-
-// Official "Lampiran B" Health Declaration Form, required for visa
-// processing — a static government PDF, not an app-hosted document, so it
-// just links out directly rather than going through getDocumentDownloadUrl.
-const HEALTH_DECLARATION_FORM_URL =
-  "https://visa.educationmalaysia.gov.my/media/cms_upload/Lampiran_B_-_Health_Declaration_Form_For_ApplicantV2.pdf";
 
 interface OfferLetterDecisionProps {
   application: any;
@@ -37,6 +32,7 @@ export default function OfferLetterDecision({
 
   const [submitting, setSubmitting] = useState(false);
   const { showToast } = useToast();
+  const healthDeclarationFormUrl = useHealthDeclarationFormUrl();
 
   const currentStatus = application?.stage?.statuses?.[0]?.name;
   const isUniversityApproved = currentStatus === "University Approved";
@@ -140,7 +136,7 @@ export default function OfferLetterDecision({
             </div>
           </div>
           <a
-            href={HEALTH_DECLARATION_FORM_URL}
+            href={healthDeclarationFormUrl}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Download Health Declaration Form"
