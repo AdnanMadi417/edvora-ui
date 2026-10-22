@@ -9,6 +9,8 @@ import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService
 interface OfferLetterExtras {
   visaInvoiceFile?: File | null;
   applicationFormTemplateFile?: File | null;
+  applicationForm2TemplateFile?: File | null;
+  healthDeclarationFormRequired?: boolean;
 }
 
 interface UseOfferLetterUploadReturn {
@@ -33,6 +35,7 @@ export const useOfferLetterUpload = (): UseOfferLetterUploadReturn => {
       const filesToUpload: File[] = [file];
       if (extras.visaInvoiceFile) filesToUpload.push(extras.visaInvoiceFile);
       if (extras.applicationFormTemplateFile) filesToUpload.push(extras.applicationFormTemplateFile);
+      if (extras.applicationForm2TemplateFile) filesToUpload.push(extras.applicationForm2TemplateFile);
 
       const presigned = await getPresignedUploads(filesToUpload, "documents");
       const results = await uploadFilesToSpaces(filesToUpload, presigned);
@@ -41,7 +44,7 @@ export const useOfferLetterUpload = (): UseOfferLetterUploadReturn => {
       if (!uploaded?.file_key || !uploaded?.public_url) throw new Error("Offer letter upload failed");
 
       let resultIndex = 1;
-      const payload: Record<string, string> = {
+      const payload: Record<string, string | boolean> = {
         file_key: uploaded.file_key,
         file_url: uploaded.public_url,
       };
@@ -60,6 +63,18 @@ export const useOfferLetterUpload = (): UseOfferLetterUploadReturn => {
           payload.application_form_template_file_key = r.file_key;
           payload.application_form_template_file_url = r.public_url;
         }
+      }
+
+      if (extras.applicationForm2TemplateFile) {
+        const r = results[resultIndex++];
+        if (r?.file_key && r?.public_url) {
+          payload.application_form_2_template_file_key = r.file_key;
+          payload.application_form_2_template_file_url = r.public_url;
+        }
+      }
+
+      if (extras.healthDeclarationFormRequired !== undefined) {
+        payload.health_declaration_form_required = extras.healthDeclarationFormRequired;
       }
 
       await api.post(`/applications/${applicationId}/offer-letter`, payload);

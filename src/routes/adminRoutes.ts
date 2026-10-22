@@ -16,6 +16,7 @@ import {
   Users,
   Bell,
   Wallet,
+  FileText,
 } from "lucide-react";
 
 const AdminRoutes: IRoute[] = [
@@ -107,6 +108,12 @@ const AdminRoutes: IRoute[] = [
         layout: "/admin/config-universities",
         path: "/payment-methods",
         icon: CreditCard,
+      },
+      {
+        name: "Document Templates",
+        layout: "/admin",
+        path: "/document-types",
+        icon: FileText,
       },
     ],
   },
