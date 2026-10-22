@@ -5,6 +5,11 @@ import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { useApplicationFormDocumentUpload } from "features/applications/hooks/files/useApplicationFormDocumentUpload";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import Button from "components/ui/buttons/Button";
+import { getApiErrorCode, parseApiError } from "utils/parseApiError";
+
+const ERROR_MESSAGES: Record<string, string> = {
+  invalid_status_for_application_form_reupload: "This application isn't currently awaiting an application form.",
+};
 
 interface ApplicationFormReuploadProps {
   isOpen: boolean;
@@ -42,8 +47,10 @@ export default function ApplicationFormReupload({
       await uploadApplicationFormDocument(file, applicationId);
       handleClose();
       onRefetch?.();
-    } catch {
-      setUploadError("Failed to upload application form");
+    } catch (error: unknown) {
+      const code = getApiErrorCode(error);
+      const msg = (code && ERROR_MESSAGES[code]) || parseApiError(error, "Failed to upload application form");
+      setUploadError(msg);
     }
   };
 

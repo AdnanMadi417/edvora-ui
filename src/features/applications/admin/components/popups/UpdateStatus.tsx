@@ -12,7 +12,11 @@ import {
   ListX,
 } from "lucide-react";
 import { useToast } from "components/context/ToastContext";
-import { parseApiError } from "utils/parseApiError";
+import { getApiErrorCode, parseApiError } from "utils/parseApiError";
+
+const UPDATE_STATUS_ERROR_MESSAGES: Record<string, string> = {
+  health_declaration_template_not_configured: "Health Declaration template not configured — contact admin.",
+};
 
 import {
   useOfferLetterUpload,
@@ -258,6 +262,7 @@ export default function UpdateStatusPopup({
   const [offerLetterFile, setOfferLetterFile] = useState<File | null>(null);
   const [offerLetterVisaInvoiceFile, setOfferLetterVisaInvoiceFile] = useState<File | null>(null);
   const [offerLetterAppFormTemplateFile, setOfferLetterAppFormTemplateFile] = useState<File | null>(null);
+  const [offerLetterAppForm2TemplateFile, setOfferLetterAppForm2TemplateFile] = useState<File | null>(null);
 
   const isVisaSetupSelected = selectedOption?.label === "Visa Setup";
 
@@ -268,6 +273,8 @@ export default function UpdateStatusPopup({
     visa_fee_amount: "",
     show_visa_invoice: false,
     show_app_form_template: false,
+    show_app_form_2_template: false,
+    health_declaration_form_required: false,
   });
 
   const [formErrors, setFormErrors] = useState<any>({});
@@ -333,6 +340,8 @@ export default function UpdateStatusPopup({
     await uploadOfferLetter(offerLetterFile, application.id, {
       visaInvoiceFile: formData.show_visa_invoice ? (offerLetterVisaInvoiceFile ?? undefined) : undefined,
       applicationFormTemplateFile: formData.show_app_form_template ? (offerLetterAppFormTemplateFile ?? undefined) : undefined,
+      applicationForm2TemplateFile: formData.show_app_form_2_template ? (offerLetterAppForm2TemplateFile ?? undefined) : undefined,
+      healthDeclarationFormRequired: formData.health_declaration_form_required,
     });
   };
 
@@ -565,7 +574,9 @@ export default function UpdateStatusPopup({
       onConfirm(selectedStatus, reason);
       handleClose();
     } catch (err: unknown) {
-      setError(parseApiError(err, "Failed to update application"));
+      const code = getApiErrorCode(err);
+      const msg = (code && UPDATE_STATUS_ERROR_MESSAGES[code]) || parseApiError(err, "Failed to update application");
+      setError(msg);
     } finally {
       setIsSubmitting(false);
     }
@@ -579,7 +590,14 @@ export default function UpdateStatusPopup({
     setArrivalFormTemplateFile(null);
     setOfferLetterVisaInvoiceFile(null);
     setOfferLetterAppFormTemplateFile(null);
-    setFormData({ visa_fee_amount: "", show_visa_invoice: false, show_app_form_template: false });
+    setOfferLetterAppForm2TemplateFile(null);
+    setFormData({
+      visa_fee_amount: "",
+      show_visa_invoice: false,
+      show_app_form_template: false,
+      show_app_form_2_template: false,
+      health_declaration_form_required: false,
+    });
     setPayInFormData({ payment_date: "", amount: "", currency: "RM", payment_reference: "" });
     setPayInFormErrors({});
     setPayoutFormData({ payment_method_id: "", bank_reference: "", paid_at: "", currency: "RM", paid_amount: "" });
@@ -766,6 +784,35 @@ export default function UpdateStatusPopup({
                   disabled={isSubmitting}
                 />
               )}
+              <SettingToggleInput
+                label="Attach Application Form 2 Template (optional)"
+                field="show_app_form_2_template"
+                formData={formData}
+                updateFormData={(field, value) => {
+                  updateFormData(field, value);
+                  if (!value) setOfferLetterAppForm2TemplateFile(null);
+                }}
+                errors={formErrors}
+              />
+              {formData.show_app_form_2_template && (
+                <StatusFileUpload
+                  label="Upload Application Form 2 Template"
+                  description="Upload the second application form template for the student"
+                  id="offer-letter-app-form-2-template"
+                  file={offerLetterAppForm2TemplateFile}
+                  onFileChange={setOfferLetterAppForm2TemplateFile}
+                  onRemove={() => setOfferLetterAppForm2TemplateFile(null)}
+                  onError={setError}
+                  disabled={isSubmitting}
+                />
+              )}
+              <SettingToggleInput
+                label="Health Declaration Form Required"
+                field="health_declaration_form_required"
+                formData={formData}
+                updateFormData={updateFormData}
+                errors={formErrors}
+              />
             </>
           )}
 

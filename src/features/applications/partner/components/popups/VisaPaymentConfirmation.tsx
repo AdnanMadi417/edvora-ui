@@ -4,11 +4,17 @@ import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
+import { useDocumentType } from "hooks/useDocumentType";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 import Button from "components/ui/buttons/Button";
-import { parseApiError } from "utils/parseApiError";
+import { getApiErrorCode, parseApiError } from "utils/parseApiError";
+
+const VISA_PAYMENT_ERROR_MESSAGES: Record<string, string> = {
+  application_form_2_required: "A completed second application form is required — please upload it.",
+  health_declaration_form_required: "A completed health declaration form is required — please upload it.",
+};
 
 interface VisaPaymentConfirmationProps {
   isOpen: boolean;
@@ -31,16 +37,25 @@ export default function VisaPaymentConfirmation({
   const [uploadError, setUploadError] = useState("");
   const [appFormToggle, setAppFormToggle] = useState({ show_app_form: false });
   const [appFormFile, setAppFormFile] = useState<File | null>(null);
+  const [appForm2File, setAppForm2File] = useState<File | null>(null);
+  const [healthDeclarationFile, setHealthDeclarationFile] = useState<File | null>(null);
 
   const { methods, loading: paymentLoading, error: paymentError } = useVisaPaymentMethods(applicationId);
   const { visaFeeAmount } = useApplicationVisaFee(applicationId);
   const { uploadVisaPayment, isUploading } = useVisaPaymentUpload();
+  const { documentTypes } = useDocumentType();
 
   const firstMethod = methods[0] ?? null;
   const hasAppFormTemplate = !!application?.documents?.find(
     (d: any) => d.document_type === "Application Form Template"
   );
   const showAppFormUpload = hasAppFormTemplate || appFormToggle.show_app_form;
+
+  const hasAppForm2Template = !!application?.documents?.find(
+    (d: any) => d.document_type === "Application Form 2 Template"
+  );
+  const healthDeclarationRequired = !!application?.offer_letter_document?.health_declaration_form_required;
+  const healthDeclarationTemplate = documentTypes.find((dt) => dt.code === "health_declaration_form");
 
   useEffect(() => {
     if (isOpen) setIsVisible(true);
@@ -53,6 +68,8 @@ export default function VisaPaymentConfirmation({
   const handleConfirmUpload = async () => {
     if (!paymentReference) return;
     if (hasAppFormTemplate && !appFormFile) return;
+    if (hasAppForm2Template && !appForm2File) return;
+    if (healthDeclarationRequired && !healthDeclarationFile) return;
 
     setUploadError("");
     try {
@@ -61,12 +78,16 @@ export default function VisaPaymentConfirmation({
         amount: visaFeeAmount,
         currency: firstMethod?.currency ?? null,
         applicationFormFile: showAppFormUpload ? appFormFile : null,
+        applicationForm2File: hasAppForm2Template ? appForm2File : null,
+        healthDeclarationFormFile: healthDeclarationRequired ? healthDeclarationFile : null,
       });
 
       handleClose();
       onRefetch?.();
     } catch (error: unknown) {
-      setUploadError(parseApiError(error, "Failed to submit"));
+      const code = getApiErrorCode(error);
+      const msg = (code && VISA_PAYMENT_ERROR_MESSAGES[code]) || parseApiError(error, "Failed to submit");
+      setUploadError(msg);
     }
   };
 
@@ -76,6 +97,8 @@ export default function VisaPaymentConfirmation({
     setUploadError("");
     setAppFormFile(null);
     setAppFormToggle({ show_app_form: false });
+    setAppForm2File(null);
+    setHealthDeclarationFile(null);
     onClose();
   };
 
@@ -189,6 +212,46 @@ export default function VisaPaymentConfirmation({
               </>
             )}
 
+            {hasAppForm2Template && (
+              <StatusFileUpload
+                label="Upload Application Form 2"
+                description="Your manager has provided a second template. Download it, complete it, and upload the filled form here."
+                id="app_form_2_document"
+                file={appForm2File}
+                onFileChange={setAppForm2File}
+                onRemove={() => setAppForm2File(null)}
+                onError={setFileError}
+                disabled={isUploading}
+                required
+              />
+            )}
+
+            {healthDeclarationRequired && (
+              <div className="space-y-2">
+                {healthDeclarationTemplate?.static_template_file_url && (
+                  <a
+                    href={healthDeclarationTemplate.static_template_file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-blue-600 hover:underline"
+                  >
+                    Download blank Health Declaration Form template
+                  </a>
+                )}
+                <StatusFileUpload
+                  label="Upload Health Declaration Form"
+                  description="Download the blank template above, complete it, and upload the filled form here."
+                  id="health_declaration_document"
+                  file={healthDeclarationFile}
+                  onFileChange={setHealthDeclarationFile}
+                  onRemove={() => setHealthDeclarationFile(null)}
+                  onError={setFileError}
+                  disabled={isUploading}
+                  required
+                />
+              </div>
+            )}
+
             {fileError && (
               <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
@@ -223,7 +286,9 @@ export default function VisaPaymentConfirmation({
                   !!uploadError ||
                   isUploading ||
                   paymentLoading ||
-                  (hasAppFormTemplate && !appFormFile)
+                  (hasAppFormTemplate && !appFormFile) ||
+                  (hasAppForm2Template && !appForm2File) ||
+                  (healthDeclarationRequired && !healthDeclarationFile)
                 }
                 onClick={handleConfirmUpload}
                 icon={<CheckCircle className="h-4 w-4" />}

@@ -17,6 +17,8 @@ export { useAllStageStatuses } from "./stages/useStageStatuses";
 export { useChangeProgram } from "./stages/useChangeProgram";
 
 export { useApplicationFormDocumentUpload } from "./files/useApplicationFormDocumentUpload";
+export { useApplicationForm2DocumentUpload } from "./files/useApplicationForm2DocumentUpload";
+export { useHealthDeclarationDocumentUpload } from "./files/useHealthDeclarationDocumentUpload";
 export { useArrivalDateUpload } from "./files/useArrivalDateUpload";
 export { useCommissionPaymentUpload } from "./files/useCommissionPaymentUpload";
 export { useEVisaUpload } from "./files/useEVisaUpload";
