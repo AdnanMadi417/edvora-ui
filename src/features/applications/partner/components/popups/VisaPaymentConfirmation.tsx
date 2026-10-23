@@ -7,6 +7,7 @@ import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applicatio
 import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import CompactFileUpload from "components/form/upload/CompactFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 import Button from "components/ui/buttons/Button";
@@ -183,9 +184,9 @@ export default function VisaPaymentConfirmation({
             />
 
             {hasAppFormTemplate ? (
-              <StatusFileUpload
-                label="Upload Application Form"
-                description="Your manager has provided a template. Download it, complete it, and upload the filled form here."
+              <CompactFileUpload
+                label="Application Form"
+                description="Your manager has provided a template — download it, complete it, and upload the filled form here."
                 id="app_form_document"
                 file={appFormFile}
                 onFileChange={setAppFormFile}
@@ -207,8 +208,8 @@ export default function VisaPaymentConfirmation({
                   errors={{}}
                 />
                 {appFormToggle.show_app_form && (
-                  <StatusFileUpload
-                    label="Upload Application Form"
+                  <CompactFileUpload
+                    label="Application Form"
                     description="Upload your completed application form document"
                     id="app_form_document"
                     file={appFormFile}
@@ -222,9 +223,9 @@ export default function VisaPaymentConfirmation({
             )}
 
             {hasAppForm2Template && (
-              <StatusFileUpload
-                label="Upload Application Form 2"
-                description="Your manager has provided a second template. Download it, complete it, and upload the filled form here."
+              <CompactFileUpload
+                label="Application Form 2"
+                description="Your manager has provided a second template — download it, complete it, and upload the filled form here."
                 id="app_form_2_document"
                 file={appForm2File}
                 onFileChange={setAppForm2File}
@@ -236,7 +237,7 @@ export default function VisaPaymentConfirmation({
             )}
 
             {healthDeclarationRequired && (
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <button
                   type="button"
                   onClick={downloadHealthDeclarationForm}
@@ -245,8 +246,8 @@ export default function VisaPaymentConfirmation({
                 >
                   {downloadingHealthDeclarationForm ? "Opening..." : "Download blank Health Declaration Form template"}
                 </button>
-                <StatusFileUpload
-                  label="Upload Health Declaration Form"
+                <CompactFileUpload
+                  label="Health Declaration Form"
                   description="Download the blank template above, complete it, and upload the filled form here."
                   id="health_declaration_document"
                   file={healthDeclarationFile}
@@ -260,8 +261,8 @@ export default function VisaPaymentConfirmation({
             )}
 
             {signedOfferLetterRequired && (
-              <StatusFileUpload
-                label="Upload Signed Offer Letter"
+              <CompactFileUpload
+                label="Signed Offer Letter"
                 description="Download your offer letter above, sign it, and upload the signed copy here."
                 id="signed_offer_letter_document"
                 file={signedOfferLetterFile}
@@ -274,9 +275,9 @@ export default function VisaPaymentConfirmation({
             )}
 
             {hasEnglishFormTemplate && (
-              <StatusFileUpload
-                label="Upload English Form"
-                description="Your manager has provided a template. Download it, complete it, and upload the filled form here."
+              <CompactFileUpload
+                label="English Form"
+                description="Your manager has provided a template — download it, complete it, and upload the filled form here."
                 id="english_form_document"
                 file={englishFormFile}
                 onFileChange={setEnglishFormFile}
