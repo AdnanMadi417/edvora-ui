@@ -171,6 +171,16 @@ export default function UpdateStatusPopup({
   const [error, setError] = useState("");
   const [reasonError, setReasonError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) setIsVisible(true);
+    else {
+      const timer = setTimeout(() => setIsVisible(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
   const { showToast } = useToast();
   const selectedOption = statusOptions.find((opt) => opt.id === selectedStatus);
 
@@ -534,15 +544,21 @@ export default function UpdateStatusPopup({
     onClose();
   };
 
-  if (!isOpen) return null;
+  if (!isVisible) return null;
 
   return (
     <div
       className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
       onClick={handleClose}
+      aria-modal="true"
+      role="dialog"
     >
       <div
-        className="w-full max-w-2xl transform rounded-md bg-white shadow-xl"
+        className={`w-full max-w-2xl transform rounded-md bg-white shadow-xl transition-all duration-300 ${
+          isOpen
+            ? "translate-y-0 scale-100 opacity-100"
+            : "translate-y-4 scale-95 opacity-0"
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         <UpdateStatusHeader

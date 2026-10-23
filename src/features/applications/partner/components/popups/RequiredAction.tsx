@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CheckCircle, Pause, XCircle, AlertCircle, Download } from "lucide-react";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import DocumentUploadList from "features/applications/partner/components/form/stages/DocumentUploadList";
@@ -35,6 +35,15 @@ export default function RequiredAction({
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) setIsVisible(true);
+    else {
+      const timer = setTimeout(() => setIsVisible(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   const { actions, loading } = useApplicationActions(applicationId);
   const { showToast } = useToast();
@@ -199,15 +208,21 @@ export default function RequiredAction({
         : uploadedDocs.length > 0;
   const anyUploading = documents.some((d) => d.uploading);
 
-  if (!isOpen) return null;
+  if (!isVisible) return null;
 
   return (
     <div
       className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
       onClick={onClose}
+      aria-modal="true"
+      role="dialog"
     >
       <div
-        className="w-full max-w-lg transform transition-all"
+        className={`w-full max-w-lg transform transition-all duration-300 ${
+          isOpen
+            ? "translate-y-0 scale-100 opacity-100"
+            : "translate-y-4 scale-95 opacity-0"
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">

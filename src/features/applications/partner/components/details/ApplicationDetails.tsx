@@ -7,6 +7,7 @@ import { getDocumentDownloadUrl } from 'services/documentService';
 import Button from 'components/ui/buttons/Button';
 import IconButton from 'components/ui/buttons/IconButton';
 import { useApplicationActions } from "features/applications/hooks";
+import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 
 import ApplicationPartnerTopBar from "features/applications/partner/components/topBar/PartnerTopBar";
 import RequiredAction from "features/applications/partner/components/popups/RequiredAction";
@@ -108,6 +109,8 @@ export default function ApplicationDetails({
 
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
   const [downloadingTemplate, setDownloadingTemplate] = useState(false);
+  const { download: downloadHealthDeclarationForm, downloading: downloadingHealthDeclarationForm } =
+    useHealthDeclarationFormDownload();
 
   const handleTemplateDownload = async (fileKey: string) => {
     if (downloadingTemplate) return;
@@ -303,9 +306,26 @@ export default function ApplicationDetails({
                 {(() => {
                   const visaInvoiceDoc = application?.documents?.find((d: any) => d.document_type === "Visa Invoice");
                   const appFormDoc = application?.documents?.find((d: any) => d.document_type === "Application Form Template");
+                  const appForm2Doc = application?.documents?.find((d: any) => d.document_type === "Application Form 2 Template");
+                  const englishFormDoc = application?.documents?.find((d: any) => d.document_type === "English Form Template");
                   const visaInvoiceKey = visaInvoiceDoc?.file_key;
                   const appFormKey = appFormDoc?.file_key;
-                  if (!visaInvoiceKey && !appFormKey) return null;
+                  const appForm2Key = appForm2Doc?.file_key;
+                  const englishFormKey = englishFormDoc?.file_key;
+                  const showHealthDeclaration = !!actions?.is_health_declaration_form_required;
+                  const signedOfferLetterKey = actions?.is_signed_offer_letter_required
+                    ? application?.offer_letter_document?.file_key
+                    : null;
+                  if (
+                    !visaInvoiceKey &&
+                    !appFormKey &&
+                    !appForm2Key &&
+                    !englishFormKey &&
+                    !showHealthDeclaration &&
+                    !signedOfferLetterKey
+                  ) {
+                    return null;
+                  }
                   return (
                     <div className="space-y-2">
                       <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Documents for this payment</p>
@@ -349,6 +369,106 @@ export default function ApplicationDetails({
                             onClick={() => handleTemplateDownload(appFormKey)}
                             disabled={downloadingTemplate}
                             title="Download Application Form Template"
+                            icon={<Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />}
+                            bgColor="bg-blue-50"
+                            textColor="text-blue-600"
+                            borderColor="border-transparent"
+                            hoverTextColor="hover:text-blue-600"
+                            hoverBorderColor="hover:border-blue-200"
+                            className="ml-3 shrink-0 hover:bg-blue-100"
+                          />
+                        </div>
+                      )}
+                      {appForm2Key && (
+                        <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 border border-blue-200">
+                              <Download className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-slate-800">Application Form 2 Template</p>
+                              <p className="text-xs text-slate-400">Download, complete, and re-upload when requested by your manager</p>
+                            </div>
+                          </div>
+                          <IconButton
+                            onClick={() => handleTemplateDownload(appForm2Key)}
+                            disabled={downloadingTemplate}
+                            title="Download Application Form 2 Template"
+                            icon={<Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />}
+                            bgColor="bg-blue-50"
+                            textColor="text-blue-600"
+                            borderColor="border-transparent"
+                            hoverTextColor="hover:text-blue-600"
+                            hoverBorderColor="hover:border-blue-200"
+                            className="ml-3 shrink-0 hover:bg-blue-100"
+                          />
+                        </div>
+                      )}
+                      {englishFormKey && (
+                        <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 border border-blue-200">
+                              <Download className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-slate-800">English Form Template</p>
+                              <p className="text-xs text-slate-400">Download, complete, and re-upload when requested by your manager</p>
+                            </div>
+                          </div>
+                          <IconButton
+                            onClick={() => handleTemplateDownload(englishFormKey)}
+                            disabled={downloadingTemplate}
+                            title="Download English Form Template"
+                            icon={<Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />}
+                            bgColor="bg-blue-50"
+                            textColor="text-blue-600"
+                            borderColor="border-transparent"
+                            hoverTextColor="hover:text-blue-600"
+                            hoverBorderColor="hover:border-blue-200"
+                            className="ml-3 shrink-0 hover:bg-blue-100"
+                          />
+                        </div>
+                      )}
+                      {showHealthDeclaration && (
+                        <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 border border-blue-200">
+                              <Download className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-slate-800">Health Declaration Form</p>
+                              <p className="text-xs text-slate-400">Required for visa processing (Lampiran B)</p>
+                            </div>
+                          </div>
+                          <IconButton
+                            onClick={downloadHealthDeclarationForm}
+                            disabled={downloadingHealthDeclarationForm}
+                            title="Download Health Declaration Form"
+                            icon={<Download className={`h-4 w-4 ${downloadingHealthDeclarationForm ? "animate-pulse" : ""}`} />}
+                            bgColor="bg-blue-50"
+                            textColor="text-blue-600"
+                            borderColor="border-transparent"
+                            hoverTextColor="hover:text-blue-600"
+                            hoverBorderColor="hover:border-blue-200"
+                            className="ml-3 shrink-0 hover:bg-blue-100"
+                          />
+                        </div>
+                      )}
+                      {signedOfferLetterKey && (
+                        <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 border border-blue-200">
+                              <Download className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-slate-800">Offer Letter (to sign)</p>
+                              <p className="text-xs text-slate-400">Download, sign, and upload the signed copy with your payment</p>
+                            </div>
+                          </div>
+                          <IconButton
+                            onClick={() => handleTemplateDownload(signedOfferLetterKey)}
+                            disabled={downloadingTemplate}
+                            title="Download Offer Letter"
                             icon={<Download className={`h-4 w-4 ${downloadingTemplate ? "animate-pulse" : ""}`} />}
                             bgColor="bg-blue-50"
                             textColor="text-blue-600"
