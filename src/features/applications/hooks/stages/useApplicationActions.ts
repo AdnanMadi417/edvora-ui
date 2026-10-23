@@ -54,6 +54,11 @@ export type ApplicationActionsResponse = {
   status_code: string;
   is_draft: boolean;
   is_arrival_extra_docs_required?: boolean;
+  is_application_form_required?: boolean;
+  is_application_form_2_required?: boolean;
+  is_health_declaration_form_required?: boolean;
+  is_signed_offer_letter_required?: boolean;
+  is_english_form_required?: boolean;
   correction_reason: string | null;
   /** Backend-computed: whether PATCH .../correction-request would currently
    *  succeed for this user — drives the edit action, don't re-derive it. */

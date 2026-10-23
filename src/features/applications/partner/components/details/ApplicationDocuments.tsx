@@ -1,44 +1,18 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FolderOpen, ChevronDown, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { FolderOpen, ChevronDown } from 'lucide-react';
 import EmptyData from 'components/emptyData/EmptyData';
 import DocumentActions from 'features/applications/shared/DocumentActions';
 import { AppDate } from "components/ui/date";
 import { SectionIconBadge } from "components/ui/icons";
 import { SolidBadge } from "components/ui/badges";
+import { DOCUMENT_STATUS_ICON, DOCUMENT_STATUS_BADGE, DOCUMENT_STATUS_LABEL } from "features/applications/shared/documentStatus";
 
 interface ApplicationDocumentsProps {
   application: any;
   onRefetch?: () => void;
 }
-
-const STATUS_ICON: Record<string, React.ReactNode> = {
-  '1': <Clock className="h-5 w-5 text-yellow-500" />,
-  '2': <CheckCircle className="h-5 w-5 text-green-600" />,
-  '3': <XCircle className="h-5 w-5 text-red-600" />,
-  pending: <Clock className="h-5 w-5 text-yellow-500" />,
-  approved: <CheckCircle className="h-5 w-5 text-green-600" />,
-  rejected: <XCircle className="h-5 w-5 text-red-600" />,
-};
-
-const STATUS_BADGE: Record<string, string> = {
-  '1': 'border-yellow-200 bg-yellow-50 text-yellow-700',
-  '2': 'border-green-200 bg-green-50 text-green-700',
-  '3': 'border-red-200 bg-red-50 text-red-700',
-  pending: 'border-yellow-200 bg-yellow-50 text-yellow-700',
-  approved: 'border-green-200 bg-green-50 text-green-700',
-  rejected: 'border-red-200 bg-red-50 text-red-700',
-};
-
-const STATUS_LABEL: Record<string, string> = {
-  '1': 'Pending',
-  '2': 'Approved',
-  '3': 'Rejected',
-  pending: 'Pending',
-  approved: 'Approved',
-  rejected: 'Rejected',
-};
 
 export default function ApplicationDocuments({ application, onRefetch }: ApplicationDocumentsProps) {
   const [showDocs, setShowDocs] = useState(false);
@@ -61,9 +35,9 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
   if (totalDocuments === 0) return <EmptyData />;
 
   const DocRow = ({ doc }: { doc: any }) => {
-    const icon = STATUS_ICON[doc.status] ?? STATUS_ICON['1'];
-    const badge = STATUS_BADGE[doc.status] ?? STATUS_BADGE['1'];
-    const label = STATUS_LABEL[doc.status] ?? 'Pending';
+    const icon = DOCUMENT_STATUS_ICON[doc.status] ?? DOCUMENT_STATUS_ICON['1'];
+    const badge = DOCUMENT_STATUS_BADGE[doc.status] ?? DOCUMENT_STATUS_BADGE['1'];
+    const label = DOCUMENT_STATUS_LABEL[doc.status] ?? 'Pending';
 
     return (
       <div className="flex items-center justify-between rounded-lg border border-slate-200 p-5 transition-colors hover:bg-slate-50">

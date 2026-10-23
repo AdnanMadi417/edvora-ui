@@ -11,10 +11,12 @@ import { AppDate } from "components/ui/date";
 import Button from "components/ui/buttons/Button";
 import IconButton from "components/ui/buttons/IconButton";
 import { SectionIconBadge } from "components/ui/icons";
+import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";
 
 interface OfferLetterDecisionProps {
   application: any;
   visaCase: any;
+  actions?: ApplicationActionsResponse | null;
   onRefetch?: () => Promise<void>;
 }
 
@@ -26,6 +28,7 @@ interface OfferLetterDecisionPayload {
 export default function OfferLetterDecision({
   application,
   visaCase,
+  actions,
   onRefetch,
 }: OfferLetterDecisionProps) {
   const offerLetter = application?.offer_letter_document;
@@ -127,29 +130,31 @@ export default function OfferLetterDecision({
           </div>
         </div>
 
-        <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-white px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-blue-50">
-              <FaFilePdf className="h-4 w-4 text-blue-600" />
+        {actions?.is_health_declaration_form_required && (
+          <div className="flex items-center justify-between rounded-lg border border-blue-200 bg-white px-4 py-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-blue-200 bg-blue-50">
+                <FaFilePdf className="h-4 w-4 text-blue-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-slate-800">Health Declaration Form</p>
+                <p className="text-xs text-slate-400">Required for visa processing (Lampiran B)</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-slate-800">Health Declaration Form</p>
-              <p className="text-xs text-slate-400">Required for visa processing (Lampiran B)</p>
-            </div>
+            <IconButton
+              onClick={downloadHealthDeclarationForm}
+              disabled={downloadingHealthDeclarationForm}
+              title="Download Health Declaration Form"
+              icon={<Download className={`h-4 w-4 ${downloadingHealthDeclarationForm ? "animate-pulse" : ""}`} />}
+              bgColor="bg-blue-50"
+              textColor="text-blue-600"
+              borderColor="border-transparent"
+              hoverTextColor="hover:text-blue-600"
+              hoverBorderColor="hover:border-blue-200"
+              className="ml-3 shrink-0 hover:bg-blue-100"
+            />
           </div>
-          <IconButton
-            onClick={downloadHealthDeclarationForm}
-            disabled={downloadingHealthDeclarationForm}
-            title="Download Health Declaration Form"
-            icon={<Download className={`h-4 w-4 ${downloadingHealthDeclarationForm ? "animate-pulse" : ""}`} />}
-            bgColor="bg-blue-50"
-            textColor="text-blue-600"
-            borderColor="border-transparent"
-            hoverTextColor="hover:text-blue-600"
-            hoverBorderColor="hover:border-blue-200"
-            className="ml-3 shrink-0 hover:bg-blue-100"
-          />
-        </div>
+        )}
 
         {isUniversityApproved && (
           <>

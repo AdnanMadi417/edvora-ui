@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
+import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
@@ -22,7 +23,7 @@ interface VisaPaymentConfirmationProps {
   isOpen: boolean;
   onClose: () => void;
   applicationId: string;
-  application?: any;
+  actions?: ApplicationActionsResponse | null;
   onRefetch?: () => void;
 }
 
@@ -30,7 +31,7 @@ export default function VisaPaymentConfirmation({
   isOpen,
   onClose,
   applicationId,
-  application,
+  actions,
   onRefetch,
 }: VisaPaymentConfirmationProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -51,19 +52,13 @@ export default function VisaPaymentConfirmation({
     useHealthDeclarationFormDownload();
 
   const firstMethod = methods[0] ?? null;
-  const hasAppFormTemplate = !!application?.documents?.find(
-    (d: any) => d.document_type === "Application Form Template"
-  );
+  const hasAppFormTemplate = !!actions?.is_application_form_required;
   const showAppFormUpload = hasAppFormTemplate || appFormToggle.show_app_form;
 
-  const hasAppForm2Template = !!application?.documents?.find(
-    (d: any) => d.document_type === "Application Form 2 Template"
-  );
-  const healthDeclarationRequired = !!application?.offer_letter_document?.health_declaration_form_required;
-  const signedOfferLetterRequired = !!application?.offer_letter_document?.signed_offer_letter_required;
-  const hasEnglishFormTemplate = !!application?.documents?.find(
-    (d: any) => d.document_type === "English Form Template"
-  );
+  const hasAppForm2Template = !!actions?.is_application_form_2_required;
+  const healthDeclarationRequired = !!actions?.is_health_declaration_form_required;
+  const signedOfferLetterRequired = !!actions?.is_signed_offer_letter_required;
+  const hasEnglishFormTemplate = !!actions?.is_english_form_required;
 
   useEffect(() => {
     if (isOpen) setIsVisible(true);

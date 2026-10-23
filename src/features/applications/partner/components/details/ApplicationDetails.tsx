@@ -19,20 +19,16 @@ import VisaPaymentConfirmation from "features/applications/partner/components/po
 import ArrivalDate from "features/applications/partner/components/popups/ArrivalDate";
 import EmgsEvalUpload from "features/applications/partner/components/popups/EmgsEvaluationUpload";
 import EVisaUpload from "features/applications/partner/components/popups/EVisaUpload";
-import ApplicationFormReupload from "features/applications/partner/components/popups/ApplicationFormReupload";
-import ApplicationForm2Reupload from "features/applications/partner/components/popups/ApplicationForm2Reupload";
-import HealthDeclarationReupload from "features/applications/partner/components/popups/HealthDeclarationReupload";
-import SignedOfferLetterReupload from "features/applications/partner/components/popups/SignedOfferLetterReupload";
-import EnglishFormReupload from "features/applications/partner/components/popups/EnglishFormReupload";
 import ApplicationCommission from './ApplicationCommission';
 import ApplicationDocuments from './ApplicationDocuments';
+import ApplicationFormsSection from './ApplicationFormsSection';
 import { useToast } from 'components/context/ToastContext';
 import DisputeCommission from 'features/applications/partner/components/popups/DisputeCommission';
 import api from 'lib/useApi';
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
 import { Tabs } from "components/ui/tabs";
-import { APPLICATION_DETAILS_TABS, type ApplicationDetailsTab } from "features/applications/shared/applicationDetailTabs";
+import { PARTNER_APPLICATION_DETAILS_TABS, type ApplicationDetailsTab } from "features/applications/shared/applicationDetailTabs";
 import ApplicationActivityHistory from 'features/applications/shared/ApplicationActivityHistory';
 import ApplicationTimeline from 'features/applications/shared/ApplicationTimeline';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
@@ -110,12 +106,6 @@ export default function ApplicationDetails({
     currentStatusCode === "WAITING_FOR_PAYMENT" ||
     currentStatusCode === "PAYMENT_REJECTED";
 
-  const showApplicationFormReupload = currentStatusCode === "APPLICATION_FORM_REJECTED";
-  const showApplicationForm2Reupload = currentStatusCode === "APPLICATION_FORM_2_REJECTED";
-  const showHealthDeclarationReupload = currentStatusCode === "HEALTH_DECLARATION_REJECTED";
-  const showSignedOfferLetterReupload = currentStatusCode === "SIGNED_OFFER_LETTER_REJECTED";
-  const showEnglishFormReupload = currentStatusCode === "ENGLISH_FORM_REJECTED";
-
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
   const [downloadingTemplate, setDownloadingTemplate] = useState(false);
 
@@ -134,11 +124,6 @@ export default function ApplicationDetails({
 
   const [showEmgsUploadPopup, setShowEmgsUploadPopup] = useState(false);
   const [showEVisaUploadPopup, setShowEVisaUploadPopup] = useState(false);
-  const [showApplicationFormReuploadPopup, setShowApplicationFormReuploadPopup] = useState(false);
-  const [showApplicationForm2ReuploadPopup, setShowApplicationForm2ReuploadPopup] = useState(false);
-  const [showHealthDeclarationReuploadPopup, setShowHealthDeclarationReuploadPopup] = useState(false);
-  const [showSignedOfferLetterReuploadPopup, setShowSignedOfferLetterReuploadPopup] = useState(false);
-  const [showEnglishFormReuploadPopup, setShowEnglishFormReuploadPopup] = useState(false);
 
   const showArrivalConfirmation = currentStatusCode === "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE";
 
@@ -423,81 +408,6 @@ export default function ApplicationDetails({
               />
             )}
 
-            {showApplicationFormReupload && (
-              <Button
-                type="button"
-                onClick={() => setShowApplicationFormReuploadPopup(true)}
-                icon={<FileUp className="h-4 w-4" />}
-                text="Re-upload Application Form"
-                bgColor="bg-red-600"
-                textColor="text-white"
-                borderColor="border-red-600"
-                hoverTextColor="hover:text-white"
-                hoverBorderColor="hover:border-red-700"
-                className="w-full hover:bg-red-700"
-              />
-            )}
-
-            {showApplicationForm2Reupload && (
-              <Button
-                type="button"
-                onClick={() => setShowApplicationForm2ReuploadPopup(true)}
-                icon={<FileUp className="h-4 w-4" />}
-                text="Re-upload Application Form 2"
-                bgColor="bg-red-600"
-                textColor="text-white"
-                borderColor="border-red-600"
-                hoverTextColor="hover:text-white"
-                hoverBorderColor="hover:border-red-700"
-                className="w-full hover:bg-red-700"
-              />
-            )}
-
-            {showHealthDeclarationReupload && (
-              <Button
-                type="button"
-                onClick={() => setShowHealthDeclarationReuploadPopup(true)}
-                icon={<FileUp className="h-4 w-4" />}
-                text="Re-upload Health Declaration Form"
-                bgColor="bg-red-600"
-                textColor="text-white"
-                borderColor="border-red-600"
-                hoverTextColor="hover:text-white"
-                hoverBorderColor="hover:border-red-700"
-                className="w-full hover:bg-red-700"
-              />
-            )}
-
-            {showSignedOfferLetterReupload && (
-              <Button
-                type="button"
-                onClick={() => setShowSignedOfferLetterReuploadPopup(true)}
-                icon={<FileUp className="h-4 w-4" />}
-                text="Re-upload Signed Offer Letter"
-                bgColor="bg-red-600"
-                textColor="text-white"
-                borderColor="border-red-600"
-                hoverTextColor="hover:text-white"
-                hoverBorderColor="hover:border-red-700"
-                className="w-full hover:bg-red-700"
-              />
-            )}
-
-            {showEnglishFormReupload && (
-              <Button
-                type="button"
-                onClick={() => setShowEnglishFormReuploadPopup(true)}
-                icon={<FileUp className="h-4 w-4" />}
-                text="Re-upload English Form"
-                bgColor="bg-red-600"
-                textColor="text-white"
-                borderColor="border-red-600"
-                hoverTextColor="hover:text-white"
-                hoverBorderColor="hover:border-red-700"
-                className="w-full hover:bg-red-700"
-              />
-            )}
-
             {showAwaitingArrival && (
               <Button
                 type="button"
@@ -612,7 +522,7 @@ export default function ApplicationDetails({
           </div>
         </ApplicationHero>
 
-        <Tabs<ApplicationDetailsTab> tabs={APPLICATION_DETAILS_TABS} active={activeTab} onChange={setActiveTab} />
+        <Tabs<ApplicationDetailsTab> tabs={PARTNER_APPLICATION_DETAILS_TABS} active={activeTab} onChange={setActiveTab} />
 
         <AnimatePresence mode="wait">
         <motion.div
@@ -636,7 +546,7 @@ export default function ApplicationDetails({
 
         {/* Offer Letter */}
         <div className="border-b border-slate-200">
-          <OfferLetterDecision application={application} visaCase={visaCase} onRefetch={handleRefetch} />
+          <OfferLetterDecision application={application} visaCase={visaCase} actions={actions} onRefetch={handleRefetch} />
         </div>
 
         {/* Application Information */}
@@ -649,6 +559,10 @@ export default function ApplicationDetails({
         <ApplicationDocuments application={application} onRefetch={handleRefetch} />
 
         </>
+        )}
+
+        {activeTab === "documents" && (
+          <ApplicationFormsSection application={application} actions={actions} onRefetch={handleRefetch} />
         )}
 
         {activeTab === "activity" && <ApplicationActivityHistory application={application} />}
@@ -693,57 +607,12 @@ export default function ApplicationDetails({
         />
       )}
 
-      {showApplicationFormReuploadPopup && (
-        <ApplicationFormReupload
-          isOpen={showApplicationFormReuploadPopup}
-          onClose={() => setShowApplicationFormReuploadPopup(false)}
-          applicationId={application.id}
-          onRefetch={handleRefetch}
-        />
-      )}
-
-      {showApplicationForm2ReuploadPopup && (
-        <ApplicationForm2Reupload
-          isOpen={showApplicationForm2ReuploadPopup}
-          onClose={() => setShowApplicationForm2ReuploadPopup(false)}
-          applicationId={application.id}
-          onRefetch={handleRefetch}
-        />
-      )}
-
-      {showHealthDeclarationReuploadPopup && (
-        <HealthDeclarationReupload
-          isOpen={showHealthDeclarationReuploadPopup}
-          onClose={() => setShowHealthDeclarationReuploadPopup(false)}
-          applicationId={application.id}
-          onRefetch={handleRefetch}
-        />
-      )}
-
-      {showSignedOfferLetterReuploadPopup && (
-        <SignedOfferLetterReupload
-          isOpen={showSignedOfferLetterReuploadPopup}
-          onClose={() => setShowSignedOfferLetterReuploadPopup(false)}
-          applicationId={application.id}
-          onRefetch={handleRefetch}
-        />
-      )}
-
-      {showEnglishFormReuploadPopup && (
-        <EnglishFormReupload
-          isOpen={showEnglishFormReuploadPopup}
-          onClose={() => setShowEnglishFormReuploadPopup(false)}
-          applicationId={application.id}
-          onRefetch={handleRefetch}
-        />
-      )}
-
       {showVisaPaymentPopup && (
         <VisaPaymentConfirmation
           isOpen={showVisaPaymentPopup}
           onClose={() => setShowVisaPaymentPopup(false)}
           applicationId={application.id}
-          application={application}
+          actions={actions}
           onRefetch={handleRefetch}
         />
       )}
