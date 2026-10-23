@@ -26,7 +26,6 @@ import {
 } from "lucide-react";
 import { useAccountManagerPartnerDetails } from "features/partners/hooks";
 import { formatAgencyRole } from "features/partners/utils";
-import { PartnerAgreementSection } from "features/partners/agreement";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import { useToast } from "components/context/ToastContext";
@@ -388,8 +387,6 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
             </div>
           </div>
         )}
-
-        <PartnerAgreementSection partnerId={id} partnerName={partner.name} canManage />
 
         </div>
         )}

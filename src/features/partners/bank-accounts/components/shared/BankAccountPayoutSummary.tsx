@@ -15,8 +15,7 @@ interface Props {
 // none of those callers otherwise fetch. Pulled out once here instead of
 // duplicating the lookup in each, after three of them were found reading
 // intl_bank_name directly and showing a blank name for every curated-bank
-// account (the only kind that exists today, since free-text entry isn't
-// wired up in the form yet).
+// account.
 export default function BankAccountPayoutSummary({ account }: Props) {
   const { banks } = useBanks({ include_inactive: true });
   const bankLookup = useMemo(() => new Map(banks.map((b) => [b.id, b])), [banks]);
