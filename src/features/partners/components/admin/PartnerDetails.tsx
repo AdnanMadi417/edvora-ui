@@ -50,7 +50,6 @@ import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import PartnerApplicationsTable from "./PartnerApplicationsTable";
 import AdditionalManagersSection from "./AdditionalManagersSection";
 import { PartnerBankAccountSection } from "features/partners/bank-accounts";
-import { PartnerAgreementSection } from "features/partners/agreement";
 import { PayoutStatementSection } from "features/applications/payouts";
 import { parseDate, formatDate } from "components/ui/date/utils";
 
@@ -537,8 +536,6 @@ export default function PartnerDetails({ id }: Props) {
             </div>
           </div>
         )}
-
-        <PartnerAgreementSection partnerId={id} partnerName={partner.name} canManage />
 
         </>
         )}

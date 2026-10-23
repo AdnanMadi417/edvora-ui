@@ -27,7 +27,6 @@ import {
 } from "lucide-react";
 import { usePartnerDetails } from "features/partners/hooks";
 import { formatAgencyRole } from "features/partners/utils";
-import { PartnerAgreementSection } from "features/partners/agreement";
 import Loading from "components/loading/Loading";
 import EmptyData from "components/emptyData/EmptyTableData";
 import { useToast } from "components/context/ToastContext";
@@ -393,8 +392,6 @@ export default function ReviewerPartnerProfile({ id }: Props) {
             </div>
           </div>
         )}
-
-        <PartnerAgreementSection partnerId={id} partnerName={partner.name} />
 
         </div>
         )}
