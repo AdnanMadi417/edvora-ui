@@ -595,7 +595,7 @@ export default function PartnerDetails({ id }: Props) {
         {tab === "applications" && <PartnerApplicationsTable partnerId={id} />}
 
         {/* Statement */}
-        {tab === "statement" && <PayoutStatementSection partnerId={id} />}
+        {tab === "statement" && <PayoutStatementSection partnerId={id} canOpenPayout />}
         </motion.div>
         </AnimatePresence>
       </div>

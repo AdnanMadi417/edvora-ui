@@ -32,9 +32,13 @@ const formatApplicants = (applications: PayoutStatementApplication[]) =>
 
 interface PayoutStatementSectionProps {
   partnerId: string;
+  /** Rows open the payout detail page, which lives under /admin — only the
+   *  admin profile passes this; on the account manager profile rows stay
+   *  read-only instead of bouncing the manager out of the admin app. */
+  canOpenPayout?: boolean;
 }
 
-export default function PayoutStatementSection({ partnerId }: PayoutStatementSectionProps) {
+export default function PayoutStatementSection({ partnerId, canOpenPayout = false }: PayoutStatementSectionProps) {
   const router = useRouter();
   const { showToast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,15 +80,14 @@ export default function PayoutStatementSection({ partnerId }: PayoutStatementSec
 
   // Proof is resolved the same way DocumentActions does everywhere else --
   // via a signed URL from file_key, never the raw stored receipt_file_url.
-  // The statement endpoint doesn't return receipt_file_key, so fetch the
-  // full payout first (same lookup openVoidModal already does).
+  // The key comes with the statement row, so this works for account
+  // managers too (GET /admin/payouts/{id} is FINANCE only).
   const [loadingProof, setLoadingProof] = useState<{ id: string; action: "view" | "download" } | null>(null);
 
   const handleProof = async (item: PayoutStatementItem, action: "view" | "download") => {
     setLoadingProof({ id: item.payout_id, action });
     try {
-      const res = await payoutsApi.get(item.payout_id);
-      const fileKey = res.data.receipt_file_key;
+      const fileKey = item.receipt_file_key;
       if (!fileKey) {
         showToast("No receipt on file for this payout.", "error");
         return;
@@ -164,10 +167,14 @@ export default function PayoutStatementSection({ partnerId }: PayoutStatementSec
                   return (
                     <AnimatedTableRow
                       key={item.payout_id}
-                      className={`group cursor-pointer transition-colors hover:bg-slate-100/50 ${
-                        isVoided ? "opacity-60" : ""
-                      }`}
-                      onClick={() => router.push(`/admin/advisors/${partnerId}/payouts/${item.payout_id}`)}
+                      className={`group transition-colors ${
+                        canOpenPayout ? "cursor-pointer hover:bg-slate-100/50" : ""
+                      } ${isVoided ? "opacity-60" : ""}`}
+                      onClick={
+                        canOpenPayout
+                          ? () => router.push(`/admin/advisors/${partnerId}/payouts/${item.payout_id}`)
+                          : undefined
+                      }
                     >
                       <td className="px-6 py-4 text-sm">
                         <p className="font-medium text-slate-900">{item.bank_reference}</p>
@@ -281,7 +288,9 @@ export default function PayoutStatementSection({ partnerId }: PayoutStatementSec
                         </div>
                       </td>
                       <td className="w-8 pr-4 py-4">
-                        <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                        {canOpenPayout && (
+                          <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                        )}
                       </td>
                     </AnimatedTableRow>
                   );
