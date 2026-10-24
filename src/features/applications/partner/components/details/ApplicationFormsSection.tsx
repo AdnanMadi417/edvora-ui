@@ -120,9 +120,12 @@ export default function ApplicationFormsSection({ application, actions, onRefetc
 
   const docTemplate = (type: string) => application?.documents?.find((d: any) => d.document_type === type);
 
+  // A rejected status always shows its row, even with the flag unset —
+  // applications that predate the is_*_required flags never had them set,
+  // and the re-upload button is the partner's only way out of that status.
   const rowState = (required: boolean, rejectedStatusCode: string): RowState | null => {
-    if (!required) return null;
     if (currentStatusCode === rejectedStatusCode) return "rejected";
+    if (!required) return null;
     return pastPaymentGate ? "submitted" : "not_submitted";
   };
 

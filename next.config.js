@@ -34,6 +34,26 @@ const nextConfig = {
   },
   // Disable source maps in production to save memory
   productionBrowserSourceMaps: false,
+  // Pages renamed after the partner → advisor rename. Old addresses are still
+  // in emails prod has already sent (sign-up verify links, the admin "new
+  // advisor" CTA) and in bookmarks, so send them to the new page — the query
+  // string (e.g. ?email=) is carried over. Redirects run before middleware,
+  // so the old private paths no longer bounce to sign-in.
+  async redirects() {
+    const moved = [
+      ['/register/verify', '/apply-as-adviser/verify'],
+      ['/auth/register', '/apply-as-adviser'],
+      ['/auth/partner-reset-password', '/auth/reset-password'],
+      ['/partner/commission', '/partner/commission-tracker'],
+      ['/admin/partners', '/admin/advisors'],
+      ['/admin/partners/:path*', '/admin/advisors/:path*'],
+      ['/account-manager/partners', '/account-manager/advisors'],
+      ['/account-manager/partners/:path*', '/account-manager/advisors/:path*'],
+      ['/reviewer/partners', '/reviewer/advisors'],
+      ['/reviewer/partners/:path*', '/reviewer/advisors/:path*'],
+    ];
+    return moved.map(([source, destination]) => ({ source, destination, permanent: false }));
+  },
   async headers() {
     return [
       {
