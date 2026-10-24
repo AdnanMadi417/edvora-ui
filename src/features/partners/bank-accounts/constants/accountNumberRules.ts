@@ -1,10 +1,8 @@
 /**
- * Expected account-number digit length per curated (Malaysian) bank, keyed
- * by the bank's `code` (e.g. "MBB0228" for Maybank) — not a fixed
- * one-size-fits-all rule. Ranges, not single lengths, since real-world
- * account lengths vary within a bank over time (legacy vs. current
- * formats); a range is safer than a single exact figure that could reject
- * a genuinely valid number.
+ * Usual account-number digit length per curated (Malaysian) bank, keyed by
+ * the bank's `code` (e.g. "MBB0228" for Maybank). A number outside the range
+ * is a warning, never a block: an advisor who can't save a real account
+ * can't be paid, and the backend only requires the field to be non-empty.
  *
  * These are best-effort figures from general public banking references,
  * NOT pulled from an authoritative per-bank spec — if a specific length
@@ -30,24 +28,50 @@ export const ACCOUNT_NUMBER_LENGTH_BY_BANK_CODE: Record<string, { min: number; m
   UOVB0226: { min: 10, max: 13 }, // United Overseas Bank Malaysia
 };
 
-/** Used when the selected bank's code isn't in the table above (e.g. a
- *  newly-added curated bank, or a manually-entered international one) —
- *  wide enough to not block a legitimate number, tight enough to catch
- *  obvious typos (way too short/long). */
-export const DEFAULT_ACCOUNT_NUMBER_LENGTH = { min: 6, max: 20 };
+/** Any bank not in the table above (a newly-added curated bank, or a
+ *  manually-entered international one). Some countries' account numbers
+ *  contain letters; 34 is the longest IBAN, the widest format in use. */
+export const DEFAULT_ACCOUNT_NUMBER_LENGTH = { min: 4, max: 34 };
 
-export function validateAccountNumber(accountNumber: string, bankCode?: string | null): string | null {
-  const trimmed = accountNumber.trim();
-  if (!trimmed) return "Account number is required";
-  if (!/^\d+$/.test(trimmed)) return "Account number must contain digits only";
+/** Spaces and dashes are how people copy numbers off a statement
+ *  ("1234-5678-90"), not part of the number — strip them rather than
+ *  rejecting the input. Uppercased so letters are stored consistently. */
+export function normalizeAccountNumber(accountNumber: string): string {
+  return accountNumber.replace(/[\s-]+/g, "").toUpperCase();
+}
 
-  const rule = (bankCode && ACCOUNT_NUMBER_LENGTH_BY_BANK_CODE[bankCode]) || DEFAULT_ACCOUNT_NUMBER_LENGTH;
-  if (trimmed.length < rule.min || trimmed.length > rule.max) {
-    return rule.min === rule.max
-      ? `Must be exactly ${rule.min} digits for this bank`
-      : `Must be ${rule.min}–${rule.max} digits for this bank`;
+export interface AccountNumberCheck {
+  /** Blocks saving. */
+  error: string | null;
+  /** Shown under the field; saving still goes ahead. */
+  warning: string | null;
+}
+
+export function validateAccountNumber(accountNumber: string, bankCode?: string | null): AccountNumberCheck {
+  const normalized = normalizeAccountNumber(accountNumber);
+  if (!normalized) return { error: "Account number is required", warning: null };
+
+  const bankRule = bankCode ? ACCOUNT_NUMBER_LENGTH_BY_BANK_CODE[bankCode] : undefined;
+  if (bankRule) {
+    if (!/^\d+$/.test(normalized)) return { error: "Account number must contain digits only", warning: null };
+    if (normalized.length < bankRule.min || normalized.length > bankRule.max) {
+      const expected = bankRule.min === bankRule.max ? `${bankRule.min}` : `${bankRule.min}–${bankRule.max}`;
+      return {
+        error: null,
+        warning: `Accounts at this bank usually have ${expected} digits — this one has ${normalized.length}. Double-check it before saving.`,
+      };
+    }
+    return { error: null, warning: null };
   }
-  return null;
+
+  if (!/^[A-Z0-9]+$/.test(normalized)) {
+    return { error: "Account number can only contain letters and digits", warning: null };
+  }
+  const { min, max } = DEFAULT_ACCOUNT_NUMBER_LENGTH;
+  if (normalized.length < min || normalized.length > max) {
+    return { error: `Must be ${min}–${max} characters`, warning: null };
+  }
+  return { error: null, warning: null };
 }
 
 /**
