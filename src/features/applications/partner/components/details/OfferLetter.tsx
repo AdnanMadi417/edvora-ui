@@ -18,6 +18,8 @@ interface OfferLetterDecisionProps {
   visaCase: any;
   actions?: ApplicationActionsResponse | null;
   onRefetch?: () => Promise<void>;
+  // Agency admin viewing a member's application: no accepting on their behalf.
+  readOnly?: boolean;
 }
 
 interface OfferLetterDecisionPayload {
@@ -30,6 +32,7 @@ export default function OfferLetterDecision({
   visaCase,
   actions,
   onRefetch,
+  readOnly = false,
 }: OfferLetterDecisionProps) {
   const offerLetter = application?.offer_letter_document;
   const studentName = application?.student?.name;
@@ -156,7 +159,7 @@ export default function OfferLetterDecision({
           </div>
         )}
 
-        {isUniversityApproved && (
+        {isUniversityApproved && !readOnly && (
           <>
             <p className="text-sm text-slate-500">
               Please review the offer letter carefully before accepting or rejecting.

@@ -103,7 +103,7 @@ const PartnerApplications = () => {
     let cancelled = false;
     Promise.all(
       stages.map((s) =>
-        api.get(`/partners/${partnerId}/applications`, { params: { stage_id: s.id, limit: 10, status: selectedLifecycle } })
+        api.get(`/partners/${partnerId}/applications`, { params: { stage_id: s.id, limit: 10, status: selectedLifecycle, include_members: true } })
           .then((res) => ({
             id: s.id,
             count: (res.data as any)?.total ?? 0,
@@ -124,7 +124,9 @@ const PartnerApplications = () => {
     return () => { cancelled = true; };
   }, [stages.length, partnerId, selectedLifecycle]);
 
-  const { total: grandTotal } = usePartnerApplications({ partnerId, limit: 1, status: selectedLifecycle });
+  // include_members: an agency admin sees their members' applications too
+  // (D8); the backend ignores it for everyone else.
+  const { total: grandTotal } = usePartnerApplications({ partnerId, limit: 1, status: selectedLifecycle, include_members: true });
 
   const { items: applications, total, loading, error, refetch } = usePartnerApplications({
     partnerId,
@@ -135,7 +137,11 @@ const PartnerApplications = () => {
     stage_status_id: selectedStageStatus !== 'all' ? selectedStageStatus : undefined,
     search: debouncedSearch || undefined,
     university_id: selectedUniversity !== 'all' ? selectedUniversity : undefined,
+    include_members: true,
   });
+
+  const submittedByMember = (app: { partner_id?: string | null; partner_name?: string | null }) =>
+    app.partner_id && app.partner_id !== partnerId ? app.partner_name || 'a team member' : null;
 
 
   const totalActionRequired = useMemo(
@@ -367,6 +373,9 @@ const PartnerApplications = () => {
                   <span className="shrink-0 text-xs text-slate-400"><AppDate value={app.updated_at} format="relative" /></span>
                 </div>
                 <div className="mt-0.5 truncate text-xs text-slate-500">{app.program_name}</div>
+                {submittedByMember(app) && (
+                  <div className="mt-0.5 truncate text-xs text-slate-500">By {submittedByMember(app)}</div>
+                )}
                 <div className="mt-1.5"><ApplicationStatusBadge status={app.status} /></div>
               </div>
               <ChevronRight className="h-4 w-4 shrink-0 text-slate-400" />
@@ -475,6 +484,9 @@ const PartnerApplications = () => {
                       <div className="min-w-0">
                         <div className="truncate font-medium text-slate-900">{app.student_name}</div>
                         <div className="truncate text-xs text-slate-500">{app.passport_number ?? '—'}</div>
+                        {submittedByMember(app) && (
+                          <div className="truncate text-xs text-slate-500">By {submittedByMember(app)}</div>
+                        )}
                       </div>
                     </div>
                   </td>

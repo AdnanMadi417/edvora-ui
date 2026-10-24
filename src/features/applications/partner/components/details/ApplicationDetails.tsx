@@ -7,6 +7,7 @@ import { getDocumentDownloadUrl } from 'services/documentService';
 import Button from 'components/ui/buttons/Button';
 import IconButton from 'components/ui/buttons/IconButton';
 import { useApplicationActions } from "features/applications/hooks";
+import { usePartnerProfile } from "features/partners/hooks/usePartnerProfile";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 
 import ApplicationPartnerTopBar from "features/applications/partner/components/topBar/PartnerTopBar";
@@ -51,6 +52,13 @@ export default function ApplicationDetails({
     await onRefetch?.();
     refetchActions();
   };
+
+  // An agency admin viewing one of their members' applications (D8): read
+  // only, the member does the uploads and forms. Commission confirm/dispute
+  // stays available -- those are the agency admin's to do.
+  const { partner: viewer } = usePartnerProfile();
+  const ownerId: string | undefined = application?.partner?.id;
+  const isTeamView = !!viewer?.id && !!ownerId && ownerId !== viewer.id;
 
   const stage = application.stage || {};
   const [showRequiredActionPopup, setShowRequiredActionPopup] = useState(false);
@@ -127,6 +135,13 @@ export default function ApplicationDetails({
         {/* Hero */}
         <ApplicationHero application={application}>
           <div className="mt-4 space-y-2">
+            {isTeamView ? (
+              <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                Submitted by <span className="font-medium text-slate-800">{application?.partner?.name || "a team member"}</span>.
+                You can view this application; uploads and forms are done from their account.
+              </p>
+            ) : (
+            <>
             {actions && (
               <>
                 {hasRequiredDocs && !showArrivalExtraDocs && (
@@ -576,6 +591,8 @@ export default function ApplicationDetails({
                 />
               </div>
             )}
+            </>
+            )}
 
           </div>
         </ApplicationHero>
@@ -604,7 +621,7 @@ export default function ApplicationDetails({
 
         {/* Offer Letter */}
         <div className="border-b border-slate-200">
-          <OfferLetterDecision application={application} visaCase={visaCase} actions={actions} onRefetch={handleRefetch} />
+          <OfferLetterDecision application={application} visaCase={visaCase} actions={actions} onRefetch={handleRefetch} readOnly={isTeamView} />
         </div>
 
         {/* Application Information */}
@@ -620,7 +637,7 @@ export default function ApplicationDetails({
         )}
 
         {activeTab === "documents" && (
-          <ApplicationFormsSection application={application} actions={actions} onRefetch={handleRefetch} />
+          <ApplicationFormsSection application={application} actions={actions} onRefetch={handleRefetch} readOnly={isTeamView} />
         )}
 
         {activeTab === "activity" && <ApplicationActivityHistory application={application} />}

@@ -17,6 +17,9 @@ export type PartnerApplication = {
   next_action: string;
   lifecycle_status: string;
   new_notifications_count: number;
+  // Owning partner -- a member's on an agency's include_members list.
+  partner_id?: string | null;
+  partner_name?: string | null;
 };
 
 export type PartnerApplicationsResponse = {
@@ -35,6 +38,8 @@ export type UsePartnerApplicationsParams = {
   stage_status_id?: string;
   search?: string;
   university_id?: string;
+  // Agency only: also list every member's applications. Ignored for other partners.
+  include_members?: boolean;
 };
 
 export function usePartnerApplications({
@@ -46,6 +51,7 @@ export function usePartnerApplications({
   stage_status_id,
   search,
   university_id,
+  include_members,
 }: UsePartnerApplicationsParams) {
   const [data, setData] = useState<PartnerApplicationsResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -69,6 +75,7 @@ export function usePartnerApplications({
             ...(stage_status_id ? { stage_status_id } : {}),
             ...(search ? { search } : {}),
             ...(university_id ? { university_id } : {}),
+            ...(include_members ? { include_members } : {}),
           },
           headers: token
             ? { Authorization: `Bearer ${token}` }
@@ -87,7 +94,7 @@ export function usePartnerApplications({
 
   useEffect(() => {
     fetchApplications();
-  }, [partnerId, limit, offset, status, stage_id, stage_status_id, search, university_id]);
+  }, [partnerId, limit, offset, status, stage_id, stage_status_id, search, university_id, include_members]);
 
   return {
     items: data?.items ?? [],
