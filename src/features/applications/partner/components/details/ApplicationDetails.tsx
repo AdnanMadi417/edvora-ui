@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 
-import { Wallet, AlertCircle } from "lucide-react";
-import { Clock, Upload, ClipboardCheck, CreditCard, Plane, CheckCircle, FileUp, Download } from 'lucide-react';
+import { Wallet } from "lucide-react";
+import { Clock, Upload, ClipboardCheck, CreditCard, Plane, FileUp, Download } from 'lucide-react';
 import { getDocumentDownloadUrl } from 'services/documentService';
 import Button from 'components/ui/buttons/Button';
 import IconButton from 'components/ui/buttons/IconButton';
@@ -24,8 +24,6 @@ import ApplicationCommission from './ApplicationCommission';
 import ApplicationDocuments from './ApplicationDocuments';
 import ApplicationFormsSection from './ApplicationFormsSection';
 import { useToast } from 'components/context/ToastContext';
-import DisputeCommission from 'features/applications/partner/components/popups/DisputeCommission';
-import api from 'lib/useApi';
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
 import { Tabs } from "components/ui/tabs";
@@ -34,7 +32,6 @@ import ApplicationActivityHistory from 'features/applications/shared/Application
 import ApplicationTimeline from 'features/applications/shared/ApplicationTimeline';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useVisaCase } from "hooks/useVisaCase";
-import { parseApiError } from "utils/parseApiError";
 
 interface ApplicationDetailsProps {
   application: any;
@@ -46,7 +43,7 @@ export default function ApplicationDetails({
   onRefetch,
 }: ApplicationDetailsProps) {
   const [activeTab, setActiveTab] = useState<ApplicationDetailsTab>("details");
-  const { actions, loading: actionsLoading, refetch: refetchActions } = useApplicationActions(
+  const { actions, refetch: refetchActions } = useApplicationActions(
     application?.id
   );
 
@@ -64,34 +61,6 @@ export default function ApplicationDetails({
   const { visaCase } = useVisaCase(application?.id || "");
 
   const { showToast } = useToast();
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [showDispute, setShowDispute] = useState(false);
-  const { partner_actions } = actions || {};
-  const confirmAction = partner_actions?.find(
-    (a: any) => a.target_status_code === "APPLICATION_COMPLETE"
-  );
-  const disputeAction = partner_actions?.find(
-    (a: any) => a.target_status_code === "COMMISSION_DISPUTED"
-  );
-
-  const handleCommissionConfirm = async () => {
-    if (!confirmAction) return;
-    try {
-      setConfirmLoading(true);
-      await api.post(`/applications/${application.id}/status`, {
-        status_id: confirmAction.target_status_id,
-        reason_text: null,
-        notes: "Partner commission confirmed successfully",
-      });
-      showToast("Commission confirmed successfully", "success");
-      handleRefetch();
-    } catch (err: unknown) {
-      showToast(parseApiError(err, "Failed to confirm commission"), "error");
-    } finally {
-      setConfirmLoading(false);
-    }
-  };
-
   const [showProgramDecisionPopup, setShowProgramDecisionPopup] = useState(false);
   const openProgramDecisionPopup = () => setShowProgramDecisionPopup(true);
   const closeProgramDecisionPopup = () => setShowProgramDecisionPopup(false);
@@ -608,37 +577,6 @@ export default function ApplicationDetails({
               </div>
             )}
 
-            {!actionsLoading && (confirmAction || disputeAction) && (
-              <div className="flex flex-row gap-2">
-                {confirmAction && (
-                  <Button
-                    icon={<CheckCircle className="h-4 w-4" />}
-                    text={confirmLoading ? "Processing..." : "Confirm Commission "}
-                    bgColor="bg-green-50"
-                    textColor="text-green-700"
-                    borderColor="border-green-600"
-                    hoverTextColor="hover:text-green-800"
-                    hoverBorderColor="hover:border-green-700"
-                    className="w-full"
-                    onClick={handleCommissionConfirm}
-                    disabled={confirmLoading}
-                  />
-                )}
-                {disputeAction && (
-                  <Button
-                    icon={<AlertCircle className="h-4 w-4" />}
-                    text="Dispute Commission "
-                    bgColor="bg-red-50"
-                    textColor="text-red-700"
-                    borderColor="border-red-600"
-                    hoverTextColor="hover:text-red-800"
-                    hoverBorderColor="hover:border-red-700"
-                    className="w-full"
-                    onClick={() => setShowDispute(true)}
-                  />
-                )}
-              </div>
-            )}
           </div>
         </ApplicationHero>
 
@@ -748,14 +686,6 @@ export default function ApplicationDetails({
         />
       )}
 
-      {showDispute && disputeAction && (
-        <DisputeCommission
-          isOpen={showDispute}
-          onClose={() => setShowDispute(false)}
-          applicationId={application.id}
-          onSuccess={handleRefetch}
-        />
-      )}
     </section>
   );
 }
