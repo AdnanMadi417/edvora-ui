@@ -6,10 +6,8 @@ import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
 import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
-import StatusFileUpload from "components/form/upload/StatusFileUpload";
 import CompactFileUpload from "components/form/upload/CompactFileUpload";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
-import RichTextDisplay from "components/ui/RichTextDisplay";
 import Button from "components/ui/buttons/Button";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
@@ -155,15 +153,6 @@ export default function VisaPaymentConfirmation({
           </div>
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
-            {firstMethod?.instructions && (
-              <div className="rounded-md border border-slate-200 bg-slate-50 p-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Payment Instructions
-                </p>
-                <RichTextDisplay html={firstMethod.instructions} />
-              </div>
-            )}
-
             {paymentError && (
               <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-3">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
@@ -171,8 +160,8 @@ export default function VisaPaymentConfirmation({
               </div>
             )}
 
-            <StatusFileUpload
-              label="Upload Payment Receipt"
+            <CompactFileUpload
+              label="Payment Receipt"
               description="Upload your proof of visa fee payment (bank transfer slip, receipt, etc.)"
               id="payment_reference"
               file={paymentReference}
