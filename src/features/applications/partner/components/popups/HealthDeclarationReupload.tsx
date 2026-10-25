@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { useHealthDeclarationDocumentUpload } from "features/applications/hooks/files/useHealthDeclarationDocumentUpload";
-import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import CompactFileUpload from "components/form/upload/CompactFileUpload";
 import Button from "components/ui/buttons/Button";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
@@ -107,7 +107,7 @@ export default function HealthDeclarationReupload({
           </div>
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
-            <StatusFileUpload
+            <CompactFileUpload
               label="Health Declaration Form"
               description="Upload the corrected health declaration form"
               id="health_declaration_form"

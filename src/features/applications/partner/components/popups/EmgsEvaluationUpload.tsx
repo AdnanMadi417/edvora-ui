@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { useEmgsEvalUpload } from "features/applications/hooks";
-import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import CompactFileUpload from "components/form/upload/CompactFileUpload";
 import Button from "components/ui/buttons/Button";
 import { parseApiError } from "utils/parseApiError";
 
@@ -101,7 +101,7 @@ export default function EmgsEvalUpload({
           </div>
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
-            <StatusFileUpload
+            <CompactFileUpload
               label="EMGS Eval Document"
               description="Upload the EMGS eval document downloaded from the EMGS portal"
               id="emgs_eval"

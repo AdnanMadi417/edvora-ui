@@ -30,7 +30,7 @@ import { usePartnerBankAccount, BankAccountPayoutSummary } from "features/partne
 import { usePaymentMethods } from "features/applications/payouts";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
-import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import CompactFileUpload from "components/form/upload/CompactFileUpload";
 import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
 import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 
@@ -753,7 +753,7 @@ export default function UpdateStatusPopup({
 
           {isUniversityApproved && (
             <>
-              <StatusFileUpload
+              <CompactFileUpload
                 label="Upload Offer Letter"
                 description="Upload the official offer letter issued by the university"
                 id="offer-letter"
@@ -775,7 +775,7 @@ export default function UpdateStatusPopup({
                 errors={formErrors}
               />
               {formData.show_visa_invoice && (
-                <StatusFileUpload
+                <CompactFileUpload
                   label="Upload Visa Invoice"
                   description="Upload the visa invoice to attach with the offer letter"
                   id="offer-letter-visa-invoice"
@@ -797,7 +797,7 @@ export default function UpdateStatusPopup({
                 errors={formErrors}
               />
               {formData.show_app_form_template && (
-                <StatusFileUpload
+                <CompactFileUpload
                   label="Upload Application Form Template"
                   description="Upload the application form template for the student"
                   id="offer-letter-app-form-template"
@@ -819,7 +819,7 @@ export default function UpdateStatusPopup({
                 errors={formErrors}
               />
               {formData.show_app_form_2_template && (
-                <StatusFileUpload
+                <CompactFileUpload
                   label="Upload Application Form 2 Template"
                   description="Upload the second application form template for the student"
                   id="offer-letter-app-form-2-template"
@@ -855,7 +855,7 @@ export default function UpdateStatusPopup({
                 errors={formErrors}
               />
               {formData.show_english_form_template && (
-                <StatusFileUpload
+                <CompactFileUpload
                   label="Upload English Form Template"
                   description="Upload the blank English proficiency form template for the student"
                   id="offer-letter-english-form-template"
@@ -911,7 +911,7 @@ export default function UpdateStatusPopup({
           )}
 
           {isVisaIssued && (
-            <StatusFileUpload
+            <CompactFileUpload
               label="Upload Visa Document"
               description="Upload the visa document issued by the immigration authority"
               id="visa-document"
@@ -988,7 +988,7 @@ export default function UpdateStatusPopup({
                 />
               </div>
 
-              <StatusFileUpload
+              <CompactFileUpload
                 label="Upload Payout Receipt"
                 description="Upload proof of payment (receipt or transfer confirmation)"
                 id="payout-receipt"
@@ -1047,7 +1047,7 @@ export default function UpdateStatusPopup({
           )}
 
           {hasArrivalFormSelected && (
-            <StatusFileUpload
+            <CompactFileUpload
               label="Upload Arrival Form Template"
               description="Upload a template for the student to complete their arrival form"
               id="arrival-form-template"

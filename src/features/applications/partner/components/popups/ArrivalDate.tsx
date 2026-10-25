@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, Plane, CheckCircle, AlertCircle } from 'lucide-react';
 import { InputField } from "components/form";
-import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import CompactFileUpload from "components/form/upload/CompactFileUpload";
 import { useArrivalDateUpload } from "features/applications/hooks";
 import Button from "components/ui/buttons/Button";
 
@@ -150,7 +150,7 @@ export default function ArrivalDateConfirmation({
               />
             </div>
 
-            <StatusFileUpload
+            <CompactFileUpload
               label="Travel Ticket"
               description="Upload your flight ticket or booking confirmation"
               id="ticket_file"
@@ -162,7 +162,7 @@ export default function ArrivalDateConfirmation({
               disabled={isSubmitting}
             />
 
-            <StatusFileUpload
+            <CompactFileUpload
               label="E-Visa Document (if required)"
               description="Upload your e-visa if entry requires one — check with immigration before travelling"
               id="e_visa_file"

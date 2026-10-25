@@ -24,6 +24,7 @@ import EVisaUpload from "features/applications/partner/components/popups/EVisaUp
 import ApplicationCommission from './ApplicationCommission';
 import ApplicationDocuments from './ApplicationDocuments';
 import ApplicationFormsSection from './ApplicationFormsSection';
+import MDACSection from './MDACSection';
 import { useToast } from 'components/context/ToastContext';
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
@@ -622,6 +623,11 @@ export default function ApplicationDetails({
         {/* Offer Letter */}
         <div className="border-b border-slate-200">
           <OfferLetterDecision application={application} visaCase={visaCase} actions={actions} onRefetch={handleRefetch} readOnly={isTeamView} />
+        </div>
+
+        {/* MDAC — standalone, independent of the Visa/Offer Letter section */}
+        <div className="border-b border-slate-200">
+          <MDACSection />
         </div>
 
         {/* Application Information */}
