@@ -6,17 +6,29 @@ import { DetailStatusBadge } from "components/ui/badges";
 import { getStatusVariant } from "utils/getStatusVariant";
 import { daysSince } from "utils/applicationFormatting";
 
+// A status can carry a different next_actions entry per actor (e.g. partner
+// "upload a corrected version" vs manager "review after re-upload") -- "2"
+// consistently means partner and "3" consistently means manager/admin in
+// every example observed from the real API so far.
+type ApplicationHeroActor = "2" | "3";
+
 interface ApplicationHeroProps {
   application: any;
   children?: React.ReactNode;
+  /** Which actor's next_actions entry to show; falls back to the first entry if no match. */
+  viewerActor?: ApplicationHeroActor;
 }
 
-export default function ApplicationHero({ application, children }: ApplicationHeroProps) {
+export default function ApplicationHero({ application, children, viewerActor }: ApplicationHeroProps) {
   const student = application.student || {};
   const program = application.program || {};
   const university = program.university || {};
   const stage = application.stage || {};
   const currentStatus = stage.statuses?.[0] || {};
+  const nextActions = currentStatus.next_actions || [];
+  const nextAction = viewerActor
+    ? nextActions.find((a: any) => a.actor === viewerActor) ?? nextActions[0]
+    : nextActions[0];
 
   return (
     <div className="p-6 border-b border-slate-200">
@@ -132,7 +144,7 @@ export default function ApplicationHero({ application, children }: ApplicationHe
             <div className="block space-y-1">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-blue-500">Next Action</p>
               <p className="text-sm font-medium text-slate-800">
-                {application?.stage?.statuses?.[0]?.next_actions?.[0]?.name ?? "Not provided"}
+                {nextAction?.name ?? "Not provided"}
               </p>
             </div>
           </div>

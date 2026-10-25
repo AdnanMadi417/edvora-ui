@@ -134,7 +134,7 @@ export default function ApplicationDetails({
         </div>
 
         {/* Hero */}
-        <ApplicationHero application={application}>
+        <ApplicationHero application={application} viewerActor="2">
           <div className="mt-4 space-y-2">
             {isTeamView ? (
               <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
