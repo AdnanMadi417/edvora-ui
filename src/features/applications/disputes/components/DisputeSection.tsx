@@ -1,32 +1,24 @@
 "use client";
 
 import React, { useState } from "react";
-import { AlertTriangle, UserCheck, CheckCircle, Wrench } from "lucide-react";
+import { AlertTriangle, CheckCircle, Wrench } from "lucide-react";
 
 import { DetailStatusBadge } from "components/ui/badges";
 import { SectionIconBadge } from "components/ui/icons";
 import Button from "components/ui/buttons/Button";
-import { useToast } from "components/context/ToastContext";
-import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import type { Dispute } from "features/applications/shared/applicationTypes";
 
-import { useClaimDispute } from "../hooks";
 import ResolveNoIssue from "./ResolveNoIssue";
 import ResolveDisputeCorrection from "./ResolveDisputeCorrection";
 
 interface DisputeSectionProps {
   dispute: Dispute | null;
   partnerPayoutId?: string | null;
-  /** Admin-only — account managers and partners never get claim/resolve
+  /** Admin-only — account managers and partners never get resolve
    *  buttons, since those calls would 403 server-side for them anyway. */
   canManageDispute?: boolean;
   onRefetch?: () => void;
 }
-
-const CLAIM_ERROR_MESSAGES: Record<string, string> = {
-  dispute_not_found: "This dispute could not be found — it may have already been removed.",
-  dispute_not_open: "This dispute has already been claimed or resolved.",
-};
 
 export default function DisputeSection({
   dispute,
@@ -34,25 +26,10 @@ export default function DisputeSection({
   canManageDispute = false,
   onRefetch,
 }: DisputeSectionProps) {
-  const { showToast } = useToast();
-  const { claimDispute, loading: claiming } = useClaimDispute();
   const [showResolveNoIssue, setShowResolveNoIssue] = useState(false);
   const [showResolveCorrection, setShowResolveCorrection] = useState(false);
 
   if (!dispute) return null;
-
-  const handleClaim = async () => {
-    if (!dispute) return;
-    try {
-      await claimDispute(dispute.id);
-      showToast("Dispute claimed.", "success");
-      onRefetch?.();
-    } catch (err: unknown) {
-      const code = getApiErrorCode(err);
-      const msg = (code && CLAIM_ERROR_MESSAGES[code]) || parseApiError(err, "Failed to claim dispute.");
-      showToast(msg, "error");
-    }
-  };
 
   const isActionable = dispute.status !== "resolved";
 
@@ -89,20 +66,6 @@ export default function DisputeSection({
 
       {canManageDispute && isActionable && (
         <div className="flex flex-wrap justify-end gap-3">
-          {dispute.status === "open" && (
-            <Button
-              onClick={handleClaim}
-              disabled={claiming}
-              icon={<UserCheck className="h-4 w-4" />}
-              text={claiming ? "Claiming..." : "Claim"}
-              bgColor="bg-white"
-              textColor="text-blue-600"
-              borderColor="border-blue-200"
-              hoverTextColor="hover:text-blue-700"
-              hoverBorderColor="hover:border-blue-300"
-              className="hover:bg-blue-50"
-            />
-          )}
           <Button
             onClick={() => setShowResolveNoIssue(true)}
             icon={<CheckCircle className="h-4 w-4" />}

@@ -1,16 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
-import { Receipt, CheckCircle } from "lucide-react";
-import Button from "components/ui/buttons/Button";
+import React from "react";
+import { Receipt } from "lucide-react";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { SectionIconBadge } from "components/ui/icons";
 import ApplicationCommissionRecords from "features/applications/shared/ApplicationCommissionRecords";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 import { UniversityPayInSection } from "features/applications/pay-ins";
 import { PartnerPayoutSection } from "features/applications/payouts";
-import { DisputeSection, CompleteCommissionOnBehalf } from "features/applications/disputes";
-import { useApplicationActions } from "features/applications/hooks";
+import { DisputeSection } from "features/applications/disputes";
 
 interface ApplicationCommissionsProps {
   application: any;
@@ -23,19 +21,6 @@ export default function ApplicationCommissions({
 }: ApplicationCommissionsProps) {
   const commissions: ApplicationCommissionItem[] = application?.commissions || [];
   const studentName = application?.student?.name;
-  const [isCompleteOpen, setIsCompleteOpen] = useState(false);
-
-  // For when the advisor never confirms receipt: the status picker has no
-  // edges from these two statuses, so this is the admin's only way to close it.
-  const { actions, refetch: refetchActions } = useApplicationActions(application?.id);
-  const statusCode = actions?.status_code;
-  const canCompleteOnBehalf =
-    statusCode === "COMMISSION_PAID" || statusCode === "DISPUTE_RESPONSE_RECEIVED";
-
-  const handleCompleted = () => {
-    refetchActions();
-    onRefetch?.();
-  };
 
   const commissionDocs = Object.values(
     application?.commission_documents || {}
@@ -61,20 +46,6 @@ export default function ApplicationCommissions({
               </span>
             </div>
           </div>
-
-          {canCompleteOnBehalf && (
-            <Button
-              onClick={() => setIsCompleteOpen(true)}
-              icon={<CheckCircle className="h-4 w-4" />}
-              text="Complete on Advisor's Behalf"
-              bgColor="bg-green-50"
-              textColor="text-green-700"
-              borderColor="border-green-500"
-              hoverTextColor="hover:text-green-700"
-              hoverBorderColor="hover:border-green-600"
-              className="w-full hover:bg-green-100 sm:w-auto sm:shrink-0"
-            />
-          )}
         </div>
 
         <ApplicationCommissionRecords commissions={commissions} />
@@ -126,13 +97,6 @@ export default function ApplicationCommissions({
             </p>
           )}
         </div>
-
-        <CompleteCommissionOnBehalf
-          isOpen={isCompleteOpen}
-          onClose={() => setIsCompleteOpen(false)}
-          applicationId={application?.id}
-          onSuccess={handleCompleted}
-        />
     </>
   );
 }

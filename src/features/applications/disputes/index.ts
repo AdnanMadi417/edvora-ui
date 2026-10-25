@@ -4,4 +4,3 @@ export * from './services';
 export { default as DisputeSection } from './components/DisputeSection';
 export { default as ResolveNoIssue } from './components/ResolveNoIssue';
 export { default as ResolveDisputeCorrection } from './components/ResolveDisputeCorrection';
-export { default as CompleteCommissionOnBehalf } from './components/CompleteCommissionOnBehalf';
