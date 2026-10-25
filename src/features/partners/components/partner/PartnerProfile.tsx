@@ -212,6 +212,8 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
   const profileTabs: TabItem<ProfileTab>[] = [
     { key: "profile", label: "Profile" },
     ...(isCompany ? [{ key: "team" as const, label: "Team" }] : []),
+    // Agency members see this tab too -- it now shows their agency admin's
+    // bank account (the one payouts actually go to), read-only.
     { key: "bank", label: "Bank Account" },
   ];
 
