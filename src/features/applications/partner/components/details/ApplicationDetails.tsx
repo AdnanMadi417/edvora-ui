@@ -24,6 +24,7 @@ import EVisaUpload from "features/applications/partner/components/popups/EVisaUp
 import ApplicationCommission from './ApplicationCommission';
 import ApplicationDocuments from './ApplicationDocuments';
 import ApplicationFormsSection from './ApplicationFormsSection';
+import RejectedFormReuploadAction from './RejectedFormReuploadAction';
 import MDACSection from './MDACSection';
 import { useToast } from 'components/context/ToastContext';
 import { AnimatePresence, motion } from "framer-motion";
@@ -143,6 +144,12 @@ export default function ApplicationDetails({
               </p>
             ) : (
             <>
+            <RejectedFormReuploadAction
+              statusCode={currentStatusCode}
+              applicationId={application.id}
+              correctionReason={actions?.correction_reason}
+              onRefetch={handleRefetch}
+            />
             {actions && (
               <>
                 {hasRequiredDocs && !showArrivalExtraDocs && (
@@ -603,9 +610,9 @@ export default function ApplicationDetails({
         <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: MICRO_DURATION, ease: EASE }}
         >
         {activeTab === "details" && (

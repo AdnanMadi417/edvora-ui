@@ -148,19 +148,20 @@ export default function ApplicationHero({ application, children, viewerActor, co
               <p className="text-sm font-medium text-slate-800">
                 {nextAction?.name ?? "Not provided"}
               </p>
-              {correctionReason && (
-                <div className="mt-2 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-2.5">
-                  <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
-                  <div>
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">Reason for rejection</p>
-                    <p className="mt-0.5 text-xs text-amber-800">{correctionReason}</p>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>
       </div>
+
+      {correctionReason && (
+        <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Reason for rejection</p>
+            <p className="mt-0.5 text-sm text-amber-800">{correctionReason}</p>
+          </div>
+        </div>
+      )}
 
       {children}
     </div>
