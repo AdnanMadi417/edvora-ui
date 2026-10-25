@@ -31,6 +31,7 @@ const COUNTRY_OPTIONS = ISO_COUNTRIES.map((c) => ({ value: c.code, label: `${c.n
 const ERROR_MESSAGES: Record<string, string> = {
   bank_account_not_found: "This bank account no longer exists — it may have been removed elsewhere.",
   bank_account_not_current: "This account was changed elsewhere — refresh and try again.",
+  agency_member_bank_account_blocked: "Agency members don't have their own bank account; payouts use the agency admin's account.",
 };
 
 interface Props {
@@ -123,6 +124,10 @@ export default function PartnerBankAccountSection({ partner }: Props) {
   const [curatedSuggestion, setCuratedSuggestion] = useState<{ bankId: string; bankName: string } | null>(null);
 
   const isMalaysia = partner.country.trim().toLowerCase() === "malaysia";
+  // Agency members don't have their own bank account -- GET now returns the
+  // agency admin's account (for payout visibility), but POST/PATCH 409.
+  // Read-only here rather than relying on that 409 as the only guard.
+  const isAgencyMember = partner.agency_role === "member";
   const saving = creating || updating;
   const status = getAsyncStatus(loading, error, account, (a) => a === null);
 
@@ -306,6 +311,12 @@ export default function PartnerBankAccountSection({ partner }: Props) {
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bank Account</p>
       </div>
 
+      {isAgencyMember && (
+        <p className="px-6 pb-2 text-xs text-slate-500">
+          This is the agency admin&apos;s bank account — payouts for this advisor are sent there.
+        </p>
+      )}
+
       {mode === "view" && (
         <AsyncStateView
           status={status}
@@ -313,19 +324,21 @@ export default function PartnerBankAccountSection({ partner }: Props) {
           errorMessage={error ?? undefined}
           onRetry={refetch}
           emptyTitle="No payout bank account yet"
-          emptySubtitle="Add one so this advisor can be paid."
+          emptySubtitle={isAgencyMember ? "The agency admin hasn't set up a payout bank account yet." : "Add one so this advisor can be paid."}
           emptyIcon={Landmark}
           emptyAction={
-            <Button
-              onClick={openAdd}
-              icon={<Plus className="h-4 w-4" />}
-              text="Add Bank Account"
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
-            />
+            isAgencyMember ? undefined : (
+              <Button
+                onClick={openAdd}
+                icon={<Plus className="h-4 w-4" />}
+                text="Add Bank Account"
+                bgColor="bg-blue-50"
+                textColor="text-blue-700"
+                borderColor="border-blue-600"
+                hoverTextColor="hover:text-blue-800"
+                hoverBorderColor="hover:border-blue-700"
+              />
+            )
           }
         >
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 p-6">
@@ -359,16 +372,18 @@ export default function PartnerBankAccountSection({ partner }: Props) {
               hoverTextColor="hover:text-slate-800"
               hoverBorderColor="hover:border-slate-400"
             />
-            <Button
-              onClick={openEdit}
-              icon={<Pencil className="h-4 w-4" />}
-              text="Edit"
-              bgColor="bg-white"
-              textColor="text-slate-600"
-              borderColor="border-slate-300"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-400"
-            />
+            {!isAgencyMember && (
+              <Button
+                onClick={openEdit}
+                icon={<Pencil className="h-4 w-4" />}
+                text="Edit"
+                bgColor="bg-white"
+                textColor="text-slate-600"
+                borderColor="border-slate-300"
+                hoverTextColor="hover:text-slate-800"
+                hoverBorderColor="hover:border-slate-400"
+              />
+            )}
           </div>
         </AsyncStateView>
       )}

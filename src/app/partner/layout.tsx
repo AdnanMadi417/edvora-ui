@@ -32,10 +32,14 @@ function PartnerShell({ children }: { children: React.ReactNode }) {
   // "Agency Scaler" (agency invitations) only applies to agency/company
   // partners — individual advisors have no team to manage. "My Public
   // Profile" is the mirror image — public profiles are individual-only
-  // in V1, so agency partners don't get that item.
-  const visibleRoutes = partner && partner.type !== "agency"
-    ? partnerRoutes.filter((route) => route.name !== "Agency Scaler")
-    : partnerRoutes.filter((route) => route.name !== "My Public Profile");
+  // in V1, so agency partners don't get that item. "Commission Tracker" is
+  // the agency admin's payout view -- agency members don't manage commissions.
+  const isAgencyMember = partner?.agency_role === "member";
+  const visibleRoutes = (
+    partner && partner.type !== "agency"
+      ? partnerRoutes.filter((route) => route.name !== "Agency Scaler")
+      : partnerRoutes.filter((route) => route.name !== "My Public Profile")
+  ).filter((route) => !isAgencyMember || route.name !== "Commission Tracker");
 
   return (
     <ToastProvider>
