@@ -286,30 +286,35 @@ export default function ApplicationFormsSection({ application, actions, onRefetc
         isOpen={openPopup === "application_form"}
         onClose={() => setOpenPopup(null)}
         applicationId={application.id}
+        correctionReason={actions?.correction_reason}
         onRefetch={handleRefetchAndClose}
       />
       <ApplicationForm2Reupload
         isOpen={openPopup === "application_form_2"}
         onClose={() => setOpenPopup(null)}
         applicationId={application.id}
+        correctionReason={actions?.correction_reason}
         onRefetch={handleRefetchAndClose}
       />
       <HealthDeclarationReupload
         isOpen={openPopup === "health_declaration"}
         onClose={() => setOpenPopup(null)}
         applicationId={application.id}
+        correctionReason={actions?.correction_reason}
         onRefetch={handleRefetchAndClose}
       />
       <SignedOfferLetterReupload
         isOpen={openPopup === "signed_offer_letter"}
         onClose={() => setOpenPopup(null)}
         applicationId={application.id}
+        correctionReason={actions?.correction_reason}
         onRefetch={handleRefetchAndClose}
       />
       <EnglishFormReupload
         isOpen={openPopup === "english_form"}
         onClose={() => setOpenPopup(null)}
         applicationId={application.id}
+        correctionReason={actions?.correction_reason}
         onRefetch={handleRefetchAndClose}
       />
     </div>

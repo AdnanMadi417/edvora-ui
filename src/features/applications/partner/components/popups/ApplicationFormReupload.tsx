@@ -15,6 +15,7 @@ interface ApplicationFormReuploadProps {
   isOpen: boolean;
   onClose: () => void;
   applicationId: string;
+  correctionReason?: string | null;
   onRefetch?: () => void;
 }
 
@@ -22,6 +23,7 @@ export default function ApplicationFormReupload({
   isOpen,
   onClose,
   applicationId,
+  correctionReason,
   onRefetch,
 }: ApplicationFormReuploadProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -107,6 +109,16 @@ export default function ApplicationFormReupload({
           </div>
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
+            {correctionReason && (
+              <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Reason for rejection</p>
+                  <p className="mt-0.5 text-xs text-amber-800">{correctionReason}</p>
+                </div>
+              </div>
+            )}
+
             <CompactFileUpload
               label="Application Form"
               description="Upload the corrected application form"
