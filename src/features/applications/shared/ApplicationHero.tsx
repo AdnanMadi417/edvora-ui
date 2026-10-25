@@ -1,5 +1,5 @@
 import React from "react";
-import { GraduationCap, Building2, Clock, Globe, Calendar, ArrowRight } from "lucide-react";
+import { GraduationCap, Building2, Clock, Globe, Calendar, ArrowRight, AlertCircle } from "lucide-react";
 import PresignedImage from "components/ui/PresignedImage";
 import { AppDate } from "components/ui/date";
 import { DetailStatusBadge } from "components/ui/badges";
@@ -17,9 +17,11 @@ interface ApplicationHeroProps {
   children?: React.ReactNode;
   /** Which actor's next_actions entry to show; falls back to the first entry if no match. */
   viewerActor?: ApplicationHeroActor;
+  /** The specific reason an admin/manager typed when rejecting the current form, if any. */
+  correctionReason?: string | null;
 }
 
-export default function ApplicationHero({ application, children, viewerActor }: ApplicationHeroProps) {
+export default function ApplicationHero({ application, children, viewerActor, correctionReason }: ApplicationHeroProps) {
   const student = application.student || {};
   const program = application.program || {};
   const university = program.university || {};
@@ -146,6 +148,15 @@ export default function ApplicationHero({ application, children, viewerActor }: 
               <p className="text-sm font-medium text-slate-800">
                 {nextAction?.name ?? "Not provided"}
               </p>
+              {correctionReason && (
+                <div className="mt-2 flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-2.5">
+                  <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-amber-700">Reason for rejection</p>
+                    <p className="mt-0.5 text-xs text-amber-800">{correctionReason}</p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
