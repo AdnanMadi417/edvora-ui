@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { useApplicationForm2DocumentUpload } from "features/applications/hooks/files/useApplicationForm2DocumentUpload";
 import CompactFileUpload from "components/form/upload/CompactFileUpload";
@@ -65,7 +66,10 @@ export default function ApplicationForm2Reupload({
 
   if (!isVisible) return null;
 
-  return (
+  // Portaled to document.body: a fixed-position overlay nested inside the
+  // tab content isn't guaranteed to cover the viewport if any ancestor
+  // establishes a containing block (e.g. a transform from a page transition).
+  return createPortal(
     <div
       className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
       onClick={handleClose}
@@ -176,6 +180,7 @@ export default function ApplicationForm2Reupload({
 
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

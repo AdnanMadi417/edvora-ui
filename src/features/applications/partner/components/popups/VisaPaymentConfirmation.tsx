@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { XCircle, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
@@ -108,7 +109,9 @@ export default function VisaPaymentConfirmation({
 
   if (!isVisible) return null;
 
-  return (
+  // Portaled to document.body so the overlay always covers the full
+  // viewport, regardless of any ancestor's stacking context.
+  return createPortal(
     <div
       className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
       onClick={handleClose}
@@ -302,6 +305,7 @@ export default function VisaPaymentConfirmation({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
