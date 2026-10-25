@@ -11,7 +11,7 @@ import { useToast } from "components/context/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { InputField, SearchableDropdown } from "components/form";
-import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import CompactFileUpload from "components/form/upload/CompactFileUpload";
 import ModalHeader from "components/ui/modal/ModalHeader";
 import Button from "components/ui/buttons/Button";
 
@@ -225,7 +225,7 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
               />
             </div>
 
-            <StatusFileUpload
+            <CompactFileUpload
               id="batch-payout-receipt"
               label="Upload Payout Receipt"
               description="Upload proof of payment (receipt or transfer confirmation)"

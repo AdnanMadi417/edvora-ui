@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { useSignedOfferLetterDocumentUpload } from "features/applications/hooks/files/useSignedOfferLetterDocumentUpload";
-import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import CompactFileUpload from "components/form/upload/CompactFileUpload";
 import Button from "components/ui/buttons/Button";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
@@ -107,7 +107,7 @@ export default function SignedOfferLetterReupload({
           </div>
 
           <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
-            <StatusFileUpload
+            <CompactFileUpload
               label="Signed Offer Letter"
               description="Upload the corrected signed offer letter"
               id="signed_offer_letter"

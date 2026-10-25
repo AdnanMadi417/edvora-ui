@@ -4,7 +4,7 @@ import React from "react";
 import { AlertCircle } from "lucide-react";
 
 import { InputField, SelectField, TextareaField, SearchableDropdown } from "components/form";
-import StatusFileUpload from "components/form/upload/StatusFileUpload";
+import CompactFileUpload from "components/form/upload/CompactFileUpload";
 import type { Payout } from "../../types";
 import type { PartnerBankAccount } from "features/partners/bank-accounts";
 import { BankAccountPayoutSummary } from "features/partners/bank-accounts";
@@ -143,7 +143,7 @@ export default function PayoutCorrectionFields({
         {formErrors.lines && <p className="text-xs text-red-600">{formErrors.lines}</p>}
       </div>
 
-      <StatusFileUpload
+      <CompactFileUpload
         id="payout-correction-receipt"
         label="Corrected Receipt"
         description="Upload the corrected proof of payment"
