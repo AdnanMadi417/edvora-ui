@@ -34,7 +34,7 @@ export default function ApplicationDetails({
         </div>
 
         {/* Hero */}
-        <ApplicationHero application={application} />
+        <ApplicationHero application={application} viewerActor="3" />
 
         <Tabs<ApplicationDetailsTab> tabs={APPLICATION_DETAILS_TABS} active={activeTab} onChange={setActiveTab} />
 
