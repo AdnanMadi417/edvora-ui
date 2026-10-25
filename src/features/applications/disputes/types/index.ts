@@ -8,10 +8,6 @@ export interface ResolveNoIssuePayload {
   report: string;
 }
 
-export interface CompleteCommissionPayload {
-  reason: string;
-}
-
 /** Byte-for-byte identical shape to VoidPayoutPayload -- resolving a
  *  dispute via correction voids the current payout and records a
  *  corrected one, the exact same operation as a plain void. */
