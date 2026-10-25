@@ -293,9 +293,9 @@ export default function ApplicationDetails({
                   const appForm2Doc = application?.documents?.find((d: any) => d.document_type === "Application Form 2 Template");
                   const englishFormDoc = application?.documents?.find((d: any) => d.document_type === "English Form Template");
                   const visaInvoiceKey = visaInvoiceDoc?.file_key;
-                  const appFormKey = appFormDoc?.file_key;
-                  const appForm2Key = appForm2Doc?.file_key;
-                  const englishFormKey = englishFormDoc?.file_key;
+                  const appFormKey = actions?.is_application_form_required ? appFormDoc?.file_key : null;
+                  const appForm2Key = actions?.is_application_form_2_required ? appForm2Doc?.file_key : null;
+                  const englishFormKey = actions?.is_english_form_required ? englishFormDoc?.file_key : null;
                   const showHealthDeclaration = !!actions?.is_health_declaration_form_required;
                   const signedOfferLetterKey = actions?.is_signed_offer_letter_required
                     ? application?.offer_letter_document?.file_key

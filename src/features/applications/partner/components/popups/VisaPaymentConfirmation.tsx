@@ -7,7 +7,6 @@ import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applicatio
 import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import CompactFileUpload from "components/form/upload/CompactFileUpload";
-import SettingToggleInput from "components/form/toggle/SettingToggleInput";
 import Button from "components/ui/buttons/Button";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
@@ -37,7 +36,6 @@ export default function VisaPaymentConfirmation({
   const [paymentReference, setPaymentReference] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
   const [uploadError, setUploadError] = useState("");
-  const [appFormToggle, setAppFormToggle] = useState({ show_app_form: false });
   const [appFormFile, setAppFormFile] = useState<File | null>(null);
   const [appForm2File, setAppForm2File] = useState<File | null>(null);
   const [healthDeclarationFile, setHealthDeclarationFile] = useState<File | null>(null);
@@ -52,7 +50,6 @@ export default function VisaPaymentConfirmation({
 
   const firstMethod = methods[0] ?? null;
   const hasAppFormTemplate = !!actions?.is_application_form_required;
-  const showAppFormUpload = hasAppFormTemplate || appFormToggle.show_app_form;
 
   const hasAppForm2Template = !!actions?.is_application_form_2_required;
   const healthDeclarationRequired = !!actions?.is_health_declaration_form_required;
@@ -81,7 +78,7 @@ export default function VisaPaymentConfirmation({
         methodId: firstMethod?.id ?? null,
         amount: visaFeeAmount,
         currency: firstMethod?.currency ?? null,
-        applicationFormFile: showAppFormUpload ? appFormFile : null,
+        applicationFormFile: hasAppFormTemplate ? appFormFile : null,
         applicationForm2File: hasAppForm2Template ? appForm2File : null,
         healthDeclarationFormFile: healthDeclarationRequired ? healthDeclarationFile : null,
         signedOfferLetterFile: signedOfferLetterRequired ? signedOfferLetterFile : null,
@@ -102,7 +99,6 @@ export default function VisaPaymentConfirmation({
     setFileError("");
     setUploadError("");
     setAppFormFile(null);
-    setAppFormToggle({ show_app_form: false });
     setAppForm2File(null);
     setHealthDeclarationFile(null);
     setSignedOfferLetterFile(null);
@@ -172,7 +168,7 @@ export default function VisaPaymentConfirmation({
               required
             />
 
-            {hasAppFormTemplate ? (
+            {hasAppFormTemplate && (
               <CompactFileUpload
                 label="Application Form"
                 description="Your manager has provided a template — download it, complete it, and upload the filled form here."
@@ -184,31 +180,6 @@ export default function VisaPaymentConfirmation({
                 disabled={isUploading}
                 required
               />
-            ) : (
-              <>
-                <SettingToggleInput
-                  label="Upload Application Form (optional)"
-                  field="show_app_form"
-                  formData={appFormToggle}
-                  updateFormData={(field: string, value: boolean) => {
-                    setAppFormToggle((prev) => ({ ...prev, [field]: value }));
-                    if (!value) setAppFormFile(null);
-                  }}
-                  errors={{}}
-                />
-                {appFormToggle.show_app_form && (
-                  <CompactFileUpload
-                    label="Application Form"
-                    description="Upload your completed application form document"
-                    id="app_form_document"
-                    file={appFormFile}
-                    onFileChange={setAppFormFile}
-                    onRemove={() => setAppFormFile(null)}
-                    onError={setFileError}
-                    disabled={isUploading}
-                  />
-                )}
-              </>
             )}
 
             {hasAppForm2Template && (
