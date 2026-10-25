@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import RichTextDisplay from "components/ui/RichTextDisplay";
 
-import { Wallet, AlertCircle } from "lucide-react";
-import { Clock, Upload, ClipboardCheck, CreditCard, Plane, CheckCircle, FileUp, Download } from 'lucide-react';
+import { Wallet } from "lucide-react";
+import { Clock, Upload, ClipboardCheck, CreditCard, Plane, FileUp, Download } from 'lucide-react';
 import { getDocumentDownloadUrl } from 'services/documentService';
 import Button from 'components/ui/buttons/Button';
 import IconButton from 'components/ui/buttons/IconButton';
 import { useApplicationActions } from "features/applications/hooks";
+import { usePartnerProfile } from "features/partners/hooks/usePartnerProfile";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 
 import ApplicationPartnerTopBar from "features/applications/partner/components/topBar/PartnerTopBar";
@@ -24,8 +25,6 @@ import ApplicationCommission from './ApplicationCommission';
 import ApplicationDocuments from './ApplicationDocuments';
 import ApplicationFormsSection from './ApplicationFormsSection';
 import { useToast } from 'components/context/ToastContext';
-import DisputeCommission from 'features/applications/partner/components/popups/DisputeCommission';
-import api from 'lib/useApi';
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
 import { Tabs } from "components/ui/tabs";
@@ -34,7 +33,6 @@ import ApplicationActivityHistory from 'features/applications/shared/Application
 import ApplicationTimeline from 'features/applications/shared/ApplicationTimeline';
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useVisaCase } from "hooks/useVisaCase";
-import { parseApiError } from "utils/parseApiError";
 
 interface ApplicationDetailsProps {
   application: any;
@@ -46,7 +44,7 @@ export default function ApplicationDetails({
   onRefetch,
 }: ApplicationDetailsProps) {
   const [activeTab, setActiveTab] = useState<ApplicationDetailsTab>("details");
-  const { actions, loading: actionsLoading, refetch: refetchActions } = useApplicationActions(
+  const { actions, refetch: refetchActions } = useApplicationActions(
     application?.id
   );
 
@@ -54,6 +52,13 @@ export default function ApplicationDetails({
     await onRefetch?.();
     refetchActions();
   };
+
+  // An agency admin viewing one of their members' applications (D8): read
+  // only, the member does the uploads and forms. Commission confirm/dispute
+  // stays available -- those are the agency admin's to do.
+  const { partner: viewer } = usePartnerProfile();
+  const ownerId: string | undefined = application?.partner?.id;
+  const isTeamView = !!viewer?.id && !!ownerId && ownerId !== viewer.id;
 
   const stage = application.stage || {};
   const [showRequiredActionPopup, setShowRequiredActionPopup] = useState(false);
@@ -64,34 +69,6 @@ export default function ApplicationDetails({
   const { visaCase } = useVisaCase(application?.id || "");
 
   const { showToast } = useToast();
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [showDispute, setShowDispute] = useState(false);
-  const { partner_actions } = actions || {};
-  const confirmAction = partner_actions?.find(
-    (a: any) => a.target_status_code === "APPLICATION_COMPLETE"
-  );
-  const disputeAction = partner_actions?.find(
-    (a: any) => a.target_status_code === "COMMISSION_DISPUTED"
-  );
-
-  const handleCommissionConfirm = async () => {
-    if (!confirmAction) return;
-    try {
-      setConfirmLoading(true);
-      await api.post(`/applications/${application.id}/status`, {
-        status_id: confirmAction.target_status_id,
-        reason_text: null,
-        notes: "Partner commission confirmed successfully",
-      });
-      showToast("Commission confirmed successfully", "success");
-      handleRefetch();
-    } catch (err: unknown) {
-      showToast(parseApiError(err, "Failed to confirm commission"), "error");
-    } finally {
-      setConfirmLoading(false);
-    }
-  };
-
   const [showProgramDecisionPopup, setShowProgramDecisionPopup] = useState(false);
   const openProgramDecisionPopup = () => setShowProgramDecisionPopup(true);
   const closeProgramDecisionPopup = () => setShowProgramDecisionPopup(false);
@@ -158,6 +135,13 @@ export default function ApplicationDetails({
         {/* Hero */}
         <ApplicationHero application={application}>
           <div className="mt-4 space-y-2">
+            {isTeamView ? (
+              <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                Submitted by <span className="font-medium text-slate-800">{application?.partner?.name || "a team member"}</span>.
+                You can view this application; uploads and forms are done from their account.
+              </p>
+            ) : (
+            <>
             {actions && (
               <>
                 {hasRequiredDocs && !showArrivalExtraDocs && (
@@ -607,38 +591,9 @@ export default function ApplicationDetails({
                 />
               </div>
             )}
-
-            {!actionsLoading && (confirmAction || disputeAction) && (
-              <div className="flex flex-row gap-2">
-                {confirmAction && (
-                  <Button
-                    icon={<CheckCircle className="h-4 w-4" />}
-                    text={confirmLoading ? "Processing..." : "Confirm Commission "}
-                    bgColor="bg-green-50"
-                    textColor="text-green-700"
-                    borderColor="border-green-600"
-                    hoverTextColor="hover:text-green-800"
-                    hoverBorderColor="hover:border-green-700"
-                    className="w-full"
-                    onClick={handleCommissionConfirm}
-                    disabled={confirmLoading}
-                  />
-                )}
-                {disputeAction && (
-                  <Button
-                    icon={<AlertCircle className="h-4 w-4" />}
-                    text="Dispute Commission "
-                    bgColor="bg-red-50"
-                    textColor="text-red-700"
-                    borderColor="border-red-600"
-                    hoverTextColor="hover:text-red-800"
-                    hoverBorderColor="hover:border-red-700"
-                    className="w-full"
-                    onClick={() => setShowDispute(true)}
-                  />
-                )}
-              </div>
+            </>
             )}
+
           </div>
         </ApplicationHero>
 
@@ -666,7 +621,7 @@ export default function ApplicationDetails({
 
         {/* Offer Letter */}
         <div className="border-b border-slate-200">
-          <OfferLetterDecision application={application} visaCase={visaCase} actions={actions} onRefetch={handleRefetch} />
+          <OfferLetterDecision application={application} visaCase={visaCase} actions={actions} onRefetch={handleRefetch} readOnly={isTeamView} />
         </div>
 
         {/* Application Information */}
@@ -682,7 +637,7 @@ export default function ApplicationDetails({
         )}
 
         {activeTab === "documents" && (
-          <ApplicationFormsSection application={application} actions={actions} onRefetch={handleRefetch} />
+          <ApplicationFormsSection application={application} actions={actions} onRefetch={handleRefetch} readOnly={isTeamView} />
         )}
 
         {activeTab === "activity" && <ApplicationActivityHistory application={application} />}
@@ -748,14 +703,6 @@ export default function ApplicationDetails({
         />
       )}
 
-      {showDispute && disputeAction && (
-        <DisputeCommission
-          isOpen={showDispute}
-          onClose={() => setShowDispute(false)}
-          applicationId={application.id}
-          onSuccess={handleRefetch}
-        />
-      )}
     </section>
   );
 }

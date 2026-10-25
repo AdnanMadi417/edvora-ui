@@ -152,6 +152,9 @@ export interface PayoutStatementItem {
   void_reason: string | null;
   voided_by_name: string | null;
   receipt_file_url: string | null;
+  /** Signed for download via storage — readable by anyone who can see the
+   *  statement, unlike GET /admin/payouts/{id} (FINANCE only). */
+  receipt_file_key: string | null;
   can_void: boolean;
 }
 

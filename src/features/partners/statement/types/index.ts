@@ -19,7 +19,8 @@ export interface PartnerStatementItem {
   university_name: string;
   program_name: string;
   created_at: string;
-  commission_amount: number;
+  /** Null when no amount was agreed on the program's commission. */
+  commission_amount: number | null;
   commission_currency: string;
   waiting_on: WaitingOn;
   since_date: string;

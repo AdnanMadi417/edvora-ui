@@ -216,7 +216,9 @@ export default function StatementPage() {
                         <p className="text-xs text-slate-400">{item.program_name}</p>
                       </td>
                       <td className="px-6 py-4 text-sm font-medium text-slate-900">
-                        {formatCommissionAmount(item.commission_amount, item.commission_currency)}
+                        {item.commission_amount != null
+                          ? formatCommissionAmount(item.commission_amount, item.commission_currency)
+                          : "—"}
                       </td>
                       <td className="px-6 py-4">
                         <StatusBadge variant={WAITING_ON_VARIANT[item.waiting_on]}>

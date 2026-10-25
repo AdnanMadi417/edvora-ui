@@ -19,7 +19,7 @@ import type { PartnerDetails } from "features/partners/types";
 import { usePartnerBankAccount, useCreatePartnerBankAccount, useUpdatePartnerBankAccount } from "../../hooks";
 import type { CreatePartnerBankAccountPayload } from "../../types";
 import PartnerBankAccountHistory from "./PartnerBankAccountHistory";
-import { validateAccountNumber, validateIban } from "../../constants/accountNumberRules";
+import { normalizeAccountNumber, validateAccountNumber, validateIban } from "../../constants/accountNumberRules";
 
 const CURRENCY_OPTIONS = [
   { value: "RM", label: "RM — Malaysian Ringgit" },
@@ -190,6 +190,12 @@ export default function PartnerBankAccountSection({ partner }: Props) {
     setErrors((prev) => ({ ...prev, bank_id: "", intl_bank_name: "", intl_bank_country: "", intl_bank_swift: "" }));
   };
 
+  // Computed on every render so the length warning updates as they type.
+  const accountNumberCheck = validateAccountNumber(
+    formData.account_number,
+    formData.isManualBank ? null : bankLookup.get(formData.bank_id)?.code
+  );
+
   const validate = (): Record<string, string> => {
     const next: Record<string, string> = {};
     if (formData.isManualBank) {
@@ -201,9 +207,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
     }
     if (!formData.account_holder_name.trim()) next.account_holder_name = "Account holder name is required";
 
-    const selectedBankCode = bankLookup.get(formData.bank_id)?.code;
-    const accountNumberError = validateAccountNumber(formData.account_number, selectedBankCode);
-    if (accountNumberError) next.account_number = accountNumberError;
+    if (accountNumberCheck.error) next.account_number = accountNumberCheck.error;
 
     const ibanError = validateIban(formData.iban);
     if (ibanError) next.iban = ibanError;
@@ -231,7 +235,7 @@ export default function PartnerBankAccountSection({ partner }: Props) {
     intl_bank_country: formData.isManualBank ? formData.intl_bank_country : null,
     intl_bank_swift: formData.isManualBank ? formData.intl_bank_swift.trim() : null,
     account_holder_name: formData.account_holder_name.trim(),
-    account_number: formData.account_number.trim(),
+    account_number: normalizeAccountNumber(formData.account_number),
     iban: formData.iban.trim() || undefined,
     currency: formData.currency,
     beneficiary_address: formData.beneficiary_address.trim() || undefined,
@@ -442,7 +446,12 @@ export default function PartnerBankAccountSection({ partner }: Props) {
           )}
 
           <InputField label="Account Holder Name" field="account_holder_name" placeholder="Name as it appears on the account" formData={formData} errors={errors} updateFormData={updateFormData} />
-          <InputField label="Account Number" field="account_number" placeholder="e.g. 1234567890" formData={formData} errors={errors} updateFormData={updateFormData} />
+          <div>
+            <InputField label="Account Number" field="account_number" placeholder="e.g. 1234567890" formData={formData} errors={errors} updateFormData={updateFormData} />
+            {!errors.account_number && accountNumberCheck.warning && (
+              <p className="-mt-3 mb-4 text-xs text-amber-700">{accountNumberCheck.warning}</p>
+            )}
+          </div>
           <InputField label="IBAN" field="iban" required={false} placeholder="e.g. GB29 NWBK 6016 1331 9268 19" formData={formData} errors={errors} updateFormData={updateFormData} />
           <SelectField
             label="Currency"

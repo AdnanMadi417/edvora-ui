@@ -12,6 +12,7 @@ import ApplicationCommissionRecords from "features/applications/shared/Applicati
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 import { PartnerPayoutSection } from "features/applications/payouts";
 import { DisputeSection } from "features/applications/disputes";
+import { usePartnerProfile } from "features/partners/hooks/usePartnerProfile";
 
 interface ApplicationCommissionProps {
   application: any;
@@ -29,9 +30,14 @@ export default function ApplicationCommission({
   const studentName = application?.student?.name;
 
   const { status: statusLabel, status_code: statusCode } = actions || {};
+  const { partner } = usePartnerProfile();
 
+  // Only the agency admin (or an independent advisor) may confirm or dispute;
+  // the backend refuses an agency member with forbidden_agency_member.
+  const isAgencyMember = partner?.agency_role === "member";
   const canActOnCommission =
-    statusCode === "COMMISSION_PAID" || statusCode === "DISPUTE_RESPONSE_RECEIVED";
+    !isAgencyMember &&
+    (statusCode === "COMMISSION_PAID" || statusCode === "DISPUTE_RESPONSE_RECEIVED");
 
   const commissions: ApplicationCommissionItem[] = Array.isArray(application?.commissions)
     ? application.commissions

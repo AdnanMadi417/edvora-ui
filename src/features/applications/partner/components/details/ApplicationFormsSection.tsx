@@ -20,6 +20,8 @@ interface ApplicationFormsSectionProps {
   application: any;
   actions: ApplicationActionsResponse | null;
   onRefetch?: () => void;
+  // Agency admin viewing a member's application: no re-uploads on their behalf.
+  readOnly?: boolean;
 }
 
 type RowState = "not_submitted" | "submitted" | "rejected";
@@ -108,7 +110,7 @@ function FormRow({
  * are ever uploaded), which is a safe inference: the backend blocks that
  * submission with a 422 unless every required form was attached.
  */
-export default function ApplicationFormsSection({ application, actions, onRefetch }: ApplicationFormsSectionProps) {
+export default function ApplicationFormsSection({ application, actions, onRefetch, readOnly = false }: ApplicationFormsSectionProps) {
   const currentStatusCode = actions?.status_code;
   const pastPaymentGate = !!currentStatusCode && currentStatusCode !== "WAITING_FOR_PAYMENT" && currentStatusCode !== "PAYMENT_REJECTED";
 
@@ -120,9 +122,12 @@ export default function ApplicationFormsSection({ application, actions, onRefetc
 
   const docTemplate = (type: string) => application?.documents?.find((d: any) => d.document_type === type);
 
+  // A rejected status always shows its row, even with the flag unset —
+  // applications that predate the is_*_required flags never had them set,
+  // and the re-upload button is the partner's only way out of that status.
   const rowState = (required: boolean, rejectedStatusCode: string): RowState | null => {
-    if (!required) return null;
     if (currentStatusCode === rejectedStatusCode) return "rejected";
+    if (!required) return null;
     return pastPaymentGate ? "submitted" : "not_submitted";
   };
 
@@ -177,7 +182,7 @@ export default function ApplicationFormsSection({ application, actions, onRefetc
                   />
                 )
               }
-              onReupload={() => setOpenPopup("application_form")}
+              onReupload={readOnly ? undefined : () => setOpenPopup("application_form")}
             />
           )}
 
@@ -201,7 +206,7 @@ export default function ApplicationFormsSection({ application, actions, onRefetc
                   />
                 )
               }
-              onReupload={() => setOpenPopup("application_form_2")}
+              onReupload={readOnly ? undefined : () => setOpenPopup("application_form_2")}
             />
           )}
 
@@ -223,7 +228,7 @@ export default function ApplicationFormsSection({ application, actions, onRefetc
                   className="hover:bg-blue-100"
                 />
               }
-              onReupload={() => setOpenPopup("health_declaration")}
+              onReupload={readOnly ? undefined : () => setOpenPopup("health_declaration")}
             />
           )}
 
@@ -247,7 +252,7 @@ export default function ApplicationFormsSection({ application, actions, onRefetc
                   />
                 )
               }
-              onReupload={() => setOpenPopup("signed_offer_letter")}
+              onReupload={readOnly ? undefined : () => setOpenPopup("signed_offer_letter")}
             />
           )}
 
@@ -271,7 +276,7 @@ export default function ApplicationFormsSection({ application, actions, onRefetc
                   />
                 )
               }
-              onReupload={() => setOpenPopup("english_form")}
+              onReupload={readOnly ? undefined : () => setOpenPopup("english_form")}
             />
           )}
         </div>
