@@ -3,6 +3,7 @@ import type {
   RaiseDisputePayload,
   ResolveNoIssuePayload,
   ResolveCorrectionPayload,
+  CompleteCommissionPayload,
 } from "../types";
 
 export const disputesApi = {
@@ -14,4 +15,6 @@ export const disputesApi = {
     api.post(`/admin/disputes/${disputeId}/resolve-correction`, payload),
   confirmReceived: (applicationId: string) =>
     api.post(`/partner/applications/${applicationId}/confirm-received`),
+  completeOnBehalf: (applicationId: string, payload: CompleteCommissionPayload) =>
+    api.post(`/admin/applications/${applicationId}/complete-commission`, payload),
 };
