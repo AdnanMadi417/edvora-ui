@@ -34,8 +34,14 @@ export default function ApplicationDocuments({
   const offerLetterDoc = application?.offer_letter_document || null;
   const visaDoc = application?.visa_document || null;
   const commissionDocuments: any[] = Object.values(application?.commission_documents || {}).filter(Boolean) as any[];
+  const payout = application?.partner_payout || null;
+  // Not a reviewed submission like the others -- it's the finance team's
+  // proof of an already-completed payout, so it's always shown as approved.
+  const payoutReceiptDoc = payout?.receipt_file_key
+    ? { id: `${payout.id}-receipt`, file_key: payout.receipt_file_key, document_type: "Payout Receipt", status: "2", created_at: payout.created_at }
+    : null;
 
-  const singleDocs = [emgsEvalDoc, offerLetterDoc, visaDoc].filter(Boolean);
+  const singleDocs = [emgsEvalDoc, offerLetterDoc, visaDoc, payoutReceiptDoc].filter(Boolean);
   const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + singleDocs.length + commissionDocuments.length;
   const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...singleDocs, ...commissionDocuments].filter(
     (d) => d.status === "1" || d.status === "pending"
@@ -434,6 +440,35 @@ export default function ApplicationDocuments({
                 </div>
                 <div className="ml-4 flex flex-wrap gap-2">
                   <DocumentActions fileKey={visaDoc.file_key} label={visaDoc.document_type} personName={studentName} />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {payoutReceiptDoc && (
+            <div className="space-y-2">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Payout Receipt</p>
+              <div className="relative flex items-center justify-between rounded-lg border border-slate-200 p-5 backdrop-blur transition-all duration-300">
+                <div className="flex min-w-0 flex-1 items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary">
+                      {getFileStatus(payoutReceiptDoc.status)}
+                    </div>
+                  </div>
+                  <div className="min-w-0 max-w-[350px] flex-1">
+                    <div className="mb-2 flex items-center gap-2">
+                      <h3 className="truncate text-sm font-semibold text-slate-800">{payoutReceiptDoc.document_type}</h3>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-600">
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5 text-slate-400" />
+                        <span><AppDate value={payoutReceiptDoc.created_at} format="short" fallback="Not provided" /></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="ml-4 flex flex-wrap gap-2">
+                  <DocumentActions fileKey={payoutReceiptDoc.file_key} label={payoutReceiptDoc.document_type} personName={studentName} />
                 </div>
               </div>
             </div>

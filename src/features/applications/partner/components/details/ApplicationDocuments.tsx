@@ -26,7 +26,13 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
   const offerLetterDoc: any = application?.offer_letter_document || null;
   const visaDoc: any = application?.visa_document || null;
   const commissionDocuments: any[] = Object.values(application?.commission_documents || {}).filter(Boolean) as any[];
-  const singleDocs = [emgsEvalDoc, offerLetterDoc, visaDoc].filter(Boolean);
+  const payout = application?.partner_payout || null;
+  // Not a reviewed submission like the others -- it's the finance team's
+  // proof of an already-completed payout, so it's always shown as approved.
+  const payoutReceiptDoc = payout?.receipt_file_key
+    ? { id: `${payout.id}-receipt`, file_key: payout.receipt_file_key, document_type: 'Payout Receipt', status: '2', created_at: payout.created_at }
+    : null;
+  const singleDocs = [emgsEvalDoc, offerLetterDoc, visaDoc, payoutReceiptDoc].filter(Boolean);
   const totalDocuments = documents.length + paymentDocuments.length + arrivalDocuments.length + singleDocs.length + commissionDocuments.length;
   const pendingDocuments = [...documents, ...paymentDocuments, ...arrivalDocuments, ...[emgsEvalDoc, visaDoc].filter(Boolean), ...commissionDocuments].filter(
     (d) => d.status === '1' || d.status === 'pending',
@@ -140,6 +146,7 @@ export default function ApplicationDocuments({ application, onRefetch }: Applica
           <DocGroup label="Offer Letter" docs={offerLetterDoc ? [offerLetterDoc] : []} />
           <DocGroup label="EMGS Eval Document" docs={emgsEvalDoc ? [emgsEvalDoc] : []} />
           <DocGroup label="Visa Document" docs={visaDoc ? [visaDoc] : []} />
+          <DocGroup label="Payout Receipt" docs={payoutReceiptDoc ? [payoutReceiptDoc] : []} />
           <DocGroup label="Commission Documents" docs={commissionDocuments} />
         </div>
       )}
