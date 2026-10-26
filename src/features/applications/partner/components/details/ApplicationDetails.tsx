@@ -86,6 +86,22 @@ export default function ApplicationDetails({
     currentStatusCode === "WAITING_FOR_PAYMENT" ||
     currentStatusCode === "PAYMENT_REJECTED";
 
+  // correction_reason sticks around on the actions payload from whichever
+  // status last set it -- only show it while the application is actually
+  // sitting in a rejected status, not after it's moved on (e.g. all the way
+  // to APPLICATION_COMPLETE).
+  const REJECTED_STATUS_CODES = new Set([
+    "PAYMENT_REJECTED",
+    "APPLICATION_FORM_REJECTED",
+    "APPLICATION_FORM_2_REJECTED",
+    "HEALTH_DECLARATION_REJECTED",
+    "SIGNED_OFFER_LETTER_REJECTED",
+    "ENGLISH_FORM_REJECTED",
+  ]);
+  const currentCorrectionReason = currentStatusCode && REJECTED_STATUS_CODES.has(currentStatusCode)
+    ? actions?.correction_reason
+    : undefined;
+
   const [showArrivalPopup, setShowArrivalPopup] = useState(false);
   const [downloadingTemplate, setDownloadingTemplate] = useState(false);
   const { download: downloadHealthDeclarationForm, downloading: downloadingHealthDeclarationForm } =
@@ -135,7 +151,7 @@ export default function ApplicationDetails({
         </div>
 
         {/* Hero */}
-        <ApplicationHero application={application} viewerActor="2" correctionReason={actions?.correction_reason}>
+        <ApplicationHero application={application} viewerActor="2" correctionReason={currentCorrectionReason}>
           <div className="mt-4 space-y-2">
             {isTeamView ? (
               <p className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
