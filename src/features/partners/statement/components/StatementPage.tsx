@@ -48,7 +48,7 @@ export default function StatementPage() {
   const { partner } = usePartnerProfile();
   const isAgencyAdmin = partner?.type === "agency" && partner?.agency_role === "admin";
 
-  const { members } = useAgencyMembers(isAgencyAdmin ? { is_active: true, page_size: 100 } : {});
+  const { members } = useAgencyMembers({ is_active: true, page_size: 100, enabled: isAgencyAdmin });
   const memberOptions = [
     { value: "", label: "All Members" },
     ...members.map((m) => ({ value: m.partner_id, label: m.name })),
