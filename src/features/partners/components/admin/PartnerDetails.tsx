@@ -589,7 +589,7 @@ export default function PartnerDetails({ id }: Props) {
         )}
 
         {/* Bank Account */}
-        {tab === "bank-account" && <PartnerBankAccountSection partner={partner} />}
+        {tab === "bank-account" && <PartnerBankAccountSection partner={partner} viewer="staff" />}
 
         {/* Applications */}
         {tab === "applications" && <PartnerApplicationsTable partnerId={id} />}

@@ -212,8 +212,8 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
   const profileTabs: TabItem<ProfileTab>[] = [
     { key: "profile", label: "Profile" },
     ...(isCompany ? [{ key: "team" as const, label: "Team" }] : []),
-    // Agency members see this tab too -- it now shows their agency admin's
-    // bank account (the one payouts actually go to), read-only.
+    // Agency members see this tab too, but only a note that payouts go to
+    // their agency's account -- never the admin's details (UBX-482).
     { key: "bank", label: "Bank Account" },
   ];
 
@@ -401,7 +401,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
           {/* Bank Account */}
           {tab === "bank" && (
             <div key={tab} className="animate-in fade-in duration-200">
-              <PartnerBankAccountSection partner={partner} />
+              <PartnerBankAccountSection partner={partner} viewer="self" />
             </div>
           )}
 

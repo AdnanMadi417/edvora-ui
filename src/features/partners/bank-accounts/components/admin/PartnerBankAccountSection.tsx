@@ -36,6 +36,12 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 interface Props {
   partner: PartnerDetails;
+  /**
+   * Who is looking: the partner at their own profile ("self") or admin/staff
+   * at the partner's record ("staff"). Decides what an agency member gets to
+   * see -- see the UBX-482 note in the component.
+   */
+  viewer: "self" | "staff";
 }
 
 interface FormData {
@@ -107,9 +113,17 @@ function BankAccountSkeleton() {
  * always creates a new row and retires the old one, so "Edit" really means
  * "Replace".
  */
-export default function PartnerBankAccountSection({ partner }: Props) {
+export default function PartnerBankAccountSection({ partner, viewer }: Props) {
   const { showToast } = useToast();
-  const { account, loading, error, refetch } = usePartnerBankAccount(partner.id);
+  // Agency members don't have their own bank account -- payouts go to the
+  // agency admin's. Staff see that account here (they need it to pay out);
+  // the member themself must not (UBX-482): its account number, IBAN and
+  // beneficiary details are the admin's private data. The backend returns
+  // [] to a member anyway; passing "" skips the request entirely so none of
+  // it ever reaches this browser.
+  const isAgencyMember = partner.agency_role === "member";
+  const memberSelfView = isAgencyMember && viewer === "self";
+  const { account, loading, error, refetch } = usePartnerBankAccount(memberSelfView ? "" : partner.id);
   const { banks: allBanks } = useBanks({ include_inactive: true });
   const { createAccount, loading: creating } = useCreatePartnerBankAccount();
   const { updateAccount, loading: updating } = useUpdatePartnerBankAccount();
@@ -124,10 +138,8 @@ export default function PartnerBankAccountSection({ partner }: Props) {
   const [curatedSuggestion, setCuratedSuggestion] = useState<{ bankId: string; bankName: string } | null>(null);
 
   const isMalaysia = partner.country.trim().toLowerCase() === "malaysia";
-  // Agency members don't have their own bank account -- GET now returns the
-  // agency admin's account (for payout visibility), but POST/PATCH 409.
-  // Read-only here rather than relying on that 409 as the only guard.
-  const isAgencyMember = partner.agency_role === "member";
+  // POST/PATCH 409 for a member; read-only here rather than relying on that
+  // 409 as the only guard.
   const saving = creating || updating;
   const status = getAsyncStatus(loading, error, account, (a) => a === null);
 
@@ -311,13 +323,17 @@ export default function PartnerBankAccountSection({ partner }: Props) {
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bank Account</p>
       </div>
 
-      {isAgencyMember && (
+      {memberSelfView && (
+        <p className="px-6 pb-6 text-sm text-slate-600">Payouts are sent to your agency&apos;s bank account.</p>
+      )}
+
+      {isAgencyMember && !memberSelfView && (
         <p className="px-6 pb-2 text-xs text-slate-500">
           This is the agency admin&apos;s bank account — payouts for this advisor are sent there.
         </p>
       )}
 
-      {mode === "view" && (
+      {!memberSelfView && mode === "view" && (
         <AsyncStateView
           status={status}
           skeleton={<BankAccountSkeleton />}
