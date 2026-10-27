@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { ShieldX, UserPlus } from "lucide-react";
 
 import Button from "components/ui/buttons/Button";
+import Loading from "components/loading/Loading";
 import { Tabs, type TabItem } from "components/ui/tabs";
 import { usePartnerProfile } from "features/partners/hooks";
 import AgencyMembersTable from "./AgencyMembersTable";
@@ -27,8 +28,22 @@ export default function TeamMembersPage() {
   // agency-admin-only endpoints unconditionally, which 403 for a member and
   // (via the global axios interceptor) bounce the whole app to
   // /unauthorized. Guard here instead of letting that happen.
+  //
+  // Must block on isPartnerLoading rather than just checking agency_role:
+  // rendering the real tables (and their unconditional fetches) even
+  // briefly while the profile is still loading reintroduces the exact 403
+  // this guard exists to prevent.
   const { partner, isPartnerLoading } = usePartnerProfile();
-  if (!isPartnerLoading && partner?.agency_role === "member") {
+  if (isPartnerLoading) {
+    return (
+      <div className="mt-6 max-w-5xl mx-auto text-p2">
+        <div className="rounded-lg border border-slate-200 bg-white">
+          <Loading text="Loading..." />
+        </div>
+      </div>
+    );
+  }
+  if (partner?.agency_role === "member") {
     return (
       <div className="mt-6 max-w-5xl mx-auto text-p2">
         <div className="flex flex-col items-center gap-3 rounded-lg border border-slate-200 bg-white p-12 text-center">

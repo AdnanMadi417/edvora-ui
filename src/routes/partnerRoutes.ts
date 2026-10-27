@@ -3,6 +3,14 @@ import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2, Landmark, Gradu
 import type { IRoute } from "../types/navigation";
 import { FEATURES } from "../config/featureFlags";
 
+// The full set of conditions a partner nav item can be hidden behind,
+// resolved from the signed-in partner's profile in app/partner/layout.tsx.
+// Setting a route's `hiddenWhen` through this helper (instead of writing
+// the array literal directly) means a typo or a renamed flag is a compile
+// error here, not a route that silently never hides or never shows.
+export type PartnerVisibilityFlag = "agency" | "individual" | "agencyMember";
+const hideFor = (...flags: PartnerVisibilityFlag[]): string[] => flags;
+
 const partnerRoutes: IRoute[] = [
   {
     // The mandatory partner onboarding tour (PartnerOnboardingTour.tsx) spotlights
@@ -55,7 +63,7 @@ const partnerRoutes: IRoute[] = [
     icon: Receipt,
     // The agency admin's payout view — agency members don't manage
     // commissions (and the member-filter dropdown's data is admin-only).
-    hiddenWhen: ["agencyMember"],
+    hiddenWhen: hideFor("agencyMember"),
   },
 
   {
@@ -73,7 +81,7 @@ const partnerRoutes: IRoute[] = [
     // Admin-only team management: individual advisors have no team to
     // manage, and agency members can't invite/manage teammates either
     // (its data is admin-only on the backend too — see TeamMembersPage.tsx).
-    hiddenWhen: ["individual", "agencyMember"],
+    hiddenWhen: hideFor("individual", "agencyMember"),
   },
 
   // Individual advisors only — public profiles are individual-only in V1
@@ -86,7 +94,7 @@ const partnerRoutes: IRoute[] = [
           layout: "/partner",
           path: "/public-profile",
           icon: Globe2,
-          hiddenWhen: ["agency"],
+          hiddenWhen: hideFor("agency"),
         },
       ]
     : []),
