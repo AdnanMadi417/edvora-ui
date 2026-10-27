@@ -53,6 +53,9 @@ const partnerRoutes: IRoute[] = [
     layout: "/partner",
     path: "/commission-tracker",
     icon: Receipt,
+    // The agency admin's payout view — agency members don't manage
+    // commissions (and the member-filter dropdown's data is admin-only).
+    hiddenWhen: ["agencyMember"],
   },
 
   {
@@ -67,12 +70,14 @@ const partnerRoutes: IRoute[] = [
     layout: "/partner",
     path: "/team-members",
     icon: UserPlus,
+    // Admin-only team management: individual advisors have no team to
+    // manage, and agency members can't invite/manage teammates either
+    // (its data is admin-only on the backend too — see TeamMembersPage.tsx).
+    hiddenWhen: ["individual", "agencyMember"],
   },
 
   // Individual advisors only — public profiles are individual-only in V1
-  // (see partner_public_profiles). Filtered out for agency partners in
-  // app/partner/layout.tsx, mirroring how "Agency Scaler" is filtered out
-  // for individual partners. Gated on top of that while the feature is
+  // (see partner_public_profiles). Gated on top of that while the feature is
   // unreleased; middleware.ts blocks the route itself.
   ...(FEATURES.partnerPublicProfile
     ? [
@@ -81,6 +86,7 @@ const partnerRoutes: IRoute[] = [
           layout: "/partner",
           path: "/public-profile",
           icon: Globe2,
+          hiddenWhen: ["agency"],
         },
       ]
     : []),
