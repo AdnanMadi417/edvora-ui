@@ -29,20 +29,20 @@ function PartnerShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { partner } = usePartnerProfile();
 
-  // "Agency Scaler" (agency invitations) only applies to agency/company
-  // partners — individual advisors have no team to manage. "My Public
-  // Profile" is the mirror image — public profiles are individual-only
-  // in V1, so agency partners don't get that item. "Commission Tracker" is
-  // the agency admin's payout view -- agency members don't manage commissions.
-  // Agency Scaler itself is admin-only too -- its backend endpoints
-  // (GET /partners/agency/members, .../invitations) 403 for a member, and
-  // that page has no fallback for that, so it must stay hidden for them.
-  const isAgencyMember = partner?.agency_role === "member";
-  const visibleRoutes = (
-    partner && partner.type !== "agency"
-      ? partnerRoutes.filter((route) => route.name !== "Agency Scaler")
-      : partnerRoutes.filter((route) => route.name !== "My Public Profile")
-  ).filter((route) => !isAgencyMember || (route.name !== "Commission Tracker" && route.name !== "Agency Scaler"));
+  // Per-route visibility rules live on the route itself (routes/partnerRoutes.ts,
+  // `hiddenWhen`) — this just resolves the flags they reference from the
+  // signed-in partner's profile. `agency` defaults to true while `partner`
+  // is still loading, matching the previous behavior: "My Public Profile"
+  // (individual-only) was the one hidden by default pre-load, not "Agency
+  // Scaler" (agency-only).
+  const visibilityFlags: Record<string, boolean> = {
+    agency: !partner || partner.type === "agency",
+    individual: !!partner && partner.type !== "agency",
+    agencyMember: partner?.agency_role === "member",
+  };
+  const visibleRoutes = partnerRoutes.filter(
+    (route) => !route.hiddenWhen?.some((flag) => visibilityFlags[flag])
+  );
 
   return (
     <ToastProvider>
