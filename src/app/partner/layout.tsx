@@ -34,12 +34,15 @@ function PartnerShell({ children }: { children: React.ReactNode }) {
   // Profile" is the mirror image — public profiles are individual-only
   // in V1, so agency partners don't get that item. "Commission Tracker" is
   // the agency admin's payout view -- agency members don't manage commissions.
+  // Agency Scaler itself is admin-only too -- its backend endpoints
+  // (GET /partners/agency/members, .../invitations) 403 for a member, and
+  // that page has no fallback for that, so it must stay hidden for them.
   const isAgencyMember = partner?.agency_role === "member";
   const visibleRoutes = (
     partner && partner.type !== "agency"
       ? partnerRoutes.filter((route) => route.name !== "Agency Scaler")
       : partnerRoutes.filter((route) => route.name !== "My Public Profile")
-  ).filter((route) => !isAgencyMember || route.name !== "Commission Tracker");
+  ).filter((route) => !isAgencyMember || (route.name !== "Commission Tracker" && route.name !== "Agency Scaler"));
 
   return (
     <ToastProvider>
