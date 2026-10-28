@@ -208,13 +208,15 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
 
   const isIndividual = partner.type === "individual";
   const isCompany = partner.type === "agency";
+  // Agency members have nothing of their own to manage here -- payouts go
+  // to the agency admin's account, not theirs (UBX-482) -- so the tab
+  // itself is hidden rather than showing just a one-line note.
+  const isAgencyMember = partner.agency_role === "member";
 
   const profileTabs: TabItem<ProfileTab>[] = [
     { key: "profile", label: "Profile" },
     ...(isCompany ? [{ key: "team" as const, label: "Team" }] : []),
-    // Agency members see this tab too, but only a note that payouts go to
-    // their agency's account -- never the admin's details (UBX-482).
-    { key: "bank", label: "Bank Account" },
+    ...(isAgencyMember ? [] : [{ key: "bank" as const, label: "Bank Account" }]),
   ];
 
   return (
