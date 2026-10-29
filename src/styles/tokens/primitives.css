@@ -1,0 +1,154 @@
+/*
+ * Unibexs design system — primitive tokens.
+ * Source: Unibexs Design System Guide v1.1 (docs/unibexs-frontend-redesign-brief.md §2).
+ * Components never use these directly; they use semantic.css.
+ */
+:root {
+  /* Brand */
+  --ub-deep-navy: #000c29;
+  --ub-primary-blue: #0348d1;
+  --ub-light-blue: #ebf1ff;
+  --ub-light-grey: #e9edf3;
+
+  /* Blue scale */
+  --ub-blue-50: #ebf1ff;
+  --ub-blue-100: #d6e3ff;
+  --ub-blue-200: #b9cffe;
+  --ub-blue-300: #92b5fd;
+  --ub-blue-400: #6394fa;
+  --ub-blue-500: #356fed;
+  --ub-blue-600: #0348d1;
+  --ub-blue-700: #023caa;
+  --ub-blue-800: #023085;
+  --ub-blue-900: #012364;
+  --ub-blue-950: #011746;
+
+  /* Neutral scale (navy-tinted) */
+  --ub-neutral-0: #ffffff;
+  --ub-neutral-25: #f8fafd;
+  --ub-neutral-50: #f3f5f9;
+  --ub-neutral-100: #e9edf3;
+  --ub-neutral-200: #dbe0e8;
+  --ub-neutral-300: #c6cdd7;
+  --ub-neutral-400: #9da5b3;
+  --ub-neutral-500: #778190;
+  --ub-neutral-600: #596475;
+  --ub-neutral-700: #3f4b5e;
+  --ub-neutral-800: #25334a;
+  --ub-neutral-900: #0d1e38;
+  --ub-neutral-950: #000c29;
+
+  /* Dark surfaces */
+  --ub-navy-canvas: #000c29;
+  --ub-navy-surface-1: #041634;
+  --ub-navy-surface-2: #0c203e;
+  --ub-navy-surface-3: #192b49;
+  --ub-navy-border: #253857;
+  --ub-navy-border-strong: #5a7092;
+
+  /* Semantic colors: 50 bg · 200 border · 500 indicator · 600 fill · 700 text · 800 */
+  --ub-success-50: #ecf9ee;
+  --ub-success-200: #b8e5c0;
+  --ub-success-500: #27a654;
+  --ub-success-600: #09853d;
+  --ub-success-700: #086d31;
+  --ub-success-800: #005725;
+
+  --ub-warning-50: #fff5ea;
+  --ub-warning-200: #fcd7ae;
+  --ub-warning-500: #ffa92c;
+  --ub-warning-600: #d98b06;
+  --ub-warning-700: #9d6301;
+  --ub-warning-800: #7e4f04;
+
+  --ub-danger-50: #fff2f0;
+  --ub-danger-200: #ffc8c1;
+  --ub-danger-500: #f1453f;
+  --ub-danger-600: #d00016;
+  --ub-danger-700: #ac0211;
+  --ub-danger-800: #8a040c;
+
+  --ub-info-50: #ebf7ff;
+  --ub-info-200: #b5def8;
+  --ub-info-500: #0f97d1;
+  --ub-info-600: #0678a7;
+  --ub-info-700: #05628a;
+  --ub-info-800: #054e6e;
+
+  /* Tag hues (Stage, Status and Days tags only): solid · bg · border · text · bg-dark · text-dark */
+  --ub-tag-sky-solid: #55caf3;    --ub-tag-sky-bg: #def4fe;    --ub-tag-sky-border: #afdcef;    --ub-tag-sky-text: #016f8d;    --ub-tag-sky-bg-dark: #0a303d;    --ub-tag-sky-text-dark: #6cbcda;
+  --ub-tag-indigo-solid: #3e63dd; --ub-tag-indigo-bg: #eaf0ff; --ub-tag-indigo-border: #c2d4fe; --ub-tag-indigo-text: #4060be; --ub-tag-indigo-bg-dark: #1a2950; --ub-tag-indigo-text-dark: #8faefd;
+  --ub-tag-orange-solid: #f76808; --ub-tag-orange-bg: #ffece3; --ub-tag-orange-border: #fdc6af; --ub-tag-orange-text: #ac4709; --ub-tag-orange-bg-dark: #481c06; --ub-tag-orange-text-dark: #f7966b;
+  --ub-tag-plum-solid: #ac4cbb;   --ub-tag-plum-bg: #faeafc;   --ub-tag-plum-border: #ebc6f0;   --ub-tag-plum-text: #91489c;   --ub-tag-plum-bg-dark: #3c1d41;   --ub-tag-plum-text-dark: #d996e4;
+  --ub-tag-amber-solid: #ffc704;  --ub-tag-amber-bg: #f9efda;  --ub-tag-amber-border: #e7d2a0;  --ub-tag-amber-text: #7f6204;  --ub-tag-amber-bg-dark: #372901;  --ub-tag-amber-text-dark: #d3ac41;
+  --ub-tag-red-solid: #e5484d;    --ub-tag-red-bg: #ffebe9;    --ub-tag-red-border: #fec3bf;    --ub-tag-red-text: #b23b3e;    --ub-tag-red-bg-dark: #4a1919;    --ub-tag-red-text-dark: #fb908b;
+  --ub-tag-pink-solid: #f46396;   --ub-tag-pink-bg: #ffeaef;   --ub-tag-pink-border: #fdc2d1;   --ub-tag-pink-text: #aa3e65;   --ub-tag-pink-bg-dark: #471929;   --ub-tag-pink-text-dark: #f68ead;
+  --ub-tag-teal-solid: #15a695;   --ub-tag-teal-bg: #dff6f1;   --ub-tag-teal-border: #b0e0d7;   --ub-tag-teal-text: #067367;   --ub-tag-teal-bg-dark: #0a332d;   --ub-tag-teal-text-dark: #6dc1b3;
+  --ub-tag-grey-solid: #bbbbbb;   --ub-tag-grey-bg: #edf0f5;   --ub-tag-grey-border: #cfd5dd;   --ub-tag-grey-text: #5e6774;   --ub-tag-grey-bg-dark: #282c31;   --ub-tag-grey-text-dark: #a9b2c0;
+
+  /* Chart palette (categorical, in order) */
+  --ub-chart-1: #0348d1;
+  --ub-chart-2: #15a695;
+  --ub-chart-3: #ffc704;
+  --ub-chart-4: #ac4cbb;
+  --ub-chart-5: #55caf3;
+  --ub-chart-6: #f76808;
+  --ub-chart-7: #f46396;
+  --ub-chart-8: #9da5b3;
+
+  /* Spacing (4px base) */
+  --ub-space-0-5: 2px;
+  --ub-space-1: 4px;
+  --ub-space-2: 8px;
+  --ub-space-3: 12px;
+  --ub-space-4: 16px;
+  --ub-space-5: 20px;
+  --ub-space-6: 24px;
+  --ub-space-8: 32px;
+  --ub-space-10: 40px;
+  --ub-space-12: 48px;
+  --ub-space-16: 64px;
+  --ub-space-20: 80px;
+  --ub-space-24: 96px;
+  --ub-space-32: 128px;
+
+  /* Radius */
+  --ub-radius-xs: 4px;
+  --ub-radius-sm: 6px;
+  --ub-radius-md: 8px;
+  --ub-radius-lg: 12px;
+  --ub-radius-xl: 16px;
+  --ub-radius-2xl: 24px;
+  --ub-radius-full: 9999px;
+
+  /* Borders */
+  --ub-border-width-default: 1px;
+  --ub-border-width-strong: 1.5px;
+  --ub-border-width-focus: 2px;
+
+  /* Type */
+  --ub-font-sans: var(--font-inter), Arial, sans-serif;
+  /* Thmanya Sans pending web licensing (brief §11.3): system Arabic fallback. */
+  --ub-font-arabic: "Thmanya Sans", "Geeza Pro", "Noto Sans Arabic", "Segoe UI", sans-serif;
+
+  /* Elevation (floating layers only) */
+  --ub-shadow-xs: 0 1px 2px rgba(0, 12, 41, 0.06);
+  --ub-shadow-sm: 0 1px 3px rgba(0, 12, 41, 0.08), 0 1px 2px rgba(0, 12, 41, 0.04);
+  --ub-shadow-md: 0 4px 12px rgba(0, 12, 41, 0.08), 0 2px 4px rgba(0, 12, 41, 0.04);
+  --ub-shadow-lg: 0 12px 32px rgba(0, 12, 41, 0.12), 0 4px 8px rgba(0, 12, 41, 0.04);
+  --ub-shadow-xl: 0 24px 64px rgba(0, 12, 41, 0.18);
+
+  /* Motion */
+  --ub-duration-fast: 120ms;
+  --ub-duration-base: 200ms;
+  --ub-duration-slow: 320ms;
+  --ub-duration-deliberate: 480ms;
+  --ub-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ub-ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ub-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Notch sizes */
+  --ub-notch-sm: 12px;
+  --ub-notch-md: 24px;
+  --ub-notch-lg: 40px;
+}

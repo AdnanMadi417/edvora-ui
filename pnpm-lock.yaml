@@ -160,6 +160,9 @@ importers:
       react-dom:
         specifier: ^19.0.0-rc.1
         version: 19.2.4(react@19.2.4)
+      react-hook-form:
+        specifier: ^7.91.0
+        version: 7.91.0(@types/react@18.0.31)(react@19.2.4)
       react-icons:
         specifier: ^4.12.0
         version: 4.12.0(react@19.2.4)
@@ -178,6 +181,9 @@ importers:
       web-vitals:
         specifier: ^2.1.4
         version: 2.1.4
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
     devDependencies:
       '@playwright/test':
         specifier: ^1.61.1
@@ -4094,6 +4100,16 @@ packages:
       '@types/react':
         optional: true
 
+  react-hook-form@7.91.0:
+    resolution: {integrity: sha512-5BEBUnCBwa28AFXYTYmOaB/+CSpJ/+CWVASHEvIGUzFdHyUiPHeRhG7r5hOZ8nZi0yP7pbHdFNXO/p31EKTJFQ==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      '@types/react': 18.0.31
+      react: ^16.8.0 || ^17 || ^18 || ^19
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+
   react-icons@4.12.0:
     resolution: {integrity: sha512-IBaDuHiShdZqmfc/TwHu6+d6k2ltNCf3AszxNmjJc1KUfXdEeRJOKyNvLmAHaarhzGmTSVygNdyu8/opXv2gaw==}
     peerDependencies:
@@ -4834,6 +4850,9 @@ packages:
   yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
 
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
@@ -9390,6 +9409,12 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.0.31
 
+  react-hook-form@7.91.0(@types/react@18.0.31)(react@19.2.4):
+    dependencies:
+      react: 19.2.4
+    optionalDependencies:
+      '@types/react': 18.0.31
+
   react-icons@4.12.0(react@19.2.4):
     dependencies:
       react: 19.2.4
@@ -10228,5 +10253,7 @@ snapshots:
       yargs-parser: 21.1.1
 
   yocto-queue@0.1.0: {}
+
+  zod@3.23.8: {}
 
   zod@3.25.76: {}

@@ -51,10 +51,10 @@ export default function PublicNavbar() {
           </Link>
 
           <Link
-            href="/auth/sign-in"
+            href="/"
             className="rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 hover:shadow"
           >
-            Sign In
+            Open App
           </Link>
         </div>
       </div>

@@ -4,7 +4,7 @@
 // a release branch.
 //
 // These are NEXT_PUBLIC_* because the same flag is read from three
-// runtimes: the partner sidebar (client), middleware (edge), and the
+// runtimes: the partner sidebar (client) and the
 // server-rendered /p/[slug] page. Next.js inlines NEXT_PUBLIC_* values at
 // build time, so flipping one needs a rebuild, not just an env change on
 // the host.
@@ -21,12 +21,3 @@ export const FEATURES = {
    *  management screens are a separate feature and stay enabled. */
   partnerUniversities: enabled(process.env.NEXT_PUBLIC_ENABLE_PARTNER_UNIVERSITIES),
 };
-
-// Route prefixes that must stay unreachable while their feature is off.
-// Hiding the sidebar entry alone isn't enough — bookmarks and pasted links
-// would still resolve. Consumed by middleware.ts. (/p/[slug] isn't listed:
-// it's public, so it 404s from the page itself rather than redirecting.)
-export const DISABLED_ROUTE_PREFIXES: string[] = [
-  ...(FEATURES.partnerPublicProfile ? [] : ["/partner/public-profile"]),
-  ...(FEATURES.partnerUniversities ? [] : ["/partner/universities"]),
-];

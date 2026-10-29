@@ -23,7 +23,7 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
 }
 
 // Rendered inside RoleGuard so the partner profile comes from the shared
-// session (one /partners/profile per page) rather than a separate fetch.
+// (mock) session rather than a separate fetch.
 function PartnerShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();

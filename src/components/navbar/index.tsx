@@ -3,16 +3,13 @@
 import React, { useEffect, useState } from "react";
 import Dropdown from "components/dropdown";
 import { FiAlignJustify } from "react-icons/fi";
-import { KeyRound, LogOut, Settings, Bell } from "lucide-react";
+import { Repeat, Settings, Bell } from "lucide-react";
 import Link from "next/link";
-import api, { setLoggingOut, SIGN_IN_URL } from "../../lib/useApi";
 
 import { useMe } from "hooks/useMe";
 import { profileRouteMap, notificationsRouteMap, applicationsRouteMap, partnersRouteMap } from "components/navbar/config/navigation";
 import { useUnreadCount } from "features/notifications/hooks";
 import NotificationsPreviewPopover from "features/notifications/components/NotificationsPreviewPopover";
-import { useToast } from "components/context/ToastContext";
-import ChangePasswordPopup from "features/partners/components/partner/ChangePasswordPopup";
 import { usePartnerProfile } from "features/partners/hooks";
 import PresignedImage from "components/ui/PresignedImage";
 
@@ -30,11 +27,7 @@ const Navbar = ({
   setOpen?: (v: boolean) => void;
 }) => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [showChangePassword, setShowChangePassword] = useState(false);
-  const [isSendingReset, setIsSendingReset] = useState(false);
   const { user, loading } = useMe();
-  const { showToast } = useToast();
   const { partner } = usePartnerProfile({ enabled: user?.role === "partner" });
   const isAgencyPartner = partner?.type === "agency";
   const photoFileKey = isAgencyPartner
@@ -42,18 +35,6 @@ const Navbar = ({
     : partner?.individual_details?.profile_photo_file_key;
   const avatarDisplayName = (isAgencyPartner && partner?.company_details?.company_name) || user?.name || "";
 
-  const handleSendResetLink = async () => {
-    if (!user?.email || isSendingReset) return;
-    setIsSendingReset(true);
-    try {
-      await api.post("/auth/forgot-password", { email: user.email });
-    } catch {
-      // always show success to prevent enumeration
-    } finally {
-      setIsSendingReset(false);
-      showToast("Password reset link sent to your email.", "success");
-    }
-  };
   const { unreadCount, refetch: refetchUnreadCount } = useUnreadCount({ pollIntervalMs: 30000 });
 
   useEffect(() => {
@@ -63,12 +44,12 @@ const Navbar = ({
   }, [refetchUnreadCount]);
 
   const getProfileRoute = (role?: string) => {
-    if (!role) return "/auth/sign-in";
+    if (!role) return "/";
     return profileRouteMap[role] || "/profile";
   };
 
   const getNotificationsRoute = (role?: string) => {
-    if (!role) return "/auth/sign-in";
+    if (!role) return "/";
     return notificationsRouteMap[role] || "/notifications";
   };
 
@@ -90,36 +71,8 @@ const Navbar = ({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const deleteAllCookies = () => {
-    document.cookie.split(";").forEach((cookie) => {
-      const eqPos = cookie.indexOf("=");
-      const name = eqPos > -1 ? cookie.slice(0, eqPos).trim() : cookie.trim();
-      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
-    });
-  };
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    setLoggingOut(true);
-
-    try {
-      await api.post("/auth/logout").catch(() => {});
-    } catch (err) {
-      console.error("Logout API error:", err);
-    }
-
-    localStorage.clear();
-    sessionStorage.clear();
-    deleteAllCookies();
-
-    window.location.replace(SIGN_IN_URL);
-  };
-
   return (
     <>
-    {user?.role === "partner" && (
-      <ChangePasswordPopup isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
-    )}
     <nav
       className={`sticky z-40 flex flex-wrap items-center justify-between rounded-md bg-brand-50/10 p-2 backdrop-blur-xl transition-all duration-300 ${
         isScrolled ? "top-0" : "top-4"
@@ -209,39 +162,13 @@ const Navbar = ({
                 <span>Profile Settings</span>
               </Link>
 
-              {user?.role === "partner" && (
-                <button
-                  type="button"
-                  onClick={() => setShowChangePassword(true)}
-                  className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-slate-900"
-                >
-                  <KeyRound className="h-4 w-4 text-slate-700 group-hover:text-slate-900" />
-                  <span>Change Password</span>
-                </button>
-              )}
-
-              {(user?.role === "admin" || user?.role === "account_manager") && (
-                <button
-                  type="button"
-                  onClick={handleSendResetLink}
-                  disabled={isSendingReset}
-                  className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <KeyRound className="h-4 w-4 text-slate-700 group-hover:text-slate-900" />
-                  <span>{isSendingReset ? "Sending…" : "Reset Password"}</span>
-                </button>
-              )}
-
-              <button
-                onClick={handleLogout}
-                disabled={isLoggingOut}
-                type="button"
-                aria-label="Sign out of your account"
-                className="group flex items-center gap-2 rounded-lg px-3 py-2 font-medium text-failed transition-colors duration-200 hover:bg-failed/10 hover:text-failed-hover disabled:cursor-not-allowed disabled:opacity-50"
+              <Link
+                href="/"
+                className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-muted hover:text-slate-900"
               >
-                <LogOut className="h-4 w-4 text-failed group-hover:text-failed-hover" />
-                <span>{isLoggingOut ? "Logging out..." : "Logout"}</span>
-              </button>
+                <Repeat className="h-4 w-4 text-slate-700 group-hover:text-slate-900" />
+                <span>Switch Area</span>
+              </Link>
             </div>
           </div>
         </Dropdown>

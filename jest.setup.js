@@ -31,3 +31,6 @@ jest.mock('next/image', () => ({
   },
 }))
 
+
+// Unit tests stub HTTP themselves; keep the in-browser mock API out of the way.
+process.env.NEXT_PUBLIC_USE_MOCKS = "false";

@@ -1,0 +1,95 @@
+/*
+ * Unibexs design system — semantic (role) tokens, light by default.
+ * Opt a section into dark with data-ub-theme="dark" (brief §1.3, §2.2).
+ */
+:root {
+  /* backgrounds */
+  --ub-bg-canvas: var(--ub-neutral-50);
+  --ub-bg-surface: var(--ub-neutral-0);
+  --ub-bg-surface-subtle: var(--ub-neutral-25);
+  --ub-bg-surface-raised: var(--ub-neutral-0);
+  --ub-bg-selected: var(--ub-blue-50);
+  --ub-bg-disabled: var(--ub-neutral-100);
+  --ub-bg-skeleton: var(--ub-neutral-100);
+  --ub-bg-scrim: rgba(0, 12, 41, 0.56);
+  --ub-bg-tooltip: var(--ub-neutral-900);
+  --ub-bg-toast: var(--ub-deep-navy);
+
+  /* text */
+  --ub-text-primary: var(--ub-neutral-950);
+  --ub-text-secondary: var(--ub-neutral-700);
+  --ub-text-tertiary: var(--ub-neutral-600);
+  --ub-text-disabled: var(--ub-neutral-400);
+  --ub-text-link: var(--ub-blue-600);
+  --ub-text-on-action: #ffffff;
+
+  /* borders */
+  --ub-border-default: var(--ub-neutral-200);
+  --ub-border-control: var(--ub-neutral-500);
+  --ub-border-control-hover: var(--ub-neutral-600);
+  --ub-border-focus: var(--ub-blue-600);
+  --ub-border-interactive-hover: var(--ub-blue-300);
+
+  /* actions */
+  --ub-action-primary-bg: var(--ub-blue-600);
+  --ub-action-primary-bg-hover: var(--ub-blue-700);
+  --ub-action-primary-bg-pressed: var(--ub-blue-800);
+  --ub-action-primary-text: #ffffff;
+  --ub-action-secondary-border: var(--ub-blue-600);
+  --ub-action-secondary-text: var(--ub-blue-600);
+  --ub-action-secondary-bg-hover: var(--ub-blue-50);
+  --ub-action-secondary-bg-pressed: var(--ub-blue-100);
+  --ub-action-inverse-bg: var(--ub-light-blue);
+  --ub-action-inverse-bg-hover: #ffffff;
+  --ub-action-inverse-text: var(--ub-blue-600);
+  --ub-action-disabled-bg: var(--ub-neutral-100);
+  --ub-action-disabled-text: var(--ub-neutral-400);
+
+  /* icons */
+  --ub-icon-default: var(--ub-neutral-700);
+  --ub-icon-interactive: var(--ub-blue-600);
+
+  /* glow (dark only; none in light) */
+  --ub-glow-action: none;
+
+  color-scheme: light;
+}
+
+[data-ub-theme="dark"] {
+  --ub-bg-canvas: var(--ub-navy-canvas);
+  --ub-bg-surface: var(--ub-navy-surface-1);
+  --ub-bg-surface-subtle: var(--ub-navy-surface-1);
+  --ub-bg-surface-raised: var(--ub-navy-surface-2);
+  --ub-bg-selected: var(--ub-navy-surface-3);
+  --ub-bg-disabled: var(--ub-navy-surface-2);
+  --ub-bg-skeleton: var(--ub-navy-surface-2);
+
+  --ub-text-primary: #ffffff;
+  --ub-text-secondary: var(--ub-blue-200);
+  --ub-text-tertiary: var(--ub-blue-200);
+  --ub-text-link: var(--ub-blue-300);
+
+  --ub-border-default: var(--ub-navy-border);
+  --ub-border-control: var(--ub-navy-border-strong);
+  --ub-border-control-hover: var(--ub-blue-200);
+  --ub-border-focus: var(--ub-blue-300);
+  --ub-border-interactive-hover: var(--ub-blue-400);
+
+  /* never Primary Blue text on navy (2.63:1 fails) */
+  --ub-action-primary-bg: var(--ub-blue-500);
+  --ub-action-primary-bg-hover: var(--ub-blue-600);
+  --ub-action-primary-bg-pressed: var(--ub-blue-700);
+  --ub-action-secondary-border: var(--ub-blue-300);
+  --ub-action-secondary-text: var(--ub-blue-300);
+  --ub-action-secondary-bg-hover: rgba(146, 181, 253, 0.12);
+  --ub-action-secondary-bg-pressed: rgba(146, 181, 253, 0.2);
+  --ub-action-disabled-bg: var(--ub-navy-surface-2);
+  --ub-action-disabled-text: var(--ub-navy-border-strong);
+
+  --ub-icon-default: var(--ub-blue-200);
+  --ub-icon-interactive: var(--ub-blue-300);
+
+  --ub-glow-action: 0 0 0 1px var(--ub-blue-400), 0 0 24px 0 rgba(3, 72, 209, 0.65);
+
+  color-scheme: dark;
+}

@@ -1,0 +1,87 @@
+/* Unibexs design system — surface and type utilities (brief §1.2, §3). */
+
+/* Numerals and reference IDs */
+.ub-tabular {
+  font-variant-numeric: tabular-nums;
+}
+.ub-ref {
+  font-feature-settings: "ss02";
+}
+
+/* Canvas: soft blue radial wash behind product screens */
+.ub-canvas-light {
+  background-color: #f5f8ff;
+  background-image:
+    radial-gradient(1200px 600px at 0% 0%, rgba(3, 72, 209, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(99, 148, 250, 0.1), transparent 60%);
+}
+
+/* Light glass: chrome and summaries only */
+.ub-glass-light,
+.ub-glass-light-strong {
+  background: rgba(255, 255, 255, 0.62);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 0 1px rgba(3, 72, 209, 0.08),
+    0 8px 24px rgba(0, 12, 41, 0.06);
+}
+.ub-glass-light-strong {
+  background: rgba(255, 255, 255, 0.82);
+}
+
+/* Dark glass: dark sections only, never on data tables */
+.ub-glass {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ub-glass-light,
+  .ub-glass-light-strong {
+    background: #ffffff;
+  }
+  .ub-glass {
+    background: var(--ub-navy-surface-2);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .ub-glass-light,
+  .ub-glass-light-strong {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .ub-glass {
+    background: var(--ub-navy-surface-2);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* The notch: 45° cut at the bottom-end corner. Brand/marketing cards only.
+   clip-path removes borders and shadows: draw borders with an inner SVG
+   stroke and shadows with filter: drop-shadow() on a wrapper. */
+.ub-notch-sm { --ub-notch: var(--ub-notch-sm); }
+.ub-notch-md { --ub-notch: var(--ub-notch-md); }
+.ub-notch-lg { --ub-notch: var(--ub-notch-lg); }
+.ub-notch-sm,
+.ub-notch-md,
+.ub-notch-lg {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - var(--ub-notch)), calc(100% - var(--ub-notch)) 100%, 0 100%);
+}
+[dir="rtl"] .ub-notch-sm,
+[dir="rtl"] .ub-notch-md,
+[dir="rtl"] .ub-notch-lg {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, var(--ub-notch) 100%, 0 calc(100% - var(--ub-notch)));
+}
+
+/* Arabic: no letter-spacing, no italics */
+:lang(ar) {
+  font-family: var(--ub-font-arabic);
+  letter-spacing: 0 !important;
+  font-style: normal !important;
+}

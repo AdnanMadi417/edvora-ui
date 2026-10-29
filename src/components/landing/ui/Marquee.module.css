@@ -1,0 +1,28 @@
+.track {
+  display: flex;
+  width: max-content;
+  animation: marquee var(--marquee-duration, 40s) linear infinite;
+}
+.viewport:hover .track,
+.viewport:focus-within .track {
+  animation-play-state: paused;
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+[dir="rtl"] .track {
+  animation-direction: reverse;
+}
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+    flex-wrap: wrap;
+    width: auto;
+    justify-content: center;
+  }
+  .duplicate {
+    display: none;
+  }
+}

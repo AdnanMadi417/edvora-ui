@@ -202,9 +202,9 @@ export default function AgencyMemberSubmitProfile() {
           <p className="mt-2 text-sm text-slate-500">
             Your account has been created. Check your email for your login details.
           </p>
-          <Link href="/auth/sign-in"
+          <Link href="/"
             className="mt-6 block w-full rounded-lg bg-blue-600 py-3 text-center text-sm font-semibold text-white transition hover:bg-blue-700">
-            Back to Sign In
+            Back to Home
           </Link>
         </div>
       </div>

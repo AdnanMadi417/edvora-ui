@@ -1,4 +1,93 @@
 /** @type {import('tailwindcss').Config} */
+
+// Unibexs design system (docs/unibexs-frontend-redesign-brief.md §2.10).
+// Additive for now: everything lives under `ub` names (bg-ub-blue-600,
+// rounded-ub-lg, shadow-ub-md, text-ub-heading-xl, duration-ub-fast…) and
+// resolves to the --ub-* CSS variables in src/styles/tokens. The legacy
+// palette below stays until each screen is migrated.
+const v = (name) => `var(--ub-${name})`;
+const scale = (prefix, steps) => Object.fromEntries(steps.map((s) => [s, v(`${prefix}-${s}`)]));
+const semantic = (name) => scale(name, [50, 200, 500, 600, 700, 800]);
+const tagHue = (hue) => ({
+  solid: v(`tag-${hue}-solid`),
+  bg: v(`tag-${hue}-bg`),
+  border: v(`tag-${hue}-border`),
+  text: v(`tag-${hue}-text`),
+  'bg-dark': v(`tag-${hue}-bg-dark`),
+  'text-dark': v(`tag-${hue}-text-dark`),
+});
+
+const ubColors = {
+  navy: v('deep-navy'),
+  'light-blue': v('light-blue'),
+  'light-grey': v('light-grey'),
+  blue: scale('blue', [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]),
+  neutral: scale('neutral', [0, 25, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]),
+  'navy-canvas': v('navy-canvas'),
+  'navy-surface': { 1: v('navy-surface-1'), 2: v('navy-surface-2'), 3: v('navy-surface-3') },
+  'navy-border': { DEFAULT: v('navy-border'), strong: v('navy-border-strong') },
+  success: semantic('success'),
+  warning: semantic('warning'),
+  danger: semantic('danger'),
+  info: semantic('info'),
+  tag: Object.fromEntries(['sky', 'indigo', 'orange', 'plum', 'amber', 'red', 'pink', 'teal', 'grey'].map((h) => [h, tagHue(h)])),
+  chart: scale('chart', [1, 2, 3, 4, 5, 6, 7, 8]),
+  // semantic roles
+  canvas: v('bg-canvas'),
+  surface: { DEFAULT: v('bg-surface'), subtle: v('bg-surface-subtle'), raised: v('bg-surface-raised') },
+  selected: v('bg-selected'),
+  disabled: v('bg-disabled'),
+  skeleton: v('bg-skeleton'),
+  scrim: v('bg-scrim'),
+  'text-primary': v('text-primary'),
+  'text-secondary': v('text-secondary'),
+  'text-tertiary': v('text-tertiary'),
+  'text-disabled': v('text-disabled'),
+  'text-link': v('text-link'),
+  'text-on-action': v('text-on-action'),
+  border: { DEFAULT: v('border-default'), control: v('border-control'), 'control-hover': v('border-control-hover'), focus: v('border-focus'), hover: v('border-interactive-hover') },
+  action: {
+    primary: v('action-primary-bg'),
+    'primary-hover': v('action-primary-bg-hover'),
+    'primary-pressed': v('action-primary-bg-pressed'),
+    'primary-text': v('action-primary-text'),
+    secondary: v('action-secondary-border'),
+    'secondary-text': v('action-secondary-text'),
+    'secondary-hover': v('action-secondary-bg-hover'),
+    'secondary-pressed': v('action-secondary-bg-pressed'),
+    inverse: v('action-inverse-bg'),
+    'inverse-hover': v('action-inverse-bg-hover'),
+    'inverse-text': v('action-inverse-text'),
+    'disabled-bg': v('action-disabled-bg'),
+    'disabled-text': v('action-disabled-text'),
+  },
+  icon: { DEFAULT: v('icon-default'), interactive: v('icon-interactive') },
+};
+
+// [size, { lineHeight, fontWeight, letterSpacing }]
+const ubType = {
+  'display-lg': ['48px', { lineHeight: '56px', fontWeight: '700', letterSpacing: '-0.02em' }],
+  'display-md': ['40px', { lineHeight: '48px', fontWeight: '700', letterSpacing: '-0.02em' }],
+  'heading-xl': ['32px', { lineHeight: '40px', fontWeight: '700', letterSpacing: '-0.015em' }],
+  'heading-lg': ['24px', { lineHeight: '32px', fontWeight: '700' }],
+  'heading-md': ['20px', { lineHeight: '28px', fontWeight: '600' }],
+  'heading-sm': ['18px', { lineHeight: '26px', fontWeight: '600' }],
+  'body-lg': ['18px', { lineHeight: '28px', fontWeight: '400' }],
+  'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
+  'body-sm': ['14px', { lineHeight: '20px', fontWeight: '400' }],
+  'label-lg': ['16px', { lineHeight: '24px', fontWeight: '500' }],
+  'label-md': ['14px', { lineHeight: '20px', fontWeight: '500' }],
+  'label-sm': ['12px', { lineHeight: '16px', fontWeight: '500' }],
+  caption: ['12px', { lineHeight: '16px', fontWeight: '400' }],
+  'data-xl': ['40px', { lineHeight: '48px', fontWeight: '700' }],
+  'data-lg': ['28px', { lineHeight: '36px', fontWeight: '700' }],
+  // below 640px (brief §2.5)
+  'display-lg-mobile': ['36px', { lineHeight: '44px', fontWeight: '700', letterSpacing: '-0.02em' }],
+  'display-md-mobile': ['32px', { lineHeight: '40px', fontWeight: '700', letterSpacing: '-0.02em' }],
+  'heading-xl-mobile': ['28px', { lineHeight: '36px', fontWeight: '700', letterSpacing: '-0.015em' }],
+};
+const prefixed = (obj) => Object.fromEntries(Object.entries(obj).map(([k, val]) => [`ub-${k}`, val]));
+
 module.exports = {
   darkMode: 'class',
   content: [
@@ -113,9 +202,11 @@ module.exports = {
 
       fontFamily: {
         sans: ['var(--font-inter)', 'sans-serif'],
+        arabic: ['var(--ub-font-arabic)'],
       },
 
       boxShadow: {
+        ...prefixed({ xs: 'var(--ub-shadow-xs)', sm: 'var(--ub-shadow-sm)', md: 'var(--ub-shadow-md)', lg: 'var(--ub-shadow-lg)', xl: 'var(--ub-shadow-xl)', glow: 'var(--ub-glow-action)' }),
         sm: "0 1px 2px rgba(0, 0, 0, 0.05)",
         md: "0 4px 6px rgba(0, 0, 0, 0.1)",
         lg: "0 10px 15px rgba(0, 0, 0, 0.15)",
@@ -148,6 +239,7 @@ module.exports = {
       },
 
       colors: {
+        ub: ubColors,
 
         primary: 'var(--primary-bg)',
         secondary: 'var(--secondary-bg)',
@@ -365,6 +457,7 @@ module.exports = {
       },
 
       borderWidth: {
+        'ub-strong': 'var(--ub-border-width-strong)',
         thin: 'var(--border-thin)',
         medium: 'var(--border-medium)',
         thick: 'var(--border-thick)',
@@ -372,6 +465,7 @@ module.exports = {
       },
 
       borderRadius: {
+        ...prefixed({ xs: 'var(--ub-radius-xs)', sm: 'var(--ub-radius-sm)', md: 'var(--ub-radius-md)', lg: 'var(--ub-radius-lg)', xl: 'var(--ub-radius-xl)', '2xl': 'var(--ub-radius-2xl)', full: 'var(--ub-radius-full)' }),
         sm: 'var(--radius-sm)',
         md: 'var(--radius-md)',
         lg: 'var(--radius-lg)',
@@ -379,6 +473,7 @@ module.exports = {
       },
 
       fontSize: {
+        ...prefixed(ubType),
         h1: 'var(--font-size-h1)',
         h2: 'var(--font-size-h2)',
         h3: 'var(--font-size-h3)',
@@ -402,6 +497,10 @@ module.exports = {
         medium: 'var(--transition-medium)',
         slow: 'var(--transition-slow)',
       },
+
+      transitionDuration: prefixed({ fast: '120ms', base: '200ms', slow: '320ms', deliberate: '480ms' }),
+      transitionTimingFunction: prefixed({ standard: 'cubic-bezier(.2,0,0,1)', enter: 'cubic-bezier(0,0,.2,1)', exit: 'cubic-bezier(.4,0,1,1)' }),
+      maxWidth: prefixed({ dashboard: '1440px', form: '720px', reading: '680px', marketing: '1200px', 'marketing-2xl': '1320px' }),
 
       spacing: {
         icon: 'var(--icon-size)',

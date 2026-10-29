@@ -18,7 +18,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
 
 
-  // The session comes from the role layout's SessionProvider (via RoleGuard),
+  // The (mock) session comes from the role layout's SessionProvider (via RoleGuard),
   // so the sidebar no longer makes its own /auth/me call on every mount.
   const { user, error: userFetchError } = useMe();
   const userError = !!userFetchError;

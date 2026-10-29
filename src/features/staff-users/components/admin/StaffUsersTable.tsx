@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   User, Mail, ShieldCheck, BadgeCheck, ChevronRight,
   CheckCircle, XCircle, RefreshCw, SlidersHorizontal, Ban, Power,
-  UserPlus, KeyRound, ExternalLink, Users,
+  UserPlus, KeyRound, Users,
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 
@@ -143,12 +143,6 @@ export default function StaffUsersTable() {
               icon: KeyRound,
               onClick: () => setIsResendOtpOpen(true),
               color: "amber",
-            },
-            {
-              label: "Staff Invitation Page",
-              icon: ExternalLink,
-              onClick: () => window.open("/auth/staff-invitation", "_blank"),
-              color: "blue",
             },
           ]}
         />

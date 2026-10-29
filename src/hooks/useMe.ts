@@ -11,12 +11,6 @@ interface MeState {
   error: string | null;
 }
 
-const FAILURE_MESSAGE: Record<string, string> = {
-  unauthenticated: "Your session has expired",
-  forbidden: "You are not allowed to access this page",
-  unavailable: "Failed to fetch user data",
-};
-
 /**
  * The signed-in user. Inside a role layout this reads the shared session
  * (one /auth/me per page, see SessionContext); outside one it falls back to
@@ -49,7 +43,7 @@ export function useMe() {
     return {
       user: session.user,
       loading: session.status === "loading",
-      error: session.status === "ready" || session.status === "loading" ? null : FAILURE_MESSAGE[session.status] ?? "Failed to fetch user data",
+      error: null,
     };
   }
   return standalone;

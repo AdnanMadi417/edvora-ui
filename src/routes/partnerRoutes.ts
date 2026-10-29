@@ -86,7 +86,7 @@ const partnerRoutes: IRoute[] = [
 
   // Individual advisors only — public profiles are individual-only in V1
   // (see partner_public_profiles). Gated on top of that while the feature is
-  // unreleased; middleware.ts blocks the route itself.
+  // unreleased.
   ...(FEATURES.partnerPublicProfile
     ? [
         {
