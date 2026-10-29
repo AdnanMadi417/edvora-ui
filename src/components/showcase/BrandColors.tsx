@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { Check, X } from "lucide-react";
-import { Demo, ShowcaseSection } from "./Showcase";
+import { Demo, Pick, ShowcaseSection } from "./Showcase";
+import NewBrand from "./NewBrand";
 
 // ── Live token values + WCAG contrast (brief §7.2: computed, never hard-coded) ──
 
@@ -124,6 +125,10 @@ export default function BrandColors() {
       title="Brand identity and colors"
       description="The Unibexs System is built on Deep Navy and Primary Blue, supported by a navy-tinted neutral scale. Every swatch shows its live token value and its contrast on white and on navy; click one to copy its CSS variable. Atmosphere colors are for brand and social only, never product UI."
     >
+      <Pick demos={["Logo"]}>
+        <NewBrand />
+      </Pick>
+
       <Demo name="Primary palette" path="styles/tokens/primitives.css">
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {PRIMARY.map((p) => (

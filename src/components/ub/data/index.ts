@@ -1,0 +1,28 @@
+// data: canonical import point for this category (brief §1.1).
+// Generated from the files that have a default export; prefer named imports from here in new code.
+export { default as AnimatedTableRow } from "./AnimatedTableRow";
+export { default as AppDate } from "./AppDate";
+export { default as Avatar } from "./Avatar";
+export { default as Card } from "./Card";
+export { default as Chip } from "./Chip";
+export { default as CountBadge } from "./CountBadge";
+export { default as CourseList } from "./CourseList";
+export { default as DataTable } from "./DataTable";
+export { default as DaysTag } from "./DaysTag";
+export { default as DetailStatusBadge } from "./DetailStatusBadge";
+export { default as Faq } from "./Faq";
+export { default as FilterChip } from "./FilterChip";
+export { default as List } from "./List";
+export { default as PresignedImage } from "./PresignedImage";
+export { default as RichTextDisplay } from "./RichTextDisplay";
+export { default as SolidBadge } from "./SolidBadge";
+export { default as StatCard } from "./StatCard";
+export { default as StatusBadge } from "./StatusBadge";
+export { default as TableEmptyRow } from "./TableEmptyRow";
+export { default as TableErrorRow } from "./TableErrorRow";
+export { default as TableLoadingRow } from "./TableLoadingRow";
+export { default as TablePagination } from "./TablePagination";
+export { default as TableSkeletonRows } from "./TableSkeletonRows";
+export { default as TableWrapper } from "./TableWrapper";
+export { default as Tag } from "./Tag";
+export { default as Widget } from "./Widget";

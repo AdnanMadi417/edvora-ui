@@ -171,7 +171,7 @@ export default function ApplicationTracker({ steps, nextStep, orientation = "aut
   });
 
   return (
-    <div className={className}>
+    <div className={clsx("relative", className)}>
       <ol aria-label={label} className={L.list}>
         {steps.map((step, i) => {
           const last = i === steps.length - 1;
