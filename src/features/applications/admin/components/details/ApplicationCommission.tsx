@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { Receipt, CheckCircle } from "lucide-react";
-import Button from "components/ui/buttons/Button";
+import Button from "components/ub/core/Button";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import { SectionIconBadge } from "components/ui/icons";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 import ApplicationCommissionRecords from "features/applications/shared/ApplicationCommissionRecords";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 import { UniversityPayInSection } from "features/applications/pay-ins";

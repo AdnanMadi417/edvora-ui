@@ -5,8 +5,8 @@ import ApplicationStudentInfoSection from "features/applications/shared/Applicat
 import OfferLetterCard from './OfferLetterCard';
 import AccountManagerTopBar from "features/applications/account-manager/components/topBar/AccountManagerTopBar";
 import { AnimatePresence, motion } from "framer-motion";
-import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
-import { Tabs } from "components/ui/tabs";
+import { EASE, MICRO_DURATION } from "components/ub/core/FadeIn";
+import Tabs from "components/ub/navigation/Tabs";
 import { APPLICATION_DETAILS_TABS, type ApplicationDetailsTab } from "features/applications/shared/applicationDetailTabs";
 import ApplicationActivityHistory from 'features/applications/shared/ApplicationActivityHistory';
 import ApplicationTimeline from 'features/applications/shared/ApplicationTimeline';

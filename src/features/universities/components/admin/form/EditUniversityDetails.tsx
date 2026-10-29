@@ -12,7 +12,7 @@ import {
   CreditCard,
 } from "lucide-react";
 
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
@@ -30,21 +30,21 @@ import {
 } from "features/universities/hooks";
 import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 import { useStates } from "features/programs/hooks";
-import InputField from "components/form/fields/InputField";
-import TextareaField from "components/form/fields/TextareaField";
-import RichTextEditor from "components/form/fields/RichTextEditor";
-import SelectField from "components/form/fields/SelectField";
+import InputField from "components/ub/forms/InputField";
+import TextareaField from "components/ub/forms/TextareaField";
+import RichTextEditor from "components/ub/forms/RichTextEditor";
+import SelectField from "components/ub/forms/SelectField";
 import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
-import ToggleInput from "components/form/toggle/ToggleInput";
-import SearchableDropdown from "components/form/search/SearchableDropdown";
-import ImageUploadField from "components/form/upload/ImageUploadField";
+import ToggleInput from "components/ub/forms/ToggleInput";
+import SearchableDropdown from "components/ub/forms/SearchableDropdown";
+import ImageUploadField from "components/ub/forms/ImageUploadField";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
-import Button from "components/ui/buttons/Button";
-import Loading from "components/loading/Loading";
-import IconButton from "components/ui/buttons/IconButton";
-import EmptyData from "components/emptyData/EmptyTableData";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import Button from "components/ub/core/Button";
+import Loading from "components/ub/feedback/Loading";
+import IconButton from "components/ub/core/IconButton";
+import EmptyData from "components/ub/feedback/EmptyTableData";
+import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
 import { validateUniversity, isUniversityComplete, universityFieldMap } from "./validateUniversity";
 
 // ─── Types ───────────────────────────────────────────────────────────────────

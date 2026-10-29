@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import { Banknote, Calendar, Ban } from "lucide-react";
-import { DetailStatusBadge } from "components/ui/badges";
-import AppDate from "components/ui/date/AppDate";
+import DetailStatusBadge from "components/ub/data/DetailStatusBadge";
+import AppDate from "components/ub/data/AppDate";
 import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
-import Button from "components/ui/buttons/Button";
+import Button from "components/ub/core/Button";
 import VoidPayIn from "./VoidPayIn";
 import type { UniversityPayIn } from "../../types";
 

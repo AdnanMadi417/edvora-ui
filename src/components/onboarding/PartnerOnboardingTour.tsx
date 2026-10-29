@@ -5,17 +5,19 @@ import { useRouter, usePathname } from "next/navigation";
 import { FileText, BookOpen, Bell, Truck, Landmark, LucideIcon } from "lucide-react";
 import { useMe } from "hooks/useMe";
 import { useCompleteOnboarding } from "features/partners/hooks";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { FEATURES } from "config/featureFlags";
+import clsx from "clsx";
+import { buttonBase, buttonSizes, buttonVariants, iconTints, modalPanel, popover, scrim } from "components/ub/recipes";
 
 interface Step {
   tourId: string;
   icon: LucideIcon;
   title: string;
   description: string;
-  bg: string;
-  text: string;
+  /** Theme-aware icon tint (iconTints recipe). */
+  tint: string;
 }
 
 const STEPS: Step[] = [
@@ -24,8 +26,7 @@ const STEPS: Step[] = [
     icon: BookOpen,
     title: "Knowledge Hub",
     description: "Browse programs and universities to find the right fit, with commission and tuition details up front.",
-    bg: "bg-violet-50",
-    text: "text-violet-600",
+    tint: iconTints.violet,
   },
   // Hidden while the partner Universities page is off (config/featureFlags.ts).
   // This step navigates to /partner/universities and spotlights that sidebar
@@ -39,8 +40,7 @@ const STEPS: Step[] = [
           icon: Landmark,
           title: "Universities",
           description: "Look up a university's campuses and intake details before recommending it to a student.",
-          bg: "bg-indigo-50",
-          text: "text-indigo-600",
+          tint: iconTints.blue,
         },
       ]
     : []),
@@ -49,24 +49,21 @@ const STEPS: Step[] = [
     icon: FileText,
     title: "Applications",
     description: "Submit a new student application and track it through every stage — review, offer letter, visa, and arrival.",
-    bg: "bg-blue-50",
-    text: "text-blue-600",
+    tint: iconTints.blue,
   },
   {
     tourId: "notifications",
     icon: Bell,
     title: "Notifications",
     description: "Stay on top of application updates and messages from your account manager here.",
-    bg: "bg-amber-50",
-    text: "text-amber-600",
+    tint: iconTints.amber,
   },
   {
     tourId: "logistics-marketplace",
     icon: Truck,
     title: "Logistics Marketplace",
     description: "Connect your students with verified arrival, accommodation, and airport pickup services.",
-    bg: "bg-cyan-50",
-    text: "text-cyan-600",
+    tint: iconTints.cyan,
   },
 ];
 
@@ -212,24 +209,24 @@ function DesktopCoachmarkTour({ stepIndex, setStepIndex, onEnd, ending }: TourVi
       <div className="fixed inset-0 z-[90]" />
 
       <div
-        className="pointer-events-none fixed z-[91] rounded-lg"
+        className="pointer-events-none fixed z-[91] rounded-ub-md"
         style={{
           top: targetRect.top - PADDING,
           left: targetRect.left - PADDING,
           width: targetRect.width + PADDING * 2,
           height: targetRect.height + PADDING * 2,
-          boxShadow: "0 0 0 9999px rgba(15, 23, 42, 0.6)",
+          boxShadow: "0 0 0 9999px var(--ub-bg-scrim)",
         }}
       />
 
       <div
         ref={popoverRef}
         onClick={(e) => e.stopPropagation()}
-        className="fixed z-[92] rounded-xl bg-white p-5 shadow-2xl"
+        className={clsx(popover, "fixed z-[92] p-5")}
         style={{ top, left, width: popoverWidth }}
       >
         <div
-          className="absolute h-3.5 w-3.5 rotate-45 bg-white"
+          className="absolute h-3.5 w-3.5 rotate-45 bg-ub-surface"
           style={
             arrowSide === "left"
               ? { left: 0, top: arrowOffset, transform: "translateX(-50%) rotate(45deg)" }
@@ -239,24 +236,24 @@ function DesktopCoachmarkTour({ stepIndex, setStepIndex, onEnd, ending }: TourVi
           }
         />
 
-        <h4 className="text-base font-semibold text-slate-900">{step.title}</h4>
-        <p className="mt-1.5 text-sm text-slate-600">{step.description}</p>
+        <h4 className="text-ub-heading-sm text-ub-text-primary">{step.title}</h4>
+        <p className="mt-1.5 text-ub-body-sm text-ub-text-secondary">{step.description}</p>
 
         <div className="mt-5 flex items-center justify-between gap-3">
-          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${step.bg}`}>
-            <Icon className={`h-5 w-5 ${step.text}`} />
+          <div className={clsx("flex h-9 w-9 shrink-0 items-center justify-center rounded-ub-md", step.tint)}>
+            <Icon className="h-5 w-5" aria-hidden />
           </div>
 
           <div className="flex items-center gap-1.5">
             {STEPS.map((s, i) => (
-              <span key={s.tourId} className={`h-1.5 w-1.5 rounded-full transition-colors ${i === stepIndex ? "bg-blue-600" : "bg-slate-200"}`} />
+              <span key={s.tourId} className={clsx("h-1.5 w-1.5 rounded-ub-full transition-colors", i === stepIndex ? "bg-ub-action-primary" : "bg-ub-border")} />
             ))}
           </div>
 
           <button
             onClick={goNext}
             disabled={ending}
-            className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className={clsx(buttonBase, buttonVariants.primary, buttonSizes.md, "shrink-0")}
           >
             {isLast ? (ending ? "Finishing..." : "Got it") : "Next"}
           </button>
@@ -285,51 +282,51 @@ function MobileCarouselModal({ stepIndex, setStepIndex, onEnd, ending }: TourVie
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
-        <div className="border-b border-slate-200 px-5 py-4">
-          <h3 className="text-base font-semibold text-slate-900">Welcome to Unibexs!</h3>
-          <p className="mt-0.5 text-xs text-slate-500">Here&apos;s a quick look at what you can do.</p>
+    <div className={clsx("fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-sm", scrim)}>
+      <div className={clsx(modalPanel, "w-full max-w-sm overflow-hidden")} onClick={(e) => e.stopPropagation()}>
+        <div className="border-b border-ub-border px-5 py-4">
+          <h3 className="text-ub-heading-sm text-ub-text-primary">Welcome to Unibexs!</h3>
+          <p className="mt-0.5 text-ub-caption text-ub-text-secondary">Here&apos;s a quick look at what you can do.</p>
         </div>
 
         <div className="overflow-hidden" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-          <div className="flex transition-transform duration-300 ease-in-out" style={{ transform: `translateX(-${stepIndex * 100}%)` }}>
-            {STEPS.map(({ tourId, icon: Icon, title, description, bg, text }) => (
+          <div className="flex transition-transform duration-ub-slow ease-ub-standard motion-reduce:transition-none" style={{ transform: `translateX(-${stepIndex * 100}%)` }}>
+            {STEPS.map(({ tourId, icon: Icon, title, description, tint }) => (
               <div key={tourId} className="w-full shrink-0 px-6 py-8">
                 <div className="flex flex-col items-center text-center">
-                  <div className={`flex h-14 w-14 items-center justify-center rounded-xl ${bg}`}>
-                    <Icon className={`h-7 w-7 ${text}`} />
+                  <div className={clsx("flex h-14 w-14 items-center justify-center rounded-ub-lg", tint)}>
+                    <Icon className="h-7 w-7" aria-hidden />
                   </div>
-                  <p className="mt-4 text-base font-semibold text-slate-900">{title}</p>
-                  <p className="mt-2 text-sm text-slate-500">{description}</p>
+                  <p className="mt-4 text-ub-heading-sm text-ub-text-primary">{title}</p>
+                  <p className="mt-2 text-ub-body-sm text-ub-text-secondary">{description}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-4 border-t border-slate-200 px-5 py-4">
+        <div className="flex items-center justify-between gap-4 border-t border-ub-border px-5 py-4">
           <div className="flex items-center gap-1.5">
             {STEPS.map((s, i) => (
               <button
                 key={s.tourId}
                 aria-label={`Go to slide ${i + 1}`}
                 onClick={() => setStepIndex(i)}
-                className={`h-1.5 rounded-full transition-all ${i === stepIndex ? "w-6 bg-blue-600" : "w-1.5 bg-slate-200"}`}
+                className={clsx("h-1.5 rounded-ub-full transition-all motion-reduce:transition-none", i === stepIndex ? "w-6 bg-ub-action-primary" : "w-1.5 bg-ub-border")}
               />
             ))}
           </div>
 
           <div className="flex items-center gap-2">
             {stepIndex > 0 && (
-              <button onClick={goBack} disabled={ending} className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50">
+              <button onClick={goBack} disabled={ending} className={clsx(buttonBase, buttonVariants.tertiary, buttonSizes.md)}>
                 Back
               </button>
             )}
             <button
               onClick={goNext}
               disabled={ending}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+              className={clsx(buttonBase, buttonVariants.primary, buttonSizes.md)}
             >
               {isLast ? (ending ? "Finishing..." : "Got it") : "Next"}
             </button>

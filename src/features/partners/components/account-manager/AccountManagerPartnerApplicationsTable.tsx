@@ -4,14 +4,18 @@ import React, { useEffect, useRef, useState } from "react";
 import { ChevronRight, User, GraduationCap, Clock, RefreshCw, SlidersHorizontal, ClipboardList } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import { useAccountManagerApplications } from "features/applications/hooks";
-import PresignedImage from "components/ui/PresignedImage";
-import SearchInput from "components/form/filter/SearchInput";
-import FilterSelectField from "components/form/filter/FilterSelectField";
-import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
-import { AnimatedTableRow } from "components/ui/motion";
-import { StatusBadge } from "components/ui/badges";
+import PresignedImage from "components/ub/data/PresignedImage";
+import SearchInput from "components/ub/forms/SearchInput";
+import FilterSelectField from "components/ub/forms/FilterSelectField";
+import TableWrapper from "components/ub/data/TableWrapper";
+import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/TableEmptyRow";
+import TableErrorRow from "components/ub/data/TableErrorRow";
+import TablePagination from "components/ub/data/TablePagination";
+import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
+import StatusBadge from "components/ub/data/StatusBadge";
 import { getStatusVariant } from "utils/getStatusVariant";
-import Button from "components/ui/buttons/Button";
+import Button from "components/ub/core/Button";
 
 const ITEMS_PER_PAGE = 5;
 

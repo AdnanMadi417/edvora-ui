@@ -3,8 +3,8 @@ import { CreditCard } from "lucide-react";
 import { useVisaCase } from "hooks/useVisaCase";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import { AppDate } from "components/ui/date";
-import { SectionIconBadge } from "components/ui/icons";
+import AppDate from "components/ub/data/AppDate";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 
 interface OfferLetterDecisionProps {
   application: any;

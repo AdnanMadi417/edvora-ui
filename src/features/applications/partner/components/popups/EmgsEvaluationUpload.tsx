@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { useEmgsEvalUpload } from "features/applications/hooks";
-import CompactFileUpload from "components/form/upload/CompactFileUpload";
-import Button from "components/ui/buttons/Button";
+import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import Button from "components/ub/core/Button";
 import { parseApiError } from "utils/parseApiError";
 
 interface EmgsEvalUploadProps {

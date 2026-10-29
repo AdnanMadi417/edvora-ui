@@ -3,14 +3,14 @@
 import React from "react";
 import { FileSignature, Send, RotateCcw } from "lucide-react";
 
-import { DetailStatusBadge } from "components/ui/badges";
-import type { StatusBadgeVariant } from "components/ui/badges";
-import { SectionIconBadge } from "components/ui/icons";
-import Button from "components/ui/buttons/Button";
-import { Skeleton } from "components/ui/skeleton";
-import { useToast } from "components/context/ToastContext";
+import DetailStatusBadge from "components/ub/data/DetailStatusBadge";
+import type { StatusBadgeVariant } from "components/ub/data/StatusBadge";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
+import Button from "components/ub/core/Button";
+import Skeleton from "components/ub/feedback/Skeleton";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode } from "utils/parseApiError";
-import AppDate from "components/ui/date/AppDate";
+import AppDate from "components/ub/data/AppDate";
 import DocumentActions from "features/applications/shared/DocumentActions";
 
 import { usePartnerAgreement, useStartPartnerAgreement } from "../hooks";

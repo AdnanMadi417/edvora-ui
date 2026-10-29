@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import { mock, httpError } from "../router";
 import { newId, pick, placeholderImage, SAMPLE_PDF_URL } from "../db";
+import { ACCOUNT_MANAGERS, PARTNERS, STUDENTS, UNIVERSITIES } from "../seed";
 import { applications, programDetail } from "./applications.data";
 import { universityPaymentMethods } from "./universities";
 
@@ -33,10 +34,19 @@ const IMAGE_EXT = /\.(png|jpe?g|webp|gif|svg)$/i;
 const isImageKey = (key: string) => IMAGE_EXT.test(key.split("?")[0]);
 const safeName = (name: string) => name.replace(/[^\w.-]+/g, "_");
 
+/** Real name for keys that embed a seeded id (stu_001, ptn_003, uni_004…), so initials read "NA", not "S0". */
+function seededName(fileKey: string): string | null {
+  const id = fileKey.match(/\b(stu|ptn|uni|am)_\d{3}\b/)?.[0];
+  if (!id) return null;
+  const entity = [...STUDENTS, ...PARTNERS, ...ACCOUNT_MANAGERS].find((e) => e.id === id);
+  if (entity) return entity.name;
+  return UNIVERSITIES.find((u) => u.id === id)?.short ?? null;
+}
+
 /** A viewable URL for a stored file: initials image for images, the sample PDF otherwise. */
 export function mockFileUrl(fileKey: string) {
   if (!isImageKey(fileKey)) return SAMPLE_PDF_URL;
-  const base = fileKey.split("/").pop()?.replace(IMAGE_EXT, "").replace(/[_-]+/g, " ") || "File";
+  const base = seededName(fileKey) ?? (fileKey.split("/").pop()?.replace(IMAGE_EXT, "").replace(/[_-]+/g, " ") || "File");
   return placeholderImage(base, pick(["#0348D1", "#7C3AED", "#059669", "#D97706", "#0891B2"], base.length));
 }
 

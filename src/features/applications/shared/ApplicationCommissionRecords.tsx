@@ -4,8 +4,8 @@ import React from "react";
 // `Clock` is only used by the hidden payout-timeline line below.
 // import { Clock, Calendar } from "lucide-react";
 import { Calendar } from "lucide-react";
-import { DetailStatusBadge } from "components/ui/badges";
-import AppDate from "components/ui/date/AppDate";
+import DetailStatusBadge from "components/ub/data/DetailStatusBadge";
+import AppDate from "components/ub/data/AppDate";
 import { getStatusVariant } from "utils/getStatusVariant";
 import {
   type ApplicationCommissionItem,

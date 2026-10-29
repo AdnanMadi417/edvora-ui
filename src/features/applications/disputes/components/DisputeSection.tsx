@@ -3,9 +3,9 @@
 import React, { useState } from "react";
 import { AlertTriangle, CheckCircle, Wrench } from "lucide-react";
 
-import { DetailStatusBadge } from "components/ui/badges";
-import { SectionIconBadge } from "components/ui/icons";
-import Button from "components/ui/buttons/Button";
+import DetailStatusBadge from "components/ub/data/DetailStatusBadge";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
+import Button from "components/ub/core/Button";
 import type { Dispute } from "features/applications/shared/applicationTypes";
 
 import ResolveNoIssue from "./ResolveNoIssue";

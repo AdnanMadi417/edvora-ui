@@ -4,14 +4,14 @@ import React, { useState } from "react";
 import { ChevronLeft } from "lucide-react";
 import { MdPersonAdd } from "react-icons/md";
 
-import InputField from "components/form/fields/InputField";
-import PasswordField from "components/form/fields/PasswordField";
-import PasswordRequirementsChecklist from "components/form/fields/PasswordRequirementsChecklist";
-import PasswordMatchIndicator from "components/form/fields/PasswordMatchIndicator";
-import Button from "components/ui/buttons/Button";
+import InputField from "components/ub/forms/InputField";
+import PasswordField from "components/ub/forms/PasswordField";
+import PasswordRequirementsChecklist from "components/ub/forms/PasswordRequirementsChecklist";
+import PasswordMatchIndicator from "components/ub/forms/PasswordMatchIndicator";
+import Button from "components/ub/core/Button";
 
 import { useCreateAccountManager } from "../hooks/useCreateAccountManager";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { useRouter } from "next/navigation";
 import { validateNewPassword, isPasswordValid } from "utils/passwordValidation";

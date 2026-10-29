@@ -6,8 +6,8 @@ import { FaWhatsapp } from "react-icons/fa";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 
-import EmptyData from "components/emptyData/EmptyData";
-import Loading from "components/loading/Loading";
+import EmptyData from "components/ub/feedback/EmptyData";
+import Loading from "components/ub/feedback/Loading";
 
 import ApplicationDetails from "features/applications/partner/components/details/ApplicationDetails";
 import type { ApplicationDetail } from "features/applications/shared/applicationTypes";

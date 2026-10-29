@@ -12,9 +12,9 @@ import {
 
 import { useUniversityTypeDetails } from "features/universities/hooks";
 
-import Loading from "components/loading/Loading";
-import EmptyData from "components/emptyData/EmptyTableData";
-import Button from "components/ui/buttons/Button";
+import Loading from "components/ub/feedback/Loading";
+import EmptyData from "components/ub/feedback/EmptyTableData";
+import Button from "components/ub/core/Button";
 
 interface UniversityDetailsProps {
   id: string;

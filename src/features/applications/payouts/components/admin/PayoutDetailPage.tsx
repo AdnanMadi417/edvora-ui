@@ -4,14 +4,15 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Ban, Wallet } from "lucide-react";
 
-import { Skeleton } from "components/ui/skeleton";
-import { AsyncStateView, getAsyncStatus } from "components/ui/async";
-import { StatusBadge } from "components/ui/badges";
-import Button from "components/ui/buttons/Button";
-import ActionsDropdown from "components/ui/buttons/ActionsDropdown";
+import Skeleton from "components/ub/feedback/Skeleton";
+import AsyncStateView from "components/ub/feedback/AsyncStateView";
+import { getAsyncStatus } from "components/ub/feedback/AsyncStatus";
+import StatusBadge from "components/ub/data/StatusBadge";
+import Button from "components/ub/core/Button";
+import ActionsDropdown from "components/ub/navigation/ActionsDropdown";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
-import AppDate from "components/ui/date/AppDate";
+import AppDate from "components/ub/data/AppDate";
 
 import { usePayout, usePaymentMethods } from "../../hooks";
 

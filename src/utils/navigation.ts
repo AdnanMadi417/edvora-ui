@@ -8,8 +8,8 @@ export const findCurrentRoute = (
   routes: IRoute[],
   pathname: string,
 ): IRoute => {
-  if (!isWindowAvailable()) return null;
-
+  // Pure on `pathname` (usePathname works during SSR too), so server and
+  // client resolve the same route and the navbar title hydrates cleanly.
   for (let route of routes) {
     if (!!route.items) {
       const found = findCurrentRoute(route.items, pathname);

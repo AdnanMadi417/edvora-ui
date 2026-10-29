@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Clock } from "lucide-react";
-import ModalHeader from "components/ui/modal/ModalHeader";
+import ModalHeader from "components/ub/feedback/ModalHeader";
 
 interface UpdateStatusHeaderProps {
   stageName?: string;

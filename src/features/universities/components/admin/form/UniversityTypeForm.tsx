@@ -4,13 +4,13 @@ import { ArrowLeft, Layers, } from 'lucide-react';
 
 import { useApplicationSubmissionFields, useCreateUniversityType } from "features/universities/hooks";
 
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
-import InputField from "components/form/fields/InputField";
-import Loading from "components/loading/Loading";
-import Button from "components/ui/buttons/Button";
-import SettingToggleInput from "components/form/toggle/SettingToggleInput";
+import InputField from "components/ub/forms/InputField";
+import Loading from "components/ub/feedback/Loading";
+import Button from "components/ub/core/Button";
+import SettingToggleInput from "components/ub/forms/SettingToggleInput";
 import { useRouter } from "next/navigation";
 
 interface Props {

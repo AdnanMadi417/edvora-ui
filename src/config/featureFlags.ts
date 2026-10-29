@@ -20,4 +20,9 @@ export const FEATURES = {
    *  (/partner/universities). The admin and data-entry university
    *  management screens are a separate feature and stay enabled. */
   partnerUniversities: enabled(process.env.NEXT_PUBLIC_ENABLE_PARTNER_UNIVERSITIES),
+
+  /** Dark theme and its toggle. Off: the app always renders light and the
+   *  toggle is hidden. The dark colors themselves live in one block in
+   *  src/styles/tokens/primitives.css ("Dark theme palette"). */
+  darkMode: enabled(process.env.NEXT_PUBLIC_ENABLE_DARK_MODE),
 };

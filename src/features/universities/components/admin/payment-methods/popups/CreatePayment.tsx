@@ -5,11 +5,11 @@ import { CreditCard, XCircle } from 'lucide-react';
 
 import { useCreatePayment } from "features/knowledge-hub/payment-methods/hooks";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import InputField from "components/form/fields/InputField";
-import RichTextEditor from "components/form/fields/RichTextEditor";
-import { useToast } from "components/context/ToastContext";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
+import InputField from "components/ub/forms/InputField";
+import RichTextEditor from "components/ub/forms/RichTextEditor";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";

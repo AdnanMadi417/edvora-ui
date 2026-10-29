@@ -1,7 +1,7 @@
 ﻿import React from "react";
-import { InputField } from "components/form";
-import SearchableSelect from "components/form/search/SearchableSelect";
-import SearchableDropdown from "components/form/search/SearchableDropdown";
+import InputField from "components/ub/forms/InputField";
+import SearchableSelect from "components/ub/forms/SearchableSelect";
+import SearchableDropdown from "components/ub/forms/SearchableDropdown";
 import { NATIONALITIES } from "constants/lists";
 
 interface Props {

@@ -4,12 +4,12 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle, ArrowRightLeft, ChevronDown, ChevronUp, ListChecks, Share2, Users, XCircle,
 } from "lucide-react";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import SelectField from "components/form/fields/SelectField";
-import SearchableChecklist, { type SearchableChecklistItem } from "components/form/search/SearchableChecklist";
-import RadioCardGroup from "components/form/radio/RadioCardGroup";
-import { useToast } from "components/context/ToastContext";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
+import SelectField from "components/ub/forms/SelectField";
+import SearchableChecklist, { type SearchableChecklistItem } from "components/ub/forms/SearchableChecklist";
+import RadioCardGroup from "components/ub/forms/RadioCardGroup";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, getApiErrorDetails, parseApiError } from "utils/parseApiError";
 import { useAccountManagers } from "../hooks/useAccountManagers";
 import { useTransferPartners } from "../hooks/useTransferPartners";

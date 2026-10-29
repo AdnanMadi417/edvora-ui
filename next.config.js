@@ -14,6 +14,10 @@ const nextConfig = {
   // Without this, dynamic `await import()` calls in instrumentation.ts are not
   // traced by @vercel/nft and the packages are missing from the container.
   serverExternalPackages: [
+    // jsdom (via isomorphic-dompurify) breaks when bundled: it reads its default
+    // stylesheet from disk at runtime, so server-rendered rich text 500s.
+    'isomorphic-dompurify',
+    'jsdom',
     '@opentelemetry/api',
     '@opentelemetry/api-logs',
     '@opentelemetry/exporter-logs-otlp-http',

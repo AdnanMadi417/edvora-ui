@@ -13,9 +13,9 @@ import {
   RefreshCw,
   type LucideIcon,
 } from "lucide-react";
-import { AppDate } from "components/ui/date";
-import { SectionIconBadge } from "components/ui/icons";
-import Button from "components/ui/buttons/Button";
+import AppDate from "components/ub/data/AppDate";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
+import Button from "components/ub/core/Button";
 import { useApplicationTimeline } from "features/applications/hooks";
 import type { ApplicationTimelineItem, TimelineDocumentTypeRef } from "features/applications/shared/applicationTypes";
 

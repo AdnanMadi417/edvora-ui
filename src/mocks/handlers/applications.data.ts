@@ -277,6 +277,8 @@ export type AppRecord = {
   overrides: Partial<Record<"offer_letter_document" | "visa_document" | "emgs_evaluation_document", Doc>>;
   commissionDocs: Record<string, Doc>;
   visaPayments: any[];
+  /** Set once the seeded visa payments have been copied into visaPayments. */
+  visaPaymentsSeeded?: boolean;
   visaCaseOverride: any | null;
   timeline: TimelineEntry[];
   new_notifications_count: number;
@@ -430,7 +432,7 @@ const doc = (app: AppRecord, name: string, type: string, status: string, created
 });
 
 /** Day offset of a status along the application's route (for timestamps). */
-function stepDate(app: AppRecord, code: string) {
+export function stepDate(app: AppRecord, code: string) {
   const route = pathTo(app.statusCode);
   const idx = Math.max(0, route.indexOf(code));
   const start = (Date.parse(daysAgo(0)) - Date.parse(app.created_at)) / 86400000;
@@ -541,14 +543,14 @@ export function visaCaseFor(app: AppRecord) {
   };
 }
 
-export function visaPaymentsFor(app: AppRecord) {
+/** The payment the seed history implies for the application's current status. */
+function seededVisaPayments(app: AppRecord) {
   const s = app.statusCode;
-  const seeded = [];
-  if (!visaCaseFor(app)) return [];
-  if (reached(s, "PAYMENT_SUBMITTED")) {
-    const at = stepDate(app, "PAYMENT_SUBMITTED");
-    const status = s === "PAYMENT_SUBMITTED" ? "pending" : s === "PAYMENT_REJECTED" ? "rejected" : "approved";
-    seeded.push({
+  if (!reached(s, "PAYMENT_SUBMITTED")) return [];
+  const at = stepDate(app, "PAYMENT_SUBMITTED");
+  const status = s === "PAYMENT_SUBMITTED" ? "pending" : s === "PAYMENT_REJECTED" ? "rejected" : "approved";
+  return [
+    {
       id: `vp_${app.id}`,
       visa_case_id: `visa_${app.id}`,
       university_payment_method_id: defaultUniversityPaymentMethodId(app) ?? "",
@@ -562,37 +564,25 @@ export function visaPaymentsFor(app: AppRecord) {
       created_at: at,
       updated_at: at,
       documents: [{ id: `vpd_${app.id}`, file_key: fileKey(app.id, "visa_payment_receipt"), file_url: SAMPLE_PDF_URL }],
-    });
-  }
-  return [...app.visaPayments, ...seeded];
-}
-
-export function commissionsFor(app: AppRecord) {
-  const s = app.statusCode;
-  const p = PROGRAMS.find((x) => x.id === app.programId) ?? PROGRAMS[0];
-  const status = reached(s, "COMMISSION_PAID")
-    ? "paid"
-    : s === "COMMISSION_READY"
-      ? "released"
-      : reached(s, "STUDENT_ENROLLED")
-        ? "approved"
-        : "pending";
-  return [
-    {
-      id: `com_${app.id}`,
-      status,
-      amount: Math.round(p.tuition_fee * 0.15),
-      currency: "RM",
-      commission_type_id: "ctype_001",
-      commission_type: "Percentage",
-      notes: "15% of first-year tuition fee, payable after enrollment is confirmed.",
-      expected_commission_from: 30,
-      expected_commission_to: 60,
-      created_at: app.created_at,
     },
   ];
 }
 
+/**
+ * Visa payments, newest first. The seeded history is materialised onto the
+ * record the first time it is needed, so later status changes review these
+ * rows (see transition) instead of re-deriving them.
+ */
+export function visaPaymentsFor(app: AppRecord) {
+  if (!app.visaPaymentsSeeded && visaCaseFor(app)) {
+    app.visaPaymentsSeeded = true;
+    app.visaPayments = [...app.visaPayments, ...seededVisaPayments(app)];
+  }
+  return app.visaPayments;
+}
+
+// Commission amounts, pay-ins, payouts and disputes are owned by finance.ts
+// (seeded from these statuses); only the commission documents live here.
 const inCommissionStage = (app: AppRecord) => statusByCode(app.statusCode).stageIndex === 5;
 const isPaid = (app: AppRecord) => ["COMMISSION_PAID", "COMMISSION_DISPUTED", "DISPUTE_RESPONSE_RECEIVED", "APPLICATION_COMPLETE"].includes(app.statusCode);
 
@@ -605,57 +595,6 @@ export function commissionDocumentsFor(app: AppRecord) {
     docs.commission_payment_document = doc(app, "commission_payment", "commission_payment_document", "2", stepDate(app, "COMMISSION_PAID"));
   }
   return { ...docs, ...app.commissionDocs };
-}
-
-export function payInFor(app: AppRecord) {
-  if (!inCommissionStage(app)) return null;
-  const amount = Math.round((PROGRAMS.find((x) => x.id === app.programId) ?? PROGRAMS[0]).tuition_fee * 0.25);
-  return {
-    id: `payin_${app.id}`,
-    payment_date: stepDate(app, "COMMISSION_READY").slice(0, 10),
-    amount,
-    currency: "RM",
-    payment_reference: `INST-REM-${app.id.slice(-3)}2026`,
-    voided_at: null,
-    void_reason: null,
-    created_at: stepDate(app, "COMMISSION_READY"),
-  };
-}
-
-export function payoutFor(app: AppRecord) {
-  if (!isPaid(app)) return null;
-  const amount = commissionsFor(app)[0].amount;
-  return {
-    id: `payout_${app.id}`,
-    bank_reference: `MBB-TRF-${app.id.slice(-3)}7781`,
-    paid_at: stepDate(app, "COMMISSION_PAID"),
-    currency: "RM",
-    paid_amount: amount,
-    source_amount: amount,
-    source_currency: "RM",
-    voided_at: null,
-    void_reason: null,
-    created_at: stepDate(app, "COMMISSION_PAID"),
-    receipt_file_key: fileKey(app.id, "payout_receipt"),
-    receipt_file_url: SAMPLE_PDF_URL,
-  };
-}
-
-export function disputeFor(app: AppRecord) {
-  if (app.statusCode !== "COMMISSION_DISPUTED" && app.statusCode !== "DISPUTE_RESPONSE_RECEIVED") return null;
-  const resolved = app.statusCode === "DISPUTE_RESPONSE_RECEIVED";
-  return {
-    id: `dsp_${app.id}`,
-    status: resolved ? "resolved" : "open",
-    justification: "The payout covers 10% of tuition, but the agreement for this Institution is 15% of first-year tuition.",
-    report: resolved ? "Rate confirmed at 15%. The difference has been paid in a corrected payout." : null,
-    reported_by_user_id: `usr_${app.partnerId}`,
-    resolved_by_user_id: resolved ? "usr_admin_001" : null,
-    old_partner_payout_id: resolved ? `payout_${app.id}_old` : null,
-    new_partner_payout_id: resolved ? `payout_${app.id}` : null,
-    created_at: daysAgo(3),
-    updated_at: daysAgo(resolved ? 1 : 3),
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -757,9 +696,24 @@ export function addTimeline(app: AppRecord, entry: Partial<TimelineEntry> & { en
 export const partnerActorOf = (app: AppRecord) => ({ id: `usr_${app.partnerId}`, name: app.partnerName });
 
 /** Move to a new status, recording the transition. */
+/** Payment review outcomes a status change implies for the latest pending visa payment. */
+const PAYMENT_REVIEW: Record<string, "approved" | "rejected"> = { PAYMENT_APPROVED: "approved", PAYMENT_REJECTED: "rejected" };
+
 export function transition(app: AppRecord, code: string, opts: { reason?: string; notes?: string; docIds?: string[]; actor?: { id: string; name: string } } = {}) {
   const from = statusByCode(app.statusCode);
   const to = statusByCode(code);
+  const review = PAYMENT_REVIEW[code];
+  if (review) {
+    const pending = visaPaymentsFor(app).find((p) => p.status === "pending");
+    if (pending) {
+      Object.assign(pending, {
+        status: review,
+        reviewed_at: nowIso(),
+        review_notes: review === "rejected" ? opts.reason || "Payment rejected." : "Payment verified against bank statement.",
+        updated_at: nowIso(),
+      });
+    }
+  }
   addTimeline(
     app,
     {

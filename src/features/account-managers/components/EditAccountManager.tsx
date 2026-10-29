@@ -3,14 +3,14 @@
 import { Pencil, XCircle } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-import InputField from "components/form/fields/InputField";
-import PasswordField from "components/form/fields/PasswordField";
-import PasswordRequirementsChecklist from "components/form/fields/PasswordRequirementsChecklist";
-import PasswordMatchIndicator from "components/form/fields/PasswordMatchIndicator";
-import ToggleInput from "components/form/toggle/ToggleInput";
-import Button from "components/ui/buttons/Button";
-import { StatusBadge } from "components/ui/badges";
-import { useToast } from "components/context/ToastContext";
+import InputField from "components/ub/forms/InputField";
+import PasswordField from "components/ub/forms/PasswordField";
+import PasswordRequirementsChecklist from "components/ub/forms/PasswordRequirementsChecklist";
+import PasswordMatchIndicator from "components/ub/forms/PasswordMatchIndicator";
+import ToggleInput from "components/ub/forms/ToggleInput";
+import Button from "components/ub/core/Button";
+import StatusBadge from "components/ub/data/StatusBadge";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 import { useEditAccountManager } from "../hooks/useEditAccountManager";

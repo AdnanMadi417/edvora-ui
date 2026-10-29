@@ -5,13 +5,13 @@ import { XCircle, GraduationCap, CalendarPlus, Plus, Trash2 } from "lucide-react
 
 import { useBatchUpdatePrograms } from "features/programs/hooks";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
-import InputField from "components/form/fields/InputField";
-import RichTextEditor from "components/form/fields/RichTextEditor";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
+import InputField from "components/ub/forms/InputField";
+import RichTextEditor from "components/ub/forms/RichTextEditor";
 
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface BatchProgramScholarshipsProps {

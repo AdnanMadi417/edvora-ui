@@ -5,10 +5,10 @@ import { XCircle, Tag } from "lucide-react";
 
 import { useCreateFieldOfStudy } from "features/knowledge-hub/field-of-study/hooks";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import InputField from "components/form/fields/InputField";
-import { useToast } from "components/context/ToastContext";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
+import InputField from "components/ub/forms/InputField";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 

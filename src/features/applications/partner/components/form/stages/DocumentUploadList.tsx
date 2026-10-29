@@ -10,8 +10,8 @@ import {
 } from "lucide-react";
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
 import { FormDataType, DocumentType } from "features/applications/partner/components/form/utility-functions/types";
-import Button from "components/ui/buttons/Button";
-import { useFileDrop } from "components/form/upload/useFileDrop";
+import Button from "components/ub/core/Button";
+import { useFileDrop } from "components/ub/forms/useFileDrop";
 
 interface Props {
   documentTypes: DocumentType[];

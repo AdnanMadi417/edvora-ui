@@ -5,7 +5,7 @@ import { FileText, Calendar, XCircle, AlertCircle } from "lucide-react";
 
 import { useVisaPayments } from "hooks/useVisaPayments";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import { AppDate } from "components/ui/date";
+import AppDate from "components/ub/data/AppDate";
 
 interface VisaTrackingTimelineProps {
   application: any;

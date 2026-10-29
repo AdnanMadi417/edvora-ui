@@ -31,16 +31,16 @@ import { useProgram, useCopyTargetBranches, useDeletePrograms, useSetProgramHidd
 import { getIeltsLabel } from "constants/lists";
 
 import Link from "next/link";
-import Loading from "components/loading/Loading";
+import Loading from "components/ub/feedback/Loading";
 import CatalogueQuotaNotice from "features/programs/components/shared/CatalogueQuotaNotice";
-import PresignedImage from "components/ui/PresignedImage";
-import Button from "components/ui/buttons/Button";
-import RichTextDisplay from "components/ui/RichTextDisplay";
+import PresignedImage from "components/ub/data/PresignedImage";
+import Button from "components/ub/core/Button";
+import RichTextDisplay from "components/ub/data/RichTextDisplay";
 import CurrencySelector from "features/programs/components/shared/CurrencySelector";
 import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
 import CopyProgramToBranch from "features/programs/components/admin/popups/CopyProgramToBranch";
 import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate, formatFeeAmount } from "features/programs/utils/exchangeRate";
 import { monthLabel, nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";

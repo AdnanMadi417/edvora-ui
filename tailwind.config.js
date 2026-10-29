@@ -32,6 +32,16 @@ const ubColors = {
   info: semantic('info'),
   tag: Object.fromEntries(['sky', 'indigo', 'orange', 'plum', 'amber', 'red', 'pink', 'teal', 'grey'].map((h) => [h, tagHue(h)])),
   chart: scale('chart', [1, 2, 3, 4, 5, 6, 7, 8]),
+  // Theme-aware tints: bg-ub-tone-success-bg, text-ub-tone-success-text, …
+  tone: Object.fromEntries(
+    ['success', 'danger', 'warning', 'info', 'brand', 'attention', 'neutral', 'plum', 'teal', 'pink', 'sky'].map((t) => [
+      t,
+      { bg: v(`tone-${t}-bg`), border: v(`tone-${t}-border`), text: v(`tone-${t}-text`), dot: v(`tone-${t}-dot`) },
+    ]),
+  ),
+  'table-head': v('bg-table-head'),
+  tooltip: v('bg-tooltip'),
+  toast: v('bg-toast'),
   // semantic roles
   canvas: v('bg-canvas'),
   surface: { DEFAULT: v('bg-surface'), subtle: v('bg-surface-subtle'), raised: v('bg-surface-raised') },
@@ -89,7 +99,9 @@ const ubType = {
 const prefixed = (obj) => Object.fromEntries(Object.entries(obj).map(([k, val]) => [`ub-${k}`, val]));
 
 module.exports = {
-  darkMode: 'class',
+  // One theme switch for the app: data-ub-theme="dark" on <html> (or on a
+  // section) flips both the --ub-* tokens and Tailwind's dark: variant.
+  darkMode: ['variant', '&:is([data-ub-theme="dark"], [data-ub-theme="dark"] *)'],
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',

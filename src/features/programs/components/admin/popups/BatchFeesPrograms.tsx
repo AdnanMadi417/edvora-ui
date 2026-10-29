@@ -6,12 +6,12 @@ import { XCircle, DollarSign } from "lucide-react";
 import { useBatchUpdatePrograms } from "features/programs/hooks";
 import { type Currency } from "features/programs/types";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
 import YearlyFeesField from "features/programs/components/shared/YearlyFeesField";
 import OneTimeFeesField from "features/programs/components/shared/OneTimeFeesField";
 
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface CreateFeesProps {

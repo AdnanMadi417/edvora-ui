@@ -8,7 +8,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useCreatePartnerApplication } from "features/applications/partner/hooks/useCreatePartnerApplication";
 import { useGetApplicationRequiredFields } from "features/applications/partner/hooks/useApplicationRequiredFields";
@@ -32,10 +32,10 @@ import {
 import { useMe } from "hooks/useMe";
 import { usePartnerProgramIntakeMonths } from "features/programs/hooks";
 import { isDateInIntakeMonths, nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
-import Loading from "components/loading/Loading";
-import Button from "components/ui/buttons/Button";
-import PrevButton from "components/ui/buttons/PrevButton";
-import NextButton from "components/ui/buttons/NextButton";
+import Loading from "components/ub/feedback/Loading";
+import Button from "components/ub/core/Button";
+import PrevButton from "components/ub/core/PrevButton";
+import NextButton from "components/ub/core/NextButton";
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { FormDataType, DocumentItem } from "features/applications/partner/components/form/utility-functions/types";

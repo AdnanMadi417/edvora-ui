@@ -2,7 +2,8 @@
  * Unibexs design system — semantic (role) tokens, light by default.
  * Opt a section into dark with data-ub-theme="dark" (brief §1.3, §2.2).
  */
-:root {
+:root,
+[data-ub-theme="light"] {
   /* backgrounds */
   --ub-bg-canvas: var(--ub-neutral-50);
   --ub-bg-surface: var(--ub-neutral-0);
@@ -14,6 +15,21 @@
   --ub-bg-scrim: rgba(0, 12, 41, 0.56);
   --ub-bg-tooltip: var(--ub-neutral-900);
   --ub-bg-toast: var(--ub-deep-navy);
+
+  /* tones: tinted tags, alerts, icon badges (700 text on 50 with a 200 border) */
+  --ub-tone-success-bg: var(--ub-success-50);   --ub-tone-success-border: var(--ub-success-200);   --ub-tone-success-text: var(--ub-success-700);   --ub-tone-success-dot: var(--ub-success-500);
+  --ub-tone-danger-bg: var(--ub-danger-50);     --ub-tone-danger-border: var(--ub-danger-200);     --ub-tone-danger-text: var(--ub-danger-700);     --ub-tone-danger-dot: var(--ub-danger-500);
+  --ub-tone-warning-bg: var(--ub-warning-50);   --ub-tone-warning-border: var(--ub-warning-200);   --ub-tone-warning-text: var(--ub-warning-800);   --ub-tone-warning-dot: var(--ub-warning-500);
+  --ub-tone-info-bg: var(--ub-info-50);         --ub-tone-info-border: var(--ub-info-200);         --ub-tone-info-text: var(--ub-info-700);         --ub-tone-info-dot: var(--ub-info-500);
+  --ub-tone-brand-bg: var(--ub-blue-50);        --ub-tone-brand-border: var(--ub-blue-200);        --ub-tone-brand-text: var(--ub-blue-700);        --ub-tone-brand-dot: var(--ub-blue-600);
+  --ub-tone-attention-bg: var(--ub-tag-orange-bg); --ub-tone-attention-border: var(--ub-tag-orange-border); --ub-tone-attention-text: var(--ub-tag-orange-text); --ub-tone-attention-dot: var(--ub-tag-orange-solid);
+  --ub-tone-neutral-bg: var(--ub-tag-grey-bg);  --ub-tone-neutral-border: var(--ub-tag-grey-border);  --ub-tone-neutral-text: var(--ub-tag-grey-text);  --ub-tone-neutral-dot: var(--ub-tag-grey-solid);
+  --ub-tone-plum-bg: var(--ub-tag-plum-bg);     --ub-tone-plum-border: var(--ub-tag-plum-border);     --ub-tone-plum-text: var(--ub-tag-plum-text);     --ub-tone-plum-dot: var(--ub-tag-plum-solid);
+  --ub-tone-teal-bg: var(--ub-tag-teal-bg);     --ub-tone-teal-border: var(--ub-tag-teal-border);     --ub-tone-teal-text: var(--ub-tag-teal-text);     --ub-tone-teal-dot: var(--ub-tag-teal-solid);
+  --ub-tone-pink-bg: var(--ub-tag-pink-bg);     --ub-tone-pink-border: var(--ub-tag-pink-border);     --ub-tone-pink-text: var(--ub-tag-pink-text);     --ub-tone-pink-dot: var(--ub-tag-pink-solid);
+  --ub-tone-sky-bg: var(--ub-tag-sky-bg);       --ub-tone-sky-border: var(--ub-tag-sky-border);       --ub-tone-sky-text: var(--ub-tag-sky-text);       --ub-tone-sky-dot: var(--ub-tag-sky-solid);
+
+  --ub-bg-table-head: var(--ub-neutral-50);
 
   /* text */
   --ub-text-primary: var(--ub-neutral-950);
@@ -56,21 +72,21 @@
 }
 
 [data-ub-theme="dark"] {
-  --ub-bg-canvas: var(--ub-navy-canvas);
-  --ub-bg-surface: var(--ub-navy-surface-1);
-  --ub-bg-surface-subtle: var(--ub-navy-surface-1);
-  --ub-bg-surface-raised: var(--ub-navy-surface-2);
-  --ub-bg-selected: var(--ub-navy-surface-3);
-  --ub-bg-disabled: var(--ub-navy-surface-2);
-  --ub-bg-skeleton: var(--ub-navy-surface-2);
+  --ub-bg-canvas: var(--ub-dark-canvas);
+  --ub-bg-surface: var(--ub-dark-surface-1);
+  --ub-bg-surface-subtle: var(--ub-dark-surface-1);
+  --ub-bg-surface-raised: var(--ub-dark-surface-2);
+  --ub-bg-selected: var(--ub-dark-surface-3);
+  --ub-bg-disabled: var(--ub-dark-surface-2);
+  --ub-bg-skeleton: var(--ub-dark-surface-2);
 
   --ub-text-primary: #ffffff;
   --ub-text-secondary: var(--ub-blue-200);
   --ub-text-tertiary: var(--ub-blue-200);
   --ub-text-link: var(--ub-blue-300);
 
-  --ub-border-default: var(--ub-navy-border);
-  --ub-border-control: var(--ub-navy-border-strong);
+  --ub-border-default: var(--ub-dark-border);
+  --ub-border-control: var(--ub-dark-border-strong);
   --ub-border-control-hover: var(--ub-blue-200);
   --ub-border-focus: var(--ub-blue-300);
   --ub-border-interactive-hover: var(--ub-blue-400);
@@ -83,13 +99,30 @@
   --ub-action-secondary-text: var(--ub-blue-300);
   --ub-action-secondary-bg-hover: rgba(146, 181, 253, 0.12);
   --ub-action-secondary-bg-pressed: rgba(146, 181, 253, 0.2);
-  --ub-action-disabled-bg: var(--ub-navy-surface-2);
-  --ub-action-disabled-text: var(--ub-navy-border-strong);
+  --ub-action-disabled-bg: var(--ub-dark-surface-2);
+  --ub-action-disabled-text: var(--ub-dark-border-strong);
 
   --ub-icon-default: var(--ub-blue-200);
   --ub-icon-interactive: var(--ub-blue-300);
 
   --ub-glow-action: 0 0 0 1px var(--ub-blue-400), 0 0 24px 0 rgba(3, 72, 209, 0.65);
+
+  --ub-bg-table-head: var(--ub-dark-surface-2);
+  --ub-bg-tooltip: var(--ub-dark-surface-3);
+  --ub-bg-toast: var(--ub-dark-surface-3);
+
+  /* tones on navy: the guide's dark tag hues; borders are the text colour at ~35% */
+  --ub-tone-success-bg: var(--ub-tag-teal-bg-dark);    --ub-tone-success-border: #6dc1b359; --ub-tone-success-text: var(--ub-tag-teal-text-dark);    --ub-tone-success-dot: var(--ub-success-500);
+  --ub-tone-danger-bg: var(--ub-tag-red-bg-dark);      --ub-tone-danger-border: #fb908b59;  --ub-tone-danger-text: var(--ub-tag-red-text-dark);      --ub-tone-danger-dot: var(--ub-danger-500);
+  --ub-tone-warning-bg: var(--ub-tag-amber-bg-dark);   --ub-tone-warning-border: #d3ac4159; --ub-tone-warning-text: var(--ub-tag-amber-text-dark);   --ub-tone-warning-dot: var(--ub-warning-500);
+  --ub-tone-info-bg: var(--ub-tag-sky-bg-dark);        --ub-tone-info-border: #6cbcda59;    --ub-tone-info-text: var(--ub-tag-sky-text-dark);        --ub-tone-info-dot: var(--ub-info-500);
+  --ub-tone-brand-bg: var(--ub-tag-indigo-bg-dark);    --ub-tone-brand-border: #8faefd59;   --ub-tone-brand-text: var(--ub-tag-indigo-text-dark);    --ub-tone-brand-dot: var(--ub-blue-400);
+  --ub-tone-attention-bg: var(--ub-tag-orange-bg-dark); --ub-tone-attention-border: #f7966b59; --ub-tone-attention-text: var(--ub-tag-orange-text-dark); --ub-tone-attention-dot: var(--ub-tag-orange-solid);
+  --ub-tone-neutral-bg: var(--ub-tag-grey-bg-dark);    --ub-tone-neutral-border: #a9b2c059; --ub-tone-neutral-text: var(--ub-tag-grey-text-dark);    --ub-tone-neutral-dot: var(--ub-tag-grey-solid);
+  --ub-tone-plum-bg: var(--ub-tag-plum-bg-dark);       --ub-tone-plum-border: #d996e459;    --ub-tone-plum-text: var(--ub-tag-plum-text-dark);       --ub-tone-plum-dot: var(--ub-tag-plum-solid);
+  --ub-tone-teal-bg: var(--ub-tag-teal-bg-dark);       --ub-tone-teal-border: #6dc1b359;    --ub-tone-teal-text: var(--ub-tag-teal-text-dark);       --ub-tone-teal-dot: var(--ub-tag-teal-solid);
+  --ub-tone-pink-bg: var(--ub-tag-pink-bg-dark);       --ub-tone-pink-border: #f68ead59;    --ub-tone-pink-text: var(--ub-tag-pink-text-dark);       --ub-tone-pink-dot: var(--ub-tag-pink-solid);
+  --ub-tone-sky-bg: var(--ub-tag-sky-bg-dark);         --ub-tone-sky-border: #6cbcda59;     --ub-tone-sky-text: var(--ub-tag-sky-text-dark);         --ub-tone-sky-dot: var(--ub-tag-sky-solid);
 
   color-scheme: dark;
 }

@@ -5,11 +5,12 @@ import { createPortal } from "react-dom";
 import { XCircle, Receipt } from "lucide-react";
 
 import { useRecordPayIn } from "../../hooks";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
-import { InputField, SelectField } from "components/form";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
+import InputField from "components/ub/forms/InputField";
+import SelectField from "components/ub/forms/SelectField";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
 
 export interface RecordPayInRow {
   application_id: string;

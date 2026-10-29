@@ -18,18 +18,22 @@ import {
   Languages,
 } from "lucide-react";
 import { MdOutlineCategory, MdSchool } from "react-icons/md";
-import PresignedImage from "components/ui/PresignedImage";
+import PresignedImage from "components/ub/data/PresignedImage";
 import { monthLabel } from "features/programs/utils/intakeMonths";
 import { useSetUniversityHidden, useUniversities } from "features/universities/hooks";
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
-import Link from "components/ui/links/LinkBtn";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
+import Link from "components/ub/core/LinkBtn";
 import UniversityFilterPanel from "features/universities/components/shared/filters/UniversityFilterPanel";
-import { StatusBadge } from "components/ui/badges";
-import { Tooltip } from "components/ui/tooltip";
-import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
-import { AnimatedTableRow } from "components/ui/motion";
-import { useToast } from "components/context/ToastContext";
+import StatusBadge from "components/ub/data/StatusBadge";
+import Tooltip from "components/ub/feedback/Tooltip";
+import TableWrapper from "components/ub/data/TableWrapper";
+import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/TableEmptyRow";
+import TableErrorRow from "components/ub/data/TableErrorRow";
+import TablePagination from "components/ub/data/TablePagination";
+import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 const ITEMS_PER_PAGE = 10;

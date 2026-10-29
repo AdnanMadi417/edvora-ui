@@ -1,0 +1,75 @@
+/*
+ * Dark-mode bridge for screens not yet migrated to the --ub-* tokens
+ * (brief §10, phase 5). In the dark theme only, the legacy utility classes
+ * most used across src/features are remapped to semantic tokens so those
+ * screens stay readable on Night Blue. Light mode is untouched. Delete each
+ * rule once no screen uses that class any more.
+ */
+[data-ub-theme="dark"] .bg-white,
+[data-ub-theme="dark"] .bg-slate-50,
+[data-ub-theme="dark"] .bg-gray-50 {
+  background-color: var(--ub-bg-surface);
+}
+[data-ub-theme="dark"] .bg-slate-100,
+[data-ub-theme="dark"] .bg-gray-100,
+[data-ub-theme="dark"] .hover\:bg-slate-50:hover,
+[data-ub-theme="dark"] .hover\:bg-slate-100:hover,
+[data-ub-theme="dark"] .hover\:bg-slate-100\/50:hover {
+  background-color: var(--ub-bg-surface-raised);
+}
+[data-ub-theme="dark"] .bg-slate-200,
+[data-ub-theme="dark"] .bg-slate-300 {
+  background-color: var(--ub-dark-surface-3);
+}
+
+[data-ub-theme="dark"] .text-slate-900,
+[data-ub-theme="dark"] .text-slate-800,
+[data-ub-theme="dark"] .text-gray-900,
+[data-ub-theme="dark"] .text-gray-800,
+[data-ub-theme="dark"] .text-navy-700,
+[data-ub-theme="dark"] .hover\:text-slate-900:hover,
+[data-ub-theme="dark"] .hover\:text-slate-800:hover {
+  color: var(--ub-text-primary);
+}
+[data-ub-theme="dark"] .text-slate-700,
+[data-ub-theme="dark"] .text-slate-600,
+[data-ub-theme="dark"] .text-gray-700,
+[data-ub-theme="dark"] .text-gray-600,
+[data-ub-theme="dark"] .hover\:text-slate-700:hover {
+  color: var(--ub-text-secondary);
+}
+[data-ub-theme="dark"] .text-slate-500,
+[data-ub-theme="dark"] .text-slate-400,
+[data-ub-theme="dark"] .text-gray-500,
+[data-ub-theme="dark"] .text-gray-400 {
+  color: var(--ub-text-tertiary);
+}
+
+[data-ub-theme="dark"] .border-slate-100,
+[data-ub-theme="dark"] .border-slate-200,
+[data-ub-theme="dark"] .border-slate-300,
+[data-ub-theme="dark"] .border-gray-200,
+[data-ub-theme="dark"] .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+[data-ub-theme="dark"] .divide-slate-200 > :not([hidden]) ~ :not([hidden]),
+[data-ub-theme="dark"] .hover\:border-slate-200:hover,
+[data-ub-theme="dark"] .hover\:border-slate-300:hover {
+  border-color: var(--ub-border-default);
+}
+
+/* Blue tints and links: Primary Blue text fails on navy, so use the link token. */
+[data-ub-theme="dark"] .bg-blue-50,
+[data-ub-theme="dark"] .bg-blue-100,
+[data-ub-theme="dark"] .hover\:bg-blue-50:hover {
+  background-color: var(--ub-tone-brand-bg);
+}
+[data-ub-theme="dark"] .border-blue-200,
+[data-ub-theme="dark"] .hover\:border-blue-200:hover {
+  border-color: var(--ub-tone-brand-border);
+}
+[data-ub-theme="dark"] .text-blue-600,
+[data-ub-theme="dark"] .text-blue-700,
+[data-ub-theme="dark"] .hover\:text-blue-600:hover,
+[data-ub-theme="dark"] .hover\:text-blue-700:hover,
+[data-ub-theme="dark"] .hover\:text-blue-800:hover {
+  color: var(--ub-text-link);
+}

@@ -9,9 +9,9 @@ import { useMe } from "hooks/useMe";
 import { useUnreadCount, useAllNotifications } from "features/notifications/hooks";
 import api from "lib/useApi";
 import { Send, User } from "lucide-react";
-import Loading from "components/loading/Loading";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
-import { useToast } from "components/context/ToastContext";
+import Loading from "components/ub/feedback/Loading";
+import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
+import { useToast } from "components/ub/feedback/ToastContext";
 
 interface AgentPartnerChatProps {
   applicationId: string;

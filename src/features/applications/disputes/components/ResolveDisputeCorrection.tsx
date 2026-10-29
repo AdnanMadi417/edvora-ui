@@ -8,11 +8,11 @@ import { useResolveCorrection } from "../hooks";
 import { payoutsApi, usePaymentMethods, PayoutCorrectionFields } from "features/applications/payouts";
 import type { Payout } from "features/applications/payouts";
 import { usePartnerBankAccount } from "features/partners/bank-accounts";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
 
 interface ResolveDisputeCorrectionProps {
   isOpen: boolean;

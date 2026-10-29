@@ -3,11 +3,12 @@
 import React, { useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { History as HistoryIcon } from "lucide-react";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import { DetailStatusBadge } from "components/ui/badges";
-import { Skeleton } from "components/ui/skeleton";
-import { AsyncStateView, getAsyncStatus } from "components/ui/async";
-import { AppDate } from "components/ui/date";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import DetailStatusBadge from "components/ub/data/DetailStatusBadge";
+import Skeleton from "components/ub/feedback/Skeleton";
+import AsyncStateView from "components/ub/feedback/AsyncStateView";
+import { getAsyncStatus } from "components/ub/feedback/AsyncStatus";
+import AppDate from "components/ub/data/AppDate";
 import { useBanks } from "features/banks/hooks";
 import { usePartnerBankAccountHistory } from "../../hooks";
 

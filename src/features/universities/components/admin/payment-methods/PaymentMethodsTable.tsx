@@ -15,22 +15,22 @@ import { MdOutlineCategory } from "react-icons/md";
 
 import { useDeleteUniversity, useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 
-import NextButton from "components/ui/buttons/NextButton";
-import PrevButton from "components/ui/buttons/PrevButton";
-import SearchInput from "components/form/filter/SearchInput";
+import NextButton from "components/ub/core/NextButton";
+import PrevButton from "components/ub/core/PrevButton";
+import SearchInput from "components/ub/forms/SearchInput";
 
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
 
 import DeletePaymentConfirmation from "features/universities/components/admin/payment-methods/popups/DeletePaymentConfirmation";
 import CreatePayment from "features/universities/components/admin/payment-methods/popups/CreatePayment";
 
-import Loading from "components/loading/Loading";
+import Loading from "components/ub/feedback/Loading";
 
 import { useRouter } from "next/navigation";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
 
 const PaymentMethodsTable = () => {
   const router = useRouter();

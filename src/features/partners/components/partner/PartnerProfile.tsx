@@ -22,22 +22,23 @@ import {
   User,
   Users,
 } from "lucide-react";
-import { StatusBadge } from "components/ui/badges";
-import { Tabs, type TabItem } from "components/ui/tabs";
+import StatusBadge from "components/ub/data/StatusBadge";
+import Tabs from "components/ub/navigation/Tabs";
+import type { TabItem } from "components/ub/navigation/Tabs";
 import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners";
 import { PartnerBankAccountSection } from "features/partners/bank-accounts";
-import Loading from "components/loading/Loading";
-import EmptyData from "components/emptyData/EmptyTableData";
+import Loading from "components/ub/feedback/Loading";
+import EmptyData from "components/ub/feedback/EmptyTableData";
 import ChangePasswordPopup from "./ChangePasswordPopup";
-import ActionsDropdown from "components/ui/buttons/ActionsDropdown";
-import IconButton from "components/ui/buttons/IconButton";
-import { useToast } from "components/context/ToastContext";
+import ActionsDropdown from "components/ub/navigation/ActionsDropdown";
+import IconButton from "components/ub/core/IconButton";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import { useFileDrop } from "components/form/upload/useFileDrop";
-import PresignedImage from "components/ui/PresignedImage";
-import { parseDate, formatDate } from "components/ui/date/utils";
+import { useFileDrop } from "components/ub/forms/useFileDrop";
+import PresignedImage from "components/ub/data/PresignedImage";
+import { parseDate, formatDate } from "components/ub/data/appDateUtils";
 import { parseApiError } from "utils/parseApiError";
 
 interface PartnerDetailsProps {

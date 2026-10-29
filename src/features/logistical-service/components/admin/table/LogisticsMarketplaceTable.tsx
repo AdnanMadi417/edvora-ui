@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import PresignedImage from "components/ui/PresignedImage";
+import PresignedImage from "components/ub/data/PresignedImage";
 import {
   CheckCircle,
   XCircle,
@@ -18,18 +18,22 @@ import {
 import { MdAddBusiness } from "react-icons/md";
 import { AnimatePresence } from "framer-motion";
 
-import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
-import { AnimatedTableRow } from "components/ui/motion";
-import { StatusBadge } from "components/ui/badges";
-import SearchInput from "components/form/filter/SearchInput";
-import { useToast } from 'components/context/ToastContext';
+import TableWrapper from "components/ub/data/TableWrapper";
+import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/TableEmptyRow";
+import TableErrorRow from "components/ub/data/TableErrorRow";
+import TablePagination from "components/ub/data/TablePagination";
+import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
+import StatusBadge from "components/ub/data/StatusBadge";
+import SearchInput from "components/ub/forms/SearchInput";
+import { useToast } from 'components/ub/feedback/ToastContext';
 import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from "next/navigation";
 
 import { useLogisticProviders, useDeleteLogisticProvider } from "features/logistical-service/hooks";
 import DeleteServiceConfirmation from "../DeleteServiceConfirmation";
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
 
 const LogisticsMarketplaceTable = () => {
   const router = useRouter();

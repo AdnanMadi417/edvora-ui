@@ -1,8 +1,8 @@
 import React from "react";
 import { GraduationCap, Building2, Clock, Globe, Calendar, ArrowRight, AlertCircle } from "lucide-react";
-import PresignedImage from "components/ui/PresignedImage";
-import { AppDate } from "components/ui/date";
-import { DetailStatusBadge } from "components/ui/badges";
+import PresignedImage from "components/ub/data/PresignedImage";
+import AppDate from "components/ub/data/AppDate";
+import DetailStatusBadge from "components/ub/data/DetailStatusBadge";
 import { getStatusVariant } from "utils/getStatusVariant";
 import { daysSince } from "utils/applicationFormatting";
 

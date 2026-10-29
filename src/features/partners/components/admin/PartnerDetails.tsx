@@ -29,29 +29,30 @@ import {
   Users,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
+import { EASE, MICRO_DURATION } from "components/ub/core/FadeIn";
 import { usePartnerDetails, useUpdateAgencyMemberStatus } from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import SuspendReactivateMemberModal from "features/agency-members/components/partner/SuspendReactivateMemberModal";
 import type { AgencyMember } from "features/agency-members/types";
-import Loading from "components/loading/Loading";
-import EmptyData from "components/emptyData/EmptyTableData";
-import { useToast } from "components/context/ToastContext";
+import Loading from "components/ub/feedback/Loading";
+import EmptyData from "components/ub/feedback/EmptyTableData";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { parseApiError } from "utils/parseApiError";
 import { formatAgencyRole } from "features/partners/utils";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
-import PresignedImage from "components/ui/PresignedImage";
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
-import { StatusBadge } from "components/ui/badges";
-import { Tabs, type TabItem } from "components/ui/tabs";
+import PresignedImage from "components/ub/data/PresignedImage";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
+import StatusBadge from "components/ub/data/StatusBadge";
+import Tabs from "components/ub/navigation/Tabs";
+import type { TabItem } from "components/ub/navigation/Tabs";
 import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import PartnerApplicationsTable from "./PartnerApplicationsTable";
 import AdditionalManagersSection from "./AdditionalManagersSection";
 import { PartnerBankAccountSection } from "features/partners/bank-accounts";
 import { PayoutStatementSection } from "features/applications/payouts";
-import { parseDate, formatDate } from "components/ui/date/utils";
+import { parseDate, formatDate } from "components/ub/data/appDateUtils";
 
 interface Props {
   id: string;

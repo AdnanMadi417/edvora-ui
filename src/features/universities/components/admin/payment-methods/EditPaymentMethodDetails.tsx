@@ -9,10 +9,10 @@ import api from "lib/useApi";
 import { useDeleteUniversity, useUpdatePaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 
 import DeletePaymentConfirmation from "features/universities/components/admin/payment-methods/popups/DeletePaymentConfirmation";
-import InputField from "components/form/fields/InputField";
-import RichTextEditor from "components/form/fields/RichTextEditor";
-import Button from "components/ui/buttons/Button";
-import { useToast } from "components/context/ToastContext";
+import InputField from "components/ub/forms/InputField";
+import RichTextEditor from "components/ub/forms/RichTextEditor";
+import Button from "components/ub/core/Button";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";

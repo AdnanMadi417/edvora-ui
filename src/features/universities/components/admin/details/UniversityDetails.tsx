@@ -10,9 +10,9 @@ import {
   Languages,
   Pencil,
 } from "lucide-react";
-import Button from "components/ui/buttons/Button";
-import PresignedImage from "components/ui/PresignedImage";
-import RichTextDisplay from "components/ui/RichTextDisplay";
+import Button from "components/ub/core/Button";
+import PresignedImage from "components/ub/data/PresignedImage";
+import RichTextDisplay from "components/ub/data/RichTextDisplay";
 import { FaTimesCircle } from "react-icons/fa";
 import { MdEvent, MdLocationCity, MdPublic } from "react-icons/md";
 import { HiOutlineCheckCircle } from "react-icons/hi";
@@ -20,8 +20,8 @@ import { HiOutlineCheckCircle } from "react-icons/hi";
 import { useUniversityDetails, useUniversityPaymentMethods } from "features/universities/hooks";
 import { monthLabel } from "features/programs/utils/intakeMonths";
 
-import Loading from "components/loading/Loading";
-import EmptyData from "components/emptyData/EmptyTableData";
+import Loading from "components/ub/feedback/Loading";
+import EmptyData from "components/ub/feedback/EmptyTableData";
 
 interface UniversityDetailsProps {
   id: string;

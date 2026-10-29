@@ -3,7 +3,7 @@
 import React from "react";
 import { Check, Clock, AlertCircle } from "lucide-react";
 import { useAllStages } from "features/applications/hooks";
-import { SectionIconBadge } from "components/ui/icons";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 
 interface ApplicationTimelineProps {
   application: any;

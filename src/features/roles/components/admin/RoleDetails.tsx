@@ -6,12 +6,12 @@ import { ChevronLeft, KeyRound, Save, ShieldCheck } from "lucide-react";
 
 import { useRoles, useRenameRole } from "../../hooks";
 
-import Loading from "components/loading/Loading";
-import EmptyData from "components/emptyData/EmptyTableData";
-import InputField from "components/form/fields/InputField";
-import Button from "components/ui/buttons/Button";
-import { StatusBadge } from "components/ui/badges";
-import { useToast } from "components/context/ToastContext";
+import Loading from "components/ub/feedback/Loading";
+import EmptyData from "components/ub/feedback/EmptyTableData";
+import InputField from "components/ub/forms/InputField";
+import Button from "components/ub/core/Button";
+import StatusBadge from "components/ub/data/StatusBadge";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface RoleDetailsProps {

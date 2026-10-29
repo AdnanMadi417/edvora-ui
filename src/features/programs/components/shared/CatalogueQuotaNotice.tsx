@@ -1,7 +1,7 @@
 "use client";
 
 import { Hourglass } from "lucide-react";
-import EmptyData from "components/emptyData/EmptyData";
+import EmptyData from "components/ub/feedback/EmptyData";
 import type { CatalogueQuotaError } from "features/programs/utils/catalogueQuota";
 
 /**

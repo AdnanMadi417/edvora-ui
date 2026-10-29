@@ -1,9 +1,9 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EmptyData from "components/emptyData/EmptyData";
+import EmptyData from "components/ub/feedback/EmptyData";
 import ApplicationDetails from "features/applications/admin/components/details/ApplicationDetails";
-import Loading from "components/loading/Loading";
+import Loading from "components/ub/feedback/Loading";
 import { FaWhatsapp } from "react-icons/fa";
 import { useApplicationDetails } from "features/applications/hooks";
 

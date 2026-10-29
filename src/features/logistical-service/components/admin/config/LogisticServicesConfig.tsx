@@ -4,11 +4,14 @@ import React, { useState } from "react";
 import { Pencil, Check, X, Settings, Plus, Tag, Trash2, Truck } from "lucide-react";
 
 import { useLogisticServices, useEditLogisticService, useDeleteLogisticService } from "features/logistical-service/hooks";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
-import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow } from "components/ui/table";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
+import TableWrapper from "components/ub/data/TableWrapper";
+import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/TableEmptyRow";
+import TableErrorRow from "components/ub/data/TableErrorRow";
 import CreateLogisticsMarketplacePopup from "../CreateLogisticsMarketplacePopup";
 import DeleteServiceConfirmation from "../DeleteServiceConfirmation";
 

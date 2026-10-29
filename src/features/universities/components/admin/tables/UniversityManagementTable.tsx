@@ -22,14 +22,14 @@ import { CheckCircle, XCircle, SlidersHorizontal } from 'lucide-react';
 import { useUniversityTypes, useDeleteUniversityType } from "features/universities/hooks";
 import DeleteUniversityConfirmation from 'features/universities/components/admin/popups/DeleteUniversityConfirmation';
 
-import NextButton from 'components/ui/buttons/NextButton';
-import PrevButton from 'components/ui/buttons/PrevButton';
-import Button from 'components/ui/buttons/Button';
-import IconButton from 'components/ui/buttons/IconButton';
-import SearchInput from 'components/form/filter/SearchInput';
-import NoMessagesFound from 'components/emptyData/NoMessagesFound';
-import Loading from 'components/loading/Loading';
-import { useToast } from 'components/context/ToastContext';
+import NextButton from 'components/ub/core/NextButton';
+import PrevButton from 'components/ub/core/PrevButton';
+import Button from 'components/ub/core/Button';
+import IconButton from 'components/ub/core/IconButton';
+import SearchInput from 'components/ub/forms/SearchInput';
+import NoMessagesFound from 'components/ub/feedback/NoMessagesFound';
+import Loading from 'components/ub/feedback/Loading';
+import { useToast } from 'components/ub/feedback/ToastContext';
 import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
 

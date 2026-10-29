@@ -7,8 +7,8 @@ import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
 import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
-import CompactFileUpload from "components/form/upload/CompactFileUpload";
-import Button from "components/ui/buttons/Button";
+import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import Button from "components/ub/core/Button";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 const VISA_PAYMENT_ERROR_MESSAGES: Record<string, string> = {

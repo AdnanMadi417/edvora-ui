@@ -11,12 +11,13 @@ import {
   MapPin,
   Users,
 } from "lucide-react";
-import PillButton from "components/ui/buttons/PillButton";
-import SiteFooter from "components/footer/SiteFooter";
-import FadeIn from "components/ui/FadeIn";
-import { Faq, type FaqItem } from "components/ui/faq";
-import Tabs, { type TabItem } from "components/ui/tabs/Tabs";
-import CourseList, { type Course } from "components/ui/CourseList";
+import PillButton from "components/ub/core/PillButton";
+import SiteFooter from "components/ub/navigation/SiteFooter";
+import FadeIn from "components/ub/core/FadeIn";
+import Faq from "components/ub/data/Faq";
+import type { FaqItem } from "components/ub/data/Faq";
+import Tabs, { type TabItem } from "components/ub/navigation/Tabs";
+import CourseList, { type Course } from "components/ub/data/CourseList";
 
 // Same gradient/dot-grid/glow banner as the partner public profile
 // (src/features/partners/components/public/PartnerPublicProfile.tsx) —

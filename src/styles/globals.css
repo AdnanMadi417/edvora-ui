@@ -1,0 +1,8 @@
+/*
+ * Unibexs design system entry point (brief §1.1): tokens, utilities and
+ * the dark-mode bridge, in cascade order. Imported once from AppWrappers.
+ */
+@import "./tokens/primitives.css";
+@import "./tokens/semantic.css";
+@import "./tokens/utilities.css";
+@import "./tokens/legacy-dark.css";

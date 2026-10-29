@@ -5,14 +5,19 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { Receipt, SlidersHorizontal, ChevronRight } from "lucide-react";
 
-import SearchInput from "components/form/filter/SearchInput";
-import FilterSelectField from "components/form/filter/FilterSelectField";
-import { SearchableDropdown } from "components/form";
-import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
-import { AnimatedTableRow } from "components/ui/motion";
-import { getAsyncStatus } from "components/ui/async";
-import { StatusBadge, type StatusBadgeVariant } from "components/ui/badges";
-import AppDate from "components/ui/date/AppDate";
+import SearchInput from "components/ub/forms/SearchInput";
+import FilterSelectField from "components/ub/forms/FilterSelectField";
+import SearchableDropdown from "components/ub/forms/SearchableDropdown";
+import TableWrapper from "components/ub/data/TableWrapper";
+import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/TableEmptyRow";
+import TableErrorRow from "components/ub/data/TableErrorRow";
+import TablePagination from "components/ub/data/TablePagination";
+import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
+import { getAsyncStatus } from "components/ub/feedback/AsyncStatus";
+import StatusBadge from "components/ub/data/StatusBadge";
+import type { StatusBadgeVariant } from "components/ub/data/StatusBadge";
+import AppDate from "components/ub/data/AppDate";
 import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
 
 import { usePartnerProfile } from "features/partners/hooks/usePartnerProfile";

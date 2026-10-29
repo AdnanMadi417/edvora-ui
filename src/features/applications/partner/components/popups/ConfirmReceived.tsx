@@ -5,10 +5,10 @@ import { createPortal } from "react-dom";
 import { XCircle, CheckCircle } from "lucide-react";
 
 import { useConfirmReceived } from "features/applications/disputes";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
 
 interface ConfirmReceivedProps {
   isOpen: boolean;

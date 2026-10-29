@@ -5,11 +5,11 @@ import { createPortal } from "react-dom";
 import { XCircle, CheckCircle } from "lucide-react";
 
 import { useResolveNoIssue } from "../hooks";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
-import { TextareaField } from "components/form";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
+import TextareaField from "components/ub/forms/TextareaField";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
 
 interface ResolveNoIssueProps {
   isOpen: boolean;

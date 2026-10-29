@@ -47,14 +47,15 @@ const SUBMISSION_FIELDS: SubmissionField[] = [
   ["student.gender", "Gender"],
   ["student.english_proficiencies", "English Proficiency Results"],
   ["student.photo", "Passport-size Photo"],
-  ["student.date_of_birth", "Date of Birth"],
-  ["student.emergency_contact", "Emergency Contact"],
-  ["student.previous_education", "Previous Education History"],
+  // Keys match the Advisor application form's student fields (validateFormData.ts).
+  ["student.birthday", "Date of Birth"],
+  ["student.emergency_contacts", "Emergency Contact"],
+  ["student.previous_educations", "Previous Education History"],
 ].map(([field_key, field_name], i) => ({ id: seedId("sf", i + 1), field_key, field_name }));
 
 const TYPE_SEED: [string, string, string[]][] = [
-  ["Private Institution (Standard)", "Default intake requirements for private institutions.", ["student.phone", "student.gender", "student.photo", "student.date_of_birth"]],
-  ["Public Institution", "Stricter document checks required by public institutions and the Ministry of Higher Education.", ["student.phone", "student.current_address", "student.gender", "student.english_proficiencies", "student.photo", "student.date_of_birth", "student.previous_education"]],
+  ["Private Institution (Standard)", "Default intake requirements for private institutions.", ["student.phone", "student.gender", "student.photo", "student.birthday"]],
+  ["Public Institution", "Stricter document checks required by public institutions and the Ministry of Higher Education.", ["student.phone", "student.current_address", "student.gender", "student.english_proficiencies", "student.photo", "student.birthday", "student.previous_educations"]],
   ["Language Centre Pathway", "Institutions with an in-house English language centre; proficiency results are optional.", ["student.phone", "student.photo"]],
   ["Fast-track Private Institution", "Minimal submission set for institutions offering conditional offers within 48 hours.", ["student.phone"]],
 ];
@@ -447,3 +448,30 @@ mock.get("/partners/:partnerId/universities", () => ({
       })),
     })),
 }));
+
+/**
+ * Fields an Advisor must fill when applying to this Institution: the fields its
+ * university type marks required (admin "Application required fields"), plus
+ * the core fields every application needs. Served by applications.ts for
+ * GET /applications/universities/:id/required-fields and the partner variant.
+ */
+const CORE_FIELDS: [string, string][] = [
+  ["intake_date", "Intake Date"],
+  ["student.nationality", "Nationality"],
+  ["student.passport_number", "Passport Number"],
+  ["student.email", "Email Address"],
+];
+
+export function applicationRequiredFields(universityId: string) {
+  const uni = universities.find(universityId);
+  const type = uni ? types.find(uni.university_type_id) : undefined;
+  return {
+    university_id: universityId,
+    university_type_id: type?.id ?? null,
+    university_type_name: type?.name ?? null,
+    fields: [
+      ...CORE_FIELDS.map(([field_key, field_name], i) => ({ id: `rf_core_${i + 1}`, field_key, field_name, is_required: true })),
+      ...(type?.required_fields ?? []),
+    ],
+  };
+}

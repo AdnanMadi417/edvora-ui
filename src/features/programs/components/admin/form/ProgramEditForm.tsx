@@ -21,10 +21,10 @@ import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
 import { normalizeCommissionCurrency } from 'features/programs/utils/commissionCurrency';
 import { pickChangedFields } from 'features/programs/utils/changedFields';
 
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import Loading from "components/loading/Loading";
-import Button from "components/ui/buttons/Button";
+import Loading from "components/ub/feedback/Loading";
+import Button from "components/ub/core/Button";
 import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
 
 import { useProgram, useDeletePrograms, useUpdateProgram } from "features/programs/hooks";
@@ -34,12 +34,12 @@ import { useUniversities, useBranches } from "features/universities/hooks";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 
-import InputField from "components/form/fields/InputField";
-import TextareaField from "components/form/fields/TextareaField";
-import RichTextEditor from "components/form/fields/RichTextEditor";
-import ToggleInput from "components/form/toggle/ToggleInput";
-import SearchableDropdown from "components/form/search/SearchableDropdown";
-import SelectField from "components/form/fields/SelectField";
+import InputField from "components/ub/forms/InputField";
+import TextareaField from "components/ub/forms/TextareaField";
+import RichTextEditor from "components/ub/forms/RichTextEditor";
+import ToggleInput from "components/ub/forms/ToggleInput";
+import SearchableDropdown from "components/ub/forms/SearchableDropdown";
+import SelectField from "components/ub/forms/SelectField";
 import YearlyFeesField from "features/programs/components/shared/YearlyFeesField";
 import OneTimeFeesField from "features/programs/components/shared/OneTimeFeesField";
 import AccordionSection from "features/programs/components/shared/form/AccordionSection";
@@ -49,8 +49,8 @@ import { COURSE_TYPE_OPTIONS, isMasterOrPhd } from "features/programs/utils/cour
 import { setFormPath } from "features/programs/components/shared/form/setFormPath";
 import { useIsFormDirty } from "features/programs/components/shared/form/useIsFormDirty";
 
-import IconButton from "components/ui/buttons/IconButton";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
+import IconButton from "components/ub/core/IconButton";
+import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
 import { validateProgram } from "./validateProgram";
 import type { FormData as ProgramFormData } from "./RegisterProgram";
 

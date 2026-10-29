@@ -6,10 +6,8 @@ import 'styles/Contact.css';
 // import 'styles/Plugins.css';
 import 'styles/MiniCalendar.css';
 import 'styles/index.css';
-// Unibexs design system tokens (docs/unibexs-frontend-redesign-brief.md).
-import 'styles/tokens/primitives.css';
-import 'styles/tokens/semantic.css';
-import 'styles/tokens/utilities.css';
+// Unibexs design system: tokens, utilities, dark bridge (styles/globals.css).
+import 'styles/globals.css';
 
 export default function AppWrappers({ children }: { children: ReactNode }) {
   useEffect(() => {

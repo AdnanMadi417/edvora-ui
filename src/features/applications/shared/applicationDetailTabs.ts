@@ -1,4 +1,4 @@
-import type { TabItem } from "components/ui/tabs";
+import type { TabItem } from "components/ub/navigation/Tabs";
 
 export type ApplicationDetailsTab = "details" | "documents" | "activity";
 

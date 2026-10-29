@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from "react";
 import { GraduationCap, Building2, XCircle } from 'lucide-react';
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
 
-import InputField from "components/form/fields/InputField";
+import InputField from "components/ub/forms/InputField";
 
 import { useCreateUniversityType } from "features/universities/hooks";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 

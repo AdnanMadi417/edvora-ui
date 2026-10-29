@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import { AlertCircle, CheckCircle2, Share2, Users, XCircle } from "lucide-react";
-import { StatusBadge } from "components/ui/badges";
-import { Tabs, type TabItem } from "components/ui/tabs";
+import StatusBadge from "components/ub/data/StatusBadge";
+import Tabs from "components/ub/navigation/Tabs";
+import type { TabItem } from "components/ub/navigation/Tabs";
 import type { AccountManager } from "../../types";
 import AccountManagerPartnersTable from "../AccountManagerPartnersTable";
 

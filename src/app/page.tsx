@@ -1,29 +1,40 @@
 import Link from "next/link";
+import clsx from "clsx";
+import { ChevronRight } from "lucide-react";
+import ThemeToggle from "components/theme/ThemeToggle";
+import { card, cardInteractive, focusRing } from "components/ub/recipes";
 
 // UI-only mode: no sign-in. Each area runs as a mock user of its role
 // (config/mockSession.ts).
 const AREAS = [
   { href: "/admin/applications", label: "Admin" },
-  { href: "/partner/applications", label: "Partner" },
-  { href: "/account-manager/applications", label: "Account Manager" },
+  { href: "/partner/applications", label: "Advisor" },
+  { href: "/account-manager/applications", label: "Account manager" },
   { href: "/reviewer/advisors", label: "Reviewer" },
-  { href: "/data-entry/knowledge-hub", label: "Data Entry" },
+  { href: "/data-entry/knowledge-hub", label: "Data entry" },
 ];
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-primary px-4">
-      <div className="w-full max-w-sm rounded-lg bg-card p-6 shadow-md">
-        <h1 className="text-h5 font-bold text-slate-900">Choose an area</h1>
-        <p className="mt-1 text-p2 text-slate-500">UI preview. No sign-in required.</p>
-        <ul className="mt-5 space-y-2">
+    <main className="ub-canvas-light relative flex min-h-screen items-center justify-center px-4 py-16 text-ub-text-primary">
+      <ThemeToggle className="absolute end-4 top-4 md:end-6 md:top-6" />
+      <div className="ub-glass-light-strong w-full max-w-sm rounded-ub-xl p-6 md:p-8">
+        <h1 className="text-ub-heading-lg text-ub-text-primary">Choose an area</h1>
+        <p className="mt-1 text-ub-body-sm text-ub-text-secondary">UI preview. No sign-in required.</p>
+        <ul className="mt-6 grid gap-2">
           {AREAS.map((area) => (
             <li key={area.href}>
               <Link
                 href={area.href}
-                className="block rounded-md border border-slate-200 px-4 py-2.5 text-p2 font-medium text-slate-700 transition hover:border-accent hover:text-accent"
+                className={clsx(
+                  card,
+                  cardInteractive,
+                  focusRing,
+                  "group flex h-12 items-center justify-between gap-3 px-4 text-ub-label-md text-ub-text-primary hover:text-ub-text-link",
+                )}
               >
                 {area.label}
+                <ChevronRight aria-hidden className="h-5 w-5 text-ub-icon transition-colors group-hover:text-ub-icon-interactive rtl:-scale-x-100" />
               </Link>
             </li>
           ))}

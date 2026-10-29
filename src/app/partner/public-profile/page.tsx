@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { Globe2, ExternalLink, Copy, Check, Info } from "lucide-react";
 import { usePartnerProfile } from "features/partners/hooks";
-import { useToast } from "components/context/ToastContext";
-import Loading from "components/loading/Loading";
-import PresignedImage from "components/ui/PresignedImage";
-import Button from "components/ui/buttons/Button";
-import { Faq, type FaqItem } from "components/ui/faq";
+import { useToast } from "components/ub/feedback/ToastContext";
+import Loading from "components/ub/feedback/Loading";
+import PresignedImage from "components/ub/data/PresignedImage";
+import Button from "components/ub/core/Button";
+import Faq from "components/ub/data/Faq";
+import type { FaqItem } from "components/ub/data/Faq";
 
 // Answers reflect exactly how the feature behaves today (UBX-317) — no
 // self-editing yet, verification is automatic, no public directory — update

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, AlertCircle, RotateCcw } from "lucide-react";
-import Button from "components/ui/buttons/Button";
-import { useFileDrop } from "components/form/upload/useFileDrop";
+import Button from "components/ub/core/Button";
+import { useFileDrop } from "components/ub/forms/useFileDrop";
 
 interface ResubmitDocProps {
   isOpen: boolean;

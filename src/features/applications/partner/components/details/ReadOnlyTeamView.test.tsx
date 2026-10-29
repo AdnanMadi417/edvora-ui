@@ -5,7 +5,7 @@ import ApplicationFormsSection from "./ApplicationFormsSection";
 
 // An agency admin viewing a member's application gets readOnly: the member
 // does the uploads and forms (the backend refuses the agency admin anyway).
-jest.mock("../../../../../components/context/ToastContext", () => ({ useToast: () => ({ showToast: jest.fn() }) }));
+jest.mock("components/ub/feedback/ToastContext", () => ({ useToast: () => ({ showToast: jest.fn() }) }));
 jest.mock("../../../shared/useHealthDeclarationFormDownload", () => ({
   useHealthDeclarationFormDownload: () => ({ download: jest.fn(), downloading: false }),
 }));

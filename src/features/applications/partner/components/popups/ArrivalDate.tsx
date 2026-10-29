@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from "react";
 import { XCircle, Plane, CheckCircle, AlertCircle } from 'lucide-react';
-import { InputField } from "components/form";
-import CompactFileUpload from "components/form/upload/CompactFileUpload";
+import InputField from "components/ub/forms/InputField";
+import CompactFileUpload from "components/ub/forms/CompactFileUpload";
 import { useArrivalDateUpload } from "features/applications/hooks";
-import Button from "components/ui/buttons/Button";
+import Button from "components/ub/core/Button";
 
 
 interface ArrivalDateConfirmationProps {

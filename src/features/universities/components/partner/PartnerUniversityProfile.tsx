@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Award, BookOpen, Calendar, GraduationCap, Landmark, Languages, MapPin } from "lucide-react";
-import FadeIn from "components/ui/FadeIn";
-import PresignedImage from "components/ui/PresignedImage";
-import Loading from "components/loading/Loading";
-import EmptyData from "components/emptyData/EmptyTableData";
-import { Tabs, type TabItem } from "components/ui/tabs";
+import FadeIn from "components/ub/core/FadeIn";
+import PresignedImage from "components/ub/data/PresignedImage";
+import Loading from "components/ub/feedback/Loading";
+import EmptyData from "components/ub/feedback/EmptyTableData";
+import Tabs from "components/ub/navigation/Tabs";
+import type { TabItem } from "components/ub/navigation/Tabs";
 import { useUniversityDetails } from "features/universities/hooks";
 
 type ProfileTab = "overview" | "campuses";

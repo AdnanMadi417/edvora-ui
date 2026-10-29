@@ -1,7 +1,7 @@
 import React from "react";
 import { MdAssignmentTurnedIn } from "react-icons/md";
-import { AppDate } from "components/ui/date";
-import { SectionIconBadge } from "components/ui/icons";
+import AppDate from "components/ub/data/AppDate";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 import { courseTypeLabel } from "features/programs/utils/courseType";
 
 interface ApplicationInfoSectionProps {

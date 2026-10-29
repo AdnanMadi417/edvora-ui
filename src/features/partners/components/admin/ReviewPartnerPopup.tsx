@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle, CheckCircle2, ClipboardCheck, ShieldCheck, UserCog, XCircle } from "lucide-react";
 import { useReviewPartner, useAssignPartnerManager } from "features/partners/hooks";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import { StatusBadge } from "components/ui/badges";
-import Button from "components/ui/buttons/Button";
-import ApproveRejectToggle from "components/ui/buttons/ApproveRejectToggle";
-import SelectField from "components/form/fields/SelectField";
-import { useToast } from "components/context/ToastContext";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import StatusBadge from "components/ub/data/StatusBadge";
+import Button from "components/ub/core/Button";
+import ApproveRejectToggle from "components/ub/core/ApproveRejectToggle";
+import SelectField from "components/ub/forms/SelectField";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface Props {

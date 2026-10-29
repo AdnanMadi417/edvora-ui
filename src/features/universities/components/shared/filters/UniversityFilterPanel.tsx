@@ -3,9 +3,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { SlidersHorizontal, X, RotateCcw, EyeOff, Languages, Building2 } from "lucide-react";
 import { MdOutlineCategory } from "react-icons/md";
-import FilterSelectField from "components/form/filter/FilterSelectField";
-import SearchInput from "components/form/filter/SearchInput";
-import FilterChip from "components/ui/filters/FilterChip";
+import FilterSelectField from "components/ub/forms/FilterSelectField";
+import SearchInput from "components/ub/forms/SearchInput";
+import FilterChip from "components/ub/data/FilterChip";
 
 interface Option {
   label: string;

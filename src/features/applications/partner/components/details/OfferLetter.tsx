@@ -2,15 +2,15 @@ import React, { useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
 import { CheckCircle, CreditCard, Download } from 'lucide-react';
 import { submitOfferLetterDecision } from "services/offerLetterService";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import VisaTrackingTimeline from "./VisaTrackingTimeline";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import { AppDate } from "components/ui/date";
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
-import { SectionIconBadge } from "components/ui/icons";
+import AppDate from "components/ub/data/AppDate";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";
 
 interface OfferLetterDecisionProps {

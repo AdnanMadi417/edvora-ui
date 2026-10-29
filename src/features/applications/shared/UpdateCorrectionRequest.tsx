@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { AlertTriangle, FilePlus2, XCircle } from "lucide-react";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import { useToast } from "components/context/ToastContext";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useUpdateCorrectionRequest } from "features/applications/hooks";
 import type { DocumentType } from "features/applications/hooks/stages/useApplicationActions";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";

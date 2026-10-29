@@ -1,5 +1,5 @@
 // All copy, links and data for the studio landing page
-// (/ui-unibexs-template-2026). Every value here is a placeholder: replace
+// (/landing-template). Every value here is a placeholder: replace
 // names, numbers, prices, quotes and contact details with your own.
 
 export const site = {
@@ -8,7 +8,7 @@ export const site = {
   description:
     "Unibexs is a software studio that designs and builds web apps, mobile apps, SaaS products and AI integrations for startups and enterprises worldwide.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com",
-  path: "/ui-unibexs-template-2026",
+  path: "/landing-template",
   location: "[CITY, COUNTRY]",
   email: "hello@example.com",
   phone: "+00 000 000 000",

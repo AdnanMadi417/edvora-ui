@@ -6,7 +6,7 @@ import { CalendarClock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react"
 import clsx from "clsx";
 import { contact, site } from "lib/content";
 import { contactSchema, type ContactInput } from "lib/contactSchema";
-import { submitContact } from "app/ui-unibexs-template-2026/actions";
+import { submitContact } from "app/landing-template/actions";
 import Container from "./ui/Container";
 import SectionHeading from "./ui/SectionHeading";
 import Button, { ButtonLink } from "./ui/Button";

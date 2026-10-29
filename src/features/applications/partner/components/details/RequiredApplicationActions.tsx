@@ -5,7 +5,7 @@ import api from "lib/useApi";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import UploadDoc from "features/applications/partner/components/popups/UploadDoc";
 import { AlertCircle } from "lucide-react";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface RequiredApplicationActionsProps {

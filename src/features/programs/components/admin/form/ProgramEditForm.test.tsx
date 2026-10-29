@@ -9,10 +9,10 @@ let mockProgram: any;
 let mockCommission: any;
 
 jest.mock("next/navigation", () => ({ useRouter: () => ({ push: jest.fn() }) }));
-jest.mock("../../../../../components/context/ToastContext", () => ({
+jest.mock("components/ub/feedback/ToastContext", () => ({
   useToast: () => ({ showToast: mockShowToast }),
 }));
-jest.mock("../../../../../components/form/fields/RichTextEditor", () => () => null);
+jest.mock("components/ub/forms/RichTextEditor", () => () => null);
 jest.mock("../../shared/form/useUnsavedChangesGuard", () => ({
   useUnsavedChangesGuard: () => {},
   confirmDiscard: (_dirty: boolean, go: () => void) => go(),

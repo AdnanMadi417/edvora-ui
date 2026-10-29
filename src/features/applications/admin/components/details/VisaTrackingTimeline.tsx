@@ -11,7 +11,7 @@ import {
 import { useVisaCase } from "hooks/useVisaCase";
 import { useVisaPayments } from "hooks/useVisaPayments";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import { AppDate } from "components/ui/date";
+import AppDate from "components/ub/data/AppDate";
 
 interface VisaTrackingTimelineProps {
   application: any;

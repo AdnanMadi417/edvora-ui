@@ -5,12 +5,12 @@ import { Layers, GraduationCap, XCircle } from "lucide-react";
 
 import { useAssignUniversityType, useUniversityTypes } from "features/universities/hooks";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import { useToast } from "components/context/ToastContext";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
-import SelectField from "components/form/fields/SelectField";
+import SelectField from "components/ub/forms/SelectField";
 
 interface Props {
   isOpen: boolean;

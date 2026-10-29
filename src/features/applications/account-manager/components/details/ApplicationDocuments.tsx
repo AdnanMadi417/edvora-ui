@@ -10,13 +10,13 @@ import {
   UploadCloud,
 } from "lucide-react";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import EmptyData from "components/emptyData/EmptyData";
-import { AppDate } from "components/ui/date";
+import EmptyData from "components/ub/feedback/EmptyData";
+import AppDate from "components/ub/data/AppDate";
 import { useManagerReuploadDocument } from "features/applications/hooks";
-import { SectionIconBadge } from "components/ui/icons";
-import { SolidBadge } from "components/ui/badges";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
+import SolidBadge from "components/ub/data/SolidBadge";
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
-import { useFileDrop } from "components/form/upload/useFileDrop";
+import { useFileDrop } from "components/ub/forms/useFileDrop";
 
 interface ApplicationDocumentsProps {
   application: any;

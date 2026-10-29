@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import PresignedImage from "components/ui/PresignedImage";
+import PresignedImage from "components/ub/data/PresignedImage";
 import {
   ArrowRight,
   ArrowLeft,
@@ -19,10 +19,10 @@ import {
 } from 'react-icons/md';
 
 import { useLogisticProviders } from "features/logistical-service/hooks";
-import Loading from "components/loading/Loading";
-import NoMessagesFound from "components/emptyData/NoMessagesFound";
-import NextButton from "components/ui/buttons/NextButton";
-import PrevButton from "components/ui/buttons/PrevButton";
+import Loading from "components/ub/feedback/Loading";
+import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
+import NextButton from "components/ub/core/NextButton";
+import PrevButton from "components/ub/core/PrevButton";
 
 const ITEMS_PER_PAGE = 9;
 

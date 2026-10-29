@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { XCircle, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { useEnglishFormDocumentUpload } from "features/applications/hooks/files/useEnglishFormDocumentUpload";
-import CompactFileUpload from "components/form/upload/CompactFileUpload";
-import Button from "components/ui/buttons/Button";
+import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import Button from "components/ub/core/Button";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 const ERROR_MESSAGES: Record<string, string> = {

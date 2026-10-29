@@ -2,11 +2,11 @@
 
 import React, { useState } from 'react';
 import { FolderOpen, ChevronDown } from 'lucide-react';
-import EmptyData from 'components/emptyData/EmptyData';
+import EmptyData from 'components/ub/feedback/EmptyData';
 import DocumentActions from 'features/applications/shared/DocumentActions';
-import { AppDate } from "components/ui/date";
-import { SectionIconBadge } from "components/ui/icons";
-import { SolidBadge } from "components/ui/badges";
+import AppDate from "components/ub/data/AppDate";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
+import SolidBadge from "components/ub/data/SolidBadge";
 import { DOCUMENT_STATUS_ICON, DOCUMENT_STATUS_BADGE, DOCUMENT_STATUS_LABEL } from "features/applications/shared/documentStatus";
 
 interface ApplicationDocumentsProps {

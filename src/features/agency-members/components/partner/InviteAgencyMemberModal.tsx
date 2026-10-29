@@ -5,12 +5,12 @@ import { XCircle, UserPlus } from "lucide-react";
 
 import { useInviteAgencyMember } from "../../hooks";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import InputField from "components/form/fields/InputField";
-import ToggleInput from "components/form/toggle/ToggleInput";
-import CommissionPercentageField from "components/form/fields/CommissionPercentageField";
-import { useToast } from "components/context/ToastContext";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
+import InputField from "components/ub/forms/InputField";
+import ToggleInput from "components/ub/forms/ToggleInput";
+import CommissionPercentageField from "components/ub/forms/CommissionPercentageField";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 

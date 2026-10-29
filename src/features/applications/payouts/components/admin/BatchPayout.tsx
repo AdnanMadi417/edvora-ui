@@ -7,13 +7,14 @@ import { XCircle, AlertCircle, CheckCircle, Wallet } from "lucide-react";
 
 import { useRecordBulkPayout, usePaymentMethods } from "../../hooks";
 import { usePartnerBankAccount, BankAccountPayoutSummary } from "features/partners/bank-accounts";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import { InputField, SearchableDropdown } from "components/form";
-import CompactFileUpload from "components/form/upload/CompactFileUpload";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
+import InputField from "components/ub/forms/InputField";
+import SearchableDropdown from "components/ub/forms/SearchableDropdown";
+import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
 
 export interface BatchPayoutLine {
   application_id: string;

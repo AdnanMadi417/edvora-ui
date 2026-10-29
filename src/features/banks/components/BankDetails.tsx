@@ -3,10 +3,11 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Landmark, Pencil } from "lucide-react";
-import { Skeleton } from "components/ui/skeleton";
-import { AsyncStateView, getAsyncStatus } from "components/ui/async";
-import Button from "components/ui/buttons/Button";
-import { StatusBadge } from "components/ui/badges";
+import Skeleton from "components/ub/feedback/Skeleton";
+import AsyncStateView from "components/ub/feedback/AsyncStateView";
+import { getAsyncStatus } from "components/ub/feedback/AsyncStatus";
+import Button from "components/ub/core/Button";
+import StatusBadge from "components/ub/data/StatusBadge";
 import { useBank } from "../hooks";
 import { getCountryName } from "constants/lists";
 

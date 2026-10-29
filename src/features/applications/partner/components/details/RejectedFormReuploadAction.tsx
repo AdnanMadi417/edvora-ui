@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { FileUp } from "lucide-react";
-import Button from "components/ui/buttons/Button";
+import Button from "components/ub/core/Button";
 import ApplicationFormReupload from "../popups/ApplicationFormReupload";
 import ApplicationForm2Reupload from "../popups/ApplicationForm2Reupload";
 import HealthDeclarationReupload from "../popups/HealthDeclarationReupload";

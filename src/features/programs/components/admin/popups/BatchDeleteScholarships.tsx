@@ -5,12 +5,12 @@ import { XCircle, GraduationCap, Trash2, AlertCircle } from "lucide-react";
 
 import { useDeleteScholarships, useGetProgramScholarships } from "features/programs/hooks";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import Loading from "components/loading/Loading";
-import RichTextDisplay from "components/ui/RichTextDisplay";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
+import Loading from "components/ub/feedback/Loading";
+import RichTextDisplay from "components/ub/data/RichTextDisplay";
 
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface BatchDeleteScholarshipsProps {

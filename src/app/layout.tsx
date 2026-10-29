@@ -2,6 +2,7 @@ import React, { ReactNode } from 'react';
 import AppWrappers from './AppWrappers';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
+import { THEME_INIT_SCRIPT } from 'components/theme/theme';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -11,8 +12,12 @@ const inter = Inter({
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
-    <body id="root" className="font-sans">
+    <html lang="en" dir="ltr" data-ub-theme="light" className={inter.variable} suppressHydrationWarning>
+    <head>
+      {/* Applies the saved light/dark theme before first paint. */}
+      <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+    </head>
+    <body id="root" className="bg-ub-canvas font-sans text-ub-text-primary">
     <AppWrappers>{children}</AppWrappers>
     {/* Cloudflare Web Analytics. The token is a public site id, and the beacon
         only records hits from the hostname registered in Cloudflare. */}

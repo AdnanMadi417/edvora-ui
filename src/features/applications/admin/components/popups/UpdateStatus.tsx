@@ -11,7 +11,7 @@ import {
   CheckCircle,
   ListX,
 } from "lucide-react";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 const UPDATE_STATUS_ERROR_MESSAGES: Record<string, string> = {
@@ -30,12 +30,15 @@ import { usePartnerBankAccount, BankAccountPayoutSummary } from "features/partne
 import { usePaymentMethods } from "features/applications/payouts";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
-import CompactFileUpload from "components/form/upload/CompactFileUpload";
-import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
-import SettingToggleInput from "components/form/toggle/SettingToggleInput";
+import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import NoDocumentsRequired from "components/ub/feedback/NoDocumentsRequired";
+import SettingToggleInput from "components/ub/forms/SettingToggleInput";
 
-import { InputField, SelectField, TextareaField, SearchableDropdown } from "components/form";
-import Button from "components/ui/buttons/Button";
+import InputField from "components/ub/forms/InputField";
+import SelectField from "components/ub/forms/SelectField";
+import TextareaField from "components/ub/forms/TextareaField";
+import SearchableDropdown from "components/ub/forms/SearchableDropdown";
+import Button from "components/ub/core/Button";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
 import UpdateStatusHeader from "features/applications/shared/UpdateStatusHeader";
 

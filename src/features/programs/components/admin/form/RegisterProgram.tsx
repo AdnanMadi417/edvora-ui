@@ -2,7 +2,7 @@
 
 import { ArrowLeft, Award, BookOpen, CalendarPlus, CalendarRange, DollarSign, MapPin, Plus, Trash2 } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useToast } from 'components/context/ToastContext';
+import { useToast } from 'components/ub/feedback/ToastContext';
 import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from 'next/navigation';
 
@@ -16,14 +16,14 @@ import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useCommissionTypes } from "features/knowledge-hub/commission/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 
-import InputField from 'components/form/fields/InputField';
-import TextareaField from 'components/form/fields/TextareaField';
-import RichTextEditor from 'components/form/fields/RichTextEditor';
-import SelectField from 'components/form/fields/SelectField';
+import InputField from 'components/ub/forms/InputField';
+import TextareaField from 'components/ub/forms/TextareaField';
+import RichTextEditor from 'components/ub/forms/RichTextEditor';
+import SelectField from 'components/ub/forms/SelectField';
 import YearlyFeesField from 'features/programs/components/shared/YearlyFeesField';
 import OneTimeFeesField from 'features/programs/components/shared/OneTimeFeesField';
-import SearchableDropdown from 'components/form/search/SearchableDropdown';
-import ToggleInput from 'components/form/toggle/ToggleInput';
+import SearchableDropdown from 'components/ub/forms/SearchableDropdown';
+import ToggleInput from 'components/ub/forms/ToggleInput';
 import AccordionSection from 'features/programs/components/shared/form/AccordionSection';
 import IntakeMonthsField from 'features/programs/components/shared/form/IntakeMonthsField';
 import { useUnsavedChangesGuard, confirmDiscard } from 'features/programs/components/shared/form/useUnsavedChangesGuard';
@@ -32,9 +32,9 @@ import { COURSE_TYPE_OPTIONS, isMasterOrPhd } from 'features/programs/utils/cour
 import { setFormPath } from 'features/programs/components/shared/form/setFormPath';
 import { useIsFormDirty } from 'features/programs/components/shared/form/useIsFormDirty';
 
-import Button from 'components/ui/buttons/Button';
-import PrevButton from 'components/ui/buttons/PrevButton';
-import IconButton from 'components/ui/buttons/IconButton';
+import Button from 'components/ub/core/Button';
+import PrevButton from 'components/ub/core/PrevButton';
+import IconButton from 'components/ub/core/IconButton';
 import { validateProgram } from './validateProgram';
 
 export interface FormData {

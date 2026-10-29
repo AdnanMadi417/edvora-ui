@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { KeyRound, XCircle } from "lucide-react";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
 
 interface Props {
   isOpen: boolean;

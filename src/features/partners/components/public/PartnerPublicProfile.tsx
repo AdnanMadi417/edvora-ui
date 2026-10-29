@@ -2,12 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BadgeCheck, Check, MessageCircle, Globe2, Languages, Linkedin, Link2, MapPin } from "lucide-react";
-import { Tooltip } from "components/ui/tooltip";
-import PillButton from "components/ui/buttons/PillButton";
-import IconButton from "components/ui/buttons/IconButton";
-import SiteFooter from "components/footer/SiteFooter";
-import FadeIn from "components/ui/FadeIn";
-import { Faq, type FaqItem } from "components/ui/faq";
+import Tooltip from "components/ub/feedback/Tooltip";
+import PillButton from "components/ub/core/PillButton";
+import IconButton from "components/ub/core/IconButton";
+import SiteFooter from "components/ub/navigation/SiteFooter";
+import FadeIn from "components/ub/core/FadeIn";
+import Faq from "components/ub/data/Faq";
+import type { FaqItem } from "components/ub/data/Faq";
 import type { PublicPartnerProfile } from "features/partners/types";
 
 // Written for the visitor/prospective-student reading this page — a

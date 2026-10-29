@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { universityApi } from "../services";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import type { UpdatePaymentMethodPayload } from "../types";
 import { parseApiError } from "utils/parseApiError";
 

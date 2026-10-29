@@ -4,11 +4,11 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import dataEntryRoutes from "../../routes/dataEntryRoutes";
 import { getActiveNavbar, getActiveRoute } from "utils/navigation";
-import Navbar from "components/navbar";
-import Sidebar from "components/sidebar";
-import Footer from "components/footer/Footer";
+import Navbar from "components/ub/navigation/NavbarTop";
+import Sidebar from "components/ub/navigation/Sidebar";
+import Footer from "components/ub/navigation/Footer";
 import RoleGuard from "components/guard/RoleGuard";
-import { ToastProvider } from "components/context/ToastContext";
+import { ToastProvider } from "components/ub/feedback/ToastContext";
 
 const DATA_ENTRY_ROLES = ["admin", "data_entry"];
 
@@ -20,7 +20,7 @@ export default function DataEntryLayout({ children }: { children: React.ReactNod
     <RoleGuard allowedRoles={DATA_ENTRY_ROLES}>
 
       <ToastProvider>
-        <div className="relative flex min-h-screen w-full bg-slate-50">
+        <div className="ub-canvas-light relative flex min-h-screen w-full text-ub-text-primary">
 
           <Sidebar
             routes={dataEntryRoutes}
@@ -29,21 +29,16 @@ export default function DataEntryLayout({ children }: { children: React.ReactNod
             variant="admin"
           />
 
-          <div className="relative h-full w-full dark:bg-navy-900">
-            <main className="mx-2.5 flex-none transition-all md:pr-2 xl:ml-[300px]">
-              <Navbar
-                onOpenSidenav={() => setOpen(!open)}
-                brandText={getActiveRoute(dataEntryRoutes, pathname)}
-                secondary={getActiveNavbar(dataEntryRoutes, pathname)}
-              />
-              <div className="mx-auto min-h-screen p-2 !pt-[10px] md:p-2">
-                {children}
-              </div>
-              <div className="p-3">
-                <Footer />
-              </div>
-            </main>
-
+          <div className="relative flex min-h-screen w-full min-w-0 flex-col xl:ms-64">
+            <Navbar
+              onOpenSidenav={() => setOpen(!open)}
+              brandText={getActiveRoute(dataEntryRoutes, pathname)}
+              secondary={getActiveNavbar(dataEntryRoutes, pathname)}
+            />
+            <main className="w-full flex-1 p-4 md:p-6 lg:p-8">{children}</main>
+            <div className="px-4 md:px-6 lg:px-8">
+              <Footer />
+            </div>
           </div>
         </div>
       </ToastProvider>

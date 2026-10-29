@@ -2,16 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { CheckCircle, Pause, XCircle, AlertCircle, Download } from "lucide-react";
-import NoDocumentsRequired from "components/emptyData/NoDocumentsRequired";
+import NoDocumentsRequired from "components/ub/feedback/NoDocumentsRequired";
 import DocumentUploadList from "features/applications/partner/components/form/stages/DocumentUploadList";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { useApplicationActions } from "features/applications/hooks";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import api from "lib/useApi";
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
 import { parseApiError } from "utils/parseApiError";
 import { DocumentItem, DocumentType, FormDataType } from "features/applications/partner/components/form/utility-functions/types";
 

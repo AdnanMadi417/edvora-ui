@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import { Wallet, Calendar, Ban } from "lucide-react";
-import { DetailStatusBadge } from "components/ui/badges";
-import AppDate from "components/ui/date/AppDate";
+import DetailStatusBadge from "components/ub/data/DetailStatusBadge";
+import AppDate from "components/ub/data/AppDate";
 import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import Button from "components/ui/buttons/Button";
+import Button from "components/ub/core/Button";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { payoutsApi } from "../services";
 import type { PartnerPayout, Payout } from "../types";

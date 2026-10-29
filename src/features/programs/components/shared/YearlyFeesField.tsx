@@ -1,6 +1,6 @@
 import React from "react";
-import SelectInput from "components/form/fields/SelectInput";
-import ArrayObjectField from "components/form/fields/ArrayObjectField";
+import SelectInput from "components/ub/forms/SelectInput";
+import ArrayObjectField from "components/ub/forms/ArrayObjectField";
 import { CURRENCY_OPTIONS } from "features/programs/types";
 
 interface YearlyFeesFieldProps {

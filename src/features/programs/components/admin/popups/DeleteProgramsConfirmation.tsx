@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Trash2, XCircle } from 'lucide-react';
-import ModalHeader from "components/ui/modal/ModalHeader";
-import DeleteBtn from 'components/ui/buttons/Button';
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import DeleteBtn from 'components/ub/core/Button';
 
 interface DeleteProgramsConfirmationProps {
   isOpen: boolean;

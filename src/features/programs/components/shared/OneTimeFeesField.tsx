@@ -1,5 +1,5 @@
 import React from "react";
-import ArrayObjectField from "components/form/fields/ArrayObjectField";
+import ArrayObjectField from "components/ub/forms/ArrayObjectField";
 import { CURRENCY_OPTIONS } from "features/programs/types";
 
 interface OneTimeFeesFieldProps {

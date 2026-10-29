@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { GraduationCap, ChevronLeft, CalendarPlus, Trash2 } from 'lucide-react';
 
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
@@ -12,15 +12,15 @@ import { useRouter } from "next/navigation";
 import { useCreateUniversity, useUniversityTypes } from "features/universities/hooks";
 import { useStates } from "features/programs/hooks";
 
-import InputField from "components/form/fields/InputField";
-import TextareaField from "components/form/fields/TextareaField";
+import InputField from "components/ub/forms/InputField";
+import TextareaField from "components/ub/forms/TextareaField";
 import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
-import SearchableDropdown from 'components/form/search/SearchableDropdown';
-import Button from "components/ui/buttons/Button";
-import IconButton from 'components/ui/buttons/IconButton';
-import SelectField from 'components/form/fields/SelectField';
-import ToggleInput from 'components/form/toggle/ToggleInput';
-import ImageUploadField from 'components/form/upload/ImageUploadField';
+import SearchableDropdown from 'components/ub/forms/SearchableDropdown';
+import Button from "components/ub/core/Button";
+import IconButton from 'components/ub/core/IconButton';
+import SelectField from 'components/ub/forms/SelectField';
+import ToggleInput from 'components/ub/forms/ToggleInput';
+import ImageUploadField from 'components/ub/forms/ImageUploadField';
 import { getPresignedUploads, uploadFilesToSpaces } from 'services/uploadService';
 import { validateUniversity, isUniversityComplete, universityFieldMap } from './validateUniversity';
 

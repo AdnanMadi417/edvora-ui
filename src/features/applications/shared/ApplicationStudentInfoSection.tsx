@@ -12,9 +12,9 @@ import {
   FaPhoneAlt,
   FaUsers,
 } from "react-icons/fa";
-import { AppDate } from "components/ui/date";
+import AppDate from "components/ub/data/AppDate";
 import { formatGender } from "utils/applicationFormatting";
-import { SectionIconBadge } from "components/ui/icons";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 
 interface ApplicationStudentInfoSectionProps {
   application: any;

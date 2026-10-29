@@ -6,12 +6,12 @@ import { ChevronLeft, Pencil } from "lucide-react";
 
 import { useUniversityTypeDetails, useUpdateUniversityType, useApplicationSubmissionFields } from "features/universities/hooks";
 
-import InputField from "components/form/fields/InputField";
-import SettingToggleInput from "components/form/toggle/SettingToggleInput";
-import Loading from "components/loading/Loading";
-import EmptyData from "components/emptyData/EmptyTableData";
-import Button from "components/ui/buttons/Button";
-import { useToast } from "components/context/ToastContext";
+import InputField from "components/ub/forms/InputField";
+import SettingToggleInput from "components/ub/forms/SettingToggleInput";
+import Loading from "components/ub/feedback/Loading";
+import EmptyData from "components/ub/feedback/EmptyTableData";
+import Button from "components/ub/core/Button";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 

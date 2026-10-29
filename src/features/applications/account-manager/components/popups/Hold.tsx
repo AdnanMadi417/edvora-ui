@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react";
 import { XCircle, AlertCircle, CheckCircle, Pause } from "lucide-react";
 
 import api from "lib/useApi";
-import { useToast } from "components/context/ToastContext";
-import SelectField from "components/form/fields/SelectField";
-import Button from "components/ui/buttons/Button";
+import { useToast } from "components/ub/feedback/ToastContext";
+import SelectField from "components/ub/forms/SelectField";
+import Button from "components/ub/core/Button";
 
 interface HoldPopupProps {
   isOpen: boolean;

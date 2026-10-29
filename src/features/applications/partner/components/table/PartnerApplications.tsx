@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import PresignedImage from 'components/ui/PresignedImage';
+import PresignedImage from 'components/ub/data/PresignedImage';
 import {
   ChevronUp,
   ChevronDown,
@@ -21,18 +21,21 @@ import { useRouter } from 'next/navigation';
 import api from 'lib/useApi';
 import { useMe } from 'hooks/useMe';
 
-import EmptyData from 'components/emptyData/EmptyTableData';
-import Button from 'components/ui/buttons/Button';
-import ApplicationFilterBar from 'components/filters/ApplicationFilterBar';
-import { TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from 'components/ui/table';
-import { getAsyncStatus } from 'components/ui/async';
-import { StatusBadge } from 'components/ui/badges';
+import EmptyData from 'components/ub/feedback/EmptyTableData';
+import Button from 'components/ub/core/Button';
+import ApplicationFilterBar from 'components/ub/navigation/ApplicationFilterBar';
+import TableSkeletonRows from 'components/ub/data/TableSkeletonRows';
+import TableEmptyRow from 'components/ub/data/TableEmptyRow';
+import TableErrorRow from 'components/ub/data/TableErrorRow';
+import TablePagination from 'components/ub/data/TablePagination';
+import { getAsyncStatus } from 'components/ub/feedback/AsyncStatus';
+import StatusBadge from 'components/ub/data/StatusBadge';
 import { getStatusVariant } from 'utils/getStatusVariant';
 
 import { useUniversities } from "features/universities/hooks";
 import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 import { usePartnerApplications } from "features/applications/partner/hooks/usePartnerApplications";
-import { AppDate } from "components/ui/date";
+import AppDate from "components/ub/data/AppDate";
 
 
 const ACTION_REQUIRED_STATUSES = new Set([

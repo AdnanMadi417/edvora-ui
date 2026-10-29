@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import { FileText, Download, CheckCircle, Clock, XCircle, FileUp } from "lucide-react";
-import { SectionIconBadge } from "components/ui/icons";
-import { StatusBadge } from "components/ui/badges";
-import IconButton from "components/ui/buttons/IconButton";
-import Button from "components/ui/buttons/Button";
-import { useToast } from "components/context/ToastContext";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
+import StatusBadge from "components/ub/data/StatusBadge";
+import IconButton from "components/ub/core/IconButton";
+import Button from "components/ub/core/Button";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";

@@ -1,4 +1,4 @@
-import type { StatusBadgeVariant } from "components/ui/badges";
+import type { StatusBadgeVariant } from "components/ub/data/StatusBadge";
 
 export function getStatusVariant(name: string): StatusBadgeVariant {
   const code = name?.toLowerCase().replace(/\s+/g, "_") ?? "";

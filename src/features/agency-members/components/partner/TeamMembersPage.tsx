@@ -3,9 +3,10 @@
 import React, { useState } from "react";
 import { ShieldX, UserPlus } from "lucide-react";
 
-import Button from "components/ui/buttons/Button";
-import Loading from "components/loading/Loading";
-import { Tabs, type TabItem } from "components/ui/tabs";
+import Button from "components/ub/core/Button";
+import Loading from "components/ub/feedback/Loading";
+import Tabs from "components/ub/navigation/Tabs";
+import type { TabItem } from "components/ub/navigation/Tabs";
 import { usePartnerProfile } from "features/partners/hooks";
 import AgencyMembersTable from "./AgencyMembersTable";
 import AgencyInvitationsTable from "./AgencyInvitationsTable";

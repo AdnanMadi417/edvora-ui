@@ -6,11 +6,11 @@ import { XCircle, Percent } from "lucide-react";
 import { useUpdateMemberCommission } from "../../hooks";
 import type { AgencyMember } from "../../types";
 
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
-import ToggleInput from "components/form/toggle/ToggleInput";
-import CommissionPercentageField from "components/form/fields/CommissionPercentageField";
-import { useToast } from "components/context/ToastContext";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
+import ToggleInput from "components/ub/forms/ToggleInput";
+import CommissionPercentageField from "components/ub/forms/CommissionPercentageField";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 

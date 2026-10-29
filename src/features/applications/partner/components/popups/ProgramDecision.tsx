@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { XCircle, RefreshCcw, CheckCircle } from "lucide-react";
 import { useUniversities } from "hooks/useUniversities";
-import SearchableDropdown from "components/form/search/SearchableDropdown";
-import { useToast } from "components/context/ToastContext";
+import SearchableDropdown from "components/ub/forms/SearchableDropdown";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useChangeProgram } from "features/applications/hooks";
-import Button from "components/ui/buttons/Button";
+import Button from "components/ub/core/Button";
 
 interface ProgramDecisionModalProps {
   isOpen: boolean;

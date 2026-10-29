@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { AnimatePresence } from "framer-motion";
-import PresignedImage from "components/ui/PresignedImage";
+import PresignedImage from "components/ub/data/PresignedImage";
 import {
   RefreshCw,
   Calendar,
@@ -22,23 +22,27 @@ import {
   Languages,
 } from 'lucide-react';
 import { MdOutlineCategory, MdSchool } from 'react-icons/md';
-import { StatusBadge } from "components/ui/badges";
+import StatusBadge from "components/ub/data/StatusBadge";
 
 import { useDeleteUniversity, useSetUniversityHidden, useUniversities } from "features/universities/hooks";
 
 import { useRouter } from "next/navigation";
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
-import Link from "components/ui/links/LinkBtn";
-import { Tooltip } from "components/ui/tooltip";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
+import Link from "components/ub/core/LinkBtn";
+import Tooltip from "components/ub/feedback/Tooltip";
 
 import UniversityFilterPanel from "features/universities/components/shared/filters/UniversityFilterPanel";
-import { TableWrapper, TableSkeletonRows, TableErrorRow, TableEmptyRow, TablePagination } from "components/ui/table";
-import { AnimatedTableRow } from "components/ui/motion";
+import TableWrapper from "components/ub/data/TableWrapper";
+import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
+import TableErrorRow from "components/ub/data/TableErrorRow";
+import TableEmptyRow from "components/ub/data/TableEmptyRow";
+import TablePagination from "components/ub/data/TablePagination";
+import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
 
 import DeleteUniversityConfirmation from "../popups/DeleteUniversityConfirmation";
 import AssignPaymentUniversity from "../popups/AssignPaymentMethods";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { monthLabel } from "features/programs/utils/intakeMonths";
 

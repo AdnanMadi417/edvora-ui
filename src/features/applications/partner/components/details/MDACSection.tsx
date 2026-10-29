@@ -2,8 +2,8 @@
 
 import React from "react";
 import { Plane, ExternalLink } from "lucide-react";
-import { SectionIconBadge } from "components/ui/icons";
-import Button from "components/ui/buttons/Button";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
+import Button from "components/ub/core/Button";
 
 const MDAC_URL = "https://imigresen-online.imi.gov.my/mdac/main";
 

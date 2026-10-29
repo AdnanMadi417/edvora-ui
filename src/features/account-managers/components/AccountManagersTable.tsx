@@ -15,15 +15,19 @@ import DeleteAccountManagerModal from "./DeleteAccountManagerModal";
 import TransferPartnersModal from "./TransferPartnersModal";
 import type { AccountManager } from "../types";
 
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, getApiErrorDetails, parseApiError } from "utils/parseApiError";
-import SearchInput from "components/form/filter/SearchInput";
-import FilterSelectField from "components/form/filter/FilterSelectField";
-import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
-import { AnimatedTableRow } from "components/ui/motion";
-import { StatusBadge } from "components/ui/badges";
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
+import SearchInput from "components/ub/forms/SearchInput";
+import FilterSelectField from "components/ub/forms/FilterSelectField";
+import TableWrapper from "components/ub/data/TableWrapper";
+import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/TableEmptyRow";
+import TableErrorRow from "components/ub/data/TableErrorRow";
+import TablePagination from "components/ub/data/TablePagination";
+import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
+import StatusBadge from "components/ub/data/StatusBadge";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";

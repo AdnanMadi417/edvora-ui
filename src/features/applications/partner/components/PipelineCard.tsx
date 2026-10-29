@@ -2,8 +2,8 @@
 
 import React from "react";
 import { FileText, Mail, Send, GraduationCap, Wallet, Flag, ArrowUpRight } from "lucide-react";
-import Button from "components/ui/buttons/Button";
-import { SolidBadge } from "components/ui/badges";
+import Button from "components/ub/core/Button";
+import SolidBadge from "components/ub/data/SolidBadge";
 
 interface Stage {
   id: string;

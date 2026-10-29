@@ -16,7 +16,7 @@ import {
   XCircle,
   FileText
 } from "lucide-react";
-import { AppDate } from "components/ui/date";
+import AppDate from "components/ub/data/AppDate";
 
 interface Props {
   formData: any;

@@ -1,7 +1,8 @@
 import { mock, httpError } from "../router";
 import { daysAgo, newId, nowIso, paginate, search, SAMPLE_PDF_URL } from "../db";
-import { CURRENT_PARTNER, PARTNERS, PROGRAMS, UNIVERSITIES } from "../seed";
-import { getApplicationFinance } from "./finance";
+import { CURRENT_PARTNER, PARTNERS, PROGRAMS } from "../seed";
+import { getApplicationFinance, recordFinanceForStatus } from "./finance";
+import { applicationRequiredFields } from "./universities";
 import {
   APP_DOCUMENT_TYPES,
   STAGES,
@@ -10,17 +11,13 @@ import {
   applications,
   arrivalDocumentsFor,
   commissionDocumentsFor,
-  commissionsFor,
-  disputeFor,
   docTypeRef,
   documentsFor,
   emgsFor,
   nextStatuses,
   offerLetterFor,
   partnerActorOf,
-  payInFor,
   paymentDocumentsFor,
-  payoutFor,
   programDetail,
   seedTimeline,
   statusByCode,
@@ -29,6 +26,7 @@ import {
   toStageStatus,
   transition,
   uploadedDoc,
+  defaultUniversityPaymentMethodId,
   visaCaseFor,
   visaDocFor,
   visaPaymentsFor,
@@ -97,11 +95,9 @@ function detail(app: AppRecord, viewer: "partner" | "manager" = "manager") {
   const st = currentStatus(app);
   const stage = stageOf(app);
   const program = programDetail(app.programId);
-  // Money trail (pay-in, payout, dispute, commission) is owned by finance.ts
-  // so records written through finance routes show up here; fall back to the
-  // derived values for applications finance doesn't know (e.g. new ones).
+  // Money trail (commission, pay-in, payout, dispute) is owned by finance.ts,
+  // which seeds it from the application's status and records finance writes.
   const finance = getApplicationFinance(app.id);
-  const commissions = finance.commissions.length ? finance.commissions : commissionsFor(app);
   return {
     id: app.id,
     is_draft: false,
@@ -137,17 +133,18 @@ function detail(app: AppRecord, viewer: "partner" | "manager" = "manager") {
       ],
     },
     documents: documentsFor(app),
-    commissions,
+    commissions: finance.commissions,
     payment_documents: paymentDocumentsFor(app),
     arrival_documents: arrivalDocumentsFor(app),
     offer_letter_document: offerLetterFor(app),
     visa_document: visaDocFor(app),
     emgs_evaluation_document: emgsFor(app),
     commission_documents: commissionDocumentsFor(app),
-    university_pay_in: finance.commissions.length ? finance.university_pay_in : viewer === "partner" ? null : payInFor(app),
-    partner_payout: finance.commissions.length ? finance.partner_payout : payoutFor(app),
-    dispute: finance.commissions.length ? finance.dispute : disputeFor(app),
-    commission_completed_at: finance.commission_completed_at ?? null,
+    // The Institution's pay-in is internal; the Advisor's view never shows it.
+    university_pay_in: viewer === "partner" ? null : finance.university_pay_in,
+    partner_payout: finance.partner_payout,
+    dispute: finance.dispute,
+    commission_completed_at: finance.commission_completed_at,
     visa_fee_amount: app.visa_fee_amount,
   };
 }
@@ -201,35 +198,8 @@ mock.get("/applications/stage-statuses", ({ query }) =>
   STATUSES.filter((s) => !query.stage_id || s.stage_id === query.stage_id).map(toStageStatus),
 );
 
-const REQUIRED_FIELDS = [
-  ["intake_date", "Intake Date", true],
-  ["student.birthday", "Date of Birth", true],
-  ["student.nationality", "Nationality", true],
-  ["student.passport_number", "Passport Number", true],
-  ["student.email", "Email Address", true],
-  ["student.phone", "Phone Number", true],
-  ["student.current_address", "Current Address", false],
-  ["student.gender", "Gender", true],
-  ["student.emergency_contacts", "Emergency Contacts", false],
-  ["student.english_proficiencies", "English Proficiency", false],
-  ["student.previous_educations", "Previous Education", true],
-] as const;
-
-function requiredFields(universityId: string) {
-  const idx = Math.max(0, UNIVERSITIES.findIndex((u) => u.id === universityId));
-  return {
-    university_id: universityId,
-    university_type_id: idx % 2 ? "utype_002" : "utype_001",
-    university_type_name: idx % 2 ? "Private University College" : "Private University",
-    fields: REQUIRED_FIELDS.map(([key, name, req], i) => ({
-      id: `rf_${universityId}_${i + 1}`,
-      field_key: key,
-      field_name: name,
-      // Vary the optional set a little per Institution.
-      is_required: req || (idx + i) % 3 === 0,
-    })),
-  };
-}
+// Required fields come from the Institution's university type (universities.ts).
+const requiredFields = applicationRequiredFields;
 
 mock.get("/applications/universities/:universityId/required-fields", ({ params }) => requiredFields(params.universityId));
 mock.get("/partners/:partnerId/universities/:universityId/required-fields", ({ params }) => requiredFields(params.universityId));
@@ -270,6 +240,16 @@ mock.get("/applications/:id/timeline", ({ params, query }) => {
 });
 
 // --- visa --------------------------------------------------------------------
+// The visa case and payments live on the application record (applications.data.ts):
+// these four routes are their only readers/writers.
+
+mock.get("/applications/:id/visa-case", ({ params }) => {
+  const vc = visaCaseFor(findApp(params.id));
+  if (!vc) throw httpError(404, "No visa case for this application yet.");
+  return vc;
+});
+
+mock.get("/applications/:id/visa-payments", ({ params }) => visaPaymentsFor(findApp(params.id)));
 
 mock.patch("/applications/:id/visa-case", ({ params, body }) => {
   const app = findApp(params.id);
@@ -291,11 +271,20 @@ mock.patch("/applications/:id/visa-case", ({ params, body }) => {
 
 mock.post("/applications/:id/visa-payments", ({ params, body }) => {
   const app = findApp(params.id);
-  const vc = visaCaseFor(app);
+  // Paying opens the visa case if the manager hasn't set one up yet.
+  const vc = visaCaseFor(app) ?? (app.visaCaseOverride = {
+    id: `visa_${app.id}`,
+    application_id: app.id,
+    visa_fee_amount: app.visa_fee_amount.toFixed(2),
+    visa_reference_number: null,
+    notes: null,
+    created_at: nowIso(),
+    updated_at: nowIso(),
+  });
   const payment = {
     id: newId("vp"),
-    visa_case_id: vc?.id ?? `visa_${app.id}`,
-    university_payment_method_id: body?.university_payment_method_id ?? "upm_001",
+    visa_case_id: vc.id,
+    university_payment_method_id: body?.university_payment_method_id ?? defaultUniversityPaymentMethodId(app) ?? "",
     amount: String(body?.amount ?? app.visa_fee_amount),
     currency: body?.currency ?? "RM",
     payment_reference: body?.payment_reference ?? "",
@@ -305,7 +294,7 @@ mock.post("/applications/:id/visa-payments", ({ params, body }) => {
     updated_at: nowIso(),
     documents: [{ id: newId("vpd"), file_key: body?.file_key ?? "uploads/visa_payment.pdf", file_url: SAMPLE_PDF_URL }],
   };
-  app.visaPayments.unshift(payment);
+  visaPaymentsFor(app).unshift(payment);
   addTimeline(app, { entry_type: "visa_payment_created", detail: { amount: payment.amount, currency: payment.currency } }, partnerActorOf(app));
   if (["WAITING_FOR_PAYMENT", "PAYMENT_REJECTED", "APPLICATION_FORM_REJECTED", "HEALTH_DECLARATION_REJECTED"].includes(app.statusCode)) {
     transition(app, "PAYMENT_SUBMITTED", { actor: partnerActorOf(app) });
@@ -319,6 +308,8 @@ mock.post("/applications/:id/status", ({ params, body }) => {
   const app = findApp(params.id);
   const target = statusById(body?.status_id);
   if (!target) throw httpError(422, "Unknown status");
+  // "Commission Ready" carries the pay-in and "Commission Paid" the payout (useStatusUpdate).
+  recordFinanceForStatus(app.id, target.code, body);
   transition(app, target.code, {
     reason: body?.reason_text,
     notes: body?.notes,
@@ -418,6 +409,46 @@ mock.post("/applications/:id/offer-letter", ({ params, body }) => {
   }
   app.updated_at = nowIso();
   return d;
+});
+
+/**
+ * Advisor's decision on the offer letter (partner OfferLetter.tsx, shown only
+ * while the status is "University Approved"). Accepting moves the application
+ * on to Visa Setup, the only next status from University Approved; declining
+ * keeps the status, cancels the application and records the reason.
+ */
+mock.post("/applications/:id/offer-letter/decision", ({ params, body }) => {
+  const app = findApp(params.id);
+  const decision = body?.decision;
+  if (!["accept", "reject"].includes(decision)) throw httpError(422, "Choose accept or reject, then submit again.");
+  if (app.statusCode !== "UNIVERSITY_APPROVED") {
+    throw httpError(409, "The offer letter can only be accepted or declined while the application is University Approved.");
+  }
+  const actor = partnerActorOf(app);
+  const notes = body?.notes || null;
+  const reason = body?.reason || null;
+  // Timeline: accepting records the status change; declining records the cancellation.
+  if (decision === "accept") {
+    transition(app, "VISA_SETUP", { notes: notes ?? "Offer letter accepted by the Advisor.", actor });
+  } else {
+    app.lifecycle = "cancel";
+    app.updated_at = nowIso();
+    addTimeline(
+      app,
+      { entry_type: "lifecycle_status_changed", detail: { status: "cancel", offer_letter_decision: "reject" }, reason_text: reason, notes: notes ?? "Offer letter declined by the Advisor." },
+      actor,
+    );
+  }
+  return {
+    application_id: app.id,
+    decision,
+    reason,
+    notes,
+    decided_at: nowIso(),
+    status: currentStatus(app).name,
+    status_code: app.statusCode,
+    message: decision === "accept" ? "Offer accepted. The Institution has been notified." : "Offer declined.",
+  };
 });
 
 /** Single-document uploads that may move the application along. */

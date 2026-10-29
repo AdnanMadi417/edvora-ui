@@ -7,7 +7,7 @@ import HoldPopup from "features/applications/account-manager/components/popups/H
 import UpdateStatus from "features/applications/account-manager/components/popups/UpdateStatus";
 import UpdateCorrectionRequest from "features/applications/shared/UpdateCorrectionRequest";
 import { useApplicationActions } from "features/applications/hooks";
-import Button from "components/ui/buttons/Button";
+import Button from "components/ub/core/Button";
 
 interface Props {
   application: any;

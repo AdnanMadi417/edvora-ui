@@ -3,8 +3,11 @@
 import React from "react";
 import { AlertCircle } from "lucide-react";
 
-import { InputField, SelectField, TextareaField, SearchableDropdown } from "components/form";
-import CompactFileUpload from "components/form/upload/CompactFileUpload";
+import InputField from "components/ub/forms/InputField";
+import SelectField from "components/ub/forms/SelectField";
+import TextareaField from "components/ub/forms/TextareaField";
+import SearchableDropdown from "components/ub/forms/SearchableDropdown";
+import CompactFileUpload from "components/ub/forms/CompactFileUpload";
 import type { Payout } from "../../types";
 import type { PartnerBankAccount } from "features/partners/bank-accounts";
 import { BankAccountPayoutSummary } from "features/partners/bank-accounts";

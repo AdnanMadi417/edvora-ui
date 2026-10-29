@@ -8,7 +8,7 @@ import type { PartnerDetails } from "features/partners/types";
 const mockShowToast = jest.fn();
 
 jest.mock("../../hooks", () => ({ useAdditionalManagers: jest.fn() }));
-jest.mock("../../../../components/context/ToastContext", () => ({
+jest.mock("components/ub/feedback/ToastContext", () => ({
   useToast: () => ({ showToast: mockShowToast }),
 }));
 

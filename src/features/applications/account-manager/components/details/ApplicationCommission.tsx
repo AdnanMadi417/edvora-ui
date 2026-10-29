@@ -3,7 +3,7 @@
 import React from "react";
 import { Receipt } from "lucide-react";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import { SectionIconBadge } from "components/ui/icons";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 import ApplicationCommissionRecords from "features/applications/shared/ApplicationCommissionRecords";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 import { PartnerPayoutSection } from "features/applications/payouts";

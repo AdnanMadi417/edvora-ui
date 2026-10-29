@@ -9,7 +9,7 @@ const mockShowToast = jest.fn();
 
 jest.mock("../hooks/useAccountManagers", () => ({ useAccountManagers: jest.fn() }));
 jest.mock("../hooks/useUnsharePartners", () => ({ useUnsharePartners: jest.fn() }));
-jest.mock("../../../components/context/ToastContext", () => ({
+jest.mock("components/ub/feedback/ToastContext", () => ({
   useToast: () => ({ showToast: mockShowToast }),
 }));
 

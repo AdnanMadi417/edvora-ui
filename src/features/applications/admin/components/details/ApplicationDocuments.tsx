@@ -9,10 +9,10 @@ import {
   XCircle,
 } from "lucide-react";
 import DocumentActions from "features/applications/shared/DocumentActions";
-import EmptyData from "components/emptyData/EmptyData";
-import { AppDate } from "components/ui/date";
-import { SectionIconBadge } from "components/ui/icons";
-import { SolidBadge } from "components/ui/badges";
+import EmptyData from "components/ub/feedback/EmptyData";
+import AppDate from "components/ub/data/AppDate";
+import SectionIconBadge from "components/ub/icons/SectionIconBadge";
+import SolidBadge from "components/ub/data/SolidBadge";
 
 interface ApplicationDocumentsProps {
   application: any;

@@ -3,11 +3,11 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Landmark, XCircle } from "lucide-react";
-import InputField from "components/form/fields/InputField";
-import SelectField from "components/form/fields/SelectField";
-import ToggleInput from "components/form/toggle/ToggleInput";
-import Button from "components/ui/buttons/Button";
-import { useToast } from "components/context/ToastContext";
+import InputField from "components/ub/forms/InputField";
+import SelectField from "components/ub/forms/SelectField";
+import ToggleInput from "components/ub/forms/ToggleInput";
+import Button from "components/ub/core/Button";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { useCreateBank } from "../hooks";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { ISO_COUNTRIES } from "constants/lists";

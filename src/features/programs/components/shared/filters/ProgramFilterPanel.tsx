@@ -4,9 +4,9 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { SlidersHorizontal, Globe, GraduationCap, Award, Layers, MonitorSmartphone, X, RotateCcw, EyeOff } from "lucide-react";
 import { MdSchool } from "react-icons/md";
 import { AiOutlineBank } from "react-icons/ai";
-import FilterSelectField from "components/form/filter/FilterSelectField";
-import SearchInput from "components/form/filter/SearchInput";
-import FilterChip from "components/ui/filters/FilterChip";
+import FilterSelectField from "components/ub/forms/FilterSelectField";
+import SearchInput from "components/ub/forms/SearchInput";
+import FilterChip from "components/ub/data/FilterChip";
 import SortButton from "features/programs/components/shared/filters/SortButton";
 import { COURSE_TYPE_OPTIONS } from "features/programs/utils/courseType";
 

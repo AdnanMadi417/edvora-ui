@@ -7,15 +7,19 @@ import { MdLabelOutline } from "react-icons/md";
 
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 
-import SearchInput from "components/form/filter/SearchInput";
+import SearchInput from "components/ub/forms/SearchInput";
 
 import CreateFieldOfStudy from "features/universities/components/admin/fields-of-study/popups/CreateFieldOfStudy";
 import UpdateField from "features/universities/components/admin/fields-of-study/popups/UpdateField";
 
-import Button from "components/ui/buttons/Button";
-import IconButton from "components/ui/buttons/IconButton";
-import { TableWrapper, TableSkeletonRows, TableEmptyRow, TableErrorRow, TablePagination } from "components/ui/table";
-import { AnimatedTableRow } from "components/ui/motion";
+import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
+import TableWrapper from "components/ub/data/TableWrapper";
+import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/TableEmptyRow";
+import TableErrorRow from "components/ub/data/TableErrorRow";
+import TablePagination from "components/ub/data/TablePagination";
+import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
 
 const ITEMS_PER_PAGE = 10;
 

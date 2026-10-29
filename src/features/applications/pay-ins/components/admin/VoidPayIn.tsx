@@ -6,11 +6,13 @@ import { XCircle, AlertCircle, Ban } from "lucide-react";
 
 import { useVoidPayIn } from "../../hooks";
 import type { UniversityPayIn } from "../../types";
-import { useToast } from "components/context/ToastContext";
+import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
-import { InputField, SelectField, TextareaField } from "components/form";
-import ModalHeader from "components/ui/modal/ModalHeader";
-import Button from "components/ui/buttons/Button";
+import InputField from "components/ub/forms/InputField";
+import SelectField from "components/ub/forms/SelectField";
+import TextareaField from "components/ub/forms/TextareaField";
+import ModalHeader from "components/ub/feedback/ModalHeader";
+import Button from "components/ub/core/Button";
 
 interface VoidPayInProps {
   isOpen: boolean;

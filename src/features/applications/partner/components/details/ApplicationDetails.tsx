@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import RichTextDisplay from "components/ui/RichTextDisplay";
+import RichTextDisplay from "components/ub/data/RichTextDisplay";
 
 import { Wallet } from "lucide-react";
 import { Clock, Upload, ClipboardCheck, CreditCard, Plane, FileUp, Download } from 'lucide-react';
 import { getDocumentDownloadUrl } from 'services/documentService';
-import Button from 'components/ui/buttons/Button';
-import IconButton from 'components/ui/buttons/IconButton';
+import Button from 'components/ub/core/Button';
+import IconButton from 'components/ub/core/IconButton';
 import { useApplicationActions } from "features/applications/hooks";
 import { usePartnerProfile } from "features/partners/hooks/usePartnerProfile";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
@@ -26,10 +26,10 @@ import ApplicationDocuments from './ApplicationDocuments';
 import ApplicationFormsSection from './ApplicationFormsSection';
 import RejectedFormReuploadAction from './RejectedFormReuploadAction';
 import MDACSection from './MDACSection';
-import { useToast } from 'components/context/ToastContext';
+import { useToast } from 'components/ub/feedback/ToastContext';
 import { AnimatePresence, motion } from "framer-motion";
-import { EASE, MICRO_DURATION } from "components/ui/FadeIn";
-import { Tabs } from "components/ui/tabs";
+import { EASE, MICRO_DURATION } from "components/ub/core/FadeIn";
+import Tabs from "components/ub/navigation/Tabs";
 import { PARTNER_APPLICATION_DETAILS_TABS, type ApplicationDetailsTab } from "features/applications/shared/applicationDetailTabs";
 import ApplicationActivityHistory from 'features/applications/shared/ApplicationActivityHistory';
 import ApplicationTimeline from 'features/applications/shared/ApplicationTimeline';
