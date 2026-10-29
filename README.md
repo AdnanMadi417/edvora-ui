@@ -18,3 +18,4 @@ NEXT_PUBLIC_API_URL=your_api_url
 Note: The `NEXT_PUBLIC_` prefix in `NEXT_PUBLIC_API_URL` makes this environment variable accessible in the browser. This is necessary because API calls are made from both server and client-side code.
 # ui-template
 # ui-template
+# ui-template
