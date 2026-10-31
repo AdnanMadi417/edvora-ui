@@ -67,7 +67,7 @@ export function ListItem({ title, description, leading, meta, trailing, href, on
 
   const rowClass = `flex min-w-0 flex-1 items-center gap-3 px-4 text-start ${pad}`;
   const interactiveClass =
-    `${rowClass} transition-colors duration-ub-fast ease-ub-standard motion-reduce:transition-none hover:bg-ub-surface-subtle ${focusRingInset} ` +
+    `${rowClass} transition-colors duration-ub-fast ease-ub-standard motion-reduce:transition-none hover:bg-ub-row-hover ${focusRingInset} ` +
     (current ? "bg-ub-selected hover:bg-ub-selected" : "");
 
   let main: ReactNode;

@@ -85,7 +85,7 @@ export function Avatar({ name, src, alt, size = 40, status, className }: AvatarP
       )}
       {status && (
         <span
-          className={`absolute bottom-0 end-0 rounded-ub-full ring-2 ring-ub-surface ${dotBox[size]} ${statusColor[status]}`}
+          className={`absolute bottom-0 end-0 rounded-ub-full ring-2 ring-ub-avatar-ring ${dotBox[size]} ${statusColor[status]}`}
           title={statusText[status]}
         >
           <span className="sr-only">{statusText[status]}</span>

@@ -10,7 +10,7 @@ import {
   TbBrandLinkedin,
 } from "react-icons/tb";
 import clsx from "clsx";
-import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
+import Logo from "components/ub/brand/Logo";
 import { focusRing, iconButtonSizes } from "components/ub/recipes";
 
 const footerLink = clsx(
@@ -105,7 +105,7 @@ export default function SiteFooter({ className = "" }: SiteFooterProps) {
         <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">
           <div className="lg:max-w-sm lg:shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={logoImg.src} alt="Unibexs" className="h-12 w-auto dark:brightness-0 dark:invert" />
+            <Logo size={28} />
 
             <p className="mt-4 max-w-ub-reading text-ub-body-sm text-ub-text-secondary">
               Connecting students, Advisors and Institutions to make studying abroad simple.

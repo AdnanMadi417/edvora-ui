@@ -7,14 +7,14 @@ import { progressFill, progressTrack } from "components/ub/recipes";
 export type ProgressTone = "brand" | "success" | "warning" | "danger";
 
 const TONE_FILL: Record<ProgressTone, string> = {
-  brand: "bg-ub-action-primary",
+  brand: "bg-ub-chart-1",
   success: "bg-ub-success-600",
   warning: "bg-ub-warning-500",
   danger: "bg-ub-danger-600",
 };
 
 // progressFill carries the brand fill; swap it so only one bg-* class applies.
-const fillFor = (tone: ProgressTone) => progressFill.replace("bg-ub-action-primary", TONE_FILL[tone]);
+const fillFor = (tone: ProgressTone) => progressFill.replace("bg-ub-chart-1", TONE_FILL[tone]);
 
 // Indeterminate slide. Scoped keyframes (no global CSS edits); off under reduced motion.
 const INDETERMINATE_CSS = `

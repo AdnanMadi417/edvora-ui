@@ -3,7 +3,8 @@ import React from "react";
 export type CountBadgeTone = "brand" | "danger";
 
 const countTones: Record<CountBadgeTone, string> = {
-  brand: "bg-ub-action-primary text-ub-action-primary-text",
+  // Neutral counter: solid blue in light; raised surface + border + white in dark (guide §4).
+  brand: "border border-ub-count-border bg-ub-count-bg text-ub-count-text",
   danger: "bg-ub-danger-600 text-ub-text-on-action",
 };
 

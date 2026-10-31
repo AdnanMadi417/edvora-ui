@@ -113,7 +113,7 @@ export default function Gallery() {
                 The visual language of the Unibexs System: colors, typography, foundations and the interface components used across the Advisor and admin portals. Every example on this page is the live component used in the product.
               </p>
             </div>
-            <div aria-hidden className="ub-notch-lg hidden h-48 w-48 shrink-0 place-items-center rounded-ub-2xl bg-ub-action-primary text-[96px] font-bold text-ub-action-primary-text shadow-ub-glow lg:grid">
+            <div aria-hidden className="ub-notch-lg hidden h-48 w-48 shrink-0 place-items-center rounded-ub-2xl bg-ub-action-primary text-[96px] font-bold text-ub-action-primary-text lg:grid">
               U
             </div>
           </div>

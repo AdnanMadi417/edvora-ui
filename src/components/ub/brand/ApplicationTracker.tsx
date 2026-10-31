@@ -110,10 +110,10 @@ const NODE_BASE = "relative grid h-6 w-6 shrink-0 place-items-center rounded-ub-
 const NODE: Record<TrackerStepState, string> = {
   complete: "bg-ub-action-primary text-ub-text-on-action",
   // shadow-ub-glow is `none` in light and the blue bloom in dark (brief §3.4).
-  current: "border-2 border-ub-action-primary bg-ub-surface shadow-ub-glow",
-  upcoming: "border border-ub-neutral-300 bg-ub-surface text-ub-label-sm text-ub-text-secondary ub-tabular",
-  attention: "bg-ub-danger-600 text-ub-label-md font-bold text-ub-text-on-action",
-  skipped: "border-ub-strong border-dashed border-ub-neutral-300 bg-ub-surface",
+  current: "border-2 border-ub-border-focus bg-ub-surface shadow-ub-glow",
+  upcoming: "border border-ub-border-muted bg-ub-surface text-ub-label-sm text-ub-text-secondary ub-tabular",
+  attention: "bg-ub-danger-fill text-ub-label-md font-bold text-ub-text-on-action",
+  skipped: "border-ub-strong border-dashed border-ub-border-muted bg-ub-surface",
 };
 const LABEL: Record<TrackerStepState, string> = {
   complete: "text-ub-text-primary",
@@ -189,7 +189,7 @@ export default function ApplicationTracker({ steps, nextStep, orientation = "aut
                   className={clsx(NODE_BASE, NODE[step.state])}
                 >
                   {step.state === "complete" && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
-                  {step.state === "current" && <span className="h-2 w-2 rounded-ub-full bg-ub-action-primary" />}
+                  {step.state === "current" && <span className="h-2 w-2 rounded-ub-full bg-ub-border-focus" />}
                   {step.state === "upcoming" && i + 1}
                   {step.state === "attention" && "!"}
                 </span>
@@ -198,7 +198,7 @@ export default function ApplicationTracker({ steps, nextStep, orientation = "aut
                     <span
                       data-filled={filled}
                       className={clsx(
-                        "absolute start-0 top-0 rounded-ub-full bg-ub-action-primary transition-[width,height] duration-ub-slow ease-ub-standard motion-reduce:transition-none",
+                        "absolute start-0 top-0 rounded-ub-full bg-ub-chart-1 transition-[width,height] duration-ub-slow ease-ub-standard motion-reduce:transition-none",
                         filled ? "h-full w-full" : L.fillEmpty,
                       )}
                     />

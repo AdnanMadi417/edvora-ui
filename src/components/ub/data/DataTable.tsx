@@ -322,7 +322,7 @@ export default function DataTable<T>({
                     <AnimatedTableRow
                       key={id}
                       data-selected={isSelected || undefined}
-                      className={`block border-t border-ub-border py-3 md:table-row md:py-0 ${rowHeight[density]} ${isSelected ? "bg-ub-selected" : "md:hover:bg-ub-surface-subtle"}`}
+                      className={`block border-t border-ub-border py-3 md:table-row md:py-0 ${rowHeight[density]} ${isSelected ? "bg-ub-selected" : "md:hover:bg-ub-row-hover"}`}
                     >
                       {selectable && (
                         <td className="flex px-4 py-1 md:table-cell md:w-12 md:py-0 md:align-middle">

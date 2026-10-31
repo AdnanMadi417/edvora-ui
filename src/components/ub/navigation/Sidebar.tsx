@@ -5,9 +5,7 @@ import clsx from "clsx";
 import Links, { type SidebarTip } from "components/ub/navigation/SidebarLinks";
 import Logo from "components/ub/brand/Logo";
 import { useSidebarCollapsed } from "./sidebarState";
-import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import { IRoute } from "types/navigation";
-import Image from "next/image";
 import Link from "next/link";
 
 import { useEffect, useState, useCallback, useId } from "react";
@@ -144,7 +142,8 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
       >
         <header className="ub-sidebar-header flex h-16 shrink-0 items-center gap-2 px-5">
           <Link href="/" className={clsx("ub-sidebar-expanded-only flex shrink-0 items-center rounded-ub-sm", focusRing)} aria-label="Unibexs home">
-            <Image src={logoImg} alt="Unibexs" width={120} height={60} className="h-10 w-auto object-contain dark:brightness-0 dark:invert" priority />
+            {/* Logo swaps to the reversed artwork in dark (guide §3). */}
+            <Logo size={24} priority />
           </Link>
           <Link href="/" className={clsx("ub-sidebar-collapsed-only flex shrink-0 items-center rounded-ub-sm", focusRing)} aria-label="Unibexs home">
             <Logo symbolOnly size="md" alt="" />
@@ -218,7 +217,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             aria-expanded={!collapsed}
             aria-label="Expand sidebar"
             className={clsx(
-              "ub-sidebar-collapsed-only ub-sidebar-item mb-2 flex h-10 w-full items-center rounded-ub-md text-ub-icon transition-colors duration-ub-fast hover:bg-ub-surface hover:text-ub-text-primary",
+              "ub-sidebar-collapsed-only ub-sidebar-item mb-2 flex h-10 w-full items-center rounded-ub-md text-ub-icon transition-colors duration-ub-fast hover:bg-ub-nav-hover hover:text-ub-text-primary",
               focusRingInset,
             )}
           >
@@ -250,7 +249,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
               }}
               onMouseLeave={() => setTip(null)}
               className={clsx(
-                "ub-sidebar-item flex h-10 items-center gap-3 rounded-ub-md px-3 text-ub-label-md text-ub-text-secondary transition-colors duration-ub-fast hover:bg-ub-surface hover:text-ub-text-primary",
+                "ub-sidebar-item flex h-10 items-center gap-3 rounded-ub-md px-3 text-ub-label-md text-ub-text-secondary transition-colors duration-ub-fast hover:bg-ub-nav-hover hover:text-ub-text-primary",
                 focusRingInset,
               )}
             >

@@ -60,7 +60,7 @@ export default function Drawer({
             aria-describedby={description ? descId : undefined}
             tabIndex={-1}
             className={clsx(
-              "pointer-events-auto flex h-full w-full flex-col bg-ub-surface shadow-ub-lg outline-none md:w-[480px] md:rounded-s-ub-xl",
+              "pointer-events-auto flex h-full w-full flex-col border-s border-ub-border-overlay bg-ub-modal shadow-ub-lg outline-none md:w-[480px] md:rounded-s-ub-xl",
               "transition-transform duration-ub-slow motion-reduce:transition-opacity motion-reduce:duration-ub-fast",
               visible
                 ? "translate-x-0 opacity-100 ease-ub-enter"
@@ -83,7 +83,7 @@ export default function Drawer({
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 text-ub-body-md text-ub-text-primary md:px-6">{children}</div>
             {footer && (
-              <div className="flex flex-wrap items-center justify-end gap-3 border-t border-ub-border bg-ub-surface px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 md:px-6">
+              <div className="flex flex-wrap items-center justify-end gap-3 border-t border-ub-border bg-ub-modal px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 md:px-6">
                 {footer}
               </div>
             )}

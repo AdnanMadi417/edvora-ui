@@ -59,7 +59,7 @@ export default function ActionSheet({ open, onClose, actions, title, description
             aria-describedby={description ? descId : undefined}
             tabIndex={-1}
             className={clsx(
-              "pointer-events-auto w-full overflow-hidden rounded-t-ub-xl bg-ub-surface pb-[env(safe-area-inset-bottom)] shadow-ub-xl outline-none md:max-w-[400px] md:rounded-ub-xl md:pb-0",
+              "pointer-events-auto w-full overflow-hidden rounded-t-ub-xl border border-ub-border-overlay bg-ub-modal pb-[env(safe-area-inset-bottom)] shadow-ub-xl outline-none md:max-w-[400px] md:rounded-ub-xl md:pb-0",
               "transition-[opacity,transform] duration-ub-slow motion-reduce:transform-none motion-reduce:duration-ub-fast",
               visible ? "translate-y-0 opacity-100 ease-ub-enter" : "translate-y-full opacity-0 ease-ub-exit md:translate-y-2",
             )}
@@ -92,7 +92,7 @@ export default function ActionSheet({ open, onClose, actions, title, description
                       onClick={() => select(action)}
                       className={clsx(
                         actionRow,
-                        danger ? "text-ub-tone-danger-text hover:bg-ub-tone-danger-bg" : "text-ub-text-primary hover:bg-ub-surface-subtle",
+                        danger ? "text-ub-tone-danger-text hover:bg-ub-tone-danger-bg" : "text-ub-text-primary hover:bg-ub-item-hover",
                       )}
                     >
                       {Icon && <Icon className="h-5 w-5 shrink-0" aria-hidden="true" />}

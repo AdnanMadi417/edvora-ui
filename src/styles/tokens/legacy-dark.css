@@ -88,3 +88,127 @@
   --tw-shadow: 0 0 #0000;
   box-shadow: none;
 }
+
+/* Status tints (red / green / amber …, any opacity suffix) → the dark guide's
+   status tokens (§2.5) and tag pairs (§2.6). [class*=] also covers bg-x-50/40 etc. */
+[data-ub-theme="dark"] [class*="bg-red-50"],
+[data-ub-theme="dark"] [class*="bg-red-100"],
+[data-ub-theme="dark"] [class*="bg-rose-50"],
+[data-ub-theme="dark"] [class*="bg-rose-100"] {
+  background-color: var(--ub-danger-bg);
+}
+[data-ub-theme="dark"] [class*="border-red-100"],
+[data-ub-theme="dark"] [class*="border-red-200"],
+[data-ub-theme="dark"] [class*="border-rose-100"],
+[data-ub-theme="dark"] [class*="border-rose-200"] {
+  border-color: var(--ub-danger-border);
+}
+[data-ub-theme="dark"] [class*="text-red-600"],
+[data-ub-theme="dark"] [class*="text-red-700"],
+[data-ub-theme="dark"] [class*="text-red-800"],
+[data-ub-theme="dark"] [class*="text-rose-600"],
+[data-ub-theme="dark"] [class*="text-rose-700"],
+[data-ub-theme="dark"] [class*="text-rose-800"] {
+  color: var(--ub-danger-text);
+}
+[data-ub-theme="dark"] [class*="bg-green-50"],
+[data-ub-theme="dark"] [class*="bg-green-100"],
+[data-ub-theme="dark"] [class*="bg-emerald-50"],
+[data-ub-theme="dark"] [class*="bg-emerald-100"],
+[data-ub-theme="dark"] [class*="bg-teal-50"],
+[data-ub-theme="dark"] [class*="bg-teal-100"] {
+  background-color: var(--ub-success-bg);
+}
+[data-ub-theme="dark"] [class*="border-green-100"],
+[data-ub-theme="dark"] [class*="border-green-200"],
+[data-ub-theme="dark"] [class*="border-emerald-100"],
+[data-ub-theme="dark"] [class*="border-emerald-200"],
+[data-ub-theme="dark"] [class*="border-teal-100"],
+[data-ub-theme="dark"] [class*="border-teal-200"] {
+  border-color: var(--ub-success-border);
+}
+[data-ub-theme="dark"] [class*="text-green-600"],
+[data-ub-theme="dark"] [class*="text-green-700"],
+[data-ub-theme="dark"] [class*="text-green-800"],
+[data-ub-theme="dark"] [class*="text-emerald-600"],
+[data-ub-theme="dark"] [class*="text-emerald-700"],
+[data-ub-theme="dark"] [class*="text-emerald-800"],
+[data-ub-theme="dark"] [class*="text-teal-600"],
+[data-ub-theme="dark"] [class*="text-teal-700"],
+[data-ub-theme="dark"] [class*="text-teal-800"] {
+  color: var(--ub-success-text);
+}
+[data-ub-theme="dark"] [class*="bg-amber-50"],
+[data-ub-theme="dark"] [class*="bg-amber-100"],
+[data-ub-theme="dark"] [class*="bg-yellow-50"],
+[data-ub-theme="dark"] [class*="bg-yellow-100"],
+[data-ub-theme="dark"] [class*="bg-orange-50"],
+[data-ub-theme="dark"] [class*="bg-orange-100"] {
+  background-color: var(--ub-warning-bg);
+}
+[data-ub-theme="dark"] [class*="border-amber-100"],
+[data-ub-theme="dark"] [class*="border-amber-200"],
+[data-ub-theme="dark"] [class*="border-yellow-100"],
+[data-ub-theme="dark"] [class*="border-yellow-200"],
+[data-ub-theme="dark"] [class*="border-orange-100"],
+[data-ub-theme="dark"] [class*="border-orange-200"] {
+  border-color: var(--ub-warning-border);
+}
+[data-ub-theme="dark"] [class*="text-amber-600"],
+[data-ub-theme="dark"] [class*="text-amber-700"],
+[data-ub-theme="dark"] [class*="text-amber-800"],
+[data-ub-theme="dark"] [class*="text-yellow-600"],
+[data-ub-theme="dark"] [class*="text-yellow-700"],
+[data-ub-theme="dark"] [class*="text-yellow-800"],
+[data-ub-theme="dark"] [class*="text-orange-600"],
+[data-ub-theme="dark"] [class*="text-orange-700"],
+[data-ub-theme="dark"] [class*="text-orange-800"] {
+  color: var(--ub-warning-text);
+}
+[data-ub-theme="dark"] [class*="bg-violet-50"],
+[data-ub-theme="dark"] [class*="bg-violet-100"],
+[data-ub-theme="dark"] [class*="bg-purple-50"],
+[data-ub-theme="dark"] [class*="bg-purple-100"] {
+  background-color: var(--ub-tone-plum-bg);
+}
+[data-ub-theme="dark"] [class*="border-violet-100"],
+[data-ub-theme="dark"] [class*="border-violet-200"],
+[data-ub-theme="dark"] [class*="border-purple-100"],
+[data-ub-theme="dark"] [class*="border-purple-200"] {
+  border-color: var(--ub-tone-plum-border);
+}
+[data-ub-theme="dark"] [class*="text-violet-600"],
+[data-ub-theme="dark"] [class*="text-violet-700"],
+[data-ub-theme="dark"] [class*="text-violet-800"],
+[data-ub-theme="dark"] [class*="text-purple-600"],
+[data-ub-theme="dark"] [class*="text-purple-700"],
+[data-ub-theme="dark"] [class*="text-purple-800"] {
+  color: var(--ub-tone-plum-text);
+}
+[data-ub-theme="dark"] [class*="bg-indigo-50"],
+[data-ub-theme="dark"] [class*="bg-indigo-100"],
+[data-ub-theme="dark"] [class*="bg-sky-50"],
+[data-ub-theme="dark"] [class*="bg-sky-100"],
+[data-ub-theme="dark"] [class*="bg-cyan-50"],
+[data-ub-theme="dark"] [class*="bg-cyan-100"] {
+  background-color: var(--ub-tone-brand-bg);
+}
+[data-ub-theme="dark"] [class*="border-indigo-100"],
+[data-ub-theme="dark"] [class*="border-indigo-200"],
+[data-ub-theme="dark"] [class*="border-sky-100"],
+[data-ub-theme="dark"] [class*="border-sky-200"],
+[data-ub-theme="dark"] [class*="border-cyan-100"],
+[data-ub-theme="dark"] [class*="border-cyan-200"] {
+  border-color: var(--ub-tone-brand-border);
+}
+[data-ub-theme="dark"] [class*="text-indigo-600"],
+[data-ub-theme="dark"] [class*="text-indigo-700"],
+[data-ub-theme="dark"] [class*="text-indigo-800"],
+[data-ub-theme="dark"] [class*="text-sky-600"],
+[data-ub-theme="dark"] [class*="text-sky-700"],
+[data-ub-theme="dark"] [class*="text-sky-800"],
+[data-ub-theme="dark"] [class*="text-cyan-600"],
+[data-ub-theme="dark"] [class*="text-cyan-700"],
+[data-ub-theme="dark"] [class*="text-cyan-800"] {
+  color: var(--ub-tone-brand-text);
+}

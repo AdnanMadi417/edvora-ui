@@ -19,9 +19,9 @@ const navItemBase =
   "ub-sidebar-item relative flex h-10 w-full items-center gap-3 rounded-ub-md px-3 text-start text-ub-label-md transition-colors duration-ub-fast ease-ub-standard " +
   focusRingInset;
 const navItemActive = "bg-ub-action-primary text-ub-action-primary-text";
-const navItemInactive = "text-ub-text-secondary hover:bg-ub-surface hover:text-ub-text-primary";
+const navItemInactive = "text-ub-text-secondary hover:bg-ub-nav-hover hover:text-ub-text-primary";
 // A parent whose child is the current page: tinted, not filled.
-const navItemParentActive = "bg-ub-selected text-ub-text-link hover:bg-ub-selected";
+const navItemParentActive = "bg-ub-selected text-ub-text-selected hover:bg-ub-selected";
 
 const CHILD_ROW_HEIGHT = 40;
 const CHILD_GAP = 4;

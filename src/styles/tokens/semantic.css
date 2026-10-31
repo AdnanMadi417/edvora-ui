@@ -90,14 +90,19 @@
   --ub-nav-hover: var(--ub-bg-surface);
   --ub-row-hover: var(--ub-bg-surface-subtle);
   --ub-tab-active-text: var(--ub-text-link);
-  --ub-count-bg: var(--ub-tone-brand-bg);
-  --ub-count-border: var(--ub-tone-brand-border);
-  --ub-count-text: var(--ub-tone-brand-text);
+  --ub-count-bg: var(--ub-action-primary-bg);
+  --ub-count-border: transparent;
+  --ub-count-text: var(--ub-action-primary-text);
   --ub-delta-up-bg: var(--ub-success-bg);
   --ub-delta-up-border: var(--ub-success-border);
   --ub-delta-up-text: var(--ub-success-text);
   --ub-progress-track: var(--ub-bg-disabled);
   --ub-toggle-off: var(--ub-neutral-300);
+  --ub-item-hover: var(--ub-bg-surface-subtle);
+  --ub-border-muted: var(--ub-neutral-300);
+  --ub-danger-fill: var(--ub-danger-600);
+  --ub-avatar-ring: var(--ub-bg-surface);
+  --ub-text-selected: var(--ub-text-link);
 
   /* charts (brief §2.1): series 1 is --ub-chart-1 */
   --ub-chart-grid: var(--ub-neutral-200);
@@ -213,6 +218,11 @@
   --ub-delta-up-text: var(--ub-tag-teal-text-dark);
   --ub-progress-track: var(--ub-border-default);           /* guide §2.7: track #2B3140 */
   --ub-toggle-off: var(--ub-border-control);               /* guide §4: off #5C6577 */
+  --ub-item-hover: var(--ub-action-ghost-hover);           /* menu/list rows: guide ghost white 8% */
+  --ub-border-muted: var(--ub-border-control);             /* guide §4 tracker upcoming outline #5C6577 */
+  --ub-danger-fill: var(--ub-danger-500);                  /* guide §4 tracker attention danger-500 */
+  --ub-avatar-ring: var(--ub-bg-canvas);                   /* guide §4 avatar: online dot with canvas-colour ring */
+  --ub-text-selected: var(--ub-blue-200);                  /* guide §2.3 selected: blue-200 label on blue-950 */
 
   /* icons */
   --ub-icon-default: var(--ub-text-secondary);             /* (derived) icons follow secondary text */

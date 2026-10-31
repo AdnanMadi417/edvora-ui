@@ -16,7 +16,7 @@ import { avatarInitials, focusRing, iconButtonSizes, menuItem, popover } from "c
 
 // Circular, borderless icon button for the top bar (bell, menu).
 const topBarIconButton = clsx(
-  "relative inline-grid shrink-0 place-items-center rounded-ub-full text-ub-icon transition-colors duration-ub-fast ease-ub-standard hover:bg-ub-surface hover:text-ub-icon-interactive",
+  "relative inline-grid shrink-0 place-items-center rounded-ub-full text-ub-icon transition-colors duration-ub-fast ease-ub-standard hover:bg-ub-nav-hover hover:text-ub-icon-interactive",
   iconButtonSizes.md,
   focusRing,
 );

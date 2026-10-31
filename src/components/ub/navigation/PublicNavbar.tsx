@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import clsx from "clsx";
 import { ArrowRight } from "lucide-react";
-import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
+import Logo from "components/ub/brand/Logo";
 import { buttonBase, buttonSizes, buttonVariants, focusRing } from "components/ub/recipes";
 
 const textLink = clsx(
@@ -32,14 +31,7 @@ export default function PublicNavbar() {
     >
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4 md:px-6">
         <Link href="/" className={clsx("shrink-0 rounded-ub-sm", focusRing)}>
-          <Image
-            src={logoImg}
-            alt="Unibexs"
-            width={110}
-            height={36}
-            className="object-contain dark:brightness-0 dark:invert"
-            priority
-          />
+          <Logo size={24} priority />
         </Link>
 
         <div className="flex items-center gap-2 sm:gap-4">

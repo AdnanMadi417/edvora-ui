@@ -55,6 +55,10 @@ const ubColors = {
   'brand-subtle': { bg: v('brand-subtle-bg'), text: v('brand-subtle-text') },
   'progress-track': v('progress-track'),
   'toggle-off': v('toggle-off'),
+  'item-hover': v('item-hover'),
+  'danger-fill': v('danger-fill'),
+  'avatar-ring': v('avatar-ring'),
+  'text-selected': v('text-selected'),
   // semantic roles
   canvas: v('bg-canvas'),
   surface: { DEFAULT: v('bg-surface'), subtle: v('bg-surface-subtle'), raised: v('bg-surface-raised') },
@@ -68,7 +72,7 @@ const ubColors = {
   'text-disabled': v('text-disabled'),
   'text-link': v('text-link'),
   'text-on-action': v('text-on-action'),
-  border: { DEFAULT: v('border-default'), control: v('border-control'), 'control-hover': v('border-control-hover'), focus: v('border-focus'), hover: v('border-interactive-hover'), overlay: v('border-overlay') },
+  border: { DEFAULT: v('border-default'), control: v('border-control'), 'control-hover': v('border-control-hover'), focus: v('border-focus'), hover: v('border-interactive-hover'), overlay: v('border-overlay'), muted: v('border-muted') },
   action: {
     primary: v('action-primary-bg'),
     'primary-hover': v('action-primary-bg-hover'),

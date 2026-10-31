@@ -23,7 +23,9 @@ export const buttonBase =
   "disabled:cursor-not-allowed disabled:border-transparent disabled:bg-ub-action-disabled-bg disabled:text-ub-action-disabled-text disabled:shadow-none";
 
 export const buttonVariants: Record<ButtonVariant, string> = {
-  primary: "bg-ub-action-primary text-ub-action-primary-text hover:bg-ub-action-primary-hover active:bg-ub-action-primary-pressed",
+  // Dark guide §2.4: hover keeps the fill and adds --ub-glow-action (none in light).
+  primary:
+    "bg-ub-action-primary text-ub-action-primary-text hover:bg-ub-action-primary-hover hover:shadow-ub-glow focus-visible:shadow-ub-glow active:bg-ub-action-primary-pressed",
   secondary:
     "border-ub-strong border-ub-action-secondary bg-ub-surface text-ub-action-secondary-text hover:bg-ub-action-secondary-hover hover:shadow-ub-xs active:bg-ub-action-secondary-pressed",
   tertiary: "text-ub-text-link hover:bg-ub-action-secondary-hover active:bg-ub-action-secondary-pressed",
@@ -94,7 +96,7 @@ export const searchField =
 
 // ── Tags and badges (brief §4.3): 6px radius, never pills ────────────────
 
-export type TagTone = "success" | "danger" | "warning" | "attention" | "info" | "neutral" | "brand";
+export type TagTone = "success" | "danger" | "warning" | "attention" | "info" | "neutral" | "brand" | "positive";
 
 export const tagBase = "inline-flex h-6 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-ub-sm border px-2 text-ub-label-sm";
 export const tagSm = "h-5 px-1.5";
@@ -109,6 +111,8 @@ export const tagTones: Record<TagTone, string> = {
   info: "border-ub-tone-info-border bg-ub-tone-info-bg text-ub-tone-info-text",
   neutral: "border-ub-tone-neutral-border bg-ub-tone-neutral-bg text-ub-tone-neutral-text",
   brand: "border-ub-tone-brand-border bg-ub-tone-brand-bg text-ub-tone-brand-text",
+  // KPI deltas: success in light, the teal dark pair in dark (guide §4 StatCard)
+  positive: "border-ub-delta-up-border bg-ub-delta-up-bg text-ub-delta-up-text",
 };
 
 /** Solid fills: white on 600 (success/danger/info/brand), navy on warning-500. */
@@ -120,6 +124,7 @@ export const tagSolidTones: Record<TagTone, string> = {
   info: "border-transparent bg-ub-info-600 text-ub-text-on-action",
   neutral: "border-transparent bg-ub-neutral-600 text-ub-text-on-action",
   brand: "border-transparent bg-ub-blue-600 text-ub-text-on-action",
+  positive: "border-transparent bg-ub-success-600 text-ub-text-on-action",
 };
 
 /** 6px status dot colour per tone. */
@@ -131,6 +136,7 @@ export const tagDot: Record<TagTone, string> = {
   info: "bg-ub-tone-info-dot",
   neutral: "bg-ub-tone-neutral-dot",
   brand: "bg-ub-tone-brand-dot",
+  positive: "bg-ub-tone-success-dot",
 };
 
 // ── Surfaces (brief §3, §4.4) ────────────────────────────────────────────
@@ -142,9 +148,10 @@ export const cardInteractive = `${transition} hover:border-ub-border-hover hover
 export const cardSelected = "border-2 border-ub-action-primary bg-ub-selected";
 
 /** Floating layers. */
-export const popover = "rounded-ub-lg border border-ub-border bg-ub-surface shadow-ub-md";
-export const menuItem = `flex h-10 w-full items-center gap-2 rounded-ub-md px-3 text-start text-ub-body-sm text-ub-text-primary ${transition} hover:bg-ub-surface-subtle ${focusRingInset}`;
-export const modalPanel = "rounded-ub-xl bg-ub-surface shadow-ub-xl";
+// Floating layers step one surface lighter, with a border; shadows are none in dark (guide §3).
+export const popover = "rounded-ub-lg border border-ub-border bg-ub-surface-raised shadow-ub-md";
+export const menuItem = `flex h-10 w-full items-center gap-2 rounded-ub-md px-3 text-start text-ub-body-sm text-ub-text-primary ${transition} hover:bg-ub-item-hover ${focusRingInset}`;
+export const modalPanel = "rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl";
 export const scrim = "bg-ub-scrim";
 
 /** Data table container (brief §4.6). */
@@ -158,12 +165,12 @@ export const tableCell = "h-14 px-4 text-ub-body-sm text-ub-text-primary";
 // ── Feedback (brief §4.7) ────────────────────────────────────────────────
 
 export const skeleton = "animate-pulse rounded-ub-md bg-ub-skeleton motion-reduce:animate-none";
-export const progressTrack = "h-2 w-full overflow-hidden rounded-ub-full bg-ub-disabled";
-export const progressFill = "h-full rounded-ub-full bg-ub-action-primary transition-[width] duration-ub-slow ease-ub-standard";
-export const tooltip = "pointer-events-none max-w-[280px] rounded-ub-md bg-ub-tooltip px-3 py-2 text-ub-body-sm text-white shadow-ub-md";
+export const progressTrack = "h-2 w-full overflow-hidden rounded-ub-full bg-ub-progress-track";
+export const progressFill = "h-full rounded-ub-full bg-ub-chart-1 transition-[width] duration-ub-slow ease-ub-standard";
+export const tooltip = "pointer-events-none max-w-[280px] rounded-ub-md border border-ub-border-overlay bg-ub-tooltip px-3 py-2 text-ub-body-sm text-white shadow-ub-md";
 
 /** Empty state: 32px icon in a 64px blue-50 circle, heading-md, one sentence. */
-export const emptyIconCircle = "grid h-16 w-16 place-items-center rounded-ub-full bg-ub-tone-brand-bg text-ub-icon-interactive";
+export const emptyIconCircle = "grid h-16 w-16 place-items-center rounded-ub-full bg-ub-brand-subtle-bg text-ub-icon-interactive";
 export const emptyTitle = "text-ub-heading-md text-ub-text-primary";
 export const emptyBody = "max-w-ub-reading text-ub-body-md text-ub-text-secondary";
 
@@ -181,10 +188,10 @@ export const alertTones: Record<"success" | "danger" | "warning" | "info", strin
 export const tabList = "flex gap-1 overflow-x-auto border-b border-ub-border";
 export const tab = (active: boolean) =>
   `-mb-px inline-flex h-11 shrink-0 items-center gap-2 border-b-2 px-3 text-ub-label-md ${transition} ${focusRingInset} ` +
-  (active ? "border-ub-border-focus text-ub-text-link" : "border-transparent text-ub-text-secondary hover:text-ub-text-primary");
+  (active ? "border-ub-border-focus text-ub-tab-active" : "border-transparent text-ub-text-secondary hover:text-ub-text-primary");
 
 /** Avatar initials: blue-700 on blue-50 (brief §4.7). */
-export const avatarInitials = "grid shrink-0 place-items-center overflow-hidden rounded-ub-full bg-ub-tone-brand-bg font-semibold text-ub-tone-brand-text";
+export const avatarInitials = "grid shrink-0 place-items-center overflow-hidden rounded-ub-full bg-ub-brand-subtle-bg font-semibold text-ub-brand-subtle-text";
 
 /** Icon tints for small icon badges (SectionIconBadge, stat cards). */
 export const iconTints = {

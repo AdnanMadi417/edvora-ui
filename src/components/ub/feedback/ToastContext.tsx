@@ -89,7 +89,7 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
               onMouseLeave={() => !t.exiting && schedule(t.id, t.type)}
               onFocus={() => clearTimer(t.id)}
               onBlur={() => !t.exiting && schedule(t.id, t.type)}
-              className={`pointer-events-auto flex w-[360px] max-w-[calc(100vw-2rem)] items-start gap-3 rounded-ub-lg bg-ub-toast px-4 py-3 text-white shadow-ub-lg ${
+              className={`pointer-events-auto flex w-[360px] max-w-[calc(100vw-2rem)] items-start gap-3 rounded-ub-lg border border-ub-border-overlay bg-ub-toast px-4 py-3 text-white shadow-ub-lg ${
                 t.exiting ? "ub-toast-out" : "ub-toast-in"
               }`}
             >

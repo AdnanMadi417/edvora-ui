@@ -56,7 +56,7 @@ function Sparkline({ points, label }: { points: number[]; label?: string }) {
     <svg
       viewBox="0 0 100 32"
       preserveAspectRatio="none"
-      className="mt-4 h-8 w-full text-ub-icon-interactive"
+      className="mt-4 h-8 w-full text-ub-chart-1"
       {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
     >
       <path d={`${d} L100,32 L0,32 Z`} className="fill-current opacity-10" />
@@ -85,7 +85,7 @@ export default function StatCard({ label, icon, value, delta, context, sparkline
   if (delta) {
     const dir = delta.value > 0 ? "up" : delta.value < 0 ? "down" : "neutral";
     const good = delta.goodWhen ?? "up";
-    const tone = dir === "neutral" ? "neutral" : dir === good ? "success" : "danger";
+    const tone = dir === "neutral" ? "neutral" : dir === good ? "positive" : "danger";
     const Icon = dir === "up" ? TrendingUp : dir === "down" ? TrendingDown : Minus;
     const words = dir === "up" ? "Up" : dir === "down" ? "Down" : "No change,";
     deltaTag = (
