@@ -59,6 +59,7 @@ const ubColors = {
   'danger-fill': v('danger-fill'),
   'avatar-ring': v('avatar-ring'),
   'text-selected': v('text-selected'),
+  'callout-border': v('callout-border'),
   // semantic roles
   canvas: v('bg-canvas'),
   surface: { DEFAULT: v('bg-surface'), subtle: v('bg-surface-subtle'), raised: v('bg-surface-raised') },

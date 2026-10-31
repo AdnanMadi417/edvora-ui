@@ -1,4 +1,4 @@
-import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2, Landmark, GraduationCap, Receipt } from "lucide-react";
+import { ClipboardList, BookOpen, Bell, Truck, UserPlus, Globe2, Landmark, GraduationCap, Receipt, Home } from "lucide-react";
 
 import type { IRoute } from "../types/navigation";
 import { FEATURES } from "../config/featureFlags";
@@ -12,6 +12,14 @@ export type PartnerVisibilityFlag = "agency" | "individual" | "agencyMember";
 const hideFor = (...flags: PartnerVisibilityFlag[]): string[] => flags;
 
 const partnerRoutes: IRoute[] = [
+  {
+    // Advisor home (brief §6): the Advisor's landing page.
+    name: "Home",
+    layout: "/partner",
+    path: "/home",
+    icon: Home,
+  },
+
   {
     // The mandatory partner onboarding tour (PartnerOnboardingTour.tsx) spotlights
     // this exact nav item via data-tour-id="notifications" as one of its fixed steps.

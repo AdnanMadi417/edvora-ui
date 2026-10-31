@@ -1,4 +1,5 @@
-import { redirect } from 'next/navigation';
-export default function Home({}) {
-  redirect('/partner/applications');
+import { redirect } from "next/navigation";
+
+export default function PartnerIndex() {
+  redirect("/partner/home");
 }

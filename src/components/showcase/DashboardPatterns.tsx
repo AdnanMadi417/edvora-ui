@@ -1,57 +1,14 @@
 "use client";
 
 import clsx from "clsx";
-import { BadgeDollarSign, Briefcase, FileText, GraduationCap, Plane, Plus, Search, UserPlus, Wallet, Award, Check } from "lucide-react";
-import Button from "components/ub/core/Button";
-import TextButton from "components/ub/core/TextButton";
-import StatCard from "components/ub/data/StatCard";
+import { Briefcase, Plane, Search, UserPlus, Wallet } from "lucide-react";
 import DaysTag from "components/ub/data/DaysTag";
-import PipelineBar from "components/ub/data/PipelineBar";
 import NotificationItem, { NotificationGroup } from "components/ub/feedback/NotificationItem";
-import CountBadge from "components/ub/data/CountBadge";
 import { Avatar } from "components/ub/data/Avatar";
 import { List, ListItem } from "components/ub/data/List";
-import ProgressBar from "components/ub/feedback/ProgressBar";
 import { card, cardInteractive, cardPadding, focusRing } from "components/ub/recipes";
+import AdvisorHomeScreen from "features/advisor-home/AdvisorHome";
 import { Demo, ShowcaseSection } from "./Showcase";
-
-const NEXT_ACTIONS = [
-  { student: "Nur Aisyah Binti Kamal", ref: "UBX-2026-0412", task: "Upload the signed offer letter", days: 1, mode: "deadline" as const, action: "Upload letter" },
-  { student: "Chinedu Okafor", ref: "UBX-2026-0413", task: "Pay the EMGS visa fee", days: 0, mode: "deadline" as const, action: "Pay fee" },
-  { student: "Tanvir Hossain", ref: "UBX-2026-0414", task: "Replace the blurred passport copy", days: 9, mode: "inStage" as const, action: "Replace file" },
-];
-
-// Pipeline counts per stage id from config/applicationStages.ts (brief §11.1: stages pending confirmation).
-const PIPELINE: Partial<Record<string, number>> = {
-  enquiry: 6,
-  "documents-pending": 4,
-  submitted: 3,
-  "institution-review": 5,
-  "offer-received": 3,
-  "visa-in-progress": 2,
-  "arrival-logistics": 1,
-  enrolled: 4,
-};
-
-const DEADLINES = [
-  { title: "Sunway University · September intake", detail: "Application deadline", days: 3 },
-  { title: "EMGS visa renewal · Sara Mahmoud", detail: "Passport expires before arrival", days: 12 },
-  { title: "Taylor's University · scholarship", detail: "Merit scholarship closes", days: 21 },
-];
-
-const ONBOARDING = [
-  { label: "Complete your Advisor profile", done: true },
-  { label: "Add your bank account", done: true },
-  { label: "Sign the Non-Compete Covenant", done: true },
-  { label: "Add your first student", done: false },
-  { label: "Join the Earners Circle", done: false },
-];
-
-const ACTIVITY = [
-  { who: "Sunway University", what: "sent an offer letter for Nur Aisyah Binti Kamal", when: "2 hours ago" },
-  { who: "Finance team", what: "paid RM4,200 commission for UBX-2026-0398", when: "Yesterday" },
-  { who: "You", what: "submitted Chinedu Okafor to Taylor's University", when: "27 Oct 2026" },
-];
 
 const NOTIFICATIONS: { group: string; items: { title: string; next: string; time: string; unread: boolean }[] }[] = [
   {
@@ -90,92 +47,6 @@ function Panel({ title, action, children, className }: { title: string; action?:
   );
 }
 
-function AdvisorHome() {
-  const done = ONBOARDING.filter((s) => s.done).length;
-  return (
-    <div className="ub-canvas-light space-y-6 rounded-ub-xl p-4 md:p-6">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-ub-body-sm text-ub-text-tertiary">Thursday, 29 Oct 2026</p>
-          <h3 className="text-ub-display-md-mobile text-ub-text-primary sm:text-ub-display-md">Good morning, Nur Aisyah</h3>
-          <p className="mt-1 text-ub-body-lg text-ub-text-secondary">
-            <span className="ub-tabular font-semibold text-ub-text-primary">3</span> applications need your action today.
-          </p>
-        </div>
-        <Button variant="primary" text="Add student" icon={<Plus className="h-4 w-4" />} />
-      </header>
-
-      <Panel title="Next actions" action={<CountBadge count={NEXT_ACTIONS.length} tone="danger" label={(n) => `${n} actions due`} />}>
-        <List aria-label="Next actions">
-          {NEXT_ACTIONS.map((a) => (
-            <ListItem
-              key={a.ref}
-              leading={<Avatar name={a.student} size={40} />}
-              title={a.task}
-              description={
-                <span>
-                  {a.student} · <span className="ub-ref">{a.ref}</span>
-                </span>
-              }
-              meta={<DaysTag mode={a.mode} days={a.days} />}
-              trailing={<Button size="sm" text={a.action} />}
-            />
-          ))}
-        </List>
-      </Panel>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Active applications" icon={<FileText className="h-5 w-5" />} value="24" delta={{ value: 3, unit: "" }} context="vs last month" sparkline={[14, 16, 15, 18, 20, 21, 24]} />
-        <StatCard label="Offers this intake" icon={<Award className="h-5 w-5" />} value="6" delta={{ value: 20 }} context="vs last intake" />
-        <StatCard label="Commission pending" icon={<BadgeDollarSign className="h-5 w-5" />} value="RM12,400" delta={{ value: -8 }} context="vs last month" />
-        <StatCard label="Placed this year" icon={<GraduationCap className="h-5 w-5" />} value="18" delta={{ value: 12 }} context="vs 2025" sparkline={[4, 6, 9, 11, 13, 16, 18]} />
-      </div>
-
-      <Panel title="Pipeline" action={<TextButton size="sm" href="#dashboard">Open Application Tracker</TextButton>}>
-        <PipelineBar counts={PIPELINE} />
-      </Panel>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Panel title="Upcoming deadlines">
-          <List aria-label="Upcoming deadlines" dense>
-            {DEADLINES.map((d) => (
-              <ListItem key={d.title} title={d.title} description={d.detail} meta={<DaysTag mode="deadline" days={d.days} />} />
-            ))}
-          </List>
-        </Panel>
-
-        <Panel title="Finish setting up" action={<span className="ub-tabular text-ub-label-md text-ub-text-secondary">{done} of 5</span>}>
-          <ProgressBar value={done} max={5} label="Onboarding progress" />
-          <ul className="mt-4 space-y-2">
-            {ONBOARDING.map((s) => (
-              <li key={s.label} className="flex items-center gap-3 text-ub-body-sm">
-                <span className={clsx("grid h-5 w-5 shrink-0 place-items-center rounded-ub-full", s.done ? "bg-ub-action-primary text-ub-action-primary-text" : "border border-ub-border-control")}>
-                  {s.done && <Check className="h-3 w-3" aria-hidden />}
-                </span>
-                <span className={s.done ? "text-ub-text-tertiary" : "text-ub-text-primary"}>
-                  {s.label}
-                  <span className="sr-only">{s.done ? " (done)" : " (to do)"}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-          <TextButton className="mt-4" trailingIcon="arrow-right">
-            Continue setup
-          </TextButton>
-        </Panel>
-      </div>
-
-      <Panel title="Recent activity">
-        <List aria-label="Recent activity" dense>
-          {ACTIVITY.map((a) => (
-            <ListItem key={a.what} leading={<Avatar name={a.who} size={32} />} title={<span><span className="font-semibold">{a.who}</span> {a.what}</span>} meta={<span className="text-ub-caption text-ub-text-tertiary">{a.when}</span>} />
-          ))}
-        </List>
-      </Panel>
-    </div>
-  );
-}
-
 export default function DashboardPatterns() {
   return (
     <ShowcaseSection
@@ -184,8 +55,10 @@ export default function DashboardPatterns() {
       title="Dashboard patterns"
       description="Building blocks of the Advisor and admin dashboards, assembled from the components above. The Advisor home follows the brief: next actions first, one Primary action, glass stat cards, the pipeline by stage color."
     >
-      <Demo name="Advisor home" path="docs/unibexs-frontend-redesign-brief.md" description="Brief §6: greeting with today's date and the actions count, next actions with a Days tag and one button each, four stat cards, pipeline, deadlines, onboarding and recent activity.">
-        <AdvisorHome />
+      <Demo name="Advisor home" path="docs/unibexs-frontend-redesign-brief.md" description="The live Advisor home (features/advisor-home, page /partner/home): four glass stat cards, then next actions, deadlines, pipeline, onboarding and recent activity on solid surfaces. Switch the theme to compare with the dark reference.">
+        <div className="ub-canvas-light rounded-ub-xl p-4 md:p-6">
+          <AdvisorHomeScreen headingLevel={2} />
+        </div>
       </Demo>
 
       <Demo name="Notifications feed" path="components/ub/feedback/NotificationItem.tsx" description="Each item states the event, then the next step. Unread items show an 8px blue dot. Grouped into Today, This week and Earlier.">

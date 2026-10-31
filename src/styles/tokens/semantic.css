@@ -103,6 +103,7 @@
   --ub-danger-fill: var(--ub-danger-600);
   --ub-avatar-ring: var(--ub-bg-surface);
   --ub-text-selected: var(--ub-text-link);
+  --ub-callout-border: var(--ub-blue-200);
 
   /* charts (brief §2.1): series 1 is --ub-chart-1 */
   --ub-chart-grid: var(--ub-neutral-200);
@@ -223,6 +224,7 @@
   --ub-danger-fill: var(--ub-danger-500);                  /* guide §4 tracker attention danger-500 */
   --ub-avatar-ring: var(--ub-bg-canvas);                   /* guide §4 avatar: online dot with canvas-colour ring */
   --ub-text-selected: var(--ub-blue-200);                  /* guide §2.3 selected: blue-200 label on blue-950 */
+  --ub-callout-border: color-mix(in srgb, var(--ub-blue-300) 25%, transparent); /* guide §4 callout */
 
   /* icons */
   --ub-icon-default: var(--ub-text-secondary);             /* (derived) icons follow secondary text */
