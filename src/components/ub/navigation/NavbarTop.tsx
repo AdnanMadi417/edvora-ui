@@ -11,7 +11,7 @@ import { useUnreadCount } from "features/notifications/hooks";
 import NotificationsPreviewPopover from "features/notifications/components/NotificationsPreviewPopover";
 import { usePartnerProfile } from "features/partners/hooks";
 import PresignedImage from "components/ub/data/PresignedImage";
-import ThemeToggle from "components/theme/ThemeToggle";
+import ThemeSwitcher from "components/theme/ThemeSwitcher";
 import { avatarInitials, focusRing, iconButtonSizes, menuItem, popover } from "components/ub/recipes";
 
 // Circular, borderless icon button for the top bar (bell, menu).
@@ -114,7 +114,6 @@ const Navbar = ({
           </Link>
         </NotificationsPreviewPopover>
 
-        <ThemeToggle className="border-transparent bg-transparent hover:bg-ub-surface" />
 
         <AvatarMenu
           loading={loading}
@@ -151,7 +150,7 @@ function AvatarMenu({
 
   useEffect(() => {
     if (!menuOpen) return;
-    wrapperRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();
+    wrapperRef.current?.querySelector<HTMLElement>('[role="menuitem"], [role="menuitemradio"]')?.focus();
     const onPointerDown = (e: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) setMenuOpen(false);
     };
@@ -173,7 +172,7 @@ function AvatarMenu({
   const onMenuKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
     e.preventDefault();
-    const items = Array.from(e.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]'));
+    const items = Array.from(e.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"], [role="menuitemradio"]'));
     const i = items.indexOf(document.activeElement as HTMLElement);
     const next = e.key === "ArrowDown" ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
     items[next]?.focus();
@@ -215,6 +214,13 @@ function AvatarMenu({
             <Repeat className="h-4 w-4 text-ub-icon" aria-hidden />
             <span>Switch area</span>
           </Link>
+          <div className="my-1 border-t border-ub-border" role="separator" />
+          <div className="px-3 pb-1.5 pt-1">
+            <p className="mb-1.5 text-ub-label-sm text-ub-text-tertiary" aria-hidden>
+              Theme
+            </p>
+            <ThemeSwitcher variant="menu" />
+          </div>
         </div>
       )}
     </div>

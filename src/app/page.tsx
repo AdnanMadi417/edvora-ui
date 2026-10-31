@@ -1,7 +1,7 @@
 import Link from "next/link";
 import clsx from "clsx";
 import { ChevronRight } from "lucide-react";
-import ThemeToggle from "components/theme/ThemeToggle";
+import ThemeSwitcher from "components/theme/ThemeSwitcher";
 import { card, cardInteractive, focusRing } from "components/ub/recipes";
 
 // UI-only mode: no sign-in. Each area runs as a mock user of its role
@@ -17,7 +17,7 @@ const AREAS = [
 export default function Home() {
   return (
     <main className="ub-canvas-light relative flex min-h-screen items-center justify-center px-4 py-16 text-ub-text-primary">
-      <ThemeToggle className="absolute end-4 top-4 md:end-6 md:top-6" />
+      <ThemeSwitcher className="absolute end-4 top-4 w-64 md:end-6 md:top-6" />
       <div className="ub-glass-light-strong w-full max-w-sm rounded-ub-xl p-6 md:p-8">
         <h1 className="text-ub-heading-lg text-ub-text-primary">Choose an area</h1>
         <p className="mt-1 text-ub-body-sm text-ub-text-secondary">UI preview. No sign-in required.</p>

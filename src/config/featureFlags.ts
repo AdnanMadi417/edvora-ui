@@ -21,8 +21,9 @@ export const FEATURES = {
    *  management screens are a separate feature and stay enabled. */
   partnerUniversities: enabled(process.env.NEXT_PUBLIC_ENABLE_PARTNER_UNIVERSITIES),
 
-  /** Dark theme and its toggle. Off: the app always renders light and the
-   *  toggle is hidden. The dark colors themselves live in one block in
-   *  src/styles/tokens/primitives.css ("Dark theme palette"). */
-  darkMode: enabled(process.env.NEXT_PUBLIC_ENABLE_DARK_MODE),
+  /** Near-black dark mode (docs/unibexs-dark-mode-guide.md). ON unless
+   *  NEXT_PUBLIC_ENABLE_DARK_MODE is "false" — a kill switch while the guide
+   *  awaits Brand sign-off. Off: everything renders light and the Light /
+   *  Dark / System switch is hidden. Colors live in src/styles/tokens/semantic.css. */
+  darkMode: process.env.NEXT_PUBLIC_ENABLE_DARK_MODE !== "false",
 };

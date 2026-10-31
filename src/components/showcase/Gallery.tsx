@@ -5,6 +5,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { Languages } from "lucide-react";
 import { ToastProvider } from "components/ub/feedback/ToastContext";
+import ThemeSwitcher from "components/theme/ThemeSwitcher";
 import ThemeToggle from "components/theme/ThemeToggle";
 import { buttonBase, buttonSizes, buttonVariants, focusRing, focusRingInset } from "components/ub/recipes";
 import { SECTIONS } from "./sections";
@@ -84,7 +85,8 @@ export default function Gallery() {
                 <Languages className="h-4 w-4" aria-hidden />
                 {dir === "ltr" ? "RTL" : "LTR"}
               </button>
-              <ThemeToggle />
+              <ThemeSwitcher className="hidden w-64 md:grid" />
+              <ThemeToggle className="md:hidden" />
               <Link href="/" className={clsx(buttonBase, buttonVariants.primary, buttonSizes.sm, "hidden sm:inline-flex")}>
                 Open the portal
               </Link>

@@ -1,5 +1,6 @@
 'use client';
 import React, { ReactNode, useEffect } from 'react';
+import ThemeProvider from 'components/theme/ThemeProvider';
 import 'styles/App.css';
 import 'styles/Contact.css';
 // import '@asseinfo/react-kanban/dist/styles.css';
@@ -20,5 +21,5 @@ export default function AppWrappers({ children }: { children: ReactNode }) {
     return () => document.removeEventListener('wheel', handler);
   }, []);
 
-  return <React.Fragment>{children}</React.Fragment>;
+  return <ThemeProvider>{children}</ThemeProvider>;
 }
