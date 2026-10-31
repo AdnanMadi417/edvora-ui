@@ -46,7 +46,7 @@ export default function SegmentedToggleField({
     >
       <span
         aria-hidden="true"
-        className={`absolute inset-y-1 start-1 w-[calc(50%-4px)] rounded-ub-full border border-ub-border bg-ub-surface shadow-ub-xs transition-transform duration-ub-base ease-ub-standard motion-reduce:transition-none dark:bg-ub-selected ${
+        className={`absolute inset-y-1 start-1 w-[calc(50%-4px)] rounded-ub-full border border-ub-border bg-ub-surface-raised shadow-ub-xs transition-transform duration-ub-base ease-ub-standard motion-reduce:transition-none ${
           active ? "translate-x-full rtl:-translate-x-full" : "translate-x-0"
         }`}
       />

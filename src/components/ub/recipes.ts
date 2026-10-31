@@ -79,7 +79,7 @@ export const optionCardSelected = "border-2 border-ub-action-primary bg-ub-selec
 
 /** 40×24 toggle track + 20px thumb (brief §4.2). */
 export const toggleTrack = (on: boolean) =>
-  `relative inline-flex h-6 w-10 shrink-0 items-center rounded-ub-full ${transition} ${focusRing} ${on ? "bg-ub-action-primary" : "bg-ub-neutral-300 dark:bg-ub-border-control"}`;
+  `relative inline-flex h-6 w-10 shrink-0 items-center rounded-ub-full ${transition} ${focusRing} ${on ? "bg-ub-action-primary" : "bg-ub-toggle-off"}`;
 export const toggleThumb = (on: boolean) =>
   `inline-block h-5 w-5 rounded-ub-full bg-white shadow-ub-sm transition-transform duration-ub-fast ease-ub-standard ${on ? "translate-x-[18px] rtl:-translate-x-[18px]" : "translate-x-0.5 rtl:-translate-x-0.5"}`;
 

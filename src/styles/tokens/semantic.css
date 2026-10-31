@@ -97,6 +97,7 @@
   --ub-delta-up-border: var(--ub-success-border);
   --ub-delta-up-text: var(--ub-success-text);
   --ub-progress-track: var(--ub-bg-disabled);
+  --ub-toggle-off: var(--ub-neutral-300);
 
   /* charts (brief §2.1): series 1 is --ub-chart-1 */
   --ub-chart-grid: var(--ub-neutral-200);
@@ -211,6 +212,7 @@
   --ub-delta-up-border: color-mix(in srgb, var(--ub-tag-teal-solid) 40%, transparent);
   --ub-delta-up-text: var(--ub-tag-teal-text-dark);
   --ub-progress-track: var(--ub-border-default);           /* guide §2.7: track #2B3140 */
+  --ub-toggle-off: var(--ub-border-control);               /* guide §4: off #5C6577 */
 
   /* icons */
   --ub-icon-default: var(--ub-text-secondary);             /* (derived) icons follow secondary text */

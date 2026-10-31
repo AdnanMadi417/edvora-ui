@@ -49,7 +49,7 @@ const RADIUS_SHEET: Record<NotchSize, string> = { sm: "rounded-none sm:rounded-u
 const FILL: Record<NotchedCardFill, { body: string; stroke?: string }> = {
   surface: { body: "bg-ub-surface text-ub-text-primary", stroke: "text-ub-border" },
   brand: { body: "bg-ub-blue-600 text-ub-text-on-action" },
-  navy: { body: "bg-ub-navy text-ub-text-on-action dark:bg-ub-navy-surface-1", stroke: "text-ub-navy-border" },
+  navy: { body: "bg-ub-navy text-ub-text-on-action", stroke: "text-ub-navy-border" },
 };
 
 // Navy-tinted drop-shadow, from the deep-navy token (no raw colour).

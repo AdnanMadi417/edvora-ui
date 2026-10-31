@@ -26,12 +26,13 @@ const ubColors = {
   'navy-canvas': v('navy-canvas'),
   'navy-surface': { 1: v('navy-surface-1'), 2: v('navy-surface-2'), 3: v('navy-surface-3') },
   'navy-border': { DEFAULT: v('navy-border'), strong: v('navy-border-strong') },
-  success: semantic('success'),
-  warning: semantic('warning'),
-  danger: semantic('danger'),
-  info: semantic('info'),
+  // status scales plus the theme-aware bg / border / text roles (dark guide §2.5)
+  success: { ...semantic('success'), bg: v('success-bg'), border: v('success-border'), text: v('success-text') },
+  warning: { ...semantic('warning'), bg: v('warning-bg'), border: v('warning-border'), text: v('warning-text') },
+  danger: { ...semantic('danger'), bg: v('danger-bg'), border: v('danger-border'), text: v('danger-text') },
+  info: { ...semantic('info'), bg: v('info-bg'), border: v('info-border'), text: v('info-text') },
   tag: Object.fromEntries(['sky', 'indigo', 'orange', 'plum', 'amber', 'red', 'pink', 'teal', 'grey'].map((h) => [h, tagHue(h)])),
-  chart: scale('chart', [1, 2, 3, 4, 5, 6, 7, 8]),
+  chart: { ...scale('chart', [1, 2, 3, 4, 5, 6, 7, 8]), grid: v('chart-grid') },
   // Theme-aware tints: bg-ub-tone-success-bg, text-ub-tone-success-text, …
   tone: Object.fromEntries(
     ['success', 'danger', 'warning', 'info', 'brand', 'attention', 'neutral', 'plum', 'teal', 'pink', 'sky'].map((t) => [
@@ -42,6 +43,18 @@ const ubColors = {
   'table-head': v('bg-table-head'),
   tooltip: v('bg-tooltip'),
   toast: v('bg-toast'),
+  overlay: v('bg-overlay'),
+  modal: v('bg-modal'),
+  glass: { bg: v('glass-dark-bg'), border: v('glass-dark-border') },
+  // component roles (dark guide §4)
+  'nav-hover': v('nav-hover'),
+  'row-hover': v('row-hover'),
+  'tab-active': v('tab-active-text'),
+  count: { bg: v('count-bg'), border: v('count-border'), text: v('count-text') },
+  'delta-up': { bg: v('delta-up-bg'), border: v('delta-up-border'), text: v('delta-up-text') },
+  'brand-subtle': { bg: v('brand-subtle-bg'), text: v('brand-subtle-text') },
+  'progress-track': v('progress-track'),
+  'toggle-off': v('toggle-off'),
   // semantic roles
   canvas: v('bg-canvas'),
   surface: { DEFAULT: v('bg-surface'), subtle: v('bg-surface-subtle'), raised: v('bg-surface-raised') },
@@ -55,7 +68,7 @@ const ubColors = {
   'text-disabled': v('text-disabled'),
   'text-link': v('text-link'),
   'text-on-action': v('text-on-action'),
-  border: { DEFAULT: v('border-default'), control: v('border-control'), 'control-hover': v('border-control-hover'), focus: v('border-focus'), hover: v('border-interactive-hover') },
+  border: { DEFAULT: v('border-default'), control: v('border-control'), 'control-hover': v('border-control-hover'), focus: v('border-focus'), hover: v('border-interactive-hover'), overlay: v('border-overlay') },
   action: {
     primary: v('action-primary-bg'),
     'primary-hover': v('action-primary-bg-hover'),
@@ -65,6 +78,8 @@ const ubColors = {
     'secondary-text': v('action-secondary-text'),
     'secondary-hover': v('action-secondary-bg-hover'),
     'secondary-pressed': v('action-secondary-bg-pressed'),
+    'ghost-hover': v('action-ghost-hover'),
+    'ghost-pressed': v('action-ghost-pressed'),
     inverse: v('action-inverse-bg'),
     'inverse-hover': v('action-inverse-bg-hover'),
     'inverse-text': v('action-inverse-text'),
@@ -99,9 +114,10 @@ const ubType = {
 const prefixed = (obj) => Object.fromEntries(Object.entries(obj).map(([k, val]) => [`ub-${k}`, val]));
 
 module.exports = {
-  // One theme switch for the app: data-ub-theme="dark" on <html> (or on a
-  // section) flips both the --ub-* tokens and Tailwind's dark: variant.
-  darkMode: ['variant', '&:is([data-ub-theme="dark"], [data-ub-theme="dark"] *)'],
+  // One theme switch for the app: data-ub-theme="dark" on <html> (set by
+  // next-themes) or on a section flips the --ub-* tokens and Tailwind's dark:
+  // variant. Components should rarely need dark: — tokens do the switching.
+  darkMode: ['selector', '[data-ub-theme="dark"]'],
   content: [
     './app/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',

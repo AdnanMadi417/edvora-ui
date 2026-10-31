@@ -6,22 +6,23 @@ export type TagHue = "sky" | "indigo" | "orange" | "plum" | "amber" | "red" | "p
 export type TagSize = "md" | "sm";
 export type TagVariant = "tinted" | "solid";
 
-// Hue tags: light uses the tag tokens directly; dark swaps to the *-dark
-// tokens and a 35% text-tinted border (same recipe as the dark tone tokens).
+// Hue tags read the tag tokens directly. In the dark theme those tokens swap
+// to the v1.1 dark pairs with a 40% solid-hue border (semantic.css), so no
+// dark: classes are needed here.
 // Written out in full so Tailwind's JIT sees every class.
 export const tagHueTones: Record<TagHue, string> = {
-  sky: "border-ub-tag-sky-border bg-ub-tag-sky-bg text-ub-tag-sky-text dark:border-[color:color-mix(in_srgb,var(--ub-tag-sky-text-dark)_35%,transparent)] dark:bg-ub-tag-sky-bg-dark dark:text-ub-tag-sky-text-dark",
+  sky: "border-ub-tag-sky-border bg-ub-tag-sky-bg text-ub-tag-sky-text",
   indigo:
-    "border-ub-tag-indigo-border bg-ub-tag-indigo-bg text-ub-tag-indigo-text dark:border-[color:color-mix(in_srgb,var(--ub-tag-indigo-text-dark)_35%,transparent)] dark:bg-ub-tag-indigo-bg-dark dark:text-ub-tag-indigo-text-dark",
+    "border-ub-tag-indigo-border bg-ub-tag-indigo-bg text-ub-tag-indigo-text",
   orange:
-    "border-ub-tag-orange-border bg-ub-tag-orange-bg text-ub-tag-orange-text dark:border-[color:color-mix(in_srgb,var(--ub-tag-orange-text-dark)_35%,transparent)] dark:bg-ub-tag-orange-bg-dark dark:text-ub-tag-orange-text-dark",
-  plum: "border-ub-tag-plum-border bg-ub-tag-plum-bg text-ub-tag-plum-text dark:border-[color:color-mix(in_srgb,var(--ub-tag-plum-text-dark)_35%,transparent)] dark:bg-ub-tag-plum-bg-dark dark:text-ub-tag-plum-text-dark",
+    "border-ub-tag-orange-border bg-ub-tag-orange-bg text-ub-tag-orange-text",
+  plum: "border-ub-tag-plum-border bg-ub-tag-plum-bg text-ub-tag-plum-text",
   amber:
-    "border-ub-tag-amber-border bg-ub-tag-amber-bg text-ub-tag-amber-text dark:border-[color:color-mix(in_srgb,var(--ub-tag-amber-text-dark)_35%,transparent)] dark:bg-ub-tag-amber-bg-dark dark:text-ub-tag-amber-text-dark",
-  red: "border-ub-tag-red-border bg-ub-tag-red-bg text-ub-tag-red-text dark:border-[color:color-mix(in_srgb,var(--ub-tag-red-text-dark)_35%,transparent)] dark:bg-ub-tag-red-bg-dark dark:text-ub-tag-red-text-dark",
-  pink: "border-ub-tag-pink-border bg-ub-tag-pink-bg text-ub-tag-pink-text dark:border-[color:color-mix(in_srgb,var(--ub-tag-pink-text-dark)_35%,transparent)] dark:bg-ub-tag-pink-bg-dark dark:text-ub-tag-pink-text-dark",
-  teal: "border-ub-tag-teal-border bg-ub-tag-teal-bg text-ub-tag-teal-text dark:border-[color:color-mix(in_srgb,var(--ub-tag-teal-text-dark)_35%,transparent)] dark:bg-ub-tag-teal-bg-dark dark:text-ub-tag-teal-text-dark",
-  grey: "border-ub-tag-grey-border bg-ub-tag-grey-bg text-ub-tag-grey-text dark:border-[color:color-mix(in_srgb,var(--ub-tag-grey-text-dark)_35%,transparent)] dark:bg-ub-tag-grey-bg-dark dark:text-ub-tag-grey-text-dark",
+    "border-ub-tag-amber-border bg-ub-tag-amber-bg text-ub-tag-amber-text",
+  red: "border-ub-tag-red-border bg-ub-tag-red-bg text-ub-tag-red-text",
+  pink: "border-ub-tag-pink-border bg-ub-tag-pink-bg text-ub-tag-pink-text",
+  teal: "border-ub-tag-teal-border bg-ub-tag-teal-bg text-ub-tag-teal-text",
+  grey: "border-ub-tag-grey-border bg-ub-tag-grey-bg text-ub-tag-grey-text",
 };
 
 /** Solid hue fills. Navy text except on the two hues dark enough for white (≥ 4.5:1). */
