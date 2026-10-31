@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 import { Circle, Menu } from "lucide-react";
@@ -10,6 +10,7 @@ import { focusRing } from "components/ub/recipes";
 import Sidebar, { SIDEBAR_ID } from "./Sidebar";
 import Navbar from "./NavbarTop";
 import Footer from "./Footer";
+import Loading from "components/ub/feedback/Loading";
 import NavbarBottom, { type NavbarBottomItem } from "./NavbarBottom";
 
 export interface AppShellProps {
@@ -63,7 +64,8 @@ export default function AppShell({ routes, children, bottomNavItems }: AppShellP
       <div className="relative flex min-h-screen w-full min-w-0 flex-col transition-[margin] duration-ub-slow ease-ub-standard motion-reduce:transition-none xl:ms-[var(--ub-sidebar-w)]">
         <Navbar onOpenSidenav={() => setOpen((o) => !o)} brandText={getActiveRoute(routes, pathname)} secondary={getActiveNavbar(routes, pathname)} open={open} setOpen={setOpen} />
         <main id="main" tabIndex={-1} className="w-full flex-1 p-4 pb-24 focus:outline-none md:p-6 lg:p-8">
-          {children}
+          {/* Pages that read useSearchParams() need a boundary to prerender (Next.js). */}
+          <Suspense fallback={<Loading />}>{children}</Suspense>
         </main>
         <div className="px-4 pb-20 md:px-6 md:pb-0 lg:px-8">
           <Footer />
