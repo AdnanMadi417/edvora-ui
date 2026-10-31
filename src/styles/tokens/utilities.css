@@ -80,6 +80,8 @@
   [data-ub-theme="dark"] .ub-glass-light,
   [data-ub-theme="dark"] .ub-glass-light-strong {
     background: var(--ub-bg-surface-raised);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
   .ub-glass {
     background: var(--ub-navy-surface-2);

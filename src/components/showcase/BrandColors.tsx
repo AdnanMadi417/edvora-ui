@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { Check, X } from "lucide-react";
 import { Demo, Pick, ShowcaseSection } from "./Showcase";
 import NewBrand from "./NewBrand";
+import ContrastCheck from "./ContrastCheck";
 
 // ── Live token values + WCAG contrast (brief §7.2: computed, never hard-coded) ──
 
@@ -249,6 +250,9 @@ export default function BrandColors() {
             );
           })}
         </ul>
+      </Demo>
+      <Demo name="Contrast check (live)" path="components/showcase/ContrastCheck.tsx" description="Every text/background pair and UI boundary, computed from the rendered tokens in the current theme. Switch the theme in the header to audit dark. Text needs 4.5:1, UI boundaries 3:1; disabled text is exempt.">
+        <ContrastCheck />
       </Demo>
     </ShowcaseSection>
   );
