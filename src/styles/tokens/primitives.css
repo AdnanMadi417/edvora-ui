@@ -46,19 +46,6 @@
   --ub-navy-border: #253857;
   --ub-navy-border-strong: #5a7092;
 
-  /* Dark theme palette — the ONLY place dark-mode colors are defined.
-     Every dark surface, border and canvas reads from these six values.
-     Defaults follow the brief (Night Blue). To retheme dark mode, e.g. to
-     true black, change just these lines (e.g. canvas #000000, surface-1
-     #0a0a0a, surface-2 #141414, surface-3 #1f1f1f, border #2a2a2a,
-     border-strong #525252). */
-  --ub-dark-canvas: var(--ub-navy-canvas);
-  --ub-dark-surface-1: var(--ub-navy-surface-1);
-  --ub-dark-surface-2: var(--ub-navy-surface-2);
-  --ub-dark-surface-3: var(--ub-navy-surface-3);
-  --ub-dark-border: var(--ub-navy-border);
-  --ub-dark-border-strong: var(--ub-navy-border-strong);
-
   /* Semantic colors: 50 bg · 200 border · 500 indicator · 600 fill · 700 text · 800 */
   --ub-success-50: #ecf9ee;
   --ub-success-200: #b8e5c0;

@@ -16,11 +16,11 @@
     radial-gradient(900px 500px at 100% 0%, rgba(99, 148, 250, 0.1), transparent 60%);
 }
 
-/* In the dark theme the product canvas becomes Night Blue with a faint glow. */
+/* Dark mode canvas: near-black with one faint blue radial wash at the top (dark guide §2.1). */
 [data-ub-theme="dark"] .ub-canvas-light,
 .ub-canvas-light[data-ub-theme="dark"] {
-  background-color: var(--ub-dark-canvas);
-  background-image: radial-gradient(1200px 600px at 0% 0%, rgba(3, 72, 209, 0.22), transparent 60%);
+  background-color: var(--ub-bg-canvas);
+  background-image: radial-gradient(1200px 480px at 50% 0%, rgba(53, 111, 237, 0.1), transparent 70%);
 }
 
 /* Light glass: chrome and summaries only */
@@ -38,14 +38,14 @@
   background: rgba(255, 255, 255, 0.82);
 }
 
-/* Light glass becomes dark glass in the dark theme (brief §3.3). */
+/* Dark mode: the same chrome becomes dark glass — white 4%, border white 8%,
+   24px blur, no shadow (dark guide §2.1, §3). Sidebar, top bar, stat cards only. */
 [data-ub-theme="dark"] .ub-glass-light,
 [data-ub-theme="dark"] .ub-glass-light-strong {
-  background: rgba(255, 255, 255, 0.06);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-[data-ub-theme="dark"] .ub-glass-light-strong {
-  background: color-mix(in srgb, var(--ub-dark-surface-1) 85%, transparent);
+  background: var(--ub-glass-dark-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 0 0 1px var(--ub-glass-dark-border);
 }
 
 /* Dark glass: dark sections only, never on data tables */
@@ -61,6 +61,10 @@
   .ub-glass-light-strong {
     background: #ffffff;
   }
+  [data-ub-theme="dark"] .ub-glass-light,
+  [data-ub-theme="dark"] .ub-glass-light-strong {
+    background: var(--ub-bg-surface-raised);
+  }
   .ub-glass {
     background: var(--ub-navy-surface-2);
   }
@@ -71,6 +75,11 @@
     background: #ffffff;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+  }
+  /* dark guide §3: glass falls back to the raised surface */
+  [data-ub-theme="dark"] .ub-glass-light,
+  [data-ub-theme="dark"] .ub-glass-light-strong {
+    background: var(--ub-bg-surface-raised);
   }
   .ub-glass {
     background: var(--ub-navy-surface-2);

@@ -19,7 +19,7 @@
 }
 [data-ub-theme="dark"] .bg-slate-200,
 [data-ub-theme="dark"] .bg-slate-300 {
-  background-color: var(--ub-dark-surface-3);
+  background-color: var(--ub-bg-overlay);
 }
 
 [data-ub-theme="dark"] .text-slate-900,
@@ -72,4 +72,19 @@
 [data-ub-theme="dark"] .hover\:text-blue-700:hover,
 [data-ub-theme="dark"] .hover\:text-blue-800:hover {
   color: var(--ub-text-link);
+}
+
+/* Dark guide §3: elevation is a lighter surface + 1px border, never a shadow. */
+[data-ub-theme="dark"] .shadow,
+[data-ub-theme="dark"] .shadow-sm,
+[data-ub-theme="dark"] .shadow-md,
+[data-ub-theme="dark"] .shadow-lg,
+[data-ub-theme="dark"] .shadow-xl,
+[data-ub-theme="dark"] .shadow-2xl,
+[data-ub-theme="dark"] .shadow-3xl,
+[data-ub-theme="dark"] .hover\:shadow-sm:hover,
+[data-ub-theme="dark"] .hover\:shadow-md:hover,
+[data-ub-theme="dark"] .hover\:shadow-lg:hover {
+  --tw-shadow: 0 0 #0000;
+  box-shadow: none;
 }
