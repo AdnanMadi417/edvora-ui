@@ -6,12 +6,12 @@ import Button from "components/ub/core/Button";
 import TextButton from "components/ub/core/TextButton";
 import StatCard from "components/ub/data/StatCard";
 import DaysTag from "components/ub/data/DaysTag";
-import Tag from "components/ub/data/Tag";
+import PipelineBar from "components/ub/data/PipelineBar";
+import NotificationItem, { NotificationGroup } from "components/ub/feedback/NotificationItem";
 import CountBadge from "components/ub/data/CountBadge";
 import { Avatar } from "components/ub/data/Avatar";
 import { List, ListItem } from "components/ub/data/List";
 import ProgressBar from "components/ub/feedback/ProgressBar";
-import { APPLICATION_STAGES } from "config/applicationStages";
 import { card, cardInteractive, cardPadding, focusRing } from "components/ub/recipes";
 import { Demo, ShowcaseSection } from "./Showcase";
 
@@ -22,7 +22,7 @@ const NEXT_ACTIONS = [
 ];
 
 // Pipeline counts per stage id from config/applicationStages.ts (brief §11.1: stages pending confirmation).
-const PIPELINE: Record<string, number> = {
+const PIPELINE: Partial<Record<string, number>> = {
   enquiry: 6,
   "documents-pending": 4,
   submitted: 3,
@@ -90,29 +90,6 @@ function Panel({ title, action, children, className }: { title: string; action?:
   );
 }
 
-function PipelineBar() {
-  const stages = APPLICATION_STAGES.filter((s) => PIPELINE[s.id]);
-  const total = stages.reduce((sum, s) => sum + PIPELINE[s.id], 0);
-  return (
-    <div>
-      <div className="flex h-3 overflow-hidden rounded-ub-full" role="img" aria-label={`Pipeline of ${total} applications by stage`}>
-        {stages.map((s) => (
-          <span key={s.id} className="h-full" style={{ width: `${(PIPELINE[s.id] / total) * 100}%`, background: s.hue === "success" ? "var(--ub-success-500)" : `var(--ub-tag-${s.hue}-solid)` }} />
-        ))}
-      </div>
-      <ul className="mt-4 flex flex-wrap gap-2">
-        {stages.map((s) => (
-          <li key={s.id}>
-            <Tag {...(s.hue === "success" ? { tone: "success" as const } : { hue: s.hue })} dot>
-              {s.label} · <span className="ub-tabular">{PIPELINE[s.id]}</span>
-            </Tag>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 function AdvisorHome() {
   const done = ONBOARDING.filter((s) => s.done).length;
   return (
@@ -155,7 +132,7 @@ function AdvisorHome() {
       </div>
 
       <Panel title="Pipeline" action={<TextButton size="sm" href="#dashboard">Open Application Tracker</TextButton>}>
-        <PipelineBar />
+        <PipelineBar counts={PIPELINE} />
       </Panel>
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -211,29 +188,14 @@ export default function DashboardPatterns() {
         <AdvisorHome />
       </Demo>
 
-      <Demo name="Notifications feed" path="components/ub/data/List.tsx" description="Each item states the event, then the next step. Unread items show an 8px blue dot. Grouped into Today, This week and Earlier.">
+      <Demo name="Notifications feed" path="components/ub/feedback/NotificationItem.tsx" description="Each item states the event, then the next step. Unread items show an 8px blue dot. Grouped into Today, This week and Earlier.">
         <div className={clsx(card, "max-w-ub-form divide-y divide-ub-border")}>
           {NOTIFICATIONS.map((g) => (
-            <section key={g.group} aria-label={g.group} className="p-4">
-              <h4 className="mb-2 text-ub-label-sm uppercase tracking-[0.06em] text-ub-text-tertiary">{g.group}</h4>
-              <ul className="space-y-1">
-                {g.items.map((n) => (
-                  <li key={n.title}>
-                    <button type="button" className={clsx("flex w-full items-start gap-3 rounded-ub-md p-3 text-start transition-colors duration-ub-fast hover:bg-ub-surface-subtle", focusRing)}>
-                      <span aria-hidden className={clsx("mt-1.5 h-2 w-2 shrink-0 rounded-ub-full", n.unread ? "bg-ub-action-primary" : "bg-transparent")} />
-                      <span className="min-w-0 flex-1">
-                        <span className={clsx("block text-ub-body-sm text-ub-text-primary", n.unread && "font-semibold")}>
-                          {n.title}
-                          {n.unread && <span className="sr-only"> (unread)</span>}
-                        </span>
-                        <span className="block text-ub-body-sm text-ub-text-secondary">{n.next}</span>
-                      </span>
-                      <span className="ub-tabular shrink-0 text-ub-caption text-ub-text-tertiary">{n.time}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
+            <NotificationGroup key={g.group} label={g.group}>
+              {g.items.map((n) => (
+                <NotificationItem key={n.title} title={n.title} nextStep={n.next} time={n.time} unread={n.unread} onClick={() => undefined} />
+              ))}
+            </NotificationGroup>
           ))}
         </div>
       </Demo>

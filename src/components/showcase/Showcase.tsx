@@ -2,6 +2,8 @@
 
 import { ReactNode, createContext, useCallback, useContext, useState } from "react";
 import clsx from "clsx";
+import { Check, Copy } from "lucide-react";
+import { CATALOG, type CatalogEntry } from "components/ub/catalog";
 
 /** When set, only demos with these names render, and section wrappers flatten. */
 const PickContext = createContext<ReadonlySet<string> | null>(null);
@@ -61,8 +63,71 @@ export function Demo({ name, path, description, children, className }: DemoProps
         <code className="ub-ref text-ub-caption text-ub-text-tertiary">src/{path}</code>
         {description && <p className="w-full text-ub-body-sm text-ub-text-secondary">{description}</p>}
       </header>
+      {CATALOG[name] && <UsageStrip entry={CATALOG[name]} />}
       <div className={clsx("p-5", className)}>{children}</div>
     </article>
+  );
+}
+
+/** "Where to use" strip from components/ub/catalog.ts, shown under each demo header. */
+function UsageStrip({ entry }: { entry: CatalogEntry }) {
+  const [copied, setCopied] = useState(false);
+  const code = entry.imports.join("\n");
+  return (
+    <div className="grid gap-3 border-b border-ub-border px-5 py-4 text-ub-body-sm md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <dl className="space-y-2">
+        <div>
+          <dt className="text-ub-label-sm text-ub-text-tertiary">Use for</dt>
+          <dd className="text-ub-text-primary">{entry.useFor}</dd>
+        </div>
+        <div>
+          <dt className="text-ub-label-sm text-ub-text-tertiary">Where it's used</dt>
+          <dd>
+            <ul className="mt-1 flex flex-wrap gap-1.5">
+              {entry.usedIn.map((place) => (
+                <li key={place} className="inline-flex h-6 items-center rounded-ub-sm border border-ub-tone-brand-border bg-ub-tone-brand-bg px-2 text-ub-label-sm text-ub-tone-brand-text">
+                  {place}
+                </li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+        {entry.avoid && (
+          <div>
+            <dt className="text-ub-label-sm text-ub-text-tertiary">Avoid</dt>
+            <dd className="text-ub-text-secondary">{entry.avoid}</dd>
+          </div>
+        )}
+        {entry.legacyOf && (
+          <div>
+            <dt className="sr-only">Status</dt>
+            <dd className="inline-flex items-center gap-1.5 rounded-ub-sm border border-ub-tone-warning-border bg-ub-tone-warning-bg px-2 py-0.5 text-ub-label-sm text-ub-tone-warning-text">
+              Legacy formData API. In new screens use {entry.legacyOf}.
+            </dd>
+          </div>
+        )}
+      </dl>
+      <div className="min-w-0">
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <span className="text-ub-label-sm text-ub-text-tertiary">Import</span>
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard?.writeText(code).catch(() => undefined);
+              setCopied(true);
+              window.setTimeout(() => setCopied(false), 1500);
+            }}
+            className="inline-flex h-7 items-center gap-1 rounded-ub-full px-2.5 text-ub-label-sm text-ub-text-link transition-colors duration-ub-fast hover:bg-ub-action-secondary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus"
+          >
+            {copied ? <Check className="h-3.5 w-3.5" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}
+            {copied ? "Copied" : "Copy"}
+          </button>
+        </div>
+        <pre dir="ltr" className="overflow-x-auto rounded-ub-md border border-ub-border bg-ub-surface-subtle p-3 text-ub-caption leading-5 text-ub-text-primary">
+          <code>{code}</code>
+        </pre>
+      </div>
+    </div>
   );
 }
 

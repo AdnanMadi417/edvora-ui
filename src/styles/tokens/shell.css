@@ -1,0 +1,51 @@
+/*
+ * App shell (brief §5). The sidebar is an overlay drawer below 1200px and a
+ * persistent column from 1200px (the repo's xl). On desktop it can collapse
+ * to a 72px icon rail; html[data-ub-sidebar="collapsed"] is set before paint
+ * by SIDEBAR_INIT_SCRIPT, so everything here is CSS-driven (no layout jump).
+ */
+:root {
+  --ub-sidebar-expanded: 16rem; /* 256px */
+  --ub-sidebar-collapsed: 4.5rem; /* 72px */
+  --ub-sidebar-w: var(--ub-sidebar-expanded);
+  --ub-topbar-h: 4rem; /* 64px */
+  --ub-bottomnav-h: 4rem; /* 64px + safe-area inset */
+}
+
+@media (min-width: 1200px) {
+  [data-ub-sidebar="collapsed"] {
+    --ub-sidebar-w: var(--ub-sidebar-collapsed);
+  }
+
+  /* Labels stay available to screen readers; visually the rail shows icons. */
+  [data-ub-sidebar="collapsed"] .ub-sidebar-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+  [data-ub-sidebar="collapsed"] .ub-sidebar-expanded-only {
+    display: none !important;
+  }
+  [data-ub-sidebar="collapsed"] .ub-sidebar-item {
+    justify-content: center;
+    padding-inline: 0;
+  }
+  [data-ub-sidebar="collapsed"] .ub-sidebar-header {
+    justify-content: center;
+    padding-inline: 0;
+  }
+}
+
+@media (max-width: 1199.98px) {
+  .ub-sidebar-collapsed-only {
+    display: none !important;
+  }
+}
+@media (min-width: 1200px) {
+  :root:not([data-ub-sidebar="collapsed"]) .ub-sidebar-collapsed-only {
+    display: none !important;
+  }
+}

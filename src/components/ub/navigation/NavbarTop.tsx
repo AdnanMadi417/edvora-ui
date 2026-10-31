@@ -76,7 +76,15 @@ const Navbar = ({
 
   return (
     <header className="ub-glass-light sticky top-0 z-40 flex h-16 items-center gap-3 px-4 md:px-6 lg:px-8">
-      <button type="button" onClick={onOpenSidenav} aria-label="Open navigation menu" className={clsx(topBarIconButton, "xl:hidden")}>
+      {/* Tablet only: phones use the bottom nav's Menu button, desktop has the persistent sidebar. */}
+      <button
+        type="button"
+        onClick={onOpenSidenav}
+        aria-label="Open navigation menu"
+        aria-controls="ub-sidebar"
+        aria-expanded={open ?? false}
+        className={clsx(topBarIconButton, "hidden md:inline-grid xl:hidden")}
+      >
         <Menu className="h-5 w-5" aria-hidden />
       </button>
 

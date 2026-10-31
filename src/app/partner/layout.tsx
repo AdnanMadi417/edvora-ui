@@ -1,14 +1,9 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { getActiveNavbar, getActiveRoute } from "utils/navigation";
-import Navbar from "components/ub/navigation/NavbarTop";
-import Sidebar from "components/ub/navigation/Sidebar";
-import Footer from "components/ub/navigation/Footer";
 import partnerRoutes, { type PartnerVisibilityFlag } from '../../routes/partnerRoutes';
 import RoleGuard from "components/guard/RoleGuard";
 import { ToastProvider } from "components/ub/feedback/ToastContext";
+import AppShell from "components/ub/navigation/AppShell";
 import PartnerOnboardingTour from "components/onboarding/PartnerOnboardingTour";
 import { usePartnerProfile } from "features/partners/hooks";
 
@@ -25,8 +20,6 @@ export default function PartnerLayout({ children }: { children: React.ReactNode 
 // Rendered inside RoleGuard so the partner profile comes from the shared
 // (mock) session rather than a separate fetch.
 function PartnerShell({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const pathname = usePathname();
   const { partner } = usePartnerProfile();
 
   // Per-route visibility rules live on the route itself (routes/partnerRoutes.ts,
@@ -55,26 +48,7 @@ function PartnerShell({ children }: { children: React.ReactNode }) {
   return (
     <ToastProvider>
       <PartnerOnboardingTour />
-      <div className="ub-canvas-light relative flex min-h-screen w-full text-ub-text-primary">
-        <Sidebar
-          routes={visibleRoutes}
-          open={open}
-          setOpen={setOpen}
-          variant="admin"
-        />
-
-        <div className="relative flex min-h-screen w-full min-w-0 flex-col xl:ms-64">
-          <Navbar
-            onOpenSidenav={() => setOpen(!open)}
-            brandText={getActiveRoute(visibleRoutes, pathname)}
-            secondary={getActiveNavbar(visibleRoutes, pathname)}
-          />
-          <main className="w-full flex-1 p-4 md:p-6 lg:p-8">{children}</main>
-          <div className="px-4 md:px-6 lg:px-8">
-            <Footer />
-          </div>
-        </div>
-      </div>
+      <AppShell routes={visibleRoutes}>{children}</AppShell>
     </ToastProvider>
   );
 }

@@ -16,3 +16,4 @@ export { default as SidebarLinks } from "./SidebarLinks";
 export { default as SiteFooter } from "./SiteFooter";
 export { default as StatsFilterCards } from "./StatsFilterCards";
 export { default as Tabs } from "./Tabs";
+export { default as PageHeader } from "./PageHeader";

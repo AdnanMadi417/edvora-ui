@@ -3,7 +3,89 @@
 import { useState } from "react";
 import { Check, Copy } from "lucide-react";
 import clsx from "clsx";
+import { CATALOG, type CatalogCategory } from "components/ub/catalog";
 import { Demo, ShowcaseSection } from "./Showcase";
+
+const CATEGORIES: ("all" | CatalogCategory)[] = ["all", "core", "forms", "navigation", "feedback", "data", "brand", "icons"];
+
+/** Searchable index of every component, generated from components/ub/catalog.ts. */
+function ComponentIndex() {
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<"all" | CatalogCategory>("all");
+  const q = query.trim().toLowerCase();
+  const rows = Object.entries(CATALOG).filter(([name, e]) => {
+    if (category !== "all" && e.category !== category) return false;
+    if (!q) return true;
+    return [name, e.useFor, e.avoid ?? "", ...e.usedIn].join(" ").toLowerCase().includes(q);
+  });
+  return (
+    <div>
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <label className="relative min-w-[240px] flex-1">
+          <span className="sr-only">Search components</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by name or screen, e.g. Student profile"
+            className="h-10 w-full rounded-ub-full border border-ub-border-control bg-ub-surface px-4 text-ub-body-sm text-ub-text-primary placeholder:text-ub-text-tertiary focus:border-ub-border-focus focus:outline-none focus:ring-1 focus:ring-ub-border-focus"
+          />
+        </label>
+        <div role="radiogroup" aria-label="Category" className="flex flex-wrap gap-1">
+          {CATEGORIES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              role="radio"
+              aria-checked={category === c}
+              onClick={() => setCategory(c)}
+              className={clsx(
+                "h-8 rounded-ub-full px-3 text-ub-label-sm capitalize transition-colors duration-ub-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus",
+                category === c ? "bg-ub-action-primary text-ub-action-primary-text" : "border border-ub-border text-ub-text-secondary hover:border-ub-border-hover",
+              )}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      </div>
+      <p className="mb-2 text-ub-caption text-ub-text-tertiary" aria-live="polite">
+        {rows.length} of {Object.keys(CATALOG).length} components
+      </p>
+      <div className="overflow-x-auto rounded-ub-lg border border-ub-border">
+        <table className="w-full min-w-[720px] text-start">
+          <thead className="bg-ub-table-head text-ub-label-sm text-ub-text-secondary">
+            <tr>
+              <th className="h-11 px-4 text-start font-medium">Component</th>
+              <th className="h-11 px-4 text-start font-medium">Use for</th>
+              <th className="h-11 px-4 text-start font-medium">Where it&apos;s used</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(([name, e]) => (
+              <tr key={name} className="border-t border-ub-border align-top">
+                <td className="px-4 py-3">
+                  <a href={`#c-${name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`} className="rounded-ub-xs text-ub-label-md text-ub-text-link hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus">
+                    {name}
+                  </a>
+                  <p className="text-ub-caption capitalize text-ub-text-tertiary">
+                    {e.category}
+                    {e.legacyOf ? " · legacy" : ""}
+                  </p>
+                </td>
+                <td className="px-4 py-3 text-ub-body-sm text-ub-text-primary">
+                  {e.useFor}
+                  {e.legacyOf && <span className="block text-ub-caption text-ub-tone-warning-text">New screens: {e.legacyOf}</span>}
+                </td>
+                <td className="px-4 py-3 text-ub-body-sm text-ub-text-secondary">{e.usedIn.join(" · ")}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
 
 function CodeBlock({ code, label }: { code: string; label: string }) {
   const [copied, setCopied] = useState(false);
@@ -41,6 +123,7 @@ const STRUCTURE = `src/
       legacy-dark.css        # dark bridge for screens not yet migrated
   components/ub/
     recipes.ts               # shared class recipes every component composes
+    catalog.ts               # where each component is used (drives this guide's usage notes)
     core/                    # Button, TextButton, IconButton, ButtonGroup, PageContainer…
     forms/                   # Input, Checkbox, Radio, Toggle, Stepper, Combobox, FileUpload, legacy fields
     navigation/              # NavbarTop, Sidebar, NavbarBottom, Tabs, Breadcrumbs, Pagination, ContextMenu
@@ -142,6 +225,9 @@ export default function Handoff() {
     >
       <Demo name="File structure" path="docs/unibexs-frontend-redesign-brief.md">
         <CodeBlock label="Brief §1.1" code={STRUCTURE} />
+      </Demo>
+      <Demo name="Component index" path="components/ub/catalog.ts" description="Every component, what it's for and which screens use it. Generated from the catalog that also drives the Where to use strip on each demo; add an entry when you add a component.">
+        <ComponentIndex />
       </Demo>
       <Demo name="Importing components" path="components/ub/">
         <CodeBlock label="TypeScript" code={IMPORTS} />

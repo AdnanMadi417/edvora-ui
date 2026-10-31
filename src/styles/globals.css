@@ -5,4 +5,5 @@
 @import "./tokens/primitives.css";
 @import "./tokens/semantic.css";
 @import "./tokens/utilities.css";
+@import "./tokens/shell.css";
 @import "./tokens/legacy-dark.css";

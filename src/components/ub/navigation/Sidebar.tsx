@@ -1,8 +1,10 @@
 "use client";
 
-import { X, MessageSquarePlus, FlaskConical } from "lucide-react";
+import { X, MessageSquarePlus, FlaskConical, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import clsx from "clsx";
-import Links from "components/ub/navigation/SidebarLinks";
+import Links, { type SidebarTip } from "components/ub/navigation/SidebarLinks";
+import Logo from "components/ub/brand/Logo";
+import { useSidebarCollapsed } from "./sidebarState";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import { IRoute } from "types/navigation";
 import Image from "next/image";
@@ -38,8 +40,29 @@ const PROFILE_PATHS: Record<string, string> = {
 const scrollArea =
   "[&::-webkit-scrollbar-thumb]:rounded-ub-full [&::-webkit-scrollbar-thumb]:bg-ub-border [&::-webkit-scrollbar]:w-1.5";
 
+/** id of the sidebar element, for aria-controls on the toggles that open/collapse it. */
+export const SIDEBAR_ID = "ub-sidebar";
+
+/** True when focus is in a text field, where Ctrl/⌘+B must keep meaning "bold". */
+const isTyping = (el: Element | null) => !!el && (el.matches("input, textarea, select") || (el as HTMLElement).isContentEditable);
+
 function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
   const { routes, open, setOpen } = props;
+  const { collapsed, toggle } = useSidebarCollapsed();
+  const [tip, setTip] = useState<SidebarTip | null>(null);
+
+  // Ctrl/⌘ + B collapses or expands the desktop sidebar.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() !== "b" || !(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) return;
+      if (isTyping(document.activeElement) || !window.matchMedia("(min-width: 1200px)").matches) return;
+      e.preventDefault();
+      setTip(null);
+      toggle();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [toggle]);
 
   // The (mock) session comes from the role layout's SessionProvider (via RoleGuard),
   // so the sidebar no longer makes its own /auth/me call on every mount.
@@ -84,7 +107,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           <span className="h-5 w-5 animate-pulse rounded-ub-full bg-ub-skeleton motion-reduce:animate-none" />
         )}
       </span>
-      <span className="min-w-0 flex-1">
+      <span className="ub-sidebar-label min-w-0 flex-1">
         {user ? (
           <>
             <span className="block truncate text-ub-label-md text-ub-text-primary">{sidebarDisplayName}</span>
@@ -111,19 +134,23 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
       <div
         className={clsx(
           // Strong light glass: stays legible when it overlays content as a drawer.
-          "ub-glass-light-strong fixed start-0 top-0 z-50 flex h-screen w-64 flex-col xl:z-[60]",
-          "transition-transform duration-ub-slow ease-ub-standard motion-reduce:transition-none xl:translate-x-0",
+          "ub-glass-light-strong fixed start-0 top-0 z-50 flex h-screen w-64 flex-col xl:z-[60] xl:w-[var(--ub-sidebar-w)]",
+          "transition-[transform,width] duration-ub-slow ease-ub-standard motion-reduce:transition-none xl:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full rtl:translate-x-full xl:rtl:translate-x-0",
         )}
+        id={SIDEBAR_ID}
         role="navigation"
         aria-label="Main navigation"
       >
-        <header className="flex h-16 shrink-0 items-center gap-2 px-5">
-          <Link href="/" className={clsx("flex shrink-0 items-center rounded-ub-sm", focusRing)} aria-label="Unibexs home">
+        <header className="ub-sidebar-header flex h-16 shrink-0 items-center gap-2 px-5">
+          <Link href="/" className={clsx("ub-sidebar-expanded-only flex shrink-0 items-center rounded-ub-sm", focusRing)} aria-label="Unibexs home">
             <Image src={logoImg} alt="Unibexs" width={120} height={60} className="h-10 w-auto object-contain dark:brightness-0 dark:invert" priority />
           </Link>
+          <Link href="/" className={clsx("ub-sidebar-collapsed-only flex shrink-0 items-center rounded-ub-sm", focusRing)} aria-label="Unibexs home">
+            <Logo symbolOnly size="md" alt="" />
+          </Link>
           {user?.role === "partner" && (
-            <div className="relative">
+            <div className="ub-sidebar-expanded-only relative">
               <span
                 tabIndex={0}
                 aria-describedby={showBetaTooltip ? betaTooltipId : undefined}
@@ -144,6 +171,24 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             </div>
           )}
           <button
+            type="button"
+            onClick={() => {
+              setTip(null);
+              toggle();
+            }}
+            aria-controls={SIDEBAR_ID}
+            aria-expanded={!collapsed}
+            aria-label="Collapse sidebar"
+            title="Collapse sidebar (Ctrl+B)"
+            className={clsx(
+              "ub-sidebar-expanded-only ms-auto hidden place-items-center rounded-ub-full text-ub-icon transition-colors duration-ub-fast hover:bg-ub-surface-subtle hover:text-ub-text-primary xl:inline-grid",
+              iconButtonSizes.md,
+              focusRing,
+            )}
+          >
+            <PanelLeftClose className="h-5 w-5 rtl:-scale-x-100" aria-hidden />
+          </button>
+          <button
             className={clsx(
               "ms-auto inline-grid place-items-center rounded-ub-full text-ub-icon transition-colors duration-ub-fast hover:bg-ub-surface-subtle hover:text-ub-text-primary xl:hidden",
               iconButtonSizes.md,
@@ -157,9 +202,40 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
           </button>
         </header>
 
-        <div className={clsx("flex-1 overflow-y-auto px-3 py-4", scrollArea)}>
-          <Links routes={routes} onLinkClick={() => setOpen(false)} />
+        <div className={clsx("flex-1 overflow-y-auto px-3 py-4", scrollArea)} onScroll={() => setTip(null)}>
+          <button
+            type="button"
+            onClick={() => {
+              setTip(null);
+              toggle();
+            }}
+            onMouseEnter={(e) => {
+              const r = e.currentTarget.getBoundingClientRect();
+              setTip({ label: "Expand sidebar (Ctrl+B)", top: r.top + r.height / 2 });
+            }}
+            onMouseLeave={() => setTip(null)}
+            aria-controls={SIDEBAR_ID}
+            aria-expanded={!collapsed}
+            aria-label="Expand sidebar"
+            className={clsx(
+              "ub-sidebar-collapsed-only ub-sidebar-item mb-2 flex h-10 w-full items-center rounded-ub-md text-ub-icon transition-colors duration-ub-fast hover:bg-ub-surface hover:text-ub-text-primary",
+              focusRingInset,
+            )}
+          >
+            <PanelLeftOpen className="h-5 w-5 rtl:-scale-x-100" aria-hidden />
+          </button>
+          <Links routes={routes} onLinkClick={() => setOpen(false)} onTip={setTip} />
         </div>
+
+        {tip && (
+          <div
+            aria-hidden
+            className={clsx(tooltip, "fixed z-[70] hidden -translate-y-1/2 whitespace-nowrap xl:block")}
+            style={{ top: tip.top, insetInlineStart: "calc(var(--ub-sidebar-w) + 8px)" }}
+          >
+            {tip.label}
+          </div>
+        )}
 
         {user?.role === "partner" && (
           <div className="px-3 pb-2">
@@ -167,13 +243,19 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
               href="https://docs.google.com/forms/d/e/1FAIpQLScbdcaLfK0utkj8DaMVEJdBUW82swRrWWZODNcFq1DNaRLLTQ/viewform"
               target="_blank"
               rel="noopener noreferrer"
+              onMouseEnter={(e) => {
+                if (!collapsed) return;
+                const r = e.currentTarget.getBoundingClientRect();
+                setTip({ label: "Send feedback", top: r.top + r.height / 2 });
+              }}
+              onMouseLeave={() => setTip(null)}
               className={clsx(
-                "flex h-10 items-center gap-3 rounded-ub-md px-3 text-ub-label-md text-ub-text-secondary transition-colors duration-ub-fast hover:bg-ub-surface hover:text-ub-text-primary",
+                "ub-sidebar-item flex h-10 items-center gap-3 rounded-ub-md px-3 text-ub-label-md text-ub-text-secondary transition-colors duration-ub-fast hover:bg-ub-surface hover:text-ub-text-primary",
                 focusRingInset,
               )}
             >
               <MessageSquarePlus className="h-5 w-5" aria-hidden />
-              <span>Send feedback</span>
+              <span className="ub-sidebar-label">Send feedback</span>
             </a>
           </div>
         )}
@@ -194,7 +276,7 @@ function SidebarUnibexs(props: { routes: IRoute[]; [x: string]: any }) {
             <Link
               href={profilePath}
               onClick={() => setOpen(false)}
-              className={clsx("flex items-center gap-3 rounded-ub-md p-2 transition-colors duration-ub-fast hover:bg-ub-surface", focusRingInset)}
+              className={clsx("ub-sidebar-item flex items-center gap-3 rounded-ub-md p-2 transition-colors duration-ub-fast hover:bg-ub-surface", focusRingInset)}
             >
               {userCard}
             </Link>

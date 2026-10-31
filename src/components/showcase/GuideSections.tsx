@@ -14,6 +14,7 @@ import NewCoreForms from "./NewCoreForms";
 import NewData from "./NewData";
 import NewNavigationFeedback from "./NewNavigationFeedback";
 import NewBrand from "./NewBrand";
+import NewScreenParts from "./NewScreenParts";
 
 export function ButtonsSection() {
   return (
@@ -59,6 +60,9 @@ export function NavigationSection() {
       title="Navigation"
       description="Components that help people move around: switching views, knowing where they are, paging through results and narrowing them down."
     >
+      <Pick demos={["AppShell", "Sidebar and NavbarTop", "PageHeader"]}>
+        <NewScreenParts />
+      </Pick>
       <Pick demos={["Tabs", "StatsFilterCards", "ApplicationFilterBar", "SearchInput, FilterSelectField, SortControl", "NavLink"]}>
         <Navigation />
       </Pick>
@@ -83,6 +87,9 @@ export function FeedbackSection() {
       <Pick demos={["Alert", "ProgressBar", "EmptyState"]}>
         <NewNavigationFeedback />
       </Pick>
+      <Pick demos={["NotificationItem"]}>
+        <NewScreenParts />
+      </Pick>
       <Pick demos={["Toast", "Loading", "AsyncStateView", "Empty states"]}>
         <Feedback />
       </Pick>
@@ -100,6 +107,9 @@ export function ContentSection() {
     >
       <Pick demos={["Avatar and AvatarGroup", "Tag", "DaysTag", "Chip", "CountBadge"]}>
         <NewData />
+      </Pick>
+      <Pick demos={["StageTag"]}>
+        <NewScreenParts />
       </Pick>
       <Pick demos={["StatusBadge", "SolidBadge", "DetailStatusBadge", "SectionIconBadge", "FilterChip"]}>
         <Badges />
@@ -154,6 +164,9 @@ export function DataDisplaySection() {
       </Pick>
       <Pick demos={["StatCard", "List and ListItem"]}>
         <NewData />
+      </Pick>
+      <Pick demos={["PipelineBar", "DescriptionList"]}>
+        <NewScreenParts />
       </Pick>
       <Pick demos={["Card, Widget and PresignedImage", "CourseList", "Faq"]}>
         <DataDisplay />

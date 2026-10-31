@@ -1,0 +1,665 @@
+// Component catalog: where each reusable component is used in the Unibexs
+// System, when not to use it, and how to import it. The style guide reads this
+// to show a "Where to use" strip on every demo and to build the component index
+// in Developer handoff. Keep it next to the components: when you add one, add
+// its entry here (keyed by the demo name used on the guide page).
+
+export type CatalogCategory = "core" | "forms" | "navigation" | "feedback" | "data" | "brand" | "icons";
+
+export interface CatalogEntry {
+  category: CatalogCategory;
+  /** Import lines for the component(s) the demo shows. */
+  imports: string[];
+  /** One sentence: what it's for. */
+  useFor: string;
+  /** Screens / places in the product where it belongs (brief §5–§6). */
+  usedIn: string[];
+  /** When to reach for something else. */
+  avoid?: string;
+  /** Legacy API (formData / updateFormData); prefer the named replacement in new screens. */
+  legacyOf?: string;
+}
+
+const imp = (name: string, path: string) => `import ${name} from "components/ub/${path}";`;
+const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
+
+export const CATALOG: Record<string, CatalogEntry> = {
+  // ── Brand ─────────────────────────────────────────────────────────────
+  Logo: {
+    category: "brand",
+    imports: [imp("Logo", "brand/Logo")],
+    useFor: "The Unibexs wordmark or symbol on white, Light Blue, Primary Blue or navy.",
+    usedIn: ["Sidebar and top bar", "Sign-in screens", "Glass Box header", "Emails and PDFs (export)"],
+    avoid: "Never recolor, stretch or place it on busy imagery.",
+  },
+  GlassPanel: {
+    category: "brand",
+    imports: [imp("GlassPanel", "brand/GlassPanel")],
+    useFor: "Translucent surface for chrome and summaries on the canvas.",
+    usedIn: ["Stat summaries on Advisor home", "Sticky headers", "Glass Box summary card"],
+    avoid: "Data tables, forms and any text longer than two lines: use a solid Card.",
+  },
+  NotchedCard: {
+    category: "brand",
+    imports: [imp("NotchedCard", "brand/NotchedCard")],
+    useFor: "Brand and feature cards with the 45° notch at the bottom-end corner.",
+    usedIn: ["Earners Circle and onboarding promos", "Marketing and feature cards", "Milestone moments"],
+    avoid: "Product cards, tables, inputs and modals: never notch them.",
+  },
+  VerifiedBadge: {
+    category: "brand",
+    imports: [imp("VerifiedBadge", "brand/VerifiedBadge")],
+    useFor: "Marks a verified Advisor or Institution: inline, as a label tag or as a credential.",
+    usedIn: ["Sidebar user card (Verified Advisor)", "Advisor public profile", "Glass Box Advisor card", "Institution cards"],
+    avoid: "Never decorative: only for entities that are actually verified.",
+  },
+  VerificationStamp: {
+    category: "brand",
+    imports: [imp("VerificationStamp", "brand/VerificationStamp")],
+    useFor: "Shows when data was last verified, and whether it's fresh, due for review or expired.",
+    usedIn: ["Knowledge Hub program cards (fees)", "Logistics Marketplace service cards", "Institution details"],
+  },
+  ApplicationTracker: {
+    category: "brand",
+    imports: [imp("ApplicationTracker", "brand/ApplicationTracker"), 'import { STUDENT_PROFILE_STEPS, GLASS_BOX_STEPS } from "config/applicationStages";'],
+    useFor: "The application's journey: complete, current, upcoming, needs attention and skipped steps, with the next step.",
+    usedIn: ["Student profile (horizontal)", "Glass Box student view (vertical)", "Application detail drawer"],
+    avoid: "Multi-step forms: use a step indicator, not the tracker.",
+  },
+  MilestoneMoment: {
+    category: "brand",
+    imports: [imp("MilestoneMoment", "brand/MilestoneMoment")],
+    useFor: "Celebrates a milestone once (first placement, first commission) with an Inverse share action.",
+    usedIn: ["After the first student is placed", "First commission paid", "Earners Circle welcome (end of onboarding)"],
+    avoid: "Routine confirmations: use a Toast.",
+  },
+
+  // ── Typography (core) ─────────────────────────────────────────────────
+  Heading: {
+    category: "core",
+    imports: [imp("Heading", "core/Heading")],
+    useFor: "Headings on the type scale; level for the outline, size for the look.",
+    usedIn: ["Card and section titles", "Modal and drawer titles", "Empty-state heroes"],
+    avoid: "The page title: PageHeader renders the h1 for you.",
+  },
+  Text: {
+    category: "core",
+    imports: [imp("Text", "core/Text")],
+    useFor: "Body, label and caption text with semantic tones, clamping and tabular numerals.",
+    usedIn: ["Every screen: descriptions, helper copy, metadata, timestamps"],
+    avoid: "Emphasis with color or italics: use weight.",
+  },
+  "Amount, Numeral and RefId": {
+    category: "core",
+    imports: [imp("Amount, { Numeral }", "core/Amount"), imp("RefId", "core/RefId")],
+    useFor: "Money (RM4,200), counts (3,500) and reference IDs (UBX-2026-0412) in the brief's formats.",
+    usedIn: ["Commission screen and tables", "Knowledge Hub tuition", "Stat cards", "Application and student IDs everywhere"],
+    avoid: "Formatting money or IDs by hand: these keep tabular numerals and ss02 consistent.",
+  },
+  "TextLink and Prose": {
+    category: "core",
+    imports: [imp("TextLink", "core/TextLink"), imp("Prose", "core/Prose")],
+    useFor: "Links inside sentences, and a 680px reading container for long text.",
+    usedIn: ["Knowledge Hub articles", "Onboarding steps", "Terms and help content"],
+    avoid: "Standalone actions: use TextButton or Button.",
+  },
+  Formats: {
+    category: "core",
+    imports: ['import { formatCurrency, formatNumber, formatDisplayDate, formatTime, formatSmartDate } from "lib/format";'],
+    useFor: "String formatters for currency, numbers, percent, dates and times (brief §8).",
+    usedIn: ["CSV exports", "Toast and notification copy", "Anywhere a component isn't rendering the value"],
+  },
+
+  // ── Buttons (core) ────────────────────────────────────────────────────
+  Button: {
+    category: "core",
+    imports: [imp("Button", "core/Button")],
+    useFor: "Actions. One Primary per view, labelled verb + object; secondary by default.",
+    usedIn: ["Page actions (Add student)", "Forms (Submit application)", "Dialogs (Primary last)", "Table row actions"],
+    avoid: "More than three buttons in a row; navigation that should be a link.",
+  },
+  TextButton: {
+    category: "core",
+    imports: [imp("TextButton", "core/TextButton")],
+    useFor: "Low-emphasis text action, as a button or a Next link.",
+    usedIn: ["Card footers (View all)", "Forgot password", "Resend code", "Inline 'Continue setup'"],
+  },
+  ButtonGroup: {
+    category: "core",
+    imports: [imp("ButtonGroup", "core/ButtonGroup")],
+    useFor: "Lays out up to three buttons with the Primary last.",
+    usedIn: ["Form footers", "Dialog footers", "Page header actions"],
+  },
+  IconButton: {
+    category: "core",
+    imports: [imp("IconButton", "core/IconButton")],
+    useFor: "Circular icon-only action with an aria-label and tooltip.",
+    usedIn: ["Table row actions (view, edit, delete)", "Toolbar actions", "Close buttons"],
+    avoid: "Primary actions: they need a visible label.",
+  },
+  PillButton: {
+    category: "core",
+    imports: [imp("PillButton", "core/PillButton")],
+    useFor: "Large 48px pill for prominent CTAs.",
+    usedIn: ["Public pages and marketing CTAs", "Empty-state heroes"],
+  },
+  "NextButton / PrevButton": {
+    category: "core",
+    imports: [imp("NextButton", "core/NextButton"), imp("PrevButton", "core/PrevButton")],
+    useFor: "Back and Continue in multi-step flows.",
+    usedIn: ["Student application form steps", "Advisor registration", "Onboarding"],
+  },
+  LinkBtn: {
+    category: "core",
+    imports: [imp("LinkBtn", "core/LinkBtn")],
+    useFor: "A link styled as a button (navigates instead of acting).",
+    usedIn: ["View application from tables", "Open document in a new tab"],
+  },
+  ApproveRejectToggle: {
+    category: "core",
+    imports: [imp("ApproveRejectToggle", "core/ApproveRejectToggle")],
+    useFor: "Two-option approve / reject decision with the entity in view.",
+    usedIn: ["Reviewer: Advisor applications", "Admin: document review"],
+  },
+  ActionsDropdown: {
+    category: "navigation",
+    imports: [imp("ActionsDropdown", "navigation/ActionsDropdown")],
+    useFor: "An 'Actions' pill that opens a menu of row or page actions.",
+    usedIn: ["Advisor and staff tables", "Profile page header"],
+    avoid: "Menus with groups, separators or a custom trigger: use ContextMenu.",
+  },
+
+  // ── Forms ─────────────────────────────────────────────────────────────
+  Input: {
+    category: "forms",
+    imports: [imp("Input", "forms/Input")],
+    useFor: "Controlled text field: label, helper, error, prefix (RM), icons, passport reference mode.",
+    usedIn: ["Student and Advisor forms", "Sign-in screens", "Settings", "Filters"],
+  },
+  Checkbox: {
+    category: "forms",
+    imports: [imp("Checkbox", "forms/Checkbox")],
+    useFor: "A single yes/no choice or one item in a list; supports indeterminate.",
+    usedIn: ["Terms and consent", "Table row selection", "Filter lists"],
+    avoid: "Settings that apply instantly: use Toggle.",
+  },
+  "Radio and RadioGroup": {
+    category: "forms",
+    imports: [named("Radio, RadioGroup", "forms/Radio")],
+    useFor: "One choice from a short list (2–5 options), with arrow-key navigation.",
+    usedIn: ["Study level", "Advisor type (individual / company)", "Payment method"],
+    avoid: "Long lists: use Combobox.",
+  },
+  Toggle: {
+    category: "forms",
+    imports: [imp("Toggle", "forms/Toggle")],
+    useFor: "On/off settings that apply instantly.",
+    usedIn: ["Notification preferences", "Program active / hidden", "Feature settings"],
+    avoid: "Form answers that need a Submit: use Checkbox.",
+  },
+  Stepper: {
+    category: "forms",
+    imports: [imp("Stepper", "forms/Stepper")],
+    useFor: "Numeric value with − / + and min/max (tabular).",
+    usedIn: ["Commission percentage", "Number of dependants", "Seats and quantities"],
+  },
+  Combobox: {
+    category: "forms",
+    imports: [imp("Combobox", "forms/Combobox")],
+    useFor: "Searchable single select; Institution options show logo, city and country.",
+    usedIn: ["Institution and program pickers", "Country and nationality", "Assign account manager"],
+  },
+  FileUpload: {
+    category: "forms",
+    imports: [imp("FileUpload", "forms/FileUpload")],
+    useFor: "Dropzone plus file rows: Uploading, Uploaded, Verified, Needs replacing (with reason).",
+    usedIn: ["Student profile Documents", "Application document requests", "Advisor registration documents"],
+  },
+  "InputField and TextareaField": {
+    category: "forms",
+    imports: [imp("InputField", "forms/InputField"), imp("TextareaField", "forms/TextareaField")],
+    useFor: "Text fields wired to the formData / errors / updateFormData contract.",
+    usedIn: ["Existing feature forms (applications, programs, partners)"],
+    legacyOf: "Input",
+  },
+  "SelectField, SelectInput and RadioField": {
+    category: "forms",
+    imports: [imp("SelectField", "forms/SelectField"), imp("SelectInput", "forms/SelectInput"), imp("RadioField", "forms/RadioField")],
+    useFor: "Native select and radio options on the formData contract.",
+    usedIn: ["Existing feature forms"],
+    legacyOf: "Combobox / RadioGroup",
+  },
+  "CheckBoxGroup and CheckSimpleBoxGroup": {
+    category: "forms",
+    imports: [imp("CheckBoxGroup", "forms/CheckBoxGroup"), imp("CheckSimpleBoxGroup", "forms/CheckSimpleBoxGroup")],
+    useFor: "Multi-select as cards or searchable chips on the formData contract.",
+    usedIn: ["Fields of study", "Program features"],
+    legacyOf: "Checkbox",
+  },
+  "SearchableDropdown, MultiSelect and SearchableSelect": {
+    category: "forms",
+    imports: [imp("SearchableDropdown", "forms/SearchableDropdown"), imp("MultiSelect", "forms/MultiSelect"), imp("SearchableSelect", "forms/SearchableSelect")],
+    useFor: "Searchable single and multi selects on the formData contract.",
+    usedIn: ["Existing filters and forms (universities, programs)"],
+    legacyOf: "Combobox",
+  },
+  Toggles: {
+    category: "forms",
+    imports: [imp("ToggleInput", "forms/ToggleInput"), imp("SettingToggleInput", "forms/SettingToggleInput"), imp("SegmentedToggleField", "forms/SegmentedToggleField")],
+    useFor: "Toggles and a two-option segmented switch on the formData contract.",
+    usedIn: ["Program status", "Public / private switches"],
+    legacyOf: "Toggle",
+  },
+  "Password and OTP": {
+    category: "forms",
+    imports: [imp("PasswordField", "forms/PasswordField"), imp("OtpInputField", "forms/OtpInputField"), imp("PasswordRequirementsChecklist", "forms/PasswordRequirementsChecklist")],
+    useFor: "Password with show/hide and requirements, and one-time codes.",
+    usedIn: ["Sign-in and verification", "Reset password", "Team invite acceptance"],
+  },
+  "Phone, commission and fee rows": {
+    category: "forms",
+    imports: [imp("PhoneInputField", "forms/PhoneInputField"), imp("CommissionPercentageField", "forms/CommissionPercentageField"), imp("ArrayObjectField", "forms/ArrayObjectField")],
+    useFor: "Phone (+60 default), commission percent and repeatable rows (yearly fees).",
+    usedIn: ["Student and Advisor contact details", "Program commission", "Program fee schedule"],
+  },
+  IntakeDatePicker: {
+    category: "forms",
+    imports: [imp("IntakeDatePicker", "forms/IntakeDatePicker")],
+    useFor: "Pick an intake as month-year chips.",
+    usedIn: ["Application form (intake)", "Knowledge Hub intake filter"],
+  },
+  RichTextEditor: {
+    category: "forms",
+    imports: [imp("RichTextEditor", "forms/RichTextEditor")],
+    useFor: "Formatted text editing (headings, bold, lists, links).",
+    usedIn: ["Program descriptions", "Payment method instructions", "Knowledge Hub content"],
+  },
+  RadioCardGroup: {
+    category: "forms",
+    imports: [imp("RadioCardGroup", "forms/RadioCardGroup")],
+    useFor: "One choice from 2–3 options that need an icon and a hint.",
+    usedIn: ["Transfer Advisors (move or share)", "Choose application type"],
+  },
+  SearchableChecklist: {
+    category: "forms",
+    imports: [imp("SearchableChecklist", "forms/SearchableChecklist")],
+    useFor: "Search and tick many items with a counter and select all.",
+    usedIn: ["Transfer Advisors between managers", "Bulk assign programs"],
+  },
+  "File uploads": {
+    category: "forms",
+    imports: [imp("CompactFileUpload", "forms/CompactFileUpload"), imp("StatusFileUpload", "forms/StatusFileUpload"), imp("ImageUploadField", "forms/ImageUploadField")],
+    useFor: "Existing single-file uploaders (compact row, dropzone, image).",
+    usedIn: ["Existing application and profile forms"],
+    legacyOf: "FileUpload",
+  },
+
+  // ── Navigation ────────────────────────────────────────────────────────
+  AppShell: {
+    category: "navigation",
+    imports: [imp("AppShell", "navigation/AppShell")],
+    useFor: "The whole portal frame: canvas, collapsible sidebar, top bar, padded main, footer and the phone bottom nav.",
+    usedIn: ["Every role layout (admin, Advisor, account manager, reviewer, data entry)"],
+    avoid: "Public and sign-in pages: they use PublicNavbar and their own layout.",
+  },
+  "Sidebar and NavbarTop": {
+    category: "navigation",
+    imports: [imp("Sidebar", "navigation/Sidebar"), imp("Navbar", "navigation/NavbarTop"), named("useSidebarCollapsed", "navigation/sidebarState")],
+    useFor: "The shell's parts. Sidebar collapses to a 72px rail (toggle or Ctrl/⌘+B, remembered); the top bar holds the title, bell and avatar menu.",
+    usedIn: ["Inside AppShell only"],
+    avoid: "Rendering them directly in a page: use AppShell in the role layout.",
+  },
+  PageHeader: {
+    category: "navigation",
+    imports: [imp("PageHeader", "navigation/PageHeader")],
+    useFor: "Top of every screen: breadcrumbs, h1 title, meta tags, description and the view's actions.",
+    usedIn: ["Application Tracker", "Student profile", "Knowledge Hub", "Commission", "Settings pages"],
+    avoid: "More than one per page.",
+  },
+  Tabs: {
+    category: "navigation",
+    imports: [imp("Tabs", "navigation/Tabs")],
+    useFor: "Switch between views of the same object (44px, 2px underline).",
+    usedIn: ["Student profile: Overview · Applications · Documents · Commission · Activity", "Advisor details", "Team members / invitations"],
+    avoid: "Navigating to different pages: use the sidebar.",
+  },
+  Breadcrumbs: {
+    category: "navigation",
+    imports: [imp("Breadcrumbs", "navigation/Breadcrumbs")],
+    useFor: "Where you are in nested pages; chevrons mirror in RTL.",
+    usedIn: ["Top bar on detail pages", "PageHeader (via its breadcrumbs prop)"],
+  },
+  Pagination: {
+    category: "navigation",
+    imports: [imp("Pagination", "navigation/Pagination")],
+    useFor: "Numbered pages with ellipsis, or a compact Page x of y.",
+    usedIn: ["Application Tracker", "Knowledge Hub results", "Notifications"],
+  },
+  NavbarBottom: {
+    category: "navigation",
+    imports: [imp("NavbarBottom", "navigation/NavbarBottom")],
+    useFor: "Mobile bottom navigation (4–5 items) below 768px.",
+    usedIn: ["Advisor portal on phones (replaces the sidebar)"],
+  },
+  StatsFilterCards: {
+    category: "navigation",
+    imports: [imp("StatsFilterCards", "navigation/StatsFilterCards")],
+    useFor: "Counts that double as filters (click to filter the table).",
+    usedIn: ["Advisors list", "Applications by status", "Reviewer queue"],
+  },
+  ApplicationFilterBar: {
+    category: "navigation",
+    imports: [imp("ApplicationFilterBar", "navigation/ApplicationFilterBar")],
+    useFor: "Search plus stage, Institution, status and lifecycle filters for applications.",
+    usedIn: ["Application Tracker (admin, account manager, Advisor)"],
+  },
+  "SearchInput, FilterSelectField, SortControl": {
+    category: "forms",
+    imports: [imp("SearchInput", "forms/SearchInput"), imp("FilterSelectField", "forms/FilterSelectField"), imp("SortControl", "forms/SortControl")],
+    useFor: "Pill search, 40px filter selects and sort above tables.",
+    usedIn: ["Table toolbars across the portal", "Knowledge Hub filters"],
+  },
+  NavLink: {
+    category: "navigation",
+    imports: [imp("NavLink", "navigation/NavLink")],
+    useFor: "Thin wrapper over next/link with style props.",
+    usedIn: ["Sidebar links", "Legacy navigation"],
+    avoid: "New code: use next/link or TextLink.",
+  },
+  PageContainer: {
+    category: "core",
+    imports: [imp("PageContainer", "core/PageContainer")],
+    useFor: "Caps page width: form pages or table pages (1440).",
+    usedIn: ["Every page body inside the app shell"],
+  },
+  PublicNavbar: {
+    category: "navigation",
+    imports: [imp("PublicNavbar", "navigation/PublicNavbar")],
+    useFor: "Header for public pages.",
+    usedIn: ["Apply as Advisor", "Public Advisor profile", "Team invite pages"],
+  },
+  "Footer (portal)": {
+    category: "navigation",
+    imports: [imp("Footer", "navigation/Footer")],
+    useFor: "Copyright line at the end of portal pages.",
+    usedIn: ["All role layouts"],
+  },
+  "SiteFooter (public)": {
+    category: "navigation",
+    imports: [imp("SiteFooter", "navigation/SiteFooter")],
+    useFor: "Full public footer with link columns and socials.",
+    usedIn: ["Public pages"],
+  },
+
+  // ── Feedback ──────────────────────────────────────────────────────────
+  Alert: {
+    category: "feedback",
+    imports: [imp("Alert", "feedback/Alert")],
+    useFor: "Inline message in the page: success, warning, danger or info, with an optional action.",
+    usedIn: ["Stale-fee warning on Student profile", "Form-level errors", "Account status notices"],
+    avoid: "Short confirmations after an action: use a Toast.",
+  },
+  NotificationItem: {
+    category: "feedback",
+    imports: [imp("NotificationItem, { NotificationGroup, groupNotifications }", "feedback/NotificationItem")],
+    useFor: "One notification: the event, then the next step, with an unread dot; grouped Today / This week / Earlier.",
+    usedIn: ["Notifications page", "Navbar bell popover"],
+  },
+  ProgressBar: {
+    category: "feedback",
+    imports: [imp("ProgressBar", "feedback/ProgressBar")],
+    useFor: "8px progress with a label and value.",
+    usedIn: ["Onboarding checklist", "File upload rows", "Quota usage"],
+  },
+  EmptyState: {
+    category: "feedback",
+    imports: [imp("EmptyState", "feedback/EmptyState")],
+    useFor: "Nothing here yet: icon, title, one sentence, one Primary action.",
+    usedIn: ["Empty tables and lists", "No search results", "First-run screens"],
+  },
+  Toast: {
+    category: "feedback",
+    imports: [named("ToastProvider, useToast", "feedback/ToastContext")],
+    useFor: "Brief confirmation after an action; errors stay until closed.",
+    usedIn: ["After save, submit, upload, delete", "Background job results"],
+    avoid: "Information people must act on: use an Alert.",
+  },
+  Loading: {
+    category: "feedback",
+    imports: [imp("Loading", "feedback/Loading")],
+    useFor: "Spinner for whole-area loading.",
+    usedIn: ["Route and layout loading", "Modal submit states"],
+    avoid: "Known layouts: use Skeleton.",
+  },
+  AsyncStateView: {
+    category: "feedback",
+    imports: [imp("AsyncStateView", "feedback/AsyncStateView")],
+    useFor: "One wrapper for loading / error / empty / success of a fetched block.",
+    usedIn: ["Cards and panels that load their own data"],
+  },
+  "Empty states": {
+    category: "feedback",
+    imports: [imp("EmptyData", "feedback/EmptyData"), imp("EmptyTableData", "feedback/EmptyTableData")],
+    useFor: "Existing empty-state variants.",
+    usedIn: ["Existing feature screens"],
+    legacyOf: "EmptyState",
+  },
+  Tooltip: {
+    category: "feedback",
+    imports: [imp("Tooltip", "feedback/Tooltip")],
+    useFor: "Short hint on hover and focus (max 280px).",
+    usedIn: ["Icon buttons", "Truncated text", "Field info icons"],
+    avoid: "Essential information: it must be visible without hovering.",
+  },
+  Skeleton: {
+    category: "feedback",
+    imports: [imp("Skeleton", "feedback/Skeleton")],
+    useFor: "Placeholder shaped like the content while it loads.",
+    usedIn: ["Cards, lists and tables while fetching"],
+  },
+
+  // ── Content / data ────────────────────────────────────────────────────
+  "Avatar and AvatarGroup": {
+    category: "data",
+    imports: [named("Avatar, AvatarGroup", "data/Avatar")],
+    useFor: "A person or organisation: photo or initials, optional status; groups show up to 4 then +N.",
+    usedIn: ["Table first column", "Student profile header", "Team members", "Activity feeds"],
+  },
+  Tag: {
+    category: "data",
+    imports: [imp("Tag", "data/Tag")],
+    useFor: "6px status or category tag with a tone or stage hue; text always present.",
+    usedIn: ["Statuses in tables and cards", "Program categories", "Document states"],
+    avoid: "Application stages: use StageTag so labels and colors come from config.",
+  },
+  StageTag: {
+    category: "data",
+    imports: [imp("StageTag", "data/StageTag")],
+    useFor: "An application stage by id, colored from config/applicationStages.ts, with an optional Action needed flag.",
+    usedIn: ["Application Tracker rows and board", "Student profile header", "Notifications", "Advisor home"],
+  },
+  DaysTag: {
+    category: "data",
+    imports: [imp("DaysTag", "data/DaysTag")],
+    useFor: "Days in stage or time to a deadline, colored by the brief's thresholds.",
+    usedIn: ["Next actions on Advisor home", "Tracker rows", "Upcoming deadlines", "Commission due dates"],
+  },
+  Chip: {
+    category: "data",
+    imports: [imp("Chip", "data/Chip")],
+    useFor: "Selectable or removable filter chip (pill).",
+    usedIn: ["Knowledge Hub Foundation / Degree filters", "Intake month chips", "Active filter chips"],
+  },
+  CountBadge: {
+    category: "data",
+    imports: [imp("CountBadge", "data/CountBadge")],
+    useFor: "Small count on nav items, tabs and the bell (99+ cap).",
+    usedIn: ["Sidebar: Application Tracker (count)", "Bell icon", "Tabs with counts"],
+  },
+  StatusBadge: {
+    category: "data",
+    imports: [imp("StatusBadge", "data/StatusBadge")],
+    useFor: "Existing status badge with success / danger / warning / attention / info / neutral.",
+    usedIn: ["Existing tables and detail pages"],
+    legacyOf: "Tag",
+  },
+  SolidBadge: {
+    category: "data",
+    imports: [imp("SolidBadge", "data/SolidBadge")],
+    useFor: "Filled status badge for strong emphasis.",
+    usedIn: ["Existing tables"],
+    legacyOf: 'Tag variant="solid"',
+  },
+  DetailStatusBadge: {
+    category: "data",
+    imports: [imp("DetailStatusBadge", "data/DetailStatusBadge")],
+    useFor: "Status with a dot on detail pages.",
+    usedIn: ["Existing detail pages"],
+    legacyOf: "Tag dot",
+  },
+  SectionIconBadge: {
+    category: "icons",
+    imports: [imp("SectionIconBadge", "icons/SectionIconBadge")],
+    useFor: "Tinted square icon to mark a section or card.",
+    usedIn: ["Card and panel headers", "Empty states", "Settings sections"],
+  },
+  FilterChip: {
+    category: "data",
+    imports: [imp("FilterChip", "data/FilterChip")],
+    useFor: "Removable chip for an applied filter.",
+    usedIn: ["Above tables after filtering"],
+  },
+  AppDate: {
+    category: "data",
+    imports: [imp("AppDate", "data/AppDate")],
+    useFor: "Renders a date as <time> in a chosen format, incl. relative.",
+    usedIn: ["Tables (updated)", "Timelines", "Profile details"],
+  },
+  RichTextDisplay: {
+    category: "data",
+    imports: [imp("RichTextDisplay", "data/RichTextDisplay")],
+    useFor: "Safely renders sanitized HTML from the editor.",
+    usedIn: ["Program descriptions", "Payment instructions", "Knowledge Hub articles"],
+  },
+  FadeIn: {
+    category: "core",
+    imports: [imp("FadeIn", "core/FadeIn")],
+    useFor: "Entrance motion for content blocks (respects reduced motion).",
+    usedIn: ["Public pages", "FAQ items"],
+    avoid: "Data tables and forms.",
+  },
+  Icon: {
+    category: "icons",
+    imports: [imp("Icon", "icons/Icon")],
+    useFor: "Every icon by name, so the set can switch from Lucide to Iconoir in one file.",
+    usedIn: ["Buttons, inputs, nav items, tags (new code)"],
+  },
+
+  // ── Popups ────────────────────────────────────────────────────────────
+  Modal: {
+    category: "feedback",
+    imports: [imp("Modal, { ConfirmDialog }", "feedback/Modal")],
+    useFor: "Focused task or confirmation (400 / 560 / 720); ConfirmDialog names the consequence.",
+    usedIn: ["Withdraw application (ConfirmDialog)", "Upload offer letter", "Record a payment"],
+    avoid: "Long forms or side details: use a Drawer.",
+  },
+  Drawer: {
+    category: "feedback",
+    imports: [imp("Drawer", "feedback/Drawer")],
+    useFor: "480px side panel from the end edge for details or longer forms.",
+    usedIn: ["Application quick view from the Tracker", "Filters on mobile", "Edit details"],
+  },
+  ActionSheet: {
+    category: "feedback",
+    imports: [imp("ActionSheet", "feedback/ActionSheet")],
+    useFor: "Mobile bottom sheet of actions (small modal on desktop).",
+    usedIn: ["Row actions on phones", "Share and export options"],
+  },
+  ContextMenu: {
+    category: "navigation",
+    imports: [imp("ContextMenu", "navigation/ContextMenu")],
+    useFor: "Accessible menu with groups, separators, danger items and a custom trigger.",
+    usedIn: ["Avatar menu", "More (…) actions", "Breadcrumb overflow"],
+  },
+  Dropdown: {
+    category: "navigation",
+    imports: [imp("Dropdown", "navigation/Dropdown")],
+    useFor: "Headless open/close panel; you style the content.",
+    usedIn: ["Legacy menus"],
+    avoid: "New menus: use ContextMenu.",
+  },
+  ModalHeader: {
+    category: "feedback",
+    imports: [imp("ModalHeader", "feedback/ModalHeader")],
+    useFor: "Icon, title, description and close for existing popups.",
+    usedIn: ["Existing feature popups"],
+    legacyOf: "Modal",
+  },
+
+  // ── Data display ──────────────────────────────────────────────────────
+  StatCard: {
+    category: "data",
+    imports: [imp("StatCard", "data/StatCard")],
+    useFor: "KPI: label with icon, value, delta tag, context and optional sparkline.",
+    usedIn: ["Advisor home (4 stat cards)", "Commission totals", "Admin dashboards"],
+  },
+  PipelineBar: {
+    category: "data",
+    imports: [imp("PipelineBar", "data/PipelineBar")],
+    useFor: "Stacked bar of applications by stage with a legend that can filter.",
+    usedIn: ["Advisor home pipeline", "Team-owner dashboard", "Top of the Application Tracker"],
+  },
+  DescriptionList: {
+    category: "data",
+    imports: [imp("DescriptionList", "data/DescriptionList")],
+    useFor: "Read-only label–value details in 1–3 columns, with a fallback for empty values.",
+    usedIn: ["Student profile Overview", "Advisor and Institution details", "Payout and bank details"],
+    avoid: "Editable fields: use form inputs.",
+  },
+  "List and ListItem": {
+    category: "data",
+    imports: [named("List, ListItem", "data/List")],
+    useFor: "Divided rows with leading, title, description, meta and a trailing action.",
+    usedIn: ["Next actions", "Upcoming deadlines", "Recent activity", "Documents list"],
+    avoid: "Many columns of comparable data: use DataTable.",
+  },
+  "Card, Widget and PresignedImage": {
+    category: "data",
+    imports: [imp("Card", "data/Card"), imp("Widget", "data/Widget"), imp("PresignedImage", "data/PresignedImage")],
+    useFor: "Bordered card surface, a simple icon + value widget, and images from storage keys.",
+    usedIn: ["Panels on every screen", "Profile photos and logos (PresignedImage)"],
+  },
+  CourseList: {
+    category: "data",
+    imports: [imp("CourseList", "data/CourseList")],
+    useFor: "Programs with levels, duration and fees in RM and USD.",
+    usedIn: ["Institution public profile", "Knowledge Hub program details"],
+  },
+  Faq: {
+    category: "data",
+    imports: [imp("Faq", "data/Faq")],
+    useFor: "Question and answer accordion.",
+    usedIn: ["Public profile help", "Knowledge Hub", "Onboarding help"],
+  },
+
+  // ── Tables ────────────────────────────────────────────────────────────
+  DataTable: {
+    category: "data",
+    imports: [imp("DataTable, { DataTablePrimaryCell }", "data/DataTable")],
+    useFor: "Typed table: sorting, selection with bulk actions, density, states, stacked rows on mobile.",
+    usedIn: ["Application Tracker (table view)", "Advisors, staff and Institutions lists", "Commission and payouts"],
+  },
+  "Table kit": {
+    category: "data",
+    imports: [imp("TableWrapper", "data/TableWrapper"), imp("TableSkeletonRows", "data/TableSkeletonRows"), imp("TableEmptyRow", "data/TableEmptyRow"), imp("TableErrorRow", "data/TableErrorRow")],
+    useFor: "Building blocks for hand-built tables and their states.",
+    usedIn: ["Existing feature tables"],
+    legacyOf: "DataTable",
+  },
+  TablePagination: {
+    category: "data",
+    imports: [imp("TablePagination", "data/TablePagination")],
+    useFor: "Showing x–y of z with Previous / Next under a table.",
+    usedIn: ["Existing feature tables", "DataTable footer"],
+  },
+};

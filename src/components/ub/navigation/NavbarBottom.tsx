@@ -16,9 +16,21 @@ export interface NavbarBottomItem {
   badgeLabel?: (count: number) => string;
 }
 
+export interface NavbarBottomAction {
+  label: string;
+  icon: NavbarBottomItem["icon"];
+  onClick: () => void;
+  /** For a menu/drawer toggle: whether what it controls is open. */
+  expanded?: boolean;
+  /** id of the element it controls (aria-controls). */
+  controls?: string;
+}
+
 export interface NavbarBottomProps {
   /** 4–5 items (brief §5). */
   items: NavbarBottomItem[];
+  /** Optional trailing button, e.g. "Menu" that opens the full navigation drawer. */
+  action?: NavbarBottomAction;
   /** Overrides the pathname used to pick the active item. */
   activeHref?: string;
   /** Fixed to the viewport bottom and hidden from md up (default). false renders it in flow, for previews. */
@@ -42,7 +54,7 @@ const formatCount = (n: number) => (n > 99 ? "99+" : String(n));
  * 4–5 items with an optional count badge, aria-current on the active item.
  * Hidden from md up, where the sidebar takes over.
  */
-export default function NavbarBottom({ items, activeHref, fixed = true, "aria-label": ariaLabel = "Main", className }: NavbarBottomProps) {
+export default function NavbarBottom({ items, action, activeHref, fixed = true, "aria-label": ariaLabel = "Main", className }: NavbarBottomProps) {
   const pathname = usePathname();
   const active = findActiveHref(items, activeHref ?? pathname);
 
@@ -55,7 +67,7 @@ export default function NavbarBottom({ items, activeHref, fixed = true, "aria-la
         className,
       )}
     >
-      <ul className="grid h-16" style={{ gridTemplateColumns: `repeat(${Math.max(items.length, 1)}, minmax(0, 1fr))` }}>
+      <ul className="grid h-16" style={{ gridTemplateColumns: `repeat(${Math.max(items.length + (action ? 1 : 0), 1)}, minmax(0, 1fr))` }}>
         {items.map((item) => {
           const Icon = item.icon;
           const isActive = item.href === active;
@@ -66,7 +78,7 @@ export default function NavbarBottom({ items, activeHref, fixed = true, "aria-la
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
                 className={clsx(
-                  "flex h-full flex-col items-center justify-center gap-1 rounded-ub-md px-1 transition-colors duration-ub-fast ease-ub-standard",
+                  "flex h-full flex-col items-center justify-center gap-1 rounded-ub-md px-0.5 transition-colors duration-ub-fast ease-ub-standard",
                   focusRingInset,
                   isActive ? "text-ub-text-link" : "text-ub-text-secondary hover:text-ub-text-primary",
                 )}
@@ -93,6 +105,25 @@ export default function NavbarBottom({ items, activeHref, fixed = true, "aria-la
             </li>
           );
         })}
+        {action && (
+          <li className="min-w-0">
+            <button
+              type="button"
+              onClick={action.onClick}
+              aria-expanded={action.expanded}
+              aria-controls={action.controls}
+              className={clsx(
+                "flex h-full w-full flex-col items-center justify-center gap-1 rounded-ub-md px-0.5 text-ub-text-secondary transition-colors duration-ub-fast ease-ub-standard hover:text-ub-text-primary",
+                focusRingInset,
+              )}
+            >
+              <span className={clsx("grid h-8 w-14 place-items-center rounded-ub-full", action.expanded && "bg-ub-selected")}>
+                <action.icon className="h-5 w-5" aria-hidden="true" />
+              </span>
+              <span className="max-w-full truncate text-ub-label-sm">{action.label}</span>
+            </button>
+          </li>
+        )}
       </ul>
     </nav>
   );

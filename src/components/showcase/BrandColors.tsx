@@ -162,7 +162,7 @@ export default function BrandColors() {
         <Swatches tokens={["bg-canvas", "bg-surface", "bg-surface-subtle", "bg-selected", "bg-disabled", "bg-table-head"]} />
       </Demo>
 
-      <Demo name="Text" path="styles/tokens/semantic.css" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <Demo name="Text colors" path="styles/tokens/semantic.css" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {[
           ["text-primary", "text-ub-text-primary", "Headings and body"],
           ["text-secondary", "text-ub-text-secondary", "Supporting text"],

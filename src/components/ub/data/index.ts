@@ -26,3 +26,6 @@ export { default as TableSkeletonRows } from "./TableSkeletonRows";
 export { default as TableWrapper } from "./TableWrapper";
 export { default as Tag } from "./Tag";
 export { default as Widget } from "./Widget";
+export { default as StageTag } from "./StageTag";
+export { default as PipelineBar } from "./PipelineBar";
+export { default as DescriptionList } from "./DescriptionList";
