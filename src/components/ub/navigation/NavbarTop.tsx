@@ -75,7 +75,7 @@ const Navbar = ({
   const unreadLabel = unreadCount > 99 ? "99+" : String(unreadCount);
 
   return (
-    <header className="ub-glass-light sticky top-0 z-40 flex h-16 items-center gap-3 px-4 md:px-6 lg:px-8">
+    <header className="ub-glass-light-strong sticky top-0 z-40 flex h-16 items-center gap-3 px-4 md:px-6 lg:px-8">
       {/* Tablet only: phones use the bottom nav's Menu button, desktop has the persistent sidebar. */}
       <button
         type="button"
