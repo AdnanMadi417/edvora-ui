@@ -319,9 +319,9 @@ export const CATALOG: Record<string, CatalogEntry> = {
   Tabs: {
     category: "navigation",
     imports: [imp("Tabs", "navigation/Tabs")],
-    useFor: "Switch between views of the same object (44px, 2px underline).",
+    useFor: "Switch between views of the same object. variant: underline (default, 44px, 2px underline) for page sections · segmented for views of the same data (Table / Board) · pills for status filters · vertical for settings. Items take icon, count and disabled.",
     usedIn: ["Student profile: Overview · Applications · Documents · Commission · Activity", "Advisor details", "Team members / invitations"],
-    avoid: "Navigating to different pages: use the sidebar.",
+    avoid: "Navigating to different pages: use the sidebar. Mixing variants in one view, or using tabs as the Primary action.",
   },
   Breadcrumbs: {
     category: "navigation",
