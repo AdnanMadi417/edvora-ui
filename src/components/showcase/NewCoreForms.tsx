@@ -5,6 +5,7 @@ import Button from "components/ub/core/Button";
 import { TextButton } from "components/ub/core/TextButton";
 import { ButtonGroup } from "components/ub/core/ButtonGroup";
 import { Input } from "components/ub/forms/Input";
+import { Textarea } from "components/ub/forms/Textarea";
 import { Checkbox } from "components/ub/forms/Checkbox";
 import { Radio, RadioGroup } from "components/ub/forms/Radio";
 import { Toggle } from "components/ub/forms/Toggle";
@@ -12,7 +13,7 @@ import { Stepper } from "components/ub/forms/Stepper";
 import { Combobox, type ComboboxOption } from "components/ub/forms/Combobox";
 import { FileUpload, type FileUploadItem, type FileUploadStatus } from "components/ub/forms/FileUpload";
 import { Icon, iconNames, type IconSize } from "components/ub/icons/Icon";
-import { Demo, ShowcaseSection, StateSwitch, Variant } from "./Showcase";
+import { Demo, ShowcaseSection, StateSwitch, ThemePreviews, Variant } from "./Showcase";
 
 // Initials tile standing in for Institution logos until the SVGs arrive.
 function LogoTile({ initials }: { initials: string }) {
@@ -33,6 +34,52 @@ const INSTITUTIONS: ComboboxOption[] = [
 ];
 
 const ICON_SIZES: IconSize[] = [16, 20, 24, 32];
+
+/** Textarea demo with its own state: default, with count, error, disabled. */
+function TextareaDemo() {
+  const [state, setState] = useState<"default" | "error" | "disabled">("default");
+  const [reason, setReason] = useState("The academic transcript is not certified.");
+  return (
+    <Demo
+      name="Textarea"
+      path="components/ub/forms/Textarea.tsx"
+      description="Same label, helper and error pattern as Input, for reasons, notes and descriptions. maxLength adds a tabular count and caps input."
+      className="grid gap-6"
+      code={`<Textarea
+  label="Reason for rejection"
+  value={reason}
+  onChange={setReason}
+  maxLength={500}
+  error={submitted && !reason.trim() ? "Tell the Advisor why the registration is rejected." : undefined}
+  required
+/>`}
+      props={[
+        { name: "label", type: "ReactNode", description: "Shown above; required adds aria-required, optional fields are marked." },
+        { name: "value / onChange", type: "string / (value, event) => void", description: "Controlled value." },
+        { name: "helperText", type: "ReactNode", description: "Shown under the field." },
+        { name: "error", type: "ReactNode", description: "What happened and how to fix it; sets aria-invalid." },
+        { name: "maxLength", type: "number", description: "Caps input and shows “120 / 500”." },
+        { name: "rows", type: "number", default: "4", description: "Initial height; resizable vertically." },
+        { name: "hideLabel", type: "boolean", default: "false", description: "Visually hidden label for screen readers." },
+      ]}
+    >
+      <StateSwitch<"default" | "error" | "disabled"> value={state} options={["default", "error", "disabled"] as const} onChange={setState} label="Textarea state" />
+      <ThemePreviews>
+        <Textarea
+          label="Reason for rejection"
+          helperText="Be specific, so the Advisor knows what to fix."
+          value={state === "error" ? "" : reason}
+          onChange={setReason}
+          maxLength={500}
+          error={state === "error" ? "Tell the Advisor why the registration is rejected." : undefined}
+          disabled={state === "disabled"}
+          required
+          rows={3}
+        />
+      </ThemePreviews>
+    </Demo>
+  );
+}
 
 function useFakeUpload() {
   const [files, setFiles] = useState<FileUploadItem[]>([]);
@@ -163,6 +210,8 @@ export default function NewCoreForms() {
         <Input label="Application reference" reference leadingIcon="search" value={reference} onChange={setReference} helperText="Starts with UBX, for example UBX-2026-0412." />
         <Input label="Advisor notes" disabled value="Locked after submission" onChange={() => {}} helperText="Disabled fields keep their value visible." />
       </Demo>
+
+      <TextareaDemo />
 
       <Demo name="Checkbox" path="components/ub/forms/Checkbox.tsx" description="20px, radius 4. Label, description and an indeterminate state for select-all." className="grid gap-6 md:grid-cols-2">
         <Variant label="With description">

@@ -45,7 +45,7 @@ export function FormInputsSection() {
       title="Form inputs"
       description="Every input shares the same look, validation and error handling: label above, helper text below, 40px fields (48 on mobile), and errors that say how to fix the problem. Optional fields are marked, required ones are not."
     >
-      <Pick demos={["Input", "Checkbox", "Radio and RadioGroup", "Toggle", "Stepper", "Combobox", "FileUpload"]}>
+      <Pick demos={["Input", "Textarea", "Checkbox", "Radio and RadioGroup", "Toggle", "Stepper", "Combobox", "FileUpload"]}>
         <NewCoreForms />
       </Pick>
       <Pick demos={["InputField and TextareaField","SelectField, SelectInput and RadioField","CheckBoxGroup and CheckSimpleBoxGroup","SearchableDropdown, MultiSelect and SearchableSelect","Toggles","Password and OTP","Phone, commission and fee rows","IntakeDatePicker","RichTextEditor","RadioCardGroup","SearchableChecklist","File uploads"]}>
