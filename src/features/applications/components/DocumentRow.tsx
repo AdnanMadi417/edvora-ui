@@ -11,7 +11,7 @@ export interface DocumentRowProps {
   document: DocumentItem;
   /** Opens or downloads the file. Hidden when there's no file. */
   onDownload?: (doc: DocumentItem) => void;
-  /** Shown for Needs replacing (and Missing) when the viewer may upload. */
+  /** Replace/upload action; shown when `document.replaceable`, or for Needs replacing and Missing when the API doesn't say. */
   onReplace?: (doc: DocumentItem) => void;
   /** Busy state for an in-flight download of this file. */
   downloading?: boolean;
@@ -24,7 +24,8 @@ export interface DocumentRowProps {
 /** One application document with its state, reason and actions (brief §6). */
 export default function DocumentRow({ document: doc, onDownload, onReplace, downloading = false, uploadProgress = null, readOnly = false }: DocumentRowProps) {
   const uploading = typeof uploadProgress === "number";
-  const canReplace = !readOnly && !!onReplace && (doc.state === "needs-replacing" || doc.state === "missing");
+  // The backend's per-file flag wins; otherwise only files that need replacing (or are missing) offer it.
+  const canReplace = !readOnly && !!onReplace && (doc.replaceable ?? (doc.state === "needs-replacing" || doc.state === "missing"));
   return (
     <FileRow
       name={doc.name}

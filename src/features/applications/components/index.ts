@@ -14,3 +14,4 @@ export { default as NotesPanel } from "./NotesPanel";
 export { default as ApplicationAlerts, buildApplicationAlerts } from "./ApplicationAlerts";
 export { default as WithdrawApplicationDialog } from "./WithdrawApplicationDialog";
 export { default as ApplicationDetailsLayout, OverviewGrid, TwoColumn } from "./ApplicationDetailsLayout";
+export { default as StudentBackgroundCard } from "./StudentBackgroundCard";

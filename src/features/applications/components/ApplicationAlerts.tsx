@@ -10,8 +10,8 @@ export interface ApplicationAlert {
 }
 
 /**
- * Pure: alerts the application data itself implies — documents needing
- * replacement and a correction/rejection reason. Stale-fee warnings need
+ * Pure: alerts the application data itself implies — a correction/rejection
+ * reason, else documents needing replacement (never both: same message). Stale-fee warnings need
  * Knowledge Hub data the details API doesn't return, so callers pass them in.
  */
 export function buildApplicationAlerts(view: Pick<ApplicationView, "documents" | "stage">, correctionReason?: string | null): ApplicationAlert[] {
@@ -20,7 +20,8 @@ export function buildApplicationAlerts(view: Pick<ApplicationView, "documents" |
   if (view.stage.resolved?.attention && correctionReason) {
     alerts.push({ id: "action-needed", tone: "warning", title: view.stage.statusName ?? "Action needed", body: correctionReason });
   }
-  if (replace.length > 0) {
+  // The correction alert already names what to fix; the rows show which files.
+  if (replace.length > 0 && alerts.length === 0) {
     alerts.push({
       id: "replace-documents",
       tone: "danger",

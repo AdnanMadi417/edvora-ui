@@ -1,87 +1,76 @@
-import React, { useState } from "react";
-import AdminTopBar from "features/applications/admin/components/topBar/AdminTopBar";
-import ApplicationHero from "features/applications/shared/ApplicationHero";
-import ApplicationInfoSection from "features/applications/shared/ApplicationInfoSection";
-import ApplicationStudentInfoSection from "features/applications/shared/ApplicationStudentInfoSection";
-import OfferLetterCard from './OfferLetterCard';
-import { AnimatePresence, motion } from "framer-motion";
-import { EASE, MICRO_DURATION } from "components/ub/core/FadeIn";
-import Tabs from "components/ub/navigation/Tabs";
-import { APPLICATION_DETAILS_TABS, type ApplicationDetailsTab } from "features/applications/shared/applicationDetailTabs";
-import ApplicationActivityHistory from 'features/applications/shared/ApplicationActivityHistory';
-import ApplicationTimeline from 'features/applications/shared/ApplicationTimeline';
-import ApplicationCommission from './ApplicationCommission';
-import ApplicationDocuments from './ApplicationDocuments';
+"use client";
+
+import { useState } from "react";
+import { Clock, FilePlus2, RefreshCw } from "lucide-react";
+import HoldPopup from "features/applications/admin/components/popups/Hold";
+import UpdateStatus from "features/applications/admin/components/popups/UpdateStatus";
+import UpdateCorrectionRequest from "features/applications/shared/UpdateCorrectionRequest";
+import { useApplicationActions } from "features/applications/hooks";
+import ApplicationDetailsScreen from "features/applications/details/ApplicationDetailsScreen";
+import ApplicationCommission from "./ApplicationCommission";
 
 interface ApplicationDetailsProps {
   application: any;
   onRefetch?: () => void;
 }
 
-export default function ApplicationDetails({
-  application,
-  onRefetch,
-}: ApplicationDetailsProps) {
-  const [activeTab, setActiveTab] = useState<ApplicationDetailsTab>("details");
+/** Admin view: Update status is the Primary action; Hold and the correction request sit in the overflow menu. */
+export default function ApplicationDetails({ application, onRefetch }: ApplicationDetailsProps) {
+  const [showHold, setShowHold] = useState(false);
+  const [showUpdate, setShowUpdate] = useState(false);
+  const [showCorrection, setShowCorrection] = useState(false);
+  // can_update_correction_request is computed by the backend from the same
+  // rules the PATCH enforces — just read it, don't re-derive it here.
+  const { actions, refetch: refetchActions } = useApplicationActions(application?.id);
+
+  const refresh = () => {
+    refetchActions();
+    onRefetch?.();
+  };
 
   return (
-    <section className="max-w-5xl mx-auto">
-
-      <div className="mt-4 bg-white rounded-lg border border-slate-200">
-
-        {/* Admin actions */}
-        <div className="border-b border-slate-200">
-          <AdminTopBar application={application} onRefetch={onRefetch} />
-        </div>
-
-        {/* Hero section */}
-        <ApplicationHero application={application} viewerActor="3" />
-
-        <Tabs<ApplicationDetailsTab> tabs={APPLICATION_DETAILS_TABS} active={activeTab} onChange={setActiveTab} />
-
-        <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: MICRO_DURATION, ease: EASE }}
-        >
-        {activeTab === "details" && (
-        <>
-        {/* Application Timeline */}
-        <div className="p-6 border-b border-slate-200">
-          <ApplicationTimeline application={application} />
-        </div>
-
-        {/* Commission Details */}
-        <div className="border-b border-slate-200">
-          <ApplicationCommission application={application} onRefetch={onRefetch} />
-        </div>
-
-        {/* Offer Letter + Visa Payment */}
-        <div className="border-b border-slate-200">
-          <OfferLetterCard application={application} onRefetch={onRefetch} />
-        </div>
-
-        {/* Application Information */}
-        <ApplicationInfoSection application={application} />
-
-        {/* Student Information */}
-        <ApplicationStudentInfoSection application={application} />
-
-        {/* Documents */}
-        <ApplicationDocuments application={application} onRefetch={onRefetch} />
-
-        </>
-        )}
-
-        {activeTab === "activity" && <ApplicationActivityHistory application={application} />}
-        </motion.div>
-        </AnimatePresence>
-
-      </div>
-
-    </section>
+    <ApplicationDetailsScreen
+      application={application}
+      viewer="3"
+      backHref="/admin/applications"
+      correctionReason={actions?.correction_reason}
+      primaryAction={{ label: "Update status", icon: RefreshCw, onClick: () => setShowUpdate(true) }}
+      overflowActions={[
+        ...(actions?.can_update_correction_request ? [{ label: "Update correction request", icon: FilePlus2, onClick: () => setShowCorrection(true) }] : []),
+        { label: "Put on hold", icon: Clock, onClick: () => setShowHold(true) },
+      ]}
+      commissionDetail={<ApplicationCommission application={application} onRefetch={onRefetch} />}
+    >
+      <HoldPopup
+        isOpen={showHold}
+        onClose={() => setShowHold(false)}
+        onConfirm={() => setShowHold(false)}
+        applicationId={application?.id}
+        currentStatus={application?.lifecycle_status}
+        onRefetch={onRefetch}
+      />
+      {actions && showCorrection && (
+        <UpdateCorrectionRequest
+          isOpen={showCorrection}
+          onClose={() => setShowCorrection(false)}
+          applicationId={application.id}
+          statusName={actions.status}
+          currentReason={actions.correction_reason}
+          documentTypes={actions.document_types ?? []}
+          onUpdated={refresh}
+        />
+      )}
+      {application && showUpdate && (
+        <UpdateStatus
+          isOpen={showUpdate}
+          onClose={() => setShowUpdate(false)}
+          onConfirm={() => {
+            setShowUpdate(false);
+            refresh();
+          }}
+          application={application}
+        />
+      )}
+    </ApplicationDetailsScreen>
   );
 }

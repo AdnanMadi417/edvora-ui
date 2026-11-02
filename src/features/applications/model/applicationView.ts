@@ -13,7 +13,7 @@ export type ViewerActor = "2" | "3";
 
 // ── Documents ────────────────────────────────────────────────────────────────
 
-export type DocumentGroup = "application" | "payment" | "offer" | "visa" | "arrival";
+export type DocumentGroup = "application" | "payment" | "offer" | "visa" | "arrival" | "commission";
 
 export interface DocumentItem {
   id: string;
@@ -26,6 +26,8 @@ export interface DocumentItem {
   reason: string | null;
   fileKey: string | null;
   fileUrl: string | null;
+  /** Backend says this viewer may replace the file (can_manager_reupload); undefined when it doesn't say. */
+  replaceable?: boolean;
 }
 
 /**
@@ -63,6 +65,7 @@ function toDocument(raw: any, group: DocumentGroup): DocumentItem | null {
     reason: state === "needs-replacing" ? raw.approve_notes ?? null : null,
     fileKey: raw.file_key ?? null,
     fileUrl: raw.file_url ?? null,
+    replaceable: typeof raw.can_manager_reupload === "boolean" ? raw.can_manager_reupload : undefined,
   };
 }
 
@@ -151,6 +154,8 @@ export interface ApplicationView {
   offerLetter: DocumentItem | null;
   visa: { evaluation: DocumentItem | null; visaLetter: DocumentItem | null; eVisaRequired: boolean };
   commission: CommissionView | null;
+  /** Commission invoices/receipts plus the payout receipt (always shown as verified: it's finance's proof). */
+  commissionDocuments: DocumentItem[];
 }
 
 const str = (v: unknown): string | null => (typeof v === "string" && v.trim() ? v : null);
@@ -220,5 +225,11 @@ export function toApplicationView(a: ApplicationDetail & Record<string, any>, vi
           notes: c.notes,
         }
       : null,
+    commissionDocuments: [
+      ...list(Object.values(a.commission_documents ?? {}).filter(Boolean), "commission"),
+      ...(a.partner_payout?.receipt_file_key
+        ? [toDocument({ id: `${a.partner_payout.id}-receipt`, file_key: a.partner_payout.receipt_file_key, document_type: "Payout receipt", status: "2", created_at: a.partner_payout.created_at }, "commission")!]
+        : []),
+    ],
   };
 }

@@ -6,7 +6,14 @@ import KeyValueGrid from "components/ub/data/KeyValueGrid";
 import SectionCard, { type SectionCardState } from "components/ub/data/SectionCard";
 import Tag from "components/ub/data/Tag";
 import { COMMISSION_STATES, type CommissionView } from "features/applications/model/applicationView";
-import { formatCommissionTimeline } from "features/applications/shared/commissionTypes";
+
+/** Pure: "30–60 days" / "From 30 days" / "Within 60 days" for the expected payment window. */
+export function paymentWindow(from: number | null, to: number | null): string | null {
+  if (from != null && to != null) return `${from}–${to} days`;
+  if (from != null) return `From ${from} days`;
+  if (to != null) return `Within ${to} days`;
+  return null;
+}
 
 export interface CommissionCardProps {
   commission: CommissionView | null;
@@ -23,7 +30,7 @@ export interface CommissionCardProps {
 export default function CommissionCard({ commission, dueInDays, actions, state = "ready", onRetry, className }: CommissionCardProps) {
   const resolved = state === "ready" && !commission ? "empty" : state;
   const s = commission ? COMMISSION_STATES[commission.state] : null;
-  const window = commission ? formatCommissionTimeline(commission.expectedFrom, commission.expectedTo) : null;
+  const window = commission ? paymentWindow(commission.expectedFrom, commission.expectedTo) : null;
   return (
     <SectionCard
       title="Commission"
@@ -41,7 +48,9 @@ export default function CommissionCard({ commission, dueInDays, actions, state =
             columns={2}
             items={[
               { label: "Amount", value: commission.amount !== null ? <Amount value={commission.amount} currency={commission.currency} /> : null, hint: commission.type ?? undefined },
-              { label: "Due", value: typeof dueInDays === "number" ? <DaysTag mode="deadline" days={dueInDays} /> : window, hint: typeof dueInDays === "number" ? window ?? undefined : undefined },
+              typeof dueInDays === "number"
+                ? { label: "Due", value: <DaysTag mode="deadline" days={dueInDays} />, hint: window ? `Expected within ${window}` : undefined }
+                : { label: "Expected within", value: window },
             ]}
           />
           {commission.notes && <p className="text-ub-body-sm text-ub-text-secondary">{commission.notes}</p>}

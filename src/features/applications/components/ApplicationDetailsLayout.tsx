@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import Button from "components/ub/core/Button";
 import StickyActionBar from "components/ub/navigation/StickyActionBar";
 import Tabs, { tabPanelProps } from "components/ub/navigation/Tabs";
-import { APPLICATION_DETAILS_TABS, type ApplicationDetailsTab } from "features/applications/detailsTabs";
+import { APPLICATION_DETAILS_TABS, type ApplicationDetailsTab } from "features/applications/shared/applicationDetailTabs";
 import type { HeaderAction } from "./ApplicationHeader";
 
 export interface ApplicationDetailsLayoutProps {
