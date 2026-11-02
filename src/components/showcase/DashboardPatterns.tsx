@@ -61,6 +61,16 @@ export default function DashboardPatterns() {
         </div>
       </Demo>
 
+      <Demo name="Application Details" path="components/showcase/ApplicationDetailsPattern.tsx" description="The full Student profile / Application Details page, built only from the shared feature components with mock data. Open it full size to check every breakpoint, theme and direction.">
+        <a href="/design-system/patterns/application-details" className={clsx(card, cardInteractive, focusRing, "flex items-center justify-between gap-4 p-4")}>
+          <span>
+            <span className="block text-ub-label-md text-ub-text-primary">Open the Application Details pattern</span>
+            <span className="block text-ub-caption text-ub-text-tertiary">/design-system/patterns/application-details</span>
+          </span>
+          <Briefcase className="h-5 w-5 text-ub-icon" aria-hidden />
+        </a>
+      </Demo>
+
       <Demo name="Notifications feed" path="components/ub/feedback/NotificationItem.tsx" description="Each item states the event, then the next step. Unread items show an 8px blue dot. Grouped into Today, This week and Earlier.">
         <div className={clsx(card, "max-w-ub-form divide-y divide-ub-border")}>
           {NOTIFICATIONS.map((g) => (

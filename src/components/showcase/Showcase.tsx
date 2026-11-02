@@ -45,10 +45,21 @@ interface DemoProps {
   className?: string;
   /** Wide demos take the full row on large screens. */
   wide?: boolean;
+  /** Props table under the preview. */
+  props?: PropRow[];
+  /** Copyable JSX example under the preview. */
+  code?: string;
+}
+
+export interface PropRow {
+  name: string;
+  type: string;
+  default?: string;
+  description: string;
 }
 
 /** One component: name, file path and a live, interactive preview. */
-export function Demo({ name, path, description, children, className }: DemoProps) {
+export function Demo({ name, path, description, children, className, props, code }: DemoProps) {
   const pick = useContext(PickContext);
   const id = `c-${name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}`;
   if (pick && !pick.has(name)) return null;
@@ -65,13 +76,18 @@ export function Demo({ name, path, description, children, className }: DemoProps
       </header>
       {CATALOG[name] && <UsageStrip entry={CATALOG[name]} />}
       <div className={clsx("p-5", className)}>{children}</div>
+      {(code || props) && (
+        <div className="grid gap-4 border-t border-ub-border px-5 py-4">
+          {code && <CodeBlock label="Usage" code={code} />}
+          {props && <PropsTable rows={props} />}
+        </div>
+      )}
     </article>
   );
 }
 
 /** "Where to use" strip from components/ub/catalog.ts, shown under each demo header. */
 function UsageStrip({ entry }: { entry: CatalogEntry }) {
-  const [copied, setCopied] = useState(false);
   const code = entry.imports.join("\n");
   return (
     <div className="grid gap-3 border-b border-ub-border px-5 py-4 text-ub-body-sm md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -107,26 +123,87 @@ function UsageStrip({ entry }: { entry: CatalogEntry }) {
           </div>
         )}
       </dl>
-      <div className="min-w-0">
-        <div className="mb-1 flex items-center justify-between gap-2">
-          <span className="text-ub-label-sm text-ub-text-tertiary">Import</span>
-          <button
-            type="button"
-            onClick={() => {
-              navigator.clipboard?.writeText(code).catch(() => undefined);
-              setCopied(true);
-              window.setTimeout(() => setCopied(false), 1500);
-            }}
-            className="inline-flex h-7 items-center gap-1 rounded-ub-full px-2.5 text-ub-label-sm text-ub-text-link transition-colors duration-ub-fast hover:bg-ub-action-secondary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus"
-          >
-            {copied ? <Check className="h-3.5 w-3.5" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}
-            {copied ? "Copied" : "Copy"}
-          </button>
-        </div>
-        <pre dir="ltr" className="overflow-x-auto rounded-ub-md border border-ub-border bg-ub-surface-subtle p-3 text-ub-caption leading-5 text-ub-text-primary">
-          <code>{code}</code>
-        </pre>
+      <CodeBlock label="Import" code={code} />
+    </div>
+  );
+}
+
+/** Copy button + pre block (always LTR). */
+export function CodeBlock({ label, code }: { label: string; code: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="min-w-0">
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <span className="text-ub-label-sm text-ub-text-tertiary">{label}</span>
+        <button
+          type="button"
+          onClick={() => {
+            navigator.clipboard?.writeText(code).catch(() => undefined);
+            setCopied(true);
+            window.setTimeout(() => setCopied(false), 1500);
+          }}
+          aria-label={`Copy ${label.toLowerCase()}`}
+          className="inline-flex h-7 items-center gap-1 rounded-ub-full px-2.5 text-ub-label-sm text-ub-text-link transition-colors duration-ub-fast hover:bg-ub-action-secondary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus"
+        >
+          {copied ? <Check className="h-3.5 w-3.5" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}
+          {copied ? "Copied" : "Copy"}
+        </button>
       </div>
+      <pre dir="ltr" className="overflow-x-auto rounded-ub-md border border-ub-border bg-ub-surface-subtle p-3 text-ub-caption leading-5 text-ub-text-primary">
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
+/** Props table: name, type, default, description. */
+export function PropsTable({ rows }: { rows: PropRow[] }) {
+  return (
+    <div className="min-w-0">
+      <p className="mb-1 text-ub-label-sm text-ub-text-tertiary">Props</p>
+      <div className="overflow-x-auto rounded-ub-md border border-ub-border">
+        <table className="w-full min-w-[560px] text-start text-ub-body-sm">
+          <thead className="bg-ub-table-head text-ub-label-sm text-ub-text-secondary">
+            <tr>
+              <th scope="col" className="h-9 px-3 text-start font-medium">Prop</th>
+              <th scope="col" className="h-9 px-3 text-start font-medium">Type</th>
+              <th scope="col" className="h-9 px-3 text-start font-medium">Default</th>
+              <th scope="col" className="h-9 px-3 text-start font-medium">Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => (
+              <tr key={r.name} className="border-t border-ub-border align-top">
+                <td className="px-3 py-2"><code className="ub-ref text-ub-text-primary">{r.name}</code></td>
+                <td className="px-3 py-2"><code dir="ltr" className="text-ub-caption text-ub-text-secondary">{r.type}</code></td>
+                <td className="px-3 py-2 text-ub-text-secondary">{r.default ?? "—"}</td>
+                <td className="px-3 py-2 text-ub-text-primary">{r.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+/** The same preview in light, near-black dark and RTL, side by side on wide screens. */
+export function ThemePreviews({ children, className }: { children: ReactNode; className?: string }) {
+  const frames: { label: string; theme: "light" | "dark"; dir: "ltr" | "rtl" }[] = [
+    { label: "Light", theme: "light", dir: "ltr" },
+    { label: "Dark", theme: "dark", dir: "ltr" },
+    { label: "RTL", theme: "light", dir: "rtl" },
+  ];
+  return (
+    <div className={clsx("grid gap-4 xl:grid-cols-3", className)}>
+      {frames.map((f) => (
+        <figure key={f.label} className="min-w-0">
+          <figcaption className="mb-2 text-ub-label-sm text-ub-text-tertiary">{f.label}</figcaption>
+          <div data-ub-theme={f.theme} dir={f.dir} className="rounded-ub-lg border border-ub-border bg-ub-canvas p-4 text-ub-text-primary">
+            {children}
+          </div>
+        </figure>
+      ))}
     </div>
   );
 }

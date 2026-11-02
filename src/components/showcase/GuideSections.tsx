@@ -15,6 +15,7 @@ import NewData from "./NewData";
 import NewNavigationFeedback from "./NewNavigationFeedback";
 import NewBrand from "./NewBrand";
 import NewScreenParts from "./NewScreenParts";
+import ApplicationKit from "./ApplicationKit";
 
 export function ButtonsSection() {
   return (
@@ -68,6 +69,9 @@ export function NavigationSection() {
       </Pick>
       <Pick demos={["Breadcrumbs", "Pagination", "NavbarBottom"]}>
         <NewNavigationFeedback />
+      </Pick>
+      <Pick demos={["StickyActionBar"]}>
+        <ApplicationKit />
       </Pick>
       <Pick demos={["PageContainer", "PublicNavbar", "Footer (portal)", "SiteFooter (public)"]}>
         <DataDisplay />
@@ -167,6 +171,9 @@ export function DataDisplaySection() {
       </Pick>
       <Pick demos={["PipelineBar", "DescriptionList"]}>
         <NewScreenParts />
+      </Pick>
+      <Pick demos={["SectionCard", "KeyValueGrid", "FileRow", "Timeline"]}>
+        <ApplicationKit />
       </Pick>
       <Pick demos={["Card, Widget and PresignedImage", "CourseList", "Faq"]}>
         <DataDisplay />

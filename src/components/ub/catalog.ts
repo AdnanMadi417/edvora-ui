@@ -24,6 +24,43 @@ const imp = (name: string, path: string) => `import ${name} from "components/ub/
 const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
 
 export const CATALOG: Record<string, CatalogEntry> = {
+  // ── Detail page kit ──────────────────────────────────────────────────────
+  SectionCard: {
+    category: "data",
+    imports: [imp("SectionCard", "data/SectionCard")],
+    useFor: "Every read-only block on a detail page: one header plus the loading, empty and error states.",
+    usedIn: ["Application Details: summary, student, documents, offer, visa, commission, activity", "Advisor details", "Payout details"],
+    avoid: "Interactive cards (use the interactive card recipe) and glass summaries (StatCard).",
+  },
+  KeyValueGrid: {
+    category: "data",
+    imports: [imp("KeyValueGrid", "data/KeyValueGrid")],
+    useFor: "The two to four figures a card leads with: amount, due date, visa fee, tuition.",
+    usedIn: ["Commission card", "Visa fee on the offer card", "Next-step panel (amount due)"],
+    avoid: "Long detail lists: use DescriptionList.",
+  },
+  FileRow: {
+    category: "data",
+    imports: [named("default as FileRow, FILE_ROW_STATES, type FileRowState", "data/FileRow")],
+    useFor: "One file with its state: Missing, Uploading, Uploaded, Verified, Needs replacing.",
+    usedIn: ["Document checklist", "Offer letter", "Visa files", "Templates to download"],
+    avoid: "Choosing a file to upload: use FileUpload.",
+  },
+  Timeline: {
+    category: "data",
+    imports: [named("default as Timeline, groupTimeline, formatEventTime", "data/Timeline")],
+    useFor: "Events newest first, grouped Today / This week / Earlier with relative time under 7 days.",
+    usedIn: ["Application activity", "Internal notes", "Notification history"],
+    avoid: "Progress through fixed steps: use ApplicationTracker.",
+  },
+  StickyActionBar: {
+    category: "navigation",
+    imports: [imp("StickyActionBar", "navigation/StickyActionBar")],
+    useFor: "Keeping the one Primary action in reach on long pages below 768px.",
+    usedIn: ["Application Details (mobile)"],
+    avoid: "Desktop, or more than one Primary action.",
+  },
+
   // ── Brand ─────────────────────────────────────────────────────────────
   Logo: {
     category: "brand",
