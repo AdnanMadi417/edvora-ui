@@ -17,7 +17,7 @@ import type { StatusBadgeVariant } from "components/ub/data/StatusBadge";
 import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 import FilterChip from "components/ub/data/FilterChip";
 import { useToast } from "components/ub/feedback/ToastContext";
-import { Demo, ShowcaseSection, Variant } from "./Showcase";
+import { Demo, ShowcaseSection, StateSwitch, ThemePreviews, Variant } from "./Showcase";
 
 const VARIANTS: StatusBadgeVariant[] = ["success", "danger", "warning", "attention", "info", "neutral"];
 const VARIANT_ICON = { success: CheckCircle2, danger: XCircle, warning: AlertTriangle, attention: Clock, info: Info, neutral: FileText };
@@ -26,6 +26,8 @@ const VARIANT_LABEL = { success: "Offer received", danger: "Rejected", warning: 
 export function Buttons() {
   const { showToast } = useToast();
   const [decision, setDecision] = useState<"approved" | "rejected" | null>(null);
+  const [toggleState, setToggleState] = useState<"default" | "error" | "disabled">("default");
+  const [compactDecision, setCompactDecision] = useState<"approved" | "rejected" | null>("approved");
   const clicked = (what: string) => () => showToast(`${what} clicked`, "info");
 
   return (
@@ -96,8 +98,49 @@ export function Buttons() {
         <LinkBtn href="#buttons" icon={<FileText className="h-4 w-4" />} title="Open document" />
       </Demo>
 
-      <Demo name="ApproveRejectToggle" path="components/ub/core/ApproveRejectToggle.tsx">
-        <ApproveRejectToggle value={decision} onChange={setDecision} companyName="Global Pathways Education" />
+      <Demo
+        name="ApproveRejectToggle"
+        path="components/ub/core/ApproveRejectToggle.tsx"
+        description="One radio group: Tab lands once, arrow keys (mirrored in RTL), Home and End move and select. Selected options are tinted with a 2px border and a check marker, never a solid red or green fill; the solid destructive button belongs to the confirmation dialog that commits the decision."
+        className="grid gap-6"
+        code={`<ApproveRejectToggle
+  value={decision}
+  onChange={setDecision}
+  companyName="Global Pathways Education"
+  approveDescription="Activates the Advisor's account."
+  rejectDescription="You'll add a reason next."
+  error={submitted && !decision ? "Choose approve or reject." : undefined}
+  required
+/>`}
+        props={[
+          { name: "value", type: '"approved" | "rejected" | null', description: "The recorded decision; null until chosen." },
+          { name: "onChange", type: "(value) => void", description: "Called on click or arrow-key selection." },
+          { name: "variant", type: '"card" | "compact"', default: '"card"', description: "Cards with icon, description and marker, or a 40px segmented row for dense forms." },
+          { name: "approveLabel / rejectLabel", type: "string", default: '"Approve" / "Reject"', description: "Verb-first labels, e.g. Verify document / Request replacement." },
+          { name: "approveDescription / rejectDescription", type: "ReactNode", description: "One line naming what each choice does (card only)." },
+          { name: "error", type: "ReactNode", description: "Validation message; sets aria-invalid and describes the group." },
+          { name: "required", type: "boolean", default: "false", description: "Sets aria-required." },
+          { name: "disabled", type: "boolean", default: "false", description: "Locks the group; the chosen option stays readable." },
+          { name: "companyName / subjectLabel", type: "string", default: '— / "Stakeholder"', description: "The entity being decided on, shown above the options." },
+          { name: "label", type: "string", default: '"Decision"', description: "Accessible name of the radio group." },
+        ]}
+      >
+        <StateSwitch<"default" | "error" | "disabled"> value={toggleState} options={["default", "error", "disabled"] as const} onChange={setToggleState} label="Toggle state" />
+        <ThemePreviews>
+          <ApproveRejectToggle
+            value={toggleState === "error" ? null : decision ?? (toggleState === "disabled" ? "approved" : null)}
+            onChange={setDecision}
+            companyName="Global Pathways Education"
+            approveDescription="Activates the Advisor's account."
+            rejectDescription="You'll add a reason next."
+            error={toggleState === "error" ? "Choose approve or reject." : undefined}
+            disabled={toggleState === "disabled"}
+            required
+          />
+        </ThemePreviews>
+        <Variant label="Compact, custom labels: document review">
+          <ApproveRejectToggle variant="compact" value={compactDecision} onChange={setCompactDecision} label="Passport review" approveLabel="Verify" rejectLabel="Request replacement" />
+        </Variant>
       </Demo>
 
       <Demo name="ActionsDropdown" path="components/ub/navigation/ActionsDropdown.tsx" className="flex min-h-[220px] items-start justify-end">

@@ -38,17 +38,9 @@
   --ub-info-bg: var(--ub-info-50);       --ub-info-border: var(--ub-info-200);       --ub-info-text: var(--ub-info-700);
 
   /* tones: what tags, alerts and icon badges read (status tones point at the tokens above) */
-  --ub-tone-success-bg: var(--ub-success-bg);  --ub-tone-success-border: var(--ub-success-border);  --ub-tone-success-text: var(--ub-success-text);  --ub-tone-success-dot: var(--ub-success-500);
-  --ub-tone-danger-bg: var(--ub-danger-bg);    --ub-tone-danger-border: var(--ub-danger-border);    --ub-tone-danger-text: var(--ub-danger-text);    --ub-tone-danger-dot: var(--ub-danger-500);
-  --ub-tone-warning-bg: var(--ub-warning-bg);  --ub-tone-warning-border: var(--ub-warning-border);  --ub-tone-warning-text: var(--ub-warning-text);  --ub-tone-warning-dot: var(--ub-warning-500);
-  --ub-tone-info-bg: var(--ub-info-bg);        --ub-tone-info-border: var(--ub-info-border);        --ub-tone-info-text: var(--ub-info-text);        --ub-tone-info-dot: var(--ub-info-500);
   --ub-tone-brand-bg: var(--ub-blue-50);       --ub-tone-brand-border: var(--ub-blue-200);          --ub-tone-brand-text: var(--ub-blue-700);        --ub-tone-brand-dot: var(--ub-blue-600);
   --ub-tone-attention-bg: var(--ub-tag-orange-bg); --ub-tone-attention-border: var(--ub-tag-orange-border); --ub-tone-attention-text: var(--ub-tag-orange-text); --ub-tone-attention-dot: var(--ub-tag-orange-solid);
   --ub-tone-neutral-bg: var(--ub-tag-grey-bg);  --ub-tone-neutral-border: var(--ub-tag-grey-border);  --ub-tone-neutral-text: var(--ub-tag-grey-text);  --ub-tone-neutral-dot: var(--ub-tag-grey-solid);
-  --ub-tone-plum-bg: var(--ub-tag-plum-bg);     --ub-tone-plum-border: var(--ub-tag-plum-border);     --ub-tone-plum-text: var(--ub-tag-plum-text);     --ub-tone-plum-dot: var(--ub-tag-plum-solid);
-  --ub-tone-teal-bg: var(--ub-tag-teal-bg);     --ub-tone-teal-border: var(--ub-tag-teal-border);     --ub-tone-teal-text: var(--ub-tag-teal-text);     --ub-tone-teal-dot: var(--ub-tag-teal-solid);
-  --ub-tone-pink-bg: var(--ub-tag-pink-bg);     --ub-tone-pink-border: var(--ub-tag-pink-border);     --ub-tone-pink-text: var(--ub-tag-pink-text);     --ub-tone-pink-dot: var(--ub-tag-pink-solid);
-  --ub-tone-sky-bg: var(--ub-tag-sky-bg);       --ub-tone-sky-border: var(--ub-tag-sky-border);       --ub-tone-sky-text: var(--ub-tag-sky-text);       --ub-tone-sky-dot: var(--ub-tag-sky-solid);
 
   /* brand-subtle: avatar initials, empty-state circle, callouts (brief §4.7: blue-700 on blue-50) */
   --ub-brand-subtle-bg: var(--ub-blue-50);
@@ -236,4 +228,21 @@
   --ub-shadow-md: none;
   --ub-shadow-lg: none;
   --ub-shadow-xl: none;
+}
+
+/* Status and hue tones are pure aliases of theme tokens. Declared on every
+   theme scope (not only :root) so they re-resolve inside nested
+   data-ub-theme frames, e.g. the style guide's dark and light previews;
+   on :root alone they'd inherit the outer theme's already-resolved value. */
+:root,
+[data-ub-theme="light"],
+[data-ub-theme="dark"] {
+  --ub-tone-success-bg: var(--ub-success-bg);  --ub-tone-success-border: var(--ub-success-border);  --ub-tone-success-text: var(--ub-success-text);  --ub-tone-success-dot: var(--ub-success-500);
+  --ub-tone-danger-bg: var(--ub-danger-bg);    --ub-tone-danger-border: var(--ub-danger-border);    --ub-tone-danger-text: var(--ub-danger-text);    --ub-tone-danger-dot: var(--ub-danger-500);
+  --ub-tone-warning-bg: var(--ub-warning-bg);  --ub-tone-warning-border: var(--ub-warning-border);  --ub-tone-warning-text: var(--ub-warning-text);  --ub-tone-warning-dot: var(--ub-warning-500);
+  --ub-tone-info-bg: var(--ub-info-bg);        --ub-tone-info-border: var(--ub-info-border);        --ub-tone-info-text: var(--ub-info-text);        --ub-tone-info-dot: var(--ub-info-500);
+  --ub-tone-plum-bg: var(--ub-tag-plum-bg);     --ub-tone-plum-border: var(--ub-tag-plum-border);     --ub-tone-plum-text: var(--ub-tag-plum-text);     --ub-tone-plum-dot: var(--ub-tag-plum-solid);
+  --ub-tone-teal-bg: var(--ub-tag-teal-bg);     --ub-tone-teal-border: var(--ub-tag-teal-border);     --ub-tone-teal-text: var(--ub-tag-teal-text);     --ub-tone-teal-dot: var(--ub-tag-teal-solid);
+  --ub-tone-pink-bg: var(--ub-tag-pink-bg);     --ub-tone-pink-border: var(--ub-tag-pink-border);     --ub-tone-pink-text: var(--ub-tag-pink-text);     --ub-tone-pink-dot: var(--ub-tag-pink-solid);
+  --ub-tone-sky-bg: var(--ub-tag-sky-bg);       --ub-tone-sky-border: var(--ub-tag-sky-border);       --ub-tone-sky-text: var(--ub-tag-sky-text);       --ub-tone-sky-dot: var(--ub-tag-sky-solid);
 }

@@ -205,8 +205,9 @@ export const CATALOG: Record<string, CatalogEntry> = {
   ApproveRejectToggle: {
     category: "core",
     imports: [imp("ApproveRejectToggle", "core/ApproveRejectToggle")],
-    useFor: "Two-option approve / reject decision with the entity in view.",
-    usedIn: ["Reviewer: Advisor applications", "Admin: document review"],
+    useFor: "A single approve / reject choice (radio group) with the entity in view; card or compact.",
+    usedIn: ["Admin: review Advisor registration", "Reviewer: Advisor applications", "Document review (compact: Verify / Request replacement)"],
+    avoid: "Committing the decision on its own: pair it with a confirmation dialog for destructive outcomes, and never use it for more than two options (use RadioCardGroup).",
   },
   ActionsDropdown: {
     category: "navigation",
