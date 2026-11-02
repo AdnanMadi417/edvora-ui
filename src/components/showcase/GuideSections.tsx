@@ -17,6 +17,7 @@ import NewBrand from "./NewBrand";
 import NewScreenParts from "./NewScreenParts";
 import ApplicationKit from "./ApplicationKit";
 import PopupForms from "./PopupForms";
+import TableOptions from "./TableOptions";
 import { ApplicationDetailsDemo } from "./ApplicationDetailsPattern";
 
 export function ButtonsSection() {
@@ -199,6 +200,9 @@ export function TablesSection() {
       title="Tables"
       description="Tables for managing records: sorting, selecting rows and acting on them in bulk. Rows are 56px (44px compact), amounts are right-aligned with tabular numerals, and below 768px rows stack."
     >
+      <Pick demos={["Table: Standard", "Table: Selectable", "Table: Card list", "DataTableToolbar"]}>
+        <TableOptions />
+      </Pick>
       <Pick demos={["DataTable"]}>
         <NewData />
       </Pick>

@@ -134,6 +134,32 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "The Application Details page frame: header, alerts, tracker, tabs and panels.",
     usedIn: ["/partner, /account-manager and /admin applications/[id]"],
   },
+  "Table: Standard": {
+    category: "data",
+    imports: [named("default as DataTable, DataTablePrimaryCell", "data/DataTable"), imp("DataTableToolbar", "data/DataTableToolbar")],
+    useFor: "Lists of records people scan, sort and open: toolbar, density, column visibility, row links.",
+    usedIn: ["Application Tracker", "Advisors", "Institutions and programmes", "Staff and roles"],
+    avoid: "Fewer than about five rows or no comparison between rows: use List.",
+  },
+  "Table: Selectable": {
+    category: "data",
+    imports: [imp("DataTable", "data/DataTable")],
+    useFor: "Acting on many records at once: select rows (or all results) and use the bulk-action bar.",
+    usedIn: ["Application Tracker (team owners)", "Finance queue: batch payouts", "Advisor review queue"],
+    avoid: "Tables with no bulk actions: the checkbox column only adds noise.",
+  },
+  "Table: Card list": {
+    category: "data",
+    imports: [imp("DataTable", "data/DataTable")],
+    useFor: "The same rows as stacked label: value cards at every width.",
+    usedIn: ["Narrow side panels", "Knowledge Hub lists", "Every table below 768px (automatic)"],
+  },
+  DataTableToolbar: {
+    category: "data",
+    imports: [imp("DataTableToolbar", "data/DataTableToolbar")],
+    useFor: "Search, filters, result count, density and column controls above a table.",
+    usedIn: ["Application Tracker", "Advisors", "Finance queue"],
+  },
   // ── Detail page kit ──────────────────────────────────────────────────────
   SectionCard: {
     category: "data",

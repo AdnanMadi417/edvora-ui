@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import React, { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import clsx from "clsx";
@@ -175,6 +175,7 @@ function TableCheckbox({
   disabledReason?: string;
 }) {
   const ref = useRef<HTMLInputElement>(null);
+  const reasonId = useId();
   useEffect(() => {
     if (ref.current) ref.current.indeterminate = !!indeterminate;
   }, [indeterminate]);
@@ -189,13 +190,18 @@ function TableCheckbox({
         onClick={onChange}
         disabled={!!disabledReason}
         title={disabledReason}
-        aria-description={disabledReason}
+        aria-describedby={disabledReason ? reasonId : undefined}
         aria-label={label}
         aria-checked={indeterminate ? "mixed" : checked}
         className={`peer ${checkbox} indeterminate:border-ub-action-primary indeterminate:bg-ub-action-primary`}
       />
       <Check aria-hidden="true" strokeWidth={3} className="pointer-events-none absolute inset-0 m-auto hidden h-3.5 w-3.5 text-ub-action-primary-text peer-checked:block" />
       <Minus aria-hidden="true" strokeWidth={3} className="pointer-events-none absolute inset-0 m-auto hidden h-3.5 w-3.5 text-ub-action-primary-text peer-indeterminate:block" />
+      {disabledReason && (
+        <span id={reasonId} className="sr-only">
+          {disabledReason}
+        </span>
+      )}
     </span>
   );
 }
