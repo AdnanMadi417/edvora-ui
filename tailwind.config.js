@@ -32,7 +32,7 @@ const ubColors = {
   danger: { ...semantic('danger'), bg: v('danger-bg'), border: v('danger-border'), text: v('danger-text') },
   info: { ...semantic('info'), bg: v('info-bg'), border: v('info-border'), text: v('info-text') },
   tag: Object.fromEntries(['sky', 'indigo', 'orange', 'plum', 'amber', 'red', 'pink', 'teal', 'grey'].map((h) => [h, tagHue(h)])),
-  chart: { ...scale('chart', [1, 2, 3, 4, 5, 6, 7, 8]), grid: v('chart-grid') },
+  chart: { ...scale('chart', [1, 2, 3, 4, 5, 6, 7, 8]), grid: v('chart-grid'), 'cat-1': v('chart-cat-1'), 'cat-2': v('chart-cat-2'), 'cat-3': v('chart-cat-3'), 'seq-0': v('chart-seq-0'), 'seq-1': v('chart-seq-1'), 'seq-2': v('chart-seq-2'), 'seq-3': v('chart-seq-3'), 'seq-4': v('chart-seq-4'), muted: v('chart-muted'), hatch: v('chart-hatch'), track: v('chart-track') },
   // Theme-aware tints: bg-ub-tone-success-bg, text-ub-tone-success-text, …
   tone: Object.fromEntries(
     ['success', 'danger', 'warning', 'info', 'brand', 'attention', 'neutral', 'plum', 'teal', 'pink', 'sky'].map((t) => [

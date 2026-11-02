@@ -99,6 +99,15 @@
 
   /* charts (brief §2.1): series 1 is --ub-chart-1 */
   --ub-chart-grid: var(--ub-neutral-200);
+  /* dashboard widgets (validated with the dataviz checks, light surface):
+     categorical slots 1/2/4 (slot 3 yellow fails contrast on white);
+     sequential blue for heatmaps; muted = non-current bars; hatch = pending/forecast */
+  --ub-chart-cat-1: var(--ub-chart-1); --ub-chart-cat-2: var(--ub-chart-2); --ub-chart-cat-3: var(--ub-chart-4);
+  --ub-chart-seq-0: var(--ub-neutral-100); --ub-chart-seq-1: var(--ub-blue-100); --ub-chart-seq-2: var(--ub-blue-300);
+  --ub-chart-seq-3: var(--ub-blue-500); --ub-chart-seq-4: var(--ub-blue-700);
+  --ub-chart-muted: var(--ub-blue-200);
+  --ub-chart-hatch: var(--ub-blue-300);
+  --ub-chart-track: var(--ub-neutral-100);
 
   /* icons */
   --ub-icon-default: var(--ub-neutral-700);
@@ -147,6 +156,14 @@
 
   --ub-chart-1: var(--ub-blue-400);
   --ub-chart-grid: #2B3140;
+  /* dashboard widgets, dark surface: series 1 steps to blue-500 (blue-400 is over the
+     dark lightness band for multi-series); sequential ramp runs dark → light */
+  --ub-chart-cat-1: var(--ub-blue-500); --ub-chart-cat-2: var(--ub-chart-2); --ub-chart-cat-3: var(--ub-chart-4);
+  --ub-chart-seq-0: var(--ub-neutral-800); --ub-chart-seq-1: var(--ub-blue-950); --ub-chart-seq-2: var(--ub-blue-800);
+  --ub-chart-seq-3: var(--ub-blue-600); --ub-chart-seq-4: var(--ub-blue-400);
+  --ub-chart-muted: var(--ub-blue-900);
+  --ub-chart-hatch: var(--ub-blue-700);
+  --ub-chart-track: var(--ub-neutral-800);
   --ub-scrim: rgba(0,0,0,0.6);
   --ub-glow-action: 0 0 0 1px var(--ub-blue-400), 0 0 24px rgba(3,72,209,0.55);
 }

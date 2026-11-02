@@ -113,3 +113,12 @@
   letter-spacing: 0 !important;
   font-style: normal !important;
 }
+
+/* Pending / forecast bars (dataviz texture rule: one direction, 45°, tone-on-tone). */
+.ub-chart-hatch {
+  background-color: var(--ub-chart-track);
+  background-image: repeating-linear-gradient(45deg, var(--ub-chart-hatch) 0 2px, transparent 2px 6px);
+}
+[dir="rtl"] .ub-chart-hatch {
+  background-image: repeating-linear-gradient(-45deg, var(--ub-chart-hatch) 0 2px, transparent 2px 6px);
+}
