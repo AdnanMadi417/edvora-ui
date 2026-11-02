@@ -1,0 +1,27 @@
+// Dashboard widget library (presentational: props in, UI out).
+export { default as DashboardHeader } from "./DashboardHeader";
+export { default as PeriodSelect, PERIOD_LABELS, type DashboardPeriod } from "./PeriodSelect";
+export { default as CardMenu } from "./CardMenu";
+export { default as CardLinkButton } from "./CardLinkButton";
+export { default as DashboardCard } from "./DashboardCard";
+export { default as CardFooterStats } from "./CardFooterStats";
+export { default as StatCard } from "./StatCard";
+export { default as DeltaPill, formatDelta, deltaTone } from "./DeltaPill";
+export { default as IconTile } from "./IconTile";
+export { default as PillBarChart, defaultHighlight } from "./PillBarChart";
+export { default as CategoryColumnChart } from "./CategoryColumnChart";
+export { default as GaugeChart, gaugeDashes } from "./GaugeChart";
+export { default as GaugeLegendStats } from "./GaugeLegendStats";
+export { default as ActivityHeatmap, heatLevel } from "./ActivityHeatmap";
+export { default as Sparkline, sparkPoints } from "./Sparkline";
+export { default as PipelineBar } from "./PipelineBar";
+export { default as ChartLegend } from "./ChartLegend";
+export { default as TaskList, TaskListItem } from "./TaskList";
+export { default as PeopleList, PeopleListItem } from "./PeopleList";
+export { default as BreakdownTable } from "./BreakdownTable";
+export { default as StatusTag } from "./StatusTag";
+export { default as ReminderCard } from "./ReminderCard";
+export { default as CountdownCard, countdownParts } from "./CountdownCard";
+export { default as ProgressCard } from "./ProgressCard";
+export { default as WidgetStatus, resolveWidgetState } from "./WidgetStatus";
+export * from "./types";
