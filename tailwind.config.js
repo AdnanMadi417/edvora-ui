@@ -533,7 +533,7 @@ module.exports = {
 
       transitionDuration: prefixed({ fast: '120ms', base: '200ms', slow: '320ms', deliberate: '480ms' }),
       transitionTimingFunction: prefixed({ standard: 'cubic-bezier(.2,0,0,1)', enter: 'cubic-bezier(0,0,.2,1)', exit: 'cubic-bezier(.4,0,1,1)' }),
-      maxWidth: prefixed({ dashboard: '1440px', form: '720px', reading: '680px', marketing: '1200px', 'marketing-2xl': '1320px' }),
+      maxWidth: prefixed({ dashboard: '1440px', 'form-sm': '560px', form: '720px', 'form-xl': '960px', reading: '680px', marketing: '1200px', 'marketing-2xl': '1320px' }),
 
       spacing: {
         icon: 'var(--icon-size)',

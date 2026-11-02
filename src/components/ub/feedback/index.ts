@@ -18,3 +18,4 @@ export { ToastProvider, useToast } from "./ToastContext";
 export { default as Tooltip } from "./Tooltip";
 export { default as NotificationItem } from "./NotificationItem";
 export { NotificationGroup, groupNotifications } from "./NotificationItem";
+export { default as FormModal, FormSection } from "./FormModal";

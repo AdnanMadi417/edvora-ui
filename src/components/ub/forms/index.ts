@@ -38,3 +38,4 @@ export { default as Stepper } from "./Stepper";
 export { default as TextareaField } from "./TextareaField";
 export { default as Toggle } from "./Toggle";
 export { default as ToggleInput } from "./ToggleInput";
+export { default as Textarea } from "./Textarea";
