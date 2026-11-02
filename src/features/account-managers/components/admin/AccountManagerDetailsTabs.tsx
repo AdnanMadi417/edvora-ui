@@ -25,7 +25,7 @@ export default function AccountManagerDetailsTabs({ manager, onManagerChanged }:
   const [tab, setTab] = useState<DetailsTab>("profile");
 
   return (
-    <div className="mt-5 max-w-5xl mx-auto rounded-lg border border-slate-200 bg-white">
+    <div className="mt-5 max-w-ub-dashboard mx-auto rounded-lg border border-slate-200 bg-white">
       {/* Header */}
       <div className="flex items-center gap-5 border-b border-slate-200 p-6">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-slate-700">

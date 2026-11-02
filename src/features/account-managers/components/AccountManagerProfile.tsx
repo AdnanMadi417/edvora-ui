@@ -10,7 +10,7 @@ interface AccountManagerProfileProps {
 export default function AccountManagerProfile({ manager }: AccountManagerProfileProps) {
   return (
     <section>
-      <div className="mb-5 mt-5 max-w-5xl mx-auto block rounded-lg border border-slate-200 bg-white p-6 ">
+      <div className="mb-5 mt-5 max-w-ub-dashboard mx-auto block rounded-lg border border-slate-200 bg-white p-6 ">
         <div className="flex items-center gap-5">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-slate-700">
             {manager.name?.charAt(0).toUpperCase() ?? "?"}

@@ -257,7 +257,7 @@ export default function PartnerDetails({ id }: Props) {
         isActive={!!suspendTarget?.is_active}
       />
 
-    <div className="mx-auto mt-6 max-w-5xl">
+    <div className="mx-auto mt-6 max-w-ub-dashboard">
       <div className="rounded-lg border border-slate-200 bg-white">
 
         {/* Header */}

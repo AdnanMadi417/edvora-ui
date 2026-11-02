@@ -39,7 +39,7 @@ const UniversityConfigDetails = ({ id }: UniversityDetailsProps) => {
 
   return (
     <>
-      <div className="mt-6 max-w-5xl mx-auto">
+      <div className="mt-6 max-w-ub-dashboard mx-auto">
         <div className="rounded-md border bg-white shadow-sm">
 
           <div className="flex items-center gap-4 border-b p-6">

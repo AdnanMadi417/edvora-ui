@@ -37,7 +37,7 @@ export default function TeamMembersPage() {
   const { partner, isPartnerLoading } = usePartnerProfile();
   if (isPartnerLoading) {
     return (
-      <div className="mt-6 max-w-5xl mx-auto text-p2">
+      <div className="mt-6 max-w-ub-dashboard mx-auto text-p2">
         <div className="rounded-lg border border-slate-200 bg-white">
           <Loading text="Loading..." />
         </div>
@@ -46,7 +46,7 @@ export default function TeamMembersPage() {
   }
   if (partner?.agency_role === "member") {
     return (
-      <div className="mt-6 max-w-5xl mx-auto text-p2">
+      <div className="mt-6 max-w-ub-dashboard mx-auto text-p2">
         <div className="flex flex-col items-center gap-3 rounded-lg border border-slate-200 bg-white p-12 text-center">
           <ShieldX className="h-10 w-10 text-slate-300" />
           <p className="text-sm font-medium text-slate-700">Agency Scaler is managed by your agency admin.</p>
@@ -57,7 +57,7 @@ export default function TeamMembersPage() {
   }
 
   return (
-    <div className="mt-6 max-w-5xl mx-auto text-p2">
+    <div className="mt-6 max-w-ub-dashboard mx-auto text-p2">
       <div className="rounded-lg border border-slate-200 bg-white">
 
         {/* Header */}

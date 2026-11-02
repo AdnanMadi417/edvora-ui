@@ -92,7 +92,7 @@ export default function StatementPage() {
   const activeFiltersCount = (waitingOnFilter ? 1 : 0) + (memberFilter ? 1 : 0);
 
   return (
-    <div className="mx-auto mt-5 max-w-6xl overflow-hidden rounded-lg border border-slate-200 bg-white text-p2">
+    <div className="mx-auto mt-5 max-w-ub-dashboard overflow-hidden rounded-lg border border-slate-200 bg-white text-p2">
       {/* Header */}
       <div className="flex items-center gap-x-4 border-b border-slate-200 p-6">
         <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">

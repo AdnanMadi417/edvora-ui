@@ -224,7 +224,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
     <>
       <ChangePasswordPopup isOpen={showChangePassword} onClose={() => setShowChangePassword(false)} />
 
-      <div className="mx-auto mt-6 max-w-5xl">
+      <div className="mx-auto mt-6 max-w-ub-dashboard">
         <div className="rounded-lg border border-slate-200 bg-white">
 
           {/* Header */}

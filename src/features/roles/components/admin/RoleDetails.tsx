@@ -54,7 +54,7 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
   if (!role) return <EmptyData />;
 
   return (
-    <section className="mx-auto mt-6 max-w-5xl">
+    <section className="mx-auto mt-6 max-w-ub-dashboard">
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         {/* Header */}
         <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
