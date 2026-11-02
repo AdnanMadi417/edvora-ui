@@ -1,19 +1,13 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import { AnimatePresence } from "framer-motion";
-import { Receipt, Eye, Download, Ban, ChevronRight } from "lucide-react";
+import { Receipt, Eye, Download, Ban } from "lucide-react";
 
-import SearchInput from "components/ub/forms/SearchInput";
-import TableWrapper from "components/ub/data/TableWrapper";
-import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
-import TableEmptyRow from "components/ub/data/TableEmptyRow";
-import TableErrorRow from "components/ub/data/TableErrorRow";
 import TablePagination from "components/ub/data/TablePagination";
-import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
+import DataTable, { type DataTableColumn } from "components/ub/data/DataTable";
+import DataTableToolbar from "components/ub/data/DataTableToolbar";
+import Tag from "components/ub/data/Tag";
 import { getAsyncStatus } from "components/ub/feedback/AsyncStatus";
-import StatusBadge from "components/ub/data/StatusBadge";
 import Tooltip from "components/ub/feedback/Tooltip";
 import AppDate from "components/ub/data/AppDate";
 import IconButton from "components/ub/core/IconButton";
@@ -43,7 +37,6 @@ interface PayoutStatementSectionProps {
 }
 
 export default function PayoutStatementSection({ partnerId, canOpenPayout = false }: PayoutStatementSectionProps) {
-  const router = useRouter();
   const { showToast } = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -109,200 +102,81 @@ export default function PayoutStatementSection({ partnerId, canOpenPayout = fals
     }
   };
 
+  const busy = (item: PayoutStatementItem, action: "view" | "download") => loadingProof?.id === item.payout_id && loadingProof.action === action;
+  const columns: DataTableColumn<PayoutStatementItem>[] = [
+    {
+      key: "reference",
+      header: "Bank Reference",
+      cell: (item) => (
+        <span className="flex flex-wrap items-center gap-2">
+          <span className="ub-ref whitespace-nowrap font-medium text-ub-text-primary">{item.bank_reference}</span>
+          {item.voided_at && <Tag tone="danger" size="sm">Voided</Tag>}
+        </span>
+      ),
+    },
+    { key: "method", header: "Payment Method", cell: (item) => item.payment_method_name },
+    { key: "paid", header: "Paid At", cell: (item) => <AppDate value={item.paid_at} format="short" className="whitespace-nowrap" /> },
+    { key: "apps", header: "Applications", cell: (item) => formatApplicants(item.applications) },
+    {
+      key: "amount",
+      header: "Amount Sent",
+      align: "end",
+      cell: (item) => (
+        <span className="block whitespace-nowrap">
+          <span className={item.voided_at ? "block text-ub-text-tertiary line-through" : "block font-medium text-ub-text-primary"}>{formatCommissionAmount(item.amount_sent, item.currency)}</span>
+          {item.agreed_totals.length > 0 && <span className="block text-ub-caption text-ub-text-tertiary">Agreed: {item.agreed_totals.map((t) => formatCommissionAmount(t.amount, t.currency)).join(" + ")}</span>}
+          {item.voided_at && (
+            <span className="block whitespace-normal text-ub-caption text-ub-tone-danger-text">
+              {item.void_reason}
+              {item.voided_by_name ? ` — ${item.voided_by_name}` : ""}
+            </span>
+          )}
+        </span>
+      ),
+    },
+    { key: "by", header: "Recorded By", cell: (item) => item.recorded_by_name },
+    {
+      key: "actions",
+      header: "Actions",
+      cell: (item) => (
+        <span className="flex items-center gap-1">
+          {item.receipt_file_url && (
+            <>
+              <Tooltip content="View Receipt" position="left">
+                <IconButton variant="tertiary" size="sm" onClick={() => handleProof(item, "view")} disabled={loadingProof?.id === item.payout_id} aria-label="View Receipt" title="View Receipt" icon={<Eye className={busy(item, "view") ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />} />
+              </Tooltip>
+              <Tooltip content="Download Receipt" position="left">
+                <IconButton variant="tertiary" size="sm" onClick={() => handleProof(item, "download")} disabled={loadingProof?.id === item.payout_id} aria-label="Download Receipt" title="Download Receipt" icon={<Download className={busy(item, "download") ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />} />
+              </Tooltip>
+            </>
+          )}
+          {item.can_void && (
+            <Tooltip content="Void & correct" position="left">
+              <IconButton variant="tertiary" size="sm" onClick={() => openVoidModal(item)} disabled={loadingVoidId === item.payout_id} aria-label="Void & correct" title="Void & correct" icon={<Ban className={loadingVoidId === item.payout_id ? "h-4 w-4 animate-pulse text-ub-tone-danger-text motion-reduce:animate-none" : "h-4 w-4 text-ub-tone-danger-text"} aria-hidden="true" />} />
+            </Tooltip>
+          )}
+        </span>
+      ),
+    },
+  ];
+
   return (
     <div className="p-6">
-      <div className="mb-4">
-        <SearchInput
-          value={searchTerm}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-          placeholder="Search by bank reference or student..."
-          className="sm:w-80"
-        />
-      </div>
+      <DataTableToolbar search={{ value: searchTerm, onChange: setSearchTerm, placeholder: "Search by bank reference or student..." }} />
 
-      <TableWrapper
-        footer={
-          <TablePagination
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-            itemsPerPage={PAGE_SIZE}
-            itemCount={filteredItems.length}
-            totalCount={total}
-            itemLabel="payouts"
-            loading={status === "loading"}
-          />
-        }
-      >
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-200 bg-slate-50">
-              <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Bank Reference</th>
-              <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Payment Method</th>
-              <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Paid At</th>
-              <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Applications</th>
-              <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Amount Sent</th>
-              <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Recorded By</th>
-              <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Actions</th>
-              <th className="w-8" />
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-200 bg-white">
-            {status === "loading" && <TableSkeletonRows columns={8} rows={5} />}
-
-            {status === "error" && <TableErrorRow colSpan={8} message={error ?? undefined} onRetry={refetch} />}
-
-            {status === "empty" && (
-              <TableEmptyRow
-                colSpan={8}
-                title="No payouts found"
-                subtitle={
-                  searchTerm
-                    ? "Try adjusting your search."
-                    : "No payouts have been recorded for this advisor yet."
-                }
-                icon={<Receipt className="h-8 w-8 text-slate-400" />}
-              />
-            )}
-
-            <AnimatePresence>
-              {status === "success" &&
-                filteredItems.map((item) => {
-                  const isVoided = !!item.voided_at;
-                  return (
-                    <AnimatedTableRow
-                      key={item.payout_id}
-                      className={`group transition-colors ${
-                        canOpenPayout ? "cursor-pointer hover:bg-slate-100/50" : ""
-                      } ${isVoided ? "opacity-60" : ""}`}
-                      onClick={
-                        canOpenPayout
-                          ? () => router.push(`/admin/advisors/${partnerId}/payouts/${item.payout_id}`)
-                          : undefined
-                      }
-                    >
-                      <td className="px-6 py-4 text-sm">
-                        <p className="font-medium text-slate-900">{item.bank_reference}</p>
-                        {isVoided && (
-                          <StatusBadge variant="danger" className="mt-1">
-                            Voided
-                          </StatusBadge>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">{item.payment_method_name}</td>
-                      <td className="px-6 py-4 text-sm text-slate-700">
-                        <AppDate value={item.paid_at} format="short" />
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">{formatApplicants(item.applications)}</td>
-                      <td className="px-6 py-4 text-sm">
-                        <p className={isVoided ? "text-slate-400 line-through" : "font-medium text-slate-900"}>
-                          {formatCommissionAmount(item.amount_sent, item.currency)}
-                        </p>
-                        {item.agreed_totals.length > 0 && (
-                          <p className="text-xs text-slate-400">
-                            Agreed: {item.agreed_totals.map((t) => formatCommissionAmount(t.amount, t.currency)).join(" + ")}
-                          </p>
-                        )}
-                        {isVoided && (
-                          <p className="text-xs text-red-600">
-                            {item.void_reason}
-                            {item.voided_by_name ? ` — ${item.voided_by_name}` : ""}
-                          </p>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-700">{item.recorded_by_name}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          {item.receipt_file_url && (
-                            <>
-                              <Tooltip content="View Receipt" position="left">
-                                <IconButton
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleProof(item, "view");
-                                  }}
-                                  disabled={loadingProof?.id === item.payout_id}
-                                  aria-label="View Receipt"
-                                  icon={
-                                    <Eye
-                                      className={`h-4 w-4 ${
-                                        loadingProof?.id === item.payout_id && loadingProof.action === "view"
-                                          ? "animate-pulse"
-                                          : ""
-                                      }`}
-                                    />
-                                  }
-                                  bgColor="bg-slate-100"
-                                  textColor="text-slate-600"
-                                  borderColor="border-transparent"
-                                  hoverTextColor="hover:text-slate-600"
-                                  hoverBorderColor="hover:border-slate-200"
-                                  className="hover:bg-slate-200"
-                                />
-                              </Tooltip>
-                              <Tooltip content="Download Receipt" position="left">
-                                <IconButton
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleProof(item, "download");
-                                  }}
-                                  disabled={loadingProof?.id === item.payout_id}
-                                  aria-label="Download Receipt"
-                                  icon={
-                                    <Download
-                                      className={`h-4 w-4 ${
-                                        loadingProof?.id === item.payout_id && loadingProof.action === "download"
-                                          ? "animate-pulse"
-                                          : ""
-                                      }`}
-                                    />
-                                  }
-                                  bgColor="bg-blue-50"
-                                  textColor="text-blue-600"
-                                  borderColor="border-transparent"
-                                  hoverTextColor="hover:text-blue-700"
-                                  hoverBorderColor="hover:border-blue-200"
-                                  className="hover:bg-blue-100"
-                                />
-                              </Tooltip>
-                            </>
-                          )}
-                          {item.can_void && (
-                            <Tooltip content="Void & correct" position="left">
-                              <IconButton
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openVoidModal(item);
-                                }}
-                                disabled={loadingVoidId === item.payout_id}
-                                aria-label="Void & correct"
-                                icon={
-                                  <Ban
-                                    className={`h-4 w-4 ${loadingVoidId === item.payout_id ? "animate-pulse" : ""}`}
-                                  />
-                                }
-                                bgColor="bg-transparent"
-                                textColor="text-red-500"
-                                borderColor="border-transparent"
-                                hoverTextColor="hover:text-red-700"
-                                hoverBorderColor="hover:border-transparent"
-                                className="hover:bg-red-50"
-                              />
-                            </Tooltip>
-                          )}
-                        </div>
-                      </td>
-                      <td className="w-8 pr-4 py-4">
-                        {canOpenPayout && (
-                          <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
-                        )}
-                      </td>
-                    </AnimatedTableRow>
-                  );
-                })}
-            </AnimatePresence>
-          </tbody>
-        </table>
-      </TableWrapper>
+      <DataTable<PayoutStatementItem>
+        caption="Payout statement"
+        columns={columns}
+        rows={filteredItems}
+        getRowId={(item) => item.payout_id}
+        getRowHref={canOpenPayout ? (item) => `/admin/advisors/${partnerId}/payouts/${item.payout_id}` : undefined}
+        manualSort
+        loading={status === "loading"}
+        error={status === "error" ? error ?? "Couldn't load payouts." : null}
+        onRetry={refetch}
+        empty={{ title: "No payouts found", description: searchTerm ? "Try adjusting your search." : "No payouts have been recorded for this advisor yet.", icon: <Receipt aria-hidden="true" /> }}
+        footer={<TablePagination currentPage={currentPage} onPageChange={setCurrentPage} itemsPerPage={PAGE_SIZE} itemCount={filteredItems.length} totalCount={total} itemLabel="payouts" loading={status === "loading"} />}
+      />
 
       {voidTarget && (
         <React.Suspense fallback={null}>

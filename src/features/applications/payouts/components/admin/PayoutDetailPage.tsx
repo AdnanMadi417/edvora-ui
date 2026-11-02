@@ -7,7 +7,11 @@ import { ChevronLeft, Ban, Wallet } from "lucide-react";
 import Skeleton from "components/ub/feedback/Skeleton";
 import AsyncStateView from "components/ub/feedback/AsyncStateView";
 import { getAsyncStatus } from "components/ub/feedback/AsyncStatus";
-import StatusBadge from "components/ub/data/StatusBadge";
+import Tag from "components/ub/data/Tag";
+import DescriptionList from "components/ub/data/DescriptionList";
+import DataTable from "components/ub/data/DataTable";
+import IconTile from "components/ub/dashboard/IconTile";
+import { card } from "components/ub/recipes";
 import Button from "components/ub/core/Button";
 import ActionsDropdown from "components/ub/navigation/ActionsDropdown";
 import DocumentActions from "features/applications/shared/DocumentActions";
@@ -23,27 +27,18 @@ interface Props {
   payoutId: string;
 }
 
-function DetailRow({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
-      <div className="mt-1 flex items-center gap-2 text-sm text-slate-900">{value}</div>
-    </div>
-  );
-}
-
 function PayoutDetailSkeleton() {
   return (
     <>
-      <div className="flex items-center gap-4 border-b p-6">
-        <Skeleton className="h-12 w-12 shrink-0 rounded-lg" />
+      <div className="flex items-center gap-4 border-b border-ub-border p-6">
+        <Skeleton className="h-12 w-12 shrink-0 rounded-ub-md" />
         <div className="min-w-0 flex-1">
           <Skeleton className="h-5 w-48" />
           <Skeleton className="mt-2 h-4 w-32" />
         </div>
-        <Skeleton className="h-6 w-16 rounded-full" />
+        <Skeleton className="h-6 w-16 rounded-ub-full" />
       </div>
-      <div className="grid grid-cols-1 gap-4 border-t border-slate-200 px-6 py-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 px-6 py-6 sm:grid-cols-2">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i}>
             <Skeleton className="h-3 w-24" />
@@ -79,7 +74,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
 
   return (
     <div className="mx-auto mt-6 max-w-ub-dashboard">
-      <div className="rounded-md border bg-white shadow-sm">
+      <div className={card}>
         <AsyncStateView
           status={status}
           skeleton={<PayoutDetailSkeleton />}
@@ -89,33 +84,18 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
           emptySubtitle="It may have been removed, or the link is out of date."
           emptyIcon={Wallet}
           emptyAction={
-            <Button
-              onClick={handleBack}
-              icon={<ChevronLeft className="h-4 w-4" />}
-              text="Back"
-              bgColor="bg-white"
-              textColor="text-slate-600"
-              borderColor="border-slate-300"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-400"
-            />
+            <Button variant="secondary" onClick={handleBack} icon={<ChevronLeft className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} text="Back" />
           }
         >
-          <div className="flex items-center gap-4 border-b p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700">
-              <Wallet className="h-6 w-6 text-white" />
-            </div>
+          <div className="flex items-center gap-4 border-b border-ub-border p-6">
+            <IconTile icon={Wallet} tone="brand" size="lg" />
             <div className="min-w-0 flex-1">
-              <h2 className="truncate text-lg font-semibold text-slate-900">{payout?.bank_reference}</h2>
-              <p className="text-sm text-slate-500">
+              <h2 className="ub-ref truncate text-ub-heading-md text-ub-text-primary">{payout?.bank_reference}</h2>
+              <p className="text-ub-body-sm text-ub-text-secondary">
                 {paymentMethodName} · <AppDate value={payout?.paid_at} format="short" />
               </p>
             </div>
-            {isVoided ? (
-              <StatusBadge variant="danger">Voided</StatusBadge>
-            ) : (
-              <StatusBadge variant="success">Active</StatusBadge>
-            )}
+            {isVoided ? <Tag tone="danger">Voided</Tag> : <Tag tone="success">Active</Tag>}
             {!isVoided && (
               <ActionsDropdown
                 items={[
@@ -130,69 +110,43 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
             )}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 border-t border-slate-200 px-6 py-6 sm:grid-cols-2">
-            <DetailRow label="Payment Method" value={paymentMethodName} />
-            <DetailRow label="Paid At" value={<AppDate value={payout?.paid_at} format="short" />} />
-            <DetailRow
-              label="Amount Sent"
-              value={payout ? formatCommissionAmount(amountSent, payout.currency) : "—"}
-            />
-            <DetailRow
-              label="Agreed Total"
-              value={
-                Object.entries(agreedTotals).length > 0
-                  ? Object.entries(agreedTotals)
-                      .map(([currency, amount]) => formatCommissionAmount(amount, currency))
-                      .join(" + ")
-                  : "—"
-              }
-            />
-            {isVoided && <DetailRow label="Void Reason" value={payout?.void_reason ?? "—"} />}
-            <DetailRow
-              label="Receipt"
-              value={
-                <DocumentActions
-                  fileKey={payout?.receipt_file_key}
-                  label="Payout Receipt"
-                />
-              }
+          <div className="px-6 py-6">
+            <DescriptionList
+              columns={2}
+              items={[
+                { label: "Payment Method", value: paymentMethodName },
+                { label: "Paid At", value: <AppDate value={payout?.paid_at} format="short" /> },
+                { label: "Amount Sent", value: payout ? <span className="ub-tabular">{formatCommissionAmount(amountSent, payout.currency)}</span> : "—" },
+                {
+                  label: "Agreed Total",
+                  value:
+                    Object.entries(agreedTotals).length > 0 ? (
+                      <span className="ub-tabular">{Object.entries(agreedTotals).map(([currency, amount]) => formatCommissionAmount(amount, currency)).join(" + ")}</span>
+                    ) : (
+                      "—"
+                    ),
+                },
+                ...(isVoided ? [{ label: "Void Reason", value: payout?.void_reason ?? "—" }] : []),
+                { label: "Receipt", value: <DocumentActions fileKey={payout?.receipt_file_key} label="Payout Receipt" /> },
+              ]}
             />
           </div>
 
-          <div className="border-t border-slate-200 px-6 py-6">
-            <p className="mb-3 text-sm font-semibold text-slate-900">Applications Covered</p>
-            <div className="overflow-hidden rounded-lg border border-slate-200">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="px-4 py-3 text-start text-xs font-semibold tracking-wider text-slate-900">
-                      Application
-                    </th>
-                    <th className="px-4 py-3 text-start text-xs font-semibold tracking-wider text-slate-900">
-                      Paid Amount
-                    </th>
-                    <th className="px-4 py-3 text-start text-xs font-semibold tracking-wider text-slate-900">
-                      Agreed Amount
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 bg-white">
-                  {payout?.items.map((item) => (
-                    <tr key={item.application_commission_id}>
-                      <td className="px-4 py-3 text-sm font-medium text-slate-900">
-                        {item.application_id.slice(0, 8).toUpperCase()}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-700">
-                        {formatCommissionAmount(item.paid_amount, payout.currency)}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-700">
-                        {formatCommissionAmount(item.source_amount, item.source_currency)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className="border-t border-ub-border px-6 py-6">
+            <h3 className="mb-3 text-ub-heading-sm text-ub-text-primary">Applications Covered</h3>
+            <DataTable
+              caption="Applications covered by this payout"
+              density="compact"
+              rows={payout?.items ?? []}
+              getRowId={(item) => item.application_commission_id}
+              manualSort
+              empty={{ title: "No applications", description: "This payout covers no applications." }}
+              columns={[
+                { key: "application", header: "Application", cell: (item) => <span className="ub-ref font-medium">{item.application_id.slice(0, 8).toUpperCase()}</span> },
+                { key: "paid", header: "Paid Amount", align: "end", cell: (item) => (payout ? formatCommissionAmount(item.paid_amount, payout.currency) : "—") },
+                { key: "agreed", header: "Agreed Amount", align: "end", cell: (item) => formatCommissionAmount(item.source_amount, item.source_currency) },
+              ]}
+            />
           </div>
         </AsyncStateView>
       </div>
