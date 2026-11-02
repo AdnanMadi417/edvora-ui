@@ -16,6 +16,7 @@ import NewNavigationFeedback from "./NewNavigationFeedback";
 import NewBrand from "./NewBrand";
 import NewScreenParts from "./NewScreenParts";
 import ApplicationKit from "./ApplicationKit";
+import PopupForms from "./PopupForms";
 import { ApplicationDetailsDemo } from "./ApplicationDetailsPattern";
 
 export function ButtonsSection() {
@@ -152,6 +153,9 @@ export function PopupsSection() {
       </Pick>
       <Pick demos={["MilestoneMoment"]}>
         <NewBrand />
+      </Pick>
+      <Pick demos={["FormModal", "Review Advisor popup"]}>
+        <PopupForms />
       </Pick>
     </ShowcaseSection>
   );

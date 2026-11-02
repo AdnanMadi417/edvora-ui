@@ -34,6 +34,25 @@ export const CATALOG: Record<string, CatalogEntry> = {
     usedIn: ["/partner/applications/[id]", "/account-manager/applications/[id]", "/admin/applications/[id]"],
     avoid: "Fetching inside the feature components: data stays in the page/route and comes in as props.",
   },
+  FormModal: {
+    category: "feedback",
+    imports: [named("default as FormModal, FormSection", "feedback/FormModal")],
+    useFor: "A popup that holds a form: sections, error summary, unsaved-changes check, full-screen on mobile.",
+    usedIn: ["Add student", "Review Advisor registration", "Update application status", "Record pay-in / payout"],
+    avoid: "Yes/no confirmations (ConfirmDialog) and forms longer than about six sections (use a page).",
+  },
+  "Review Advisor popup": {
+    category: "feedback",
+    imports: ['import ReviewPartnerPopup from "features/partners/components/admin/ReviewPartnerPopup";'],
+    useFor: "Admins and reviewers deciding on an Advisor registration.",
+    usedIn: ["Advisors table", "Advisor details", "Reviewer queue"],
+  },
+  Textarea: {
+    category: "forms",
+    imports: [imp("Textarea", "forms/Textarea")],
+    useFor: "Multi-line text with label, helper, error and an optional character count.",
+    usedIn: ["Rejection reasons", "Notes for the account manager", "Dispute justification"],
+  },
   // ── Detail page kit ──────────────────────────────────────────────────────
   SectionCard: {
     category: "data",
