@@ -11,6 +11,8 @@ import { useMe } from 'hooks/useMe';
 import Button from 'components/ub/core/Button';
 import ApplicationFilterBar from 'components/ub/navigation/ApplicationFilterBar';
 import ApplicationsTable from 'features/applications/components/ApplicationsTable';
+import DashboardHeader from "components/ub/dashboard/DashboardHeader";
+import { card } from "components/ub/recipes";
 import TablePagination from 'components/ub/data/TablePagination';
 import { getAsyncStatus } from 'components/ub/feedback/AsyncStatus';
 
@@ -196,28 +198,12 @@ const PartnerApplications = () => {
   };
 
   return (
-    <div className="mt-6 max-w-ub-dashboard mx-auto text-p2 bg-white rounded-lg border border-slate-200">
+    <div className={`mt-6 mx-auto max-w-ub-dashboard ${card}`}>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
-        <div>
-          <h3 className="text-xl font-semibold text-slate-900">Applications Dashboard</h3>
-          <p className="mt-0.5 text-sm text-slate-500">Manage and track student applications</p>
-        </div>
-        <Button
-          onClick={() => router.push('/partner/applications/apply-now')}
-          icon={<FilePlus className="h-4 w-4" />}
-          text="Create Application"
-          bgColor="bg-blue-600"
-          textColor="text-white"
-          borderColor="border-blue-600"
-          hoverTextColor="hover:text-white"
-          hoverBorderColor="hover:border-blue-700"
-          className="shrink-0 !bg-blue-600 hover:!bg-blue-700"
-        />
-      </div>
+      <DashboardHeader as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" primaryAction={<Button variant="primary" onClick={() => router.push("/partner/applications/apply-now")} icon={<FilePlus className="h-4 w-4" aria-hidden="true" />} text="Create application" />} className="border-b border-ub-border p-6" />
 
       {grandTotal > 0 && (
-        <div className="hidden sm:block p-6 border-b border-slate-200">
+        <div className="hidden sm:block p-6 border-b border-ub-border">
           <PipelineCard
             stages={stages}
             stageCounts={stageCounts}
@@ -234,7 +220,7 @@ const PartnerApplications = () => {
         </div>
       )}
 
-      <div className="border-b border-slate-200 p-6">
+      <div className="border-b border-ub-border p-6">
         <ApplicationFilterBar
           searchTerm={searchTerm}
           onSearchChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}

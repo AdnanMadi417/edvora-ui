@@ -7,6 +7,8 @@ import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 
 import ApplicationFilterBar from "components/ub/navigation/ApplicationFilterBar";
 import ApplicationsTable from "features/applications/components/ApplicationsTable";
+import DashboardHeader from "components/ub/dashboard/DashboardHeader";
+import { card } from "components/ub/recipes";
 import TablePagination from "components/ub/data/TablePagination";
 import { getAsyncStatus } from "components/ub/feedback/AsyncStatus";
 import api from "lib/useApi";
@@ -161,18 +163,13 @@ const ModernApplicationsTable = () => {
   };
 
   return (
-    <div className="mt-6 max-w-ub-dashboard mx-auto text-p2 bg-white rounded-lg border border-slate-200">
+    <div className={`mt-6 mx-auto max-w-ub-dashboard ${card}`}>
 
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
-        <div>
-          <h3 className="text-xl font-semibold text-slate-900">Applications Dashboard</h3>
-          <p className="mt-0.5 text-sm text-slate-500">Manage and track student applications</p>
-        </div>
-      </div>
+      <DashboardHeader as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" className="border-b border-ub-border p-6" />
 
       {grandTotal > 0 && (
-        <div className="hidden sm:block p-6 border-b border-slate-200">
+        <div className="hidden sm:block p-6 border-b border-ub-border">
           <PipelineCard
             stages={stages}
             stageCounts={stageCounts}
@@ -190,7 +187,7 @@ const ModernApplicationsTable = () => {
         </div>
       )}
 
-      <div className="border-b border-slate-200 p-6">
+      <div className="border-b border-ub-border p-6">
 
         <ApplicationFilterBar
         searchTerm={searchTerm}
