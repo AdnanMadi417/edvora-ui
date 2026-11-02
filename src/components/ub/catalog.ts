@@ -24,6 +24,16 @@ const imp = (name: string, path: string) => `import ${name} from "components/ub/
 const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
 
 export const CATALOG: Record<string, CatalogEntry> = {
+  "Application Details": {
+    category: "data",
+    imports: [
+      'import { ApplicationDetailsLayout, ApplicationHeader, ApplicationTrackerCard, OverviewGrid } from "features/applications/components";',
+      'import ApplicationDetailsScreen from "features/applications/details/ApplicationDetailsScreen";',
+    ],
+    useFor: "The Student profile / Application Details page for every role; roles pass only their Primary action, overflow menu and extra panels.",
+    usedIn: ["/partner/applications/[id]", "/account-manager/applications/[id]", "/admin/applications/[id]"],
+    avoid: "Fetching inside the feature components: data stays in the page/route and comes in as props.",
+  },
   // ── Detail page kit ──────────────────────────────────────────────────────
   SectionCard: {
     category: "data",

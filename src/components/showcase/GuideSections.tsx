@@ -16,6 +16,7 @@ import NewNavigationFeedback from "./NewNavigationFeedback";
 import NewBrand from "./NewBrand";
 import NewScreenParts from "./NewScreenParts";
 import ApplicationKit from "./ApplicationKit";
+import { ApplicationDetailsDemo } from "./ApplicationDetailsPattern";
 
 export function ButtonsSection() {
   return (
@@ -130,6 +131,7 @@ export function ContentSection() {
       <Pick demos={["Icon"]}>
         <NewCoreForms />
       </Pick>
+      <ApplicationDetailsDemo />
     </ShowcaseSection>
   );
 }

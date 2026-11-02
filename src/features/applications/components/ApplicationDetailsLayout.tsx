@@ -19,6 +19,8 @@ export interface ApplicationDetailsLayoutProps {
   tabCounts?: Partial<Record<ApplicationDetailsTab, number>>;
   /** The header's Primary action, repeated in the sticky bar below 768px. */
   primaryAction?: HeaderAction | null;
+  /** Repeat the Primary action in a fixed bar below 768px. Default true; false when embedded (style guide previews). */
+  stickyAction?: boolean;
   /** Anything rendered after the page (dialogs, popups). */
   children?: ReactNode;
 }
@@ -30,10 +32,11 @@ const ID = "application-details";
  * Overview · Documents · Offer & visa · Commission · Activity. Tabs scroll
  * horizontally on mobile, where the Primary action moves to a sticky bar.
  */
-export default function ApplicationDetailsLayout({ header, alerts, tracker, activeTab, onTabChange, panels, tabCounts = {}, primaryAction, children }: ApplicationDetailsLayoutProps) {
+export default function ApplicationDetailsLayout({ header, alerts, tracker, activeTab, onTabChange, panels, tabCounts = {}, primaryAction, stickyAction = true, children }: ApplicationDetailsLayoutProps) {
+  const sticky = !!primaryAction && stickyAction;
   const tabs = APPLICATION_DETAILS_TABS.map((t) => ({ ...t, count: tabCounts[t.key] }));
   return (
-    <div className={primaryAction ? "mx-auto grid max-w-ub-dashboard gap-4 pb-20 md:gap-6 md:pb-0" : "mx-auto grid max-w-ub-dashboard gap-4 md:gap-6"}>
+    <div className={sticky ? "mx-auto grid max-w-ub-dashboard gap-4 pb-20 md:gap-6 md:pb-0" : "mx-auto grid max-w-ub-dashboard gap-4 md:gap-6"}>
       {header}
       {alerts}
       {tracker}
@@ -43,7 +46,7 @@ export default function ApplicationDetailsLayout({ header, alerts, tracker, acti
           {panels[activeTab]}
         </div>
       </div>
-      {primaryAction && (
+      {sticky && primaryAction && (
         <StickyActionBar aria-label="Next action">
           <Button
             variant="primary"

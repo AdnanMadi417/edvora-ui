@@ -54,6 +54,8 @@ export interface ApplicationHeaderProps {
   /** Back link / breadcrumbs above the header row. */
   breadcrumbs?: ReactNode;
   loading?: boolean;
+  /** Heading level for the name. Default h1; use h3 when the header is embedded in another page. */
+  titleAs?: "h1" | "h2" | "h3";
   className?: string;
 }
 
@@ -77,11 +79,17 @@ export default function ApplicationHeader({
   overflowActions = [],
   breadcrumbs,
   loading = false,
+  titleAs: Title = "h1",
   className,
 }: ApplicationHeaderProps) {
   if (loading) {
     return (
-      <div className={clsx(card, "flex items-center gap-4 p-4 md:p-6", className)} aria-busy="true" role="status" aria-label="Loading application">
+      <div
+        className={clsx(card, "flex items-center gap-4 p-4 md:p-6", className)}
+        aria-busy="true"
+        role="status"
+        aria-label="Loading application"
+      >
         <Skeleton className="h-16 w-16 shrink-0 rounded-ub-full" />
         <div className="grid flex-1 gap-2">
           <Skeleton className="h-7 w-1/2" />
@@ -98,16 +106,40 @@ export default function ApplicationHeader({
       {breadcrumbs && <div className="mb-4">{breadcrumbs}</div>}
       <div className="flex flex-col gap-4 md:flex-row md:items-start">
         <div className="flex min-w-0 flex-1 items-start gap-4">
-          <Avatar name={studentName} src={photoUrl} size={64} className="hidden sm:inline-flex" />
-          <Avatar name={studentName} src={photoUrl} size={48} className="sm:hidden" />
+          <Avatar
+            name={studentName}
+            src={photoUrl}
+            size={64}
+            className="hidden sm:inline-flex"
+          />
+          <Avatar
+            name={studentName}
+            src={photoUrl}
+            size={48}
+            className="sm:hidden"
+          />
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <h1 className="min-w-0 text-ub-heading-lg text-ub-text-primary">{studentName}</h1>
-              {reference && <RefId value={reference} copyable className="text-ub-body-sm text-ub-text-secondary" />}
+              <Title className="min-w-0 text-ub-heading-lg text-ub-text-primary">
+                {studentName}
+              </Title>
+              {reference && (
+                <RefId
+                  value={reference}
+                  copyable
+                  className="text-ub-body-sm text-ub-text-secondary"
+                />
+              )}
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              {stageId ? <StageTag stageId={stageId} actionNeeded={actionNeeded} /> : stageLabel ? <Tag dot>{stageLabel}</Tag> : null}
-              {typeof daysInStage === "number" && <DaysTag mode="inStage" days={daysInStage} />}
+              {stageId ? (
+                <StageTag stageId={stageId} actionNeeded={actionNeeded} />
+              ) : stageLabel ? (
+                <Tag dot>{stageLabel}</Tag>
+              ) : null}
+              {typeof daysInStage === "number" && (
+                <DaysTag mode="inStage" days={daysInStage} />
+              )}
             </div>
             {(meta.length > 0 || intake) && (
               <p className="mt-2 text-ub-body-sm text-ub-text-secondary">
@@ -115,7 +147,12 @@ export default function ApplicationHeader({
                 {intake && (
                   <>
                     {meta.length > 0 && " · "}
-                    Intake <AppDate value={intake} format="short" className="ub-tabular" />
+                    Intake{" "}
+                    <AppDate
+                      value={intake}
+                      format="short"
+                      className="ub-tabular"
+                    />
                   </>
                 )}
               </p>
@@ -129,7 +166,14 @@ export default function ApplicationHeader({
               <Button
                 variant="primary"
                 text={primaryAction.label}
-                icon={primaryAction.icon ? <primaryAction.icon className="h-4 w-4" aria-hidden="true" /> : undefined}
+                icon={
+                  primaryAction.icon ? (
+                    <primaryAction.icon
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    />
+                  ) : undefined
+                }
                 onClick={primaryAction.onClick}
                 loading={primaryAction.loading}
                 disabled={primaryAction.disabled}
@@ -140,7 +184,12 @@ export default function ApplicationHeader({
               <ActionsDropdown
                 iconOnly
                 label="More actions"
-                items={overflowActions.map((a) => ({ label: a.label, icon: a.icon, onClick: a.onClick, color: a.destructive ? "red" : "blue" }))}
+                items={overflowActions.map((a) => ({
+                  label: a.label,
+                  icon: a.icon,
+                  onClick: a.onClick,
+                  color: a.destructive ? "red" : "blue",
+                }))}
               />
             )}
           </div>

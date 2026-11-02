@@ -61,7 +61,7 @@ export default function DashboardPatterns() {
         </div>
       </Demo>
 
-      <Demo name="Application Details" path="components/showcase/ApplicationDetailsPattern.tsx" description="The full Student profile / Application Details page, built only from the shared feature components with mock data. Open it full size to check every breakpoint, theme and direction.">
+      <Demo name="Application Details (full page)" path="components/showcase/ApplicationDetailsPattern.tsx" description="The full Student profile / Application Details page, built only from the shared feature components with mock data. Open it full size to check every breakpoint, theme and direction.">
         <a href="/design-system/patterns/application-details" className={clsx(card, cardInteractive, focusRing, "flex items-center justify-between gap-4 p-4")}>
           <span>
             <span className="block text-ub-label-md text-ub-text-primary">Open the Application Details pattern</span>

@@ -38,7 +38,7 @@ export default function KeyValueGrid({ items, columns = 2, fallback = "Not avail
         return (
           <div key={label} className="min-w-0 rounded-ub-md border border-ub-border bg-ub-surface-subtle p-4">
             <dt className="text-ub-label-sm text-ub-text-secondary">{label}</dt>
-            <dd className={clsx("ub-tabular mt-1 truncate text-ub-heading-sm", missing ? "text-ub-text-tertiary" : "text-ub-text-primary")}>{missing ? fallback : value}</dd>
+            <dd className={clsx("ub-tabular mt-1 break-words text-ub-heading-sm", missing ? "text-ub-text-tertiary" : "text-ub-text-primary")}>{missing ? fallback : value}</dd>
             {hint && <dd className="mt-2 text-ub-body-sm text-ub-text-secondary">{hint}</dd>}
           </div>
         );
