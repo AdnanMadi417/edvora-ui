@@ -137,6 +137,9 @@ export function ContentSection() {
       <Pick demos={["Icon"]}>
         <NewCoreForms />
       </Pick>
+      <Pick demos={["Collapse"]}>
+        <ApplicationFormDemo />
+      </Pick>
       <ApplicationDetailsDemo />
     </ShowcaseSection>
   );

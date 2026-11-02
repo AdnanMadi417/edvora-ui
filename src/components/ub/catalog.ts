@@ -53,6 +53,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "Multi-line text with label, helper, error and an optional character count.",
     usedIn: ["Rejection reasons", "Notes for the account manager", "Dispute justification"],
   },
+  Collapse: {
+    category: "core",
+    imports: [imp("Collapse", "core/Collapse")],
+    useFor: "Smoothly showing and hiding content on demand: optional fields, error summaries, show more.",
+    usedIn: ["Application form: optional documents, programme change, error summary"],
+    avoid: "Navigation between sections (use Tabs) or content that is always visible.",
+  },
   StepIndicator: {
     category: "navigation",
     imports: [named("default as StepIndicator, canOpenStep", "navigation/StepIndicator")],

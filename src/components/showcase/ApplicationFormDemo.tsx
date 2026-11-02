@@ -6,6 +6,9 @@
 
 import { useState } from "react";
 import StepIndicator from "components/ub/navigation/StepIndicator";
+import Collapse from "components/ub/core/Collapse";
+import Toggle from "components/ub/forms/Toggle";
+import Input from "components/ub/forms/Input";
 import ApplicationFormView, { type FormUniversity } from "features/applications/form/ApplicationFormView";
 import { visibleSteps, type ApplicationFormStepId } from "features/applications/form/applicationFormModel";
 import { updateFormData } from "features/applications/partner/components/form/utility-functions/updateFormData";
@@ -122,10 +125,36 @@ const STEPS = [
 
 export default function ApplicationFormDemo() {
   const [current, setCurrent] = useState("b");
+  const [showMore, setShowMore] = useState(false);
+  const [agent, setAgent] = useState("");
   const [mode, setMode] = useState<"new" | "programme">("new");
   const done = STEPS.slice(0, STEPS.findIndex((s) => s.id === current)).map((s) => s.id);
   return (
     <ShowcaseSection id="application-form" title="Application form" description="The Advisor's multi-step application form.">
+      <Demo
+        name="Collapse"
+        path="components/ub/core/Collapse.tsx"
+        description="Smoothly reveals and hides on-demand content: optional fields, error summaries, show more. Height and opacity animate together with the app's ease (250ms); reduced motion only fades. Closed content is unmounted, so it leaves the tab order; clipping only applies while animating, so focus rings stay visible."
+        code={`<Toggle checked={open} onChange={setOpen} label="Add a sub-agent" />
+<Collapse open={open}>
+  <Input label="Sub-agent name" value={name} onChange={setName} />
+</Collapse>`}
+        props={[
+          { name: "open", type: "boolean", description: "Mounts with a height + fade transition; unmounts when false." },
+          { name: "skipInitial", type: "boolean", default: "true", description: "Don't animate content that starts open." },
+          { name: "className", type: "string", description: "Layout only." },
+        ]}
+      >
+        <div className="max-w-ub-form-sm rounded-ub-lg border border-ub-border bg-ub-surface p-4">
+          <Toggle checked={showMore} onChange={setShowMore} label="Add a sub-agent" description="Only if someone else referred the student." />
+          <Collapse open={showMore}>
+            <div className="pt-4">
+              <Input label="Sub-agent name" value={agent} onChange={setAgent} required />
+            </div>
+          </Collapse>
+        </div>
+      </Demo>
+
       <Demo
         name="StepIndicator"
         path="components/ub/navigation/StepIndicator.tsx"

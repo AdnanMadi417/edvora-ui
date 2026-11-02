@@ -18,3 +18,4 @@ export { default as RefId } from "./RefId";
 export { default as Text } from "./Text";
 export { default as TextLink } from "./TextLink";
 export { Numeral } from "./Amount";
+export { default as Collapse } from "./Collapse";

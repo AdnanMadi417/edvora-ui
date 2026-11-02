@@ -51,7 +51,7 @@ export default function StepIndicator({ steps, currentId, completedIds = [], onS
         <p className="text-ub-label-lg text-ub-text-primary">{current?.label}</p>
         <div className="mt-2 grid gap-1" style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }} aria-hidden="true">
           {steps.map((s, i) => (
-            <span key={s.id} className={clsx("h-1.5 rounded-ub-full", i < currentIndex || completedIds.includes(s.id) ? "bg-ub-action-primary" : i === currentIndex ? "bg-ub-border-focus" : "bg-ub-border")} />
+            <span key={s.id} className={clsx("h-1.5 rounded-ub-full transition-colors duration-ub-slow ease-ub-standard motion-reduce:transition-none", i < currentIndex || completedIds.includes(s.id) ? "bg-ub-action-primary" : i === currentIndex ? "bg-ub-border-focus" : "bg-ub-border")} />
           ))}
         </div>
       </div>
@@ -67,7 +67,7 @@ export default function StepIndicator({ steps, currentId, completedIds = [], onS
             <span
               aria-hidden="true"
               className={clsx(
-                "ub-tabular grid h-8 w-8 shrink-0 place-items-center rounded-ub-full border text-ub-label-md transition-colors duration-ub-fast motion-reduce:transition-none",
+                "ub-tabular grid h-8 w-8 shrink-0 place-items-center rounded-ub-full border text-ub-label-md transition-[background-color,border-color,color,box-shadow] duration-ub-slow ease-ub-standard motion-reduce:transition-none",
                 done && "border-transparent bg-ub-action-primary text-ub-action-primary-text",
                 isCurrent && "border-2 border-ub-border-focus bg-ub-surface text-ub-text-link shadow-ub-glow",
                 !done && !isCurrent && "border-ub-border-muted bg-ub-surface text-ub-text-secondary",
@@ -98,7 +98,7 @@ export default function StepIndicator({ steps, currentId, completedIds = [], onS
                   {text}
                 </span>
               )}
-              {!last && <span aria-hidden="true" className={clsx("mx-3 h-0.5 min-w-6 flex-1 rounded-ub-full", done ? "bg-ub-action-primary" : "bg-ub-border")} />}
+              {!last && <span aria-hidden="true" className={clsx("mx-3 h-0.5 min-w-6 flex-1 rounded-ub-full transition-colors duration-ub-slow ease-ub-standard motion-reduce:transition-none", done ? "bg-ub-action-primary" : "bg-ub-border")} />}
             </li>
           );
         })}

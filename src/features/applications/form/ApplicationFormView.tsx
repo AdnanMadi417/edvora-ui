@@ -4,10 +4,13 @@
 // API calls live in useApplicationForm (or a mock in the style guide), so this
 // renders the same in the product and on /ui-unibexs-template-2026.
 
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import clsx from "clsx";
 import { ArrowLeft, ArrowRight, CircleAlert, FileText, Send, Trash2, Upload } from "lucide-react";
 import Button from "components/ub/core/Button";
+import Collapse from "components/ub/core/Collapse";
+import { EASE, MICRO_DURATION } from "components/ub/core/FadeIn";
 import IconButton from "components/ub/core/IconButton";
 import TextButton from "components/ub/core/TextButton";
 import AppDate from "components/ub/data/AppDate";
@@ -70,23 +73,24 @@ function ErrorSummary({ errors }: { errors: Record<string, string | undefined> }
   const items = Object.entries(errors).filter(([, m]) => m && m !== "required") as [string, string][];
   const required = Object.entries(errors).filter(([, m]) => m === "required");
   const all = [...items, ...required.map(([k]) => [k, "This document is required."] as [string, string])];
-  if (!all.length) return null;
   return (
-    <div role="alert" className="mb-6 rounded-ub-md border border-ub-tone-danger-border bg-ub-tone-danger-bg p-4">
-      <p className="flex items-center gap-2 text-ub-label-md text-ub-tone-danger-text">
-        <CircleAlert className="h-5 w-5 shrink-0" aria-hidden="true" />
-        {all.length === 1 ? "Fix 1 field to continue" : `Fix ${all.length} fields to continue`}
-      </p>
-      <ul className="mt-2 grid gap-1 ps-7">
-        {all.map(([path, message]) => (
-          <li key={path}>
-            <a href={`#${fieldId(path)}`} className="text-ub-body-sm text-ub-tone-danger-text underline underline-offset-2 hover:no-underline">
-              {message}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <Collapse open={all.length > 0}>
+      <div role="alert" className="mb-6 rounded-ub-md border border-ub-tone-danger-border bg-ub-tone-danger-bg p-4">
+        <p className="flex items-center gap-2 text-ub-label-md text-ub-tone-danger-text">
+          <CircleAlert className="h-5 w-5 shrink-0" aria-hidden="true" />
+          {all.length === 1 ? "Fix 1 field to continue" : `Fix ${all.length} fields to continue`}
+        </p>
+        <ul className="mt-2 grid gap-1 ps-7">
+          {all.map(([path, message]) => (
+            <li key={path}>
+              <a href={`#${fieldId(path)}`} className="text-ub-body-sm text-ub-tone-danger-text underline underline-offset-2 hover:no-underline">
+                {message}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Collapse>
   );
 }
 
@@ -132,7 +136,7 @@ function StudentStep({ mode, formData, errors, update, validateField, universiti
             <Toggle checked={changeProgramme} onChange={setChangeProgramme} label="Choose a different programme" />
           </div>
         )}
-        {changeProgramme && (
+        <Collapse open={changeProgramme}>
           <div className="mt-4 grid gap-x-4 sm:grid-cols-2">
             <Combobox
               id={fieldId("university_id")}
@@ -159,7 +163,7 @@ function StudentStep({ mode, formData, errors, update, validateField, universiti
               required
             />
           </div>
-        )}
+        </Collapse>
       </section>
     </div>
   );
@@ -234,7 +238,9 @@ function DocumentsStep({ formData, errors, upload, removeDocument, documentTypes
       {optional.length > 0 && (
         <div className="grid gap-3">
           <Toggle checked={showOptional} onChange={setShowOptional} label={`Optional documents (${optional.length})`} description="Add them now if you have them; they can also be uploaded later." />
-          {showOptional && <div className="-mx-3 divide-y divide-ub-border">{optional.map(slot)}</div>}
+          <Collapse open={showOptional}>
+            <div className="-mx-3 divide-y divide-ub-border">{optional.map(slot)}</div>
+          </Collapse>
         </div>
       )}
       {errors.documents && (
@@ -413,6 +419,17 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
   const last = index === steps.length - 1;
   const current = steps[index];
   const top = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+
+  // Direction of travel: forward slides in from the end side, back from the start (mirrored in RTL).
+  const prevIndex = useRef(index);
+  const direction = index >= prevIndex.current ? 1 : -1;
+  useEffect(() => {
+    prevIndex.current = index;
+  }, [index]);
+  const [rtl, setRtl] = useState(false);
+  useEffect(() => setRtl(getComputedStyle(document.documentElement).direction === "rtl"), []);
+  const shift = (sign: number) => (reduce ? 0 : sign * (rtl ? -1 : 1) * 24);
 
   // Keep the step's top in view after moving, and move focus for screen readers.
   const move = (fn: () => unknown) => {
@@ -447,10 +464,26 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
         <StepIndicator aria-label="Application steps" steps={steps} currentId={step} completedIds={completed} onStepClick={(id) => move(() => goTo(id as ApplicationFormStepId))} />
       </div>
 
-      <div ref={top} tabIndex={-1} className="scroll-mt-24 px-4 py-6 outline-none md:px-6">
+      <div ref={top} tabIndex={-1} className="scroll-mt-24 overflow-x-clip px-4 py-6 outline-none md:px-6">
         <h2 className="sr-only">{current?.label}</h2>
         <ErrorSummary errors={errors} />
-        {body}
+        <AnimatePresence mode="wait" initial={false} custom={direction}>
+          <motion.div
+            key={step}
+            custom={direction}
+            variants={{
+              enter: (d: number) => ({ opacity: 0, x: shift(d) }),
+              center: { opacity: 1, x: 0 },
+              exit: (d: number) => ({ opacity: 0, x: shift(-d) / 2 }),
+            }}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: reduce ? 0.12 : MICRO_DURATION, ease: EASE }}
+          >
+            {body}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       <footer className="flex flex-col-reverse gap-3 border-t border-ub-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between md:px-6">
