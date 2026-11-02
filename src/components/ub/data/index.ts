@@ -33,3 +33,4 @@ export { default as SectionCard } from "./SectionCard";
 export { default as KeyValueGrid } from "./KeyValueGrid";
 export { default as FileRow } from "./FileRow";
 export { default as Timeline } from "./Timeline";
+export { default as DataTableToolbar } from "./DataTableToolbar";

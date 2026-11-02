@@ -2,7 +2,10 @@
 
 import React, { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import clsx from "clsx";
 import { ArrowDown, ArrowUp, ArrowUpDown, Check, Minus, X } from "lucide-react";
+import { pageSelectionState, selectRange, toggleId, togglePage } from "components/ub/data/tableSelection";
 import TableWrapper from "components/ub/data/TableWrapper";
 import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
 import TableEmptyRow from "components/ub/data/TableEmptyRow";
@@ -68,7 +71,7 @@ export interface DataTableProps<T> {
   /** Checkbox name per row, e.g. (r) => r.student. Default "row N". */
   getRowLabel?: (row: T) => string;
   /** Bulk-action buttons; receives the selected ids and a clear function. */
-  bulkActions?: (selectedIds: string[], clearSelection: () => void) => ReactNode;
+  bulkActions?: (selectedIds: string[], clearSelection: () => void, context: BulkContext) => ReactNode;
 
   /** Controlled sort (pass `null` for unsorted). */
   sort?: DataTableSort | null;
@@ -79,7 +82,34 @@ export interface DataTableProps<T> {
 
   /** Footer slot, typically <TablePagination />. */
   footer?: ReactNode;
+
+  /** table (default; stacked cards below 768px) · cards: stacked cards at every width (Knowledge Hub, mobile-first lists). */
+  layout?: DataTableLayout;
+  /** Return true, or a reason string to disable the row's checkbox (shown as its tooltip). */
+  isRowSelectable?: (row: T) => true | string;
+  /** Total rows across all pages (server mode). With onSelectAllMatchingChange, offers "Select all N". */
+  totalCount?: number;
+  /** "All matching rows" is selected, not just the ids (bulk actions get { allMatching: true }). */
+  allMatchingSelected?: boolean;
+  onSelectAllMatchingChange?: (all: boolean) => void;
+  /** When this value changes (e.g. the filters), the selection clears and the change is announced. */
+  selectionResetKey?: string;
+  /** Makes each row open this href: the first column becomes a link that covers the row. */
+  getRowHref?: (row: T) => string;
+  /** Keys of columns to hide (DataTableToolbar's Columns menu). */
+  hiddenColumns?: string[];
+  /** Pin the first column while the table scrolls sideways (wide tables, from 768px). */
+  stickyFirstColumn?: boolean;
   className?: string;
+}
+
+export type DataTableLayout = "table" | "cards";
+
+/** Third argument of bulkActions. */
+export interface BulkContext {
+  /** Every row matching the current filters is selected (send the filters, not the ids). */
+  allMatching: boolean;
+  count: number;
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────
@@ -130,7 +160,20 @@ function useControllable<V>(value: V | undefined, initial: V, onChange?: (v: V) 
 
 const ariaSort = (dir?: SortDirection) => (dir === "asc" ? "ascending" : dir === "desc" ? "descending" : "none");
 
-function TableCheckbox({ checked, indeterminate, onChange, label }: { checked: boolean; indeterminate?: boolean; onChange: () => void; label: string }) {
+function TableCheckbox({
+  checked,
+  indeterminate,
+  onChange,
+  label,
+  disabledReason,
+}: {
+  checked: boolean;
+  indeterminate?: boolean;
+  onChange: (e: React.MouseEvent<HTMLInputElement>) => void;
+  label: string;
+  /** Disables the box; the reason is its tooltip and accessible description. */
+  disabledReason?: string;
+}) {
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (ref.current) ref.current.indeterminate = !!indeterminate;
@@ -141,7 +184,12 @@ function TableCheckbox({ checked, indeterminate, onChange, label }: { checked: b
         ref={ref}
         type="checkbox"
         checked={checked}
-        onChange={onChange}
+        // onClick (not onChange) so the handler sees shiftKey for range selection.
+        onChange={() => undefined}
+        onClick={onChange}
+        disabled={!!disabledReason}
+        title={disabledReason}
+        aria-description={disabledReason}
         aria-label={label}
         aria-checked={indeterminate ? "mixed" : checked}
         className={`peer ${checkbox} indeterminate:border-ub-action-primary indeterminate:bg-ub-action-primary`}
@@ -176,13 +224,11 @@ export function DataTablePrimaryCell({ name, reference, avatarSrc }: DataTablePr
 
 // ── DataTable ────────────────────────────────────────────────────────────
 
-// Below md every row is a stacked card; from md up it's a real table.
+// Below md (or always, with layout="cards") every row is a stacked card; from md up it's a real table.
 const rowHeight: Record<DataTableDensity, string> = { comfortable: "md:h-14", compact: "md:h-11" };
-const cellBase = "flex items-start justify-between gap-4 px-4 py-1 text-ub-body-sm text-ub-text-primary md:table-cell md:py-0 md:align-middle";
-const headCellBase = "hidden h-11 px-4 font-medium md:table-cell";
 
 export default function DataTable<T>({
-  columns,
+  columns: allColumns,
   rows,
   getRowId,
   caption,
@@ -203,27 +249,74 @@ export default function DataTable<T>({
   onSortChange,
   manualSort,
   footer,
+  layout = "table",
+  isRowSelectable,
+  totalCount,
+  allMatchingSelected = false,
+  onSelectAllMatchingChange,
+  selectionResetKey,
+  getRowHref,
+  hiddenColumns,
+  stickyFirstColumn = false,
   className,
 }: DataTableProps<T>) {
-  const [selected, setSelected] = useControllable<string[]>(selectedIds, defaultSelectedIds, onSelectionChange);
+  const [selected, setSelectedRaw] = useControllable<string[]>(selectedIds, defaultSelectedIds, onSelectionChange);
   const [sort, setSort] = useControllable<DataTableSort | null>(sortProp, defaultSort, onSortChange);
+  const [announcement, setAnnouncement] = useState("");
+  const anchor = useRef<string | null>(null);
 
-  const sortedRows = useMemo(() => (manualSort ? rows : sortRows(rows, columns, sort)), [rows, columns, sort, manualSort]);
+  const columns = useMemo(() => (hiddenColumns?.length ? allColumns.filter((c) => !hiddenColumns.includes(c.key)) : allColumns), [allColumns, hiddenColumns]);
+  const sortedRows = useMemo(() => (manualSort ? rows : sortRows(rows, allColumns, sort)), [rows, allColumns, sort, manualSort]);
   const rowIds = useMemo(() => sortedRows.map(getRowId), [sortedRows, getRowId]);
+  const disabledReason = useMemo(() => {
+    const map = new Map<string, string>();
+    if (isRowSelectable) sortedRows.forEach((r, i) => {
+      const ok = isRowSelectable(r);
+      if (ok !== true) map.set(rowIds[i], ok);
+    });
+    return map;
+  }, [sortedRows, rowIds, isRowSelectable]);
+  const selectableIds = useMemo(() => rowIds.filter((id) => !disabledReason.has(id)), [rowIds, disabledReason]);
 
   const selectedSet = new Set(selected);
-  const selectedVisible = rowIds.filter((id) => selectedSet.has(id)).length;
-  const allSelected = rowIds.length > 0 && selectedVisible === rowIds.length;
-  const someSelected = selectedVisible > 0 && !allSelected;
+  const pageState = pageSelectionState(selected, selectableIds);
   const showData = !loading && !error && sortedRows.length > 0;
   const colCount = columns.length + (selectable ? 1 : 0);
+  const cards = layout === "cards";
+  const count = allMatchingSelected && totalCount ? totalCount : selected.length;
 
-  const clearSelection = () => setSelected([]);
-  const toggleAll = () => {
-    if (allSelected) setSelected(selected.filter((id) => !rowIds.includes(id)));
-    else setSelected(Array.from(new Set([...selected, ...rowIds])));
+  const setSelected = (ids: string[]) => {
+    if (allMatchingSelected) onSelectAllMatchingChange?.(false);
+    setSelectedRaw(ids);
+    setAnnouncement(ids.length ? `${ids.length} selected` : "");
   };
-  const toggleRow = (id: string) => setSelected(selectedSet.has(id) ? selected.filter((s) => s !== id) : [...selected, id]);
+  const clearSelection = () => {
+    if (allMatchingSelected) onSelectAllMatchingChange?.(false);
+    setSelectedRaw([]);
+    setAnnouncement("");
+  };
+
+  // Filters changed: the old selection no longer matches what's on screen.
+  const resetKey = useRef(selectionResetKey);
+  useEffect(() => {
+    if (resetKey.current === selectionResetKey) return;
+    resetKey.current = selectionResetKey;
+    if (selected.length || allMatchingSelected) {
+      clearSelection();
+      setAnnouncement("Selection cleared because the filters changed");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on a key change
+  }, [selectionResetKey]);
+
+  const toggleAll = () => {
+    anchor.current = null;
+    setSelected(togglePage(selected, selectableIds));
+  };
+  const toggleRow = (id: string, shift: boolean) => {
+    const next = shift && anchor.current ? selectRange(selected, rowIds, anchor.current, id, (x) => !disabledReason.has(x)) : toggleId(selected, id);
+    anchor.current = id;
+    setSelected(next);
+  };
 
   // asc → desc → unsorted
   const cycleSort = (key: string) => {
@@ -232,53 +325,77 @@ export default function DataTable<T>({
     else setSort(null);
   };
 
-  const count = selected.length;
+  const offerAllMatching = !!onSelectAllMatchingChange && !!totalCount && totalCount > rowIds.length && pageState === "all";
+
+  // Stacked-card vs table classes for each element.
+  const t = {
+    table: cards ? "block w-full" : "block w-full border-collapse text-start md:table",
+    thead: cards ? "block" : "block md:table-header-group",
+    headRow: (show: boolean) => clsx(show ? "flex items-center" : "hidden", !cards && "md:table-row"),
+    tbody: cards ? "block" : "block md:table-row-group",
+    row: cards ? "block border-t border-ub-border py-3" : clsx("block border-t border-ub-border py-3 md:table-row md:py-0", rowHeight[density]),
+    cell: cards
+      ? "flex items-start justify-between gap-4 px-4 py-1 text-ub-body-sm text-ub-text-primary"
+      : "flex items-start justify-between gap-4 px-4 py-1 text-ub-body-sm text-ub-text-primary md:table-cell md:py-0 md:align-middle",
+    headCell: cards ? "hidden" : "hidden h-11 px-4 font-medium md:table-cell",
+    label: cards ? "shrink-0 text-ub-label-sm text-ub-text-tertiary" : "shrink-0 text-ub-label-sm text-ub-text-tertiary md:hidden",
+    checkCell: cards ? "flex px-4 py-1" : "flex px-4 py-1 md:table-cell md:w-12 md:py-0 md:align-middle",
+  };
+  const pin = (first: boolean, head = false) =>
+    stickyFirstColumn && first && !cards ? clsx("md:sticky md:z-10", selectable ? "md:start-12" : "md:start-0", head ? "md:bg-ub-table-head" : "md:bg-inherit") : "";
 
   return (
-    <div className={className}>
+    <div
+      className={className}
+      onKeyDown={(e) => {
+        if (e.key === "Escape" && selectable && count > 0) {
+          e.stopPropagation();
+          clearSelection();
+          setAnnouncement("Selection cleared");
+        }
+      }}
+    >
       {selectable && (
-        <>
-          <div role="status" aria-live="polite" className="sr-only">
-            {count > 0 ? `${count} selected` : ""}
-          </div>
-          {count > 0 && (
-            <div
-              role="group"
-              aria-label="Bulk actions"
-              className="mb-3 flex flex-wrap items-center gap-3 rounded-ub-lg border border-ub-action-primary bg-ub-selected px-4 py-2"
-            >
-              <span aria-hidden="true" className="ub-tabular text-ub-label-md text-ub-text-primary">
-                {count} selected
-              </span>
-              <div className="flex flex-1 flex-wrap items-center gap-2">{bulkActions?.(selected, clearSelection)}</div>
-              <button
-                type="button"
-                onClick={clearSelection}
-                className={`inline-flex h-8 items-center gap-1.5 rounded-ub-full px-3 text-ub-label-md text-ub-text-link hover:bg-ub-action-secondary-hover ${focusRing}`}
-              >
-                <X aria-hidden="true" className="h-4 w-4" />
+        <div role="status" aria-live="polite" className="sr-only">
+          {announcement || (count > 0 ? `${count} selected` : "")}
+        </div>
+      )}
+
+      {selectable && (offerAllMatching || allMatchingSelected) && (
+        <p className="mb-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-ub-md bg-ub-surface-subtle px-4 py-2 text-ub-body-sm text-ub-text-secondary">
+          {allMatchingSelected ? (
+            <>
+              All <span className="ub-tabular font-medium text-ub-text-primary">{totalCount}</span> results are selected.
+              <button type="button" onClick={clearSelection} className={`rounded-ub-xs font-medium text-ub-text-link hover:underline ${focusRing}`}>
                 Clear selection
               </button>
-            </div>
+            </>
+          ) : (
+            <>
+              All <span className="ub-tabular font-medium text-ub-text-primary">{selectableIds.length}</span> on this page are selected.
+              <button type="button" onClick={() => onSelectAllMatchingChange?.(true)} className={`rounded-ub-xs font-medium text-ub-text-link hover:underline ${focusRing}`}>
+                Select all {totalCount} results
+              </button>
+            </>
           )}
-        </>
+        </p>
       )}
 
       <TableWrapper footer={footer}>
-        <table className="block w-full border-collapse text-start md:table" aria-busy={loading || undefined}>
+        <table className={t.table} aria-busy={loading || undefined}>
           <caption className="sr-only">{caption}</caption>
-          <thead className={`${tableHead} block md:table-header-group`}>
-            {/* On mobile only the select-all cell of the header row is shown. */}
-            <tr className={`${selectable && showData ? "flex items-center" : "hidden"} md:table-row`}>
+          <thead className={`${tableHead} ${t.thead}`}>
+            {/* On mobile (and in cards) only the select-all cell of the header row is shown. */}
+            <tr className={t.headRow(!!selectable && showData)}>
               {selectable && (
-                <th scope="col" className="flex h-11 w-auto items-center gap-3 px-4 md:table-cell md:w-12 md:align-middle">
-                  <TableCheckbox checked={allSelected} indeterminate={someSelected} onChange={toggleAll} label="Select all rows" />
-                  <span aria-hidden="true" className="md:hidden">
+                <th scope="col" className={clsx("flex h-11 w-auto items-center gap-3 px-4", !cards && "md:table-cell md:w-12 md:align-middle", stickyFirstColumn && !cards && "md:sticky md:start-0 md:z-10 md:bg-ub-table-head")}>
+                  <TableCheckbox checked={pageState === "all"} indeterminate={pageState === "some"} onChange={toggleAll} label="Select all rows" />
+                  <span aria-hidden="true" className={cards ? "" : "md:hidden"}>
                     Select all
                   </span>
                 </th>
               )}
-              {columns.map((col) => {
+              {columns.map((col, ci) => {
                 const active = sort?.key === col.key ? sort.direction : undefined;
                 const end = col.align === "end";
                 const SortIcon = active === "asc" ? ArrowUp : active === "desc" ? ArrowDown : ArrowUpDown;
@@ -288,7 +405,7 @@ export default function DataTable<T>({
                     scope="col"
                     style={col.width ? { width: col.width } : undefined}
                     aria-sort={col.sortable ? ariaSort(active) : undefined}
-                    className={`${headCellBase} ${end ? "text-end" : "text-start"}`}
+                    className={clsx(t.headCell, end ? "text-end" : "text-start", pin(ci === 0, true))}
                   >
                     {col.sortable ? (
                       <button
@@ -307,7 +424,7 @@ export default function DataTable<T>({
               })}
             </tr>
           </thead>
-          <tbody className="block md:table-row-group">
+          <tbody className={t.tbody}>
             {loading && <TableSkeletonRows columns={colCount} rows={skeletonRows} />}
             {!loading && error && <TableErrorRow colSpan={colCount} message={error} onRetry={onRetry} />}
             {!loading && !error && sortedRows.length === 0 && (
@@ -317,31 +434,44 @@ export default function DataTable<T>({
               <AnimatePresence initial={false}>
                 {sortedRows.map((row, index) => {
                   const id = rowIds[index];
-                  const isSelected = selectedSet.has(id);
+                  const isSelected = allMatchingSelected ? !disabledReason.has(id) : selectedSet.has(id);
+                  const href = getRowHref?.(row);
+                  const label = getRowLabel ? getRowLabel(row) : `row ${index + 1}`;
                   return (
                     <AnimatedTableRow
                       key={id}
                       data-selected={isSelected || undefined}
-                      className={`block border-t border-ub-border py-3 md:table-row md:py-0 ${rowHeight[density]} ${isSelected ? "bg-ub-selected" : "md:hover:bg-ub-row-hover"}`}
+                      className={clsx(t.row, href && "relative cursor-pointer", isSelected ? "bg-ub-selected" : clsx("bg-ub-surface", cards ? "hover:bg-ub-row-hover" : "md:hover:bg-ub-row-hover"))}
                     >
                       {selectable && (
-                        <td className="flex px-4 py-1 md:table-cell md:w-12 md:py-0 md:align-middle">
+                        <td className={clsx(t.checkCell, "relative z-10", stickyFirstColumn && !cards && "md:sticky md:start-0 md:bg-inherit")}>
                           <TableCheckbox
                             checked={isSelected}
-                            onChange={() => toggleRow(id)}
-                            label={`Select ${getRowLabel ? getRowLabel(row) : `row ${index + 1}`}`}
+                            onChange={(e) => toggleRow(id, e.shiftKey)}
+                            label={`Select ${label}`}
+                            disabledReason={disabledReason.get(id)}
                           />
                         </td>
                       )}
-                      {columns.map((col) => {
+                      {columns.map((col, ci) => {
                         const end = col.align === "end";
                         const mobileLabel = col.mobileLabel ?? (typeof col.header === "string" ? col.header : col.key);
+                        const content = col.cell(row, index);
                         return (
-                          <td key={col.key} className={`${cellBase} ${end ? "ub-tabular md:text-end" : "md:text-start"}`}>
-                            <span aria-hidden="true" className="shrink-0 text-ub-label-sm text-ub-text-tertiary md:hidden">
+                          <td key={col.key} className={clsx(t.cell, end ? clsx("ub-tabular", !cards && "md:text-end") : !cards && "md:text-start", pin(ci === 0))}>
+                            <span aria-hidden="true" className={t.label}>
                               {mobileLabel}
                             </span>
-                            <span className={`min-w-0 text-end md:block ${end ? "md:text-end" : "md:text-start"}`}>{col.cell(row, index)}</span>
+                            <span className={clsx("min-w-0 text-end", !cards && "md:block", !cards && (end ? "md:text-end" : "md:text-start"))}>
+                              {/* The first column's link covers the whole row; other interactive cells sit above it (relative z-10). */}
+                              {href && ci === 0 ? (
+                                <Link href={href} className={`rounded-ub-xs after:absolute after:inset-0 ${focusRing}`}>
+                                  {content}
+                                </Link>
+                              ) : (
+                                <span className={href ? "relative z-10" : undefined}>{content}</span>
+                              )}
+                            </span>
                           </td>
                         );
                       })}
@@ -353,6 +483,28 @@ export default function DataTable<T>({
           </tbody>
         </table>
       </TableWrapper>
+
+      {/* Bulk-action bar floats at the bottom of the viewport while rows are selected (above the mobile nav). */}
+      {selectable && count > 0 && (
+        <div
+          role="group"
+          aria-label="Bulk actions"
+          className="sticky bottom-20 z-20 mt-3 flex flex-wrap items-center gap-3 rounded-ub-lg border border-ub-border-overlay bg-ub-surface-raised px-4 py-2 shadow-ub-lg md:bottom-4"
+        >
+          <span aria-hidden="true" className="ub-tabular text-ub-label-md text-ub-text-primary">
+            {count} selected
+          </span>
+          <div className="flex flex-1 flex-wrap items-center gap-2">{bulkActions?.(selected, clearSelection, { allMatching: allMatchingSelected, count })}</div>
+          <button
+            type="button"
+            onClick={clearSelection}
+            className={`inline-flex h-8 items-center gap-1.5 rounded-ub-full px-3 text-ub-label-md text-ub-text-link hover:bg-ub-action-secondary-hover ${focusRing}`}
+          >
+            <X aria-hidden="true" className="h-4 w-4" />
+            Clear selection
+          </button>
+        </div>
+      )}
     </div>
   );
 }
