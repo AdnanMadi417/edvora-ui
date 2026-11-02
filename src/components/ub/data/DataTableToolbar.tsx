@@ -153,7 +153,12 @@ export default function DataTableToolbar({ search, filters, density, columns, re
         )}
         {filters}
         <div className="ms-auto flex flex-wrap items-center gap-2">
-          {density && <DensitySwitch {...density} />}
+          {/* Rows are stacked cards below 768px, where density has no effect. */}
+          {density && (
+            <div className="hidden md:block">
+              <DensitySwitch {...density} />
+            </div>
+          )}
           {columns && <ColumnsMenu {...columns} />}
           {actions}
         </div>

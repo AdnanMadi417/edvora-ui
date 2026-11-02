@@ -53,6 +53,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "Multi-line text with label, helper, error and an optional character count.",
     usedIn: ["Rejection reasons", "Notes for the account manager", "Dispute justification"],
   },
+  "ApplicationsTable": {
+    category: "data",
+    imports: ['import ApplicationsTable from "features/applications/components/ApplicationsTable";'],
+    useFor: "The Application Tracker list: one table for Advisors, account managers and admins.",
+    usedIn: ["/partner/applications", "/account-manager/applications", "/admin/applications"],
+    avoid: "Board view by stage (not built yet).",
+  },
   "ApplicationHeader": {
     category: "data",
     imports: ['import { ApplicationHeader } from "features/applications/components";'],

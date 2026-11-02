@@ -13,6 +13,7 @@ import { resolveStage } from "features/applications/stages";
 import type { DocumentItem } from "features/applications/model/applicationView";
 import type { ApplicationDetailsTab } from "features/applications/shared/applicationDetailTabs";
 import type { OfferStatus } from "features/applications/components/OfferCard";
+import ApplicationsTable, { type ApplicationListRow } from "features/applications/components/ApplicationsTable";
 import {
   ActivityTimeline,
   ApplicationAlerts,
@@ -53,6 +54,11 @@ const DOCS: DocumentItem[] = [
   doc("photo", "Passport photo", "verified"),
 ];
 const CARD_STATES = ["ready", "loading", "empty", "error"] as const;
+const LIST_ROWS: ApplicationListRow[] = [
+  { id: "app_001", student_name: "Nur Aisyah Binti Kamal", passport_number: "A12345678", program_name: "Bachelor of Computer Science (Hons)", university_name: "Sunway University", partner_name: "Global Pathways Education", account_manager_name: "Farid Hakimi", stage: "Institution Review", status: "Correction Requested", updated_at: ago(3) },
+  { id: "app_002", student_name: "Chinedu Okafor", passport_number: "B98765432", program_name: "Master of Data Science", university_name: "Taylor's University", partner_name: "Bright Future Consultancy", account_manager_name: "Lim Wei Jie", stage: "Offer & Visa Payment", status: "Waiting for Payment", updated_at: ago(30) },
+  { id: "app_003", student_name: "Tanvir Hossain", passport_number: "C24681357", program_name: "Diploma in Information Technology", university_name: "UCSI University", partner_name: "Global Pathways Education", account_manager_name: "Priya Nair", stage: "Visa Processing", status: "Visa Issued", updated_at: ago(120) },
+];
 const noop = () => undefined;
 
 function useCardState() {
@@ -72,6 +78,36 @@ export default function ApplicationComponents() {
 
   return (
     <ShowcaseSection id="application-components" title="Application Details components" description="Feature components that compose the kit with application data. Typed props in, no fetching.">
+      <Demo
+        name="ApplicationsTable"
+        path="features/applications/components/ApplicationsTable.tsx"
+        description="The Application Tracker list for every role, on DataTable: student with passport number, programme and Institution, owner (staff), stage with a status tag and an Action needed tag, updated time. Rows open in a new tab. Staff get compact rows, selection and Export as CSV; Advisors get comfortable rows."
+        code={`<ApplicationsTable
+  rows={applications}
+  loading={loading}
+  error={error}
+  onRetry={refetch}
+  hrefFor={(id) => \`/admin/applications/\${id}\`}
+  ownership="advisor-and-manager"
+  statusLabel={statusLabel}
+  needsAction={needsAction}
+  defaultDensity="compact"
+  selectable
+  selectionResetKey={filtersKey}
+  footer={<TablePagination ... />}
+/>`}
+        props={[
+          { name: "rows / loading / error / onRetry", type: "ApplicationListRow[] / boolean / string | null / () => void", description: "From the role's list hook; data stays in the page." },
+          { name: "hrefFor", type: "(id) => string", description: "Detail page; opens in a new tab." },
+          { name: "ownership", type: '"advisor-and-manager" | "advisor" | "none"', default: '"none"', description: "Owner column per role." },
+          { name: "statusLabel / needsAction", type: "(status) => string / (status) => boolean", description: "Status display name and the Action needed rule." },
+          { name: "defaultDensity", type: '"comfortable" | "compact"', default: '"comfortable"', description: "Staff compact, Advisors comfortable; the toolbar switches it." },
+          { name: "selectable / selectionResetKey", type: "boolean / string", default: "false", description: "Staff selection with Export as CSV; clears when filters change." },
+        ]}
+      >
+        <ApplicationsTable rows={LIST_ROWS} hrefFor={() => "#c-applicationstable"} ownership="advisor-and-manager" statusLabel={(s) => s} needsAction={(s) => s === "Correction Requested"} defaultDensity="compact" selectable />
+      </Demo>
+
       <Demo
         name="ApplicationHeader"
         path="features/applications/components/ApplicationHeader.tsx"

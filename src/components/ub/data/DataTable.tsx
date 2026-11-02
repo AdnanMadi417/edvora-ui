@@ -96,6 +96,8 @@ export interface DataTableProps<T> {
   selectionResetKey?: string;
   /** Makes each row open this href: the first column becomes a link that covers the row. */
   getRowHref?: (row: T) => string;
+  /** "_blank" opens rows in a new tab (announced to screen readers). Default same tab. */
+  rowLinkTarget?: "_self" | "_blank";
   /** Keys of columns to hide (DataTableToolbar's Columns menu). */
   hiddenColumns?: string[];
   /** Pin the first column while the table scrolls sideways (wide tables, from 768px). */
@@ -262,6 +264,7 @@ export default function DataTable<T>({
   onSelectAllMatchingChange,
   selectionResetKey,
   getRowHref,
+  rowLinkTarget = "_self",
   hiddenColumns,
   stickyFirstColumn = false,
   className,
@@ -471,8 +474,14 @@ export default function DataTable<T>({
                             <span className={clsx("min-w-0 text-end", !cards && "md:block", !cards && (end ? "md:text-end" : "md:text-start"))}>
                               {/* The first column's link covers the whole row; other interactive cells sit above it (relative z-10). */}
                               {href && ci === 0 ? (
-                                <Link href={href} className={`rounded-ub-xs after:absolute after:inset-0 ${focusRing}`}>
+                                <Link
+                                  href={href}
+                                  target={rowLinkTarget === "_blank" ? "_blank" : undefined}
+                                  rel={rowLinkTarget === "_blank" ? "noopener noreferrer" : undefined}
+                                  className={`rounded-ub-xs after:absolute after:inset-0 ${focusRing}`}
+                                >
                                   {content}
+                                  {rowLinkTarget === "_blank" && <span className="sr-only"> (opens in a new tab)</span>}
                                 </Link>
                               ) : (
                                 <span className={href ? "relative z-10" : undefined}>{content}</span>

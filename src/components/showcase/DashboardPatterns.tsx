@@ -73,7 +73,7 @@ export default function DashboardPatterns() {
       </Demo>
 
       {/* Flattened into this section: one demo per Application Details feature component. */}
-      <Pick demos={["ApplicationHeader", "ApplicationAlerts", "ApplicationTrackerCard", "ApplicationSummaryCard", "StudentInfoCard and StudentBackgroundCard", "DocumentChecklist and DocumentRow", "OfferCard", "VisaStatusCard", "CommissionCard", "ActivityTimeline", "NotesPanel", "WithdrawApplicationDialog", "ApplicationDetailsLayout"]}>
+      <Pick demos={["ApplicationsTable", "ApplicationHeader", "ApplicationAlerts", "ApplicationTrackerCard", "ApplicationSummaryCard", "StudentInfoCard and StudentBackgroundCard", "DocumentChecklist and DocumentRow", "OfferCard", "VisaStatusCard", "CommissionCard", "ActivityTimeline", "NotesPanel", "WithdrawApplicationDialog", "ApplicationDetailsLayout"]}>
         <ApplicationComponents />
       </Pick>
 
