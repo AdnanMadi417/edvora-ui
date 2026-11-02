@@ -17,3 +17,4 @@ export { default as SiteFooter } from "./SiteFooter";
 export { default as StatsFilterCards } from "./StatsFilterCards";
 export { default as Tabs } from "./Tabs";
 export { default as PageHeader } from "./PageHeader";
+export { default as StickyActionBar } from "./StickyActionBar";

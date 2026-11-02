@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-react";
 import React, { ReactNode } from "react";
 import { buttonBase, buttonSizes, buttonVariants, type ButtonSize, type ButtonVariant } from "components/ub/recipes";
 
@@ -21,6 +22,8 @@ type ButtonProps = {
   textClassName?: string;
   title?: string;
   type?: "button" | "submit" | "reset";
+  /** Busy state: disables the button, swaps the icon for a spinner and sets aria-busy. */
+  loading?: boolean;
 };
 
 export type LegacyColorProps = {
@@ -81,17 +84,23 @@ const Button: React.FC<ButtonProps> = ({
   textClassName,
   title,
   type = "button",
+  loading = false,
 }) => {
   const colors = resolveButtonColors(variant, { bgColor, textColor, borderColor, hoverTextColor, hoverBorderColor });
   return (
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       title={title}
       className={`${buttonBase} ${buttonSizes[size]} ${colors} ${className || ""}`}
     >
-      {icon && <span className="flex shrink-0 items-center">{icon}</span>}
+      {loading ? (
+        <Loader2 className="h-4 w-4 shrink-0 animate-spin motion-reduce:animate-none" aria-hidden="true" />
+      ) : (
+        icon && <span className="flex shrink-0 items-center">{icon}</span>
+      )}
       {text && <span className={`truncate ${textClassName || ""}`}>{text}</span>}
     </button>
   );

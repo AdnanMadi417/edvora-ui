@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { LucideIcon, MoreVertical } from "lucide-react";
-import { buttonBase, buttonSizes, buttonVariants, iconTints, menuItem, popover } from "components/ub/recipes";
+import { buttonBase, buttonSizes, iconButtonSizes, buttonVariants, iconTints, menuItem, popover } from "components/ub/recipes";
 
 type ItemColor = "amber" | "blue" | "red" | "green";
 
@@ -23,10 +23,15 @@ export interface DropdownItem {
 
 interface ActionsDropdownProps {
   items: DropdownItem[];
+  /** Trigger text, or its accessible name when iconOnly. */
   label?: string;
+  /** Circular ⋮ trigger (overflow menu); `label` becomes its aria-label. */
+  iconOnly?: boolean;
+  /** Layout only. */
+  className?: string;
 }
 
-export default function ActionsDropdown({ items, label = "Actions" }: ActionsDropdownProps) {
+export default function ActionsDropdown({ items, label = "Actions", iconOnly = false, className }: ActionsDropdownProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -103,7 +108,7 @@ export default function ActionsDropdown({ items, label = "Actions" }: ActionsDro
   };
 
   return (
-    <div className="relative" ref={ref}>
+    <div className={`relative ${className ?? ""}`} ref={ref}>
       {/* Trigger */}
       <button
         ref={triggerRef}
@@ -112,9 +117,11 @@ export default function ActionsDropdown({ items, label = "Actions" }: ActionsDro
         onKeyDown={onTriggerKeyDown}
         aria-expanded={open}
         aria-haspopup="menu"
-        className={`${buttonBase} ${buttonSizes.md} ${buttonVariants.secondary} ${open ? "bg-ub-action-secondary-pressed" : ""}`}
+        aria-label={iconOnly ? label : undefined}
+        title={iconOnly ? label : undefined}
+        className={`${buttonBase} ${iconOnly ? iconButtonSizes.md : buttonSizes.md} ${buttonVariants.secondary} ${open ? "bg-ub-action-secondary-pressed" : ""}`}
       >
-        {label}
+        {!iconOnly && label}
         <MoreVertical
           aria-hidden
           className={`h-4 w-4 transition-transform duration-ub-base ease-ub-standard motion-reduce:transition-none ${open ? "rotate-90" : "rotate-0"}`}
