@@ -39,7 +39,7 @@ const validateStudentFields = (
 ) => {
   if (requiredFieldKeys.includes("student.birthday")) {
     if (isEmpty(student.birthday)) {
-      errors["student.birthday"] = "Date of birth is required";
+      errors["student.birthday"] = "Enter the date of birth.";
     } else {
       const err = isValidBirthday(student.birthday);
       if (err) errors["student.birthday"] = err;
@@ -47,11 +47,11 @@ const validateStudentFields = (
   }
 
   if (requiredFieldKeys.includes("student.nationality") && isEmpty(student.nationality))
-    errors["student.nationality"] = "Nationality is required";
+    errors["student.nationality"] = "Choose the student's nationality.";
 
   if (requiredFieldKeys.includes("student.passport_number")) {
     if (isEmpty(student.passport_number)) {
-      errors["student.passport_number"] = "Passport number is required";
+      errors["student.passport_number"] = "Enter the passport number.";
     } else if (!isValidPassport(student.passport_number)) {
       errors["student.passport_number"] = "Must be 6–20 letters and digits, no spaces";
     }
@@ -59,7 +59,7 @@ const validateStudentFields = (
 
   if (requiredFieldKeys.includes("student.email")) {
     if (isEmpty(student.email)) {
-      errors["student.email"] = "Email address is required";
+      errors["student.email"] = "Enter an email address.";
     } else if (!isValidEmail(student.email)) {
       errors["student.email"] = "Enter a valid email address (e.g. name@example.com)";
     }
@@ -67,7 +67,7 @@ const validateStudentFields = (
 
   if (requiredFieldKeys.includes("student.phone")) {
     if (isEmpty(student.phone)) {
-      errors["student.phone"] = "Phone number is required";
+      errors["student.phone"] = "Enter a phone number.";
     } else if (!isValidPhone(student.phone)) {
       errors["student.phone"] = "Enter a valid phone number (7–20 digits, may include + and spaces)";
     }
@@ -75,14 +75,14 @@ const validateStudentFields = (
 
   if (requiredFieldKeys.includes("student.current_address")) {
     if (isEmpty(student.current_address)) {
-      errors["student.current_address"] = "Current address is required";
+      errors["student.current_address"] = "Enter the current address.";
     } else if (student.current_address.trim().length < 5) {
       errors["student.current_address"] = "Address must be at least 5 characters";
     }
   }
 
   if (requiredFieldKeys.includes("student.gender") && isEmpty(student.gender))
-    errors["student.gender"] = "Please select a gender";
+    errors["student.gender"] = "Choose a gender.";
 };
 
 const validateEmergencyContacts = (
@@ -95,15 +95,15 @@ const validateEmergencyContacts = (
     const hasAnyData = fields.some((f) => !isEmpty(contact[f]));
 
     if ((requiredFieldKeys.includes(`student.emergency_contacts[${idx}].name`) || hasAnyData) && isEmpty(contact.name))
-      errors[`student.emergency_contacts[${idx}].name`] = "Contact name is required";
+      errors[`student.emergency_contacts[${idx}].name`] = "Enter the emergency contact's name.";
     else if (!isEmpty(contact.name) && contact.name.trim().length < 2)
       errors[`student.emergency_contacts[${idx}].name`] = "Name must be at least 2 characters";
 
     if ((requiredFieldKeys.includes(`student.emergency_contacts[${idx}].relation`) || hasAnyData) && isEmpty(contact.relation))
-      errors[`student.emergency_contacts[${idx}].relation`] = "Relation is required";
+      errors[`student.emergency_contacts[${idx}].relation`] = "Enter how they're related to the student.";
 
     if ((requiredFieldKeys.includes(`student.emergency_contacts[${idx}].phone`) || hasAnyData) && isEmpty(contact.phone)) {
-      errors[`student.emergency_contacts[${idx}].phone`] = "Contact phone is required";
+      errors[`student.emergency_contacts[${idx}].phone`] = "Enter the emergency contact's phone number.";
     } else if (!isEmpty(contact.phone) && !isValidPhone(contact.phone)) {
       errors[`student.emergency_contacts[${idx}].phone`] = "Enter a valid phone number";
     }
@@ -161,7 +161,7 @@ export const validateFormData = (
 
   if (stageNum === 1) {
     if (isEmpty(student.name)) {
-      newErrors["student.name"] = "Full name is required";
+      newErrors["student.name"] = "Enter the student's full name as on the passport.";
     } else if (student.name.trim().length < 3) {
       newErrors["student.name"] = "Name must be at least 3 characters";
     } else if (student.name.trim().length > 100) {
@@ -171,7 +171,7 @@ export const validateFormData = (
     }
 
     if (isEmpty(student.passport_number)) {
-      newErrors["student.passport_number"] = "Passport number is required";
+      newErrors["student.passport_number"] = "Enter the passport number.";
     } else if (student.passport_number.trim().length < 6) {
       newErrors["student.passport_number"] = "Passport number must be at least 6 characters";
     } else if (student.passport_number.trim().length > 20) {
@@ -181,13 +181,13 @@ export const validateFormData = (
     }
 
     if (isEmpty(student.nationality))
-      newErrors["student.nationality"] = "Please select a nationality";
+      newErrors["student.nationality"] = "Choose the student's nationality.";
 
     if (isEmpty(formData.university_id))
-      newErrors["university_id"] = "Please select a university";
+      newErrors["university_id"] = "Choose an Institution.";
 
     if (isEmpty(formData.program_id))
-      newErrors["program_id"] = "Please select a program";
+      newErrors["program_id"] = "Choose a programme.";
   }
 
   if (stageNum === 2) {
@@ -207,7 +207,7 @@ export const validateFormData = (
 
   if (stageNum === 3) {
     if (requiredFieldKeys.includes("intake_date") && isEmpty(formData.intake_date))
-      newErrors["intake_date"] = "Intake date is required";
+      newErrors["intake_date"] = "Choose an intake.";
 
     validateStudentFields(student, requiredFieldKeys, newErrors);
     validateEmergencyContacts(student.emergency_contacts || [], requiredFieldKeys, newErrors);

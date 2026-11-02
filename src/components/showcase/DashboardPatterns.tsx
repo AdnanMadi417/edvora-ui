@@ -9,6 +9,7 @@ import { List, ListItem } from "components/ub/data/List";
 import { card, cardInteractive, cardPadding, focusRing } from "components/ub/recipes";
 import AdvisorHomeScreen from "features/advisor-home/AdvisorHome";
 import ApplicationComponents from "./ApplicationComponents";
+import ApplicationFormDemo from "./ApplicationFormDemo";
 import { Demo, Pick, ShowcaseSection } from "./Showcase";
 
 const NOTIFICATIONS: { group: string; items: { title: string; next: string; time: string; unread: boolean }[] }[] = [
@@ -75,6 +76,10 @@ export default function DashboardPatterns() {
       {/* Flattened into this section: one demo per Application Details feature component. */}
       <Pick demos={["ApplicationsTable", "ApplicationHeader", "ApplicationAlerts", "ApplicationTrackerCard", "ApplicationSummaryCard", "StudentInfoCard and StudentBackgroundCard", "DocumentChecklist and DocumentRow", "OfferCard", "VisaStatusCard", "CommissionCard", "ActivityTimeline", "NotesPanel", "WithdrawApplicationDialog", "ApplicationDetailsLayout"]}>
         <ApplicationComponents />
+      </Pick>
+
+      <Pick demos={["Application form"]}>
+        <ApplicationFormDemo />
       </Pick>
 
       <Demo name="Notifications feed" path="components/ub/feedback/NotificationItem.tsx" description="Each item states the event, then the next step. Unread items show an 8px blue dot. Grouped into Today, This week and Earlier.">

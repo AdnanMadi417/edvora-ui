@@ -53,6 +53,20 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "Multi-line text with label, helper, error and an optional character count.",
     usedIn: ["Rejection reasons", "Notes for the account manager", "Dispute justification"],
   },
+  StepIndicator: {
+    category: "navigation",
+    imports: [named("default as StepIndicator, canOpenStep", "navigation/StepIndicator")],
+    useFor: "Progress through a multi-step form, with completed steps reachable.",
+    usedIn: ["Application form", "Advisor onboarding"],
+    avoid: "An application's journey through stages: use ApplicationTracker.",
+  },
+  "Application form": {
+    category: "data",
+    imports: ['import ApplicationFormView from "features/applications/form/ApplicationFormView";', 'import { useApplicationForm } from "features/applications/form/useApplicationForm";'],
+    useFor: "Advisors creating an application: student and programme, documents, Institution-specific details, review.",
+    usedIn: ["/partner/applications/apply-now", "/partner/applications/apply-for-program (from the Knowledge Hub)"],
+    avoid: "Editing an existing application: use the Application Details popups.",
+  },
   "ApplicationsTable": {
     category: "data",
     imports: ['import ApplicationsTable from "features/applications/components/ApplicationsTable";'],

@@ -18,6 +18,7 @@ import NewScreenParts from "./NewScreenParts";
 import ApplicationKit from "./ApplicationKit";
 import PopupForms from "./PopupForms";
 import TableOptions from "./TableOptions";
+import ApplicationFormDemo from "./ApplicationFormDemo";
 import { ApplicationDetailsDemo } from "./ApplicationDetailsPattern";
 
 export function ButtonsSection() {
@@ -75,6 +76,9 @@ export function NavigationSection() {
       </Pick>
       <Pick demos={["StickyActionBar"]}>
         <ApplicationKit />
+      </Pick>
+      <Pick demos={["StepIndicator"]}>
+        <ApplicationFormDemo />
       </Pick>
       <Pick demos={["PageContainer", "PublicNavbar", "Footer (portal)", "SiteFooter (public)"]}>
         <DataDisplay />
