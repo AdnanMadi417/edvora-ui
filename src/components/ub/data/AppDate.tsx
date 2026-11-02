@@ -29,12 +29,17 @@ const AppDate: React.FC<AppDateProps> = ({
     [parsed, format, locale],
   );
 
+  // A dir attribute isolates the date from the surrounding text, so "14 Jun 2026"
+  // keeps its order inside RTL pages; Arabic locales format right-to-left.
+  const dir = /^(ar|fa|he|ur)\b/i.test(locale) ? "rtl" : "ltr";
+
   if (!parsed) {
     return <span className={className}>{fallback}</span>;
   }
 
   return (
     <time
+      dir={dir}
       dateTime={toISOString(parsed)}
       className={className}
       title={new Intl.DateTimeFormat(locale, {

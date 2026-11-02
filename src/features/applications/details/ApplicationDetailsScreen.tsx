@@ -63,7 +63,7 @@ export interface ApplicationDetailsScreenProps {
   documentsExtra?: ReactNode;
   /** After the offer and visa cards. */
   offerVisaExtra?: ReactNode;
-  /** Commission tab content under the summary card: records and role actions. */
+  /** Commission tab content (the role's CommissionCard with actions, pay-in, payout, dispute); defaults to the plain card. */
   commissionDetail?: ReactNode;
   /** Replace action on documents that need replacing (roles allowed to upload). */
   onReplaceDocument?: (doc: DocumentItem) => void;
@@ -107,7 +107,8 @@ export default function ApplicationDetailsScreen({
   };
 
   const studentDocs = view.documents.filter((d) => !isTemplate(d));
-  const templates = view.documents.filter(isTemplate);
+  // Templates are files to download, not submissions, so they never read "Verified".
+  const templates = view.documents.filter(isTemplate).map((d) => ({ ...d, state: "uploaded" as const, stateLabel: "To download" }));
   const offerVisaDocs = [view.offerLetter, view.visa.evaluation, view.visa.visaLetter].filter(Boolean) as DocumentItem[];
   const replaceCount = studentDocs.filter((d) => d.state === "needs-replacing").length;
   const resolved = view.stage.resolved;
@@ -198,9 +199,8 @@ export default function ApplicationDetailsScreen({
     ),
     commission: (
       <div className="grid gap-4 md:gap-6">
-        {commissionCard}
+        {commissionDetail ?? commissionCard}
         {view.commissionDocuments.length > 0 && <DocumentChecklist documents={view.commissionDocuments} title="Commission documents" onDownload={download} downloadingId={downloadingId} readOnly />}
-        {commissionDetail}
       </div>
     ),
     activity: (

@@ -1,5 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { XCircle } from "lucide-react";
 import { resolveStage } from "features/applications/stages";
 import type { DocumentItem } from "features/applications/model/applicationView";
 import {
@@ -25,7 +26,7 @@ const doc = (id: string, state: DocumentItem["state"], extra: Partial<DocumentIt
 describe("Application Details components", () => {
   it("ApplicationHeader: name, reference, stage, days and one Primary action", async () => {
     const onClick = jest.fn();
-    render(<ApplicationHeader studentName="Nur Aisyah Binti Kamal" reference="UBX-2026-0412" stageId="offer-received" daysInStage={9} institution="Sunway University" primaryAction={{ label: "Accept offer", onClick }} overflowActions={[{ label: "Withdraw application", icon: () => null, onClick: jest.fn(), destructive: true }]} />);
+    render(<ApplicationHeader studentName="Nur Aisyah Binti Kamal" reference="UBX-2026-0412" stageId="offer-received" daysInStage={9} institution="Sunway University" primaryAction={{ label: "Accept offer", onClick }} overflowActions={[{ label: "Withdraw application", icon: XCircle, onClick: jest.fn(), destructive: true }]} />);
     expect(screen.getByRole("heading", { level: 1, name: "Nur Aisyah Binti Kamal" })).toBeInTheDocument();
     expect(screen.getByText("UBX-2026-0412")).toBeInTheDocument();
     expect(screen.getByText("Offer received")).toBeInTheDocument();
@@ -106,7 +107,7 @@ describe("Application Details components", () => {
     const { rerender } = render(<CommissionCard commission={{ state: "paid", amount: 4200, currency: "RM", type: null, expectedFrom: 30, expectedTo: 60, notes: null }} />);
     expect(screen.getByText("Paid")).toBeInTheDocument();
     expect(screen.getByText("RM4,200")).toBeInTheDocument();
-    expect(screen.getByText("30–60 days")).toBeInTheDocument();
+    expect(screen.queryByText(/30–60/)).toBeNull(); // payout window is never shown as a commitment
     expect(screen.getByText("Tracked automatically")).toBeInTheDocument();
     rerender(<CommissionCard commission={null} />);
     expect(screen.getByText("No commission yet")).toBeInTheDocument();

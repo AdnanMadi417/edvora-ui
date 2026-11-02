@@ -2,12 +2,11 @@ import { getDaysLevel, getDaysLabel } from "components/ub/data/DaysTag";
 import { formatEventTime, groupTimeline, timelineGroupOf } from "components/ub/data/Timeline";
 import { getStage } from "config/applicationStages";
 import { resolveStage, API_STAGE_MAP } from "features/applications/stages";
-import { commissionStateOf, documentStateOf, toApplicationView } from "features/applications/model/applicationView";
+import { commissionStateOf, documentName, documentStateOf, toApplicationView } from "features/applications/model/applicationView";
 import { toTimelineEvents } from "features/applications/model/activity";
 import { trackerStepsFor } from "features/applications/components/ApplicationTrackerCard";
 import { visaSteps } from "features/applications/components/VisaStatusCard";
 import { offerStatusOf } from "features/applications/components/OfferCard";
-import { paymentWindow } from "features/applications/components/CommissionCard";
 import { buildApplicationAlerts } from "features/applications/components/ApplicationAlerts";
 import { sortDocuments } from "features/applications/components/DocumentChecklist";
 import { partnerNextAction, type PartnerActionInput } from "features/applications/partner/components/details/partnerNextAction";
@@ -53,6 +52,11 @@ describe("document status", () => {
   it.each([
     ["1", "uploaded"], ["pending", "uploaded"], ["2", "verified"], ["approved", "verified"], ["3", "needs-replacing"], ["rejected", "needs-replacing"], [undefined, "uploaded"],
   ])("%s → %s", (status, state) => expect(documentStateOf(status).state).toBe(state));
+  it("humanizes raw document codes", () => {
+    expect(documentName("commission_invoice")).toBe("Commission invoice");
+    expect(documentName("Passport")).toBe("Passport");
+    expect(documentName(null)).toBe("Document");
+  });
   it("in-review label for pending", () => expect(documentStateOf("1").stateLabel).toBe("In review"));
   it("sorts needing attention first", () => {
     const docs = [
@@ -69,10 +73,6 @@ describe("commission, offer and visa", () => {
     expect(commissionStateOf("released")).toBe("invoiced");
     expect(commissionStateOf("paid")).toBe("paid");
     expect(commissionStateOf("paid", true)).toBe("disputed");
-  });
-  it("payment window", () => {
-    expect(paymentWindow(30, 60)).toBe("30–60 days");
-    expect(paymentWindow(null, null)).toBeNull();
   });
   it("offer status", () => {
     expect(offerStatusOf("UNIVERSITY_REJECTED", false)).toBe("declined");

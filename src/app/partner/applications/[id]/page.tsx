@@ -9,12 +9,16 @@ import EmptyData from "components/ub/feedback/EmptyData";
 import Loading from "components/ub/feedback/Loading";
 import Alert from "components/ub/feedback/Alert";
 
+import { useSession } from "components/context/SessionContext";
 import ApplicationDetails from "features/applications/partner/components/details/ApplicationDetails";
 import type { ApplicationDetail } from "features/applications/shared/applicationTypes";
 
 
 export default function ApplicationPage() {
   const { id: applicationId } = useParams<{ id: string }>();
+  // localStorage is only set by the list page; a deep link falls back to the session's partner.
+  const session = useSession();
+  const sessionPartnerId = session?.partner?.id ?? session?.user?.partner_id ?? null;
 
   const [application, setApplication] = useState<ApplicationDetail | null>(null);
 
@@ -25,7 +29,13 @@ export default function ApplicationPage() {
     try {
       setError(null);
       const token = Cookies.get("token");
-      const partnerId = localStorage.getItem("partnerId");
+      let partnerId: string | null = null;
+      try {
+        partnerId = localStorage.getItem("partnerId");
+      } catch {
+        /* storage blocked */
+      }
+      partnerId = partnerId || sessionPartnerId;
       if (!token || !partnerId) return;
 
       const res = await api.get<ApplicationDetail>(
@@ -44,7 +54,7 @@ export default function ApplicationPage() {
 
   useEffect(() => {
     fetchApplication();
-  }, [applicationId]);
+  }, [applicationId, sessionPartnerId]);
 
   if (loading) return <Loading text="Fetching application data..." />;
   if (error) return <Alert tone="danger" title="This application couldn't load">{error}</Alert>;

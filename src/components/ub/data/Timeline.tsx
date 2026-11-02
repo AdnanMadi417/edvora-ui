@@ -86,7 +86,7 @@ function EventItem({ event, now, last }: { event: TimelineEvent; now: Date; last
         <div className="flex flex-wrap items-baseline justify-between gap-x-3">
           <p className="min-w-0 text-ub-label-md text-ub-text-primary">{event.title}</p>
           {date && (
-            <time dateTime={toISOString(date)} className="ub-tabular shrink-0 text-ub-caption text-ub-text-tertiary">
+            <time dir="auto" dateTime={toISOString(date)} className="ub-tabular shrink-0 text-ub-caption text-ub-text-tertiary">
               {formatEventTime(event.at, now)}
             </time>
           )}

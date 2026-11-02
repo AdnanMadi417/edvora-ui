@@ -6,7 +6,6 @@ import { useApplicationActions } from "features/applications/hooks";
 
 jest.mock("../../../hooks", () => ({ useApplicationActions: jest.fn() }));
 jest.mock("../../../shared/DocumentActions", () => () => null);
-jest.mock("../../../shared/ApplicationCommissionRecords", () => () => null);
 jest.mock("../../../pay-ins", () => ({ UniversityPayInSection: () => null }));
 jest.mock("../../../payouts", () => ({ PartnerPayoutSection: () => null }));
 jest.mock("../../../disputes", () => ({
@@ -29,7 +28,7 @@ describe("admin ApplicationCommission", () => {
     "offers Complete on Advisor's Behalf at %s and opens the reason popup",
     async (statusCode) => {
       renderAt(statusCode);
-      await userEvent.click(screen.getByText("Complete on Advisor's Behalf"));
+      await userEvent.click(screen.getByText("Complete on Advisor's behalf"));
       expect(screen.getByText("complete-on-behalf-popup")).toBeInTheDocument();
     }
   );
@@ -38,7 +37,7 @@ describe("admin ApplicationCommission", () => {
     "does not offer it at %s",
     (statusCode) => {
       renderAt(statusCode);
-      expect(screen.queryByText("Complete on Advisor's Behalf")).not.toBeInTheDocument();
+      expect(screen.queryByText("Complete on Advisor's behalf")).not.toBeInTheDocument();
     }
   );
 });

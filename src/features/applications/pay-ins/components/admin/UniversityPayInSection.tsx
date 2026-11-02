@@ -1,10 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import { Banknote, Calendar, Ban } from "lucide-react";
-import DetailStatusBadge from "components/ub/data/DetailStatusBadge";
+import { Ban } from "lucide-react";
+import Amount from "components/ub/core/Amount";
+import RefId from "components/ub/core/RefId";
 import AppDate from "components/ub/data/AppDate";
-import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
+import DescriptionList from "components/ub/data/DescriptionList";
+import KeyValueGrid from "components/ub/data/KeyValueGrid";
+import SectionCard from "components/ub/data/SectionCard";
+import Tag from "components/ub/data/Tag";
 import Button from "components/ub/core/Button";
 import VoidPayIn from "./VoidPayIn";
 import type { UniversityPayIn } from "../../types";
@@ -23,44 +27,30 @@ export default function UniversityPayInSection({ payIn, onRefetch }: UniversityP
 
   return (
     <>
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-200 p-6">
-        <div>
-          <p className="flex items-center gap-2 text-sm font-semibold text-slate-900">
-            <Banknote className="h-4 w-4 text-slate-400" />
-            University Pay-In
-          </p>
-          <p className={`mt-1 text-lg font-bold ${isVoided ? "text-slate-400 line-through" : "text-slate-900"}`}>
-            {formatCommissionAmount(payIn.amount, payIn.currency)}
-          </p>
-          <p className="mt-1 text-sm text-slate-500">{payIn.payment_reference}</p>
-          <p className="mt-1 flex items-center gap-1.5 text-xs text-slate-400">
-            <Calendar className="h-3.5 w-3.5" />
-            Paid on <AppDate value={payIn.payment_date} format="short" />
-          </p>
-          {isVoided && payIn.void_reason && (
-            <p className="mt-2 text-xs text-red-600">Void reason: {payIn.void_reason}</p>
-          )}
+      <SectionCard
+        title="Institution pay-in"
+        action={<Tag tone={isVoided ? "danger" : "success"}>{isVoided ? "Voided" : "Received"}</Tag>}
+        footer={!isVoided ? <Button variant="secondary" size="sm" onClick={() => setShowVoidModal(true)} icon={<Ban className="h-4 w-4" aria-hidden="true" />} text="Void and correct" /> : undefined}
+      >
+        <div className="grid gap-4">
+          <KeyValueGrid
+            columns={2}
+            items={[
+              { label: "Amount received", value: <span className={isVoided ? "text-ub-text-tertiary line-through" : undefined}><Amount value={payIn.amount} currency={payIn.currency} /></span> },
+              { label: "Paid on", value: <AppDate value={payIn.payment_date} /> },
+            ]}
+          />
+          <DescriptionList
+            layout="inline"
+            divided
+            fallback="Not available"
+            items={[
+              { label: "Payment reference", value: payIn.payment_reference && <RefId value={payIn.payment_reference} copyable /> },
+              ...(isVoided ? [{ label: "Void reason", value: payIn.void_reason }] : []),
+            ]}
+          />
         </div>
-
-        <div className="flex flex-col items-end gap-2">
-          <DetailStatusBadge variant={isVoided ? "danger" : "success"}>
-            {isVoided ? "Voided" : "Active"}
-          </DetailStatusBadge>
-          {!isVoided && (
-            <Button
-              onClick={() => setShowVoidModal(true)}
-              icon={<Ban className="h-4 w-4" />}
-              text="Void & Correct"
-              bgColor="bg-white"
-              textColor="text-red-600"
-              borderColor="border-red-200"
-              hoverTextColor="hover:text-red-700"
-              hoverBorderColor="hover:border-red-300"
-              className="hover:bg-red-50"
-            />
-          )}
-        </div>
-      </div>
+      </SectionCard>
 
       <VoidPayIn
         isOpen={showVoidModal}

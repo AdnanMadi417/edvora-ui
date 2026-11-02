@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { AlertTriangle, CheckCircle, Wrench } from "lucide-react";
+import { CheckCircle, Wrench } from "lucide-react";
 
-import DetailStatusBadge from "components/ub/data/DetailStatusBadge";
-import SectionIconBadge from "components/ub/icons/SectionIconBadge";
 import Button from "components/ub/core/Button";
+import DescriptionList from "components/ub/data/DescriptionList";
+import SectionCard from "components/ub/data/SectionCard";
+import Tag from "components/ub/data/Tag";
 import type { Dispute } from "features/applications/shared/applicationTypes";
 
 import ResolveNoIssue from "./ResolveNoIssue";
@@ -33,65 +34,32 @@ export default function DisputeSection({
 
   const isActionable = dispute.status !== "resolved";
 
+  const STATUS = {
+    open: { label: "Open", description: "Raised, not yet claimed", tone: "attention" as const },
+    pending: { label: "In review", description: "Claimed, awaiting resolution", tone: "warning" as const },
+    resolved: { label: "Resolved", description: "Resolved", tone: "success" as const },
+  }[dispute.status];
+
   return (
-    <div className="space-y-4 border-t border-slate-200 p-6">
-      <div className="flex items-center gap-3">
-        <SectionIconBadge icon={AlertTriangle} color="red" />
-        <div className="flex-1">
-          <p className="text-p3 font-semibold text-slate-900">Dispute</p>
-          <span className="text-sm text-slate-500">
-            {dispute.status === "open" && "Raised, not yet claimed"}
-            {dispute.status === "pending" && "Claimed, awaiting resolution"}
-            {dispute.status === "resolved" && "Resolved"}
-          </span>
-        </div>
-        <DetailStatusBadge variant={dispute.status === "resolved" ? "success" : "danger"}>
-          {dispute.status === "open" && "Open"}
-          {dispute.status === "pending" && "Pending"}
-          {dispute.status === "resolved" && "Resolved"}
-        </DetailStatusBadge>
-      </div>
-
-      <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-        <p className="font-medium text-slate-900">Justification</p>
-        <p className="mt-1">{dispute.justification}</p>
-      </div>
-
-      {dispute.report && (
-        <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-          <p className="font-medium text-slate-900">Report</p>
-          <p className="mt-1">{dispute.report}</p>
-        </div>
-      )}
-
-      {canManageDispute && isActionable && (
-        <div className="flex flex-wrap justify-end gap-3">
-          <Button
-            onClick={() => setShowResolveNoIssue(true)}
-            icon={<CheckCircle className="h-4 w-4" />}
-            text="Resolve: No Issue"
-            bgColor="bg-white"
-            textColor="text-green-600"
-            borderColor="border-green-200"
-            hoverTextColor="hover:text-green-700"
-            hoverBorderColor="hover:border-green-300"
-            className="hover:bg-green-50"
-          />
-          {partnerPayoutId && (
-            <Button
-              onClick={() => setShowResolveCorrection(true)}
-              icon={<Wrench className="h-4 w-4" />}
-              text="Resolve: Correction"
-              bgColor="bg-white"
-              textColor="text-red-600"
-              borderColor="border-red-200"
-              hoverTextColor="hover:text-red-700"
-              hoverBorderColor="hover:border-red-300"
-              className="hover:bg-red-50"
-            />
-          )}
-        </div>
-      )}
+    <SectionCard
+      title="Dispute"
+      description={STATUS.description}
+      action={<Tag tone={STATUS.tone}>{STATUS.label}</Tag>}
+      footer={
+        canManageDispute && isActionable ? (
+          <div className="flex flex-wrap justify-end gap-2">
+            <Button variant="secondary" size="sm" onClick={() => setShowResolveNoIssue(true)} icon={<CheckCircle className="h-4 w-4" aria-hidden="true" />} text="Resolve: no issue" />
+            {partnerPayoutId && <Button variant="secondary" size="sm" onClick={() => setShowResolveCorrection(true)} icon={<Wrench className="h-4 w-4" aria-hidden="true" />} text="Resolve with a correction" />}
+          </div>
+        ) : undefined
+      }
+    >
+      <DescriptionList
+        items={[
+          { label: "Justification", value: <span className="whitespace-pre-wrap">{dispute.justification}</span> },
+          ...(dispute.report ? [{ label: "Report", value: <span className="whitespace-pre-wrap">{dispute.report}</span> }] : []),
+        ]}
+      />
 
       <ResolveNoIssue
         isOpen={showResolveNoIssue}
@@ -109,6 +77,6 @@ export default function DisputeSection({
           onSuccess={onRefetch}
         />
       )}
-    </div>
+    </SectionCard>
   );
 }

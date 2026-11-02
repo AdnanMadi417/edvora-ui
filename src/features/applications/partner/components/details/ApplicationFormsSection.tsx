@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { FileText, Download, CheckCircle, Clock, XCircle, FileUp } from "lucide-react";
-import SectionIconBadge from "components/ub/icons/SectionIconBadge";
-import StatusBadge from "components/ub/data/StatusBadge";
-import IconButton from "components/ub/core/IconButton";
+import { Download, FileText, FileUp } from "lucide-react";
 import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
+import FileRow, { type FileRowState } from "components/ub/data/FileRow";
+import SectionCard from "components/ub/data/SectionCard";
 import { useToast } from "components/ub/feedback/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
@@ -46,59 +46,63 @@ function useGenericTemplateDownload() {
   return { download, downloading };
 }
 
-function FormRow({
-  label,
-  state,
-  templateAction,
-  onReupload,
-}: {
+type FormKey =
+  | "application_form"
+  | "application_form_2"
+  | "health_declaration"
+  | "signed_offer_letter"
+  | "english_form";
+
+/** The five offer-letter-stage forms: label, required flag, rejected status and template source. */
+const FORMS: {
+  key: FormKey;
   label: string;
-  state: RowState;
-  templateAction?: React.ReactNode;
-  onReupload?: () => void;
-}) {
-  const stateMeta: Record<RowState, { icon: React.ReactNode; variant: "success" | "attention" | "danger"; text: string }> = {
-    not_submitted: { icon: <Clock className="h-3 w-3" />, variant: "attention", text: "Not submitted yet" },
-    submitted: { icon: <CheckCircle className="h-3 w-3" />, variant: "success", text: "Submitted" },
-    rejected: { icon: <XCircle className="h-3 w-3" />, variant: "danger", text: "Rejected" },
-  };
-  const meta = stateMeta[state];
+  flag: keyof ApplicationActionsResponse;
+  rejected: string;
+  template: string | "offer-letter" | "health" | null;
+}[] = [
+  {
+    key: "application_form",
+    label: "Application form",
+    flag: "is_application_form_required",
+    rejected: "APPLICATION_FORM_REJECTED",
+    template: "Application Form Template",
+  },
+  {
+    key: "application_form_2",
+    label: "Application form 2",
+    flag: "is_application_form_2_required" as keyof ApplicationActionsResponse,
+    rejected: "APPLICATION_FORM_2_REJECTED",
+    template: "Application Form 2 Template",
+  },
+  {
+    key: "health_declaration",
+    label: "Health declaration form",
+    flag: "is_health_declaration_form_required",
+    rejected: "HEALTH_DECLARATION_REJECTED",
+    template: "health",
+  },
+  {
+    key: "signed_offer_letter",
+    label: "Signed offer letter",
+    flag: "is_signed_offer_letter_required",
+    rejected: "SIGNED_OFFER_LETTER_REJECTED",
+    template: "offer-letter",
+  },
+  {
+    key: "english_form",
+    label: "English form",
+    flag: "is_english_form_required",
+    rejected: "ENGLISH_FORM_REJECTED",
+    template: "English Form Template",
+  },
+];
 
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3">
-      <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50">
-          <FileText className="h-4 w-4 text-slate-500" />
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
-          <div className="mt-1">
-            <StatusBadge variant={meta.variant} icon={meta.icon}>{meta.text}</StatusBadge>
-          </div>
-          {state === "not_submitted" && (
-            <p className="mt-1 text-xs text-slate-500">Submit together with your visa fee payment.</p>
-          )}
-        </div>
-      </div>
-
-      <div className="flex shrink-0 items-center gap-2">
-        {templateAction}
-        {state === "rejected" && onReupload && (
-          <Button
-            onClick={onReupload}
-            icon={<FileUp className="h-4 w-4" />}
-            text="Re-upload"
-            bgColor="bg-red-50"
-            textColor="text-red-700"
-            borderColor="border-red-600"
-            hoverTextColor="hover:text-red-800"
-            hoverBorderColor="hover:border-red-700"
-          />
-        )}
-      </div>
-    </div>
-  );
-}
+const ROW: Record<RowState, { state: FileRowState; label: string }> = {
+  not_submitted: { state: "missing", label: "Not submitted yet" },
+  submitted: { state: "uploaded", label: "Submitted" },
+  rejected: { state: "needs-replacing", label: "Rejected" },
+};
 
 /**
  * Documents tab (partner only): status of the five offer-letter-stage forms
@@ -110,177 +114,126 @@ function FormRow({
  * are ever uploaded), which is a safe inference: the backend blocks that
  * submission with a 422 unless every required form was attached.
  */
-export default function ApplicationFormsSection({ application, actions, onRefetch, readOnly = false }: ApplicationFormsSectionProps) {
+export default function ApplicationFormsSection({
+  application,
+  actions,
+  onRefetch,
+  readOnly = false,
+}: ApplicationFormsSectionProps) {
   const currentStatusCode = actions?.status_code;
-  const pastPaymentGate = !!currentStatusCode && currentStatusCode !== "WAITING_FOR_PAYMENT" && currentStatusCode !== "PAYMENT_REJECTED";
+  const pastPaymentGate =
+    !!currentStatusCode &&
+    currentStatusCode !== "WAITING_FOR_PAYMENT" &&
+    currentStatusCode !== "PAYMENT_REJECTED";
 
-  const { download: downloadHealthDeclarationForm, downloading: downloadingHealthDeclarationForm } =
-    useHealthDeclarationFormDownload();
-  const { download: downloadTemplate, downloading: downloadingTemplate } = useGenericTemplateDownload();
-
-  const [openPopup, setOpenPopup] = useState<null | "application_form" | "application_form_2" | "health_declaration" | "signed_offer_letter" | "english_form">(null);
-
-  const docTemplate = (type: string) => application?.documents?.find((d: any) => d.document_type === type);
+  const {
+    download: downloadHealthDeclarationForm,
+    downloading: downloadingHealth,
+  } = useHealthDeclarationFormDownload();
+  const { download: downloadTemplate, downloading: downloadingTemplate } =
+    useGenericTemplateDownload();
+  const [openPopup, setOpenPopup] = useState<null | FormKey>(null);
 
   // A rejected status always shows its row, even with the flag unset —
   // applications that predate the is_*_required flags never had them set,
   // and the re-upload button is the partner's only way out of that status.
-  const rowState = (required: boolean, rejectedStatusCode: string): RowState | null => {
+  const rowState = (
+    required: boolean,
+    rejectedStatusCode: string
+  ): RowState | null => {
     if (currentStatusCode === rejectedStatusCode) return "rejected";
     if (!required) return null;
     return pastPaymentGate ? "submitted" : "not_submitted";
   };
 
-  const appFormState = rowState(!!actions?.is_application_form_required, "APPLICATION_FORM_REJECTED");
-  const appForm2State = rowState(!!actions?.is_application_form_2_required, "APPLICATION_FORM_2_REJECTED");
-  const healthDeclarationState = rowState(!!actions?.is_health_declaration_form_required, "HEALTH_DECLARATION_REJECTED");
-  const signedOfferLetterState = rowState(!!actions?.is_signed_offer_letter_required, "SIGNED_OFFER_LETTER_REJECTED");
-  const englishFormState = rowState(!!actions?.is_english_form_required, "ENGLISH_FORM_REJECTED");
+  const templateKey = (t: string | null): string | null => {
+    if (!t || t === "health") return null;
+    if (t === "offer-letter")
+      return application?.offer_letter_document?.file_key ?? null;
+    return (
+      application?.documents?.find((d: any) => d.document_type === t)
+        ?.file_key ?? null
+    );
+  };
 
-  const appFormTemplate = docTemplate("Application Form Template");
-  const appForm2Template = docTemplate("Application Form 2 Template");
-  const englishFormTemplate = docTemplate("English Form Template");
+  const rows = FORMS.map((f) => ({
+    ...f,
+    row: rowState(!!actions?.[f.flag], f.rejected),
+  })).filter((f) => f.row) as ((typeof FORMS)[number] & { row: RowState })[];
 
   const handleRefetchAndClose = () => {
     setOpenPopup(null);
     onRefetch?.();
   };
 
-  const noneRequired = !appFormState && !appForm2State && !healthDeclarationState && !signedOfferLetterState && !englishFormState;
-
   return (
-    <div className="p-6">
-      <div className="mb-4 flex items-center gap-3">
-        <SectionIconBadge icon={FileText} color="blue" />
-        <div>
-          <h3 className="text-p3 font-semibold text-slate-900">Offer Letter Documents</h3>
-          <p className="text-sm text-slate-500">Status of the forms requested alongside your offer letter.</p>
-        </div>
-      </div>
-
-      {noneRequired ? (
-        <p className="text-sm text-slate-500">No additional forms have been requested for this application.</p>
-      ) : (
-        <div className="space-y-3">
-          {appFormState && (
-            <FormRow
-              label="Application Form"
-              state={appFormState}
-              templateAction={
-                appFormTemplate?.file_key && (
-                  <IconButton
-                    onClick={() => downloadTemplate(appFormTemplate.file_key)}
-                    disabled={downloadingTemplate}
-                    title="Download Application Form Template"
-                    icon={<Download className="h-4 w-4" />}
-                    bgColor="bg-blue-50"
-                    textColor="text-blue-600"
-                    borderColor="border-transparent"
-                    hoverTextColor="hover:text-blue-600"
-                    hoverBorderColor="hover:border-blue-200"
-                    className="hover:bg-blue-100"
-                  />
-                )
+    <SectionCard
+      title="Offer letter documents"
+      description="Status of the forms requested alongside the offer letter."
+      state={rows.length ? "ready" : "empty"}
+      empty={{
+        icon: FileText,
+        title: "No additional forms requested",
+        description:
+          "No additional forms have been requested for this application.",
+      }}
+    >
+      <ul className="-my-4 divide-y divide-ub-border">
+        {rows.map((f) => {
+          const meta = ROW[f.row];
+          const key = templateKey(f.template);
+          const canDownload = f.template === "health" || !!key;
+          return (
+            <FileRow
+              key={f.key}
+              name={f.label}
+              state={meta.state}
+              stateLabel={meta.label}
+              meta={
+                f.row === "not_submitted"
+                  ? "Submit together with your visa fee payment."
+                  : undefined
               }
-              onReupload={readOnly ? undefined : () => setOpenPopup("application_form")}
-            />
-          )}
-
-          {appForm2State && (
-            <FormRow
-              label="Application Form 2"
-              state={appForm2State}
-              templateAction={
-                appForm2Template?.file_key && (
-                  <IconButton
-                    onClick={() => downloadTemplate(appForm2Template.file_key)}
-                    disabled={downloadingTemplate}
-                    title="Download Application Form 2 Template"
-                    icon={<Download className="h-4 w-4" />}
-                    bgColor="bg-blue-50"
-                    textColor="text-blue-600"
-                    borderColor="border-transparent"
-                    hoverTextColor="hover:text-blue-600"
-                    hoverBorderColor="hover:border-blue-200"
-                    className="hover:bg-blue-100"
-                  />
-                )
+              reason={
+                f.row === "rejected"
+                  ? actions?.correction_reason ?? undefined
+                  : undefined
               }
-              onReupload={readOnly ? undefined : () => setOpenPopup("application_form_2")}
-            />
-          )}
-
-          {healthDeclarationState && (
-            <FormRow
-              label="Health Declaration Form"
-              state={healthDeclarationState}
-              templateAction={
-                <IconButton
-                  onClick={downloadHealthDeclarationForm}
-                  disabled={downloadingHealthDeclarationForm}
-                  title="Download Health Declaration Form"
-                  icon={<Download className="h-4 w-4" />}
-                  bgColor="bg-blue-50"
-                  textColor="text-blue-600"
-                  borderColor="border-transparent"
-                  hoverTextColor="hover:text-blue-600"
-                  hoverBorderColor="hover:border-blue-200"
-                  className="hover:bg-blue-100"
-                />
+              actions={
+                <>
+                  {f.row === "rejected" && !readOnly && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => setOpenPopup(f.key)}
+                      icon={<FileUp className="h-4 w-4" aria-hidden="true" />}
+                      text="Re-upload"
+                    />
+                  )}
+                  {canDownload && (
+                    <IconButton
+                      size="sm"
+                      variant="tertiary"
+                      title={`Download ${f.label.toLowerCase()} template`}
+                      disabled={
+                        f.template === "health"
+                          ? downloadingHealth
+                          : downloadingTemplate
+                      }
+                      onClick={() =>
+                        f.template === "health"
+                          ? downloadHealthDeclarationForm()
+                          : key && downloadTemplate(key)
+                      }
+                      icon={<Download className="h-4 w-4" aria-hidden="true" />}
+                    />
+                  )}
+                </>
               }
-              onReupload={readOnly ? undefined : () => setOpenPopup("health_declaration")}
             />
-          )}
-
-          {signedOfferLetterState && (
-            <FormRow
-              label="Signed Offer Letter"
-              state={signedOfferLetterState}
-              templateAction={
-                application?.offer_letter_document?.file_key && (
-                  <IconButton
-                    onClick={() => downloadTemplate(application.offer_letter_document.file_key)}
-                    disabled={downloadingTemplate}
-                    title="Download Offer Letter"
-                    icon={<Download className="h-4 w-4" />}
-                    bgColor="bg-blue-50"
-                    textColor="text-blue-600"
-                    borderColor="border-transparent"
-                    hoverTextColor="hover:text-blue-600"
-                    hoverBorderColor="hover:border-blue-200"
-                    className="hover:bg-blue-100"
-                  />
-                )
-              }
-              onReupload={readOnly ? undefined : () => setOpenPopup("signed_offer_letter")}
-            />
-          )}
-
-          {englishFormState && (
-            <FormRow
-              label="English Form"
-              state={englishFormState}
-              templateAction={
-                englishFormTemplate?.file_key && (
-                  <IconButton
-                    onClick={() => downloadTemplate(englishFormTemplate.file_key)}
-                    disabled={downloadingTemplate}
-                    title="Download English Form Template"
-                    icon={<Download className="h-4 w-4" />}
-                    bgColor="bg-blue-50"
-                    textColor="text-blue-600"
-                    borderColor="border-transparent"
-                    hoverTextColor="hover:text-blue-600"
-                    hoverBorderColor="hover:border-blue-200"
-                    className="hover:bg-blue-100"
-                  />
-                )
-              }
-              onReupload={readOnly ? undefined : () => setOpenPopup("english_form")}
-            />
-          )}
-        </div>
-      )}
+          );
+        })}
+      </ul>
 
       <ApplicationFormReupload
         isOpen={openPopup === "application_form"}
@@ -317,6 +270,6 @@ export default function ApplicationFormsSection({ application, actions, onRefetc
         correctionReason={actions?.correction_reason}
         onRefetch={handleRefetchAndClose}
       />
-    </div>
+    </SectionCard>
   );
 }

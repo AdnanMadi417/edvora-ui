@@ -52,12 +52,20 @@ export function documentStateOf(status: unknown): { state: FileRowState; stateLa
   }
 }
 
+/** Pure: "commission_invoice" → "Commission invoice"; display names pass through unchanged. */
+export function documentName(raw: string | null | undefined): string {
+  if (!raw) return "Document";
+  if (!/_/.test(raw)) return raw;
+  const words = raw.replace(/_/g, " ").trim().toLowerCase();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 function toDocument(raw: any, group: DocumentGroup): DocumentItem | null {
   if (!raw) return null;
   const { state, stateLabel } = documentStateOf(raw.status);
   return {
     id: String(raw.id ?? raw.file_key ?? raw.document_type),
-    name: raw.document_type ?? raw.name ?? "Document",
+    name: documentName(raw.document_type ?? raw.name),
     state,
     stateLabel,
     group,

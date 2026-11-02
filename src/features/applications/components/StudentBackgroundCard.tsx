@@ -33,7 +33,7 @@ export default function StudentBackgroundCard({ education, englishTests, emergen
               value: (
                 <>
                   {e.qualification}
-                  {e.grade && <span className="ub-tabular block text-ub-body-sm text-ub-text-secondary">{e.grade}{e.endDate && <> · <AppDate value={e.endDate} format="month-year" /></>}</span>}
+                  {e.grade && <span className="ub-tabular block text-ub-body-sm text-ub-text-secondary">{e.grade}{e.endDate && <> · <AppDate value={e.endDate} /></>}</span>}
                 </>
               ),
             }))}
