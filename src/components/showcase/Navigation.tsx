@@ -51,9 +51,9 @@ const SETTINGS_TABS: TabItem<SettingsTab>[] = [
 
 const CARDS: FilterCardItem[] = [
   { id: null, label: "All applications", count: 24, icon: Layers, colorScheme: "slate" },
-  { id: "action", label: "Action needed", count: 6, icon: AlertTriangle, colorScheme: "amber" },
+  { id: "action", label: "Action needed", count: 6, icon: AlertTriangle, colorScheme: "amber", badge: { label: "Your move", tone: "attention" }, progress: 25 },
   { id: "review", label: "In review", count: 9, icon: Clock, colorScheme: "blue" },
-  { id: "offer", label: "Offers", count: 5, icon: CheckCircle2, colorScheme: "emerald" },
+  { id: "offer", label: "Offers", count: 5, icon: CheckCircle2, colorScheme: "emerald", badge: { label: "Payout", tone: "success" }, progress: 21 },
   { id: "draft", label: "Drafts", count: 4, icon: FileText, colorScheme: "violet" },
 ];
 

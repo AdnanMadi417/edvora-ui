@@ -2,8 +2,10 @@
 
 import React from "react";
 import { FileText, Mail, Send, GraduationCap, Wallet, Flag, ArrowUpRight } from "lucide-react";
+import StatsFilterCards, { type CardColorScheme, type FilterCardItem } from "components/ub/navigation/StatsFilterCards";
 import Button from "components/ub/core/Button";
-import SolidBadge from "components/ub/data/SolidBadge";
+import type { StageHue } from "config/applicationStages";
+import { resolveStage } from "features/applications/stages";
 
 interface Stage {
   id: string;
@@ -23,32 +25,22 @@ interface PipelineCardProps {
   subtitle?: string;
 }
 
-type StageColor = {
-  inactive: string;
-  active: string;
-  iconBgInactive: string;
-  iconBgActive: string;
-  iconColor: string;
-  progressFill: string;
-  progressTrack: string;
+// Stage colour comes from features/applications/stages.ts (stage code → configured hue),
+// shown through the card's theme-aware icon tints.
+const HUE_SCHEME: Record<StageHue, CardColorScheme> = {
+  grey: "slate",
+  amber: "amber",
+  indigo: "violet",
+  sky: "blue",
+  teal: "cyan",
+  plum: "violet",
+  pink: "rose",
+  success: "emerald",
 };
-
-const STAGE_COLOR_MAP: Record<string, StageColor> = {
-  review:     { inactive: "border-slate-200 bg-white hover:bg-blue-50",              active: "border-blue-300 bg-blue-50 shadow-sm",          iconBgInactive: "bg-slate-100",   iconBgActive: "bg-blue-200",    iconColor: "text-blue-600",    progressFill: "bg-blue-400",    progressTrack: "bg-slate-100" },
-  offer:      { inactive: "border-slate-200 bg-white hover:bg-slate-50",             active: "border-violet-300 bg-violet-50 shadow-sm",      iconBgInactive: "bg-slate-100",   iconBgActive: "bg-violet-200",  iconColor: "text-violet-600",  progressFill: "bg-violet-400",  progressTrack: "bg-slate-100" },
-  visa:       { inactive: "border-slate-200 bg-white hover:bg-slate-50",             active: "border-amber-300 bg-amber-50 shadow-sm",        iconBgInactive: "bg-slate-100",   iconBgActive: "bg-amber-200",   iconColor: "text-amber-600",   progressFill: "bg-amber-400",   progressTrack: "bg-slate-100" },
-  arrival:    { inactive: "border-slate-200 bg-white hover:bg-slate-50",             active: "border-cyan-300 bg-cyan-50 shadow-sm",          iconBgInactive: "bg-slate-100",   iconBgActive: "bg-cyan-200",    iconColor: "text-cyan-600",    progressFill: "bg-cyan-400",    progressTrack: "bg-slate-100" },
-  commission: { inactive: "border-emerald-100 bg-emerald-50/40 hover:bg-emerald-50", active: "border-emerald-300 bg-emerald-50 shadow-sm",    iconBgInactive: "bg-emerald-100", iconBgActive: "bg-emerald-200", iconColor: "text-emerald-600", progressFill: "bg-emerald-500", progressTrack: "bg-emerald-100" },
-  default:    { inactive: "border-slate-200 bg-white hover:bg-slate-50",             active: "border-slate-400 bg-slate-100 shadow-sm",       iconBgInactive: "bg-slate-100",   iconBgActive: "bg-slate-200",   iconColor: "text-slate-600",   progressFill: "bg-slate-400",   progressTrack: "bg-slate-100" },
+const schemeFor = (stage: Stage): CardColorScheme => {
+  const hue = resolveStage({ stageCode: (stage as Stage & { code?: string }).code })?.stage?.hue;
+  return hue ? HUE_SCHEME[hue] : "slate";
 };
-
-function resolveColor(name: string): StageColor {
-  const n = name.toLowerCase();
-  for (const key of Object.keys(STAGE_COLOR_MAP)) {
-    if (n.includes(key)) return STAGE_COLOR_MAP[key];
-  }
-  return STAGE_COLOR_MAP.default;
-}
 
 function stageIcon(name: string) {
   const n = name.toLowerCase();
@@ -74,95 +66,45 @@ export default function PipelineCard({
 }: PipelineCardProps) {
   const totalStageCount = stages.reduce((sum, s) => sum + (stageCounts[s.id] ?? 0), 0);
 
+  const cards: FilterCardItem[] = stages.map((stage) => {
+    const count = stageCounts[stage.id] ?? 0;
+    const isComm = stage.name.toLowerCase().includes("commission");
+    const needsMove = !isComm && stageActionRequired[stage.id];
+    return {
+      id: stage.id,
+      label: stage.name,
+      count,
+      icon: stageIcon(stage.name),
+      colorScheme: schemeFor(stage),
+      progress: totalStageCount > 0 ? Math.round((count / totalStageCount) * 100) : 0,
+      badge: isComm ? { label: "Payout", tone: "success" } : needsMove ? { label: "Your move", tone: "attention" } : undefined,
+    };
+  });
+
   return (
-    <div className="bg-white">
-
-      {/* Header */}
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div>
-          <p className="text-base font-semibold text-slate-900">{title}</p>
-          <p className="mt-0.5 truncate text-sm text-slate-500">
-            {subtitle ?? `${totalCount} active application${totalCount !== 1 ? "s" : ""} — move students right to unlock commission`}
-          </p>
-        </div>
+    <section aria-labelledby="pipeline-title">
+      <div className="mb-4">
+        <h3 id="pipeline-title" className="text-ub-heading-sm text-ub-text-primary">{title}</h3>
+        <p className="mt-0.5 truncate text-ub-body-sm text-ub-text-secondary">
+          {subtitle ?? `${totalCount} active application${totalCount !== 1 ? "s" : ""} — move students right to unlock commission`}
+        </p>
       </div>
 
-      {/* Stage cards */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:flex lg:gap-3">
-        {stages.map((stage) => {
-          const count      = stageCounts[stage.id] ?? 0;
-          const isComm     = stage.name.toLowerCase().includes("commission");
-          const needsMove  = !isComm && stageActionRequired[stage.id];
-          const Icon       = stageIcon(stage.name);
-          const colors     = resolveColor(stage.name);
-          const progress   = totalStageCount > 0 ? Math.round((count / totalStageCount) * 100) : 0;
-          const isSelected = selectedId === stage.id;
+      <StatsFilterCards cards={cards} selectedId={selectedId} onSelect={onSelect} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3" />
 
-          return (
-            <button
-              key={stage.id}
-              onClick={() => onSelect(isSelected ? null : stage.id)}
-              className={`flex flex-col rounded-xl border p-4 text-left transition-all lg:flex-1 ${
-                isSelected ? colors.active : colors.inactive
-              }`}
-            >
-              {/* Icon + badge row */}
-              <div className="mb-3 flex items-center justify-between">
-                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${isSelected ? colors.iconBgActive : colors.iconBgInactive}`}>
-                  <Icon className={`h-5 w-5 ${colors.iconColor}`} />
-                </div>
-                {isComm && (
-                  <SolidBadge variant="success" className="rounded-full px-2 py-0.5 text-[10px]">
-                    Payout
-                  </SolidBadge>
-                )}
-                {needsMove && (
-                  <SolidBadge variant="warning" className="rounded-full px-2 py-0.5 text-[10px]">
-                    Your move
-                  </SolidBadge>
-                )}
-              </div>
-
-              {/* Count + label */}
-              <p className={`text-xl font-bold ${count === 0 ? "text-slate-300" : "text-slate-900"}`}>{count}</p>
-              <p className="truncate text-xs text-slate-500">{stage.name}</p>
-
-              {/* Progress bar */}
-              <div className={`mt-3 h-1 w-full overflow-hidden rounded-full ${colors.progressTrack}`}>
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ${colors.progressFill}`}
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Footer */}
-      <div className="mt-4 flex flex-col items-start justify-between gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center">
-        <p className="text-sm text-slate-500">
+      <div className="mt-4 flex flex-col items-start justify-between gap-3 border-t border-ub-border pt-4 sm:flex-row sm:items-center">
+        <p className="text-ub-body-sm text-ub-text-secondary">
           {totalActionRequired > 0 ? (
             <>
-              <span className="font-semibold text-amber-600">{totalActionRequired} application{totalActionRequired !== 1 ? "s" : ""}</span>
+              <span className="font-semibold text-ub-tone-warning-text">{totalActionRequired} application{totalActionRequired !== 1 ? "s" : ""}</span>
               {" "}are waiting on you — clear them to push more students toward payout.
             </>
           ) : (
-            <span className="text-emerald-600">All caught up — no actions required right now.</span>
+            <span className="text-ub-tone-success-text">All caught up — no actions required right now.</span>
           )}
         </p>
-        <Button
-          onClick={onViewCommission}
-          text="View commission ready"
-          icon={<ArrowUpRight className="h-4 w-4" />}
-          bgColor="bg-blue-600"
-          textColor="text-white"
-          borderColor="border-blue-600"
-          hoverTextColor="hover:text-white"
-          hoverBorderColor="hover:border-blue-700"
-          className="shrink-0 !bg-blue-600 hover:!bg-blue-700"
-        />
+        <Button variant="secondary" onClick={onViewCommission} text="View commission ready" icon={<ArrowUpRight className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} className="shrink-0" />
       </div>
-    </div>
+    </section>
   );
 }
