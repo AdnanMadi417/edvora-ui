@@ -120,8 +120,8 @@ function StudentStep({ mode, formData, errors, update, validateField, universiti
         </h3>
         <p className="mt-1 text-ub-body-sm text-ub-text-secondary">Exactly as printed on the passport.</p>
         <div className="mt-4 grid gap-x-4 sm:grid-cols-2">
-          {text("student.name", "Full name", { autoComplete: "name", wrapperClassName: "mb-4 sm:col-span-2" })}
-          {text("student.passport_number", "Passport number", { reference: true })}
+          {text("student.name", "Full name", { autoComplete: "name", placeholder: "e.g. Nur Aisyah Binti Kamal", wrapperClassName: "mb-4 sm:col-span-2" })}
+          {text("student.passport_number", "Passport number", { reference: true, placeholder: "e.g. A12345678" })}
           <Combobox id={fieldId("student.nationality")} label="Nationality" options={NATIONALITY_OPTIONS} value={formData.student.nationality || null} onChange={(v) => update("student.nationality", v ?? "")} error={errors["student.nationality"]} placeholder="Search nationalities" required />
         </div>
       </section>
@@ -295,9 +295,9 @@ function DetailsStep({ formData, errors, update, requiredFieldKeys, qualificatio
                 />
               </div>
             )}
-            {req("student.email") && text("student.email", "Email", { type: "email", autoComplete: "email" })}
-            {req("student.phone") && text("student.phone", "Phone (WhatsApp)", { type: "tel", autoComplete: "tel" })}
-            {req("student.current_address") && text("student.current_address", "Current address", { wrapperClassName: "mb-4 sm:col-span-2", autoComplete: "street-address" })}
+            {req("student.email") && text("student.email", "Email", { type: "email", autoComplete: "email", placeholder: "name@example.com" })}
+            {req("student.phone") && text("student.phone", "Phone (WhatsApp)", { type: "tel", autoComplete: "tel", placeholder: "+60 12 345 6789" })}
+            {req("student.current_address") && text("student.current_address", "Current address", { wrapperClassName: "mb-4 sm:col-span-2", autoComplete: "street-address", placeholder: "Street, city and postcode" })}
           </div>
         </section>
       )}
@@ -309,10 +309,10 @@ function DetailsStep({ formData, errors, update, requiredFieldKeys, qualificatio
           </h3>
           {s.emergency_contacts.map((_c, i) => (
             <div key={i} className="grid gap-x-4 sm:grid-cols-2">
-              {text(`student.emergency_contacts[${i}].name`, "Name")}
+              {text(`student.emergency_contacts[${i}].name`, "Name", { placeholder: "e.g. Kamal Bin Hassan" })}
               {text(`student.emergency_contacts[${i}].relation`, "Relation", { placeholder: "Father, mother or guardian" })}
-              {text(`student.emergency_contacts[${i}].phone`, "Phone", { type: "tel" })}
-              {text(`student.emergency_contacts[${i}].email`, "Email", { type: "email" })}
+              {text(`student.emergency_contacts[${i}].phone`, "Phone", { type: "tel", placeholder: "+60 13 222 4455" })}
+              {text(`student.emergency_contacts[${i}].email`, "Email", { type: "email", placeholder: "name@example.com" })}
             </div>
           ))}
         </section>
@@ -344,7 +344,7 @@ function DetailsStep({ formData, errors, update, requiredFieldKeys, qualificatio
                 placeholder="Search qualifications"
                 required
               />
-              {text(`student.previous_educations[${i}].institution_name`, "School or Institution")}
+              {text(`student.previous_educations[${i}].institution_name`, "School or Institution", { placeholder: "e.g. SMK Seksyen 9 Shah Alam" })}
               {text(`student.previous_educations[${i}].start_date`, "Start date", { type: "date" })}
               {text(`student.previous_educations[${i}].end_date`, "End date", { type: "date" })}
               {text(`student.previous_educations[${i}].grade`, "Grade or GPA", { required: false, placeholder: "3.75 / 4.0" })}

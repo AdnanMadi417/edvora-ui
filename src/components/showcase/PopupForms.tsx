@@ -141,8 +141,8 @@ function AddStudentDemo() {
         dirty={dirty}
       >
         <FormSection id="student-personal" title="Personal details" description="Exactly as printed on the passport.">
-          <Input id={id("fullName")} label="Full name" value={form.fullName} onChange={(v) => set("fullName", v)} error={err("fullName")} required wrapperClassName="mb-4 sm:col-span-2" autoComplete="name" />
-          <Input id={id("passport")} label="Passport number" value={form.passport} onChange={(v) => set("passport", v)} error={err("passport")} reference required />
+          <Input id={id("fullName")} label="Full name" placeholder="e.g. Nur Aisyah Binti Kamal" value={form.fullName} onChange={(v) => set("fullName", v)} error={err("fullName")} required wrapperClassName="mb-4 sm:col-span-2" autoComplete="name" />
+          <Input id={id("passport")} label="Passport number" placeholder="e.g. A12345678" value={form.passport} onChange={(v) => set("passport", v)} error={err("passport")} reference required />
           <Combobox id={id("nationality")} label="Nationality" options={NATIONALITIES} value={form.nationality} onChange={(v) => set("nationality", v)} error={err("nationality")} placeholder="Search countries" required />
           <Input id={id("birthday")} label="Date of birth" type="date" value={form.birthday} onChange={(v) => set("birthday", v)} error={err("birthday")} required />
           <div id={id("gender")} tabIndex={-1} className="mb-4 outline-none">
@@ -151,14 +151,14 @@ function AddStudentDemo() {
         </FormSection>
 
         <FormSection id="student-contact" title="Contact" description="Used for Institution and visa updates.">
-          <Input id={id("email")} label="Email" type="email" value={form.email} onChange={(v) => set("email", v)} error={err("email")} required autoComplete="email" />
-          <Input id={id("phone")} label="Phone (WhatsApp)" type="tel" value={form.phone} onChange={(v) => set("phone", v)} error={err("phone")} prefix="+60" required autoComplete="tel" />
+          <Input id={id("email")} label="Email" type="email" placeholder="name@example.com" value={form.email} onChange={(v) => set("email", v)} error={err("email")} required autoComplete="email" />
+          <Input id={id("phone")} label="Phone (WhatsApp)" type="tel" placeholder="12 345 6789" value={form.phone} onChange={(v) => set("phone", v)} error={err("phone")} prefix="+60" required autoComplete="tel" />
         </FormSection>
 
         <FormSection id="student-programme" title="Programme">
           <Combobox id={id("institution")} label="Institution" options={INSTITUTIONS} value={form.institution} onChange={(v) => set("institution", v)} error={err("institution")} placeholder="Search Institutions" required className="sm:col-span-2" />
           <Combobox id={id("programme")} label="Programme" options={PROGRAMMES} value={form.programme} onChange={(v) => set("programme", v)} error={err("programme")} placeholder="Search programmes" required />
-          <Input id={id("tuition")} label="Tuition per year" value={form.tuition} onChange={(v) => set("tuition", v.replace(/[^\d,]/g, ""))} prefix="RM" helperText="From the Knowledge Hub. Optional." inputMode="numeric" />
+          <Input id={id("tuition")} label="Tuition per year" placeholder="31,000" value={form.tuition} onChange={(v) => set("tuition", v.replace(/[^\d,]/g, ""))} prefix="RM" helperText="From the Knowledge Hub. Optional." inputMode="numeric" />
           <div id={id("intake")} tabIndex={-1} className="mb-4 outline-none sm:col-span-2">
             <RadioGroup legend="Intake" orientation="horizontal" options={INTAKES} value={form.intake} onChange={(v) => set("intake", v)} error={err("intake")} required />
           </div>
@@ -183,9 +183,9 @@ function AddStudentDemo() {
         </FormSection>
 
         <FormSection id="student-emergency" title="Emergency contact">
-          <Input id={id("contactName")} label="Name" value={form.contactName} onChange={(v) => set("contactName", v)} error={err("contactName")} required />
-          <Input id={id("contactPhone")} label="Phone" type="tel" value={form.contactPhone} onChange={(v) => set("contactPhone", v)} error={err("contactPhone")} required />
-          <Textarea id={id("notes")} label="Notes for your account manager" value={form.notes} onChange={(v) => set("notes", v)} maxLength={500} rows={3} wrapperClassName="mb-4 sm:col-span-2" />
+          <Input id={id("contactName")} label="Name" placeholder="e.g. Kamal Bin Hassan" value={form.contactName} onChange={(v) => set("contactName", v)} error={err("contactName")} required />
+          <Input id={id("contactPhone")} label="Phone" type="tel" placeholder="+60 13 222 4455" value={form.contactPhone} onChange={(v) => set("contactPhone", v)} error={err("contactPhone")} required />
+          <Textarea id={id("notes")} label="Notes for your account manager" placeholder="Anything they should know, e.g. preferred intake" value={form.notes} onChange={(v) => set("notes", v)} maxLength={500} rows={3} wrapperClassName="mb-4 sm:col-span-2" />
         </FormSection>
 
         <FormSection id="student-confirm" title="Confirm" columns={1}>

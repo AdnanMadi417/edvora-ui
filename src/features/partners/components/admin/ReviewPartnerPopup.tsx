@@ -171,6 +171,7 @@ export default function ReviewPartnerPopup({ isOpen, onClose, onSuccess, partner
           <Textarea
             id={FIELD.reason}
             label="Reason for rejection"
+            placeholder="Say what's missing or wrong so the Advisor can fix it"
             value={reason}
             onChange={(v) => {
               setReason(v);
