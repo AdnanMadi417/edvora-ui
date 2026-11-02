@@ -10,6 +10,7 @@ import { card, cardInteractive, cardPadding, focusRing } from "components/ub/rec
 import AdvisorHomeScreen from "features/advisor-home/AdvisorHome";
 import ApplicationComponents from "./ApplicationComponents";
 import ApplicationFormDemo from "./ApplicationFormDemo";
+import DashboardWidgets from "./DashboardWidgets";
 import { Demo, Pick, ShowcaseSection } from "./Showcase";
 
 const NOTIFICATIONS: { group: string; items: { title: string; next: string; time: string; unread: boolean }[] }[] = [
@@ -62,6 +63,11 @@ export default function DashboardPatterns() {
           <AdvisorHomeScreen headingLevel={2} />
         </div>
       </Demo>
+
+      {/* Dashboard widget library (components/ub/dashboard). */}
+      <Pick demos={["DashboardHeader and PeriodSelect", "DashboardCard, CardMenu, CardLinkButton and CardFooterStats", "StatCard, DeltaPill and IconTile", "PillBarChart and ChartLegend", "CategoryColumnChart", "GaugeChart and GaugeLegendStats", "ActivityHeatmap", "Sparkline and PipelineBar", "TaskList and PeopleList", "BreakdownTable and StatusTag", "ReminderCard, CountdownCard and ProgressCard", "Admin dashboard"]}>
+        <DashboardWidgets />
+      </Pick>
 
       <Demo name="Application Details (full page)" path="components/showcase/ApplicationDetailsPattern.tsx" description="The full Student profile / Application Details page, built only from the shared feature components with mock data. Open it full size to check every breakpoint, theme and direction.">
         <a href="/design-system/patterns/application-details" className={clsx(card, cardInteractive, focusRing, "flex items-center justify-between gap-4 p-4")}>
