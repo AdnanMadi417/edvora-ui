@@ -1,0 +1,81 @@
+"use client";
+
+import { useId, useState, type FormEvent } from "react";
+import { StickyNote } from "lucide-react";
+import Button from "components/ub/core/Button";
+import SectionCard, { type SectionCardState } from "components/ub/data/SectionCard";
+import Timeline from "components/ub/data/Timeline";
+import { fieldControl } from "components/ub/recipes";
+
+export interface NoteItem {
+  id: string;
+  author: string;
+  body: string;
+  /** ISO date-time. */
+  at: string;
+}
+
+export interface NotesPanelProps {
+  notes: NoteItem[];
+  /** Adds a note; omit for read-only viewers. Resolve when saved. */
+  onAdd?: (body: string) => Promise<void> | void;
+  state?: SectionCardState;
+  onRetry?: () => void;
+  now?: Date;
+  className?: string;
+}
+
+/**
+ * Internal notes for the Unibexs team and the Advisor. Never render this in
+ * the Glass Box (student view).
+ */
+export default function NotesPanel({ notes, onAdd, state = "ready", onRetry, now, className }: NotesPanelProps) {
+  const fieldId = useId();
+  const [draft, setDraft] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const submit = async (e: FormEvent) => {
+    e.preventDefault();
+    const body = draft.trim();
+    if (!body || !onAdd) return;
+    setSaving(true);
+    try {
+      await onAdd(body);
+      setDraft("");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const resolved = state === "ready" && notes.length === 0 && !onAdd ? "empty" : state;
+  return (
+    <SectionCard
+      title="Notes"
+      description="Internal. Not shown in the Glass Box."
+      state={resolved}
+      empty={{ icon: StickyNote, title: "No notes yet" }}
+      errorMessage="Notes couldn't load."
+      onRetry={onRetry}
+      className={className}
+    >
+      {notes.length > 0 && <Timeline grouped={false} now={now} aria-label="Notes" events={notes.map((n) => ({ id: n.id, title: n.author, description: <p className="whitespace-pre-wrap">{n.body}</p>, at: n.at }))} />}
+      {onAdd && (
+        <form onSubmit={submit} className={notes.length ? "mt-4 grid gap-2" : "grid gap-2"}>
+          <label htmlFor={fieldId} className="text-ub-label-md text-ub-text-primary">
+            Add a note
+          </label>
+          <textarea
+            id={fieldId}
+            rows={3}
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            className={`${fieldControl} py-2`}
+          />
+          <div className="flex justify-end">
+            <Button type="submit" variant="secondary" text="Save note" loading={saving} disabled={!draft.trim()} />
+          </div>
+        </form>
+      )}
+    </SectionCard>
+  );
+}
