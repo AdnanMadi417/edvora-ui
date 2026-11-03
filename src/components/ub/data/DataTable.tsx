@@ -102,6 +102,8 @@ export interface DataTableProps<T> {
   hiddenColumns?: string[];
   /** Pin the first column while the table scrolls sideways (wide tables, from 768px). */
   stickyFirstColumn?: boolean;
+  /** Extra classes for one row, e.g. "opacity-60" for a voided entry. Keep to tokens and opacity; selection and hover colours still apply. */
+  getRowClassName?: (row: T, index: number) => string | undefined;
   className?: string;
 }
 
@@ -267,6 +269,7 @@ export default function DataTable<T>({
   rowLinkTarget = "_self",
   hiddenColumns,
   stickyFirstColumn = false,
+  getRowClassName,
   className,
 }: DataTableProps<T>) {
   const [selected, setSelectedRaw] = useControllable<string[]>(selectedIds, defaultSelectedIds, onSelectionChange);
@@ -450,7 +453,7 @@ export default function DataTable<T>({
                     <AnimatedTableRow
                       key={id}
                       data-selected={isSelected || undefined}
-                      className={clsx(t.row, href && "relative cursor-pointer", isSelected ? "bg-ub-selected" : clsx("bg-ub-surface", cards ? "hover:bg-ub-row-hover" : "md:hover:bg-ub-row-hover"))}
+                      className={clsx(t.row, href && "relative cursor-pointer", isSelected ? "bg-ub-selected" : clsx("bg-ub-surface", cards ? "hover:bg-ub-row-hover" : "md:hover:bg-ub-row-hover"), getRowClassName?.(row, index))}
                     >
                       {selectable && (
                         <td className={clsx(t.checkCell, "relative z-10", stickyFirstColumn && !cards && "md:sticky md:start-0 md:bg-inherit")}>

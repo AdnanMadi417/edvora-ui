@@ -169,6 +169,7 @@ export default function PayoutStatementSection({ partnerId, canOpenPayout = fals
         columns={columns}
         rows={filteredItems}
         getRowId={(item) => item.payout_id}
+        getRowClassName={(item) => (item.voided_at ? "opacity-60" : undefined)}
         getRowHref={canOpenPayout ? (item) => `/admin/advisors/${partnerId}/payouts/${item.payout_id}` : undefined}
         manualSort
         loading={status === "loading"}

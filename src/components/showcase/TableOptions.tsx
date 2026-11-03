@@ -113,6 +113,7 @@ function SelectableDemo() {
         onSelectAllMatchingChange={setAllMatching}
         selectionResetKey={stage}
         stickyFirstColumn
+        getRowClassName={(r) => (r.status === "paid" ? "opacity-60" : undefined)}
         bulkActions={(ids, clear, ctx) => (
           <>
             <Button variant="primary" size="sm" icon={<UserRoundCog className="h-4 w-4" aria-hidden="true" />} text="Reassign Advisor" onClick={clear} />
@@ -160,6 +161,7 @@ export default function TableOptions() {
           { name: "getRowHref", type: "(row) => string", description: "First column becomes a link covering the row; other interactive cells stay clickable." },
           { name: "hiddenColumns", type: "string[]", description: "Keys hidden by the Columns menu." },
           { name: "stickyFirstColumn", type: "boolean", default: "false", description: "Pins the first column on wide tables (768px+)." },
+          { name: "getRowClassName", type: "(row, index) => string | undefined", description: "Extra classes for one row, e.g. opacity-60 for paid or voided entries. Tokens and opacity only." },
           { name: "sort / defaultSort / manualSort", type: "{ key, direction } / boolean", description: "Client sorting, or server-sorted rows." },
         ]}
       >
