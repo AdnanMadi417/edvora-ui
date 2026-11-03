@@ -13,30 +13,68 @@ import { useToast } from "components/ub/feedback/ToastContext";
 import { card } from "components/ub/recipes";
 import { parseApiError } from "utils/parseApiError";
 import { useMyPublicProfile } from "features/partners/hooks/useMyPublicProfile";
+import type { PublicPartnerProfile, UpdateMyPublicProfilePayload } from "features/partners/types";
 import AdvisorProfile, { type AdvisorProfileErrors } from "./AdvisorProfile";
 import { draftFromProfile, draftToPayload, validateDraft, type AdvisorProfileDraft } from "./profileModel";
 
 /**
- * The Advisor's own profile page (/partner/public-profile): edit the page in
- * place, flip Preview to see exactly what students see, then save.
+ * The Advisor's own profile page (/partner/public-profile): loads the profile,
+ * then hands it to the workspace below.
  */
 export default function AdvisorProfileEditor() {
   const { profile, loading, error, saving, save, reload } = useMyPublicProfile();
+
+  if (loading && !profile) {
+    return (
+      <div className="mx-auto mt-6 max-w-3xl space-y-4" aria-busy="true" aria-label="Loading your profile">
+        <Skeleton className="h-20 w-full" />
+        <Skeleton className="h-80 w-full" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+    );
+  }
+
+  if (error || !profile) {
+    return (
+      <div className="mx-auto mt-6 max-w-3xl">
+        <Alert tone="danger" title="Couldn't load your profile" action={{ label: "Try again", onClick: reload }}>
+          {error ?? "Your public profile isn't set up yet. Ask your account manager to create it."}
+        </Alert>
+      </div>
+    );
+  }
+
+  return <AdvisorProfileWorkspace profile={profile} saving={saving} onSave={save} />;
+}
+
+export interface AdvisorProfileWorkspaceProps {
+  profile: PublicPartnerProfile;
+  /** Persists the edits; resolve with the saved profile, throw to show an error. */
+  onSave: (payload: UpdateMyPublicProfilePayload) => Promise<unknown>;
+  saving?: boolean;
+  /** Where "View public profile" goes; defaults to the live /p/[slug] page in a new tab. */
+  onViewPublic?: () => void;
+}
+
+/**
+ * Edit the page in place, flip Preview to see exactly what students see,
+ * then save. Data comes in as props so the style guide can run it on mock data.
+ */
+export function AdvisorProfileWorkspace({ profile, onSave, saving = false, onViewPublic }: AdvisorProfileWorkspaceProps) {
   const { showToast } = useToast();
-  const [draft, setDraft] = useState<AdvisorProfileDraft | null>(null);
-  const [saved, setSaved] = useState<AdvisorProfileDraft | null>(null);
+  const [draft, setDraft] = useState<AdvisorProfileDraft>(() => draftFromProfile(profile));
+  const [saved, setSaved] = useState<AdvisorProfileDraft>(() => draftFromProfile(profile));
   const [preview, setPreview] = useState(false);
   const [errors, setErrors] = useState<AdvisorProfileErrors>({});
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (!profile) return;
     const d = draftFromProfile(profile);
     setDraft(d);
     setSaved(d);
   }, [profile]);
 
-  const dirty = useMemo(() => !!draft && !!saved && JSON.stringify(draft) !== JSON.stringify(saved), [draft, saved]);
+  const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(saved), [draft, saved]);
 
   // Leaving with unsaved edits asks first.
   useEffect(() => {
@@ -49,31 +87,11 @@ export default function AdvisorProfileEditor() {
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
 
-  if (loading && !profile) {
-    return (
-      <div className="mx-auto mt-6 max-w-3xl space-y-4" aria-busy="true" aria-label="Loading your profile">
-        <Skeleton className="h-20 w-full" />
-        <Skeleton className="h-80 w-full" />
-        <Skeleton className="h-48 w-full" />
-      </div>
-    );
-  }
-
-  if (error || !profile || !draft) {
-    return (
-      <div className="mx-auto mt-6 max-w-3xl">
-        <Alert tone="danger" title="Couldn't load your profile" action={{ label: "Try again", onClick: reload }}>
-          {error ?? "Your public profile isn't set up yet. Ask your account manager to create it."}
-        </Alert>
-      </div>
-    );
-  }
-
   const livePath = `/p/${profile.slug}`;
   const published = profile.is_published ?? true;
 
   const update = (patch: Partial<AdvisorProfileDraft>) => {
-    setDraft((d) => (d ? { ...d, ...patch } : d));
+    setDraft((d) => ({ ...d, ...patch }));
     setErrors((e) => {
       const next = { ...e };
       (Object.keys(patch) as (keyof AdvisorProfileErrors)[]).forEach((k) => delete next[k]);
@@ -91,7 +109,8 @@ export default function AdvisorProfileEditor() {
       return;
     }
     try {
-      await save(draftToPayload(draft));
+      await onSave(draftToPayload(draft));
+      setSaved(draft);
       showToast("Profile saved.", "success");
     } catch (err) {
       showToast(parseApiError(err, "Couldn't save your profile."), "error");
@@ -131,7 +150,7 @@ export default function AdvisorProfileEditor() {
           variant="primary"
           icon={<ExternalLink className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />}
           text="View public profile"
-          onClick={() => window.open(livePath, "_blank", "noopener,noreferrer")}
+          onClick={onViewPublic ?? (() => window.open(livePath, "_blank", "noopener,noreferrer"))}
           title={dirty ? "Shows your last saved version" : undefined}
         />
         <Button variant="secondary" icon={copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />} text={copied ? "Copied" : "Copy link"} onClick={handleCopy} />
@@ -153,7 +172,10 @@ export default function AdvisorProfileEditor() {
         >
           <p className="ps-1 text-ub-body-sm text-ub-text-secondary">You have unsaved changes</p>
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" text="Discard" disabled={saving} onClick={() => { setDraft(saved); setErrors({}); }} />
+            <Button variant="secondary" size="sm" text="Discard" disabled={saving} onClick={() => {
+                setDraft(saved);
+                setErrors({});
+              }} />
             <Button variant="primary" size="sm" text="Save changes" loading={saving} onClick={handleSave} />
           </div>
         </div>

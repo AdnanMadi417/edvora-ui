@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { Briefcase, Plane, Search, UserPlus, Wallet } from "lucide-react";
+import { Briefcase, Plane, Search, UserPlus, UserRound, Wallet } from "lucide-react";
 import DaysTag from "components/ub/data/DaysTag";
 import NotificationItem, { NotificationGroup } from "components/ub/feedback/NotificationItem";
 import { Avatar } from "components/ub/data/Avatar";
@@ -76,6 +76,16 @@ export default function DashboardPatterns() {
             <span className="block text-ub-caption text-ub-text-tertiary">/design-system/patterns/application-details</span>
           </span>
           <Briefcase className="h-5 w-5 text-ub-icon" aria-hidden />
+        </a>
+      </Demo>
+
+      <Demo name="Advisor profile (full page)" path="components/showcase/AdvisorProfilePattern.tsx" description="The Advisor profile editor and its public page on mock data. Switch views, edit, save and see the public page update. Open it full size to check every breakpoint, theme and direction.">
+        <a href="/design-system/patterns/advisor-profile" className={clsx(card, cardInteractive, focusRing, "flex items-center justify-between gap-4 p-4")}>
+          <span>
+            <span className="block text-ub-label-md text-ub-text-primary">Open the Advisor profile pattern</span>
+            <span className="block text-ub-caption text-ub-text-tertiary">/design-system/patterns/advisor-profile</span>
+          </span>
+          <UserRound className="h-5 w-5 text-ub-icon" aria-hidden />
         </a>
       </Demo>
 

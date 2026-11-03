@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { ExternalLink } from "lucide-react";
 import Toggle from "components/ub/forms/Toggle";
 import AdvisorProfile from "features/partners/components/profile/AdvisorProfile";
 import { draftFromProfile, validateDraft, type AdvisorProfileDraft } from "features/partners/components/profile/profileModel";
 import type { PublicPartnerProfile } from "features/partners/types";
 import { Demo } from "./Showcase";
 
-const SAMPLE: PublicPartnerProfile = {
+export const SAMPLE_ADVISOR_PROFILE: PublicPartnerProfile = {
   slug: "ahmed-al-rashid",
   display_name: "Ahmed Al-Rashid",
   bio: null,
@@ -42,7 +44,7 @@ const SAMPLE: PublicPartnerProfile = {
 };
 
 export function AdvisorProfileDemo() {
-  const [draft, setDraft] = useState<AdvisorProfileDraft>(() => draftFromProfile(SAMPLE));
+  const [draft, setDraft] = useState<AdvisorProfileDraft>(() => draftFromProfile(SAMPLE_ADVISOR_PROFILE));
   const [editing, setEditing] = useState(false);
   return (
     <Demo
@@ -57,11 +59,15 @@ export function AdvisorProfileDemo() {
         { name: "errors", type: "{ display_name?, intro_video_url?, contact_value? }", description: "From validateDraft." },
       ]}
     >
-      <div className="mb-4 flex justify-end">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <Toggle checked={editing} onChange={setEditing} label="Edit mode" switchPosition="end" />
+        <Link href="/design-system/patterns/advisor-profile" className="inline-flex items-center gap-1.5 text-ub-label-md text-ub-text-link hover:underline">
+          Open full page
+          <ExternalLink className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />
+        </Link>
       </div>
       <div className="mx-auto max-w-3xl">
-        <AdvisorProfile profile={SAMPLE} draft={draft} editing={editing} onChange={(patch) => setDraft((d) => ({ ...d, ...patch }))} errors={editing ? validateDraft(draft) : {}} />
+        <AdvisorProfile profile={SAMPLE_ADVISOR_PROFILE} draft={draft} editing={editing} onChange={(patch) => setDraft((d) => ({ ...d, ...patch }))} errors={editing ? validateDraft(draft) : {}} />
       </div>
     </Demo>
   );
