@@ -122,3 +122,21 @@
 [dir="rtl"] .ub-chart-hatch {
   background-image: repeating-linear-gradient(-45deg, var(--ub-chart-hatch) 0 2px, transparent 2px 6px);
 }
+
+/* PipelineFlow track: light dashes drifting toward payout (reversed in RTL, still under reduced motion). */
+.ub-pipeline-flow {
+  background-image: repeating-linear-gradient(90deg, var(--ub-bg-surface) 0 3px, transparent 3px 14px);
+  background-size: 14px 100%;
+  opacity: 0.55;
+  animation: ub-pipeline-flow 1.2s linear infinite;
+}
+[dir="rtl"] .ub-pipeline-flow {
+  animation-direction: reverse;
+}
+@keyframes ub-pipeline-flow {
+  from { background-position: 0 0; }
+  to { background-position: 14px 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ub-pipeline-flow { animation: none; }
+}

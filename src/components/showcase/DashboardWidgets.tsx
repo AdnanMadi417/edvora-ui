@@ -27,6 +27,7 @@ import {
   PeriodSelect,
   PillBarChart,
   PipelineBar,
+  PipelineFlow,
   ProgressCard,
   ReminderCard,
   Sparkline,
@@ -67,6 +68,15 @@ const PLACEMENT = [
   { label: "In progress", value: 27, color: "cat-2" as const },
   { label: "Withdrawn", value: 11, color: "cat-3" as const },
 ];
+const FLOW_STAGES = [
+  { id: "s1", label: "Application Submission", count: 6, stageId: "documents-pending", badge: { label: "Your move", tone: "attention" as const }, attention: true },
+  { id: "s2", label: "Institution Review", count: 4, stageId: "institution-review" },
+  { id: "s3", label: "Offer & Visa Payment", count: 3, stageId: "offer-received", badge: { label: "Your move", tone: "attention" as const }, attention: true },
+  { id: "s4", label: "Visa Processing", count: 5, stageId: "visa-in-progress" },
+  { id: "s5", label: "Arrival & Enrollment", count: 2, stageId: "arrival-logistics" },
+  { id: "s6", label: "Commission Invoicing", count: 3, stageId: "enrolled", badge: { label: "Payout", tone: "success" as const } },
+];
+
 const COUNTS = { enquiry: 18, "documents-pending": 24, submitted: 15, "institution-review": 21, "offer-received": 12, "visa-in-progress": 9, "arrival-logistics": 5, enrolled: 7 };
 
 function useStateSwitch() {
@@ -276,6 +286,24 @@ export default function DashboardWidgets() {
       </Demo>
 
       <Demo
+        name="PipelineFlow"
+        path="components/ub/dashboard/PipelineFlow.tsx"
+        description="Applications by stage as a journey line toward payout. Each station grows with its volume (44–64px), the track takes the stage colour from config/applicationStages.ts and drifts toward the end (still under reduced motion), and attention stations pulse. Press a station to filter; press it again to clear. Scrolls sideways on narrow screens; flows the other way in RTL."
+        code={`<PipelineFlow
+  stages={[{ id: "s1", label: "Application Submission", count: 6, stageId: "documents-pending", badge: { label: "Your move", tone: "attention" }, attention: true }]}
+  selectedId={stage}
+  onSelect={setStage}
+/>`}
+        props={[
+          { name: "stages", type: "{ id, label, count, stageId?, badge?, attention? }[]", description: "stageId picks the colour; unknown ids show neutral. attention pulses the station." },
+          { name: "selectedId / onSelect", type: "string | null / (id | null) => void", description: "Without onSelect the stations are static." },
+          { name: "label", type: "string", default: '"Applications by stage"', description: "Accessible name for the group." },
+        ]}
+      >
+        <PipelineFlowDemo />
+      </Demo>
+
+      <Demo
         name="TaskList and PeopleList"
         path="components/ub/dashboard/TaskList.tsx"
         description="TaskListItem: icon tile, title, meta, due Days tag (amber, orange, red as it nears), action. PeopleListItem: avatar, name, current work, status tag. Both lists handle loading / empty / error."
@@ -411,4 +439,9 @@ export default function DashboardWidgets() {
       </Demo>
     </ShowcaseSection>
   );
+}
+
+function PipelineFlowDemo() {
+  const [stage, setStage] = useState<string | null>(null);
+  return <PipelineFlow stages={FLOW_STAGES} selectedId={stage} onSelect={setStage} />;
 }

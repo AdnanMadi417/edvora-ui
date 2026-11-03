@@ -240,6 +240,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "A trend inside a card; applications by stage.",
     usedIn: ["StatCard trends", "Tracker summary"],
   },
+  "PipelineFlow": {
+    category: "data",
+    imports: ['import { PipelineFlow } from "components/ub/dashboard";'],
+    useFor: "Applications by stage as a journey line toward payout: stations sized by volume, filterable, with Your move call-outs.",
+    usedIn: ["Application Tracker pipeline"],
+    avoid: "A compact summary inside another card: use PipelineBar.",
+  },
   "TaskList and PeopleList": {
     category: "data",
     imports: ['import { TaskList, TaskListItem, PeopleList, PeopleListItem } from "components/ub/dashboard";'],

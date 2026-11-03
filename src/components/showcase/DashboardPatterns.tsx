@@ -65,7 +65,7 @@ export default function DashboardPatterns() {
       </Demo>
 
       {/* Dashboard widget library (components/ub/dashboard). */}
-      <Pick demos={["DashboardHeader and PeriodSelect", "DashboardCard, CardMenu, CardLinkButton and CardFooterStats", "StatCard, DeltaPill and IconTile", "PillBarChart and ChartLegend", "CategoryColumnChart", "GaugeChart and GaugeLegendStats", "ActivityHeatmap", "Sparkline and PipelineBar", "TaskList and PeopleList", "BreakdownTable and StatusTag", "ReminderCard, CountdownCard and ProgressCard", "Admin dashboard"]}>
+      <Pick demos={["DashboardHeader and PeriodSelect", "DashboardCard, CardMenu, CardLinkButton and CardFooterStats", "StatCard, DeltaPill and IconTile", "PillBarChart and ChartLegend", "CategoryColumnChart", "GaugeChart and GaugeLegendStats", "ActivityHeatmap", "Sparkline and PipelineBar", "PipelineFlow", "TaskList and PeopleList", "BreakdownTable and StatusTag", "ReminderCard, CountdownCard and ProgressCard", "Admin dashboard"]}>
         <DashboardWidgets />
       </Pick>
 

@@ -15,6 +15,7 @@ export { default as GaugeLegendStats } from "./GaugeLegendStats";
 export { default as ActivityHeatmap, heatLevel } from "./ActivityHeatmap";
 export { default as Sparkline, sparkPoints } from "./Sparkline";
 export { default as PipelineBar } from "./PipelineBar";
+export { default as PipelineFlow, type PipelineFlowStage, type PipelineFlowProps } from "./PipelineFlow";
 export { default as ChartLegend } from "./ChartLegend";
 export { default as TaskList, TaskListItem } from "./TaskList";
 export { default as PeopleList, PeopleListItem } from "./PeopleList";
