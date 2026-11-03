@@ -5,7 +5,6 @@ import { ClipboardList, Download } from "lucide-react";
 import Button from "components/ub/core/Button";
 import AppDate from "components/ub/data/AppDate";
 import DataTable, { type DataTableColumn, type DataTableDensity } from "components/ub/data/DataTable";
-import DataTableToolbar from "components/ub/data/DataTableToolbar";
 import PresignedImage from "components/ub/data/PresignedImage";
 import { STATUS_BADGE_TONE } from "components/ub/data/StatusBadge";
 import Tag from "components/ub/data/Tag";
@@ -42,7 +41,7 @@ export interface ApplicationsTableProps {
   statusLabel: (status: string) => string;
   /** Statuses where this viewer has to act: shows the Action needed tag. */
   needsAction: (status: string) => boolean;
-  /** Starting density; the toolbar switch changes it. Staff default compact, Advisors comfortable (brief §4.6). */
+  /** Row density. Staff default compact, Advisors comfortable (brief §4.6). */
   defaultDensity?: DataTableDensity;
   /** Staff: select rows on the page and export them as CSV. */
   selectable?: boolean;
@@ -107,8 +106,6 @@ export default function ApplicationsTable({
   footer,
   emptyAction,
 }: ApplicationsTableProps) {
-  const [density, setDensity] = useState<DataTableDensity>(defaultDensity);
-  const [hidden, setHidden] = useState<string[]>([]);
   const [selected, setSelected] = useState<string[]>([]);
 
   const columns = useMemo<DataTableColumn<ApplicationListRow>[]>(() => {
@@ -169,11 +166,8 @@ export default function ApplicationsTable({
     return cols;
   }, [ownership, statusLabel, needsAction]);
 
-  const columnOptions = columns.map((c) => ({ key: c.key, label: String(c.header), locked: c.key === "student" }));
-
   return (
     <>
-      <DataTableToolbar density={{ value: density, onChange: setDensity }} columns={{ options: columnOptions, hidden, onChange: setHidden }} />
       <DataTable<ApplicationListRow>
         caption="Applications"
         columns={columns}
@@ -182,8 +176,7 @@ export default function ApplicationsTable({
         getRowLabel={(r) => r.student_name}
         getRowHref={(r) => hrefFor(r.id)}
         rowLinkTarget="_blank"
-        density={density}
-        hiddenColumns={hidden}
+        density={defaultDensity}
         loading={loading}
         error={error}
         onRetry={onRetry}
