@@ -1,15 +1,9 @@
-﻿"use client";
+"use client";
 
+import Input from "components/ub/forms/Input";
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useState, useEffect } from "react";
-import {
-  XCircle,
-  Clock,
-  Trash2,
-  AlertCircle,
-  Pause,
-  CheckCircle,
-  ListX,
-} from "lucide-react";
+import { XCircle, Clock, Trash2, AlertCircle, Pause, CheckCircle, ListX } from "lucide-react";
 import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
@@ -31,11 +25,12 @@ import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService
 import NoDocumentsRequired from "components/ub/feedback/NoDocumentsRequired";
 import CompactFileUpload from "components/ub/forms/CompactFileUpload";
 import SettingToggleInput from "components/ub/forms/SettingToggleInput";
-import InputField from "components/ub/forms/InputField";
-import TextareaField from "components/ub/forms/TextareaField";
-import Button from "components/ub/core/Button";
+import IconButton from "components/ub/core/IconButton";
+import Alert from "components/ub/feedback/Alert";
+import Textarea from "components/ub/forms/Textarea";
+import Checkbox from "components/ub/forms/Checkbox";
+import Chip from "components/ub/data/Chip";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
-import UpdateStatusHeader from "features/applications/shared/UpdateStatusHeader";
 
 const DocumentRequestList = ({
   documents,
@@ -75,20 +70,21 @@ const DocumentRequestList = ({
       {documents.map((doc) => (
         <div
           key={doc.id}
-          className="relative space-y-3 rounded-md border bg-white p-4"
+          className="relative space-y-3 rounded-ub-md border bg-ub-surface p-4"
         >
           {documents.length > 1 && (
-            <button
+            <IconButton
               onClick={() => removeDocument(doc.id)}
-              className="absolute right-2 top-2 rounded-md p-1.5 text-red-400 hover:bg-red-50 hover:text-red-600"
               aria-label="Remove document"
-            >
-              <Trash2 className="h-4 w-4" />
-            </button>
+              variant="tertiary"
+              size="sm"
+              icon={<Trash2 className="h-4 w-4" aria-hidden="true" />}
+              className="absolute end-2 top-2"
+            />
           )}
 
           {documentTypes.length > 0 && <div>
-            <label className="mb-2 block text-p2 font-medium text-gray-900">
+            <label className="mb-2 block text-ub-body-md font-medium text-ub-text-primary">
               Document Type
             </label>
 
@@ -97,47 +93,24 @@ const DocumentRequestList = ({
                 {doc.type.map((t) => {
                   const label = documentTypes.find((d) => d.id === t)?.label || t;
                   return (
-                    <span
-                      key={t}
-                      className="flex max-w-[160px] items-center gap-1 rounded-full bg-blue-100 py-0.5 pl-2.5 pr-1.5 text-xs font-medium text-blue-700"
-                    >
-                      <span className="truncate">{label}</span>
-                      <button
-                        type="button"
-                        onClick={() => toggleType(doc.id, t)}
-                        className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-blue-200 text-blue-600 hover:bg-blue-300"
-                      >
-                        ×
-                      </button>
-                    </span>
+                    <Chip key={t} size="sm" onRemove={() => toggleType(doc.id, t)} removeLabel={`Remove ${label}`}>
+                      <span className="block max-w-[160px] truncate">{label}</span>
+                    </Chip>
                   );
                 })}
               </div>
             )}
 
-            <div className="flex max-h-48 flex-col gap-1 overflow-y-auto rounded-lg border border-gray-200 p-1.5">
+            <div className="flex max-h-48 flex-col gap-1 overflow-y-auto rounded-ub-md border border-ub-border p-1.5">
               {documentTypes.map((d) => (
-                <label
-                  key={d.id}
-                  className={`flex cursor-pointer items-start gap-2.5 rounded-md px-3 py-2 transition-colors ${
-                    doc.type.includes(d.id)
-                      ? "bg-blue-50 text-blue-700"
-                      : "text-gray-700 hover:bg-gray-50"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
+                <div key={d.id} className={`rounded-ub-md px-3 py-2 transition-colors ${doc.type.includes(d.id) ? "bg-ub-selected" : "hover:bg-ub-surface-subtle"}`}>
+                  <Checkbox
                     checked={doc.type.includes(d.id)}
                     onChange={() => toggleType(doc.id, d.id)}
-                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    label={d.label}
+                    description={d.description || undefined}
                   />
-                  <div className="min-w-0 ">
-                    <span className="block truncate text-sm font-medium text-slate-800">{d.label}</span>
-                    {d.description && (
-                      <span className="block text-xs text-slate-400">{d.description}</span>
-                    )}
-                  </div>
-                </label>
+                </div>
               ))}
             </div>
           </div>}
@@ -172,15 +145,6 @@ export default function UpdateStatusPopup({
   const [error, setError] = useState("");
   const [reasonError, setReasonError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) setIsVisible(true);
-    else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
 
   const { showToast } = useToast();
   const selectedOption = statusOptions.find((opt) => opt.id === selectedStatus);
@@ -190,43 +154,43 @@ export default function UpdateStatusPopup({
     if (lower.includes("approve"))
       return {
         icon: CheckCircle,
-        color: "text-green-600",
-        bgColor: "bg-green-50",
-        borderColor: "border-green-200",
+        color: "text-ub-tone-success-text",
+        bgColor: "bg-ub-tone-success-bg",
+        borderColor: "border-ub-tone-success-border",
       };
     if (lower.includes("reject") || lower.includes("denied"))
       return {
         icon: XCircle,
-        color: "text-red-600",
-        bgColor: "bg-red-50",
-        borderColor: "border-red-200",
+        color: "text-ub-tone-danger-text",
+        bgColor: "bg-ub-tone-danger-bg",
+        borderColor: "border-ub-tone-danger-border",
       };
     if (lower.includes("review"))
       return {
         icon: Clock,
-        color: "text-yellow-600",
-        bgColor: "bg-yellow-50",
-        borderColor: "border-yellow-200",
+        color: "text-ub-tone-warning-text",
+        bgColor: "bg-ub-tone-warning-bg",
+        borderColor: "border-ub-tone-warning-border",
       };
     if (lower.includes("pending") || lower.includes("waiting"))
       return {
         icon: Pause,
-        color: "text-gray-600",
-        bgColor: "bg-gray-50",
-        borderColor: "border-gray-200",
+        color: "text-ub-text-secondary",
+        bgColor: "bg-ub-surface-subtle",
+        borderColor: "border-ub-border",
       };
     if (lower.includes("correction"))
       return {
         icon: AlertCircle,
-        color: "text-orange-600",
-        bgColor: "bg-orange-50",
-        borderColor: "border-orange-200",
+        color: "text-ub-tone-warning-text",
+        bgColor: "bg-ub-tone-warning-bg",
+        borderColor: "border-ub-tone-warning-border",
       };
     return {
       icon: Clock,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50",
-      borderColor: "border-blue-200",
+      color: "text-ub-text-link",
+      bgColor: "bg-ub-tone-brand-bg",
+      borderColor: "border-ub-tone-brand-border",
     };
   };
 
@@ -545,57 +509,38 @@ export default function UpdateStatusPopup({
     onClose();
   };
 
-  if (!isVisible) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={handleClose}
-      aria-modal="true"
-      role="dialog"
+    <FormModal
+      open={isOpen}
+      onClose={handleClose}
+      size="lg"
+      icon={Clock}
+      title="Update Application Status"
+      description={`Stage: ${application?.stage?.name || "No Stage"}   ·   Status: ${application?.stage?.statuses?.[0]?.name || "No Status"}`}
+      onSubmit={handleConfirm}
+      submitLabel="Update Status"
+      submitting={isSubmitting}
+      submitDisabled={!selectedStatus || !!error || (requiresReason && !reason.trim()) || (isUniversityApproved && !offerLetterFile) || (isVisaIssued && !visaDocumentFile) || (isCommissionPaid && !commissionPaymentFile) || (hasArrivalFormSelected && !arrivalFormTemplateFile)}
     >
-      <div
-        className={`w-full max-w-2xl transform rounded-md bg-white shadow-xl transition-all duration-300 ${
-          isOpen
-            ? "translate-y-0 scale-100 opacity-100"
-            : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <UpdateStatusHeader
-          stageName={application?.stage?.name}
-          statusName={application?.stage?.statuses?.[0]?.name}
-          onClose={handleClose}
-        />
+      <div className="grid gap-4">
 
-        <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
+        <div className="space-y-6">
           {error && (
-            <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4">
-              <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-red-800">Error</p>
-                <pre className="mt-1 whitespace-pre-wrap font-mono text-xs text-red-700">
-                  {error}
-                </pre>
-              </div>
-            </div>
+            <Alert tone="danger" title="Error">
+              <span className="whitespace-pre-wrap">{error}</span>
+            </Alert>
           )}
 
           {actions?.correction_reason && (
-            <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-              <div>
-                <p className="text-xs font-semibold text-amber-700">Correction Reason</p>
-                <p className="mt-0.5 text-xs text-amber-800">{actions.correction_reason}</p>
-              </div>
-            </div>
+            <Alert tone="warning" title="Correction Reason">{actions.correction_reason}</Alert>
           )}
 
           <div className="space-y-3">
-            <label className="block text-p2 font-semibold text-gray-900">
+            <label className="block text-ub-body-md font-semibold text-ub-text-primary">
               <span className="flex items-center gap-1">
                 Select New Status
-                <span className="text-red-500">*</span>
+                <span className="text-ub-tone-danger-text">*</span>
               </span>
             </label>
 
@@ -603,7 +548,7 @@ export default function UpdateStatusPopup({
               <NoDocumentsRequired
                 title="No status"
                 subtitle="There are no status options available at the moment."
-                icon={<ListX className="h-10 w-10 text-slate-400" />}
+                icon={<ListX className="h-10 w-10 text-ub-text-tertiary" />}
               />
             ) : (
               statusOptions.map((option) => {
@@ -621,13 +566,13 @@ export default function UpdateStatusPopup({
                     key={option.id}
                     title={isDisabled ? "You cannot select this option." : ""}
                     onClick={() => !isDisabled && setSelectedStatus(option.id)}
-                    className={`rounded-md border p-4 transition-all
+                    className={`rounded-ub-md border p-4 transition-all
     ${
       isDisabled
-        ? "cursor-not-allowed border-gray-300 bg-gray-100 text-gray-400 opacity-60"
+        ? "cursor-not-allowed border-ub-border bg-ub-surface-subtle text-ub-text-tertiary opacity-60"
         : isSelected
         ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
-        : "cursor-pointer border-slate-200 bg-white hover:border-gray-300 hover:shadow"
+        : "cursor-pointer border-ub-border bg-ub-surface hover:border-ub-border hover:shadow"
     }
   `}
                   >
@@ -637,22 +582,22 @@ export default function UpdateStatusPopup({
                           isSelected
                             ? option.color
                             : isDisabled
-                            ? "text-gray-400"
-                            : "text-gray-400"
+                            ? "text-ub-text-tertiary"
+                            : "text-ub-text-tertiary"
                         }`}
                       />
                       <div>
-                        <p className="font-semibold text-gray-900">
+                        <p className="font-semibold text-ub-text-primary">
                           {option.label}
                         </p>
                         {option.nextAction && (
-                          <p className="mt-1 text-xs text-slate-500">
+                          <p className="mt-1 text-ub-caption text-ub-text-tertiary">
                             <span className="font-medium">Next :</span>{" "}
                             {option.nextAction}
                           </p>
                         )}
                         {option.description && (
-                          <p className="mt-0.5 text-xs text-slate-500">
+                          <p className="mt-0.5 text-ub-caption text-ub-text-tertiary">
                             {option.description}
                           </p>
                         )}
@@ -791,13 +736,12 @@ export default function UpdateStatusPopup({
           )}
 
           {requiresReason && (
-            <TextareaField
+            <Textarea
               label="Reason"
-              field="reason"
               placeholder="Please provide a detailed reason..."
-              formData={{ reason }}
-              errors={{ reason: reasonError }}
-              updateFormData={(_, value) => {
+              value={reason}
+              error={reasonError || undefined}
+              onChange={(value) => {
                 setReason(value);
                 if (reasonError) setReasonError("");
               }}
@@ -810,18 +754,9 @@ export default function UpdateStatusPopup({
 
           {isVisaSetupSelected && (
             <div className="space-y-2">
-              <InputField
-                label="Visa Fee Amount"
-                field="visa_fee_amount"
-                type="number"
-                placeholder="Enter visa fee amount"
-                required={false}
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
+              <Input label="Visa Fee Amount" placeholder="Enter visa fee amount" type="number" value={String(formData.visa_fee_amount ?? "")} onChange={(v) => updateFormData("visa_fee_amount", v)} error={formErrors.visa_fee_amount || undefined} />
               {visaFeeAmount && (
-                <div className="flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-xs text-blue-700">
+                <div className="flex items-center gap-2 rounded-ub-md border border-ub-tone-brand-border bg-ub-tone-brand-bg px-3 py-2 text-ub-caption text-ub-text-link">
                   <AlertCircle className="h-4 w-4 shrink-0" />
                   <span>
                     Default visa fee is <strong>{visaFeeAmount}</strong>. You can enter a different amount if needed.
@@ -873,42 +808,7 @@ export default function UpdateStatusPopup({
             />
           )}
         </div>
-
-        <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
-          <Button
-            onClick={handleClose}
-            disabled={isSubmitting}
-            icon={<XCircle className="h-4 w-4" />}
-            text="Cancel"
-            bgColor="bg-white"
-            textColor="text-gray-600"
-            borderColor="border-gray-600"
-            hoverTextColor="hover:text-gray-700"
-            hoverBorderColor="hover:border-gray-700"
-          />
-          <Button
-            onClick={handleConfirm}
-            disabled={
-              !selectedStatus ||
-              isSubmitting ||
-              !!error ||
-              (requiresReason && !reason.trim()) ||
-              (isUniversityApproved && !offerLetterFile) ||
-              (isVisaIssued && !visaDocumentFile) ||
-              (isCommissionPaid && !commissionPaymentFile) ||
-              (hasArrivalFormSelected && !arrivalFormTemplateFile)
-            }
-            icon={<CheckCircle className="h-4 w-4" />}
-            text={isSubmitting ? "Updating..." : "Update Status"}
-            bgColor="bg-blue-100"
-            textColor="text-blue-700"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-blue-700"
-            hoverBorderColor="hover:border-blue-700"
-            className="hover:bg-blue-200"
-          />
-        </div>
       </div>
-    </div>
+    </FormModal>
   );
 }
