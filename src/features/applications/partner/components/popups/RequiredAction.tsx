@@ -1,7 +1,10 @@
 "use client";
 
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useEffect, useState } from "react";
-import { CheckCircle, Pause, XCircle, AlertCircle, Download } from "lucide-react";
+import { Pause, Download } from "lucide-react";
+import Alert from "components/ub/feedback/Alert";
+import Skeleton from "components/ub/feedback/Skeleton";
 import NoDocumentsRequired from "components/ub/feedback/NoDocumentsRequired";
 import DocumentUploadList from "features/applications/partner/components/form/stages/DocumentUploadList";
 import DocumentActions from "features/applications/shared/DocumentActions";
@@ -10,7 +13,6 @@ import { useHealthDeclarationFormDownload } from "features/applications/shared/u
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { useToast } from "components/ub/feedback/ToastContext";
 import api from "lib/useApi";
-import Button from "components/ub/core/Button";
 import IconButton from "components/ub/core/IconButton";
 import { parseApiError } from "utils/parseApiError";
 import { DocumentItem, DocumentType, FormDataType } from "features/applications/partner/components/form/utility-functions/types";
@@ -35,15 +37,6 @@ export default function RequiredAction({
   const [documents, setDocuments] = useState<DocumentItem[]>([]);
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) setIsVisible(true);
-    else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
 
   const { actions, loading } = useApplicationActions(applicationId);
   const { showToast } = useToast();
@@ -208,68 +201,39 @@ export default function RequiredAction({
         : uploadedDocs.length > 0;
   const anyUploading = documents.some((d) => d.uploading);
 
-  if (!isVisible) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      aria-modal="true"
-      role="dialog"
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="lg"
+      icon={Pause}
+      title="Required Documents"
+      onSubmit={handleConfirm}
+      submitLabel="Confirm"
+      submitting={isSubmitting}
+      submitDisabled={!allRequiredUploaded || anyUploading}
     >
-      <div
-        className={`w-full max-w-lg transform transition-all duration-300 ${
-          isOpen
-            ? "translate-y-0 scale-100 opacity-100"
-            : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="relative overflow-hidden rounded-2xl bg-white shadow-lg">
-          <div className="relative border-b border-slate-200 px-6 pb-4 pt-6">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-amber-200 bg-gradient-to-br from-amber-50 to-amber-100">
-                  <Pause className="h-6 w-6 text-amber-600" strokeWidth={2.5} />
-                </div>
-                <div>
-                  <h5 className="text-lg font-bold text-gray-900">Required Documents</h5>
-                  <div className="mt-1 flex items-center gap-2 text-sm text-slate-500">
-                    <span className="font-normal">
-                      <span className="font-medium">Next Action: </span>
-                      {actions ? `${actions.next_action}` : "Loading..."}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                aria-label="Close dialog"
-                className="group flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
-              >
-                <XCircle className="h-5 w-5" strokeWidth={2} />
-              </button>
-            </div>
-          </div>
+      <div className="grid gap-4">
 
-          <div className="max-h-[60vh] space-y-4 overflow-y-auto px-6 py-6">
+          <div className="space-y-4">
             {loading ? (
-              <p className="text-slate-500">Loading...</p>
+              <div className="space-y-3" aria-busy="true" aria-label="Loading documents">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-24 w-full" />
+              </div>
             ) : docTypes.length > 0 ? (
               <>
                 {actions?.correction_reason && (
-                  <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-2.5 text-amber-800">
-                    <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
-                    <span className="text-xs">{actions.correction_reason}</span>
-                  </div>
+                  <Alert tone="warning">{actions.correction_reason}</Alert>
                 )}
                 {arrivalFormTemplate?.file_key && (
-                  <div className="flex items-center justify-between rounded-md border border-blue-200 bg-blue-50 px-4 py-3">
+                  <div className="flex items-center justify-between rounded-ub-md border border-ub-tone-brand-border bg-ub-tone-brand-bg px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <Download className="h-4 w-4 text-blue-600" />
+                      <Download className="h-4 w-4 text-ub-text-link" />
                       <div>
-                        <p className="text-sm font-medium text-blue-800">Arrival Form Template</p>
-                        <p className="text-xs text-blue-600">Download and complete this form before uploading</p>
+                        <p className="text-ub-body-sm font-medium text-ub-text-link">Arrival Form Template</p>
+                        <p className="text-ub-caption text-ub-text-link">Download and complete this form before uploading</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -278,25 +242,21 @@ export default function RequiredAction({
                   </div>
                 )}
                 {requiresMedicalReportEmgs && (
-                  <div className="flex items-center justify-between rounded-md border border-blue-200 bg-blue-50 px-4 py-3">
+                  <div className="flex items-center justify-between rounded-ub-md border border-ub-tone-brand-border bg-ub-tone-brand-bg px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <Download className="h-4 w-4 text-blue-600" />
+                      <Download className="h-4 w-4 text-ub-text-link" />
                       <div>
-                        <p className="text-sm font-medium text-blue-800">Health Declaration Form</p>
-                        <p className="text-xs text-blue-600">Required for visa processing (Lampiran B)</p>
+                        <p className="text-ub-body-sm font-medium text-ub-text-link">Health Declaration Form</p>
+                        <p className="text-ub-caption text-ub-text-link">Required for visa processing (Lampiran B)</p>
                       </div>
                     </div>
                     <IconButton
                       onClick={downloadHealthDeclarationForm}
                       disabled={downloadingHealthDeclarationForm}
-                      title="Download Health Declaration Form"
-                      icon={<Download className={`h-4 w-4 ${downloadingHealthDeclarationForm ? "animate-pulse" : ""}`} />}
-                      bgColor="bg-blue-100"
-                      textColor="text-blue-600"
-                      borderColor="border-transparent"
-                      hoverTextColor="hover:text-blue-600"
-                      hoverBorderColor="hover:border-blue-200"
-                      className="shrink-0 hover:bg-blue-200"
+                      aria-label="Download Health Declaration Form"
+                      variant="secondary"
+                      size="sm"
+                      icon={<Download className={`h-4 w-4 ${downloadingHealthDeclarationForm ? "motion-safe:animate-pulse" : ""}`} />}
                     />
                   </div>
                 )}
@@ -334,33 +294,7 @@ export default function RequiredAction({
               />
             )}
           </div>
-
-          <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
-            <Button
-              onClick={onClose}
-              icon={<XCircle className="h-4 w-4" />}
-              text="Cancel"
-              bgColor="bg-white"
-              textColor="text-gray-600"
-              borderColor="border-gray-600"
-              hoverTextColor="hover:text-gray-700"
-              hoverBorderColor="hover:border-gray-700"
-            />
-            <Button
-              onClick={handleConfirm}
-              disabled={!allRequiredUploaded || anyUploading || isSubmitting}
-              icon={<CheckCircle className="h-4 w-4" />}
-              text={isSubmitting ? "Submitting..." : "Confirm"}
-              bgColor="bg-amber-100"
-              textColor="text-amber-700"
-              borderColor="border-amber-600"
-              hoverTextColor="hover:text-amber-700"
-              hoverBorderColor="hover:border-amber-700"
-              className="hover:bg-amber-200"
-            />
-          </div>
-        </div>
       </div>
-    </div>
+    </FormModal>
   );
 }

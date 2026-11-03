@@ -1,11 +1,12 @@
-﻿"use client";
+"use client";
 
+import Alert from "components/ub/feedback/Alert";
+import Input from "components/ub/forms/Input";
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useState, useEffect } from "react";
 import { XCircle, Plane, CheckCircle, AlertCircle } from 'lucide-react';
-import InputField from "components/ub/forms/InputField";
 import CompactFileUpload from "components/ub/forms/CompactFileUpload";
 import { useArrivalDateUpload } from "features/applications/hooks";
-import Button from "components/ub/core/Button";
 
 
 interface ArrivalDateConfirmationProps {
@@ -21,7 +22,6 @@ export default function ArrivalDateConfirmation({
                                                   applicationId,
                                                   onRefetch,
                                                 }: ArrivalDateConfirmationProps) {
-  const [isVisible, setIsVisible] = useState(false);
   const [arrivalDate, setArrivalDate] = useState<string>("");
   const [ticketFile, setTicketFile] = useState<File | null>(null);
   const [eVisaFile, setEVisaFile] = useState<File | null>(null);
@@ -50,14 +50,6 @@ export default function ArrivalDateConfirmation({
     return true;
   };
 
-  useEffect(() => {
-    if (isOpen) setIsVisible(true);
-    else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
   const handleConfirm = async () => {
     if (!validateDate()) return;
     try {
@@ -78,67 +70,30 @@ export default function ArrivalDateConfirmation({
     onClose();
   };
 
-  if (!isVisible) return null;
 
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={handleClose}
-      aria-modal="true"
-      role="dialog"
+    <FormModal
+      open={isOpen}
+      onClose={handleClose}
+      size="md"
+      icon={Plane}
+      title="Confirm Arrival Date"
+      description="Select your planned arrival date and upload your travel ticket."
+      onSubmit={handleConfirm}
+      submitLabel="Confirm Arrival"
+      submitting={isSubmitting}
+      submitDisabled={!formData.arrival_date || !ticketFile || !!fileError || !!eVisaError}
     >
-      <div
-        className={`w-full max-w-lg md:max-w-xl transform transition-all duration-300 ${
-          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="relative overflow-hidden rounded-2xl bg-white text-sm shadow-2xl ring-1 ring-black/5">
+      <div className="grid gap-4">
 
-          <div className="relative border-b border-gray-200 px-6 pb-4 pt-6">
-            <div className="flex items-start justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-12 w-12 items-center justify-center rounded-md border border-blue-200 bg-gradient-to-br from-blue-50 to-blue-50">
-                  <Plane className="h-6 w-6 text-blue-600" strokeWidth={2.5} />
-                </div>
-                <div>
-                  <h5 className="text-h4 font-bold text-gray-900 sm:text-lg">
-                    Confirm Arrival Date
-                  </h5>
-                  <p className="mt-1 text-caption text-slate-500">
-                    Select your planned arrival date and upload your travel ticket.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={handleClose}
-                aria-label="Close dialog"
-                className="group flex h-9 w-9 items-center justify-center rounded-md text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-600"
-              >
-                <XCircle className="h-5 w-5" strokeWidth={2} />
-              </button>
-            </div>
-          </div>
-
-          <div className="max-h-[65vh] space-y-6 overflow-y-auto px-6 py-5">
+          <div className="space-y-6">
 
             {(fileError || eVisaError) && (
-              <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 p-4">
-                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-600" />
-                <p className="text-sm text-red-700">{fileError || eVisaError}</p>
-              </div>
+              <Alert tone="danger">{fileError || eVisaError}</Alert>
             )}
 
             <div className="space-y-2">
-              <InputField
-                label="Arrival Date"
-                field="arrival_date"
-                type="date"
-                required
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-                onBlur={() => {
+              <Input label="Arrival Date" type="date" onBlur={() => {
                   const val = formData.arrival_date;
                   if (!val) return;
                   const selected = new Date(val);
@@ -146,8 +101,7 @@ export default function ArrivalDateConfirmation({
                   today.setHours(0, 0, 0, 0);
                   if (selected < today)
                     setFormErrors({ arrival_date: "Arrival date cannot be in the past" });
-                }}
-              />
+                }} value={String(formData.arrival_date ?? "")} onChange={(v) => updateFormData("arrival_date", v)} error={formErrors.arrival_date || undefined} required />
             </div>
 
             <CompactFileUpload
@@ -173,35 +127,7 @@ export default function ArrivalDateConfirmation({
               disabled={isSubmitting}
             />
           </div>
-
-          <div className="border-t border-gray-200 px-6 py-4">
-            <div className="flex justify-end gap-3">
-              <Button
-                onClick={handleClose}
-                icon={<XCircle className="h-4 w-4" />}
-                text="Cancel"
-                bgColor="bg-white"
-                textColor="text-gray-600"
-                borderColor="border-gray-600"
-                hoverTextColor="hover:text-gray-700"
-                hoverBorderColor="hover:border-gray-700"
-              />
-              <Button
-                disabled={!formData.arrival_date || !ticketFile || !!fileError || !!eVisaError || isSubmitting}
-                onClick={handleConfirm}
-                icon={<CheckCircle className="h-4 w-4" />}
-                text={isSubmitting ? "Submitting..." : "Confirm Arrival"}
-                bgColor="bg-blue-100"
-                textColor="text-blue-700"
-                borderColor="border-blue-600"
-                hoverTextColor="hover:text-blue-700"
-                hoverBorderColor="hover:border-blue-700"
-                className="hover:bg-blue-200"
-              />
-            </div>
-          </div>
-        </div>
       </div>
-    </div>
+    </FormModal>
   );
 }

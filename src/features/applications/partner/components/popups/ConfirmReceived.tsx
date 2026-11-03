@@ -1,14 +1,12 @@
 "use client";
 
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { XCircle, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 import { useConfirmReceived } from "features/applications/disputes";
 import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
 
 interface ConfirmReceivedProps {
   isOpen: boolean;
@@ -31,18 +29,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 export default function ConfirmReceived({ isOpen, onClose, applicationId, onSuccess }: ConfirmReceivedProps) {
   const { confirmReceived, loading } = useConfirmReceived();
   const { showToast } = useToast();
-  const [isVisible, setIsVisible] = useState(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
-  if (!isVisible) return null;
 
   const handleConfirm = async () => {
     try {
@@ -57,63 +44,26 @@ export default function ConfirmReceived({ isOpen, onClose, applicationId, onSucc
     }
   };
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
+  return (
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="md"
+      icon={CheckCircle}
+      title="Confirm Commission Received"
+      description="This completes the application — make sure the payment has actually arrived first."
+      onSubmit={handleConfirm}
+      submitLabel="Confirm Received"
+      submitTone="positive"
+      submitting={loading}
     >
-      <div
-        className={`w-full max-w-md transform transition-all duration-300 ${
-          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-          <ModalHeader
-            title="Confirm Commission Received"
-            description="This completes the application — make sure the payment has actually arrived first."
-            icon={CheckCircle}
-            iconBg="bg-green-50"
-            iconColor="text-green-600"
-            iconBorder="border-green-200"
-            onClose={onClose}
-          />
+      <div className="grid gap-4">
 
-          <div className="px-6 py-5 text-sm text-slate-600">
+          <div className="text-ub-body-sm text-ub-text-secondary">
             Confirming marks this application as complete. If something's wrong with the amount, raise a
             dispute instead.
           </div>
-
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <Button
-              onClick={onClose}
-              disabled={loading}
-              icon={<XCircle className="h-4 w-4" />}
-              text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
-            />
-            <Button
-              onClick={handleConfirm}
-              disabled={loading}
-              icon={<CheckCircle className="h-4 w-4" />}
-              text={loading ? "Confirming..." : "Confirm Received"}
-              bgColor="bg-green-50"
-              textColor="text-green-700"
-              borderColor="border-green-600"
-              hoverTextColor="hover:text-green-700"
-              hoverBorderColor="hover:border-green-700"
-              className="hover:bg-green-100"
-            />
-          </div>
-        </div>
       </div>
-    </div>,
-    document.body
+    </FormModal>
   );
 }

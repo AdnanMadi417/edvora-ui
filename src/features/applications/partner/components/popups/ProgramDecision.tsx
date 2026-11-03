@@ -1,12 +1,13 @@
 "use client";
 
+import Alert from "components/ub/feedback/Alert";
+import Combobox from "components/ub/forms/Combobox";
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useEffect, useState } from "react";
-import { XCircle, RefreshCcw, CheckCircle } from "lucide-react";
+import { RefreshCcw } from "lucide-react";
 import { useUniversities } from "hooks/useUniversities";
-import SearchableDropdown from "components/ub/forms/SearchableDropdown";
 import { useToast } from "components/ub/feedback/ToastContext";
 import { useChangeProgram } from "features/applications/hooks";
-import Button from "components/ub/core/Button";
 
 interface ProgramDecisionModalProps {
   isOpen: boolean;
@@ -29,16 +30,6 @@ export default function ProgramDecisionModal({
   const { universities } = useUniversities();
   const { showToast } = useToast();
 
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) setIsVisible(true);
-    else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
   const {
     formData,
     errors,
@@ -50,7 +41,6 @@ export default function ProgramDecisionModal({
   const selectedUniversity = universities?.find((u) => u.id === universityId);
   const programs = selectedUniversity?.programs || [];
 
-  if (!isVisible) return null;
 
   const handleSubmit = async () => {
     const success = await submit();
@@ -63,101 +53,34 @@ export default function ProgramDecisionModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      aria-modal="true"
-      role="dialog"
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="md"
+      icon={RefreshCcw}
+      title="Select Program"
+      description="Choose the new program and provide a reason."
+      onSubmit={handleSubmit}
+      submitLabel="Confirm"
+      submitting={loading}
+      submitDisabled={!formData.program_id}
     >
-      <div
-        className={`w-full max-w-lg transform transition-all duration-300 ${
-          isOpen
-            ? "translate-y-0 scale-100 opacity-100"
-            : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="relative overflow-visible rounded-2xl bg-white shadow-lg">
-          <div className="flex items-start justify-between border-b border-slate-200 px-6 pb-4 pt-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-md border border-blue-200 bg-blue-50">
-                <RefreshCcw
-                  className="h-6 w-6 text-blue-600"
-                  strokeWidth={2.5}
-                />
-              </div>
-              <div>
-                <h5 className="text-h4 font-bold text-gray-900">
-                  Select Program
-                </h5>
-                <p className="mt-0.5 text-caption text-slate-500">
-                  Choose the new program and provide a reason.
-                </p>
-              </div>
-            </div>
+      <div className="grid gap-4">
 
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              className="group flex h-9 w-9 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-            >
-              <XCircle className="h-5 w-5" strokeWidth={2} />
-            </button>
-          </div>
+          <div className="space-y-4">
+            <Alert tone="info" icon={RefreshCcw}>
+              {correctionReason ?? "The university has requested that this applicant's program be updated. Please select the new program and provide a brief reason."}
+            </Alert>
 
-          <div className="min-h-[60vh] overflow-y-auto space-y-4 px-6 py-4 ">
-            <div className="flex items-start gap-3 rounded-xl border border-blue-200 bg-blue-50 p-4">
-              <RefreshCcw className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
-              <p className="text-p2 leading-relaxed text-slate-900">
-                {correctionReason ?? "The university has requested that this applicant's program be updated. Please select the new program and provide a brief reason."}
-              </p>
-            </div>
+            {errors.api && <Alert tone="danger">{errors.api}</Alert>}
 
-            {errors.api && <p className="text-sm text-red-600">{errors.api}</p>}
-
-            <SearchableDropdown
-              label="Program"
-              field="program_id"
-              options={programs.map((p) => ({
+            <Combobox label="Program" options={programs.map((p) => ({
                 value: p.id,
                 label: p.name,
-              }))}
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-            />
+              }))} value={formData.program_id ? String(formData.program_id) : null} onChange={(v) => updateFormData("program_id", v ?? "")} error={errors.program_id || undefined} />
 
           </div>
-
-          <div className="flex justify-end gap-3 border-t border-slate-200 px-6 py-5">
-            <Button
-              onClick={onClose}
-              disabled={loading}
-              icon={<XCircle className="h-4 w-4" />}
-              text="Cancel"
-              bgColor="bg-white"
-              textColor="text-gray-600"
-              borderColor="border-gray-600"
-              hoverTextColor="hover:text-gray-700"
-              hoverBorderColor="hover:border-gray-700"
-            />
-
-            <Button
-              onClick={handleSubmit}
-              disabled={loading || !formData.program_id}
-              icon={<CheckCircle className="h-4 w-4" />}
-              text={loading ? "Submitting..." : "Confirm"}
-              bgColor="bg-blue-100"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-700"
-              hoverBorderColor="hover:border-blue-700"
-              className="hover:bg-blue-200"
-            />
-
-          </div>
-        </div>
       </div>
-    </div>
+    </FormModal>
   );
 }

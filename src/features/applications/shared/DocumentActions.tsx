@@ -60,28 +60,22 @@ export default function DocumentActions({ fileKey, label, personName }: Document
   return (
     <>
       <IconButton
+        variant="secondary"
+        size="sm"
         onClick={handleView}
         disabled={disabled}
         title="View Document"
-        icon={<Eye className={`h-4 w-4 transition-transform duration-200 group-hover:scale-110 ${loading === "view" ? "animate-pulse" : ""}`} />}
-        bgColor="bg-slate-100"
-        textColor="text-slate-600"
-        borderColor="border-transparent"
-        hoverTextColor="hover:text-slate-600"
-        hoverBorderColor="hover:border-slate-200"
-        className="group cursor-pointer hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-slate-400"
+        aria-label={`View ${label}`}
+        icon={<Eye className={loading === "view" ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />}
       />
       <IconButton
+        variant="secondary"
+        size="sm"
         onClick={handleDownload}
         disabled={disabled}
         title="Download Document"
-        icon={<Download className={`h-4 w-4 transition-transform duration-200 group-hover:scale-110 ${loading === "download" ? "animate-pulse" : ""}`} />}
-        bgColor="bg-blue-50"
-        textColor="text-blue-600"
-        borderColor="border-transparent"
-        hoverTextColor="hover:text-blue-700"
-        hoverBorderColor="hover:border-blue-200"
-        className="group cursor-pointer hover:bg-blue-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+        aria-label={`Download ${label}`}
+        icon={<Download className={loading === "download" ? "h-4 w-4 animate-pulse motion-reduce:animate-none" : "h-4 w-4"} aria-hidden="true" />}
       />
     </>
   );
