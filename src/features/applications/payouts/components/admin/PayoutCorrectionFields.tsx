@@ -1,12 +1,11 @@
 "use client";
 
+import Textarea from "components/ub/forms/Textarea";
+import Input from "components/ub/forms/Input";
+import Combobox from "components/ub/forms/Combobox";
+import Alert from "components/ub/feedback/Alert";
 import React from "react";
-import { AlertCircle } from "lucide-react";
 
-import InputField from "components/ub/forms/InputField";
-import SelectField from "components/ub/forms/SelectField";
-import TextareaField from "components/ub/forms/TextareaField";
-import SearchableDropdown from "components/ub/forms/SearchableDropdown";
 import CompactFileUpload from "components/ub/forms/CompactFileUpload";
 import type { Payout } from "../../types";
 import type { PartnerBankAccount } from "features/partners/bank-accounts";
@@ -64,86 +63,45 @@ export default function PayoutCorrectionFields({
 }: PayoutCorrectionFieldsProps) {
   return (
     <>
-      <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+      <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-4 text-ub-body-sm text-ub-text-secondary">
         <p>
-          <span className="font-medium text-slate-900">Current payout:</span>{" "}
+          <span className="font-medium text-ub-text-primary">Current payout:</span>{" "}
           {payout.currency} · {payout.bank_reference} · {payout.items.length}{" "}
           {payout.items.length === 1 ? "application" : "applications"}
         </p>
       </div>
 
-      <TextareaField
-        label={reasonLabel}
-        field="void_reason"
-        placeholder={reasonPlaceholder}
-        formData={formData}
-        errors={formErrors}
-        updateFormData={updateFormData}
-      />
+      <Textarea label={reasonLabel} placeholder={reasonPlaceholder} value={String(formData.void_reason ?? "")} onChange={(v) => updateFormData("void_reason", v)} error={formErrors.void_reason || undefined} />
 
-      <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+      <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-3 text-ub-body-sm text-ub-text-secondary">
         <BankAccountPayoutSummary account={account} />
       </div>
 
       <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-        <SearchableDropdown
-          label="Payment Method"
-          field="new_payment_method_id"
-          placeholder="Search for a payment method..."
-          options={paymentMethodOptions}
-          formData={formData}
-          errors={formErrors}
-          updateFormData={updateFormData}
-        />
-        <InputField
-          label="Bank Reference"
-          field="new_bank_reference"
-          placeholder="e.g. BANK-REF-CORRECTED"
-          formData={formData}
-          errors={formErrors}
-          updateFormData={updateFormData}
-        />
-        <InputField
-          label="Payment Date"
-          field="new_paid_at"
-          type="date"
-          formData={formData}
-          errors={formErrors}
-          updateFormData={updateFormData}
-        />
-        <SelectField
-          label="Currency"
-          field="new_currency"
-          options={[
+        <Combobox label="Payment Method" placeholder="Search for a payment method..." options={paymentMethodOptions} value={formData.new_payment_method_id ? String(formData.new_payment_method_id) : null} onChange={(v) => updateFormData("new_payment_method_id", v ?? "")} error={formErrors.new_payment_method_id || undefined} />
+        <Input label="Bank Reference" placeholder="e.g. BANK-REF-CORRECTED" value={String(formData.new_bank_reference ?? "")} onChange={(v) => updateFormData("new_bank_reference", v)} error={formErrors.new_bank_reference || undefined} />
+        <Input label="Payment Date" type="date" value={String(formData.new_paid_at ?? "")} onChange={(v) => updateFormData("new_paid_at", v)} error={formErrors.new_paid_at || undefined} />
+        <Combobox label="Currency" options={[
             { value: "RM", label: "RM" },
             { value: "USD", label: "USD" },
-          ]}
-          formData={formData}
-          errors={formErrors}
-          updateFormData={updateFormData}
-        />
+          ]} value={formData.new_currency ? String(formData.new_currency) : null} onChange={(v) => updateFormData("new_currency", v ?? "")} error={formErrors.new_currency || undefined} />
       </div>
 
       <div className="space-y-2">
-        <p className="text-p2 font-medium text-slate-900">
-          Corrected Amounts <span className="text-red-600">*</span>
+        <p className="text-ub-body-md font-medium text-ub-text-primary">
+          Corrected Amounts <span className="text-ub-tone-danger-text">*</span>
         </p>
         <div className="space-y-2">
           {payout.items.map((item) => (
             <div key={item.application_id} className="flex items-center gap-3">
-              <span className="flex-1 truncate text-sm text-slate-600">
+              <span className="flex-1 truncate text-ub-body-sm text-ub-text-secondary">
                 Application {item.application_id.slice(0, 8)}
               </span>
-              <input
-                type="number"
-                value={lineAmounts[item.application_id] ?? ""}
-                onChange={(e) => updateLineAmount(item.application_id, e.target.value)}
-                className="h-10 w-32 rounded-lg border border-slate-200 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
-              />
+              <Input type="number" inputMode="decimal" label={`Amount for application ${item.application_id.slice(0, 8)}`} hideLabel value={lineAmounts[item.application_id] ?? ""} onChange={(v) => updateLineAmount(item.application_id, v)} wrapperClassName="w-32" />
             </div>
           ))}
         </div>
-        {formErrors.lines && <p className="text-xs text-red-600">{formErrors.lines}</p>}
+        {formErrors.lines && <p className="text-ub-caption text-ub-tone-danger-text">{formErrors.lines}</p>}
       </div>
 
       <CompactFileUpload
@@ -158,12 +116,9 @@ export default function PayoutCorrectionFields({
         disabled={isSubmitting}
         required
       />
-      {formErrors.receipt && <p className="-mt-3 text-xs text-red-600">{formErrors.receipt}</p>}
+      {formErrors.receipt && <p className="-mt-3 text-ub-caption text-ub-tone-danger-text">{formErrors.receipt}</p>}
 
-      <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
-        <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-        <p className="text-xs leading-relaxed text-amber-800">{noteText}</p>
-      </div>
+      <Alert tone="warning">{noteText}</Alert>
     </>
   );
 }

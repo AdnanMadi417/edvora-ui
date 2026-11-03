@@ -1,15 +1,13 @@
 "use client";
 
+import Textarea from "components/ub/forms/Textarea";
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { XCircle, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 
 import { useCompleteCommission } from "../hooks";
 import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
-import TextareaField from "components/ub/forms/TextareaField";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
 
 interface CompleteCommissionOnBehalfProps {
   isOpen: boolean;
@@ -34,19 +32,13 @@ export default function CompleteCommissionOnBehalf({
 }: CompleteCommissionOnBehalfProps) {
   const { completeOnBehalf, loading } = useCompleteCommission();
   const { showToast } = useToast();
-
-  const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({ reason: "" });
   const [formErrors, setFormErrors] = useState<any>({});
 
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
       setFormData({ reason: "" });
       setFormErrors({});
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -55,7 +47,6 @@ export default function CompleteCommissionOnBehalf({
     setFormErrors((prev: any) => ({ ...prev, [field]: undefined }));
   };
 
-  if (!isVisible) return null;
 
   const handleSubmit = async () => {
     if (!formData.reason.trim()) {
@@ -75,69 +66,26 @@ export default function CompleteCommissionOnBehalf({
     }
   };
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
+  return (
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="md"
+      icon={CheckCircle}
+      title="Complete on Advisor's Behalf"
+      description="Marks the application complete when the advisor hasn't confirmed receipt. The payout stays as recorded."
+      onSubmit={handleSubmit}
+      submitLabel="Mark Complete"
+      submitTone="positive"
+      submitting={loading}
+      submitDisabled={!formData.reason.trim()}
     >
-      <div
-        className={`w-full max-w-lg transform transition-all duration-300 ${
-          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-          <ModalHeader
-            title="Complete on Advisor's Behalf"
-            description="Marks the application complete when the advisor hasn't confirmed receipt. The payout stays as recorded."
-            icon={CheckCircle}
-            iconBg="bg-green-50"
-            iconColor="text-green-600"
-            iconBorder="border-green-200"
-            onClose={onClose}
-          />
+      <div className="grid gap-4">
 
-          <div className="space-y-5 px-6 py-5">
-            <TextareaField
-              label="Reason"
-              field="reason"
-              placeholder="e.g. Advisor confirmed receipt by email on 20 Oct..."
-              formData={formData}
-              errors={formErrors}
-              updateFormData={updateFormData}
-            />
+          <div className="space-y-5">
+            <Textarea label="Reason" placeholder="e.g. Advisor confirmed receipt by email on 20 Oct..." value={String(formData.reason ?? "")} onChange={(v) => updateFormData("reason", v)} error={formErrors.reason || undefined} />
           </div>
-
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <Button
-              onClick={onClose}
-              disabled={loading}
-              icon={<XCircle className="h-4 w-4" />}
-              text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
-            />
-            <Button
-              onClick={handleSubmit}
-              disabled={loading || !formData.reason.trim()}
-              icon={<CheckCircle className="h-4 w-4" />}
-              text={loading ? "Completing..." : "Mark Complete"}
-              bgColor="bg-green-50"
-              textColor="text-green-700"
-              borderColor="border-green-600"
-              hoverTextColor="hover:text-green-700"
-              hoverBorderColor="hover:border-green-700"
-              className="hover:bg-green-100"
-            />
-          </div>
-        </div>
       </div>
-    </div>,
-    document.body
+    </FormModal>
   );
 }

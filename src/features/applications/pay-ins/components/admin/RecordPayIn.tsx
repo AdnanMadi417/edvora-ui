@@ -1,16 +1,14 @@
 "use client";
 
+import Combobox from "components/ub/forms/Combobox";
+import Input from "components/ub/forms/Input";
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { XCircle, Receipt } from "lucide-react";
+import { Receipt } from "lucide-react";
 
 import { useRecordPayIn } from "../../hooks";
 import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
-import InputField from "components/ub/forms/InputField";
-import SelectField from "components/ub/forms/SelectField";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
 
 export interface RecordPayInRow {
   application_id: string;
@@ -45,19 +43,13 @@ const INITIAL_FORM_DATA = {
 export default function RecordPayIn({ isOpen, onClose, row, onSuccess }: RecordPayInProps) {
   const { recordPayIn, loading } = useRecordPayIn();
   const { showToast } = useToast();
-
-  const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [formErrors, setFormErrors] = useState<any>({});
 
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
       setFormData(INITIAL_FORM_DATA);
       setFormErrors({});
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -66,7 +58,7 @@ export default function RecordPayIn({ isOpen, onClose, row, onSuccess }: RecordP
     setFormErrors((prev: any) => ({ ...prev, [field]: undefined }));
   };
 
-  if (!isVisible || !row) return null;
+  if (!row) return null;
 
   const validate = () => {
     const errors: any = {};
@@ -108,105 +100,39 @@ export default function RecordPayIn({ isOpen, onClose, row, onSuccess }: RecordP
     }
   };
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
+  return (
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="md"
+      icon={Receipt}
+      title="Record Pay-In"
+      description="Record the university's payment for this application's commission."
+      onSubmit={handleSubmit}
+      submitLabel="Record Pay-In"
+      submitting={loading}
+      submitDisabled={!isFormValid}
     >
-      <div
-        className={`w-full max-w-lg transform transition-all duration-300 ${
-          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-          <ModalHeader
-            title="Record Pay-In"
-            description="Record the university's payment for this application's commission."
-            icon={Receipt}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            onClose={onClose}
-          />
+      <div className="grid gap-4">
 
-          <div className="max-h-[65vh] space-y-5 overflow-y-auto px-6 py-5">
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+          <div className="space-y-5">
+            <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-4 text-ub-body-sm text-ub-text-secondary">
               <p>
-                <span className="font-medium text-slate-900">{row.reference}</span> · {row.student_name}
+                <span className="font-medium text-ub-text-primary">{row.reference}</span> · {row.student_name}
               </p>
             </div>
 
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-              <InputField
-                label="Payment Date"
-                field="payment_date"
-                type="date"
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
-              <InputField
-                label="Amount"
-                field="amount"
-                type="number"
-                placeholder="Enter amount"
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
-              <SelectField
-                label="Currency"
-                field="currency"
-                options={[
+              <Input label="Payment Date" type="date" value={String(formData.payment_date ?? "")} onChange={(v) => updateFormData("payment_date", v)} error={formErrors.payment_date || undefined} />
+              <Input label="Amount" placeholder="Enter amount" type="number" value={String(formData.amount ?? "")} onChange={(v) => updateFormData("amount", v)} error={formErrors.amount || undefined} />
+              <Combobox label="Currency" options={[
                   { value: "RM", label: "RM" },
                   { value: "USD", label: "USD" },
-                ]}
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
-              <InputField
-                label="Payment Reference"
-                field="payment_reference"
-                placeholder="e.g. UNI-REF-001"
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
+                ]} value={formData.currency ? String(formData.currency) : null} onChange={(v) => updateFormData("currency", v ?? "")} error={formErrors.currency || undefined} />
+              <Input label="Payment Reference" placeholder="e.g. UNI-REF-001" value={String(formData.payment_reference ?? "")} onChange={(v) => updateFormData("payment_reference", v)} error={formErrors.payment_reference || undefined} />
             </div>
           </div>
-
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <Button
-              onClick={onClose}
-              disabled={loading}
-              icon={<XCircle className="h-4 w-4" />}
-              text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
-            />
-            <Button
-              onClick={handleSubmit}
-              disabled={loading || !isFormValid}
-              icon={<Receipt className="h-4 w-4" />}
-              text={loading ? "Submitting..." : "Record Pay-In"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-700"
-              hoverBorderColor="hover:border-blue-700"
-              className="hover:bg-blue-100"
-            />
-          </div>
-        </div>
       </div>
-    </div>,
-    document.body
+    </FormModal>
   );
 }

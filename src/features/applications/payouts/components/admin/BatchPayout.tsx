@@ -1,20 +1,19 @@
 "use client";
 
+import Alert from "components/ub/feedback/Alert";
+import Combobox from "components/ub/forms/Combobox";
+import Input from "components/ub/forms/Input";
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { createPortal } from "react-dom";
-import { XCircle, AlertCircle, CheckCircle, Wallet } from "lucide-react";
+import { Wallet } from "lucide-react";
 
 import { useRecordBulkPayout, usePaymentMethods } from "../../hooks";
 import { usePartnerBankAccount, BankAccountPayoutSummary } from "features/partners/bank-accounts";
 import { useToast } from "components/ub/feedback/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import InputField from "components/ub/forms/InputField";
-import SearchableDropdown from "components/ub/forms/SearchableDropdown";
 import CompactFileUpload from "components/ub/forms/CompactFileUpload";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
 
 export interface BatchPayoutLine {
   application_id: string;
@@ -38,8 +37,6 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
   const { recordBulkPayout, loading: recording } = useRecordBulkPayout();
   const { paymentMethods } = usePaymentMethods();
   const paymentMethodOptions = paymentMethods.map((m) => ({ value: m.id, label: m.name }));
-
-  const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({ payment_method_id: "", bank_reference: "", paid_at: "" });
   const [formErrors, setFormErrors] = useState<any>({});
   const [lineAmounts, setLineAmounts] = useState<Record<string, string>>({});
@@ -49,7 +46,6 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
 
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
       setFormData({ payment_method_id: "", bank_reference: "", paid_at: "" });
       setFormErrors({});
       setLineAmounts(
@@ -59,9 +55,6 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
       );
       setReceiptFile(null);
       setUploadProgress(0);
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
@@ -71,7 +64,6 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
     setFormErrors((prev: any) => ({ ...prev, [field]: undefined }));
   };
 
-  if (!isVisible) return null;
 
   const validate = () => {
     const errors: any = {};
@@ -138,37 +130,28 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
   const isSubmitting = recording || uploading;
   const canSubmit = !isSubmitting && !!partnerBankAccount;
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
+  return (
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="lg"
+      icon={Wallet}
+      title="Batch Payout"
+      description="One bank reference and one receipt cover every selected application."
+      onSubmit={handleSubmit}
+      submitLabel="Record Payout"
+      submitting={isSubmitting}
+      submitDisabled={!canSubmit}
     >
-      <div
-        className={`w-full max-w-lg transform transition-all duration-300 md:max-w-xl ${
-          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-          <ModalHeader
-            title="Batch Payout"
-            description="One bank reference and one receipt cover every selected application."
-            icon={Wallet}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            onClose={onClose}
-          />
+      <div className="grid gap-4">
 
-          <div className="max-h-[65vh] space-y-5 overflow-y-auto px-6 py-5">
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-600">
+          <div className="space-y-5">
+            <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-3 text-ub-body-sm text-ub-text-secondary">
               <BankAccountPayoutSummary account={partnerBankAccount} />
               {!partnerBankAccount && (
                 <Link
                   href={`/admin/advisors/${partnerId}?tab=bank-account`}
-                  className="mt-1 block font-medium text-blue-600 hover:text-blue-700"
+                  className="mt-1 block font-medium text-ub-text-link hover:text-ub-text-link"
                 >
                   Add a bank account →
                 </Link>
@@ -176,54 +159,25 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
             </div>
 
             <div className="space-y-2">
-              <p className="text-p2 font-medium text-slate-900">
+              <p className="text-ub-body-md font-medium text-ub-text-primary">
                 {lines.length} {lines.length === 1 ? "Application" : "Applications"} · {currency}
               </p>
               <div className="space-y-2">
                 {lines.map((l) => (
                   <div key={l.application_id} className="flex items-center gap-3">
-                    <span className="flex-1 truncate text-sm text-slate-600">
+                    <span className="flex-1 truncate text-ub-body-sm text-ub-text-secondary">
                       {l.reference} · {l.student_name}
                     </span>
-                    <input
-                      type="number"
-                      value={lineAmounts[l.application_id] ?? ""}
-                      onChange={(e) =>
-                        setLineAmounts((prev) => ({ ...prev, [l.application_id]: e.target.value }))
-                      }
-                      className="h-10 w-32 rounded-lg border border-slate-200 px-3 text-sm outline-none focus:ring-1 focus:ring-blue-500"
-                    />
+                    <Input type="number" inputMode="decimal" label={`Amount for ${l.reference}`} hideLabel value={lineAmounts[l.application_id] ?? ""} onChange={(v) => setLineAmounts((prev) => ({ ...prev, [l.application_id]: v }))} wrapperClassName="w-32" />
                   </div>
                 ))}
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-              <SearchableDropdown
-                label="Payment Method"
-                field="payment_method_id"
-                placeholder="Search for a payment method..."
-                options={paymentMethodOptions}
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
-              <InputField
-                label="Bank Reference"
-                field="bank_reference"
-                placeholder="e.g. BULK-REF-001"
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
-              <InputField
-                label="Payment Date"
-                field="paid_at"
-                type="date"
-                formData={formData}
-                errors={formErrors}
-                updateFormData={updateFormData}
-              />
+              <Combobox label="Payment Method" placeholder="Search for a payment method..." options={paymentMethodOptions} value={formData.payment_method_id ? String(formData.payment_method_id) : null} onChange={(v) => updateFormData("payment_method_id", v ?? "")} error={formErrors.payment_method_id || undefined} />
+              <Input label="Bank Reference" placeholder="e.g. BULK-REF-001" value={String(formData.bank_reference ?? "")} onChange={(v) => updateFormData("bank_reference", v)} error={formErrors.bank_reference || undefined} />
+              <Input label="Payment Date" type="date" value={String(formData.paid_at ?? "")} onChange={(v) => updateFormData("paid_at", v)} error={formErrors.paid_at || undefined} />
             </div>
 
             <CompactFileUpload
@@ -239,42 +193,9 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
               required
             />
 
-            <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-              <p className="text-xs leading-relaxed text-amber-800">
-                All-or-nothing — if any application is invalid, nothing is recorded.
-              </p>
-            </div>
+            <Alert tone="warning">All-or-nothing — if any application is invalid, nothing is recorded.</Alert>
           </div>
-
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <Button
-              onClick={onClose}
-              disabled={isSubmitting}
-              icon={<XCircle className="h-4 w-4" />}
-              text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
-            />
-            <Button
-              onClick={handleSubmit}
-              disabled={!canSubmit}
-              icon={<CheckCircle className="h-4 w-4" />}
-              text={isSubmitting ? "Recording..." : "Record Payout"}
-              bgColor="bg-blue-100"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-700"
-              hoverBorderColor="hover:border-blue-700"
-              className="hover:bg-blue-200"
-            />
-          </div>
-        </div>
       </div>
-    </div>,
-    document.body
+    </FormModal>
   );
 }

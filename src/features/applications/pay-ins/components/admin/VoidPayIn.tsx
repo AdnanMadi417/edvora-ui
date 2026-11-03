@@ -1,18 +1,17 @@
 "use client";
 
+import Alert from "components/ub/feedback/Alert";
+import Combobox from "components/ub/forms/Combobox";
+import Input from "components/ub/forms/Input";
+import Textarea from "components/ub/forms/Textarea";
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { XCircle, AlertCircle, Ban } from "lucide-react";
+import { Ban } from "lucide-react";
 
 import { useVoidPayIn } from "../../hooks";
 import type { UniversityPayIn } from "../../types";
 import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
-import InputField from "components/ub/forms/InputField";
-import SelectField from "components/ub/forms/SelectField";
-import TextareaField from "components/ub/forms/TextareaField";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
 
 interface VoidPayInProps {
   isOpen: boolean;
@@ -41,19 +40,13 @@ const INITIAL_FORM_DATA = {
 export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPayInProps) {
   const { voidPayIn, loading } = useVoidPayIn();
   const { showToast } = useToast();
-
-  const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState(INITIAL_FORM_DATA);
   const [formErrors, setFormErrors] = useState<any>({});
 
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
       setFormData(INITIAL_FORM_DATA);
       setFormErrors({});
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -62,7 +55,7 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
     setFormErrors((prev: any) => ({ ...prev, [field]: undefined }));
   };
 
-  if (!isVisible || !payIn) return null;
+  if (!payIn) return null;
 
   const validate = () => {
     const errors: any = {};
@@ -108,128 +101,51 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
     }
   };
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
+  return (
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="lg"
+      icon={Ban}
+      title="Void & Correct Pay-In"
+      description="Every void must include the corrected replacement — the application stays at Commission Ready throughout."
+      onSubmit={handleSubmit}
+      submitLabel="Void & Correct"
+      submitTone="destructive"
+      submitting={loading}
+      submitDisabled={!isFormValid}
     >
-      <div
-        className={`w-full max-w-lg transform transition-all duration-300 md:max-w-xl ${
-          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-          <ModalHeader
-            title="Void & Correct Pay-In"
-            description="Every void must include the corrected replacement — the application stays at Commission Ready throughout."
-            icon={Ban}
-            iconBg="bg-red-50"
-            iconColor="text-red-600"
-            iconBorder="border-red-200"
-            onClose={onClose}
-          />
+      <div className="grid gap-4">
 
-          <div className="max-h-[65vh] space-y-5 overflow-y-auto px-6 py-5">
-            <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+          <div className="space-y-5">
+            <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-4 text-ub-body-sm text-ub-text-secondary">
               <p>
-                <span className="font-medium text-slate-900">Current pay-in:</span>{" "}
+                <span className="font-medium text-ub-text-primary">Current pay-in:</span>{" "}
                 {payIn.currency} {Number(payIn.amount).toLocaleString()} · {payIn.payment_reference}
               </p>
             </div>
 
-            <TextareaField
-              label="Void Reason"
-              field="void_reason"
-              placeholder="Explain why this pay-in is being voided..."
-              formData={formData}
-              errors={formErrors}
-              updateFormData={updateFormData}
-            />
+            <Textarea label="Void Reason" placeholder="Explain why this pay-in is being voided..." value={String(formData.void_reason ?? "")} onChange={(v) => updateFormData("void_reason", v)} error={formErrors.void_reason || undefined} />
 
             <div className="space-y-2">
-              <p className="text-p2 font-medium text-slate-900">
-                Corrected Pay-In <span className="text-red-600">*</span>
+              <p className="text-ub-body-md font-medium text-ub-text-primary">
+                Corrected Pay-In <span className="text-ub-tone-danger-text">*</span>
               </p>
               <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-                <InputField
-                  label="Payment Date"
-                  field="new_payment_date"
-                  type="date"
-                  formData={formData}
-                  errors={formErrors}
-                  updateFormData={updateFormData}
-                />
-                <InputField
-                  label="Amount"
-                  field="new_amount"
-                  type="number"
-                  placeholder="Enter amount"
-                  formData={formData}
-                  errors={formErrors}
-                  updateFormData={updateFormData}
-                />
-                <SelectField
-                  label="Currency"
-                  field="new_currency"
-                  options={[
+                <Input label="Payment Date" type="date" value={String(formData.new_payment_date ?? "")} onChange={(v) => updateFormData("new_payment_date", v)} error={formErrors.new_payment_date || undefined} />
+                <Input label="Amount" placeholder="Enter amount" type="number" value={String(formData.new_amount ?? "")} onChange={(v) => updateFormData("new_amount", v)} error={formErrors.new_amount || undefined} />
+                <Combobox label="Currency" options={[
                     { value: "RM", label: "RM" },
                     { value: "USD", label: "USD" },
-                  ]}
-                  formData={formData}
-                  errors={formErrors}
-                  updateFormData={updateFormData}
-                />
-                <InputField
-                  label="Payment Reference"
-                  field="new_payment_reference"
-                  placeholder="e.g. UNI-REF-CORRECTED"
-                  formData={formData}
-                  errors={formErrors}
-                  updateFormData={updateFormData}
-                />
+                  ]} value={formData.new_currency ? String(formData.new_currency) : null} onChange={(v) => updateFormData("new_currency", v ?? "")} error={formErrors.new_currency || undefined} />
+                <Input label="Payment Reference" placeholder="e.g. UNI-REF-CORRECTED" value={String(formData.new_payment_reference ?? "")} onChange={(v) => updateFormData("new_payment_reference", v)} error={formErrors.new_payment_reference || undefined} />
               </div>
             </div>
 
-            <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-4">
-              <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-              <p className="text-xs leading-relaxed text-amber-800">
-                The void only commits if the replacement is valid — a bad replacement leaves the original
-                pay-in completely untouched.
-              </p>
-            </div>
+            <Alert tone="warning">The void only commits if the replacement is valid — a bad replacement leaves the original
+                pay-in completely untouched.</Alert>
           </div>
-
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <Button
-              onClick={onClose}
-              disabled={loading}
-              icon={<XCircle className="h-4 w-4" />}
-              text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
-            />
-            <Button
-              onClick={handleSubmit}
-              disabled={loading || !isFormValid}
-              icon={<Ban className="h-4 w-4" />}
-              text={loading ? "Submitting..." : "Void & Correct"}
-              bgColor="bg-red-50"
-              textColor="text-red-700"
-              borderColor="border-red-600"
-              hoverTextColor="hover:text-red-700"
-              hoverBorderColor="hover:border-red-700"
-              className="hover:bg-red-100"
-            />
-          </div>
-        </div>
       </div>
-    </div>,
-    document.body
+    </FormModal>
   );
 }

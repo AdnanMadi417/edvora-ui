@@ -1,8 +1,8 @@
 "use client";
 
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { XCircle, Ban } from "lucide-react";
+import { Ban } from "lucide-react";
 
 import { useVoidPayout, usePaymentMethods } from "../../hooks";
 import type { Payout } from "../../types";
@@ -10,8 +10,6 @@ import { usePartnerBankAccount } from "features/partners/bank-accounts";
 import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
 import PayoutCorrectionFields from "./PayoutCorrectionFields";
 
 interface VoidPayoutProps {
@@ -39,8 +37,6 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
   const { account } = usePartnerBankAccount(payout?.partner_id ?? "");
   const { paymentMethods } = usePaymentMethods();
   const paymentMethodOptions = paymentMethods.map((m) => ({ value: m.id, label: m.name }));
-
-  const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({
     void_reason: "",
     new_payment_method_id: "",
@@ -56,7 +52,6 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
 
   useEffect(() => {
     if (isOpen && payout) {
-      setIsVisible(true);
       setFormData({
         void_reason: "",
         new_payment_method_id: "",
@@ -70,9 +65,6 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
       );
       setReceiptFile(null);
       setUploadProgress(0);
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
     }
   }, [isOpen, payout]);
 
@@ -85,7 +77,7 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
     setLineAmounts((prev) => ({ ...prev, [applicationId]: value }));
   };
 
-  if (!isVisible || !payout) return null;
+  if (!payout) return null;
 
   const validate = () => {
     const errors: any = {};
@@ -146,31 +138,23 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
 
   const isSubmitting = loading || uploading;
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
+  return (
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="lg"
+      icon={Ban}
+      title="Void & Correct Payout"
+      description="Every void must include the corrected replacement — the application(s) stay at Commission Paid throughout."
+      onSubmit={handleSubmit}
+      submitLabel="Void & Correct"
+      submitTone="destructive"
+      submitting={isSubmitting}
+      submitDisabled={!formData.void_reason.trim()}
     >
-      <div
-        className={`w-full max-w-lg transform transition-all duration-300 md:max-w-xl ${
-          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-          <ModalHeader
-            title="Void & Correct Payout"
-            description="Every void must include the corrected replacement — the application(s) stay at Commission Paid throughout."
-            icon={Ban}
-            iconBg="bg-red-50"
-            iconColor="text-red-600"
-            iconBorder="border-red-200"
-            onClose={onClose}
-          />
+      <div className="grid gap-4">
 
-          <div className="max-h-[65vh] space-y-5 overflow-y-auto px-6 py-5">
+          <div className="space-y-5">
             <PayoutCorrectionFields
               payout={payout}
               account={account}
@@ -187,35 +171,7 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
               isSubmitting={isSubmitting}
             />
           </div>
-
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <Button
-              onClick={onClose}
-              disabled={isSubmitting}
-              icon={<XCircle className="h-4 w-4" />}
-              text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
-            />
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting || !formData.void_reason.trim()}
-              icon={<Ban className="h-4 w-4" />}
-              text={isSubmitting ? "Submitting..." : "Void & Correct"}
-              bgColor="bg-red-50"
-              textColor="text-red-700"
-              borderColor="border-red-600"
-              hoverTextColor="hover:text-red-700"
-              hoverBorderColor="hover:border-red-700"
-              className="hover:bg-red-100"
-            />
-          </div>
-        </div>
       </div>
-    </div>,
-    document.body
+    </FormModal>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
+import FormModal from "components/ub/feedback/FormModal";
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { XCircle, Ban } from "lucide-react";
+import { Ban } from "lucide-react";
 
 import { useResolveCorrection } from "../hooks";
 import { payoutsApi, usePaymentMethods, PayoutCorrectionFields } from "features/applications/payouts";
@@ -11,8 +11,6 @@ import { usePartnerBankAccount } from "features/partners/bank-accounts";
 import { useToast } from "components/ub/feedback/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
 
 interface ResolveDisputeCorrectionProps {
   isOpen: boolean;
@@ -52,8 +50,6 @@ export default function ResolveDisputeCorrection({
   const [payout, setPayout] = useState<Payout | null>(null);
   const [loadingPayout, setLoadingPayout] = useState(false);
   const { account } = usePartnerBankAccount(payout?.partner_id ?? "");
-
-  const [isVisible, setIsVisible] = useState(false);
   const [formData, setFormData] = useState({
     void_reason: "",
     new_payment_method_id: "",
@@ -69,7 +65,6 @@ export default function ResolveDisputeCorrection({
 
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
       setFormData({
         void_reason: "",
         new_payment_method_id: "",
@@ -93,9 +88,6 @@ export default function ResolveDisputeCorrection({
         })
         .catch((err: unknown) => showToast(parseApiError(err, "Failed to load payout details."), "error"))
         .finally(() => setLoadingPayout(false));
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, partnerPayoutId]);
@@ -109,7 +101,6 @@ export default function ResolveDisputeCorrection({
     setLineAmounts((prev) => ({ ...prev, [applicationId]: value }));
   };
 
-  if (!isVisible) return null;
 
   const validate = () => {
     const errors: any = {};
@@ -170,33 +161,24 @@ export default function ResolveDisputeCorrection({
 
   const isSubmitting = loading || uploading;
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
+  return (
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="lg"
+      icon={Ban}
+      title="Resolve Dispute: Correction"
+      description="Voids the current payout and records a corrected one — resolves the dispute atomically."
+      onSubmit={handleSubmit}
+      submitLabel="Resolve & Correct"
+      submitting={isSubmitting}
+      submitDisabled={!payout || !formData.void_reason.trim()}
     >
-      <div
-        className={`w-full max-w-lg transform transition-all duration-300 md:max-w-xl ${
-          isOpen ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-          <ModalHeader
-            title="Resolve Dispute: Correction"
-            description="Voids the current payout and records a corrected one — resolves the dispute atomically."
-            icon={Ban}
-            iconBg="bg-red-50"
-            iconColor="text-red-600"
-            iconBorder="border-red-200"
-            onClose={onClose}
-          />
+      <div className="grid gap-4">
 
-          <div className="max-h-[65vh] space-y-5 overflow-y-auto px-6 py-5">
+          <div className="space-y-5">
             {loadingPayout || !payout ? (
-              <p className="text-sm text-slate-500">Loading payout details...</p>
+              <p className="text-ub-body-sm text-ub-text-tertiary">Loading payout details...</p>
             ) : (
               <PayoutCorrectionFields
                 payout={payout}
@@ -218,35 +200,7 @@ export default function ResolveDisputeCorrection({
               />
             )}
           </div>
-
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <Button
-              onClick={onClose}
-              disabled={isSubmitting}
-              icon={<XCircle className="h-4 w-4" />}
-              text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
-            />
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting || !payout || !formData.void_reason.trim()}
-              icon={<Ban className="h-4 w-4" />}
-              text={isSubmitting ? "Submitting..." : "Resolve & Correct"}
-              bgColor="bg-red-50"
-              textColor="text-red-700"
-              borderColor="border-red-600"
-              hoverTextColor="hover:text-red-700"
-              hoverBorderColor="hover:border-red-700"
-              className="hover:bg-red-100"
-            />
-          </div>
-        </div>
       </div>
-    </div>,
-    document.body
+    </FormModal>
   );
 }
