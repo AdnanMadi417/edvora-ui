@@ -24,6 +24,15 @@ const imp = (name: string, path: string) => `import ${name} from "components/ub/
 const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
 
 export const CATALOG: Record<string, CatalogEntry> = {
+  "Advisor profile": {
+    category: "data",
+    imports: [
+      'import AdvisorProfile from "features/partners/components/profile/AdvisorProfile";',
+      'import { draftFromProfile, draftToPayload, validateDraft } from "features/partners/components/profile/profileModel";',
+    ],
+    useFor: "The Advisor's public page and its in-place editor; one component, read-only or editing.",
+    usedIn: ["/p/[slug]", "/partner/public-profile"],
+  },
   "Application Details": {
     category: "data",
     imports: [

@@ -20,6 +20,7 @@ import PopupForms from "./PopupForms";
 import TableOptions from "./TableOptions";
 import ApplicationFormDemo from "./ApplicationFormDemo";
 import { ApplicationDetailsDemo } from "./ApplicationDetailsPattern";
+import { AdvisorProfileDemo } from "./AdvisorProfileDemo";
 
 export function ButtonsSection() {
   return (
@@ -141,6 +142,7 @@ export function ContentSection() {
         <ApplicationFormDemo />
       </Pick>
       <ApplicationDetailsDemo />
+      <AdvisorProfileDemo />
     </ShowcaseSection>
   );
 }
