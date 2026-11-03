@@ -258,7 +258,6 @@ const PartnerApplications = () => {
           ownership="advisor"
           statusLabel={statusLabel}
           needsAction={needsPartnerAction}
-          defaultDensity="comfortable"
           selectable={false}
           selectionResetKey={[selectedLifecycle, selectedStages, selectedStageStatus, selectedUniversity, debouncedSearch, currentPage].join("|")}
           footer={

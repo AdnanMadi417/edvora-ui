@@ -41,7 +41,7 @@ export interface ApplicationsTableProps {
   statusLabel: (status: string) => string;
   /** Statuses where this viewer has to act: shows the Action needed tag. */
   needsAction: (status: string) => boolean;
-  /** Row density. Staff default compact, Advisors comfortable (brief §4.6). */
+  /** Row density. Compact by default. */
   defaultDensity?: DataTableDensity;
   /** Staff: select rows on the page and export them as CSV. */
   selectable?: boolean;
@@ -100,7 +100,7 @@ export default function ApplicationsTable({
   ownership = "none",
   statusLabel,
   needsAction,
-  defaultDensity = "comfortable",
+  defaultDensity = "compact",
   selectable = false,
   selectionResetKey,
   footer,
@@ -161,7 +161,7 @@ export default function ApplicationsTable({
         sortable: true,
         sortValue: (r) => r.stage,
       },
-      { key: "updated", header: "Updated", cell: (r) => <AppDate value={r.updated_at} format="relative" className="text-ub-text-secondary" />, sortable: true, sortValue: (r) => new Date(r.updated_at) },
+      { key: "updated", header: "Updated", cell: (r) => <AppDate value={r.updated_at} format="relative" className="whitespace-nowrap text-ub-text-secondary" />, sortable: true, sortValue: (r) => new Date(r.updated_at) },
     );
     return cols;
   }, [ownership, statusLabel, needsAction]);
