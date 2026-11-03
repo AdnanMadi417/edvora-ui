@@ -2,7 +2,7 @@
 
 import React from "react";
 import { ArrowUpRight } from "lucide-react";
-import PipelineBar from "components/ub/data/PipelineBar";
+import PipelineFlow, { type PipelineFlowStage } from "components/ub/dashboard/PipelineFlow";
 import Button from "components/ub/core/Button";
 import { resolveStage } from "features/applications/stages";
 
@@ -14,7 +14,6 @@ interface Stage {
 interface PipelineCardProps {
   stages: Stage[];
   stageCounts: Record<string, number>;
-  /** Kept for callers; the bar legend shows counts only. */
   stageActionRequired: Record<string, boolean>;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
@@ -25,13 +24,14 @@ interface PipelineCardProps {
   subtitle?: string;
 }
 
-// Backend stage → stage tag id via features/applications/stages.ts, so the bar
-// and legend take their colours from config/applicationStages.ts.
+// Backend stage → stage tag id via features/applications/stages.ts, so each
+// station takes its colour from config/applicationStages.ts.
 const stageTagId = (stage: Stage) => resolveStage({ stageCode: (stage as Stage & { code?: string }).code })?.stageId;
 
 export default function PipelineCard({
   stages,
   stageCounts,
+  stageActionRequired,
   selectedId,
   onSelect,
   totalCount,
@@ -40,16 +40,21 @@ export default function PipelineCard({
   title = "Your Pipeline",
   subtitle,
 }: PipelineCardProps) {
-  const counts: Record<string, number> = {};
-  const backendIdFor: Record<string, string> = {};
-  stages.forEach((stage) => {
-    const tagId = stageTagId(stage);
-    if (!tagId) return;
-    counts[tagId] = (counts[tagId] ?? 0) + (stageCounts[stage.id] ?? 0);
-    backendIdFor[tagId] ??= stage.id;
+  const items: PipelineFlowStage[] = stages.map((stage) => {
+    const isComm = stage.name.toLowerCase().includes("commission");
+    return {
+      id: stage.id,
+      label: stage.name,
+      count: stageCounts[stage.id] ?? 0,
+      stageId: stageTagId(stage),
+      badge: isComm
+        ? { label: "Payout", tone: "success" }
+        : stageActionRequired[stage.id]
+          ? { label: "Your move", tone: "attention" }
+          : undefined,
+      attention: !isComm && !!stageActionRequired[stage.id],
+    };
   });
-  const selectedTag = stages.find((s) => s.id === selectedId);
-  const selectedStageId = selectedTag ? stageTagId(selectedTag) ?? null : null;
 
   return (
     <section aria-labelledby="pipeline-title">
@@ -60,12 +65,7 @@ export default function PipelineCard({
         </p>
       </div>
 
-      <PipelineBar
-        counts={counts}
-        label="Applications by stage"
-        selectedStageId={selectedStageId}
-        onStageSelect={(tagId) => onSelect(tagId === selectedStageId ? null : backendIdFor[tagId] ?? null)}
-      />
+      <PipelineFlow stages={items} selectedId={selectedId} onSelect={onSelect} />
 
       <div className="mt-4 flex flex-col items-start justify-between gap-3 border-t border-ub-border pt-4 sm:flex-row sm:items-center">
         <p className="text-ub-body-sm text-ub-text-secondary">
