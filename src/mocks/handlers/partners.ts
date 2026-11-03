@@ -7,6 +7,8 @@ import type {
   CompanyDetails,
   PartnerPublicProfileAdminView,
   PublicPartnerProfile,
+  AdvisorProfileContent,
+  UpdateMyPublicProfilePayload,
   PendingRegistrationOtp,
   AdditionalManager,
 } from "features/partners/types";
@@ -543,13 +545,41 @@ mock.post("/partners/register/verify-otp", ({ body }) => {
 
 // ── Public profile page (/p/[slug]) ─────────────────────────────────────────
 
-mock.get("/partners/public/:slug", ({ params }) => {
-  const p = partners.all().find((r) => r.public_profile?.slug === params.slug);
-  // The demo partner's page is always viewable so /p/<slug> isn't a dead link.
-  if (!p || (!p.public_profile!.is_published && p.id !== CURRENT_PARTNER.id)) throw httpError(404, "This profile doesn't exist or isn't published yet.");
+// Advisor-written page content (pending backend): seeded per Advisor, edited
+// from /partner/public-profile via PUT /partners/profile/public.
+const profileContent = new Map<string, AdvisorProfileContent>();
+const contentFor = (p: PartnerDetails, i = 0): AdvisorProfileContent => {
+  const existing = profileContent.get(p.id);
+  if (existing) return existing;
+  const seeded: AdvisorProfileContent = {
+    headline: "Your trusted guide to studying in Malaysia",
+    role_title: "Education Advisor",
+    // City only where the seed country is Malaysia, so "Based in" never contradicts it.
+    city: /^(my|malaysia)$/i.test(p.country ?? "") ? (i % 2 ? "Penang" : "Kuala Lumpur") : null,
+    intro_video_url: i % 3 === 2 ? null : "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+    help_intro:
+      "I help international students choose the right university and programme, prepare their application and get through admission and the student visa.",
+    help_points: ["University and programme selection", "Application preparation and submission", "Student visa guidance", "Pre-arrival and arrival support"],
+    faqs: [
+      { question: "Do you charge students?", answer: "My guidance is free. Universities pay me when you enrol." },
+      { question: "How will you support me after admission?", answer: "I help with your visa, airport pickup and finding accommodation when you arrive." },
+      { question: "How quickly do you normally respond?", answer: "Usually within a few hours on WhatsApp during the day." },
+    ],
+    contact_channel: "whatsapp",
+    contact_label: "Contact me",
+    contact_value: p.public_profile?.whatsapp_number ?? null,
+    students_enrolled: p.is_verified ? 2 + (i % 4) * 3 : 0,
+    identity_verified: p.is_verified,
+  };
+  profileContent.set(p.id, seeded);
+  return seeded;
+};
+
+const toPublicProfile = (p: PartnerDetails, own = false): PublicPartnerProfile => {
   const pp = p.public_profile!;
   const photo = p.individual_details ?? null;
-  const profile: PublicPartnerProfile = {
+  const i = partners.all().indexOf(p);
+  return {
     slug: pp.slug,
     display_name: pp.display_name,
     bio: pp.bio,
@@ -564,8 +594,41 @@ mock.get("/partners/public/:slug", ({ params }) => {
     profile_photo_file_key: photo?.profile_photo_file_key ?? p.company_details?.logo_file_key ?? null,
     social_media_url: photo?.social_media_url ?? null,
     linkedin_url: photo?.linkedin_url ?? `https://www.linkedin.com/company/${pp.slug}`,
+    content: contentFor(p, Math.max(i, 0)),
+    ...(own ? { is_published: pp.is_published } : {}),
   };
-  return profile;
+};
+
+mock.get("/partners/public/:slug", ({ params }) => {
+  const p = partners.all().find((r) => r.public_profile?.slug === params.slug);
+  // The demo partner's page is always viewable so /p/<slug> isn't a dead link.
+  if (!p || (!p.public_profile!.is_published && p.id !== CURRENT_PARTNER.id)) throw httpError(404, "This profile doesn't exist or isn't published yet.");
+  return toPublicProfile(p);
+});
+
+mock.get("/partners/profile/public", () => {
+  const p = partners.find(CURRENT_PARTNER.id)!;
+  if (!p.public_profile) throw httpError(404, "You don't have a public profile yet.");
+  return toPublicProfile(p, true);
+});
+
+mock.put("/partners/profile/public", ({ body }) => {
+  const p = partners.find(CURRENT_PARTNER.id)!;
+  if (!p.public_profile) throw httpError(404, "You don't have a public profile yet.");
+  const { display_name, bio, countries_supported, content } = (body ?? {}) as UpdateMyPublicProfilePayload;
+  if (display_name !== undefined && !display_name.trim()) throw httpError(422, "Your name can't be empty.");
+  p.public_profile = {
+    ...p.public_profile,
+    ...(display_name !== undefined ? { display_name: display_name.trim() } : {}),
+    ...(bio !== undefined ? { bio } : {}),
+    ...(countries_supported !== undefined ? { countries_supported } : {}),
+    updated_at: nowIso(),
+  };
+  if (content) {
+    const { students_enrolled: _s, identity_verified: _v, ...editable } = content as AdvisorProfileContent;
+    profileContent.set(p.id, { ...contentFor(p), ...editable });
+  }
+  return toPublicProfile(p, true);
 });
 
 // ── Agreement (e-signature) ─────────────────────────────────────────────────

@@ -7,6 +7,7 @@ import type {
   AdditionalManagersResult,
   UpdatePartnerProfilePayload,
   PublicPartnerProfile,
+  UpdateMyPublicProfilePayload,
 } from '../types';
 
 const authHeader = () => {
@@ -131,4 +132,12 @@ export const partnersApi = {
   // Public profile (UBX-??? — sub-feature, more endpoints expected later).
   getPublicProfile: (slug: string) =>
     publicApi.get<PublicPartnerProfile>(`/partners/public/${slug}`),
+
+  // The signed-in Advisor's own public profile, in any publish state, and
+  // their edits to it. ⚠ Pending backend: served by the mock only for now.
+  getMyPublicProfile: () =>
+    api.get<PublicPartnerProfile>('/partners/profile/public', { headers: authHeader() }),
+
+  updateMyPublicProfile: (payload: UpdateMyPublicProfilePayload) =>
+    api.put<PublicPartnerProfile>('/partners/profile/public', payload, { headers: authHeader() }),
 };

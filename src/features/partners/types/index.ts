@@ -201,6 +201,50 @@ export type AccountManagerPartnerDetails = {
 //   returned a raw ISO-2 code ("IN") for real seed data — rendered as-is,
 //   not "fixed" to match the guide, since the guide's claim didn't hold
 //   up against the real response.
+// The Advisor-written page content behind the profile (headline, intro
+// video, "How I can help", FAQ, contact button). ⚠ PENDING BACKEND: none of
+// these fields exist on the live API yet — the UI reads them as optional and
+// the mock serves them, so the page still renders against today's responses.
+export type AdvisorContactChannel = "whatsapp" | "telegram" | "link";
+
+export interface AdvisorProfileFaq {
+  question: string;
+  answer: string;
+}
+
+export interface AdvisorProfileContent {
+  /** One line under the name, e.g. "Your trusted guide to studying in Malaysia". */
+  headline: string | null;
+  /** e.g. "Education Advisor". */
+  role_title: string | null;
+  /** City shown with `country` under "Based in". */
+  city: string | null;
+  /** YouTube link; anything else is ignored. */
+  intro_video_url: string | null;
+  help_intro: string | null;
+  help_points: string[];
+  faqs: AdvisorProfileFaq[];
+  contact_channel: AdvisorContactChannel;
+  contact_label: string | null;
+  /** Phone number for WhatsApp/Telegram, or a URL for "link". */
+  contact_value: string | null;
+  /** System-set, read-only: students this Advisor has seen enrolled. */
+  students_enrolled: number;
+  /** System-set, read-only: identity documents checked by Unibexs. */
+  identity_verified: boolean;
+}
+
+/** The fields an Advisor can change from their own profile page. */
+export type AdvisorProfileContentUpdate = Partial<Omit<AdvisorProfileContent, "students_enrolled" | "identity_verified">>;
+
+// PUT /partners/profile/public — the Advisor's own edits (pending backend).
+export interface UpdateMyPublicProfilePayload {
+  display_name?: string;
+  bio?: string;
+  countries_supported?: string[];
+  content?: AdvisorProfileContentUpdate;
+}
+
 export interface PublicPartnerProfile {
   slug: string;
   display_name: string | null;
@@ -216,6 +260,10 @@ export interface PublicPartnerProfile {
   profile_photo_file_key: string | null;
   social_media_url: string | null;
   linkedin_url: string | null;
+  /** Pending backend — see AdvisorProfileContent. */
+  content?: AdvisorProfileContent | null;
+  /** Only on GET /partners/profile/public (the Advisor's own view). */
+  is_published?: boolean;
 }
 
 // The `public_profile` object embedded in GET/PUT /admin/partners/{id},
