@@ -241,7 +241,7 @@ const DataEntryProgramsTable = () => {
   };
 
   return (
-    <div className="mt-6 max-w-ub-dashboard mx-auto text-p2 rounded-lg border border-slate-200 bg-white">
+    <div className="mt-6 text-p2 rounded-lg border border-slate-200 bg-white">
 
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">

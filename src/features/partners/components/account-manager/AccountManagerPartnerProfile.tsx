@@ -191,7 +191,7 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
       ];
 
   return (
-    <div className="mx-auto mt-6 max-w-ub-dashboard">
+    <div className="mx-auto mt-6 ">
       <div className="rounded-lg border border-slate-200 bg-white">
 
         {/* Header */}

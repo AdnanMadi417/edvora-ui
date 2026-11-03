@@ -49,7 +49,7 @@ const UniversityDetails = ({ id, basePath = "/admin/universities" }: UniversityD
 
   return (
     <>
-      <div className="mt-6 max-w-ub-dashboard mx-auto">
+      <div className="mt-6">
         <div className="rounded-lg border bg-white shadow-sm">
           <div className="flex justify-between border-b p-6">
             <div className="flex items-center gap-4">

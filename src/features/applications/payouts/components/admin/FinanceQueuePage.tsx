@@ -207,7 +207,7 @@ export default function FinanceQueuePage() {
   };
 
   return (
-    <div className={`mx-auto mt-5 max-w-ub-dashboard ${card}`}>
+    <div className={`mx-auto mt-5 ${card}`}>
       <DashboardHeader as="h2" title="Finance Queue" subtitle="Every commission, who's waiting on it, and how to settle it." className="border-b border-ub-border p-6" />
 
       {/* Filters */}

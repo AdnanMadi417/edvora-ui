@@ -288,7 +288,7 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
   if (error || !program) return <div className="mt-10 text-center text-sm text-slate-500">{error ?? "Program not found."}</div>;
 
   return (
-    <div className="mt-6 max-w-ub-dashboard mx-auto">
+    <div className="mt-6">
 
       <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
 

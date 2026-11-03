@@ -161,7 +161,7 @@ const AccountManagersTable = () => {
   };
 
   return (
-    <div className="mt-6 max-w-ub-dashboard mx-auto text-p2 bg-white rounded-lg border border-slate-200">
+    <div className="mt-6 text-p2 bg-white rounded-lg border border-slate-200">
 
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">

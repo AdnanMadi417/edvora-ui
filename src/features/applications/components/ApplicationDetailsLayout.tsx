@@ -36,7 +36,7 @@ export default function ApplicationDetailsLayout({ header, alerts, tracker, acti
   const sticky = !!primaryAction && stickyAction;
   const tabs = APPLICATION_DETAILS_TABS.map((t) => ({ ...t, count: tabCounts[t.key] }));
   return (
-    <div className={sticky ? "mx-auto grid max-w-ub-dashboard gap-4 pb-20 md:gap-6 md:pb-0" : "mx-auto grid max-w-ub-dashboard gap-4 md:gap-6"}>
+    <div className={sticky ? "mx-auto grid gap-4 pb-20 md:gap-6 md:pb-0" : "mx-auto grid gap-4 md:gap-6"}>
       {header}
       {alerts}
       {tracker}

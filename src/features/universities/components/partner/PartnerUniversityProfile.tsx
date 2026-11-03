@@ -80,7 +80,7 @@ export default function PartnerUniversityProfile({ id }: Props) {
           own: it sits flush (no padding gap) against the shared outer
           shell above, which already provides the border — adding a
           second one here would double up against it. */}
-      <div className="mx-auto max-w-ub-dashboard">
+      <div className="">
         <FadeIn>
           <div className="h-28 w-full sm:h-36" style={BANNER_STYLE} role="presentation" />
 
@@ -126,7 +126,7 @@ export default function PartnerUniversityProfile({ id }: Props) {
         <div className="px-4 py-10">
 
           {/* Main content (2/3) + quick-facts sidebar (1/3). */}
-          <div className="mx-auto max-w-ub-dashboard grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <div className="md:col-span-2">
               {activeTab === "overview" ? (
                 <FadeIn key="overview" className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

@@ -259,7 +259,7 @@ const ProgramDetails = ({ id }: Props) => {
   if (!program) return <Loading text="Loading program details..." />;
 
   return (
-    <div className="mt-6 max-w-ub-dashboard mx-auto">
+    <div className="mt-6">
 
       <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
 

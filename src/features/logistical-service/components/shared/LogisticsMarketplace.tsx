@@ -56,7 +56,7 @@ const LogisticsMarketplace = ({ locked = false, visaProcessingCount = 0, basePat
   );
 
   return (
-    <div className="mt-6 overflow-hidden text-p2 max-w-ub-dashboard mx-auto">
+    <div className="mt-6 overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white">
         <div className="relative border-b border-slate-200 p-6">
           <div className="mb-6 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">

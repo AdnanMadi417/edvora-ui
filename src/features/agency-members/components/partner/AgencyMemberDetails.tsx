@@ -256,7 +256,7 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
   const canResendWelcome = member.is_active && !member.last_login;
 
   return (
-    <div className="mx-auto mt-6 max-w-ub-dashboard">
+    <div className="mx-auto mt-6 ">
       <div className="rounded-lg border border-slate-200 bg-white">
 
         {/* Header */}

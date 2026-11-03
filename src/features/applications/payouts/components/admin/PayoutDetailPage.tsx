@@ -73,7 +73,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
   const isVoided = !!payout?.voided_at;
 
   return (
-    <div className="mx-auto mt-6 max-w-ub-dashboard">
+    <div className="mx-auto mt-6 ">
       <div className={card}>
         <AsyncStateView
           status={status}

@@ -125,7 +125,7 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
   };
 
   return (
-    <div className="mt-6 overflow-hidden text-p2 max-w-ub-dashboard mx-auto">
+    <div className="mt-6 overflow-hidden text-p2">
       <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white ">
 
       <div className="relative border-b border-slate-200">

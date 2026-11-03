@@ -240,7 +240,7 @@ const UniversitiesTable = () => {
   };
 
   return (
-    <div className="mt-6 max-w-ub-dashboard mx-auto overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white">
+    <div className="mt-6 overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6">
         <div>

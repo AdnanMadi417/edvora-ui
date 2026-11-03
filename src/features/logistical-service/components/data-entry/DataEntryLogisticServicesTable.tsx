@@ -57,7 +57,7 @@ const DataEntryLogisticServicesTable = () => {
 
   return (
     <>
-      <div className="mt-6 max-w-ub-dashboard mx-auto overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white p-6">
+      <div className="mt-6 overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white p-6">
 
         {/* Header */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

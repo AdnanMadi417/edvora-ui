@@ -46,7 +46,7 @@ export default function StaffProfile() {
   const roleLabel = ROLE_LABELS[user.role] ?? user.role;
 
   return (
-    <div className="mx-auto mt-5 max-w-ub-dashboard overflow-hidden rounded-lg border border-slate-200 bg-white">
+    <div className="mx-auto mt-5 overflow-hidden rounded-lg border border-slate-200 bg-white">
       <div className="flex items-center gap-4 border-b border-slate-200 p-6">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-blue-700">
           {user.name?.[0]?.toUpperCase() ?? "?"}

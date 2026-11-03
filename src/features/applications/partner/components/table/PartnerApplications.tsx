@@ -198,7 +198,7 @@ const PartnerApplications = () => {
   };
 
   return (
-    <div className={`mt-6 mx-auto max-w-ub-dashboard ${card}`}>
+    <div className={`mt-6 ${card}`}>
 
       <DashboardHeader as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" primaryAction={<Button variant="primary" onClick={() => router.push("/partner/applications/apply-now")} icon={<FilePlus className="h-4 w-4" aria-hidden="true" />} text="Create application" />} className="border-b border-ub-border p-6" />
 

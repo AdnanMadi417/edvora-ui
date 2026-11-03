@@ -63,7 +63,7 @@ export default function BankDetails({ id, basePath = "/admin/advisors/banks" }: 
   const handleBack = () => router.push(basePath);
 
   return (
-    <div className="mt-6 max-w-ub-dashboard mx-auto">
+    <div className="mt-6">
       <div className="rounded-md border bg-white shadow-sm">
         <AsyncStateView
           status={status}

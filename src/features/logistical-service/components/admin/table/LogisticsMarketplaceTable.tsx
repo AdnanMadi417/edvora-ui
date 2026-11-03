@@ -86,7 +86,7 @@ const LogisticsMarketplaceTable = () => {
   };
 
   return (
-    <div className="mt-6 max-w-ub-dashboard mx-auto overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white">
+    <div className="mt-6 overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white">
       
       <div className="relative overflow-hidden ">
         <div className="relative p-6">

@@ -52,7 +52,7 @@ export default function StaffUserDetails({ userId }: StaffUserDetailsProps) {
   const isSubmitting = isSuspending || isReactivating;
 
   return (
-    <section className="mx-auto mt-6 max-w-ub-dashboard">
+    <section className="mx-auto mt-6 ">
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         {/* Header */}
         <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">

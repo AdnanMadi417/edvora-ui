@@ -164,7 +164,7 @@ const ModernApplicationsTable = () => {
   };
 
   return (
-    <div className={`mt-6 mx-auto max-w-ub-dashboard ${card}`}>
+    <div className={`mt-6 ${card}`}>
 
       {/* Header */}
       <DashboardHeader as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" className="border-b border-ub-border p-6" />
