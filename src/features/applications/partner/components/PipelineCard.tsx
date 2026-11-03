@@ -1,10 +1,9 @@
 "use client";
 
 import React from "react";
-import { FileText, Mail, Send, GraduationCap, Wallet, Flag, ArrowUpRight } from "lucide-react";
-import StatsFilterCards, { type CardColorScheme, type FilterCardItem } from "components/ub/navigation/StatsFilterCards";
+import { ArrowUpRight } from "lucide-react";
+import PipelineBar from "components/ub/data/PipelineBar";
 import Button from "components/ub/core/Button";
-import type { StageHue } from "config/applicationStages";
 import { resolveStage } from "features/applications/stages";
 
 interface Stage {
@@ -15,6 +14,7 @@ interface Stage {
 interface PipelineCardProps {
   stages: Stage[];
   stageCounts: Record<string, number>;
+  /** Kept for callers; the bar legend shows counts only. */
   stageActionRequired: Record<string, boolean>;
   selectedId: string | null;
   onSelect: (id: string | null) => void;
@@ -25,37 +25,13 @@ interface PipelineCardProps {
   subtitle?: string;
 }
 
-// Stage colour comes from features/applications/stages.ts (stage code → configured hue),
-// shown through the card's theme-aware icon tints.
-const HUE_SCHEME: Record<StageHue, CardColorScheme> = {
-  grey: "slate",
-  amber: "amber",
-  indigo: "violet",
-  sky: "blue",
-  teal: "cyan",
-  plum: "violet",
-  pink: "rose",
-  success: "emerald",
-};
-const schemeFor = (stage: Stage): CardColorScheme => {
-  const hue = resolveStage({ stageCode: (stage as Stage & { code?: string }).code })?.stage?.hue;
-  return hue ? HUE_SCHEME[hue] : "slate";
-};
-
-function stageIcon(name: string) {
-  const n = name.toLowerCase();
-  if (n.includes("commission")) return Wallet;
-  if (n.includes("arrival"))    return GraduationCap;
-  if (n.includes("visa"))       return Send;
-  if (n.includes("offer"))      return Mail;
-  if (n.includes("review"))     return FileText;
-  return Flag;
-}
+// Backend stage → stage tag id via features/applications/stages.ts, so the bar
+// and legend take their colours from config/applicationStages.ts.
+const stageTagId = (stage: Stage) => resolveStage({ stageCode: (stage as Stage & { code?: string }).code })?.stageId;
 
 export default function PipelineCard({
   stages,
   stageCounts,
-  stageActionRequired,
   selectedId,
   onSelect,
   totalCount,
@@ -64,22 +40,16 @@ export default function PipelineCard({
   title = "Your Pipeline",
   subtitle,
 }: PipelineCardProps) {
-  const totalStageCount = stages.reduce((sum, s) => sum + (stageCounts[s.id] ?? 0), 0);
-
-  const cards: FilterCardItem[] = stages.map((stage) => {
-    const count = stageCounts[stage.id] ?? 0;
-    const isComm = stage.name.toLowerCase().includes("commission");
-    const needsMove = !isComm && stageActionRequired[stage.id];
-    return {
-      id: stage.id,
-      label: stage.name,
-      count,
-      icon: stageIcon(stage.name),
-      colorScheme: schemeFor(stage),
-      progress: totalStageCount > 0 ? Math.round((count / totalStageCount) * 100) : 0,
-      badge: isComm ? { label: "Payout", tone: "success" } : needsMove ? { label: "Your move", tone: "attention" } : undefined,
-    };
+  const counts: Record<string, number> = {};
+  const backendIdFor: Record<string, string> = {};
+  stages.forEach((stage) => {
+    const tagId = stageTagId(stage);
+    if (!tagId) return;
+    counts[tagId] = (counts[tagId] ?? 0) + (stageCounts[stage.id] ?? 0);
+    backendIdFor[tagId] ??= stage.id;
   });
+  const selectedTag = stages.find((s) => s.id === selectedId);
+  const selectedStageId = selectedTag ? stageTagId(selectedTag) ?? null : null;
 
   return (
     <section aria-labelledby="pipeline-title">
@@ -90,7 +60,12 @@ export default function PipelineCard({
         </p>
       </div>
 
-      <StatsFilterCards cards={cards} selectedId={selectedId} onSelect={onSelect} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3" />
+      <PipelineBar
+        counts={counts}
+        label="Applications by stage"
+        selectedStageId={selectedStageId}
+        onStageSelect={(tagId) => onSelect(tagId === selectedStageId ? null : backendIdFor[tagId] ?? null)}
+      />
 
       <div className="mt-4 flex flex-col items-start justify-between gap-3 border-t border-ub-border pt-4 sm:flex-row sm:items-center">
         <p className="text-ub-body-sm text-ub-text-secondary">
