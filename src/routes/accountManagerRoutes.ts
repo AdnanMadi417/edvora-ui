@@ -1,7 +1,9 @@
+import { Home } from "lucide-react";
 import { IRoute } from "../types/navigation";
 import { ClipboardList, Handshake, BookOpen, Truck, Bell } from "lucide-react";
 
 const accountManagerRoutes: IRoute[] = [
+  { name: "Home", layout: "/account-manager", path: "/home", icon: Home },
     {
         name: "Notifications",
         layout: "/account-manager",

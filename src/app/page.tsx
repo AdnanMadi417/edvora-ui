@@ -7,11 +7,11 @@ import { card, cardInteractive, focusRing } from "components/ub/recipes";
 // UI-only mode: no sign-in. Each area runs as a mock user of its role
 // (config/mockSession.ts).
 const AREAS = [
-  { href: "/admin/applications", label: "Admin" },
-  { href: "/partner/applications", label: "Advisor" },
-  { href: "/account-manager/applications", label: "Account manager" },
-  { href: "/reviewer/advisors", label: "Reviewer" },
-  { href: "/data-entry/knowledge-hub", label: "Data entry" },
+  { href: "/admin/home", label: "Admin" },
+  { href: "/partner/home", label: "Advisor" },
+  { href: "/account-manager/home", label: "Account manager" },
+  { href: "/reviewer/home", label: "Reviewer" },
+  { href: "/data-entry/home", label: "Data entry" },
 ];
 
 export default function Home() {

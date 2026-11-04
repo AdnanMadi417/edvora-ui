@@ -1,4 +1,2 @@
-import { redirect } from 'next/navigation';
-export default function Home({}) {
-  redirect('/reviewer/advisors');
-}
+import { redirect } from "next/navigation";
+export default function Home() { redirect("/reviewer/home"); }

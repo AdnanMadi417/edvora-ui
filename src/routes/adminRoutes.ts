@@ -1,3 +1,4 @@
+import { Home } from "lucide-react";
 import { IRoute } from "../types/navigation";
 import {
   ClipboardList,
@@ -20,6 +21,7 @@ import {
 } from "lucide-react";
 
 const AdminRoutes: IRoute[] = [
+  { name: "Home", layout: "/admin", path: "/home", icon: Home },
   {
     name: "Notifications",
     layout: "/admin",

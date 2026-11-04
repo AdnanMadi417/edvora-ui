@@ -1,4 +1,2 @@
-import { redirect } from 'next/navigation';
-export default function Home({}) {
-  redirect('/data-entry/knowledge-hub');
-}
+import { redirect } from "next/navigation";
+export default function Home() { redirect("/data-entry/home"); }

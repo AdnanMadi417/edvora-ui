@@ -1,5 +1,5 @@
-import AdvisorHome from "features/advisor-home/AdvisorHome";
+import RoleOverview from "features/overview/components/RoleOverview";
 
-export default function AdvisorHomePage() {
-  return <AdvisorHome />;
+export default function HomePage() {
+  return <RoleOverview role="partner" />;
 }

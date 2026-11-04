@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   RefreshCw, Users, UserCog, BadgeCheck, CalendarDays, Pencil,
   ShieldCheck, CheckCircle, XCircle, Ban, Power, Clock, Handshake,
@@ -60,7 +60,8 @@ export default function ReviewerPartnersTable() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
-  const [activeTab, setActiveTab] = useState<ReviewerPartnersTab>("partners");
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<ReviewerPartnersTab>(searchParams.get("tab") === "pending-otps" ? "pending-otps" : "partners");
 
   const { accountManagers } = useAccountManagers();
   const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));

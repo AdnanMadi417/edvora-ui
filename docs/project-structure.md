@@ -44,3 +44,5 @@ Keep hooks with their owning feature and group crowded hook folders by domain:
 - Programs: `catalog`, `batch`, `copy`, `scholarships`, `configuration`.
 
 Feature hook `index.ts` files remain the public entry points. Smaller feature folders keep their existing structure until a distinct group is useful. Do not move feature-specific components into the shared UI library solely to reduce the number of files in a feature folder.
+
+Role landing pages share `src/features/overview`, with role configuration in `model`, API resource plans in `services`, session-aware loading in `hooks`, and page composition in `components`. See [Role overviews](role-overviews.md) for data sources and access behavior.

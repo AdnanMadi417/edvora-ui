@@ -26,3 +26,6 @@ export { default as CountdownCard, countdownParts } from "./cards/CountdownCard"
 export { default as ProgressCard } from "./cards/ProgressCard";
 export { default as WidgetStatus, resolveWidgetState } from "./shared/WidgetStatus";
 export * from "./types";
+
+export { default as QuickActions } from "./lists/QuickActions";
+export type { QuickAction } from "./lists/QuickActions";

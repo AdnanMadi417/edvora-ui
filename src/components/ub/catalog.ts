@@ -204,6 +204,12 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "Search, filters, result count, density and column controls above a table.",
     usedIn: ["Application Tracker", "Advisors", "Finance queue"],
   },
+  QuickActions: {
+    category: "data",
+    imports: ['import { QuickActions } from "components/ub/dashboard";'],
+    useFor: "Keyboard-accessible links to common tasks, with labels and descriptions.",
+    usedIn: ["Role home pages"],
+  },
   "DashboardHeader and PeriodSelect": {
     category: "data",
     imports: ['import { DashboardHeader, PeriodSelect } from "components/ub/dashboard";'],

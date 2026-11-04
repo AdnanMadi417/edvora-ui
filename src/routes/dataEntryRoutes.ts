@@ -1,3 +1,4 @@
+import { Home } from "lucide-react";
 import { IRoute } from "../types/navigation";
 import {
   BookOpen,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 
 const dataEntryRoutes: IRoute[] = [
+  { name: "Home", layout: "/data-entry", path: "/home", icon: Home },
   {
     name: "Notifications",
     layout: "/data-entry",

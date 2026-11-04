@@ -12,10 +12,10 @@ export const metadata: Metadata = {
 
 const areas = [
   { name: "Advisor", icon: GraduationCap, href: "/partner/home", description: "Explore your workspace, manage student applications, and track commissions.", detail: "Applications · Universities · Team" },
-  { name: "Admin", icon: ShieldCheck, href: "/admin/applications", description: "Oversee applications and manage the people and programs behind every placement.", detail: "Applications · Advisors · Programs" },
-  { name: "Account manager", icon: Briefcase, href: "/account-manager/applications", description: "Support advisors, follow application progress, and coordinate the next steps.", detail: "Applications · Advisors · Commission" },
-  { name: "Reviewer", icon: Users, href: "/reviewer/advisors", description: "Review advisor profiles and explore the account manager directory.", detail: "Advisors · Account managers" },
-  { name: "Data entry", icon: BookOpen, href: "/data-entry/knowledge-hub", description: "Explore the knowledge hub and maintain resources for the team.", detail: "Knowledge hub · Resources" },
+  { name: "Admin", icon: ShieldCheck, href: "/admin/home", description: "Oversee applications and manage the people and programs behind every placement.", detail: "Applications · Advisors · Programs" },
+  { name: "Account manager", icon: Briefcase, href: "/account-manager/home", description: "Support advisors, follow application progress, and coordinate the next steps.", detail: "Applications · Advisors · Commission" },
+  { name: "Reviewer", icon: Users, href: "/reviewer/home", description: "Review advisor profiles and explore the account manager directory.", detail: "Advisors · Account managers" },
+  { name: "Data entry", icon: BookOpen, href: "/data-entry/home", description: "Explore the knowledge hub and maintain resources for the team.", detail: "Knowledge hub · Resources" },
 ];
 
 const showcases = [

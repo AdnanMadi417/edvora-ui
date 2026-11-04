@@ -1,5 +1,2 @@
 import { redirect } from "next/navigation";
-
-export default function PartnerIndex() {
-  redirect("/partner/home");
-}
+export default function Home() { redirect("/partner/home"); }

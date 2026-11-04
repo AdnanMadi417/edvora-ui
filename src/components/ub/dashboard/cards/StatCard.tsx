@@ -44,7 +44,7 @@ export default function StatCard({ label, value, delta, caption, variant = "defa
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 items-center gap-3">
               {(variant === "icon" || (hi && icon)) && icon && <IconTile icon={icon} tone={hi ? "onBrand" : iconTone} size="md" />}
-              <h3 className={clsx("min-w-0 truncate text-ub-label-md", hi ? "text-ub-action-primary-text" : "text-ub-text-secondary")}>{label}</h3>
+              <h3 className={clsx("min-w-0 break-words text-ub-label-md", hi ? "text-ub-action-primary-text" : "text-ub-text-secondary")}>{label}</h3>
             </div>
             {action}
           </div>

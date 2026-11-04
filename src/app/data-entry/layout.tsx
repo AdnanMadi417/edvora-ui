@@ -5,7 +5,7 @@ import RoleGuard from "components/guard/RoleGuard";
 import { ToastProvider } from "components/ub/feedback/notifications/ToastContext";
 import AppShell from "components/ub/navigation/layout/AppShell";
 
-const DATA_ENTRY_ROLES = ["admin", "data_entry"];
+const DATA_ENTRY_ROLES = ["data_entry", "admin"];
 
 export default function DataEntryLayout({ children }: { children: React.ReactNode }) {
   return (
