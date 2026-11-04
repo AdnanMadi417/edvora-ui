@@ -2,8 +2,9 @@
 
 import Alert from "components/ub/feedback/Alert";
 import FormModal from "components/ub/feedback/FormModal";
-import React, { useState, useEffect } from "react";
-import { XCircle, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { CreditCard } from "lucide-react";
+import TextButton from "components/ub/core/TextButton";
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
 import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";
@@ -109,6 +110,7 @@ export default function VisaPaymentConfirmation({
       icon={CreditCard}
       title="Visa Application Fee Payment"
       onSubmit={handleConfirmUpload}
+      submitting={isUploading}
       submitLabel={isUploading ? "Submitting..." : paymentLoading ? "Loading..." : "Proceed to Payment"}
       submitDisabled={!paymentReference ||
                   !!fileError ||
@@ -170,14 +172,13 @@ export default function VisaPaymentConfirmation({
 
             {healthDeclarationRequired && (
               <div className="space-y-1.5">
-                <button
-                  type="button"
+                <TextButton
+                  size="sm"
                   onClick={downloadHealthDeclarationForm}
                   disabled={downloadingHealthDeclarationForm}
-                  className="inline-flex items-center gap-1 text-ub-caption font-medium text-ub-text-link hover:underline disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {downloadingHealthDeclarationForm ? "Opening..." : "Download blank Health Declaration Form template"}
-                </button>
+                </TextButton>
                 <CompactFileUpload
                   label="Health Declaration Form"
                   description="Download the blank template above, complete it, and upload the filled form here."

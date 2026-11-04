@@ -128,7 +128,7 @@ describe("Application Details components", () => {
   it("NotesPanel: adds a note", async () => {
     const onAdd = jest.fn();
     render(<NotesPanel notes={[]} onAdd={onAdd} />);
-    await userEvent.type(screen.getByLabelText("Add a note"), "Prefers January intake");
+    await userEvent.type(screen.getByRole("textbox", { name: /Add a note/ }), "Prefers January intake");
     await userEvent.click(screen.getByRole("button", { name: "Save note" }));
     expect(onAdd).toHaveBeenCalledWith("Prefers January intake");
   });

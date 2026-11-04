@@ -48,6 +48,8 @@ export interface AdvisorProfileProps {
   draft: AdvisorProfileDraft;
   /** Fields become inputs and every change goes to onChange. */
   editing?: boolean;
+  /** Wider editorial layout for the full-page pattern. */
+  spacious?: boolean;
   onChange?: (patch: Partial<AdvisorProfileDraft>) => void;
   errors?: AdvisorProfileErrors;
 }
@@ -77,7 +79,7 @@ function Section({ title, icon, children, className }: { title: string; icon?: L
 
 function Fact({ icon, label, children }: { icon: LucideIcon; label: string; children: ReactNode }) {
   return (
-    <div className="flex min-w-0 items-start gap-3 rounded-ub-md border border-ub-border bg-ub-surface-subtle p-3">
+    <div className="flex min-w-0 items-start gap-3 border-b border-ub-border py-3 last:border-b-0">
       <IconTile icon={icon} tone="brand" size="sm" />
       <div className="min-w-0 flex-1">
         <p className="text-ub-label-sm text-ub-text-tertiary">{label}</p>
@@ -118,7 +120,7 @@ function EditableList({ items, onChange, itemLabel, addLabel, placeholder }: { i
  * Read-only on /p/[slug]; editable on /partner/public-profile, where Preview
  * shows this same component read-only.
  */
-export default function AdvisorProfile({ profile, draft, editing = false, onChange = () => undefined, errors = {} }: AdvisorProfileProps) {
+export default function AdvisorProfile({ profile, draft, editing = false, spacious = false, onChange = () => undefined, errors = {} }: AdvisorProfileProps) {
   const name = draft.display_name || profile.name;
   const content = profile.content;
   const students = content?.students_enrolled ?? 0;
@@ -147,27 +149,29 @@ export default function AdvisorProfile({ profile, draft, editing = false, onChan
   );
 
   return (
-    <div className="space-y-4">
+    <div className={clsx(spacious ? "grid items-start gap-5 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.6fr)] lg:gap-6" : "space-y-4")}>
       {/* Who they are + how to reach them */}
-      <section className={clsx(card, cardPadding)} aria-label="Advisor">
-        <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-start sm:text-start">
+      <section className={clsx(card, "overflow-hidden", spacious && "lg:col-start-1 lg:row-span-4 lg:sticky lg:top-24")} aria-label="Advisor">
+
+        <div className={cardPadding}>
+        <div className={clsx("flex flex-col items-start gap-5 text-start", !spacious && "sm:flex-row")}>
           <Avatar name={name} src={profile.profile_photo_file_url} size={96} className="ring-4 ring-ub-tone-brand-bg rounded-ub-full" />
           <div className="min-w-0 flex-1 space-y-2">
             {editing ? (
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className={clsx("grid gap-3", !spacious && "sm:grid-cols-2")}>
                 <Input label="Name" value={draft.display_name} onChange={(v) => onChange({ display_name: v })} error={errors.display_name} required />
                 <Input label="Role" value={draft.role_title} placeholder="Education Advisor" onChange={(v) => onChange({ role_title: v })} />
               </div>
             ) : (
               <>
-                <h1 className="text-ub-heading-lg text-ub-text-primary">{name}</h1>
-                <p className="flex items-center justify-center gap-1.5 text-ub-body-sm text-ub-text-secondary sm:justify-start">
+                <h1 className="text-ub-heading-xl text-ub-text-primary">{name}</h1>
+                <p className="flex items-center justify-start gap-1.5 text-ub-body-sm text-ub-text-secondary sm:justify-start">
                   <GraduationCap className="h-4 w-4 shrink-0 text-ub-text-link" aria-hidden="true" />
                   {[draft.role_title, "Unibexs Network"].filter(Boolean).join(" · ")}
                 </p>
               </>
             )}
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+            <div className="flex flex-wrap items-center justify-start gap-2">
               {profile.is_verified && (
                 <Tooltip content={VERIFIED_EXPLANATION} position="bottom">
                   <Tag tone="success" icon={<BadgeCheck aria-hidden="true" />}>
@@ -177,7 +181,7 @@ export default function AdvisorProfile({ profile, draft, editing = false, onChan
               )}
               {students > 0 && (
                 <Tag tone="brand" icon={<Award aria-hidden="true" />}>
-                  {students} {students === 1 ? "student" : "students"} enrolled
+                  {students} {students === 1 ? "student" : "students"} placed
                 </Tag>
               )}
               {content?.identity_verified && (
@@ -197,7 +201,7 @@ export default function AdvisorProfile({ profile, draft, editing = false, onChan
           )}
         </div>
 
-        <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        <div className={clsx("mt-6 grid gap-3", !spacious && "sm:grid-cols-3")}>
           <Fact icon={MapPin} label="Based in">
             {editing ? (
               <Input label="City" hideLabel value={draft.city} placeholder="City" onChange={(v) => onChange({ city: v })} helperText={country ? `Country: ${country}` : undefined} />
@@ -225,8 +229,8 @@ export default function AdvisorProfile({ profile, draft, editing = false, onChan
           </Fact>
         </div>
 
-        <div className="mt-5 space-y-3">
-          {contactButton}
+        <div className={clsx("mt-6 space-y-3", spacious && !editing && "max-w-sm")}>
+          {!editing && contactButton}
           {editing && (
             <div className="space-y-4 rounded-ub-md border border-ub-border bg-ub-surface-subtle p-4">
               <div className="space-y-2">
@@ -240,7 +244,7 @@ export default function AdvisorProfile({ profile, draft, editing = false, onChan
                   onChange={(key) => onChange({ contact_channel: key, contact_value: key === "link" ? "" : draft.contact_channel === "link" ? profile.whatsapp_number ?? "" : draft.contact_value })}
                 />
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className={clsx("grid gap-3", !spacious && "sm:grid-cols-2")}>
                 <Input label="Button text" value={draft.contact_label} placeholder={DEFAULT_CONTACT_LABEL} onChange={(v) => onChange({ contact_label: v })} maxLength={30} />
                 <Input
                   label={draft.contact_channel === "link" ? "Link" : "Phone number"}
@@ -256,11 +260,12 @@ export default function AdvisorProfile({ profile, draft, editing = false, onChan
             </div>
           )}
         </div>
+        </div>
       </section>
 
       {/* Intro video */}
       {(editing || embed) && (
-        <Section title="A quick hello before you reach out" icon={PlayCircle}>
+        <Section title="Meet your advisor" icon={PlayCircle} className={spacious ? "lg:col-start-2" : undefined}>
           {embed ? (
             <div className="aspect-video overflow-hidden rounded-ub-md border border-ub-border bg-ub-surface-subtle">
               <iframe
@@ -294,7 +299,7 @@ export default function AdvisorProfile({ profile, draft, editing = false, onChan
 
       {/* What they help with */}
       {(editing || draft.help_intro.trim() || helpPoints.length > 0) && (
-        <Section title="How I can help you">
+        <Section title="How I can help you" className={spacious ? "lg:col-start-2" : undefined}>
           {editing ? (
             <div className="space-y-4">
               <Textarea label="Introduction" value={draft.help_intro} rows={3} placeholder="I help international students…" onChange={(v) => onChange({ help_intro: v })} maxLength={400} />
@@ -320,7 +325,7 @@ export default function AdvisorProfile({ profile, draft, editing = false, onChan
 
       {/* Questions */}
       {(editing || faqs.length > 0) && (
-        <Section title="Questions students ask me" icon={CircleHelp}>
+        <Section title="Questions students ask me" icon={CircleHelp} className={spacious ? "lg:col-start-2" : undefined}>
           {editing ? (
             <div className="space-y-3">
               {draft.faqs.map((f, i) => (
@@ -344,7 +349,7 @@ export default function AdvisorProfile({ profile, draft, editing = false, onChan
       )}
 
       {/* Trust note */}
-      <aside className="flex items-start gap-3 rounded-ub-lg border border-ub-border bg-ub-surface-subtle p-4">
+      <aside className={clsx("flex items-start gap-3 rounded-ub-lg border border-ub-border bg-ub-surface-subtle p-5", spacious && "lg:col-start-2")}>
         <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-ub-tone-success-text" aria-hidden="true" />
         <p className="text-ub-body-sm text-ub-text-secondary">
           This page is run by an advisor in the Unibexs network. Applications are submitted and tracked through Unibexs. Always confirm details before making any payment.

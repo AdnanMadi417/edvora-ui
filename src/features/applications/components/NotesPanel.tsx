@@ -1,11 +1,11 @@
 "use client";
 
-import { useId, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { StickyNote } from "lucide-react";
 import Button from "components/ub/core/Button";
 import SectionCard, { type SectionCardState } from "components/ub/data/SectionCard";
 import Timeline from "components/ub/data/Timeline";
-import { fieldControl } from "components/ub/recipes";
+import Textarea from "components/ub/forms/Textarea";
 
 export interface NoteItem {
   id: string;
@@ -30,7 +30,6 @@ export interface NotesPanelProps {
  * the Glass Box (student view).
  */
 export default function NotesPanel({ notes, onAdd, state = "ready", onRetry, now, className }: NotesPanelProps) {
-  const fieldId = useId();
   const [draft, setDraft] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -61,15 +60,11 @@ export default function NotesPanel({ notes, onAdd, state = "ready", onRetry, now
       {notes.length > 0 && <Timeline grouped={false} now={now} aria-label="Notes" events={notes.map((n) => ({ id: n.id, title: n.author, description: <p className="whitespace-pre-wrap">{n.body}</p>, at: n.at }))} />}
       {onAdd && (
         <form onSubmit={submit} className={notes.length ? "mt-4 grid gap-2" : "grid gap-2"}>
-          <label htmlFor={fieldId} className="text-ub-label-md text-ub-text-primary">
-            Add a note
-          </label>
-          <textarea
-            id={fieldId}
+          <Textarea
+            label="Add a note"
             rows={3}
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            className={`${fieldControl} py-2`}
+            onChange={setDraft}
           />
           <div className="flex justify-end">
             <Button type="submit" variant="secondary" text="Save note" loading={saving} disabled={!draft.trim()} />

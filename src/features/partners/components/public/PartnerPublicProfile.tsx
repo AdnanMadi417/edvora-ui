@@ -29,32 +29,34 @@ const VISITOR_FAQ = [
 
 interface Props {
   profile: PublicPartnerProfile;
+  spacious?: boolean;
+  embedded?: boolean;
 }
 
 /** /p/[slug]: the Advisor's public page, read-only, with a contact bar on phones. */
-export default function PartnerPublicProfile({ profile }: Props) {
+export default function PartnerPublicProfile({ profile, spacious = false, embedded = false }: Props) {
   const draft = draftFromProfile(profile);
   if (draft.faqs.length === 0) draft.faqs = VISITOR_FAQ;
   const href = contactHref(draft.contact_channel, draft.contact_value, draft.display_name);
   const ContactIcon = channelIcon(draft.contact_channel);
 
   return (
-    <div className="min-h-screen bg-ub-surface-subtle">
-      <header className="border-b border-ub-border bg-ub-surface">
+    <div className="ub-canvas-light min-h-screen">
+      {!embedded && <header className="border-b border-ub-border bg-ub-surface">
         <div className="mx-auto flex h-16 max-w-3xl items-center px-4">
           <Link href="/" aria-label="Unibexs home">
             <Logo size="sm" />
           </Link>
         </div>
-      </header>
+      </header>}
 
-      <main className="mx-auto max-w-3xl px-4 pb-28 pt-6 md:pb-12">
+      <main className={`mx-auto px-4 pb-28 pt-6 md:pb-12 ${spacious ? "max-w-6xl" : "max-w-3xl"}`}>
         <FadeIn>
-          <AdvisorProfile profile={profile} draft={draft} />
+          <AdvisorProfile spacious={spacious} profile={profile} draft={draft} />
         </FadeIn>
       </main>
 
-      <SiteFooter />
+      {!embedded && <SiteFooter />}
 
       {href && (
         <StickyActionBar aboveBottomNav={false} aria-label="Contact the advisor">

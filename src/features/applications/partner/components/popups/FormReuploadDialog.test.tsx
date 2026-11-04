@@ -37,4 +37,15 @@ describe("FormReuploadDialog", () => {
     await userEvent.click(screen.getByRole("button", { name: /Submit application form/ }));
     expect(await screen.findByText("Not awaiting an application form.")).toBeInTheDocument();
   });
+  it("prevents closing while an upload is in progress", async () => {
+    const onClose = jest.fn();
+    render(<FormReuploadDialog isOpen onClose={onClose} applicationId="app-1" formName="application form" fieldId="application_form" upload={jest.fn()} isUploading />);
+    const dialog = await screen.findByRole("dialog", { name: "Re-upload the application form" });
+    expect(within(dialog).getByRole("button", { name: "Cancel" })).toBeDisabled();
+    expect(within(dialog).getByRole("button", { name: /Submit application form/ })).toBeDisabled();
+    await userEvent.click(within(dialog).getByRole("button", { name: "Close dialog" }));
+    await userEvent.keyboard("{Escape}");
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
 });

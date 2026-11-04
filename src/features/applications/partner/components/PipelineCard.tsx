@@ -47,11 +47,7 @@ export default function PipelineCard({
       label: stage.name,
       count: stageCounts[stage.id] ?? 0,
       stageId: stageTagId(stage),
-      badge: isComm
-        ? { label: "Payout", tone: "success" }
-        : stageActionRequired[stage.id]
-          ? { label: "Your move", tone: "attention" }
-          : undefined,
+      badge: isComm ? { label: "Payout", tone: "success" } : undefined,
       attention: !isComm && !!stageActionRequired[stage.id],
     };
   });

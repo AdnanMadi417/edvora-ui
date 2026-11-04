@@ -52,6 +52,7 @@ export interface AdvisorProfileWorkspaceProps {
   /** Persists the edits; resolve with the saved profile, throw to show an error. */
   onSave: (payload: UpdateMyPublicProfilePayload) => Promise<unknown>;
   saving?: boolean;
+  spacious?: boolean;
   /** Where "View public profile" goes; defaults to the live /p/[slug] page in a new tab. */
   onViewPublic?: () => void;
 }
@@ -60,7 +61,7 @@ export interface AdvisorProfileWorkspaceProps {
  * Edit the page in place, flip Preview to see exactly what students see,
  * then save. Data comes in as props so the style guide can run it on mock data.
  */
-export function AdvisorProfileWorkspace({ profile, onSave, saving = false, onViewPublic }: AdvisorProfileWorkspaceProps) {
+export function AdvisorProfileWorkspace({ profile, onSave, saving = false, onViewPublic, spacious = false }: AdvisorProfileWorkspaceProps) {
   const { showToast } = useToast();
   const [draft, setDraft] = useState<AdvisorProfileDraft>(() => draftFromProfile(profile));
   const [saved, setSaved] = useState<AdvisorProfileDraft>(() => draftFromProfile(profile));
@@ -128,13 +129,27 @@ export function AdvisorProfileWorkspace({ profile, onSave, saving = false, onVie
   };
 
   return (
-    <div className="mx-auto mt-6 max-w-3xl pb-24">
+    <div className={clsx("mx-auto mt-6 pb-24", spacious ? "max-w-6xl" : "max-w-3xl")}>
+      {spacious ? (
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b border-ub-border pb-5">
+          <div className="flex flex-wrap items-center gap-3">
+            <Tag tone={published ? "success" : "warning"} size="sm">{published ? "Published" : "Not published"}</Tag>
+            <span role="status" className="text-ub-body-sm text-ub-text-tertiary">{dirty ? "You have unsaved changes" : "Your profile is up to date"}</span>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Toggle checked={preview} onChange={setPreview} label="Preview" switchPosition="end" />
+            <Button variant="tertiary" size="sm" icon={<ExternalLink className="h-4 w-4" aria-hidden="true" />} text="View public page" onClick={onViewPublic ?? (() => window.open(livePath, "_blank", "noopener,noreferrer"))} />
+            <Button variant="primary" text="Save changes" disabled={!dirty} loading={saving} onClick={handleSave} />
+          </div>
+        </div>
+      ) : (
+        <>
       <div className={clsx(card, "mb-4 flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between")}>
         <div className="flex min-w-0 items-center gap-3">
           <IconTile icon={preview ? Eye : PencilLine} tone="brand" />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-ub-heading-sm text-ub-text-primary">My public profile</h1>
+              <h2 className="text-ub-heading-sm text-ub-text-primary">Profile workspace</h2>
               <Tag tone={published ? "success" : "warning"} size="sm">
                 {published ? "Published" : "Not published"}
               </Tag>
@@ -147,7 +162,7 @@ export function AdvisorProfileWorkspace({ profile, onSave, saving = false, onVie
 
       <div className="mb-4 flex flex-wrap gap-2">
         <Button
-          variant="primary"
+          variant="secondary"
           icon={<ExternalLink className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />}
           text="View public profile"
           onClick={onViewPublic ?? (() => window.open(livePath, "_blank", "noopener,noreferrer"))}
@@ -156,13 +171,16 @@ export function AdvisorProfileWorkspace({ profile, onSave, saving = false, onVie
         <Button variant="secondary" icon={copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />} text={copied ? "Copied" : "Copy link"} onClick={handleCopy} />
       </div>
 
+        </>
+      )}
+
       {!published && (
         <Alert tone="info" className="mb-4">
           Your page isn't public yet. Your account manager publishes it once it's ready. You can still edit and preview it.
         </Alert>
       )}
 
-      <AdvisorProfile profile={profile} draft={draft} editing={!preview} onChange={update} errors={errors} />
+      <AdvisorProfile spacious={spacious} profile={profile} draft={draft} editing={!preview} onChange={update} errors={errors} />
 
       {dirty && (
         <div
@@ -176,7 +194,7 @@ export function AdvisorProfileWorkspace({ profile, onSave, saving = false, onVie
                 setDraft(saved);
                 setErrors({});
               }} />
-            <Button variant="primary" size="sm" text="Save changes" loading={saving} onClick={handleSave} />
+            {!spacious && <Button variant="primary" size="sm" text="Save changes" loading={saving} onClick={handleSave} />}
           </div>
         </div>
       )}

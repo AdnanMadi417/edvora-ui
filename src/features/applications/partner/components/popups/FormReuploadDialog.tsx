@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import { Upload } from "lucide-react";
-import Button from "components/ub/core/Button";
 import CompactFileUpload from "components/ub/forms/CompactFileUpload";
 import Alert from "components/ub/feedback/Alert";
-import Modal from "components/ub/feedback/Modal";
+import FormModal from "components/ub/feedback/FormModal";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 export interface FormReuploadDialogProps {
@@ -26,7 +25,7 @@ export interface FormReuploadDialogProps {
 }
 
 /**
- * Re-upload one rejected offer-letter form (brief §4.7 Modal): the rejection
+ * Re-upload one rejected offer-letter form (brief §4.7 FormModal): the rejection
  * reason, one file field, Cancel and "Submit <form>". Shared by the five
  * form-specific popups, which differ only in their upload hook.
  */
@@ -57,18 +56,18 @@ export default function FormReuploadDialog({ isOpen, onClose, applicationId, cor
   };
 
   return (
-    <Modal
+    <FormModal
       open={isOpen}
       onClose={close}
-      closeOnScrimClick={!isUploading}
+      size="md"
+      icon={Upload}
       title={`Re-upload the ${formName}`}
       description={`The ${formName} was rejected. Upload a corrected copy to resubmit.`}
-      footer={
-        <>
-          <Button variant="secondary" text="Cancel" onClick={close} disabled={isUploading} />
-          <Button variant="primary" text={`Submit ${formName}`} icon={<Upload className="h-4 w-4" aria-hidden="true" />} onClick={submit} loading={isUploading} disabled={!file || !!fileError || !!uploadError} />
-        </>
-      }
+      onSubmit={submit}
+      submitLabel={`Submit ${formName}`}
+      submitIcon={<Upload className="h-4 w-4" aria-hidden="true" />}
+      submitting={isUploading}
+      submitDisabled={!file || !!fileError || !!uploadError}
     >
       <div className="grid gap-4">
         {correctionReason && (
@@ -95,6 +94,6 @@ export default function FormReuploadDialog({ isOpen, onClose, applicationId, cor
         />
         {(fileError || uploadError) && <Alert tone="danger">{fileError || uploadError}</Alert>}
       </div>
-    </Modal>
+    </FormModal>
   );
 }

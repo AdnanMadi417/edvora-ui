@@ -39,6 +39,9 @@ export default function Home() {
             </li>
           ))}
         </ul>
+        <Link href="/demo" className={clsx(focusRing, "mt-6 inline-flex items-center gap-2 text-ub-label-md text-ub-text-link")}>
+          Explore the demo <ChevronRight aria-hidden className="h-4 w-4" />
+        </Link>
       </div>
     </main>
   );
