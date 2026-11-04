@@ -5,11 +5,11 @@ import { XCircle, UserPlus } from "lucide-react";
 
 import { useInviteStaffUser } from "../../hooks";
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import InputField from "components/ub/forms/InputField";
-import SelectField from "components/ub/forms/SelectField";
-import { useToast } from "components/ub/feedback/ToastContext";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
+import InputField from "components/ub/forms/text/InputField";
+import SelectField from "components/ub/forms/selection/SelectField";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface InviteStaffUserModalProps {

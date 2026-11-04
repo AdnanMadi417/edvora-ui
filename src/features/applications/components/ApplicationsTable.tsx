@@ -2,13 +2,13 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { ClipboardList, Download } from "lucide-react";
-import Button from "components/ub/core/Button";
-import AppDate from "components/ub/data/AppDate";
-import DataTable, { type DataTableColumn, type DataTableDensity } from "components/ub/data/DataTable";
-import PresignedImage from "components/ub/data/PresignedImage";
-import { STATUS_BADGE_TONE } from "components/ub/data/StatusBadge";
-import Tag from "components/ub/data/Tag";
-import { getInitials } from "components/ub/data/Avatar";
+import Button from "components/ub/core/buttons/Button";
+import AppDate from "components/ub/data/formatting/AppDate";
+import DataTable, { type DataTableColumn, type DataTableDensity } from "components/ub/data/tables/DataTable";
+import PresignedImage from "components/ub/data/media/PresignedImage";
+import { STATUS_BADGE_TONE } from "components/ub/data/badges/StatusBadge";
+import Tag from "components/ub/data/badges/Tag";
+import { getInitials } from "components/ub/data/media/Avatar";
 import { getStatusVariant } from "utils/getStatusVariant";
 
 /** The fields every role's list endpoint returns (admin adds account_manager_name). */

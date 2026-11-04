@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { Upload } from "lucide-react";
-import CompactFileUpload from "components/ub/forms/CompactFileUpload";
-import Alert from "components/ub/feedback/Alert";
-import FormModal from "components/ub/feedback/FormModal";
+import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
+import Alert from "components/ub/feedback/notifications/Alert";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 export interface FormReuploadDialogProps {

@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import { KeyRound, XCircle } from "lucide-react";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import InputField from "components/ub/forms/InputField";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
+import InputField from "components/ub/forms/text/InputField";
 
 interface Props {
   isOpen: boolean;

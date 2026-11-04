@@ -22,14 +22,14 @@ import { useRouter } from "next/navigation";
 
 import { useUniversityTypes } from "features/universities/hooks";
 
-import Button from "components/ub/core/Button";
-import SearchInput from "components/ub/forms/SearchInput";
-import TableWrapper from "components/ub/data/TableWrapper";
-import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
-import TableEmptyRow from "components/ub/data/TableEmptyRow";
-import TableErrorRow from "components/ub/data/TableErrorRow";
-import TablePagination from "components/ub/data/TablePagination";
-import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
+import Button from "components/ub/core/buttons/Button";
+import SearchInput from "components/ub/forms/selection/SearchInput";
+import TableWrapper from "components/ub/data/tables/TableWrapper";
+import TableSkeletonRows from "components/ub/data/tables/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/tables/TableEmptyRow";
+import TableErrorRow from "components/ub/data/tables/TableErrorRow";
+import TablePagination from "components/ub/data/tables/TablePagination";
+import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
 
 const ITEMS_PER_PAGE = 10;
 

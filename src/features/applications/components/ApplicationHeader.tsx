@@ -3,15 +3,15 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
 import type { LucideIcon } from "lucide-react";
-import Avatar from "components/ub/data/Avatar";
-import Button from "components/ub/core/Button";
-import RefId from "components/ub/core/RefId";
-import AppDate from "components/ub/data/AppDate";
-import DaysTag from "components/ub/data/DaysTag";
-import StageTag from "components/ub/data/StageTag";
-import Tag from "components/ub/data/Tag";
-import Skeleton from "components/ub/feedback/Skeleton";
-import ActionsDropdown from "components/ub/navigation/ActionsDropdown";
+import Avatar from "components/ub/data/media/Avatar";
+import Button from "components/ub/core/buttons/Button";
+import RefId from "components/ub/core/typography/RefId";
+import AppDate from "components/ub/data/formatting/AppDate";
+import DaysTag from "components/ub/data/badges/DaysTag";
+import StageTag from "components/ub/data/badges/StageTag";
+import Tag from "components/ub/data/badges/Tag";
+import Skeleton from "components/ub/feedback/states/Skeleton";
+import ActionsDropdown from "components/ub/navigation/menus/ActionsDropdown";
 import { card } from "components/ub/recipes";
 
 export interface HeaderAction {

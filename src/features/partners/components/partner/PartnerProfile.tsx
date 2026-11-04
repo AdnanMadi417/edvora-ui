@@ -22,23 +22,23 @@ import {
   User,
   Users,
 } from "lucide-react";
-import StatusBadge from "components/ub/data/StatusBadge";
-import Tabs from "components/ub/navigation/Tabs";
-import type { TabItem } from "components/ub/navigation/Tabs";
+import StatusBadge from "components/ub/data/badges/StatusBadge";
+import Tabs from "components/ub/navigation/controls/Tabs";
+import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners";
 import { PartnerBankAccountSection } from "features/partners/bank-accounts";
-import Loading from "components/ub/feedback/Loading";
-import EmptyData from "components/ub/feedback/EmptyTableData";
+import Loading from "components/ub/feedback/states/Loading";
+import EmptyData from "components/ub/feedback/states/EmptyTableData";
 import ChangePasswordPopup from "./ChangePasswordPopup";
-import ActionsDropdown from "components/ub/navigation/ActionsDropdown";
-import IconButton from "components/ub/core/IconButton";
-import { useToast } from "components/ub/feedback/ToastContext";
+import ActionsDropdown from "components/ub/navigation/menus/ActionsDropdown";
+import IconButton from "components/ub/core/buttons/IconButton";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import { useFileDrop } from "components/ub/forms/useFileDrop";
-import PresignedImage from "components/ub/data/PresignedImage";
-import { parseDate, formatDate } from "components/ub/data/appDateUtils";
+import { useFileDrop } from "components/ub/forms/uploads/useFileDrop";
+import PresignedImage from "components/ub/data/media/PresignedImage";
+import { parseDate, formatDate } from "components/ub/data/formatting/appDateUtils";
 import { parseApiError } from "utils/parseApiError";
 
 interface PartnerDetailsProps {

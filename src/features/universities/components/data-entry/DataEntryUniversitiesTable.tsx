@@ -18,22 +18,22 @@ import {
   Languages,
 } from "lucide-react";
 import { MdOutlineCategory, MdSchool } from "react-icons/md";
-import PresignedImage from "components/ub/data/PresignedImage";
+import PresignedImage from "components/ub/data/media/PresignedImage";
 import { monthLabel } from "features/programs/utils/intakeMonths";
 import { useSetUniversityHidden, useUniversities } from "features/universities/hooks";
-import Button from "components/ub/core/Button";
-import IconButton from "components/ub/core/IconButton";
-import Link from "components/ub/core/LinkBtn";
+import Button from "components/ub/core/buttons/Button";
+import IconButton from "components/ub/core/buttons/IconButton";
+import Link from "components/ub/core/buttons/LinkBtn";
 import UniversityFilterPanel from "features/universities/components/shared/filters/UniversityFilterPanel";
-import StatusBadge from "components/ub/data/StatusBadge";
-import Tooltip from "components/ub/feedback/Tooltip";
-import TableWrapper from "components/ub/data/TableWrapper";
-import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
-import TableEmptyRow from "components/ub/data/TableEmptyRow";
-import TableErrorRow from "components/ub/data/TableErrorRow";
-import TablePagination from "components/ub/data/TablePagination";
-import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
-import { useToast } from "components/ub/feedback/ToastContext";
+import StatusBadge from "components/ub/data/badges/StatusBadge";
+import Tooltip from "components/ub/feedback/dialogs/Tooltip";
+import TableWrapper from "components/ub/data/tables/TableWrapper";
+import TableSkeletonRows from "components/ub/data/tables/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/tables/TableEmptyRow";
+import TableErrorRow from "components/ub/data/tables/TableErrorRow";
+import TablePagination from "components/ub/data/tables/TablePagination";
+import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 const ITEMS_PER_PAGE = 10;

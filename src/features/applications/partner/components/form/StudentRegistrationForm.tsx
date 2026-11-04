@@ -1,6 +1,6 @@
 "use client";
 
-import Loading from "components/ub/feedback/Loading";
+import Loading from "components/ub/feedback/states/Loading";
 import ApplicationFormView from "features/applications/form/ApplicationFormView";
 import { useApplicationForm } from "features/applications/form/useApplicationForm";
 

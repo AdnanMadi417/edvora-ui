@@ -8,7 +8,7 @@ jest.mock("features/partners/hooks", () => ({
   useReviewPartner: () => ({ reviewPartner, loading: false }),
   useAssignPartnerManager: () => ({ assignManager, loading: false }),
 }));
-jest.mock("components/ub/feedback/ToastContext", () => ({ useToast: () => ({ showToast: jest.fn() }) }));
+jest.mock("components/ub/feedback/notifications/ToastContext", () => ({ useToast: () => ({ showToast: jest.fn() }) }));
 
 const flush = () => act(() => new Promise((r) => requestAnimationFrame(() => r(undefined))));
 const renderPopup = (currentManagerId?: string) =>

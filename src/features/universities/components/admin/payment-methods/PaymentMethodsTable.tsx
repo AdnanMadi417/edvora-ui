@@ -15,22 +15,22 @@ import { MdOutlineCategory } from "react-icons/md";
 
 import { useDeleteUniversity, useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 
-import NextButton from "components/ub/core/NextButton";
-import PrevButton from "components/ub/core/PrevButton";
-import SearchInput from "components/ub/forms/SearchInput";
+import NextButton from "components/ub/core/buttons/NextButton";
+import PrevButton from "components/ub/core/buttons/PrevButton";
+import SearchInput from "components/ub/forms/selection/SearchInput";
 
-import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
+import NoMessagesFound from "components/ub/feedback/states/NoMessagesFound";
 
 import DeletePaymentConfirmation from "features/universities/components/admin/payment-methods/popups/DeletePaymentConfirmation";
 import CreatePayment from "features/universities/components/admin/payment-methods/popups/CreatePayment";
 
-import Loading from "components/ub/feedback/Loading";
+import Loading from "components/ub/feedback/states/Loading";
 
 import { useRouter } from "next/navigation";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import Button from "components/ub/core/Button";
-import IconButton from "components/ub/core/IconButton";
+import Button from "components/ub/core/buttons/Button";
+import IconButton from "components/ub/core/buttons/IconButton";
 
 const PaymentMethodsTable = () => {
   const router = useRouter();

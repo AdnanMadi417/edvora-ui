@@ -17,7 +17,7 @@ import {
 import { usePrograms, useStates, useDeletePrograms, useSetProgramHidden, useProgramsCopyEligibility } from "features/programs/hooks";
 import { programApi } from "features/programs/services";
 import type { Program } from "features/programs/types";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";

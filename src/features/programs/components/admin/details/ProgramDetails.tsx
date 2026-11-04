@@ -29,14 +29,14 @@ import {
 import { useProgram, useDeletePrograms, useCopyTargetBranches, useSetProgramHidden } from 'features/programs/hooks';
 import { getIeltsLabel } from 'constants/lists';
 
-import { useToast } from 'components/ub/feedback/ToastContext';
+import { useToast } from 'components/ub/feedback/notifications/ToastContext';
 import { parseApiError } from 'utils/parseApiError';
 import DeleteProgramsConfirmation from 'features/programs/components/admin/popups/DeleteProgramsConfirmation';
 import CopyProgramToBranch from 'features/programs/components/admin/popups/CopyProgramToBranch';
-import Loading from 'components/ub/feedback/Loading';
-import PresignedImage from 'components/ub/data/PresignedImage';
-import Button from 'components/ub/core/Button';
-import RichTextDisplay from 'components/ub/data/RichTextDisplay';
+import Loading from 'components/ub/feedback/states/Loading';
+import PresignedImage from 'components/ub/data/media/PresignedImage';
+import Button from 'components/ub/core/buttons/Button';
+import RichTextDisplay from 'components/ub/data/display/RichTextDisplay';
 import CurrencySelector from 'features/programs/components/shared/CurrencySelector';
 import IntakeMonthsChips from 'features/programs/components/shared/IntakeMonthsChips';
 import { monthLabel } from 'features/programs/utils/intakeMonths';

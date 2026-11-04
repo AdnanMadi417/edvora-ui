@@ -1,12 +1,12 @@
 "use client";
 
-import Textarea from "components/ub/forms/Textarea";
-import Checkbox from "components/ub/forms/Checkbox";
-import Tag from "components/ub/data/Tag";
-import FormModal from "components/ub/feedback/FormModal";
+import Textarea from "components/ub/forms/text/Textarea";
+import Checkbox from "components/ub/forms/choices/Checkbox";
+import Tag from "components/ub/data/badges/Tag";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useEffect, useState } from "react";
 import { AlertTriangle, FilePlus2 } from "lucide-react";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useUpdateCorrectionRequest } from "features/applications/hooks";
 import type { DocumentType } from "features/applications/hooks/stages/useApplicationActions";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";

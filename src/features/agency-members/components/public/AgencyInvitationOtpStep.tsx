@@ -6,9 +6,9 @@ import { useSearchParams } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 
 import { useVerifyAgencyInvitationOtp, useResendAgencyInvitationOtp } from "features/agency-members/hooks";
-import OtpInputField from "components/ub/forms/OtpInputField";
-import InputField from "components/ub/forms/InputField";
-import Button from "components/ub/core/Button";
+import OtpInputField from "components/ub/forms/text/OtpInputField";
+import InputField from "components/ub/forms/text/InputField";
+import Button from "components/ub/core/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 
 export default function AgencyInvitationOtpStep() {

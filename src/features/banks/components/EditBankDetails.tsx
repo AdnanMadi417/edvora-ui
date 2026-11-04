@@ -2,20 +2,26 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, Landmark, Pencil, XCircle } from "lucide-react";
-import Skeleton from "components/ub/feedback/Skeleton";
-import AsyncStateView from "components/ub/feedback/AsyncStateView";
-import { getAsyncStatus } from "components/ub/feedback/AsyncStatus";
-import InputField from "components/ub/forms/InputField";
-import SelectField from "components/ub/forms/SelectField";
-import ToggleInput from "components/ub/forms/ToggleInput";
-import Button from "components/ub/core/Button";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { ChevronLeft, Landmark } from "lucide-react";
+import Skeleton from "components/ub/feedback/states/Skeleton";
+import AsyncStateView from "components/ub/feedback/states/AsyncStateView";
+import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
+import FormPage from "components/ub/forms/layout/FormPage";
+import { FormSection } from "components/ub/feedback/dialogs/FormModal";
+import Alert from "components/ub/feedback/notifications/Alert";
+import InputField from "components/ub/forms/text/InputField";
+import SelectField from "components/ub/forms/selection/SelectField";
+import ToggleInput from "components/ub/forms/choices/ToggleInput";
+import Button from "components/ub/core/buttons/Button";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useBank, useUpdateBank } from "../hooks";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { ISO_COUNTRIES } from "constants/lists";
 
-const COUNTRY_OPTIONS = ISO_COUNTRIES.map((c) => ({ value: c.code, label: `${c.name} (${c.code})` }));
+const COUNTRY_OPTIONS = ISO_COUNTRIES.map((c) => ({
+  value: c.code,
+  label: `${c.name} (${c.code})`,
+}));
 
 interface Props {
   id: string;
@@ -52,7 +58,7 @@ function validateName(value: string): string {
 // shift the layout once the bank (or the "not found" state) arrives.
 function EditBankFormSkeleton() {
   return (
-    <div className="space-y-4 border-t border-slate-200 px-6 py-6">
+    <div className="grid gap-4 sm:grid-cols-2">
       {Array.from({ length: 4 }).map((_, i) => (
         <div key={i}>
           <Skeleton className="h-3 w-20" />
@@ -69,14 +75,28 @@ function EditBankFormSkeleton() {
 // a bank is toggling is_active here: there's no delete endpoint, the DB
 // RESTRICTs deleting a bank that still has partner_bank_accounts pointing
 // at it).
-export default function EditBankDetails({ id, basePath = "/admin/advisors/banks" }: Props) {
+export default function EditBankDetails({
+  id,
+  basePath = "/admin/advisors/banks",
+}: Props) {
   const router = useRouter();
   const { showToast } = useToast();
   const { bank, loading: loadingBank, error: bankError, refetch } = useBank(id);
-  const status = getAsyncStatus(loadingBank, bankError, bank, (b) => b === null);
+  const status = getAsyncStatus(
+    loadingBank,
+    bankError,
+    bank,
+    (b) => b === null
+  );
   const { updateBank, loading } = useUpdateBank();
 
-  const [formData, setFormData] = useState<FormData>({ country: "", code: "", swift_code: "", name: "", is_active: true });
+  const [formData, setFormData] = useState<FormData>({
+    country: "",
+    code: "",
+    swift_code: "",
+    name: "",
+    is_active: true,
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -92,11 +112,17 @@ export default function EditBankDetails({ id, basePath = "/admin/advisors/banks"
   }, [bank]);
 
   const updateFormData = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: field === "country" ? String(value).toUpperCase() : value }));
+    setFormData((prev) => ({
+      ...prev,
+      [field]: field === "country" ? String(value).toUpperCase() : value,
+    }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
-  const isFormValid = !validateCountry(formData.country) && !validateCode(formData.code) && !validateName(formData.name);
+  const isFormValid =
+    !validateCountry(formData.country) &&
+    !validateCode(formData.code) &&
+    !validateName(formData.name);
 
   const isChanged =
     bank &&
@@ -137,11 +163,16 @@ export default function EditBankDetails({ id, basePath = "/admin/advisors/banks"
     } catch (error: unknown) {
       const code = getApiErrorCode(error);
       if (code === "bank_already_exists") {
-        setErrors((prev) => ({ ...prev, code: "A bank with this country and code already exists." }));
+        setErrors((prev) => ({
+          ...prev,
+          code: "A bank with this country and code already exists.",
+        }));
         return;
       }
       if (code === "bank_not_found") {
-        setApiError("This bank no longer exists — it may have been removed elsewhere.");
+        setApiError(
+          "This bank no longer exists — it may have been removed elsewhere."
+        );
         return;
       }
       setApiError(parseApiError(error, "Please try again."));
@@ -149,43 +180,40 @@ export default function EditBankDetails({ id, basePath = "/admin/advisors/banks"
   };
 
   return (
-    <div className="mt-6 max-w-5xl mx-auto">
-      <div className="rounded-md border bg-white shadow-sm">
-        <div className="flex items-center gap-4 border-b p-6">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-700">
-            <Landmark className="h-6 w-6 text-white" />
-          </div>
-          <div>
-            <h2 className="text-lg font-semibold text-slate-900">Edit Bank</h2>
-            <p className="text-sm text-slate-500">
-              Retiring a bank (toggle Inactive) just hides it from the picker — it can&apos;t be deleted while any partner account
-              references it.
-            </p>
-          </div>
-        </div>
-
-        <AsyncStateView
-          status={status}
-          skeleton={<EditBankFormSkeleton />}
-          errorMessage={bankError ?? undefined}
-          onRetry={refetch}
-          emptyTitle="Bank not found"
-          emptySubtitle="It may have been removed, or the link is out of date."
-          emptyIcon={Landmark}
-          emptyAction={
-            <Button
-              onClick={handleBack}
-              icon={<ChevronLeft className="h-4 w-4" />}
-              text="Back to Banks"
-              bgColor="bg-white"
-              textColor="text-slate-600"
-              borderColor="border-slate-300"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-400"
-            />
-          }
+    <FormPage
+      title="Edit bank"
+      description="Update the bank details and control whether advisors can select it."
+      icon={Landmark}
+      onSubmit={handleSave}
+      onCancel={handleBack}
+      cancelLabel="Back"
+      submitLabel="Save changes"
+      submitting={loading}
+      submitDisabled={!isChanged || !isFormValid}
+      showActions={status === "success"}
+    >
+      <AsyncStateView
+        status={status}
+        skeleton={<EditBankFormSkeleton />}
+        errorMessage={bankError ?? undefined}
+        onRetry={refetch}
+        emptyTitle="Bank not found"
+        emptySubtitle="It may have been removed, or the link is out of date."
+        emptyIcon={Landmark}
+        emptyAction={
+          <Button
+            onClick={handleBack}
+            icon={<ChevronLeft className="h-4 w-4" />}
+            text="Back to Banks"
+            variant="secondary"
+          />
+        }
+      >
+        <FormSection
+          id="bank-details"
+          title="Bank details"
+          description="Use the bank's official name and identifiers."
         >
-        <div className="space-y-4 border-t border-slate-200 px-6 py-6">
           <SelectField
             label="Country"
             field="country"
@@ -210,7 +238,14 @@ export default function EditBankDetails({ id, basePath = "/admin/advisors/banks"
               if (err) setErrors((prev) => ({ ...prev, code: err }));
             }}
           />
-          <InputField label="SWIFT Code" field="swift_code" required={false} formData={formData} errors={errors} updateFormData={updateFormData} />
+          <InputField
+            label="SWIFT Code"
+            field="swift_code"
+            required={false}
+            formData={formData}
+            errors={errors}
+            updateFormData={updateFormData}
+          />
           <InputField
             label="Bank Name"
             field="name"
@@ -223,6 +258,8 @@ export default function EditBankDetails({ id, basePath = "/admin/advisors/banks"
               if (err) setErrors((prev) => ({ ...prev, name: err }));
             }}
           />
+        </FormSection>
+        <FormSection id="bank-availability" title="Availability" columns={1}>
           <ToggleInput
             label="Status"
             field="is_active"
@@ -234,47 +271,13 @@ export default function EditBankDetails({ id, basePath = "/admin/advisors/banks"
             enabledDescription="Shown in the bank picker on advisor account forms."
             disabledDescription="Hidden from the bank picker."
           />
-
-          {apiError && (
-            <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-4">
-              <XCircle className="mt-0.5 h-5 w-5 text-red-600" />
-              <div>
-                <p className="text-sm font-semibold text-red-800">Failed to update bank</p>
-                <p className="text-sm text-red-700">{apiError}</p>
-              </div>
-            </div>
-          )}
-        </div>
-        </AsyncStateView>
-
-        {status === "success" && (
-          <div className="flex gap-2 border-t border-slate-200 px-6 py-4">
-            <Button
-              onClick={handleBack}
-              icon={<ChevronLeft className="h-5 w-5" />}
-              text="Back"
-              bgColor="bg-white"
-              textColor="text-slate-600"
-              borderColor="border-slate-300"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-400"
-              className="flex-1 hover:bg-slate-50"
-            />
-            <Button
-              onClick={handleSave}
-              disabled={loading || !isChanged || !isFormValid}
-              icon={<Pencil className="h-5 w-5" />}
-              text={loading ? "Saving..." : "Save Changes"}
-              bgColor="bg-blue-600"
-              textColor="text-white"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-white"
-              hoverBorderColor="hover:border-blue-700"
-              className="flex-1 hover:bg-blue-700"
-            />
-          </div>
+        </FormSection>
+        {apiError && (
+          <Alert tone="danger" title="Couldn't update bank">
+            {apiError}
+          </Alert>
         )}
-      </div>
-    </div>
+      </AsyncStateView>
+    </FormPage>
   );
 }

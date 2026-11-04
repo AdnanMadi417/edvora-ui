@@ -136,10 +136,10 @@ const STRUCTURE = `src/
     featureFlags.ts          # FEATURES.darkMode and others
   app/(internal)/design-system/page.tsx   # this page`;
 
-const IMPORTS = `import Button from "components/ub/core/Button";
-import Input from "components/ub/forms/Input";
-import DataTable from "components/ub/data/DataTable";
-import Modal from "components/ub/feedback/Modal";
+const IMPORTS = `import Button from "components/ub/core/buttons/Button";
+import Input from "components/ub/forms/text/Input";
+import DataTable from "components/ub/data/tables/DataTable";
+import Modal from "components/ub/feedback/dialogs/Modal";
 import ApplicationTracker from "components/ub/brand/ApplicationTracker";
 import { STUDENT_PROFILE_STEPS } from "config/applicationStages";
 import { card, cardPadding, focusRing } from "components/ub/recipes";`;

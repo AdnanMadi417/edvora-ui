@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { Eye, Download } from "lucide-react";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { downloadFileAs, buildDocumentFileName } from "utils/documentFileName";
-import { useToast } from "components/ub/feedback/ToastContext";
-import IconButton from "components/ub/core/IconButton";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import IconButton from "components/ub/core/buttons/IconButton";
 
 interface DocumentActionsProps {
   /** Storage file_key for the document. Buttons are disabled when missing. */

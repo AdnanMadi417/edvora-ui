@@ -2,7 +2,7 @@
 
 import { ExternalLink } from "lucide-react";
 import { buttonBase, buttonSizes, buttonVariants } from "components/ub/recipes";
-import SectionCard from "components/ub/data/SectionCard";
+import SectionCard from "components/ub/data/cards/SectionCard";
 
 const MDAC_URL = "https://imigresen-online.imi.gov.my/mdac/main";
 

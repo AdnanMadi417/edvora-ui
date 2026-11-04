@@ -1,9 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Button from "components/ub/core/Button";
-import StickyActionBar from "components/ub/navigation/StickyActionBar";
-import Tabs, { tabPanelProps } from "components/ub/navigation/Tabs";
+import Button from "components/ub/core/buttons/Button";
+import StickyActionBar from "components/ub/navigation/controls/StickyActionBar";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import { APPLICATION_DETAILS_TABS, type ApplicationDetailsTab } from "features/applications/shared/applicationDetailTabs";
 import type { HeaderAction } from "./ApplicationHeader";
 

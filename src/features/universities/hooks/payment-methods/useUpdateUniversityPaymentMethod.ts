@@ -1,0 +1,31 @@
+import { useState } from "react";
+import { universityApi } from "../../services";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import type { UpdatePaymentMethodPayload } from "../../types";
+import { parseApiError } from "utils/parseApiError";
+
+export function useUpdateUniversityPaymentMethod() {
+  const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
+
+  const updateUniversityPaymentMethod = async (
+    universityId: string,
+    universityPaymentMethodId: string,
+    payload: UpdatePaymentMethodPayload
+  ) => {
+    setLoading(true);
+    try {
+      const res = await universityApi.paymentMethods.update(universityId, universityPaymentMethodId, payload);
+      showToast("Payment method updated successfully.", "success");
+      return res.data;
+    } catch (err: unknown) {
+      const backendMessage = parseApiError(err, "Please try again.");
+      showToast(`Update failed. ${backendMessage}`, "error");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { updateUniversityPaymentMethod, loading };
+}

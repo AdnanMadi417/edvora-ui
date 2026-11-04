@@ -7,7 +7,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useCreatePartnerApplication } from "features/applications/partner/hooks/useCreatePartnerApplication";
 import { useGetApplicationRequiredFields } from "features/applications/partner/hooks/useApplicationRequiredFields";

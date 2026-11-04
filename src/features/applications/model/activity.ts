@@ -3,7 +3,7 @@
 // every field is read defensively and an unknown entry_type still renders.
 
 import { ArrowRightLeft, FilePlus2, FileUp, Info, MessageCircle, Plane, Wallet, type LucideIcon } from "lucide-react";
-import type { TimelineEvent } from "components/ub/data/Timeline";
+import type { TimelineEvent } from "components/ub/data/display/Timeline";
 import type { TagTone } from "components/ub/recipes";
 import type { ApplicationTimelineItem, TimelineDocumentTypeRef } from "features/applications/shared/applicationTypes";
 

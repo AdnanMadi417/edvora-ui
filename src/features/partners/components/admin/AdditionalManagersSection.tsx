@@ -2,8 +2,8 @@
 
 import React, { useMemo, useState } from "react";
 import { Share2, UserPlus, X } from "lucide-react";
-import { useToast } from "components/ub/feedback/ToastContext";
-import Button from "components/ub/core/Button";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import Button from "components/ub/core/buttons/Button";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { useAdditionalManagers } from "features/partners/hooks";
 import type { AdditionalManager, PartnerDetails } from "features/partners/types";

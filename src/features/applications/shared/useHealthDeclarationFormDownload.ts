@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDocumentType } from "hooks/useDocumentType";
 import { getDocumentDownloadUrl } from "services/documentService";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 
 // Official "Lampiran B" Health Declaration Form — fallback used until an
 // admin uploads a static template for the health_declaration_form document

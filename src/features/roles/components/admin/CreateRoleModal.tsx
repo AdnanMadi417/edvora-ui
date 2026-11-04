@@ -5,10 +5,10 @@ import { XCircle, ShieldPlus } from "lucide-react";
 
 import { useCreateRole } from "../../hooks";
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import InputField from "components/ub/forms/InputField";
-import { useToast } from "components/ub/feedback/ToastContext";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
+import InputField from "components/ub/forms/text/InputField";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface CreateRoleModalProps {

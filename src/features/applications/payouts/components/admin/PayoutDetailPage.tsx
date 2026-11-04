@@ -4,19 +4,19 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Ban, Wallet } from "lucide-react";
 
-import Skeleton from "components/ub/feedback/Skeleton";
-import AsyncStateView from "components/ub/feedback/AsyncStateView";
-import { getAsyncStatus } from "components/ub/feedback/AsyncStatus";
-import Tag from "components/ub/data/Tag";
-import DescriptionList from "components/ub/data/DescriptionList";
-import DataTable from "components/ub/data/DataTable";
-import IconTile from "components/ub/dashboard/IconTile";
+import Skeleton from "components/ub/feedback/states/Skeleton";
+import AsyncStateView from "components/ub/feedback/states/AsyncStateView";
+import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
+import Tag from "components/ub/data/badges/Tag";
+import DescriptionList from "components/ub/data/display/DescriptionList";
+import DataTable from "components/ub/data/tables/DataTable";
+import IconTile from "components/ub/dashboard/shared/IconTile";
 import { card } from "components/ub/recipes";
-import Button from "components/ub/core/Button";
-import ActionsDropdown from "components/ub/navigation/ActionsDropdown";
+import Button from "components/ub/core/buttons/Button";
+import ActionsDropdown from "components/ub/navigation/menus/ActionsDropdown";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
-import AppDate from "components/ub/data/AppDate";
+import AppDate from "components/ub/data/formatting/AppDate";
 
 import { usePayout, usePaymentMethods } from "../../hooks";
 

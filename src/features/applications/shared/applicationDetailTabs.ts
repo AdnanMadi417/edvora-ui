@@ -1,5 +1,5 @@
 import { Activity, FileText, LayoutDashboard, Plane, Wallet } from "lucide-react";
-import type { TabItem } from "components/ub/navigation/Tabs";
+import type { TabItem } from "components/ub/navigation/controls/Tabs";
 
 export type ApplicationDetailsTab = "overview" | "documents" | "offer-visa" | "commission" | "activity";
 

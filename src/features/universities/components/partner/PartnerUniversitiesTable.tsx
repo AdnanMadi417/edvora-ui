@@ -3,15 +3,15 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw, CheckCircle, XCircle, GraduationCap, Landmark, MapPin, ChevronRight, AlertTriangle, Building2, Languages } from "lucide-react";
-import PresignedImage from "components/ub/data/PresignedImage";
+import PresignedImage from "components/ub/data/media/PresignedImage";
 import { monthLabel } from "features/programs/utils/intakeMonths";
 import { useUniversities } from "features/universities/hooks";
-import SearchInput from "components/ub/forms/SearchInput";
-import FilterSelectField from "components/ub/forms/FilterSelectField";
-import StatusBadge from "components/ub/data/StatusBadge";
-import Button from "components/ub/core/Button";
-import TablePagination from "components/ub/data/TablePagination";
-import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
+import SearchInput from "components/ub/forms/selection/SearchInput";
+import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
+import StatusBadge from "components/ub/data/badges/StatusBadge";
+import Button from "components/ub/core/buttons/Button";
+import TablePagination from "components/ub/data/tables/TablePagination";
+import NoMessagesFound from "components/ub/feedback/states/NoMessagesFound";
 
 const ITEMS_PER_PAGE = 10;
 

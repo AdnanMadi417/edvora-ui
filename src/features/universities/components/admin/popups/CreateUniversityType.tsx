@@ -1,15 +1,15 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
-import { GraduationCap, Building2, XCircle } from 'lucide-react';
+import { Building2 } from "lucide-react";
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 
-import InputField from "components/ub/forms/InputField";
+import InputField from "components/ub/forms/text/InputField";
+import TextareaField from "components/ub/forms/text/TextareaField";
 
 import { useCreateUniversityType } from "features/universities/hooks";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 
@@ -24,11 +24,8 @@ export default function CreateUniversityType({
   onClose,
   onSuccess,
 }: CreateUniversityProps) {
-
   const { createUniversityType, loading } = useCreateUniversityType();
   const { showToast } = useToast();
-
-  const [isVisible, setIsVisible] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -42,7 +39,8 @@ export default function CreateUniversityType({
       setErrors((prev) => ({ ...prev, ...patch }));
       scrollToFirstError(patch);
     },
-    onUnmappedError: (message) => showToast(`Failed to create university type. ${message}`, "error"),
+    onUnmappedError: (message) =>
+      showToast(`Failed to create university type. ${message}`, "error"),
   });
 
   const validateName = (value: string): string => {
@@ -54,22 +52,18 @@ export default function CreateUniversityType({
 
   const validateDescription = (value: string): string => {
     if (!value.trim()) return "Description is required";
-    if (value.trim().length < 10) return "Description must be at least 10 characters";
+    if (value.trim().length < 10)
+      return "Description must be at least 10 characters";
     return "";
   };
 
   const isFormValid =
-    !validateName(formData.name) &&
-    !validateDescription(formData.description);
+    !validateName(formData.name) && !validateDescription(formData.description);
 
   useEffect(() => {
     if (isOpen) {
-      setIsVisible(true);
       setFormData({ name: "", description: "" });
       setErrors({});
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
     }
   }, [isOpen]);
 
@@ -97,7 +91,10 @@ export default function CreateUniversityType({
     }
 
     try {
-      await createUniversityType({ name: formData.name.trim(), description: formData.description.trim() });
+      await createUniversityType({
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+      });
 
       showToast("University type created successfully.", "success");
 
@@ -107,93 +104,50 @@ export default function CreateUniversityType({
       handleApiError(err, "Please try again.");
     }
   };
-  if (!isVisible) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="md"
+      icon={Building2}
+      title="Create university type"
+      description="Define an institution category for the Knowledge Hub."
+      onSubmit={async () => {
+        await handleCreate();
+      }}
+      submitLabel="Create university type"
+      submitting={loading}
+      submitDisabled={!isFormValid}
     >
-      <div
-        className={`w-full max-w-lg transform transition-all duration-300 md:max-w-xl ${
-          isOpen
-            ? "translate-y-0 scale-100 opacity-100"
-            : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-          <ModalHeader
-            title="Create University"
-            description="Add a new university to the knowledge hub system."
-            icon={Building2}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
-            onClose={onClose}
-          />
+      <fieldset disabled={loading} className="min-w-0 space-y-4">
+        <InputField
+          label="University type name"
+          field="name"
+          placeholder="e.g. Public university"
+          required
+          formData={formData}
+          errors={errors}
+          updateFormData={updateFormData}
+          onBlur={() => {
+            const err = validateName(formData.name);
+            if (err) setErrors((prev) => ({ ...prev, name: err }));
+          }}
+        />
 
-          <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
-            <InputField
-              label="University Name"
-              field="name"
-              placeholder="e.g. Universiti Malaya"
-              required
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-              onBlur={() => {
-                const err = validateName(formData.name);
-                if (err) setErrors((prev) => ({ ...prev, name: err }));
-              }}
-            />
-
-            <InputField
-              label="Description"
-              field="description"
-              placeholder="Brief university description..."
-              required
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-              onBlur={() => {
-                const err = validateDescription(formData.description);
-                if (err) setErrors((prev) => ({ ...prev, description: err }));
-              }}
-            />
-
-          </div>
-
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <Button
-              onClick={onClose}
-              disabled={loading}
-              icon={<XCircle  className="h-5 w-5" />}
-              text={loading ? "Cancelling..." : "Cancel"}
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
-            />
-
-            <Button
-              onClick={handleCreate}
-              icon={<GraduationCap  className="h-5 w-5" />}
-              disabled={loading || !isFormValid}
-              text={loading ? "Creating..." : "Create University"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+        <TextareaField
+          label="Description"
+          field="description"
+          placeholder="Describe the institutions in this category"
+          required
+          formData={formData}
+          errors={errors}
+          updateFormData={updateFormData}
+          onBlur={() => {
+            const err = validateDescription(formData.description);
+            if (err) setErrors((prev) => ({ ...prev, description: err }));
+          }}
+        />
+      </fieldset>
+    </FormModal>
   );
 }

@@ -1,16 +1,16 @@
-﻿"use client";
+"use client";
 
-import { Pencil, XCircle } from "lucide-react";
+import { UserRound } from "lucide-react";
 import React, { useEffect, useState } from "react";
 
-import InputField from "components/ub/forms/InputField";
-import PasswordField from "components/ub/forms/PasswordField";
-import PasswordRequirementsChecklist from "components/ub/forms/PasswordRequirementsChecklist";
-import PasswordMatchIndicator from "components/ub/forms/PasswordMatchIndicator";
-import ToggleInput from "components/ub/forms/ToggleInput";
-import Button from "components/ub/core/Button";
-import StatusBadge from "components/ub/data/StatusBadge";
-import { useToast } from "components/ub/feedback/ToastContext";
+import InputField from "components/ub/forms/text/InputField";
+import PasswordField from "components/ub/forms/password/PasswordField";
+import PasswordRequirementsChecklist from "components/ub/forms/password/PasswordRequirementsChecklist";
+import PasswordMatchIndicator from "components/ub/forms/password/PasswordMatchIndicator";
+import ToggleInput from "components/ub/forms/choices/ToggleInput";
+import FormPage from "components/ub/forms/layout/FormPage";
+import { FormSection } from "components/ub/feedback/dialogs/FormModal";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 import { useEditAccountManager } from "../hooks/useEditAccountManager";
@@ -29,7 +29,9 @@ interface FormErrors {
   confirm_password?: string;
 }
 
-export default function EditAccountManager({ manager }: EditAccountManagerProps) {
+export default function EditAccountManager({
+  manager,
+}: EditAccountManagerProps) {
   const { showToast } = useToast();
   const { editAccountManager, loading } = useEditAccountManager(manager?.id);
   const router = useRouter();
@@ -119,129 +121,96 @@ export default function EditAccountManager({ manager }: EditAccountManagerProps)
   };
 
   return (
-    <section>
-      <div className="group relative max-w-5xl mx-auto overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition-all duration-300">
-        <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-5">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-slate-700 transition-transform group-hover:scale-105">
-              {manager.name?.charAt(0).toUpperCase() ?? "?"}
-            </div>
+    <FormPage
+      title="Edit account manager"
+      description="Update the profile, password, and platform access for this account."
+      icon={UserRound}
+      onSubmit={handleSubmit}
+      onCancel={handleCancel}
+      submitLabel="Save changes"
+      submitting={loading}
+      submitDisabled={
+        !isFormChanged() ||
+        (!!formData.password &&
+          (!isPasswordValid(formData.password) ||
+            formData.password !== formData.confirm_password))
+      }
+    >
+      <FormSection
+        id="manager-details"
+        title="Personal details"
+        description="The name and email used for this manager's account."
+      >
+        <InputField
+          label="Name"
+          field="name"
+          placeholder="Enter full name"
+          required
+          formData={formData}
+          errors={errors}
+          updateFormData={updateField}
+        />
 
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl font-semibold text-slate-900">
-                  Edit Account Manager
-                </h1>
-
-                <StatusBadge variant="info" icon={<Pencil className="h-3 w-3" />}>
-                  Editing
-                </StatusBadge>
-              </div>
-
-              <p className="text-sm text-slate-500">
-                Update account manager profile and settings
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="h-px w-full bg-slate-200" />
-
-        <div className="space-y-6 p-6">
-          <InputField
-            label="Name"
-            field="name"
-            placeholder="e.g. FastTrack Logistics"
-            required
+        <InputField
+          label="Email"
+          field="email"
+          placeholder="e.g. manager@example.com"
+          type="email"
+          required
+          formData={formData}
+          errors={errors}
+          updateFormData={updateField}
+        />
+      </FormSection>
+      <FormSection
+        id="manager-security"
+        title="Change password"
+        description="Leave both fields blank to keep the current password."
+      >
+        <div>
+          <PasswordField
+            label="Password"
+            field="password"
+            placeholder="Leave blank to keep current password"
+            required={false}
             formData={formData}
             errors={errors}
             updateFormData={updateField}
           />
+          <PasswordRequirementsChecklist password={formData.password} />
+        </div>
 
-          <InputField
-            label="Email"
-            field="email"
-            placeholder="e.g. manager@example.com"
-            type="email"
-            required
+        <div>
+          <PasswordField
+            label="Confirm Password"
+            field="confirm_password"
+            placeholder="Repeat your new password"
+            required={false}
             formData={formData}
             errors={errors}
             updateFormData={updateField}
           />
-
-          <ToggleInput
-            label="Active Status"
-            field="is_active"
-            formData={formData}
-            errors={errors}
-            updateFormData={updateField}
-            enabledText="Active"
-            disabledText="Suspended"
-            enabledDescription="This account manager can log in and access the platform."
-            disabledDescription="This account manager cannot log in until reactivated."
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-3">
-            <div>
-              <PasswordField
-                label="Password"
-                field="password"
-                placeholder="Leave blank to keep current password"
-                required={false}
-                formData={formData}
-                errors={errors}
-                updateFormData={updateField}
-              />
-              <PasswordRequirementsChecklist password={formData.password} />
-            </div>
-
-            <div>
-              <PasswordField
-                label="Confirm Password"
-                field="confirm_password"
-                placeholder="Repeat your new password"
-                required={false}
-                formData={formData}
-                errors={errors}
-                updateFormData={updateField}
-              />
-              {formData.password && (
-                <PasswordMatchIndicator password={formData.password} confirmPassword={formData.confirm_password} />
-              )}
-            </div>
-          </div>
+          {formData.password && (
+            <PasswordMatchIndicator
+              password={formData.password}
+              confirmPassword={formData.confirm_password}
+            />
+          )}
         </div>
-
-        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-slate-200 bg-white px-6 py-4">
-          <Button
-            icon={<XCircle className="h-4 w-4" />}
-            text={loading ? "Cancelling..." : "Cancel"}
-            bgColor="bg-slate-50"
-            textColor="text-slate-500"
-            borderColor="border-slate-500"
-            hoverTextColor="hover:text-slate-700"
-            hoverBorderColor="hover:border-slate-700"
-            onClick={handleCancel}
-          />
-
-          <Button
-            icon={<Pencil className="h-4 w-4" />}
-            text={loading ? "Saving..." : "Save Changes"}
-            bgColor="bg-blue-50"
-            textColor="text-blue-700"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-blue-800"
-            hoverBorderColor="hover:border-blue-700"
-            onClick={handleSubmit}
-            disabled={
-              loading ||
-              !isFormChanged() ||
-              (!!formData.password &&
-                (!isPasswordValid(formData.password) || formData.password !== formData.confirm_password))
-            }
-          />
-        </div>
-      </div>
-    </section>
+      </FormSection>
+      <FormSection id="manager-access" title="Account access" columns={1}>
+        <ToggleInput
+          label="Active Status"
+          field="is_active"
+          formData={formData}
+          errors={errors}
+          updateFormData={updateField}
+          enabledText="Active"
+          disabledText="Suspended"
+          enabledDescription="This account manager can log in and access the platform."
+          disabledDescription="This account manager cannot log in until reactivated."
+        />
+      </FormSection>
+    </FormPage>
   );
 }

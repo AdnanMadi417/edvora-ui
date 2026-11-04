@@ -1,6 +1,6 @@
 // Demo content for Advisor home (UI-only build). Replace with API data when
 // the endpoints exist; the component only reads these shapes.
-import type { DaysTagMode } from "components/ub/data/DaysTag";
+import type { DaysTagMode } from "components/ub/data/badges/DaysTag";
 
 export interface NextAction {
   student: string;

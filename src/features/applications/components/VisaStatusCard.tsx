@@ -1,7 +1,7 @@
 "use client";
 
 import ApplicationTracker, { type TrackerStep, type TrackerStepState } from "components/ub/brand/ApplicationTracker";
-import SectionCard, { type SectionCardState } from "components/ub/data/SectionCard";
+import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
 import type { DocumentItem } from "features/applications/model/applicationView";
 import DocumentRow from "./DocumentRow";
 

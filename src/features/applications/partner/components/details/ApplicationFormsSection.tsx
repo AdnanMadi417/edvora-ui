@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import { Download, FileText, FileUp } from "lucide-react";
-import Button from "components/ub/core/Button";
-import IconButton from "components/ub/core/IconButton";
-import FileRow, { type FileRowState } from "components/ub/data/FileRow";
-import SectionCard from "components/ub/data/SectionCard";
-import { useToast } from "components/ub/feedback/ToastContext";
+import Button from "components/ub/core/buttons/Button";
+import IconButton from "components/ub/core/buttons/IconButton";
+import FileRow, { type FileRowState } from "components/ub/data/display/FileRow";
+import SectionCard from "components/ub/data/cards/SectionCard";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";

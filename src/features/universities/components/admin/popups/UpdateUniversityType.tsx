@@ -1,16 +1,18 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
-import { Layers, GraduationCap, XCircle } from "lucide-react";
+import { Layers } from "lucide-react";
 
-import { useAssignUniversityType, useUniversityTypes } from "features/universities/hooks";
+import {
+  useAssignUniversityType,
+  useUniversityTypes,
+} from "features/universities/hooks";
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import { useToast } from "components/ub/feedback/ToastContext";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
-import SelectField from "components/ub/forms/SelectField";
+import SelectField from "components/ub/forms/selection/SelectField";
 
 interface Props {
   isOpen: boolean;
@@ -36,17 +38,11 @@ export default function AssignUniversityTypeModal({
 
   const { universities: universityTypes } = useUniversityTypes();
 
-  const [isVisible, setIsVisible] = useState(false);
-
   const [formData, setFormData] = useState({
     university_type_id: "" as string | "",
   });
   const [initialFormData, setInitialFormData] = useState({
     university_type_id: "" as string | "",
-  });
-
-  const normalizePayload = (data: typeof formData) => ({
-    university_type_id: data.university_type_id || "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -56,18 +52,11 @@ export default function AssignUniversityTypeModal({
       setErrors((prev) => ({ ...prev, ...patch }));
       scrollToFirstError(patch);
     },
-    onUnmappedError: (message) => showToast(`Update failed. ${message}`, "error"),
+    onUnmappedError: (message) =>
+      showToast(`Update failed. ${message}`, "error"),
   });
 
   const isFormValid = formData.university_type_id.trim() !== "";
-
-  useEffect(() => {
-    if (isOpen) setIsVisible(true);
-    else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
 
   useEffect(() => {
     if (initialData) {
@@ -80,12 +69,8 @@ export default function AssignUniversityTypeModal({
     }
   }, [initialData]);
 
-  const isFormChanged = React.useMemo(() => {
-    const current = normalizePayload(formData);
-    const initial = normalizePayload(initialFormData);
-
-    return JSON.stringify(current) !== JSON.stringify(initial);
-  }, [formData, initialFormData]);
+  const isFormChanged =
+    formData.university_type_id !== initialFormData.university_type_id;
 
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({
@@ -123,68 +108,35 @@ export default function AssignUniversityTypeModal({
     }
   };
 
-  if (!isVisible) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="md"
+      icon={Layers}
+      title="Assign university type"
+      description="Choose the category that best describes this institution."
+      onSubmit={async () => {
+        await handleSubmit();
+      }}
+      submitLabel="Save changes"
+      submitting={loading}
+      submitDisabled={!isFormValid || !isFormChanged}
     >
-      <div
-        className="w-full max-w-lg rounded-2xl bg-white shadow-2xl"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <ModalHeader
-          icon={Layers}
-          title="Assign University Type"
-          description="Select the university type for this institution"
-          iconBg="bg-blue-50"
-          iconColor="text-blue-600"
-          iconBorder="border-blue-200"
-          titleColor="text-gray-900"
-          onClose={onClose}
+      <fieldset disabled={loading} className="min-w-0 space-y-4">
+        <SelectField
+          label="University Type"
+          field="university_type_id"
+          required
+          options={universityTypes.map((type) => ({
+            value: String(type.id),
+            label: type.name,
+          }))}
+          formData={formData}
+          errors={errors}
+          updateFormData={updateFormData}
         />
-
-        <div className="space-y-6 px-6 py-6">
-          <SelectField
-            label="University Type"
-            field="university_type_id"
-            required
-            options={universityTypes.map((type) => ({
-              value: String(type.id),
-              label: type.name,
-            }))}
-            formData={formData}
-            errors={errors}
-            updateFormData={updateFormData}
-          />
-        </div>
-
-        <div className="flex justify-end gap-3 border-t px-6 py-4">
-          <Button
-            onClick={onClose}
-            icon={<XCircle className="h-5 w-5" />}
-            text="Cancel"
-            bgColor="bg-slate-50"
-            textColor="text-slate-700"
-            borderColor="border-slate-600"
-            hoverTextColor="hover:text-slate-800"
-            hoverBorderColor="hover:border-slate-700"
-          />
-
-          <Button
-            onClick={handleSubmit}
-            disabled={loading || !isFormValid || !isFormChanged}
-            icon={<GraduationCap className="h-5 w-5" />}
-            text={loading ? "Saving..." : "Save Type"}
-            bgColor="bg-blue-50"
-            textColor="text-blue-700"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-blue-800"
-            hoverBorderColor="hover:border-blue-700"
-          />
-        </div>
-      </div>
-    </div>
+      </fieldset>
+    </FormModal>
   );
 }

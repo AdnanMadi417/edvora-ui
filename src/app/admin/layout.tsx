@@ -2,8 +2,8 @@
 
 import adminRoutes from "../../routes/adminRoutes";
 import RoleGuard from "components/guard/RoleGuard";
-import { ToastProvider } from "components/ub/feedback/ToastContext";
-import AppShell from "components/ub/navigation/AppShell";
+import { ToastProvider } from "components/ub/feedback/notifications/ToastContext";
+import AppShell from "components/ub/navigation/layout/AppShell";
 
 const ADMIN_ROLES = ["admin"];
 

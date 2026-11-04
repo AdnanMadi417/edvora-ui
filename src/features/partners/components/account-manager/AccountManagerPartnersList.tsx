@@ -8,16 +8,16 @@ import {
 import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import { useAccountManagerPartners } from "features/partners/hooks";
-import SearchInput from "components/ub/forms/SearchInput";
-import TableWrapper from "components/ub/data/TableWrapper";
-import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
-import TableEmptyRow from "components/ub/data/TableEmptyRow";
-import TableErrorRow from "components/ub/data/TableErrorRow";
-import TablePagination from "components/ub/data/TablePagination";
-import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
-import AppDate from "components/ub/data/AppDate";
-import StatusBadge from "components/ub/data/StatusBadge";
-import Button from "components/ub/core/Button";
+import SearchInput from "components/ub/forms/selection/SearchInput";
+import TableWrapper from "components/ub/data/tables/TableWrapper";
+import TableSkeletonRows from "components/ub/data/tables/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/tables/TableEmptyRow";
+import TableErrorRow from "components/ub/data/tables/TableErrorRow";
+import TablePagination from "components/ub/data/tables/TablePagination";
+import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
+import AppDate from "components/ub/data/formatting/AppDate";
+import StatusBadge from "components/ub/data/badges/StatusBadge";
+import Button from "components/ub/core/buttons/Button";
 
 const ITEMS_PER_PAGE = 10;
 

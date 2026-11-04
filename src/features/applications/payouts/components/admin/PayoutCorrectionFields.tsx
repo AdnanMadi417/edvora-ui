@@ -1,12 +1,12 @@
 "use client";
 
-import Textarea from "components/ub/forms/Textarea";
-import Input from "components/ub/forms/Input";
-import Combobox from "components/ub/forms/Combobox";
-import Alert from "components/ub/feedback/Alert";
+import Textarea from "components/ub/forms/text/Textarea";
+import Input from "components/ub/forms/text/Input";
+import Combobox from "components/ub/forms/selection/Combobox";
+import Alert from "components/ub/feedback/notifications/Alert";
 import React from "react";
 
-import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
 import type { Payout } from "../../types";
 import type { PartnerBankAccount } from "features/partners/bank-accounts";
 import { BankAccountPayoutSummary } from "features/partners/bank-accounts";

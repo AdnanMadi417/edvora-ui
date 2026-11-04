@@ -8,18 +8,18 @@ import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 import { useSubmitAgencyMemberProfile } from "features/agency-members/hooks";
 import { COUNTRY_OPTIONS, isKnownCountry, NATIONALITIES, BACKGROUND_OPTIONS } from "constants/lists";
-import InputField from "components/ub/forms/InputField";
-import SelectField from "components/ub/forms/SelectField";
-import SearchableDropdown from "components/ub/forms/SearchableDropdown";
-import PhoneInputField from "components/ub/forms/PhoneInputField";
+import InputField from "components/ub/forms/text/InputField";
+import SelectField from "components/ub/forms/selection/SelectField";
+import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
+import PhoneInputField from "components/ub/forms/text/PhoneInputField";
 import { isValidWebsiteUrl } from "utils/socialMedia";
-import PublicFileUploadField, { type PublicUploadResult } from "components/ub/forms/PublicFileUploadField";
-import ImageUploadField from "components/ub/forms/ImageUploadField";
+import PublicFileUploadField, { type PublicUploadResult } from "components/ub/forms/uploads/PublicFileUploadField";
+import ImageUploadField from "components/ub/forms/uploads/ImageUploadField";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
 import { parseApiError } from "utils/parseApiError";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
-import Button from "components/ub/core/Button";
+import Button from "components/ub/core/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: n.name, label: n.name }));

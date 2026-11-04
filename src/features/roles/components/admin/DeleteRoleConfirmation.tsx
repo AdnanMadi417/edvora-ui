@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Trash2, XCircle } from "lucide-react";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
 
 interface DeleteRoleConfirmationProps {
   isOpen: boolean;

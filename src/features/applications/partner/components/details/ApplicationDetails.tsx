@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { CheckCircle2, ClipboardCheck, CreditCard, FileUp, Plane, Upload, type LucideIcon } from "lucide-react";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { submitOfferLetterDecision } from "services/offerLetterService";
 import { parseApiError } from "utils/parseApiError";
 import { useApplicationActions } from "features/applications/hooks";
-import { usePartnerProfile } from "features/partners/hooks/usePartnerProfile";
+import { usePartnerProfile } from "features/partners/hooks/profile/usePartnerProfile";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useVisaCase } from "hooks/useVisaCase";

@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import InstitutionTypeField from "components/ub/forms/choices/InstitutionTypeField";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -12,7 +13,7 @@ import {
   CreditCard,
 } from "lucide-react";
 
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
@@ -30,21 +31,21 @@ import {
 } from "features/universities/hooks";
 import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 import { useStates } from "features/programs/hooks";
-import InputField from "components/ub/forms/InputField";
-import TextareaField from "components/ub/forms/TextareaField";
-import RichTextEditor from "components/ub/forms/RichTextEditor";
-import SelectField from "components/ub/forms/SelectField";
+import InputField from "components/ub/forms/text/InputField";
+import TextareaField from "components/ub/forms/text/TextareaField";
+import RichTextEditor from "components/ub/forms/text/RichTextEditor";
+import SelectField from "components/ub/forms/selection/SelectField";
 import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
-import ToggleInput from "components/ub/forms/ToggleInput";
-import SearchableDropdown from "components/ub/forms/SearchableDropdown";
-import ImageUploadField from "components/ub/forms/ImageUploadField";
+import ToggleInput from "components/ub/forms/choices/ToggleInput";
+import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
+import ImageUploadField from "components/ub/forms/uploads/ImageUploadField";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
-import Button from "components/ub/core/Button";
-import Loading from "components/ub/feedback/Loading";
-import IconButton from "components/ub/core/IconButton";
-import EmptyData from "components/ub/feedback/EmptyTableData";
-import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
+import Button from "components/ub/core/buttons/Button";
+import Loading from "components/ub/feedback/states/Loading";
+import IconButton from "components/ub/core/buttons/IconButton";
+import EmptyData from "components/ub/feedback/states/EmptyTableData";
+import NoMessagesFound from "components/ub/feedback/states/NoMessagesFound";
 import { validateUniversity, isUniversityComplete, universityFieldMap } from "./validateUniversity";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -598,17 +599,7 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
             disabledDescription="This university is hidden and unavailable for new applications."
           />
 
-          <ToggleInput
-            label="Institution Type"
-            field="is_public"
-            formData={formData}
-            errors={{}}
-            updateFormData={updateFormData}
-            enabledText="Public"
-            disabledText="Private"
-            enabledDescription="This is a public university."
-            disabledDescription="This is a private university."
-          />
+          <InstitutionTypeField value={formData.is_public} onChange={(value) => updateFormData("is_public", value)} />
 
           <ToggleInput
             label="Language Center"

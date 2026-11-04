@@ -7,7 +7,7 @@ import { useCompleteCommission } from "../hooks";
 const mockShowToast = jest.fn();
 
 jest.mock("../hooks", () => ({ useCompleteCommission: jest.fn() }));
-jest.mock("components/ub/feedback/ToastContext", () => ({
+jest.mock("components/ub/feedback/notifications/ToastContext", () => ({
   useToast: () => ({ showToast: mockShowToast }),
 }));
 

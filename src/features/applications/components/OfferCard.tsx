@@ -1,11 +1,11 @@
 "use client";
 
 import { FileCheck2 } from "lucide-react";
-import Amount from "components/ub/core/Amount";
-import DaysTag from "components/ub/data/DaysTag";
-import KeyValueGrid from "components/ub/data/KeyValueGrid";
-import SectionCard, { type SectionCardState } from "components/ub/data/SectionCard";
-import Tag from "components/ub/data/Tag";
+import Amount from "components/ub/core/typography/Amount";
+import DaysTag from "components/ub/data/badges/DaysTag";
+import KeyValueGrid from "components/ub/data/display/KeyValueGrid";
+import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
+import Tag from "components/ub/data/badges/Tag";
 import type { TagTone } from "components/ub/recipes";
 import type { DocumentItem } from "features/applications/model/applicationView";
 import DocumentRow from "./DocumentRow";

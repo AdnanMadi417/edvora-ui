@@ -1,10 +1,10 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EmptyData from "components/ub/feedback/EmptyData";
+import EmptyData from "components/ub/feedback/states/EmptyData";
 import ApplicationDetails from "features/applications/account-manager/components/details/ApplicationDetails";
-import Loading from "components/ub/feedback/Loading";
-import Alert from "components/ub/feedback/Alert";
+import Loading from "components/ub/feedback/states/Loading";
+import Alert from "components/ub/feedback/notifications/Alert";
 import { useAccountManagerApplication } from 'features/applications/hooks';
 
 

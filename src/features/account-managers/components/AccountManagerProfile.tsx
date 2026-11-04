@@ -1,6 +1,6 @@
 import { AlertCircle, Check, Share2, Users, X } from "lucide-react";
 import React from "react";
-import StatusBadge from "components/ub/data/StatusBadge";
+import StatusBadge from "components/ub/data/badges/StatusBadge";
 import type { AccountManager } from "../types";
 
 interface AccountManagerProfileProps {

@@ -6,10 +6,10 @@ import { ChevronLeft, CreditCard, Pencil } from "lucide-react";
 
 import { usePaymentMethod } from "features/knowledge-hub/payment-methods/hooks";
 
-import Loading from "components/ub/feedback/Loading";
-import EmptyData from "components/ub/feedback/EmptyTableData";
-import RichTextDisplay from "components/ub/data/RichTextDisplay";
-import Button from "components/ub/core/Button";
+import Loading from "components/ub/feedback/states/Loading";
+import EmptyData from "components/ub/feedback/states/EmptyTableData";
+import RichTextDisplay from "components/ub/data/display/RichTextDisplay";
+import Button from "components/ub/core/buttons/Button";
 
 interface PaymentMethodDetailsProps {
   id: string;

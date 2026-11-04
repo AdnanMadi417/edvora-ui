@@ -2,8 +2,8 @@
 
 import React from "react";
 import { ArrowUpRight } from "lucide-react";
-import PipelineFlow, { type PipelineFlowStage } from "components/ub/dashboard/PipelineFlow";
-import Button from "components/ub/core/Button";
+import PipelineFlow, { type PipelineFlowStage } from "components/ub/dashboard/pipeline/PipelineFlow";
+import Button from "components/ub/core/buttons/Button";
 import { resolveStage } from "features/applications/stages";
 
 interface Stage {

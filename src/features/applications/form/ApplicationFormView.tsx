@@ -8,23 +8,23 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import clsx from "clsx";
 import { ArrowLeft, ArrowRight, CircleAlert, FileText, Send, Trash2, Upload } from "lucide-react";
-import Button from "components/ub/core/Button";
-import Collapse from "components/ub/core/Collapse";
-import { EASE, MICRO_DURATION } from "components/ub/core/FadeIn";
-import IconButton from "components/ub/core/IconButton";
-import TextButton from "components/ub/core/TextButton";
-import AppDate from "components/ub/data/AppDate";
-import DescriptionList from "components/ub/data/DescriptionList";
-import FileRow from "components/ub/data/FileRow";
-import SectionCard from "components/ub/data/SectionCard";
-import ProgressBar from "components/ub/feedback/ProgressBar";
-import Combobox from "components/ub/forms/Combobox";
-import Input from "components/ub/forms/Input";
-import IntakeDatePicker from "components/ub/forms/IntakeDatePicker";
-import { RadioGroup } from "components/ub/forms/Radio";
-import Toggle from "components/ub/forms/Toggle";
-import { useFileDrop } from "components/ub/forms/useFileDrop";
-import StepIndicator from "components/ub/navigation/StepIndicator";
+import Button from "components/ub/core/buttons/Button";
+import Collapse from "components/ub/core/motion/Collapse";
+import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
+import IconButton from "components/ub/core/buttons/IconButton";
+import TextButton from "components/ub/core/buttons/TextButton";
+import AppDate from "components/ub/data/formatting/AppDate";
+import DescriptionList from "components/ub/data/display/DescriptionList";
+import FileRow from "components/ub/data/display/FileRow";
+import SectionCard from "components/ub/data/cards/SectionCard";
+import ProgressBar from "components/ub/feedback/states/ProgressBar";
+import Combobox from "components/ub/forms/selection/Combobox";
+import Input from "components/ub/forms/text/Input";
+import IntakeDatePicker from "components/ub/forms/dates/IntakeDatePicker";
+import { RadioGroup } from "components/ub/forms/choices/Radio";
+import Toggle from "components/ub/forms/choices/Toggle";
+import { useFileDrop } from "components/ub/forms/uploads/useFileDrop";
+import StepIndicator from "components/ub/navigation/controls/StepIndicator";
 import { card } from "components/ub/recipes";
 import { NATIONALITIES } from "constants/lists";
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
@@ -447,7 +447,7 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
   if (step === "review") body = <ReviewStep {...props} />;
 
   return (
-    <section className={clsx(card, "mx-auto max-w-ub-form-xl")} aria-labelledby="af-title">
+    <section className={clsx(card, "w-full min-w-0")} aria-labelledby="af-title">
       <header className="flex items-start gap-3 border-b border-ub-border px-4 py-4 md:px-6 md:py-5">
         <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-ub-md bg-ub-tone-brand-bg text-ub-tone-brand-text">
           <FileText className="h-5 w-5" />

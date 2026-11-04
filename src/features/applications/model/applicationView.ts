@@ -3,7 +3,7 @@
 // No fetching and no React: data stays in the page/route, components get
 // props. Unit-tested in applicationView.test.ts.
 
-import type { FileRowState } from "components/ub/data/FileRow";
+import type { FileRowState } from "components/ub/data/display/FileRow";
 import type { ApplicationDetail } from "features/applications/shared/applicationTypes";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
 import { resolveStage, type ResolvedStage } from "features/applications/stages";

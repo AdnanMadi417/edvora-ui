@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { faq, services, site } from "lib/content";
 import LandingMotion from "components/landing/ui/LandingMotion";
-import Navbar from "components/landing/Navbar";
-import Hero from "components/landing/Hero";
-import ClientLogos from "components/landing/ClientLogos";
-import Services from "components/landing/Services";
-import CaseStudies from "components/landing/CaseStudies";
-import Process from "components/landing/Process";
-import TechStack from "components/landing/TechStack";
-import WhyUsBento from "components/landing/WhyUsBento";
-import Stats from "components/landing/Stats";
-import Testimonials from "components/landing/Testimonials";
-import EngagementModels from "components/landing/EngagementModels";
-import FAQ from "components/landing/FAQ";
-import ContactCTA from "components/landing/ContactCTA";
-import Footer from "components/landing/Footer";
+import Navbar from "components/landing/layout/Navbar";
+import Hero from "components/landing/sections/Hero";
+import ClientLogos from "components/landing/sections/ClientLogos";
+import Services from "components/landing/sections/Services";
+import CaseStudies from "components/landing/sections/CaseStudies";
+import Process from "components/landing/sections/Process";
+import TechStack from "components/landing/sections/TechStack";
+import WhyUsBento from "components/landing/sections/WhyUsBento";
+import Stats from "components/landing/sections/Stats";
+import Testimonials from "components/landing/sections/Testimonials";
+import EngagementModels from "components/landing/sections/EngagementModels";
+import FAQ from "components/landing/sections/FAQ";
+import ContactCTA from "components/landing/sections/ContactCTA";
+import Footer from "components/landing/layout/Footer";
 
 const title = `${site.name} | ${site.tagline}`;
 

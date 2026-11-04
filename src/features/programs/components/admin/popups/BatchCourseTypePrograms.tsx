@@ -6,11 +6,11 @@ import { XCircle, Layers, AlertTriangle } from "lucide-react";
 import { useBatchUpdatePrograms } from "features/programs/hooks";
 import { COURSE_TYPE_OPTIONS, isMasterOrPhd } from "features/programs/utils/courseType";
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import SelectField from "components/ub/forms/SelectField";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
+import SelectField from "components/ub/forms/selection/SelectField";
 
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface SelectedProgramSummary {

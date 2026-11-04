@@ -2,16 +2,16 @@
 
 import React, { useState } from "react";
 import { Ban } from "lucide-react";
-import Amount from "components/ub/core/Amount";
-import RefId from "components/ub/core/RefId";
-import AppDate from "components/ub/data/AppDate";
-import DescriptionList from "components/ub/data/DescriptionList";
-import KeyValueGrid from "components/ub/data/KeyValueGrid";
-import SectionCard from "components/ub/data/SectionCard";
-import Tag from "components/ub/data/Tag";
-import { useToast } from "components/ub/feedback/ToastContext";
+import Amount from "components/ub/core/typography/Amount";
+import RefId from "components/ub/core/typography/RefId";
+import AppDate from "components/ub/data/formatting/AppDate";
+import DescriptionList from "components/ub/data/display/DescriptionList";
+import KeyValueGrid from "components/ub/data/display/KeyValueGrid";
+import SectionCard from "components/ub/data/cards/SectionCard";
+import Tag from "components/ub/data/badges/Tag";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import Button from "components/ub/core/Button";
+import Button from "components/ub/core/buttons/Button";
 import { payoutsApi } from "../services";
 import type { PartnerPayout, Payout } from "../types";
 

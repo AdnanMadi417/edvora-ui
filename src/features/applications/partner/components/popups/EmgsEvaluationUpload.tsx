@@ -1,11 +1,11 @@
 "use client";
 
-import Alert from "components/ub/feedback/Alert";
-import FormModal from "components/ub/feedback/FormModal";
+import Alert from "components/ub/feedback/notifications/Alert";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { FileText } from "lucide-react";
 import { useEmgsEvalUpload } from "features/applications/hooks";
-import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
 import { parseApiError } from "utils/parseApiError";
 
 interface EmgsEvalUploadProps {

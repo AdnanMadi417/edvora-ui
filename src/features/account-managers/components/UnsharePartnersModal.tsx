@@ -2,10 +2,10 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { AlertTriangle, ShieldOff, XCircle } from "lucide-react";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import SelectField from "components/ub/forms/SelectField";
-import { useToast } from "components/ub/feedback/ToastContext";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
+import SelectField from "components/ub/forms/selection/SelectField";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { useAccountManagers } from "../hooks/useAccountManagers";
 import { useUnsharePartners } from "../hooks/useUnsharePartners";

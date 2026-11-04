@@ -1,10 +1,10 @@
 "use client";
 
-import Input from "components/ub/forms/Input";
-import FormModal from "components/ub/feedback/FormModal";
+import Input from "components/ub/forms/text/Input";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { XCircle, Clock, Trash2, AlertCircle, Pause, CheckCircle, ListX } from "lucide-react";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 const UPDATE_STATUS_ERROR_MESSAGES: Record<string, string> = {
@@ -22,14 +22,14 @@ import {
 } from "features/applications/hooks";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 
-import NoDocumentsRequired from "components/ub/feedback/NoDocumentsRequired";
-import CompactFileUpload from "components/ub/forms/CompactFileUpload";
-import SettingToggleInput from "components/ub/forms/SettingToggleInput";
-import IconButton from "components/ub/core/IconButton";
-import Alert from "components/ub/feedback/Alert";
-import Textarea from "components/ub/forms/Textarea";
-import Checkbox from "components/ub/forms/Checkbox";
-import Chip from "components/ub/data/Chip";
+import NoDocumentsRequired from "components/ub/feedback/states/NoDocumentsRequired";
+import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
+import SettingToggleInput from "components/ub/forms/choices/SettingToggleInput";
+import IconButton from "components/ub/core/buttons/IconButton";
+import Alert from "components/ub/feedback/notifications/Alert";
+import Textarea from "components/ub/forms/text/Textarea";
+import Checkbox from "components/ub/forms/choices/Checkbox";
+import Chip from "components/ub/data/badges/Chip";
 import { DocumentRequest, StatusOption, DocumentRequestListProps } from "features/applications/shared/types";
 
 const DocumentRequestList = ({

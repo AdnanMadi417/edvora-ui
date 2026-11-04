@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { FileText, BookOpen, Bell, Truck, Landmark, LucideIcon } from "lucide-react";
 import { useMe } from "hooks/useMe";
 import { useCompleteOnboarding } from "features/partners/hooks";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { FEATURES } from "config/featureFlags";
 import clsx from "clsx";

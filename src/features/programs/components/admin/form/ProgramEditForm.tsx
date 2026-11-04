@@ -1,5 +1,6 @@
 "use client";
 
+import CommissionFields from "features/programs/components/shared/CommissionFields";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -17,14 +18,14 @@ import {
   Plus,
 } from "lucide-react";
 
-import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
+import { IELTS_BANDS } from 'constants/lists';
 import { normalizeCommissionCurrency } from 'features/programs/utils/commissionCurrency';
 import { pickChangedFields } from 'features/programs/utils/changedFields';
 
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import Loading from "components/ub/feedback/Loading";
-import Button from "components/ub/core/Button";
+import Loading from "components/ub/feedback/states/Loading";
+import Button from "components/ub/core/buttons/Button";
 import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
 
 import { useProgram, useDeletePrograms, useUpdateProgram } from "features/programs/hooks";
@@ -34,12 +35,11 @@ import { useUniversities, useBranches } from "features/universities/hooks";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 
-import InputField from "components/ub/forms/InputField";
-import TextareaField from "components/ub/forms/TextareaField";
-import RichTextEditor from "components/ub/forms/RichTextEditor";
-import ToggleInput from "components/ub/forms/ToggleInput";
-import SearchableDropdown from "components/ub/forms/SearchableDropdown";
-import SelectField from "components/ub/forms/SelectField";
+import InputField from "components/ub/forms/text/InputField";
+import RichTextEditor from "components/ub/forms/text/RichTextEditor";
+import ToggleInput from "components/ub/forms/choices/ToggleInput";
+import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
+import SelectField from "components/ub/forms/selection/SelectField";
 import YearlyFeesField from "features/programs/components/shared/YearlyFeesField";
 import OneTimeFeesField from "features/programs/components/shared/OneTimeFeesField";
 import AccordionSection from "features/programs/components/shared/form/AccordionSection";
@@ -49,8 +49,8 @@ import { COURSE_TYPE_OPTIONS, isMasterOrPhd } from "features/programs/utils/cour
 import { setFormPath } from "features/programs/components/shared/form/setFormPath";
 import { useIsFormDirty } from "features/programs/components/shared/form/useIsFormDirty";
 
-import IconButton from "components/ub/core/IconButton";
-import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
+import IconButton from "components/ub/core/buttons/IconButton";
+import NoMessagesFound from "components/ub/feedback/states/NoMessagesFound";
 import { validateProgram } from "./validateProgram";
 import type { FormData as ProgramFormData } from "./RegisterProgram";
 
@@ -181,12 +181,8 @@ const EditKnowledgeHubProgramDetails = ({
   );
 
   const updateFormData = (field: string, value: any) => {
-    setErrors((prev) => {
-      if (!prev[field]) return prev;
-      const next = { ...prev };
-      delete next[field];
-      return next;
-    });
+    setErrors((prev) => Object.fromEntries(Object.entries(prev).filter(([key]) => key !== field && !key.startsWith(`${field}[`))));
+
     setFormData((prev: any) => {
       const clone = setFormPath(prev, field, value);
 
@@ -632,68 +628,7 @@ const EditKnowledgeHubProgramDetails = ({
                 <YearlyFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
                 <OneTimeFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
 
-                <div className="border-t border-slate-100 pt-4">
-                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Commission — how much</h4>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputField
-                      label="Commission Amount"
-                      field="commission_amount"
-                      type="number"
-                      required={false}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <SelectField
-                      label="Currency"
-                      field="commission_currency"
-                      required={false}
-                      options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                </div>
-
-                <div className="border-t border-slate-100 pt-4">
-                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Commission — when &amp; notes</h4>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <SelectField
-                      label="Expected From"
-                      field="expected_commission_from"
-                      required={false}
-                      options={MONTHS.map((m) => ({ value: m.value, label: m.label }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <SelectField
-                      label="Expected To"
-                      field="expected_commission_to"
-                      required={false}
-                      options={MONTHS.map((m) => ({ value: m.value, label: m.label }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <div className="md:col-span-2">
-                      <TextareaField
-                        label="Commission Notes"
-                        field="commission_notes"
-                        required={false}
-                        placeholder="e.g. Commission paid ..."
-                        formData={formData}
-                        errors={errors}
-                        updateFormData={updateFormData}
-                        onBlur={() => validateField('commission_notes')}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <CommissionFields formData={formData} errors={errors} updateFormData={updateFormData} validateField={validateField} />
               </AccordionSection>
 
               <AccordionSection

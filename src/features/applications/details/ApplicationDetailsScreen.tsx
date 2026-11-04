@@ -8,8 +8,8 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { Headset } from "lucide-react";
-import Breadcrumbs from "components/ub/navigation/Breadcrumbs";
-import { useToast } from "components/ub/feedback/ToastContext";
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getDocumentDownloadUrl } from "services/documentService";
 import { useVisaCase } from "hooks/useVisaCase";
 import { useApplicationTimeline } from "features/applications/hooks";

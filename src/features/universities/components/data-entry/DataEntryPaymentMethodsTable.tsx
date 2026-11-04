@@ -8,15 +8,15 @@ import { useRouter } from "next/navigation";
 
 import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 
-import SearchInput from "components/ub/forms/SearchInput";
+import SearchInput from "components/ub/forms/selection/SearchInput";
 import CreatePayment from "features/universities/components/admin/payment-methods/popups/CreatePayment";
-import Button from "components/ub/core/Button";
-import TableWrapper from "components/ub/data/TableWrapper";
-import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
-import TableEmptyRow from "components/ub/data/TableEmptyRow";
-import TableErrorRow from "components/ub/data/TableErrorRow";
-import TablePagination from "components/ub/data/TablePagination";
-import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
+import Button from "components/ub/core/buttons/Button";
+import TableWrapper from "components/ub/data/tables/TableWrapper";
+import TableSkeletonRows from "components/ub/data/tables/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/tables/TableEmptyRow";
+import TableErrorRow from "components/ub/data/tables/TableErrorRow";
+import TablePagination from "components/ub/data/tables/TablePagination";
+import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
 
 const ITEMS_PER_PAGE = 10;
 

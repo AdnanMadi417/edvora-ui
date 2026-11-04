@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import PresignedImage from "components/ub/data/PresignedImage";
+import PresignedImage from "components/ub/data/media/PresignedImage";
 import {
   MdContentCopy,
   MdKeyboardArrowDown,
@@ -14,9 +14,9 @@ import {
 import { ChevronLeft, Globe, MapPin, Truck } from "lucide-react";
 
 import { useLogisticProviderDetails } from "features/logistical-service/hooks";
-import Loading from "components/ub/feedback/Loading";
-import EmptyData from "components/ub/feedback/EmptyData";
-import Button from "components/ub/core/Button";
+import Loading from "components/ub/feedback/states/Loading";
+import EmptyData from "components/ub/feedback/states/EmptyData";
+import Button from "components/ub/core/buttons/Button";
 
 interface LogisticsMarketplaceProviderDetailsProps {
   id: string;

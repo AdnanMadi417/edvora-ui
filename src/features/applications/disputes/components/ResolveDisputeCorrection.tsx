@@ -1,6 +1,6 @@
 "use client";
 
-import FormModal from "components/ub/feedback/FormModal";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { Ban } from "lucide-react";
 
@@ -8,7 +8,7 @@ import { useResolveCorrection } from "../hooks";
 import { payoutsApi, usePaymentMethods, PayoutCorrectionFields } from "features/applications/payouts";
 import type { Payout } from "features/applications/payouts";
 import { usePartnerBankAccount } from "features/partners/bank-accounts";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
 

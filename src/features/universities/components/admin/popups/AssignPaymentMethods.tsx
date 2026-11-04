@@ -6,16 +6,16 @@ import { XCircle, CreditCard } from "lucide-react";
 import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 import { useUniversityPaymentMethods, useAssignUniversityPaymentMethod } from "features/universities/hooks";
 
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 import { CURRENCY } from 'constants/lists';
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import SelectField from "components/ub/forms/SelectField";
-import RichTextEditor from "components/ub/forms/RichTextEditor";
-import SearchableDropdown from "components/ub/forms/SearchableDropdown";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
+import SelectField from "components/ub/forms/selection/SelectField";
+import RichTextEditor from "components/ub/forms/text/RichTextEditor";
+import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
 
 interface AssignPaymentUniversityProps {
   isOpen: boolean;

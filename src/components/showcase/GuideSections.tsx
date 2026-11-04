@@ -5,22 +5,22 @@
 // in the section where people will look for it.
 
 import { Pick, ShowcaseSection } from "./Showcase";
-import { Buttons as LegacyButtons, Badges } from "./Actions";
-import Forms from "./Forms";
-import Navigation from "./Navigation";
-import Feedback from "./Feedback";
-import DataDisplay from "./DataDisplay";
-import NewCoreForms from "./NewCoreForms";
-import NewData from "./NewData";
-import NewNavigationFeedback from "./NewNavigationFeedback";
-import NewBrand from "./NewBrand";
-import NewScreenParts from "./NewScreenParts";
-import ApplicationKit from "./ApplicationKit";
-import PopupForms from "./PopupForms";
-import TableOptions from "./TableOptions";
-import ApplicationFormDemo from "./ApplicationFormDemo";
-import { ApplicationDetailsDemo } from "./ApplicationDetailsPattern";
-import { AdvisorProfileDemo } from "./AdvisorProfileDemo";
+import { Buttons as LegacyButtons, Badges } from "./sections/Actions";
+import Forms from "./sections/Forms";
+import Navigation from "./sections/Navigation";
+import Feedback from "./sections/Feedback";
+import DataDisplay from "./sections/DataDisplay";
+import NewCoreForms from "./sections/NewCoreForms";
+import NewData from "./sections/NewData";
+import NewNavigationFeedback from "./sections/NewNavigationFeedback";
+import NewBrand from "./sections/NewBrand";
+import NewScreenParts from "./sections/NewScreenParts";
+import ApplicationKit from "./sections/ApplicationKit";
+import PopupForms from "./patterns/PopupForms";
+import TableOptions from "./sections/TableOptions";
+import ApplicationFormDemo from "./patterns/ApplicationFormDemo";
+import { ApplicationDetailsDemo } from "./patterns/ApplicationDetailsPattern";
+import { AdvisorProfileDemo } from "./patterns/AdvisorProfileDemo";
 
 export function ButtonsSection() {
   return (

@@ -17,14 +17,14 @@ import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService
 import { getDocumentDownloadUrl } from "services/documentService";
 import type { PackageOffered, ServiceEntry } from "features/logistical-service/types";
 
-import EmptyData from "components/ub/feedback/EmptyData";
-import CheckSimpleBoxGroup from "components/ub/forms/CheckSimpleBoxGroup";
-import InputField from "components/ub/forms/InputField";
-import SelectField from "components/ub/forms/SelectField";
-import SearchableDropdown from "components/ub/forms/SearchableDropdown";
-import ImageUploadField from "components/ub/forms/ImageUploadField";
-import Button from "components/ub/core/Button";
-import { useToast } from "components/ub/feedback/ToastContext";
+import EmptyData from "components/ub/feedback/states/EmptyData";
+import CheckSimpleBoxGroup from "components/ub/forms/choices/CheckSimpleBoxGroup";
+import InputField from "components/ub/forms/text/InputField";
+import SelectField from "components/ub/forms/selection/SelectField";
+import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
+import ImageUploadField from "components/ub/forms/uploads/ImageUploadField";
+import Button from "components/ub/core/buttons/Button";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { NATIONALITIES } from "constants/lists";
 

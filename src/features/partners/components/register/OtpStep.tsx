@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useVerifyRegistrationOtp, useResendRegistrationOtp } from "features/partners/hooks";
-import OtpInputField from "components/ub/forms/OtpInputField";
-import Button from "components/ub/core/Button";
+import OtpInputField from "components/ub/forms/text/OtpInputField";
+import Button from "components/ub/core/buttons/Button";
 import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 
 interface Props {

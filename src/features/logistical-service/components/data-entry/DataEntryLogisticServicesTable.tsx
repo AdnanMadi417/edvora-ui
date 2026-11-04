@@ -4,14 +4,14 @@ import React, { useState } from "react";
 import { Pencil, Check, X, Settings, Plus, Tag, Truck } from "lucide-react";
 
 import { useLogisticServices, useEditLogisticService } from "features/logistical-service/hooks";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import Button from "components/ub/core/Button";
-import IconButton from "components/ub/core/IconButton";
-import TableWrapper from "components/ub/data/TableWrapper";
-import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
-import TableEmptyRow from "components/ub/data/TableEmptyRow";
-import TableErrorRow from "components/ub/data/TableErrorRow";
+import Button from "components/ub/core/buttons/Button";
+import IconButton from "components/ub/core/buttons/IconButton";
+import TableWrapper from "components/ub/data/tables/TableWrapper";
+import TableSkeletonRows from "components/ub/data/tables/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/tables/TableEmptyRow";
+import TableErrorRow from "components/ub/data/tables/TableErrorRow";
 import CreateLogisticsMarketplacePopup from "../admin/CreateLogisticsMarketplacePopup";
 
 const DataEntryLogisticServicesTable = () => {

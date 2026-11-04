@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import AdvisorProfilePattern from "components/showcase/AdvisorProfilePattern";
+import AdvisorProfilePattern from "components/showcase/patterns/AdvisorProfilePattern";
 
 export const metadata: Metadata = {
   title: "Advisor profile pattern",

@@ -1,19 +1,19 @@
 "use client";
 
-import Alert from "components/ub/feedback/Alert";
-import Combobox from "components/ub/forms/Combobox";
-import Input from "components/ub/forms/Input";
-import FormModal from "components/ub/feedback/FormModal";
+import Alert from "components/ub/feedback/notifications/Alert";
+import Combobox from "components/ub/forms/selection/Combobox";
+import Input from "components/ub/forms/text/Input";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Wallet } from "lucide-react";
 
 import { useRecordBulkPayout, usePaymentMethods } from "../../hooks";
 import { usePartnerBankAccount, BankAccountPayoutSummary } from "features/partners/bank-accounts";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
 
 export interface BatchPayoutLine {
   application_id: string;

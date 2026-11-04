@@ -5,7 +5,7 @@ import { AlertTriangle, ArrowRight, Bell, CheckCheck, ExternalLink, RefreshCw } 
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { EASE, MICRO_DURATION } from "components/ub/core/FadeIn";
+import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 
 import { useAllNotifications, useUnreadCount, useMarkAsRead, useMarkAllAsRead } from "../hooks";
 import {
@@ -17,10 +17,10 @@ import {
 import { getNotificationCategory, type NotificationCategory } from "../utils/notificationCategory";
 import type { ReadStatus, Notification } from "../types";
 import NotificationAvatar from "./NotificationAvatar";
-import TablePagination from "components/ub/data/TablePagination";
-import Tabs from "components/ub/navigation/Tabs";
-import type { TabItem } from "components/ub/navigation/Tabs";
-import EmptyData from "components/ub/feedback/EmptyData";
+import TablePagination from "components/ub/data/tables/TablePagination";
+import Tabs from "components/ub/navigation/controls/Tabs";
+import type { TabItem } from "components/ub/navigation/controls/Tabs";
+import EmptyData from "components/ub/feedback/states/EmptyData";
 
 const PAGE_SIZE = 20;
 // Unread notifications load in batches of this size via "Load more" (rather

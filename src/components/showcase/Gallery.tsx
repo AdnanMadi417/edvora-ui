@@ -4,7 +4,7 @@ import { ComponentType, useEffect, useState } from "react";
 import Link from "next/link";
 import clsx from "clsx";
 import { Languages } from "lucide-react";
-import { ToastProvider } from "components/ub/feedback/ToastContext";
+import { ToastProvider } from "components/ub/feedback/notifications/ToastContext";
 import ThemeSwitcher from "components/theme/ThemeSwitcher";
 import ThemeToggle from "components/theme/ThemeToggle";
 import { buttonBase, buttonSizes, buttonVariants, focusRing, focusRingInset } from "components/ub/recipes";

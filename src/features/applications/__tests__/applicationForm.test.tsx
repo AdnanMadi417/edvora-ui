@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import StepIndicator, { canOpenStep } from "components/ub/navigation/StepIndicator";
+import StepIndicator, { canOpenStep } from "components/ub/navigation/controls/StepIndicator";
 import ApplicationFormView, { fieldId } from "features/applications/form/ApplicationFormView";
 import { buildPayload, getPath, missingRequiredDocuments, visibleSteps } from "features/applications/form/applicationFormModel";
 
-jest.mock("components/ub/feedback/ToastContext", () => ({ useToast: () => ({ showToast: jest.fn() }) }));
+jest.mock("components/ub/feedback/notifications/ToastContext", () => ({ useToast: () => ({ showToast: jest.fn() }) }));
 
 const student = { name: "Nur", birthday: "2006-03-18", nationality: "Malaysian", passport_number: "A123456", email: "", phone: "", current_address: "", gender: true as unknown as string, emergency_contacts: [{ name: "", relation: "", phone: "", email: "" }], english_proficiencies: [{ test_type: "", score: "", test_date: "" }], previous_educations: [{ institution_name: "SMK", qualification: "spm", start_date: "2018-01-01", end_date: "2023-12-01", grade: "" }] };
 const form = { program_id: "p1", university_id: "u1", intake_date: "2027-01-05", student_id: "", student, documents: [{ document_type_id: "d1", file_url: "u", file_key: "k" }, { document_type_id: "d2", file_url: "", uploading: true }], is_draft: false };

@@ -1,14 +1,13 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
-import { XCircle, Tag } from "lucide-react";
+import { Tag } from "lucide-react";
 
 import { useCreateFieldOfStudy } from "features/knowledge-hub/field-of-study/hooks";
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import InputField from "components/ub/forms/InputField";
-import { useToast } from "components/ub/feedback/ToastContext";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
+import InputField from "components/ub/forms/text/InputField";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 
@@ -26,8 +25,6 @@ export default function CreateFieldOfStudy({
   const { CreateFieldOfStudy, fieldLoading } = useCreateFieldOfStudy();
 
   const { showToast } = useToast();
-
-  const [isVisible, setIsVisible] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -51,15 +48,6 @@ export default function CreateFieldOfStudy({
     },
   });
 
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-    } else {
-      const timer = setTimeout(() => setIsVisible(false), 300);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
   const validateName = (name: string): string => {
     if (!name.trim()) return "Field of study name is required";
     if (name.trim().length < 3) return "Name must be at least 3 characters";
@@ -70,7 +58,11 @@ export default function CreateFieldOfStudy({
   const updateFormData = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => { const n = { ...prev }; delete n[field]; return n; });
+      setErrors((prev) => {
+        const n = { ...prev };
+        delete n[field];
+        return n;
+      });
     }
   };
 
@@ -100,7 +92,6 @@ export default function CreateFieldOfStudy({
 
       onClose();
       onSuccess?.();
-
     } catch (error: unknown) {
       handleApiError(error, "Please try again.");
     }
@@ -117,76 +108,37 @@ export default function CreateFieldOfStudy({
     }
   }, [isOpen]);
 
-  if (!isVisible) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay p-4 backdrop-blur-sm"
-      onClick={onClose}
-      role="dialog"
-      aria-modal="true"
+    <FormModal
+      open={isOpen}
+      onClose={onClose}
+      size="md"
+      icon={Tag}
+      title="Create field of study"
+      description="Add a study area to help advisors find the right programmes."
+      onSubmit={async () => {
+        await handleCreate();
+      }}
+      submitLabel="Create field of study"
+      submitting={fieldLoading}
+      submitDisabled={
+        !formData.name.trim() ||
+        formData.name.trim().length < 5 ||
+        formData.name.trim().length > 100
+      }
     >
-      <div
-        className={`w-full max-w-lg transform transition-all duration-300 md:max-w-xl ${
-          isOpen
-            ? "translate-y-0 scale-100 opacity-100"
-            : "translate-y-4 scale-95 opacity-0"
-        }`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
-          <ModalHeader
-            title="Create New Field of Study"
-            description="Add a new field of study into the knowledge hub."
-            icon={Tag}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
-            onClose={onClose}
-          />
-
-          <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
-            <InputField
-              label="Field Of Study Name"
-              field="name"
-              placeholder="e.g. Computer Science"
-              required
-              formData={formData}
-              errors={errors}
-              updateFormData={updateFormData}
-              onBlur={() => validateField("name")}
-            />
-
-          </div>
-
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
-            <Button
-              onClick={onClose}
-              disabled={fieldLoading}
-              icon={<XCircle className="h-5 w-5" />}
-              text={fieldLoading ? "Cancelling..." : "Cancel"}
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
-            />
-
-            <Button
-              onClick={handleCreate}
-              disabled={fieldLoading || !formData.name.trim() || formData.name.trim().length < 5 || formData.name.trim().length > 100}
-              icon={<Tag className="h-5 w-5" />}
-              text={fieldLoading ? "Creating..." : "Create Field of Study"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+      <fieldset disabled={fieldLoading} className="min-w-0 space-y-4">
+        <InputField
+          label="Field Of Study Name"
+          field="name"
+          placeholder="e.g. Computer Science"
+          required
+          formData={formData}
+          errors={errors}
+          updateFormData={updateFormData}
+          onBlur={() => validateField("name")}
+        />
+      </fieldset>
+    </FormModal>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
 
 import { Download, RefreshCw, Upload } from "lucide-react";
-import AppDate from "components/ub/data/AppDate";
-import FileRow from "components/ub/data/FileRow";
-import Button from "components/ub/core/Button";
-import IconButton from "components/ub/core/IconButton";
+import AppDate from "components/ub/data/formatting/AppDate";
+import FileRow from "components/ub/data/display/FileRow";
+import Button from "components/ub/core/buttons/Button";
+import IconButton from "components/ub/core/buttons/IconButton";
 import type { DocumentItem } from "features/applications/model/applicationView";
 
 export interface DocumentRowProps {

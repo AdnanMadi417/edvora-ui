@@ -1,9 +1,9 @@
 "use client";
 
 import { History } from "lucide-react";
-import Button from "components/ub/core/Button";
-import SectionCard from "components/ub/data/SectionCard";
-import Timeline, { type TimelineEvent } from "components/ub/data/Timeline";
+import Button from "components/ub/core/buttons/Button";
+import SectionCard from "components/ub/data/cards/SectionCard";
+import Timeline, { type TimelineEvent } from "components/ub/data/display/Timeline";
 
 export interface ActivityEvent extends TimelineEvent {
   /** "Label: text" lines under the title (reason, notes, requested documents). */

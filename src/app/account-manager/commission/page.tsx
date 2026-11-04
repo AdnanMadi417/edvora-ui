@@ -1,7 +1,7 @@
 'use client';
 import { MdTrendingUp, MdPayments, MdShoppingCart, MdAccountBalanceWallet, MdTask, MdFolderOpen } from 'react-icons/md';
 
-import Widget from 'components/ub/data/Widget';
+import Widget from 'components/ub/data/cards/Widget';
 
 const Dashboard = () => {
 

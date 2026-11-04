@@ -1,12 +1,12 @@
 "use client";
 
-import Textarea from "components/ub/forms/Textarea";
-import FormModal from "components/ub/feedback/FormModal";
+import Textarea from "components/ub/forms/text/Textarea";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { CheckCircle } from "lucide-react";
 
 import { useResolveNoIssue } from "../hooks";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 interface ResolveNoIssueProps {

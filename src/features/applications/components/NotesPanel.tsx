@@ -2,10 +2,10 @@
 
 import { useState, type FormEvent } from "react";
 import { StickyNote } from "lucide-react";
-import Button from "components/ub/core/Button";
-import SectionCard, { type SectionCardState } from "components/ub/data/SectionCard";
-import Timeline from "components/ub/data/Timeline";
-import Textarea from "components/ub/forms/Textarea";
+import Button from "components/ub/core/buttons/Button";
+import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
+import Timeline from "components/ub/data/display/Timeline";
+import Textarea from "components/ub/forms/text/Textarea";
 
 export interface NoteItem {
   id: string;

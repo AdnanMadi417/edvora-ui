@@ -17,3 +17,7 @@ NEXT_PUBLIC_API_URL=your_api_url
 
 Note: The `NEXT_PUBLIC_` prefix in `NEXT_PUBLIC_API_URL` makes this environment variable accessible in the browser. This is necessary because API calls are made from both server and client-side code.
 # ui-template
+
+## Project folders
+
+See [Project structure](docs/project-structure.md) for shared UI categories, feature hook groups, import conventions, and test placement.

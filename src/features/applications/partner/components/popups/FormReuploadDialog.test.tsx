@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import FormReuploadDialog from "./FormReuploadDialog";
 
-jest.mock("components/ub/feedback/ToastContext", () => ({ useToast: () => ({ showToast: jest.fn() }) }));
+jest.mock("components/ub/feedback/notifications/ToastContext", () => ({ useToast: () => ({ showToast: jest.fn() }) }));
 jest.mock("utils/parseApiError", () => ({ getApiErrorCode: () => "invalid_status", parseApiError: (_: unknown, f: string) => f }));
 
 const setup = (upload = jest.fn().mockResolvedValue(undefined)) => {

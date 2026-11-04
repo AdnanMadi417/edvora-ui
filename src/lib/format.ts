@@ -5,7 +5,7 @@
 //   Currency  RM4,200 (no space), SGD 3,000
 //   Numbers   3,500
 
-import { parseDate, formatRelative } from "components/ub/data/appDateUtils";
+import { parseDate, formatRelative } from "components/ub/data/formatting/appDateUtils";
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 

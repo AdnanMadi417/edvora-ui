@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { CheckCircle } from "lucide-react";
-import Button from "components/ub/core/Button";
+import Button from "components/ub/core/buttons/Button";
 import { UniversityPayInSection } from "features/applications/pay-ins";
 import { PartnerPayoutSection } from "features/applications/payouts";
 import { DisputeSection, CompleteCommissionOnBehalf } from "features/applications/disputes";

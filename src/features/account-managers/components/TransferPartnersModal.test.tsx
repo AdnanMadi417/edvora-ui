@@ -12,7 +12,7 @@ jest.mock("../hooks/useAccountManagers", () => ({ useAccountManagers: jest.fn() 
 jest.mock("../hooks/useTransferPartners", () => ({ useTransferPartners: jest.fn() }));
 // jest.mock paths are not rewritten by the tsconfig baseUrl the way imports
 // are, so this one has to be relative to resolve to the same module.
-jest.mock("components/ub/feedback/ToastContext", () => ({
+jest.mock("components/ub/feedback/notifications/ToastContext", () => ({
   useToast: () => ({ showToast: mockShowToast }),
 }));
 

@@ -1,5 +1,5 @@
 import ApplicationTracker, { TRACKER_COPY, trackerStepsAt, type TrackerStep } from "components/ub/brand/ApplicationTracker";
-import SectionCard, { type SectionCardState } from "components/ub/data/SectionCard";
+import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
 import { APPLICATION_TRACKER_STEPS, type ResolvedStage } from "features/applications/stages";
 
 /**

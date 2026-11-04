@@ -1,13 +1,13 @@
 "use client";
 
-import Combobox from "components/ub/forms/Combobox";
-import Input from "components/ub/forms/Input";
-import FormModal from "components/ub/feedback/FormModal";
+import Combobox from "components/ub/forms/selection/Combobox";
+import Input from "components/ub/forms/text/Input";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { Receipt } from "lucide-react";
 
 import { useRecordPayIn } from "../../hooks";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 export interface RecordPayInRow {

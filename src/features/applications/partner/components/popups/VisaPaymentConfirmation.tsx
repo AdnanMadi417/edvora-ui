@@ -1,15 +1,15 @@
 "use client";
 
-import Alert from "components/ub/feedback/Alert";
-import FormModal from "components/ub/feedback/FormModal";
+import Alert from "components/ub/feedback/notifications/Alert";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState } from "react";
 import { CreditCard } from "lucide-react";
-import TextButton from "components/ub/core/TextButton";
+import TextButton from "components/ub/core/buttons/TextButton";
 import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
 import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
-import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 const VISA_PAYMENT_ERROR_MESSAGES: Record<string, string> = {

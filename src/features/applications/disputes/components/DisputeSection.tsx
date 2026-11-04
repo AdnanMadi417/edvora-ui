@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { CheckCircle, Wrench } from "lucide-react";
 
-import Button from "components/ub/core/Button";
-import DescriptionList from "components/ub/data/DescriptionList";
-import SectionCard from "components/ub/data/SectionCard";
-import Tag from "components/ub/data/Tag";
+import Button from "components/ub/core/buttons/Button";
+import DescriptionList from "components/ub/data/display/DescriptionList";
+import SectionCard from "components/ub/data/cards/SectionCard";
+import Tag from "components/ub/data/badges/Tag";
 import type { Dispute } from "features/applications/shared/applicationTypes";
 
 import ResolveNoIssue from "./ResolveNoIssue";

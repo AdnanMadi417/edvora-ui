@@ -1,12 +1,12 @@
 "use client";
 
-import Alert from "components/ub/feedback/Alert";
-import Combobox from "components/ub/forms/Combobox";
-import FormModal from "components/ub/feedback/FormModal";
+import Alert from "components/ub/feedback/notifications/Alert";
+import Combobox from "components/ub/forms/selection/Combobox";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useEffect, useState } from "react";
 import { RefreshCcw } from "lucide-react";
 import { useUniversities } from "hooks/useUniversities";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useChangeProgram } from "features/applications/hooks";
 
 interface ProgramDecisionModalProps {

@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { KeyRound, XCircle } from "lucide-react";
 import { useResendStaffInvitationOtp } from "../../hooks";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import InputField from "components/ub/forms/InputField";
-import { useToast } from "components/ub/feedback/ToastContext";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
+import InputField from "components/ub/forms/text/InputField";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface Props {

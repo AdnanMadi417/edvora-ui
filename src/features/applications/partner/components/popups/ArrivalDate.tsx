@@ -1,11 +1,11 @@
 "use client";
 
-import Alert from "components/ub/feedback/Alert";
-import Input from "components/ub/forms/Input";
-import FormModal from "components/ub/feedback/FormModal";
+import Alert from "components/ub/feedback/notifications/Alert";
+import Input from "components/ub/forms/text/Input";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { XCircle, Plane, CheckCircle, AlertCircle } from 'lucide-react';
-import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
 import { useArrivalDateUpload } from "features/applications/hooks";
 
 

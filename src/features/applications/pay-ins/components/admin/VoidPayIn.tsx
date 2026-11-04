@@ -1,16 +1,16 @@
 "use client";
 
-import Alert from "components/ub/feedback/Alert";
-import Combobox from "components/ub/forms/Combobox";
-import Input from "components/ub/forms/Input";
-import Textarea from "components/ub/forms/Textarea";
-import FormModal from "components/ub/feedback/FormModal";
+import Alert from "components/ub/feedback/notifications/Alert";
+import Combobox from "components/ub/forms/selection/Combobox";
+import Input from "components/ub/forms/text/Input";
+import Textarea from "components/ub/forms/text/Textarea";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { Ban } from "lucide-react";
 
 import { useVoidPayIn } from "../../hooks";
 import type { UniversityPayIn } from "../../types";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 interface VoidPayInProps {

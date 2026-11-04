@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import PresignedImage from "components/ub/data/PresignedImage";
+import PresignedImage from "components/ub/data/media/PresignedImage";
 import {
   CheckCircle,
   XCircle,
@@ -18,22 +18,22 @@ import {
 import { MdAddBusiness } from "react-icons/md";
 import { AnimatePresence } from "framer-motion";
 
-import TableWrapper from "components/ub/data/TableWrapper";
-import TableSkeletonRows from "components/ub/data/TableSkeletonRows";
-import TableEmptyRow from "components/ub/data/TableEmptyRow";
-import TableErrorRow from "components/ub/data/TableErrorRow";
-import TablePagination from "components/ub/data/TablePagination";
-import AnimatedTableRow from "components/ub/data/AnimatedTableRow";
-import StatusBadge from "components/ub/data/StatusBadge";
-import SearchInput from "components/ub/forms/SearchInput";
-import { useToast } from 'components/ub/feedback/ToastContext';
+import TableWrapper from "components/ub/data/tables/TableWrapper";
+import TableSkeletonRows from "components/ub/data/tables/TableSkeletonRows";
+import TableEmptyRow from "components/ub/data/tables/TableEmptyRow";
+import TableErrorRow from "components/ub/data/tables/TableErrorRow";
+import TablePagination from "components/ub/data/tables/TablePagination";
+import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
+import StatusBadge from "components/ub/data/badges/StatusBadge";
+import SearchInput from "components/ub/forms/selection/SearchInput";
+import { useToast } from 'components/ub/feedback/notifications/ToastContext';
 import { parseApiError } from 'utils/parseApiError';
 import { useRouter } from "next/navigation";
 
 import { useLogisticProviders, useDeleteLogisticProvider } from "features/logistical-service/hooks";
 import DeleteServiceConfirmation from "../DeleteServiceConfirmation";
-import Button from "components/ub/core/Button";
-import IconButton from "components/ub/core/IconButton";
+import Button from "components/ub/core/buttons/Button";
+import IconButton from "components/ub/core/buttons/IconButton";
 
 const LogisticsMarketplaceTable = () => {
   const router = useRouter();

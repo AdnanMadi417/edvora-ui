@@ -1,10 +1,10 @@
 "use client";
 
-import FormModal from "components/ub/feedback/FormModal";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { RotateCcw } from "lucide-react";
-import Alert from "components/ub/feedback/Alert";
-import CompactFileUpload from "components/ub/forms/CompactFileUpload";
+import Alert from "components/ub/feedback/notifications/Alert";
+import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
 
 interface ResubmitDocProps {
   isOpen: boolean;

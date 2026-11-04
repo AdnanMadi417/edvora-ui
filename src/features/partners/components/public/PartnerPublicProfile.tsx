@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import Logo from "components/ub/brand/Logo";
-import SiteFooter from "components/ub/navigation/SiteFooter";
-import StickyActionBar from "components/ub/navigation/StickyActionBar";
-import FadeIn from "components/ub/core/FadeIn";
+import SiteFooter from "components/ub/navigation/layout/SiteFooter";
+import StickyActionBar from "components/ub/navigation/controls/StickyActionBar";
+import FadeIn from "components/ub/core/motion/FadeIn";
 import { buttonBase, buttonSizes, buttonVariants } from "components/ub/recipes";
 import type { PublicPartnerProfile } from "features/partners/types";
 import AdvisorProfile, { channelIcon } from "features/partners/components/profile/AdvisorProfile";

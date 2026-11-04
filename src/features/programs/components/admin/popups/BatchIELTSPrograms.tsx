@@ -5,12 +5,12 @@ import { XCircle, GraduationCap } from "lucide-react";
 
 import { useBatchUpdatePrograms } from "features/programs/hooks";
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import SelectField from "components/ub/forms/SelectField";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
+import SelectField from "components/ub/forms/selection/SelectField";
 import { IELTS_BANDS } from 'constants/lists';
 
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface BatchBranchProps {

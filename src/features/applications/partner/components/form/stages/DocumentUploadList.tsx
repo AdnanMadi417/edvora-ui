@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
 import { FormDataType, DocumentType } from "features/applications/partner/components/form/utility-functions/types";
-import FileUpload, { FileUploadItem } from "components/ub/forms/FileUpload";
-import Toggle from "components/ub/forms/Toggle";
-import ProgressBar from "components/ub/feedback/ProgressBar";
-import Alert from "components/ub/feedback/Alert";
+import FileUpload, { FileUploadItem } from "components/ub/forms/uploads/FileUpload";
+import Toggle from "components/ub/forms/choices/Toggle";
+import ProgressBar from "components/ub/feedback/states/ProgressBar";
+import Alert from "components/ub/feedback/notifications/Alert";
 import { card } from "components/ub/recipes";
 
 interface Props {

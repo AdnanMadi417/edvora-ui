@@ -3,17 +3,17 @@
 import { ReactNode } from "react";
 import clsx from "clsx";
 import { Award, BadgeDollarSign, Check, FileText, GraduationCap, Plus, ShieldCheck } from "lucide-react";
-import Button from "components/ub/core/Button";
-import TextButton from "components/ub/core/TextButton";
-import Amount from "components/ub/core/Amount";
-import RefId from "components/ub/core/RefId";
-import StatCard from "components/ub/data/StatCard";
-import DaysTag from "components/ub/data/DaysTag";
-import CountBadge from "components/ub/data/CountBadge";
-import PipelineBar from "components/ub/data/PipelineBar";
-import { Avatar } from "components/ub/data/Avatar";
-import { List, ListItem } from "components/ub/data/List";
-import ProgressBar from "components/ub/feedback/ProgressBar";
+import Button from "components/ub/core/buttons/Button";
+import TextButton from "components/ub/core/buttons/TextButton";
+import Amount from "components/ub/core/typography/Amount";
+import RefId from "components/ub/core/typography/RefId";
+import StatCard from "components/ub/data/cards/StatCard";
+import DaysTag from "components/ub/data/badges/DaysTag";
+import CountBadge from "components/ub/data/badges/CountBadge";
+import PipelineBar from "components/ub/data/display/PipelineBar";
+import { Avatar } from "components/ub/data/media/Avatar";
+import { List, ListItem } from "components/ub/data/display/List";
+import ProgressBar from "components/ub/feedback/states/ProgressBar";
 import { card, cardPadding } from "components/ub/recipes";
 import { ACTIVITY, ADVISOR, DEADLINES, NEXT_ACTIONS, ONBOARDING, PIPELINE, STATS } from "./advisorHome.data";
 

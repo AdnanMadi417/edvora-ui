@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
-import BrandColors from "./BrandColors";
-import Typography from "./Typography";
-import Foundations from "./Foundations";
+import BrandColors from "./sections/BrandColors";
+import Typography from "./sections/Typography";
+import Foundations from "./sections/Foundations";
 import {
   ButtonsSection,
   FormInputsSection,
@@ -12,8 +12,8 @@ import {
   DataDisplaySection,
   TablesSection,
 } from "./GuideSections";
-import SignInScreens from "./SignInScreens";
-import DashboardPatterns from "./DashboardPatterns";
+import SignInScreens from "./patterns/SignInScreens";
+import DashboardPatterns from "./patterns/DashboardPatterns";
 import Handoff from "./Handoff";
 
 export interface GuideSection {

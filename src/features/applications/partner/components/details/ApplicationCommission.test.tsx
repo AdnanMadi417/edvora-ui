@@ -1,9 +1,9 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import ApplicationCommission from "./ApplicationCommission";
-import { usePartnerProfile } from "features/partners/hooks/usePartnerProfile";
+import { usePartnerProfile } from "features/partners/hooks/profile/usePartnerProfile";
 
-jest.mock("../../../../partners/hooks/usePartnerProfile", () => ({ usePartnerProfile: jest.fn() }));
+jest.mock("../../../../partners/hooks/profile/usePartnerProfile", () => ({ usePartnerProfile: jest.fn() }));
 jest.mock("../popups/DisputeCommission", () => () => null);
 jest.mock("../popups/ConfirmReceived", () => () => null);
 jest.mock("../../../shared/DocumentActions", () => () => null);

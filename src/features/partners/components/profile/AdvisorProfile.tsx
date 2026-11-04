@@ -19,16 +19,16 @@ import {
   Trash2,
   type LucideIcon,
 } from "lucide-react";
-import { Avatar } from "components/ub/data/Avatar";
-import Tag from "components/ub/data/Tag";
-import Faq from "components/ub/data/Faq";
-import Tooltip from "components/ub/feedback/Tooltip";
-import Input from "components/ub/forms/Input";
-import Textarea from "components/ub/forms/Textarea";
-import Tabs from "components/ub/navigation/Tabs";
-import IconButton from "components/ub/core/IconButton";
-import { TextButton } from "components/ub/core/TextButton";
-import IconTile from "components/ub/dashboard/IconTile";
+import { Avatar } from "components/ub/data/media/Avatar";
+import Tag from "components/ub/data/badges/Tag";
+import Faq from "components/ub/data/display/Faq";
+import Tooltip from "components/ub/feedback/dialogs/Tooltip";
+import Input from "components/ub/forms/text/Input";
+import Textarea from "components/ub/forms/text/Textarea";
+import Tabs from "components/ub/navigation/controls/Tabs";
+import IconButton from "components/ub/core/buttons/IconButton";
+import { TextButton } from "components/ub/core/buttons/TextButton";
+import IconTile from "components/ub/dashboard/shared/IconTile";
 import { buttonBase, buttonSizes, buttonVariants, card, cardPadding } from "components/ub/recipes";
 import type { AdvisorContactChannel, PublicPartnerProfile } from "features/partners/types";
 import {

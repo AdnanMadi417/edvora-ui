@@ -4,12 +4,12 @@ import React, { useState, useEffect } from "react";
 import { XCircle, CreditCard } from "lucide-react";
 import { useAllPaymentMethods, useBatchAssignPaymentMethod } from "features/knowledge-hub/payment-methods/hooks";
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
-import SelectField from "components/ub/forms/SelectField";
-import RichTextEditor from "components/ub/forms/RichTextEditor";
-import MultiSelect from "components/ub/forms/MultiSelect";
-import { useToast } from "components/ub/feedback/ToastContext";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
+import SelectField from "components/ub/forms/selection/SelectField";
+import RichTextEditor from "components/ub/forms/text/RichTextEditor";
+import MultiSelect from "components/ub/forms/selection/MultiSelect";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 import { CURRENCY } from 'constants/lists';

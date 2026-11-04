@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ApplicationDetailsPattern from "components/showcase/ApplicationDetailsPattern";
+import ApplicationDetailsPattern from "components/showcase/patterns/ApplicationDetailsPattern";
 
 export const metadata: Metadata = {
   title: "Application Details pattern",

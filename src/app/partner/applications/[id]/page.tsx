@@ -5,9 +5,9 @@ import { useParams } from "next/navigation";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 
-import EmptyData from "components/ub/feedback/EmptyData";
-import Loading from "components/ub/feedback/Loading";
-import Alert from "components/ub/feedback/Alert";
+import EmptyData from "components/ub/feedback/states/EmptyData";
+import Loading from "components/ub/feedback/states/Loading";
+import Alert from "components/ub/feedback/notifications/Alert";
 
 import { useSession } from "components/context/SessionContext";
 import ApplicationDetails from "features/applications/partner/components/details/ApplicationDetails";

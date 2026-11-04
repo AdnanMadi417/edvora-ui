@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import { AlertCircle, CheckCircle } from "lucide-react";
-import Button from "components/ub/core/Button";
+import Button from "components/ub/core/buttons/Button";
 import type { ApplicationActionsResponse } from "features/applications/hooks";
 import DisputeCommission from "features/applications/partner/components/popups/DisputeCommission";
 import ConfirmReceived from "features/applications/partner/components/popups/ConfirmReceived";
 import { PartnerPayoutSection } from "features/applications/payouts";
 import { DisputeSection } from "features/applications/disputes";
-import { usePartnerProfile } from "features/partners/hooks/usePartnerProfile";
+import { usePartnerProfile } from "features/partners/hooks/profile/usePartnerProfile";
 import CommissionCard from "features/applications/components/CommissionCard";
 import { toApplicationView } from "features/applications/model/applicationView";
 

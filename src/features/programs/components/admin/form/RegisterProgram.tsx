@@ -1,41 +1,54 @@
-'use client';
+"use client";
 
-import { ArrowLeft, Award, BookOpen, CalendarPlus, CalendarRange, DollarSign, MapPin, Plus, Trash2 } from 'lucide-react';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useToast } from 'components/ub/feedback/ToastContext';
-import { parseApiError } from 'utils/parseApiError';
-import { useRouter } from 'next/navigation';
+import CommissionFields from "features/programs/components/shared/CommissionFields";
+import { BookOpen, CalendarPlus, Plus, Trash2 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import { parseApiError } from "utils/parseApiError";
+import { useRouter } from "next/navigation";
 
-import { IELTS_BANDS, MONTHS, CURRENCY } from 'constants/lists';
-import { DEFAULT_COMMISSION_CURRENCY, normalizeCommissionCurrency } from 'features/programs/utils/commissionCurrency';
-import { type Currency, type CourseType } from 'features/programs/types';
+import { IELTS_BANDS, MONTHS } from "constants/lists";
+import {
+  DEFAULT_COMMISSION_CURRENCY,
+  normalizeCommissionCurrency,
+} from "features/programs/utils/commissionCurrency";
+import { type Currency, type CourseType } from "features/programs/types";
 
-import { useCreateProgram } from 'features/programs/hooks';
+import { useCreateProgram } from "features/programs/hooks";
 import { useUniversities, useBranches } from "features/universities/hooks";
 import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useCommissionTypes } from "features/knowledge-hub/commission/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 
-import InputField from 'components/ub/forms/InputField';
-import TextareaField from 'components/ub/forms/TextareaField';
-import RichTextEditor from 'components/ub/forms/RichTextEditor';
-import SelectField from 'components/ub/forms/SelectField';
-import YearlyFeesField from 'features/programs/components/shared/YearlyFeesField';
-import OneTimeFeesField from 'features/programs/components/shared/OneTimeFeesField';
-import SearchableDropdown from 'components/ub/forms/SearchableDropdown';
-import ToggleInput from 'components/ub/forms/ToggleInput';
-import AccordionSection from 'features/programs/components/shared/form/AccordionSection';
-import IntakeMonthsField from 'features/programs/components/shared/form/IntakeMonthsField';
-import { useUnsavedChangesGuard, confirmDiscard } from 'features/programs/components/shared/form/useUnsavedChangesGuard';
-import { useDraftAutosave } from 'features/programs/components/shared/form/useDraftAutosave';
-import { COURSE_TYPE_OPTIONS, isMasterOrPhd } from 'features/programs/utils/courseType';
-import { setFormPath } from 'features/programs/components/shared/form/setFormPath';
-import { useIsFormDirty } from 'features/programs/components/shared/form/useIsFormDirty';
+import InputField from "components/ub/forms/text/InputField";
+import RichTextEditor from "components/ub/forms/text/RichTextEditor";
+import SelectField from "components/ub/forms/selection/SelectField";
+import YearlyFeesField from "features/programs/components/shared/YearlyFeesField";
+import OneTimeFeesField from "features/programs/components/shared/OneTimeFeesField";
+import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
+import ToggleInput from "components/ub/forms/choices/ToggleInput";
+import SteppedFormPage from "components/ub/forms/layout/SteppedFormPage";
+import DescriptionList from "components/ub/data/display/DescriptionList";
+import SectionCard from "components/ub/data/cards/SectionCard";
+import RichTextDisplay from "components/ub/data/display/RichTextDisplay";
+import Amount from "components/ub/core/typography/Amount";
+import Alert from "components/ub/feedback/notifications/Alert";
+import { monthLabel } from "features/programs/utils/intakeMonths";
+import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
+import {
+  useUnsavedChangesGuard,
+  confirmDiscard,
+} from "features/programs/components/shared/form/useUnsavedChangesGuard";
+import { useDraftAutosave } from "features/programs/components/shared/form/useDraftAutosave";
+import {
+  COURSE_TYPE_OPTIONS,
+  isMasterOrPhd,
+} from "features/programs/utils/courseType";
+import { setFormPath } from "features/programs/components/shared/form/setFormPath";
+import { useIsFormDirty } from "features/programs/components/shared/form/useIsFormDirty";
 
-import Button from 'components/ub/core/Button';
-import PrevButton from 'components/ub/core/PrevButton';
-import IconButton from 'components/ub/core/IconButton';
-import { validateProgram } from './validateProgram';
+import IconButton from "components/ub/core/buttons/IconButton";
+import { validateProgram } from "./validateProgram";
 
 export interface FormData {
   name: string;
@@ -75,47 +88,41 @@ export interface FormData {
 }
 
 type FormErrors = Record<string, string>;
-type SectionKey = 'details' | 'university' | 'fees' | 'intakes' | 'scholarship';
-
-const SECTION_FIELDS: Record<SectionKey, string[]> = {
-  details: ['name', 'qualification_id', 'field_of_study_id', 'duration', 'is_on_campus'],
-  university: ['uni_id', 'branch_id'],
-  fees: ['commission_amount', 'commission_notes', 'yearly_fees', 'one_time_fees'],
-  intakes: ['intake_months', 'english_required_score'],
-  scholarship: ['scholarships'],
+const stepForField = (field: string): number => {
+  if (
+    /^(tuition_fee|commission_|expected_commission_|yearly_fee|one_time_fee)/.test(
+      field
+    )
+  )
+    return 1;
+  if (field === "intake_months" || field === "english_required_score") return 2;
+  if (field.startsWith("scholarships") || field === "has_scholarship") return 3;
+  return 0;
 };
 
-// Same "does this field belong to this section" test focusFirstError uses —
-// shared so a section's live error indicator can't drift out of sync with
-// which fields it's actually considered to own (e.g. missing an indexed
-// yearly_fees[i]/scholarships[i] error, or a flat field SECTION_FIELDS
-// already lists but a hand-rolled check forgot).
-const sectionHasError = (errors: FormErrors, key: SectionKey): boolean =>
-  Object.entries(errors).some(([f, v]) => !!v && SECTION_FIELDS[key].some((sf) => f === sf || f.startsWith(`${sf}[`)));
-
 const emptyFormData: FormData = {
-  name: '',
-  uni_id: '',
-  branch_id: '',
-  field_of_study_id: '',
+  name: "",
+  uni_id: "",
+  branch_id: "",
+  field_of_study_id: "",
   tuition_fee: 0,
   intake_months: [],
   duration: 0,
-  english_required_score: '0',
-  overview: '',
-  curriculum: '',
+  english_required_score: "0",
+  overview: "",
+  curriculum: "",
   is_on_campus: true,
   is_online: false,
   has_scholarship: false,
-  commission_type_id: '',
+  commission_type_id: "",
   commission_currency: DEFAULT_COMMISSION_CURRENCY,
-  commission_notes: '',
+  commission_notes: "",
   commission_amount: 0,
-  expected_commission_from: '',
-  expected_commission_to: '',
-  qualification_id: '',
+  expected_commission_from: "",
+  expected_commission_to: "",
+  qualification_id: "",
   course_type: null,
-  yearly_fee_currency: 'MYR',
+  yearly_fee_currency: "MYR",
   yearly_fees: [],
   one_time_fees: [],
   scholarships: [],
@@ -125,7 +132,9 @@ interface Props {
   basePath?: string;
 }
 
-export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: Props = {}) {
+export default function RegisterProgram({
+  basePath = "/admin/knowledge-hub",
+}: Props = {}) {
   const { showToast } = useToast();
   const router = useRouter();
 
@@ -133,9 +142,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
   const { commissionTypes } = useCommissionTypes();
 
   const [errors, setErrors] = useState<FormErrors>({});
-  const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
-    details: true, university: true, fees: true, intakes: true, scholarship: true,
-  });
+  const [currentStep, setCurrentStep] = useState(0);
 
   const [formData, setFormData] = useState<FormData>(emptyFormData);
 
@@ -152,7 +159,10 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
   const [dirtyBaseline, setDirtyBaseline] = useState<FormData>(emptyFormData);
   const isDirty = useIsFormDirty(formData, dirtyBaseline);
   useUnsavedChangesGuard(isDirty);
-  const { hasDraft, readDraft, clearDraft, dismissDraft } = useDraftAutosave(formData, isDirty);
+  const { hasDraft, readDraft, clearDraft, dismissDraft } = useDraftAutosave(
+    formData,
+    isDirty
+  );
 
   useEffect(() => {
     if (commissionTypes.length > 0) {
@@ -163,20 +173,40 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
   }, [commissionTypes]);
 
   useEffect(() => {
-    if (!branches || branches.length === 0) {
-      updateFormData('branch_id', '');
-      return;
-    }
-    const stillValid = branches.some((b) => String(b.id) === String(formData.branch_id));
-    if (stillValid) return;
-    updateFormData('branch_id', branches.length === 1 ? String(branches[0].id) : '');
+    setFormData((prev) => {
+      const stillValid = branches?.some(
+        (branch) => String(branch.id) === String(prev.branch_id)
+      );
+      if (stillValid) return prev;
+      const branchId = branches?.length === 1 ? String(branches[0].id) : "";
+      return prev.branch_id === branchId
+        ? prev
+        : { ...prev, branch_id: branchId };
+    });
+    setErrors((prev) => {
+      if (!prev.branch_id) return prev;
+      const next = { ...prev };
+      delete next.branch_id;
+      return next;
+    });
   }, [branches]);
 
-  const toggleSection = (key: SectionKey) => setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  const validateStep = (step: number) => {
+    const stepErrors = Object.fromEntries(
+      Object.entries(validateProgram(formData).errors).filter(
+        ([field]) => stepForField(field) === step
+      )
+    );
+    setErrors(stepErrors);
+    return Object.keys(stepErrors).length === 0;
+  };
 
   const validateField = React.useCallback(
     (field: string, overrideValue?: any) => {
-      const data = overrideValue !== undefined ? { ...formData, [field]: overrideValue } : formData;
+      const data =
+        overrideValue !== undefined
+          ? { ...formData, [field]: overrideValue }
+          : formData;
       const { errors: allErrors } = validateProgram(data);
       setErrors((prev) => ({ ...prev, [field]: allErrors[field] }));
     },
@@ -184,25 +214,43 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
   );
 
   const updateFormData = (field: string, value: any) => {
-    setErrors((prev) => {
-      if (!prev[field]) return prev;
-      const next = { ...prev };
-      delete next[field];
-      return next;
-    });
+    setErrors((prev) =>
+      Object.fromEntries(
+        Object.entries(prev).filter(
+          ([key]) => key !== field && !key.startsWith(`${field}[`)
+        )
+      )
+    );
+
     setFormData((prev) => {
       const updated = setFormPath(prev, field, value);
 
-      if (field === 'is_on_campus' && value === true) updated.is_online = false;
-      if (field === 'is_online' && value === true) updated.is_on_campus = false;
-      if (field === 'is_on_campus' && value === false) updated.is_online = true;
-      if (field === 'is_online' && value === false) updated.is_on_campus = true;
-      if (field === 'has_scholarship' && value === true && updated.scholarships.length === 0) {
-        updated.scholarships = [{ type: 1, coverage_percent: 0, max_amount: 0, name: '', description: '', conditions: [] }];
+      if (field === "is_on_campus" && value === true) updated.is_online = false;
+      if (field === "is_online" && value === true) updated.is_on_campus = false;
+      if (field === "is_on_campus" && value === false) updated.is_online = true;
+      if (field === "is_online" && value === false) updated.is_on_campus = true;
+      if (
+        field === "has_scholarship" &&
+        value === true &&
+        updated.scholarships.length === 0
+      ) {
+        updated.scholarships = [
+          {
+            type: 1,
+            coverage_percent: 0,
+            max_amount: 0,
+            name: "",
+            description: "",
+            conditions: [],
+          },
+        ];
       }
-      if (field === 'has_scholarship' && value === false) updated.scholarships = [];
-      if (field === 'qualification_id') {
-        const nextQualification = qualifications.find((q) => String(q.id) === String(value));
+      if (field === "has_scholarship" && value === false)
+        updated.scholarships = [];
+      if (field === "qualification_id") {
+        const nextQualification = qualifications.find(
+          (q) => String(q.id) === String(value)
+        );
         if (!isMasterOrPhd(nextQualification?.name)) updated.course_type = null;
       }
 
@@ -211,13 +259,26 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
   };
 
   const removeScholarship = (index: number) => {
-    setFormData((prev) => ({ ...prev, scholarships: prev.scholarships.filter((_, i) => i !== index) }));
+    setFormData((prev) => ({
+      ...prev,
+      scholarships: prev.scholarships.filter((_, i) => i !== index),
+    }));
   };
 
   const addScholarship = () => {
     setFormData((prev) => ({
       ...prev,
-      scholarships: [...prev.scholarships, { type: 1, coverage_percent: 0, max_amount: 0, name: '', description: '', conditions: [] }],
+      scholarships: [
+        ...prev.scholarships,
+        {
+          type: 1,
+          coverage_percent: 0,
+          max_amount: 0,
+          name: "",
+          description: "",
+          conditions: [],
+        },
+      ],
     }));
   };
 
@@ -228,14 +289,29 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
     qualification_id: formData.qualification_id,
     // Recomputed from the current qualification rather than trusted from
     // formData alone — e.g. a restored draft could carry a stale pairing.
-    course_type: isMasterOrPhd(selectedQualification?.name) ? formData.course_type : null,
+    course_type: isMasterOrPhd(selectedQualification?.name)
+      ? formData.course_type
+      : null,
     commission_amount: Number(formData.commission_amount || 0),
-    commission_currency: normalizeCommissionCurrency(formData.commission_currency),
-    expected_commission_from: formData.expected_commission_from ? Number(formData.expected_commission_from) : null,
-    expected_commission_to: formData.expected_commission_to ? Number(formData.expected_commission_to) : null,
-    yearly_fee_currency: (formData.yearly_fee_currency || 'MYR') as Currency,
-    yearly_fees: (formData.yearly_fees || []).map((y) => ({ year: Number(y.year), fee: Number(y.fee) })),
-    one_time_fees: (formData.one_time_fees || []).map((f: any) => ({ description: f.description || '', fee: Number(f.fee || 0), currency: (f.currency || 'MYR') as Currency })),
+    commission_currency: normalizeCommissionCurrency(
+      formData.commission_currency
+    ),
+    expected_commission_from: formData.expected_commission_from
+      ? Number(formData.expected_commission_from)
+      : null,
+    expected_commission_to: formData.expected_commission_to
+      ? Number(formData.expected_commission_to)
+      : null,
+    yearly_fee_currency: (formData.yearly_fee_currency || "MYR") as Currency,
+    yearly_fees: (formData.yearly_fees || []).map((y) => ({
+      year: Number(y.year),
+      fee: Number(y.fee),
+    })),
+    one_time_fees: (formData.one_time_fees || []).map((f: any) => ({
+      description: f.description || "",
+      fee: Number(f.fee || 0),
+      currency: (f.currency || "MYR") as Currency,
+    })),
     scholarships: formData.has_scholarship
       ? (formData.scholarships || [])
           .filter((s) => s.name && s.description)
@@ -250,13 +326,10 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
   });
 
   const focusFirstError = (validationErrors: FormErrors) => {
-    const sectionsToOpen: Partial<Record<SectionKey, boolean>> = {};
-    (Object.keys(SECTION_FIELDS) as SectionKey[]).forEach((key) => {
-      if (sectionHasError(validationErrors, key)) sectionsToOpen[key] = true;
-    });
-    if (Object.keys(sectionsToOpen).length) {
-      setOpenSections((prev) => ({ ...prev, ...sectionsToOpen }));
-    }
+    const first = Object.keys(validationErrors).find(
+      (field) => validationErrors[field]
+    );
+    if (first) setCurrentStep(stepForField(first));
   };
 
   const handleSubmit = async () => {
@@ -264,68 +337,80 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
     if (!isValid) {
       setErrors(validationErrors);
       focusFirstError(validationErrors);
-      showToast('Please fix the highlighted fields before publishing.', 'error');
+      showToast(
+        "Please fix the highlighted fields before publishing.",
+        "error"
+      );
       return;
     }
     try {
       await createProgram(buildPayload());
       clearDraft();
-      showToast('Program created successfully', 'success');
+      showToast("Program created successfully", "success");
       setTimeout(() => router.push(basePath), 1500);
     } catch (error: unknown) {
-      const backendMessage = parseApiError(error, 'Please try again.');
-      showToast(`Failed to create program. ${backendMessage}`, 'error');
+      const backendMessage = parseApiError(error, "Please try again.");
+      showToast(`Failed to create program. ${backendMessage}`, "error");
     }
   };
 
   const restoreDraft = () => {
     const draft = readDraft();
     // A draft saved by a build predating UBX-395 carries the old lower-case code.
-    if (draft) setFormData({ ...draft, commission_currency: normalizeCommissionCurrency(draft.commission_currency) });
+    if (draft)
+      setFormData({
+        ...draft,
+        commission_currency: normalizeCommissionCurrency(
+          draft.commission_currency
+        ),
+      });
+    setCurrentStep(0);
+    setErrors({});
     dismissDraft();
   };
 
   // ── Live preview data ──────────────────────────────────────────────────
-  const selectedUniversity = universities?.find((u) => String(u.id) === String(formData.uni_id));
-  const selectedBranch = branches?.find((b) => String(b.id) === String(formData.branch_id));
-  const selectedQualification = qualifications?.find((q) => String(q.id) === String(formData.qualification_id));
-  const location = selectedBranch ? [selectedBranch.location, selectedBranch.state].filter(Boolean).join(', ') : undefined;
-  const firstYearFee = useMemo(() => {
-    const rows = formData.yearly_fees || [];
-    if (!rows.length) return null;
-    const first = [...rows].sort((a, b) => Number(a.year) - Number(b.year))[0];
-    if (!first?.fee) return null;
-    return `${formData.yearly_fee_currency || 'MYR'} ${Number(first.fee).toLocaleString()}`;
-  }, [formData.yearly_fees, formData.yearly_fee_currency]);
-
+  const selectedUniversity = universities?.find(
+    (u) => String(u.id) === String(formData.uni_id)
+  );
+  const selectedBranch = branches?.find(
+    (b) => String(b.id) === String(formData.branch_id)
+  );
+  const selectedQualification = qualifications?.find(
+    (q) => String(q.id) === String(formData.qualification_id)
+  );
   return (
-    <section className="mx-auto mt-5 max-w-6xl">
-      <div className="mt-6 rounded-md border bg-white">
-
-        {/* Header */}
-        <div className="flex items-start gap-x-4 border-b px-6 py-5">
-          <div className="flex h-12 w-12 items-center justify-center rounded-md bg-blue-100">
-            <BookOpen className="text-blue-700" size={24} />
-          </div>
-          <div>
-            <h3 className="text-xl font-semibold text-slate-900">Register a new program</h3>
-            <p className="text-sm text-slate-500">Complete the required information to register a knowledge hub program</p>
-          </div>
-        </div>
-
-        <div className="px-6 py-6">
-
-          <div>
-            <div className="space-y-4">
-
-              <AccordionSection
-                icon={BookOpen}
-                title="Program Details"
-                hasError={sectionHasError(errors, 'details')}
-                summary={formData.name ? `${formData.name}${selectedQualification ? ` · ${selectedQualification.name}` : ''}` : 'Not started'}
-                open={openSections.details}
-                onToggle={() => toggleSection('details')}
-              >
+    <>
+      {hasDraft && (
+        <Alert
+          tone="info"
+          title="Saved draft available"
+          action={{ label: "Restore draft", onClick: restoreDraft }}
+          onDismiss={dismissDraft}
+          className="mt-5 w-full min-w-0"
+        >
+          Restore your previous programme details, then check each step before
+          publishing.
+        </Alert>
+      )}
+      <SteppedFormPage
+        title="Create program"
+        description="Define the programme, set its fees and requirements, then review before publishing."
+        icon={BookOpen}
+        currentStep={currentStep}
+        onStepChange={setCurrentStep}
+        onCancel={() => confirmDiscard(isDirty, () => router.push(basePath))}
+        onSubmit={handleSubmit}
+        submitLabel="Create program"
+        submitting={loading}
+        steps={[
+          {
+            id: "programme",
+            label: "Programme",
+            description: "Details and institution",
+            validate: () => validateStep(0),
+            content: (
+              <div className="space-y-6">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="md:col-span-2">
                     <InputField
@@ -336,20 +421,28 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                       formData={formData}
                       errors={errors}
                       updateFormData={updateFormData}
-                      onBlur={() => validateField('name')}
+                      onBlur={() => validateField("name")}
                     />
-                    <p className="mt-1 text-xs text-slate-400">Minimum 5 characters — this is exactly what renders in the Program Info column.</p>
+                    <p className="mt-1 text-xs text-ub-text-tertiary">
+                      Use the official programme name, with at least 3
+                      characters.
+                    </p>
                   </div>
 
                   <SearchableDropdown
                     label="Qualification Level"
                     field="qualification_id"
                     required
-                    options={qualifications.map((f) => ({ value: String(f.id), label: f.name.charAt(0).toUpperCase() + f.name.slice(1) }))}
+                    options={qualifications.map((f) => ({
+                      value: String(f.id),
+                      label: f.name.charAt(0).toUpperCase() + f.name.slice(1),
+                    }))}
                     formData={formData}
                     errors={errors}
                     updateFormData={updateFormData}
-                    onSelect={(v: string) => validateField('qualification_id', v)}
+                    onSelect={(v: string) =>
+                      validateField("qualification_id", v)
+                    }
                   />
 
                   {isMasterOrPhd(selectedQualification?.name) && (
@@ -360,7 +453,9 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                       options={COURSE_TYPE_OPTIONS}
                       formData={formData}
                       errors={errors}
-                      updateFormData={(f: string, v: string) => updateFormData(f, v || null)}
+                      updateFormData={(f: string, v: string) =>
+                        updateFormData(f, v || null)
+                      }
                     />
                   )}
 
@@ -368,11 +463,16 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                     label="Field of Study"
                     field="field_of_study_id"
                     required
-                    options={fields.map((f) => ({ value: String(f.id), label: f.name }))}
+                    options={fields.map((f) => ({
+                      value: String(f.id),
+                      label: f.name,
+                    }))}
                     formData={formData}
                     errors={errors}
                     updateFormData={updateFormData}
-                    onSelect={(v: string) => validateField('field_of_study_id', v)}
+                    onSelect={(v: string) =>
+                      validateField("field_of_study_id", v)
+                    }
                   />
 
                   <InputField
@@ -384,7 +484,7 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                     formData={formData}
                     errors={errors}
                     updateFormData={updateFormData}
-                    onBlur={() => validateField('duration')}
+                    onBlur={() => validateField("duration")}
                   />
 
                   <div className="md:col-span-2">
@@ -401,174 +501,139 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                     />
                   </div>
                 </div>
-              </AccordionSection>
+                <section
+                  className="border-t border-ub-border pt-6"
+                  aria-label="Institution and campus"
+                >
+                  <h3 className="mb-4 text-ub-heading-sm text-ub-text-primary">
+                    Institution and campus
+                  </h3>
 
-              <AccordionSection
-                icon={MapPin}
-                title="University & Location"
-                hasError={sectionHasError(errors, 'university')}
-                summary={selectedUniversity ? `${selectedUniversity.name}${selectedBranch ? ` · ${selectedBranch.name}` : ''}` : 'Not started'}
-                open={openSections.university}
-                onToggle={() => toggleSection('university')}
-              >
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <SearchableDropdown
-                    label="University"
-                    field="uni_id"
-                    required
-                    options={(universities ?? []).filter((u) => u.is_active).map((u) => ({ value: u.id, label: u.name }))}
-                    formData={formData}
-                    errors={errors}
-                    updateFormData={updateFormData}
-                    onSelect={(v: string) => validateField('uni_id', v)}
-                  />
-
-                  {branches.length > 1 && (
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <SearchableDropdown
-                      label="Branch"
-                      field="branch_id"
-                      options={branches.map((s) => ({ value: String(s.id), label: s.name }))}
+                      label="University"
+                      field="uni_id"
+                      required
+                      options={(universities ?? [])
+                        .filter((u) => u.is_active)
+                        .map((u) => ({ value: u.id, label: u.name }))}
                       formData={formData}
                       errors={errors}
                       updateFormData={updateFormData}
-                    />
-                  )}
-
-                </div>
-              </AccordionSection>
-
-              <AccordionSection
-                icon={DollarSign}
-                title="Fees & Commission"
-                hasError={sectionHasError(errors, 'fees')}
-                summary={firstYearFee ? `First year ${firstYearFee}` : 'Not started'}
-                open={openSections.fees}
-                onToggle={() => toggleSection('fees')}
-              >
-                <YearlyFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
-                <OneTimeFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
-
-                <div className="border-t border-slate-100 pt-4">
-                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Commission — how much</h4>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <InputField
-                      label="Commission Amount"
-                      field="commission_amount"
-                      type="number"
-                      placeholder="e.g. 10"
-                      required={false}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={(f: string, v: any) => {
-                        updateFormData(f, v);
-                        const num = Number(v);
-                        if (v !== '' && v !== 0 && num > 29999) {
-                          setErrors((prev) => ({ ...prev, commission_amount: 'Commission amount cannot exceed RM 29,999' }));
-                        } else {
-                          setErrors((prev) => { const n = { ...prev }; delete n.commission_amount; return n; });
-                        }
-                      }}
+                      onSelect={(v: string) => validateField("uni_id", v)}
                     />
 
-                    <SelectField
-                      label="Currency"
-                      field="commission_currency"
-                      required={false}
-                      options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-                  </div>
-                </div>
-
-                <div className="border-t border-slate-100 pt-4">
-                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">Commission — when &amp; notes</h4>
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <SelectField
-                      label="Expected From"
-                      field="expected_commission_from"
-                      required={false}
-                      options={MONTHS.map((m) => ({ value: m.value, label: m.label }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <SelectField
-                      label="Expected To"
-                      field="expected_commission_to"
-                      required={false}
-                      options={MONTHS.map((m) => ({ value: m.value, label: m.label }))}
-                      formData={formData}
-                      errors={errors}
-                      updateFormData={updateFormData}
-                    />
-
-                    <div className="md:col-span-2">
-                      <TextareaField
-                        label="Commission Notes"
-                        field="commission_notes"
-                        required={false}
-                        placeholder="e.g. Commission paid after visa approval..."
+                    {branches.length > 1 && (
+                      <SearchableDropdown
+                        label="Branch"
+                        field="branch_id"
+                        options={branches.map((s) => ({
+                          value: String(s.id),
+                          label: s.name,
+                        }))}
                         formData={formData}
                         errors={errors}
                         updateFormData={updateFormData}
-                        onBlur={() => validateField('commission_notes')}
                       />
-                    </div>
+                    )}
                   </div>
-                </div>
-              </AccordionSection>
+                </section>
+              </div>
+            ),
+          },
+          {
+            id: "fees",
+            label: "Fees",
+            description: "Tuition and commission",
+            validate: () => validateStep(1),
+            content: (
+              <div className="space-y-6">
+                <YearlyFeesField
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
+                <OneTimeFeesField
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
 
-              <AccordionSection
-                icon={CalendarRange}
-                title="Intakes & Requirements"
-                hasError={sectionHasError(errors, 'intakes')}
-                summary={formData.intake_months?.length ? `${formData.intake_months.length} intake month${formData.intake_months.length !== 1 ? 's' : ''}` : 'Not started'}
-                open={openSections.intakes}
-                onToggle={() => toggleSection('intakes')}
-              >
-                <IntakeMonthsField field="intake_months" label="Intake Months" formData={formData} errors={errors} updateFormData={updateFormData} />
+                <CommissionFields
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                  validateField={validateField}
+                  showTiming={true}
+                />
+              </div>
+            ),
+          },
+          {
+            id: "requirements",
+            label: "Requirements",
+            description: "Intakes and English",
+            validate: () => validateStep(2),
+            content: (
+              <div className="space-y-6">
+                <IntakeMonthsField
+                  field="intake_months"
+                  label="Intake Months"
+                  formData={formData}
+                  errors={errors}
+                  updateFormData={updateFormData}
+                />
 
                 <SelectField
                   label="IELTS Required Score"
                   field="english_required_score"
                   required={false}
-                  options={IELTS_BANDS.map((s) => ({ label: s.label, value: s.score }))}
+                  options={IELTS_BANDS.map((s) => ({
+                    label: s.label,
+                    value: s.score,
+                  }))}
                   formData={formData}
                   errors={errors}
                   updateFormData={updateFormData}
                 />
-              </AccordionSection>
-
-              <AccordionSection
-                icon={Award}
-                title="Scholarship"
-                hasError={sectionHasError(errors, 'scholarship')}
-                summary={formData.has_scholarship ? `Available · ${formData.scholarships.length} scholarship${formData.scholarships.length !== 1 ? 's' : ''}` : 'None'}
-                open={openSections.scholarship}
-                onToggle={() => toggleSection('scholarship')}
-              >
+              </div>
+            ),
+          },
+          {
+            id: "scholarships",
+            label: "Scholarships",
+            description: "Optional student support",
+            validate: () => validateStep(3),
+            content: (
+              <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <div className="inline-flex rounded-lg border border-slate-200 p-1">
+                  <div className="inline-flex rounded-lg border border-ub-border p-1">
                     <button
                       type="button"
-                      onClick={() => updateFormData('has_scholarship', true)}
-                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${formData.has_scholarship ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
+                      onClick={() => updateFormData("has_scholarship", true)}
+                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${
+                        formData.has_scholarship
+                          ? "bg-amber-500 text-white shadow-sm"
+                          : "text-ub-text-secondary hover:bg-ub-surface-subtle"
+                      }`}
                     >
                       Available
                     </button>
                     <button
                       type="button"
-                      onClick={() => updateFormData('has_scholarship', false)}
-                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${!formData.has_scholarship ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
+                      onClick={() => updateFormData("has_scholarship", false)}
+                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${
+                        !formData.has_scholarship
+                          ? "bg-slate-700 text-white shadow-sm"
+                          : "text-ub-text-secondary hover:bg-ub-surface-subtle"
+                      }`}
                     >
                       None
                     </button>
                   </div>
                   {formData.has_scholarship && (
                     <IconButton
+                      title="Add scholarship"
                       icon={<CalendarPlus className="h-4 w-4" />}
                       bgColor="bg-blue-50"
                       textColor="text-blue-700"
@@ -583,19 +648,27 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                 {formData.has_scholarship && (
                   <div className="space-y-6">
                     {formData.scholarships.map((_, index) => (
-                      <div key={index} className="rounded-xl border border-slate-200 bg-white p-6 transition">
+                      <div
+                        key={index}
+                        className="rounded-xl border border-ub-border bg-ub-surface p-6 transition"
+                      >
                         <div className="mb-5 flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-50 text-sm font-semibold text-amber-600">
                               {index + 1}
                             </div>
                             <div>
-                              <p className="text-sm font-semibold text-slate-800">Scholarship</p>
-                              <p className="text-xs text-slate-500">Configure scholarship details</p>
+                              <p className="text-sm font-semibold text-ub-text-primary">
+                                Scholarship
+                              </p>
+                              <p className="text-xs text-ub-text-secondary">
+                                Configure scholarship details
+                              </p>
                             </div>
                           </div>
                           {formData.scholarships.length > 1 && (
                             <IconButton
+                              title="Remove scholarship"
                               icon={<Trash2 className="h-4 w-4" />}
                               onClick={() => removeScholarship(index)}
                               bgColor="bg-red-50"
@@ -617,7 +690,9 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                               formData={formData}
                               errors={errors}
                               updateFormData={updateFormData}
-                              onBlur={() => validateField(`scholarships[${index}].name`)}
+                              onBlur={() =>
+                                validateField(`scholarships[${index}].name`)
+                              }
                             />
                           </div>
 
@@ -656,39 +731,73 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
 
                           <div className="md:col-span-2 space-y-3">
                             <div className="flex items-center justify-between">
-                              <h3 className="text-sm font-semibold tracking-wide text-slate-500">Conditions</h3>
+                              <h3 className="text-sm font-semibold tracking-wide text-ub-text-secondary">
+                                Conditions
+                              </h3>
                               <IconButton
+                                title="Add condition"
                                 icon={<Plus className="h-4 w-4" />}
                                 bgColor="bg-blue-50"
                                 textColor="text-blue-700"
                                 borderColor="border-blue-600"
                                 hoverTextColor="hover:text-blue-800"
                                 hoverBorderColor="hover:border-blue-700"
-                                onClick={() => updateFormData(`scholarships[${index}].conditions`, [...formData.scholarships[index].conditions, ''])}
+                                onClick={() =>
+                                  updateFormData(
+                                    `scholarships[${index}].conditions`,
+                                    [
+                                      ...formData.scholarships[index]
+                                        .conditions,
+                                      "",
+                                    ]
+                                  )
+                                }
                               />
                             </div>
 
-                            {formData.scholarships[index].conditions.length === 0 ? (
-                              <p className="text-sm text-slate-400">No conditions added yet.</p>
+                            {formData.scholarships[index].conditions.length ===
+                            0 ? (
+                              <p className="text-sm text-ub-text-tertiary">
+                                No conditions added yet.
+                              </p>
                             ) : (
                               <div className="space-y-2">
-                                {formData.scholarships[index].conditions.map((condition, cIndex) => (
-                                  <div key={cIndex} className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-                                    <input
-                                      value={condition}
-                                      onChange={(e) => updateFormData(`scholarships[${index}].conditions[${cIndex}]`, e.target.value)}
-                                      placeholder={`Condition ${cIndex + 1}`}
-                                      className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
-                                    />
-                                    <button
-                                      type="button"
-                                      onClick={() => updateFormData(`scholarships[${index}].conditions`, formData.scholarships[index].conditions.filter((_, i) => i !== cIndex))}
-                                      className="text-red-400 transition hover:text-red-600"
+                                {formData.scholarships[index].conditions.map(
+                                  (condition, cIndex) => (
+                                    <div
+                                      key={cIndex}
+                                      className="flex items-center gap-2 rounded-md border border-ub-border bg-ub-surface-subtle px-3 py-2"
                                     >
-                                      <Trash2 className="h-4 w-4" />
-                                    </button>
-                                  </div>
-                                ))}
+                                      <input
+                                        value={condition}
+                                        onChange={(e) =>
+                                          updateFormData(
+                                            `scholarships[${index}].conditions[${cIndex}]`,
+                                            e.target.value
+                                          )
+                                        }
+                                        placeholder={`Condition ${cIndex + 1}`}
+                                        className="flex-1 bg-transparent text-sm outline-none placeholder:text-ub-text-tertiary"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          updateFormData(
+                                            `scholarships[${index}].conditions`,
+                                            formData.scholarships[
+                                              index
+                                            ].conditions.filter(
+                                              (_, i) => i !== cIndex
+                                            )
+                                          )
+                                        }
+                                        className="text-red-400 transition hover:text-red-600"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </button>
+                                    </div>
+                                  )
+                                )}
                               </div>
                             )}
                           </div>
@@ -697,35 +806,184 @@ export default function RegisterProgram({ basePath = '/admin/knowledge-hub' }: P
                     ))}
                   </div>
                 )}
-              </AccordionSection>
-            </div>
+              </div>
+            ),
+          },
+        ]}
+        review={
+          <div className="space-y-4">
+            <Alert tone="info" title="Ready to publish">
+              Check the programme details, fees, and scholarships. Use Back or a
+              completed step to make changes.
+            </Alert>
+            <SectionCard title="Programme">
+              <DescriptionList
+                columns={2}
+                fallback="Not provided"
+                items={[
+                  { label: "Name", value: formData.name, fullWidth: true },
+                  {
+                    label: "Qualification",
+                    value: selectedQualification?.name,
+                  },
+                  {
+                    label: "Field of study",
+                    value: fields.find(
+                      (field) => String(field.id) === formData.field_of_study_id
+                    )?.name,
+                  },
+                  {
+                    label: "Duration",
+                    value: formData.duration
+                      ? `${formData.duration} years`
+                      : null,
+                  },
+                  {
+                    label: "Delivery",
+                    value: formData.is_on_campus ? "On campus" : "Online",
+                  },
+                  { label: "Institution", value: selectedUniversity?.name },
+                  { label: "Branch", value: selectedBranch?.name },
+                  ...(isMasterOrPhd(selectedQualification?.name)
+                    ? [
+                        {
+                          label: "Course type",
+                          value: COURSE_TYPE_OPTIONS.find(
+                            (option) => option.value === formData.course_type
+                          )?.label,
+                        },
+                      ]
+                    : []),
+                ]}
+              />
+            </SectionCard>
+            <SectionCard title="Fees and commission">
+              <DescriptionList
+                columns={2}
+                fallback="Not set"
+                items={[
+                  ...formData.yearly_fees.map((row) => ({
+                    label: `Year ${row.year}`,
+                    value: (
+                      <Amount
+                        value={Number(row.fee)}
+                        currency={formData.yearly_fee_currency}
+                      />
+                    ),
+                  })),
+                  ...formData.one_time_fees.map((row) => ({
+                    label: row.description,
+                    value: (
+                      <Amount value={Number(row.fee)} currency={row.currency} />
+                    ),
+                  })),
+                  {
+                    label: "Commission amount",
+                    value: (
+                      <Amount
+                        value={Number(formData.commission_amount)}
+                        currency={normalizeCommissionCurrency(
+                          formData.commission_currency
+                        )}
+                      />
+                    ),
+                  },
+                  {
+                    label: "Commission type",
+                    value: commissionTypes.find(
+                      (type) => String(type.id) === formData.commission_type_id
+                    )?.name,
+                  },
+                  {
+                    label: "Expected from",
+                    value: MONTHS.find(
+                      (month) =>
+                        String(month.value) ===
+                        String(formData.expected_commission_from)
+                    )?.label,
+                  },
+                  {
+                    label: "Expected to",
+                    value: MONTHS.find(
+                      (month) =>
+                        String(month.value) ===
+                        String(formData.expected_commission_to)
+                    )?.label,
+                  },
+                  {
+                    label: "Commission notes",
+                    value: formData.commission_notes,
+                    fullWidth: true,
+                  },
+                ]}
+              />
+            </SectionCard>
+            <SectionCard title="Intakes and requirements">
+              <DescriptionList
+                columns={2}
+                fallback="Not set"
+                items={[
+                  {
+                    label: "Intake months",
+                    value: formData.intake_months
+                      .map((month) => monthLabel(month, false))
+                      .join(", "),
+                  },
+                  {
+                    label: "IELTS score",
+                    value: IELTS_BANDS.find(
+                      (band) =>
+                        String(band.score) ===
+                        String(formData.english_required_score)
+                    )?.label,
+                  },
+                ]}
+              />
+            </SectionCard>
+            <SectionCard title="Scholarships">
+              {formData.has_scholarship ? (
+                formData.scholarships.map((scholarship, index) => (
+                  <div
+                    key={index}
+                    className="space-y-3 border-b border-ub-border py-4 first:pt-0 last:border-0 last:pb-0"
+                  >
+                    <DescriptionList
+                      columns={2}
+                      items={[
+                        { label: "Name", value: scholarship.name },
+                        {
+                          label: "Coverage",
+                          value: `${scholarship.coverage_percent}%`,
+                        },
+                        {
+                          label: "Maximum amount",
+                          value: (
+                            <Amount
+                              value={Number(scholarship.max_amount)}
+                              currency={formData.yearly_fee_currency}
+                            />
+                          ),
+                        },
+                        {
+                          label: "Conditions",
+                          value:
+                            scholarship.conditions.filter(Boolean).join("; ") ||
+                            "None",
+                        },
+                      ]}
+                    />
+                    <RichTextDisplay html={scholarship.description} />
+                  </div>
+                ))
+              ) : (
+                <p className="text-ub-body-sm text-ub-text-secondary">
+                  No scholarships offered.
+                </p>
+              )}
+            </SectionCard>
           </div>
-
-          {/* Footer */}
-          <div className="mt-8 flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <PrevButton
-              onClick={() => confirmDiscard(isDirty, () => router.push(basePath))}
-              text="Cancel"
-              icon={<ArrowLeft className="h-4 w-4" />}
-              disabled={loading}
-            />
-
-            <Button
-              onClick={() => handleSubmit()}
-              text={loading ? 'Creating...' : 'Create Program'}
-              icon={<BookOpen className="h-5 w-5" />}
-              bgColor="bg-blue-600"
-              textColor="text-white"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-white"
-              hoverBorderColor="hover:border-blue-700"
-              className="hover:bg-blue-700"
-              disabled={loading}
-            />
-          </div>
-
-        </div>
-      </div>
-    </section>
+        }
+      />
+    </>
   );
 }

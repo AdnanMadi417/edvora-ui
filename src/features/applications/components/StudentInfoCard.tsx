@@ -1,9 +1,9 @@
 import { MessageCircle } from "lucide-react";
 import clsx from "clsx";
-import RefId from "components/ub/core/RefId";
-import AppDate from "components/ub/data/AppDate";
-import DescriptionList from "components/ub/data/DescriptionList";
-import SectionCard, { type SectionCardState } from "components/ub/data/SectionCard";
+import RefId from "components/ub/core/typography/RefId";
+import AppDate from "components/ub/data/formatting/AppDate";
+import DescriptionList from "components/ub/data/display/DescriptionList";
+import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
 import { buttonBase, buttonSizes, buttonVariants } from "components/ub/recipes";
 
 export interface StudentInfoCardProps {

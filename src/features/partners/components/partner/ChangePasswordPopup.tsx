@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { KeyRound } from "lucide-react";
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import PasswordField from "components/ub/forms/PasswordField";
-import PasswordRequirementsChecklist from "components/ub/forms/PasswordRequirementsChecklist";
-import PasswordMatchIndicator from "components/ub/forms/PasswordMatchIndicator";
-import { useToast } from "components/ub/feedback/ToastContext";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import PasswordField from "components/ub/forms/password/PasswordField";
+import PasswordRequirementsChecklist from "components/ub/forms/password/PasswordRequirementsChecklist";
+import PasswordMatchIndicator from "components/ub/forms/password/PasswordMatchIndicator";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import api from "lib/useApi";
 import { validateNewPassword, isPasswordValid } from "utils/passwordValidation";
-import Button from "components/ub/core/Button";
+import Button from "components/ub/core/buttons/Button";
 import { parseApiError } from "utils/parseApiError";
 
 interface Props {

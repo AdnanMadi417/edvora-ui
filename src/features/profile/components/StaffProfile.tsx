@@ -4,9 +4,9 @@ import { useState } from "react";
 import { Mail, ShieldCheck, KeyRound } from "lucide-react";
 import { useMe } from "hooks/useMe";
 import api from "lib/useApi";
-import { useToast } from "components/ub/feedback/ToastContext";
-import Loading from "components/ub/feedback/Loading";
-import Button from "components/ub/core/Button";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import Loading from "components/ub/feedback/states/Loading";
+import Button from "components/ub/core/buttons/Button";
 
 const ROLE_LABELS: Record<string, string> = {
   admin: "Admin",

@@ -1,6 +1,6 @@
 "use client";
 
-import { ConfirmDialog } from "components/ub/feedback/Modal";
+import { ConfirmDialog } from "components/ub/feedback/dialogs/Modal";
 
 export interface WithdrawApplicationDialogProps {
   open: boolean;

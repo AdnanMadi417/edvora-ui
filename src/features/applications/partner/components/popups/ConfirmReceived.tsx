@@ -1,11 +1,11 @@
 "use client";
 
-import FormModal from "components/ub/feedback/FormModal";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { CheckCircle } from "lucide-react";
 
 import { useConfirmReceived } from "features/applications/disputes";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 interface ConfirmReceivedProps {

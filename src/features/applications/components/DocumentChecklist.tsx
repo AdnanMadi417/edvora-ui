@@ -1,9 +1,9 @@
 "use client";
 
 import { FileText } from "lucide-react";
-import SectionCard, { type SectionCardState } from "components/ub/data/SectionCard";
-import TextButton from "components/ub/core/TextButton";
-import CountBadge from "components/ub/data/CountBadge";
+import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
+import TextButton from "components/ub/core/buttons/TextButton";
+import CountBadge from "components/ub/data/badges/CountBadge";
 import type { DocumentItem } from "features/applications/model/applicationView";
 import DocumentRow, { type DocumentRowProps } from "./DocumentRow";
 

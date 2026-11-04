@@ -5,11 +5,11 @@ import { XCircle, CalendarDays } from "lucide-react";
 
 import { useBatchUpdatePrograms } from "features/programs/hooks";
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
 import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
 
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface BatchProgramIntakesProps {

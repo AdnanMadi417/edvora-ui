@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import AppWrappers from './AppWrappers';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
-import { SIDEBAR_INIT_SCRIPT } from 'components/ub/navigation/sidebarScript';
+import { SIDEBAR_INIT_SCRIPT } from 'components/ub/navigation/layout/sidebarScript';
 
 const inter = Inter({
   subsets: ['latin'],

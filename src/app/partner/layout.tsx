@@ -2,8 +2,8 @@
 
 import partnerRoutes, { type PartnerVisibilityFlag } from '../../routes/partnerRoutes';
 import RoleGuard from "components/guard/RoleGuard";
-import { ToastProvider } from "components/ub/feedback/ToastContext";
-import AppShell from "components/ub/navigation/AppShell";
+import { ToastProvider } from "components/ub/feedback/notifications/ToastContext";
+import AppShell from "components/ub/navigation/layout/AppShell";
 import PartnerOnboardingTour from "components/onboarding/PartnerOnboardingTour";
 import { usePartnerProfile } from "features/partners/hooks";
 

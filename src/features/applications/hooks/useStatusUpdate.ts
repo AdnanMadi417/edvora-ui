@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import api from "lib/useApi";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface UseStatusUpdateReturn {

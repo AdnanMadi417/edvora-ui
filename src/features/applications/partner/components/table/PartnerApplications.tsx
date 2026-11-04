@@ -8,13 +8,13 @@ import { useRouter } from 'next/navigation';
 import api from 'lib/useApi';
 import { useMe } from 'hooks/useMe';
 
-import Button from 'components/ub/core/Button';
-import ApplicationFilterBar from 'components/ub/navigation/ApplicationFilterBar';
+import Button from 'components/ub/core/buttons/Button';
+import ApplicationFilterBar from 'components/ub/navigation/controls/ApplicationFilterBar';
 import ApplicationsTable from 'features/applications/components/ApplicationsTable';
-import DashboardHeader from "components/ub/dashboard/DashboardHeader";
+import DashboardHeader from "components/ub/dashboard/shared/DashboardHeader";
 import { card } from "components/ub/recipes";
-import TablePagination from 'components/ub/data/TablePagination';
-import { getAsyncStatus } from 'components/ub/feedback/AsyncStatus';
+import TablePagination from 'components/ub/data/tables/TablePagination';
+import { getAsyncStatus } from 'components/ub/feedback/states/AsyncStatus';
 
 import { useUniversities } from "features/universities/hooks";
 import { useAllStages, useAllStageStatuses } from "features/applications/hooks";

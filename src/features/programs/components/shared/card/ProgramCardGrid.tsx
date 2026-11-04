@@ -2,11 +2,11 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { ArrowRight, ArrowLeft, Award, Send, GraduationCap, AlertCircle } from 'lucide-react';
-import PresignedImage from "components/ub/data/PresignedImage";
+import PresignedImage from "components/ub/data/media/PresignedImage";
 
-import Loading from "components/ub/feedback/Loading";
-import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
-import EmptyData from "components/ub/feedback/EmptyData";
+import Loading from "components/ub/feedback/states/Loading";
+import NoMessagesFound from "components/ub/feedback/states/NoMessagesFound";
+import EmptyData from "components/ub/feedback/states/EmptyData";
 import CatalogueQuotaNotice from "features/programs/components/shared/CatalogueQuotaNotice";
 
 import { usePrograms, useStates } from "features/programs/hooks";
@@ -19,8 +19,8 @@ import ProgramFilterPanel from "features/programs/components/shared/filters/Prog
 import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
 import { nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
 import { courseTypeLabel } from "features/programs/utils/courseType";
-import NextButton from "components/ub/core/NextButton";
-import PrevButton from "components/ub/core/PrevButton";
+import NextButton from "components/ub/core/buttons/NextButton";
+import PrevButton from "components/ub/core/buttons/PrevButton";
 import Link from "next/link";
 
 const ITEMS_PER_PAGE = 9;

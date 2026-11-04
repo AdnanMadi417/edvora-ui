@@ -15,21 +15,21 @@ import { MdLabelOutline } from "react-icons/md";
 
 import { useDeleteField, useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 
-import NextButton from "components/ub/core/NextButton";
-import PrevButton from "components/ub/core/PrevButton";
-import SearchInput from "components/ub/forms/SearchInput";
+import NextButton from "components/ub/core/buttons/NextButton";
+import PrevButton from "components/ub/core/buttons/PrevButton";
+import SearchInput from "components/ub/forms/selection/SearchInput";
 
-import NoMessagesFound from "components/ub/feedback/NoMessagesFound";
+import NoMessagesFound from "components/ub/feedback/states/NoMessagesFound";
 
 import DeleteFieldConfirmation from "features/universities/components/admin/fields-of-study/popups/DeleteFieldConfirmation";
 import CreateFieldOfStudy from "features/universities/components/admin/fields-of-study/popups/CreateFieldOfStudy";
 import UpdateField from "features/universities/components/admin/fields-of-study/popups/UpdateField";
 
-import Loading from "components/ub/feedback/Loading";
-import { useToast } from "components/ub/feedback/ToastContext";
+import Loading from "components/ub/feedback/states/Loading";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
-import Button from "components/ub/core/Button";
-import IconButton from "components/ub/core/IconButton";
+import Button from "components/ub/core/buttons/Button";
+import IconButton from "components/ub/core/buttons/IconButton";
 
 const FieldsOfStudyTable = () => {
   const [searchTerm, setSearchTerm] = useState("");

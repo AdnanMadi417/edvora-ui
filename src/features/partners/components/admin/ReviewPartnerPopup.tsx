@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { CheckCircle2, ShieldCheck, UserCog, XCircle } from "lucide-react";
 import { useReviewPartner, useAssignPartnerManager } from "features/partners/hooks";
-import Button from "components/ub/core/Button";
-import ApproveRejectToggle, { type Decision } from "components/ub/core/ApproveRejectToggle";
-import Tag from "components/ub/data/Tag";
-import FormModal, { FormSection, type FormModalError } from "components/ub/feedback/FormModal";
-import { useToast } from "components/ub/feedback/ToastContext";
-import Combobox from "components/ub/forms/Combobox";
-import Textarea from "components/ub/forms/Textarea";
+import Button from "components/ub/core/buttons/Button";
+import ApproveRejectToggle, { type Decision } from "components/ub/core/buttons/ApproveRejectToggle";
+import Tag from "components/ub/data/badges/Tag";
+import FormModal, { FormSection, type FormModalError } from "components/ub/feedback/dialogs/FormModal";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import Combobox from "components/ub/forms/selection/Combobox";
+import Textarea from "components/ub/forms/text/Textarea";
 import { parseApiError } from "utils/parseApiError";
 
 interface Props {

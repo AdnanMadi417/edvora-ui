@@ -6,12 +6,12 @@ import { XCircle, DollarSign } from "lucide-react";
 import { useBatchUpdatePrograms } from "features/programs/hooks";
 import { type Currency } from "features/programs/types";
 
-import ModalHeader from "components/ub/feedback/ModalHeader";
-import Button from "components/ub/core/Button";
+import ModalHeader from "components/ub/feedback/dialogs/ModalHeader";
+import Button from "components/ub/core/buttons/Button";
 import YearlyFeesField from "features/programs/components/shared/YearlyFeesField";
 import OneTimeFeesField from "features/programs/components/shared/OneTimeFeesField";
 
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 
 interface CreateFeesProps {
@@ -77,12 +77,7 @@ export default function CreateFees({
       [field]: value,
     }));
 
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
-    }
+    setErrors((prev) => Object.fromEntries(Object.entries(prev).filter(([key]) => key !== field && !key.startsWith(`${field}[`))));
   };
 
   const handleCreate = async () => {

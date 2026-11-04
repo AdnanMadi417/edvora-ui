@@ -1,5 +1,5 @@
-import { getDaysLevel, getDaysLabel } from "components/ub/data/DaysTag";
-import { formatEventTime, groupTimeline, timelineGroupOf } from "components/ub/data/Timeline";
+import { getDaysLevel, getDaysLabel } from "components/ub/data/badges/DaysTag";
+import { formatEventTime, groupTimeline, timelineGroupOf } from "components/ub/data/display/Timeline";
 import { getStage } from "config/applicationStages";
 import { resolveStage, API_STAGE_MAP } from "features/applications/stages";
 import { commissionStateOf, documentName, documentStateOf, toApplicationView } from "features/applications/model/applicationView";

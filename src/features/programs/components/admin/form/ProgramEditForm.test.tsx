@@ -9,10 +9,10 @@ let mockProgram: any;
 let mockCommission: any;
 
 jest.mock("next/navigation", () => ({ useRouter: () => ({ push: jest.fn() }) }));
-jest.mock("components/ub/feedback/ToastContext", () => ({
+jest.mock("components/ub/feedback/notifications/ToastContext", () => ({
   useToast: () => ({ showToast: mockShowToast }),
 }));
-jest.mock("components/ub/forms/RichTextEditor", () => () => null);
+jest.mock("components/ub/forms/text/RichTextEditor", () => () => null);
 jest.mock("../../shared/form/useUnsavedChangesGuard", () => ({
   useUnsavedChangesGuard: () => {},
   confirmDiscard: (_dirty: boolean, go: () => void) => go(),
@@ -107,7 +107,7 @@ describe("ProgramEditForm save", () => {
 
   it("keeps the program's own commission type and sends the commission as a unit", async () => {
     const payload = await saveAfter(() =>
-      fireEvent.change(screen.getByPlaceholderText("e.g. Commission paid ..."), {
+      fireEvent.change(screen.getByRole("textbox", { name: /Commission notes/ }), {
         target: { value: "Paid yearly" },
       })
     );

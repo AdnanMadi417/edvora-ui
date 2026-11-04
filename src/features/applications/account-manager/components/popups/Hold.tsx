@@ -4,10 +4,10 @@ import React, { useState, useEffect } from "react";
 import { XCircle, CheckCircle, Pause } from "lucide-react";
 
 import api from "lib/useApi";
-import { useToast } from "components/ub/feedback/ToastContext";
-import Combobox from "components/ub/forms/Combobox";
-import Alert from "components/ub/feedback/Alert";
-import FormModal from "components/ub/feedback/FormModal";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import Combobox from "components/ub/forms/selection/Combobox";
+import Alert from "components/ub/feedback/notifications/Alert";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 
 interface HoldPopupProps {
   isOpen: boolean;

@@ -1,19 +1,19 @@
 "use client";
 
-import FormModal from "components/ub/feedback/FormModal";
+import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useEffect, useState } from "react";
 import { Pause, Download } from "lucide-react";
-import Alert from "components/ub/feedback/Alert";
-import Skeleton from "components/ub/feedback/Skeleton";
-import NoDocumentsRequired from "components/ub/feedback/NoDocumentsRequired";
+import Alert from "components/ub/feedback/notifications/Alert";
+import Skeleton from "components/ub/feedback/states/Skeleton";
+import NoDocumentsRequired from "components/ub/feedback/states/NoDocumentsRequired";
 import DocumentUploadList from "features/applications/partner/components/form/stages/DocumentUploadList";
 import DocumentActions from "features/applications/shared/DocumentActions";
 import { useApplicationActions } from "features/applications/hooks";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
 import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
-import { useToast } from "components/ub/feedback/ToastContext";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import api from "lib/useApi";
-import IconButton from "components/ub/core/IconButton";
+import IconButton from "components/ub/core/buttons/IconButton";
 import { parseApiError } from "utils/parseApiError";
 import { DocumentItem, DocumentType, FormDataType } from "features/applications/partner/components/form/utility-functions/types";
 

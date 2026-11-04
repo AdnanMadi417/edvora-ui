@@ -1,4 +1,4 @@
-import Alert, { type AlertTone } from "components/ub/feedback/Alert";
+import Alert, { type AlertTone } from "components/ub/feedback/notifications/Alert";
 import type { ApplicationView } from "features/applications/model/applicationView";
 
 export interface ApplicationAlert {

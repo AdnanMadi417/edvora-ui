@@ -1,6 +1,6 @@
-import AppDate from "components/ub/data/AppDate";
-import DescriptionList from "components/ub/data/DescriptionList";
-import SectionCard, { type SectionCardState } from "components/ub/data/SectionCard";
+import AppDate from "components/ub/data/formatting/AppDate";
+import DescriptionList from "components/ub/data/display/DescriptionList";
+import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
 
 export interface StudentBackgroundCardProps {
   education: { id: string; institution: string; qualification: string; grade: string | null; endDate: string | null }[];
