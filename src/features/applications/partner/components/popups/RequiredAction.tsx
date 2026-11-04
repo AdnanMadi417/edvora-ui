@@ -1,5 +1,6 @@
 "use client";
 
+import FileRow from "components/ub/data/display/FileRow";
 import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useEffect, useState } from "react";
 import { Pause, Download } from "lucide-react";
@@ -228,37 +229,31 @@ export default function RequiredAction({
                   <Alert tone="warning">{actions.correction_reason}</Alert>
                 )}
                 {arrivalFormTemplate?.file_key && (
-                  <div className="flex items-center justify-between rounded-ub-md border border-ub-tone-brand-border bg-ub-tone-brand-bg px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Download className="h-4 w-4 text-ub-text-link" />
-                      <div>
-                        <p className="text-ub-body-sm font-medium text-ub-text-link">Arrival Form Template</p>
-                        <p className="text-ub-caption text-ub-text-link">Download and complete this form before uploading</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <DocumentActions fileKey={arrivalFormTemplate.file_key} label="Arrival Form Template" />
-                    </div>
-                  </div>
+                  <FileRow
+                    name="Arrival Form Template"
+                    state="uploaded"
+                    stateLabel="Template"
+                    meta="Download and complete this form before uploading"
+                    asListItem={false}
+                    actions={<DocumentActions fileKey={arrivalFormTemplate.file_key} label="Arrival Form Template" />}
+                  />
                 )}
                 {requiresMedicalReportEmgs && (
-                  <div className="flex items-center justify-between rounded-ub-md border border-ub-tone-brand-border bg-ub-tone-brand-bg px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <Download className="h-4 w-4 text-ub-text-link" />
-                      <div>
-                        <p className="text-ub-body-sm font-medium text-ub-text-link">Health Declaration Form</p>
-                        <p className="text-ub-caption text-ub-text-link">Required for visa processing (Lampiran B)</p>
-                      </div>
-                    </div>
-                    <IconButton
+                  <FileRow
+                    name="Health Declaration Form"
+                    state="uploaded"
+                    stateLabel="Template"
+                    meta="Required for visa processing (Lampiran B)"
+                    asListItem={false}
+                    actions={<IconButton
                       onClick={downloadHealthDeclarationForm}
                       disabled={downloadingHealthDeclarationForm}
                       aria-label="Download Health Declaration Form"
                       variant="secondary"
                       size="sm"
                       icon={<Download className={`h-4 w-4 ${downloadingHealthDeclarationForm ? "motion-safe:animate-pulse" : ""}`} />}
-                    />
-                  </div>
+                    />}
+                  />
                 )}
                 <DocumentUploadList
                   documentTypes={docTypes}
