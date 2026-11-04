@@ -1,5 +1,6 @@
 "use client";
 
+import Card from "components/ub/data/cards/Card";
 import React, { useState, useMemo, useEffect } from "react";
 import PipelineCard from "features/applications/partner/components/PipelineCard";
 
@@ -12,7 +13,6 @@ import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 import ApplicationFilterBar from "components/ub/navigation/controls/ApplicationFilterBar";
 import ApplicationsTable from "features/applications/components/ApplicationsTable";
 import DashboardHeader from "components/ub/dashboard/shared/DashboardHeader";
-import { card } from "components/ub/recipes";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
 
@@ -164,7 +164,7 @@ const ModernApplicationsTable = () => {
   };
 
   return (
-    <div className={`mt-6 ${card}`}>
+    <Card extra="mt-6 ">
 
       {/* Header */}
       <DashboardHeader as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" className="border-b border-ub-border p-6" />
@@ -242,7 +242,7 @@ const ModernApplicationsTable = () => {
           }
         />
       </div>
-    </div>
+    </Card>
   );
 };
 
