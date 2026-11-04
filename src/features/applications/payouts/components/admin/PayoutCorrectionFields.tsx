@@ -1,5 +1,8 @@
 "use client";
 
+import { FieldError } from "components/ub/forms/layout/FieldChrome";
+import { FieldLabel } from "components/ub/forms/layout/FieldChrome";
+import Card from "components/ub/data/cards/Card";
 import Textarea from "components/ub/forms/text/Textarea";
 import Input from "components/ub/forms/text/Input";
 import Combobox from "components/ub/forms/selection/Combobox";
@@ -63,19 +66,19 @@ export default function PayoutCorrectionFields({
 }: PayoutCorrectionFieldsProps) {
   return (
     <>
-      <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-4 text-ub-body-sm text-ub-text-secondary">
+      <Card extra="p-4">
         <p>
           <span className="font-medium text-ub-text-primary">Current payout:</span>{" "}
           {payout.currency} · {payout.bank_reference} · {payout.items.length}{" "}
           {payout.items.length === 1 ? "application" : "applications"}
         </p>
-      </div>
+      </Card>
 
       <Textarea label={reasonLabel} placeholder={reasonPlaceholder} value={String(formData.void_reason ?? "")} onChange={(v) => updateFormData("void_reason", v)} error={formErrors.void_reason || undefined} />
 
-      <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-3 text-ub-body-sm text-ub-text-secondary">
+      <Card extra="p-3">
         <BankAccountPayoutSummary account={account} />
-      </div>
+      </Card>
 
       <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
         <Combobox label="Payment Method" placeholder="Search for a payment method..." options={paymentMethodOptions} value={formData.new_payment_method_id ? String(formData.new_payment_method_id) : null} onChange={(v) => updateFormData("new_payment_method_id", v ?? "")} error={formErrors.new_payment_method_id || undefined} />
@@ -88,9 +91,9 @@ export default function PayoutCorrectionFields({
       </div>
 
       <div className="space-y-2">
-        <p className="text-ub-body-md font-medium text-ub-text-primary">
-          Corrected Amounts <span className="text-ub-tone-danger-text">*</span>
-        </p>
+        <FieldLabel as="span">
+          Corrected Amounts
+        </FieldLabel>
         <div className="space-y-2">
           {payout.items.map((item) => (
             <div key={item.application_id} className="flex items-center gap-3">
@@ -101,7 +104,7 @@ export default function PayoutCorrectionFields({
             </div>
           ))}
         </div>
-        {formErrors.lines && <p className="text-ub-caption text-ub-tone-danger-text">{formErrors.lines}</p>}
+        <FieldError>{formErrors.lines}</FieldError>
       </div>
 
       <CompactFileUpload
@@ -116,7 +119,7 @@ export default function PayoutCorrectionFields({
         disabled={isSubmitting}
         required
       />
-      {formErrors.receipt && <p className="-mt-3 text-ub-caption text-ub-tone-danger-text">{formErrors.receipt}</p>}
+      <FieldError className="-mt-3">{formErrors.receipt}</FieldError>
 
       <Alert tone="warning">{noteText}</Alert>
     </>
