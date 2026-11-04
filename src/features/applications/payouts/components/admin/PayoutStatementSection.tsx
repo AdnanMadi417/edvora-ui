@@ -6,7 +6,7 @@ import { Receipt, Eye, Download, Ban } from "lucide-react";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import DataTable, { type DataTableColumn } from "components/ub/data/tables/DataTable";
 import DataTableToolbar from "components/ub/data/tables/DataTableToolbar";
-import Tag from "components/ub/data/badges/Tag";
+import StatusTag from "components/ub/dashboard/shared/StatusTag";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
 import Tooltip from "components/ub/feedback/dialogs/Tooltip";
 import AppDate from "components/ub/data/formatting/AppDate";
@@ -110,7 +110,7 @@ export default function PayoutStatementSection({ partnerId, canOpenPayout = fals
       cell: (item) => (
         <span className="flex flex-wrap items-center gap-2">
           <span className="ub-ref whitespace-nowrap font-medium text-ub-text-primary">{item.bank_reference}</span>
-          {item.voided_at && <Tag tone="danger" size="sm">Voided</Tag>}
+          {item.voided_at && <StatusTag status="Voided" tone="danger" size="sm" />}
         </span>
       ),
     },
