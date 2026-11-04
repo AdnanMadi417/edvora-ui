@@ -1,10 +1,13 @@
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import { AnchorHTMLAttributes, ReactNode } from 'react';
 import { buttonBase, buttonSizes, iconButtonSizes, type ButtonSize, type ButtonVariant } from 'components/ub/recipes';
 import { resolveButtonColors } from 'components/ub/core/buttons/Button';
 
 type IconLinkBtnProps = {
   href: string;
+  target?: AnchorHTMLAttributes<HTMLAnchorElement>["target"];
+  rel?: string;
+  children?: ReactNode;
   icon: ReactNode;
   label?: string;
   title?: string;
@@ -24,6 +27,9 @@ type IconLinkBtnProps = {
 /** A link styled as a pill button (or a circular icon button when there is no label). */
 const LinkBtn = ({
   href,
+  target,
+  rel,
+  children,
   icon,
   label,
   title,
@@ -41,6 +47,8 @@ const LinkBtn = ({
   return (
     <Link
       href={href}
+      target={target}
+      rel={rel}
       title={title || label}
       aria-label={label ? undefined : title}
       className={`${buttonBase} ${shape} ${colors} ${className || ''}`}
@@ -48,6 +56,7 @@ const LinkBtn = ({
       {icon}
 
       {label && <span className="whitespace-nowrap">{label}</span>}
+      {children}
     </Link>
   );
 };

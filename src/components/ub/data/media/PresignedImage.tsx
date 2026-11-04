@@ -6,9 +6,10 @@ interface PresignedImageProps {
   alt?: string;
   className?: string;
   fallback: React.ReactNode;
+  renderImage?: (src: string) => React.ReactNode;
 }
 
-const PresignedImage = ({ fileKey, alt, className, fallback }: PresignedImageProps) => {
+const PresignedImage = ({ fileKey, alt, className, fallback, renderImage }: PresignedImageProps) => {
   const [src, setSrc] = useState<string | null>(null);
   const [error, setError] = useState(false);
 
@@ -20,6 +21,8 @@ const PresignedImage = ({ fileKey, alt, className, fallback }: PresignedImagePro
   }, [fileKey]);
 
   if (!fileKey || error || !src) return <>{fallback}</>;
+
+  if (renderImage) return <>{renderImage(src)}</>;
 
   return (
     <img

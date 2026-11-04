@@ -44,6 +44,7 @@ export type ComboboxOption = {
 
 export type ComboboxProps = {
   label: React.ReactNode;
+  ariaLabel?: string;
   options: ComboboxOption[];
   value: string | null;
   onChange: (value: string | null, option: ComboboxOption | null) => void;
@@ -64,6 +65,14 @@ export type ComboboxProps = {
   compact?: boolean;
   onBlur?: () => void;
   actions?: React.ReactNode;
+  /** Controlled query for existing debounced/server-side searches. */
+  searchValue?: string;
+  onSearchChange?: (query: string) => void;
+  /** Server results are already filtered. */
+  serverResults?: boolean;
+  resultsVisible?: boolean;
+  loading?: boolean;
+  loadingMessage?: string;
 };
 
 const defaultFilter = (o: ComboboxOption, q: string) => {
@@ -112,6 +121,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
   function Combobox(
     {
       label,
+      ariaLabel,
       options,
       value,
       onChange,
@@ -129,6 +139,12 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       compact = false,
       onBlur,
       actions,
+      searchValue,
+      onSearchChange,
+      serverResults = false,
+      resultsVisible = true,
+      loading = false,
+      loadingMessage = "Searching...",
     },
     ref
   ) {
@@ -145,15 +161,17 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
 
     const selected = options.find((o) => o.value === value) ?? null;
     const [open, setOpen] = useState(false);
-    const [query, setQuery] = useState("");
+    const [localQuery, setQuery] = useState("");
+    const query = searchValue ?? localQuery;
+    const visible = open && resultsVisible;
     const [typing, setTyping] = useState(false);
     const [active, setActive] = useState(-1);
     const [placeAbove, setPlaceAbove] = useState(false);
 
     // Only filter once the user has typed; opening shows every option.
     const results = useMemo(
-      () => (typing ? options.filter((o) => filter(o, query)) : options),
-      [options, filter, query, typing]
+      () => (typing && !serverResults ? options.filter((o) => filter(o, query)) : options),
+      [options, filter, query, typing, serverResults]
     );
 
     const firstEnabled = (
@@ -242,7 +260,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
           if (open) {
             e.preventDefault();
           }
-          if (open && active >= 0 && results[active]) {
+          if (visible && !loading && active >= 0 && results[active]) {
             e.preventDefault();
             choose(results[active]);
           }
@@ -262,8 +280,8 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       }
     };
 
-    const shown = open || typing ? query : selected?.label ?? value ?? "";
-    const statusText = open
+    const shown = open || typing || (serverResults && !selected) ? query : selected?.label ?? value ?? "";
+    const statusText = visible && !loading
       ? results.length
         ? `${results.length} ${
             results.length === 1 ? "result" : "results"
@@ -296,11 +314,12 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             id={id}
             type="text"
             role="combobox"
-            aria-expanded={open}
+            aria-label={ariaLabel}
+            aria-expanded={visible}
             aria-controls={listId}
             aria-autocomplete="list"
             aria-activedescendant={
-              open && active >= 0 && results[active]
+              visible && !loading && active >= 0 && results[active]
                 ? optionId(active)
                 : undefined
             }
@@ -314,10 +333,11 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             onChange={(e) => {
               const q = e.target.value;
               setQuery(q);
+              onSearchChange?.(q);
               setTyping(true);
               if (!open) place();
               setOpen(true);
-              setActive(firstEnabled(options.filter((o) => filter(o, q))));
+              setActive(firstEnabled(serverResults ? options : options.filter((o) => filter(o, q))));
             }}
             onClick={() => (open ? undefined : openList())}
             onKeyDown={onKeyDown}
@@ -371,7 +391,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             </button>
           </span>
 
-          {open && (
+          {visible && (
             <div
               className={`${popover} absolute inset-x-0 z-50 overflow-hidden ${
                 placeAbove ? "bottom-full mb-1" : "top-full mt-1"
@@ -382,11 +402,12 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
               <ul
                 id={listId}
                 role="listbox"
-                aria-labelledby={`${id}-label`}
+                aria-label={ariaLabel}
+                aria-labelledby={label ? `${id}-label` : undefined}
                 className="overflow-y-auto overscroll-contain p-1"
                 style={{ maxHeight: listMaxHeight }}
               >
-                {results.map((o, i) => {
+                {!loading && results.map((o, i) => {
                   const isSelected = o.value === value;
                   return (
                     <li
@@ -438,7 +459,8 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
                   );
                 })}
               </ul>
-              {!results.length && (
+              {loading && <p role="status" className="px-4 py-3 text-ub-body-sm text-ub-text-secondary">{loadingMessage}</p>}
+              {!loading && !results.length && (
                 <>
                   <p className="px-4 py-3 text-ub-body-sm text-ub-text-secondary">
                     {emptyMessage(query)}
