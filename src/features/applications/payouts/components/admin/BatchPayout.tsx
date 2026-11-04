@@ -1,5 +1,7 @@
 "use client";
 
+import { FieldLabel } from "components/ub/forms/layout/FieldChrome";
+import Card from "components/ub/data/cards/Card";
 import Alert from "components/ub/feedback/notifications/Alert";
 import Combobox from "components/ub/forms/selection/Combobox";
 import Input from "components/ub/forms/text/Input";
@@ -146,7 +148,7 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
       <div className="grid gap-4">
 
           <div className="space-y-5">
-            <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-3 text-ub-body-sm text-ub-text-secondary">
+            <Card extra="p-3">
               <BankAccountPayoutSummary account={partnerBankAccount} />
               {!partnerBankAccount && (
                 <Link
@@ -156,12 +158,12 @@ export default function BatchPayout({ isOpen, onClose, partnerId, currency, line
                   Add a bank account →
                 </Link>
               )}
-            </div>
+            </Card>
 
             <div className="space-y-2">
-              <p className="text-ub-body-md font-medium text-ub-text-primary">
+              <FieldLabel as="span">
                 {lines.length} {lines.length === 1 ? "Application" : "Applications"} · {currency}
-              </p>
+              </FieldLabel>
               <div className="space-y-2">
                 {lines.map((l) => (
                   <div key={l.application_id} className="flex items-center gap-3">
