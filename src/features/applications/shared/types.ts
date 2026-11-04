@@ -11,9 +11,6 @@ export interface StatusOption {
   description: string;
   nextAction: string;
   icon: any;
-  color: string;
-  bgColor: string;
-  borderColor: string;
   requiresReason: boolean;
   requiresDocumentSelection: boolean;
 }

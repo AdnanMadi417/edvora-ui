@@ -1,5 +1,8 @@
 "use client";
 
+import RadioCardGroup from "components/ub/forms/choices/RadioCardGroup";
+import { FieldLabel } from "components/ub/forms/layout/FieldChrome";
+import Card from "components/ub/data/cards/Card";
 import Combobox from "components/ub/forms/selection/Combobox";
 import Input from "components/ub/forms/text/Input";
 import FormModal from "components/ub/feedback/dialogs/FormModal";
@@ -88,9 +91,9 @@ const DocumentRequestList = ({
           )}
 
           {documentTypes.length > 0 && <div>
-            <label className="mb-2 block text-ub-body-md font-medium text-ub-text-primary">
+            <FieldLabel as="span">
               Document Type
-            </label>
+            </FieldLabel>
 
             {doc.type.length > 0 && (
               <div className="mb-2 flex flex-wrap gap-1.5">
@@ -154,48 +157,30 @@ export default function UpdateStatusPopup({
   const { showToast } = useToast();
   const selectedOption = statusOptions.find((opt) => opt.id === selectedStatus);
 
-  const getStatusStyle = (name: string) => {
+  const getStatusIcon = (name: string) => {
     const lower = name.toLowerCase();
     if (lower.includes("approve"))
       return {
         icon: CheckCircle,
-        color: "text-ub-tone-success-text",
-        bgColor: "bg-ub-tone-success-bg",
-        borderColor: "border-ub-tone-success-border",
       };
     if (lower.includes("reject") || lower.includes("denied"))
       return {
         icon: XCircle,
-        color: "text-ub-tone-danger-text",
-        bgColor: "bg-ub-tone-danger-bg",
-        borderColor: "border-ub-tone-danger-border",
       };
     if (lower.includes("review"))
       return {
         icon: Clock,
-        color: "text-ub-tone-warning-text",
-        bgColor: "bg-ub-tone-warning-bg",
-        borderColor: "border-ub-tone-warning-border",
       };
     if (lower.includes("pending") || lower.includes("waiting"))
       return {
         icon: Pause,
-        color: "text-ub-text-secondary",
-        bgColor: "bg-ub-surface-subtle",
-        borderColor: "border-ub-border",
       };
     if (lower.includes("correction"))
       return {
         icon: AlertCircle,
-        color: "text-ub-tone-warning-text",
-        bgColor: "bg-ub-tone-warning-bg",
-        borderColor: "border-ub-tone-warning-border",
       };
     return {
       icon: Clock,
-      color: "text-ub-text-link",
-      bgColor: "bg-ub-tone-brand-bg",
-      borderColor: "border-ub-tone-brand-border",
     };
   };
 
@@ -222,7 +207,7 @@ export default function UpdateStatusPopup({
         label: s.name,
         description: "",
         nextAction: matchingAction?.next_action ?? "",
-        ...getStatusStyle(s.name),
+        ...getStatusIcon(s.name),
         requiresReason: !!s.is_requires_reason,
         requiresDocumentSelection: !!s.is_requires_document_selection,
       };
@@ -620,12 +605,11 @@ export default function UpdateStatusPopup({
           )}
 
           <div className="space-y-3">
-            <label className="block text-ub-body-md font-semibold text-ub-text-primary">
+            <FieldLabel as="span">
               <span className="flex items-center gap-1">
                 Select New Status
-                <span className="text-ub-tone-danger-text">*</span>
               </span>
-            </label>
+            </FieldLabel>
 
             {statusOptions.length === 0 ? (
               <NoDocumentsRequired
@@ -634,61 +618,21 @@ export default function UpdateStatusPopup({
                 icon={<ListX className="h-10 w-10 text-ub-text-tertiary" />}
               />
             ) : (
-              statusOptions.map((option) => {
-                const Icon = option.icon;
-                const isSelected = selectedStatus === option.id;
-
-                const currentStatusId = application?.stage?.statuses?.[0]?.id;
-                const prevStatusId = application?.stage?.statuses?.[1]?.id;
-
-                const isDisabled =
-                  option.id === currentStatusId || option.id === prevStatusId;
-
-                return (
-                  <div
-                    key={option.id}
-                    title={isDisabled ? "You cannot select this option." : ""}
-                    onClick={() => !isDisabled && setSelectedStatus(option.id)}
-                    className={`rounded-ub-md border p-4 transition-all
-    ${
-      isDisabled
-        ? "cursor-not-allowed border-ub-border bg-ub-surface-subtle text-ub-text-tertiary opacity-60"
-        : isSelected
-        ? `${option.borderColor} ${option.bgColor} cursor-pointer shadow`
-        : "cursor-pointer border-ub-border bg-ub-surface hover:border-ub-border hover:shadow"
-    }
-  `}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Icon
-                        className={`h-5 w-5 ${
-                          isSelected
-                            ? option.color
-                            : isDisabled
-                            ? "text-ub-text-tertiary"
-                            : "text-ub-text-tertiary"
-                        }`}
-                      />
-                      <div>
-                        <p className="font-semibold text-ub-text-primary">
-                          {option.label}
-                        </p>
-                        {option.nextAction && (
-                          <p className="mt-1 text-ub-caption text-ub-text-tertiary">
-                            <span className="font-medium">Next :</span>{" "}
-                            {option.nextAction}
-                          </p>
-                        )}
-                        {option.description && (
-                          <p className="mt-0.5 text-ub-caption text-ub-text-tertiary">
-                            {option.description}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })
+              <RadioCardGroup
+                ariaLabel="Select New Status"
+                layout="vertical"
+                value={selectedStatus}
+                onChange={setSelectedStatus}
+                options={statusOptions.map((option) => ({
+                  value: option.id,
+                  label: option.label,
+                  icon: option.icon,
+                  hint: option.nextAction ? <>Next : {option.nextAction}</> : null,
+                  description: option.description,
+                  disabled: option.id === application?.stage?.statuses?.[0]?.id || option.id === application?.stage?.statuses?.[1]?.id,
+                  disabledReason: "You cannot select this option.",
+                }))}
+              />
             )}
           </div>
 
@@ -839,12 +783,11 @@ export default function UpdateStatusPopup({
             <div className="space-y-2">
               <Input label="Visa Fee Amount" placeholder="Enter visa fee amount" type="number" value={String(formData.visa_fee_amount ?? "")} onChange={(v) => updateFormData("visa_fee_amount", v)} error={formErrors.visa_fee_amount || undefined} required />
               {visaFeeAmount && (
-                <div className="flex items-center gap-2 rounded-ub-md border border-ub-tone-brand-border bg-ub-tone-brand-bg px-3 py-2 text-ub-caption text-ub-text-link">
-                  <AlertCircle className="h-4 w-4 shrink-0" />
+                <Alert>
                   <span>
                     Default visa fee is <strong>{visaFeeAmount}</strong>. You can enter a different amount if needed.
                   </span>
-                </div>
+                </Alert>
               )}
             </div>
           )}
@@ -867,7 +810,7 @@ export default function UpdateStatusPopup({
             <div className="space-y-2">
               <p className="text-ub-body-md font-semibold text-ub-text-primary">Payout Details</p>
 
-              <div className="rounded-ub-md border border-ub-border bg-ub-surface p-3 text-ub-body-sm text-ub-text-secondary">
+              <Card extra="p-3">
                 <BankAccountPayoutSummary account={partnerBankAccount} />
                 {!partnerBankAccount && application?.partner?.id && (
                   <Link
@@ -877,7 +820,7 @@ export default function UpdateStatusPopup({
                     Add a bank account →
                   </Link>
                 )}
-              </div>
+              </Card>
 
               <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                 <Combobox label="Payment Method" placeholder="Search for a payment method..." options={paymentMethodOptions} value={payoutFormData.payment_method_id ? String(payoutFormData.payment_method_id) : null} onChange={(v) => updatePayoutFormData("payment_method_id", v ?? "")} error={payoutFormErrors.payment_method_id || undefined} />
