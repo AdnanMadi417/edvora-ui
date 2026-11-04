@@ -24,6 +24,13 @@ const imp = (name: string, path: string) => `import ${name} from "components/ub/
 const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
 
 export const CATALOG: Record<string, CatalogEntry> = {
+  RequirementSelector: {
+    category: "forms",
+    imports: [imp("RequirementSelector", "forms/choices/RequirementSelector")],
+    useFor: "Searchable required/optional field choices with a stable label, keyboard-accessible switches, and controlled values.",
+    usedIn: ["Create university type"],
+    avoid: "Choosing a single category: use a select or radio group.",
+  },
   "Advisor profile": {
     category: "data",
     imports: [

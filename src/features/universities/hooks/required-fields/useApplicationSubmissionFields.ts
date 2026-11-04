@@ -1,27 +1,32 @@
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { universityApi } from "../../services";
 import type { SubmissionField } from "../../types";
 
 export function useApplicationSubmissionFields() {
-  const [submissionFields, setSubmissionFields] = useState<SubmissionField[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [submissionFields, setSubmissionFields] = useState<SubmissionField[]>(
+    []
+  );
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    const fetch = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const res = await universityApi.applicationFields.listSubmission();
-        setSubmissionFields(res.data);
-      } catch (err: any) {
-        setError(err?.response?.data?.detail?.[0]?.msg || "Failed to fetch submission fields");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetch();
+  const refetch = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await universityApi.applicationFields.listSubmission();
+      setSubmissionFields(response.data);
+    } catch (error: any) {
+      setError(
+        error?.response?.data?.detail?.[0]?.msg ||
+          "Failed to fetch submission fields"
+      );
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { submissionFields, loading, error };
+  useEffect(() => {
+    void refetch();
+  }, [refetch]);
+  return { submissionFields, loading, error, refetch };
 }

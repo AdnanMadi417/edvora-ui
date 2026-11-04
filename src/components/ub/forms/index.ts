@@ -43,3 +43,4 @@ export { default as FormPage } from "./layout/FormPage";
 export { default as SteppedFormPage } from "./layout/SteppedFormPage";
 export { default as UploadField } from "./uploads/UploadField";
 export { default as InstitutionTypeField } from "./choices/InstitutionTypeField";
+export { default as RequirementSelector } from "./choices/RequirementSelector";
