@@ -1,5 +1,6 @@
 "use client";
 
+import Card from "components/ub/data/cards/Card";
 import Combobox from "components/ub/forms/selection/Combobox";
 import Input from "components/ub/forms/text/Input";
 import FormModal from "components/ub/feedback/dialogs/FormModal";
@@ -116,11 +117,11 @@ export default function RecordPayIn({ isOpen, onClose, row, onSuccess }: RecordP
       <div className="grid gap-4">
 
           <div className="space-y-5">
-            <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-4 text-ub-body-sm text-ub-text-secondary">
+            <Card extra="p-4">
               <p>
                 <span className="font-medium text-ub-text-primary">{row.reference}</span> · {row.student_name}
               </p>
-            </div>
+            </Card>
 
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
               <Input label="Payment Date" type="date" value={String(formData.payment_date ?? "")} onChange={(v) => updateFormData("payment_date", v)} error={formErrors.payment_date || undefined} />
