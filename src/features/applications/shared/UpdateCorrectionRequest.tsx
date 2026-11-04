@@ -1,11 +1,15 @@
 "use client";
 
+import DescriptionList from "components/ub/data/display/DescriptionList";
+import Alert from "components/ub/feedback/notifications/Alert";
+import Card from "components/ub/data/cards/Card";
+import { FieldLabel } from "components/ub/forms/layout/FieldChrome";
 import Textarea from "components/ub/forms/text/Textarea";
 import Checkbox from "components/ub/forms/choices/Checkbox";
 import Tag from "components/ub/data/badges/Tag";
 import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useEffect, useState } from "react";
-import { AlertTriangle, FilePlus2 } from "lucide-react";
+import { FilePlus2 } from "lucide-react";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useUpdateCorrectionRequest } from "features/applications/hooks";
 import type { DocumentType } from "features/applications/hooks/stages/useApplicationActions";
@@ -111,12 +115,7 @@ export default function UpdateCorrectionRequest({
 
           <div className="space-y-5">
             {currentReason && (
-              <div>
-                <p className="mb-1 text-ub-body-md font-medium text-ub-text-tertiary">Current reason</p>
-                <p className="rounded-ub-md border border-ub-border bg-ub-surface-subtle px-4 py-3 text-ub-body-sm text-ub-text-secondary">
-                  {currentReason}
-                </p>
-              </div>
+              <DescriptionList items={[{ label: "Current reason", value: currentReason }]} />
             )}
 
             <Textarea
@@ -133,15 +132,13 @@ export default function UpdateCorrectionRequest({
             />
 
             <div className="space-y-2">
-              <p className="text-ub-body-md font-medium text-ub-text-tertiary">
-                Documents to request <span className="ml-1 text-ub-tone-danger-text">*</span>
-              </p>
+              <FieldLabel as="span">Documents to request</FieldLabel>
               {documentTypes.length === 0 ? (
                 <p className="text-ub-body-sm text-ub-text-tertiary">No documents available to request.</p>
               ) : (
                 <div className="space-y-2">
                   {documentTypes.map((d) => (
-                    <div key={d.id} className="rounded-ub-md border border-ub-border px-4 py-3">
+                    <Card key={d.id} extra="px-4 py-3">
                       <Checkbox
                         checked={selectedIds.includes(d.id)}
                         onChange={() => toggle(d.id)}
@@ -157,17 +154,14 @@ export default function UpdateCorrectionRequest({
                         }
                         description={d.description || undefined}
                       />
-                    </div>
+                    </Card>
                   ))}
                 </div>
               )}
             </div>
 
             {formError && (
-              <div className="flex items-start gap-3 rounded-ub-md border border-ub-tone-danger-border bg-ub-tone-danger-bg px-4 py-3">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-ub-tone-danger-text" />
-                <p className="text-ub-body-sm text-ub-tone-danger-text">{formError}</p>
-              </div>
+              <Alert tone="danger">{formError}</Alert>
             )}
           </div>
       </div>
