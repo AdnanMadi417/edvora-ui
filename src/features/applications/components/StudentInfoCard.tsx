@@ -1,10 +1,10 @@
 import { MessageCircle } from "lucide-react";
-import clsx from "clsx";
 import RefId from "components/ub/core/typography/RefId";
 import AppDate from "components/ub/data/formatting/AppDate";
 import DescriptionList from "components/ub/data/display/DescriptionList";
 import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
-import { buttonBase, buttonSizes, buttonVariants } from "components/ub/recipes";
+import LinkBtn from "components/ub/core/buttons/LinkBtn";
+import TextLink from "components/ub/core/buttons/TextLink";
 
 export interface StudentInfoCardProps {
   email?: string | null;
@@ -33,7 +33,7 @@ export default function StudentInfoCard({ email, phone, nationality, passportNum
         divided
         fallback="Not available"
         items={[
-          { label: "Email", value: email && <a href={`mailto:${email}`} className="break-all text-ub-text-link hover:underline">{email}</a> },
+          { label: "Email", value: email && <TextLink href={`mailto:${email}`} className="break-all">{email}</TextLink> },
           { label: "Phone", value: phone && <span className="ub-tabular" dir="ltr">{phone}</span> },
           { label: "Nationality", value: nationality },
           { label: "Passport no.", value: passportNumber && <RefId value={passportNumber} /> },
@@ -43,11 +43,9 @@ export default function StudentInfoCard({ email, phone, nationality, passportNum
         ]}
       />
       {whatsappUrl && (
-        <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className={clsx(buttonBase, buttonSizes.md, buttonVariants.secondary, "mt-4 w-full")}>
-          <MessageCircle className="h-4 w-4" aria-hidden="true" />
-          {whatsappLabel}
+        <LinkBtn href={whatsappUrl} target="_blank" rel="noopener noreferrer" variant="secondary" className="mt-4 w-full" label={whatsappLabel} icon={<MessageCircle className="h-4 w-4" aria-hidden="true" />}>
           <span className="sr-only"> (opens in a new tab)</span>
-        </a>
+        </LinkBtn>
       )}
     </SectionCard>
   );

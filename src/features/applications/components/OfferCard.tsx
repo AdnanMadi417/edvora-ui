@@ -5,7 +5,7 @@ import Amount from "components/ub/core/typography/Amount";
 import DaysTag from "components/ub/data/badges/DaysTag";
 import KeyValueGrid from "components/ub/data/display/KeyValueGrid";
 import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
-import Tag from "components/ub/data/badges/Tag";
+import StatusTag from "components/ub/dashboard/shared/StatusTag";
 import type { TagTone } from "components/ub/recipes";
 import type { DocumentItem } from "features/applications/model/applicationView";
 import DocumentRow from "./DocumentRow";
@@ -48,7 +48,7 @@ export default function OfferCard({ status, offerLetter, conditions = [], expire
   return (
     <SectionCard
       title="Offer"
-      action={<Tag tone={s.tone}>{s.label}</Tag>}
+      action={<StatusTag status={s.label} label={s.label} tone={s.tone} size="md" />}
       state={resolved}
       empty={{ icon: FileCheck2, title: s.label, description: "The offer letter appears here once the Institution decides." }}
       errorMessage="The offer couldn't load."

@@ -1,3 +1,4 @@
+import Alert from "components/ub/feedback/notifications/Alert";
 import ApplicationTracker, { TRACKER_COPY, trackerStepsAt, type TrackerStep } from "components/ub/brand/ApplicationTracker";
 import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
 import { APPLICATION_TRACKER_STEPS, type ResolvedStage } from "features/applications/stages";
@@ -38,7 +39,7 @@ export default function ApplicationTrackerCard({ stage, nextStep, statusName, st
     >
       <ApplicationTracker steps={trackerStepsFor(stage)} orientation="auto" />
       {/* Its own line (not under the current step) so it also shows on attention and completed states. */}
-      <p aria-live="polite" className="mt-6 rounded-ub-md bg-ub-surface-subtle px-4 py-3 text-ub-body-sm text-ub-text-secondary">
+      <Alert className="mt-6">
         {nextStep ? (
           <>
             <span className="font-medium text-ub-text-primary">{TRACKER_COPY.nextStepPrefix}</span> {nextStep}
@@ -46,7 +47,7 @@ export default function ApplicationTrackerCard({ stage, nextStep, statusName, st
         ) : (
           TRACKER_COPY.allComplete
         )}
-      </p>
+      </Alert>
     </SectionCard>
   );
 }

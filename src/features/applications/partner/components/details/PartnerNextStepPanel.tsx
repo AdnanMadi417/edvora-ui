@@ -1,5 +1,6 @@
 "use client";
 
+import Skeleton from "components/ub/feedback/states/Skeleton";
 import { Download } from "lucide-react";
 import Amount from "components/ub/core/typography/Amount";
 import IconButton from "components/ub/core/buttons/IconButton";
@@ -104,9 +105,7 @@ export default function PartnerNextStepPanel({ mode, ownerName, visaFeeAmount, v
         {visaFeeAmount ? <KeyValueGrid columns={1} items={[{ label: "Amount due", value: <Amount value={visaFeeAmount} /> }]} /> : null}
         {visaFeeNote && <Alert tone="warning">{visaFeeNote}</Alert>}
         {paymentMethodsLoading ? (
-          <p className="text-ub-body-sm text-ub-text-secondary" role="status">
-            Loading payment methods…
-          </p>
+          <div role="status" aria-label="Loading payment methods"><Skeleton className="h-5 w-full" /></div>
         ) : (
           paymentMethods.length > 0 && (
             <section aria-label="Payment methods">

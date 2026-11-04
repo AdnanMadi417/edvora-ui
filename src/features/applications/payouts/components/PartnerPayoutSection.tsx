@@ -8,7 +8,7 @@ import AppDate from "components/ub/data/formatting/AppDate";
 import DescriptionList from "components/ub/data/display/DescriptionList";
 import KeyValueGrid from "components/ub/data/display/KeyValueGrid";
 import SectionCard from "components/ub/data/cards/SectionCard";
-import Tag from "components/ub/data/badges/Tag";
+import StatusTag from "components/ub/dashboard/shared/StatusTag";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import Button from "components/ub/core/buttons/Button";
@@ -59,7 +59,7 @@ export default function PartnerPayoutSection({
     <>
       <SectionCard
         title="Advisor payout"
-        action={<Tag tone={isVoided ? "danger" : "success"}>{isVoided ? "Voided" : "Paid"}</Tag>}
+        action={<StatusTag status={isVoided ? "Voided" : "Paid"} tone={isVoided ? "danger" : "success"} size="md" />}
         footer={
           canVoid && !isVoided ? (
             <Button variant="secondary" size="sm" onClick={openVoidModal} loading={loadingFull} icon={<Ban className="h-4 w-4" aria-hidden="true" />} text="Void and correct" />

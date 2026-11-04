@@ -8,7 +8,7 @@ import AppDate from "components/ub/data/formatting/AppDate";
 import DescriptionList from "components/ub/data/display/DescriptionList";
 import KeyValueGrid from "components/ub/data/display/KeyValueGrid";
 import SectionCard from "components/ub/data/cards/SectionCard";
-import Tag from "components/ub/data/badges/Tag";
+import StatusTag from "components/ub/dashboard/shared/StatusTag";
 import Button from "components/ub/core/buttons/Button";
 import VoidPayIn from "./VoidPayIn";
 import type { UniversityPayIn } from "../../types";
@@ -29,7 +29,7 @@ export default function UniversityPayInSection({ payIn, onRefetch }: UniversityP
     <>
       <SectionCard
         title="Institution pay-in"
-        action={<Tag tone={isVoided ? "danger" : "success"}>{isVoided ? "Voided" : "Received"}</Tag>}
+        action={<StatusTag status={isVoided ? "Voided" : "Received"} tone={isVoided ? "danger" : "success"} size="md" />}
         footer={!isVoided ? <Button variant="secondary" size="sm" onClick={() => setShowVoidModal(true)} icon={<Ban className="h-4 w-4" aria-hidden="true" />} text="Void and correct" /> : undefined}
       >
         <div className="grid gap-4">

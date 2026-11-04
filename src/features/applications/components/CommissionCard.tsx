@@ -6,7 +6,7 @@ import KeyValueGrid from "components/ub/data/display/KeyValueGrid";
 import SectionCard, {
   type SectionCardState,
 } from "components/ub/data/cards/SectionCard";
-import Tag from "components/ub/data/badges/Tag";
+import StatusTag from "components/ub/dashboard/shared/StatusTag";
 import {
   COMMISSION_STATES,
   type CommissionView,
@@ -39,7 +39,7 @@ export default function CommissionCard({
   return (
     <SectionCard
       title="Commission"
-      action={s && <Tag tone={s.tone}>{s.label}</Tag>}
+      action={s && <StatusTag status={s.label} label={s.label} tone={s.tone} size="md" />}
       state={resolved}
       empty={{
         icon: Wallet,
