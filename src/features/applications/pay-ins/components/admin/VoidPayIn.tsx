@@ -1,5 +1,7 @@
 "use client";
 
+import { FieldLabel } from "components/ub/forms/layout/FieldChrome";
+import Card from "components/ub/data/cards/Card";
 import Alert from "components/ub/feedback/notifications/Alert";
 import Combobox from "components/ub/forms/selection/Combobox";
 import Input from "components/ub/forms/text/Input";
@@ -118,19 +120,19 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
       <div className="grid gap-4">
 
           <div className="space-y-5">
-            <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-4 text-ub-body-sm text-ub-text-secondary">
+            <Card extra="p-4">
               <p>
                 <span className="font-medium text-ub-text-primary">Current pay-in:</span>{" "}
                 {payIn.currency} {Number(payIn.amount).toLocaleString()} · {payIn.payment_reference}
               </p>
-            </div>
+            </Card>
 
             <Textarea label="Void Reason" placeholder="Explain why this pay-in is being voided..." value={String(formData.void_reason ?? "")} onChange={(v) => updateFormData("void_reason", v)} error={formErrors.void_reason || undefined} />
 
             <div className="space-y-2">
-              <p className="text-ub-body-md font-medium text-ub-text-primary">
-                Corrected Pay-In <span className="text-ub-tone-danger-text">*</span>
-              </p>
+              <FieldLabel as="span">
+                Corrected Pay-In
+              </FieldLabel>
               <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                 <Input label="Payment Date" type="date" value={String(formData.new_payment_date ?? "")} onChange={(v) => updateFormData("new_payment_date", v)} error={formErrors.new_payment_date || undefined} />
                 <Input label="Amount" placeholder="Enter amount" type="number" value={String(formData.new_amount ?? "")} onChange={(v) => updateFormData("new_amount", v)} error={formErrors.new_amount || undefined} />
