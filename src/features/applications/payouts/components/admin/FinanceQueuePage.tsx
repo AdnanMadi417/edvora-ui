@@ -1,9 +1,10 @@
 "use client";
 
+import Card from "components/ub/data/cards/Card";
 import React, { useEffect, useState } from "react";
 import { Wallet, SlidersHorizontal, Receipt, RefreshCw } from "lucide-react";
 
-import SearchInput from "components/ub/forms/selection/SearchInput";
+import Combobox from "components/ub/forms/selection/Combobox";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
 import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
@@ -11,10 +12,9 @@ import TablePagination from "components/ub/data/tables/TablePagination";
 import DataTable, { type DataTableColumn } from "components/ub/data/tables/DataTable";
 import Chip from "components/ub/data/badges/Chip";
 import CountBadge from "components/ub/data/badges/CountBadge";
-import Tag from "components/ub/data/badges/Tag";
+import StatusTag from "components/ub/dashboard/shared/StatusTag";
 import Checkbox from "components/ub/forms/choices/Checkbox";
 import DashboardHeader from "components/ub/dashboard/shared/DashboardHeader";
-import { card } from "components/ub/recipes";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
 import { STATUS_BADGE_TONE, type StatusBadgeVariant } from "components/ub/data/badges/StatusBadge";
 import Tooltip from "components/ub/feedback/dialogs/Tooltip";
@@ -150,9 +150,7 @@ export default function FinanceQueuePage() {
       key: "waiting",
       header: "Waiting On",
       cell: (item) => (
-        <Tag tone={STATUS_BADGE_TONE[WAITING_ON_VARIANT[item.waiting_on]]} size="sm">
-          {WAITING_ON_LABEL[item.waiting_on]}
-        </Tag>
+        <StatusTag status={item.waiting_on} label={WAITING_ON_LABEL[item.waiting_on]} tone={STATUS_BADGE_TONE[WAITING_ON_VARIANT[item.waiting_on]]} size="sm" />
       ),
     },
     {
@@ -207,7 +205,7 @@ export default function FinanceQueuePage() {
   };
 
   return (
-    <div className={`mx-auto mt-5 ${card}`}>
+    <Card extra="mx-auto mt-5 ">
       <DashboardHeader as="h2" title="Finance Queue" subtitle="Every commission, who's waiting on it, and how to settle it." className="border-b border-ub-border p-6" />
 
       {/* Filters */}
@@ -219,35 +217,25 @@ export default function FinanceQueuePage() {
                 {selectedPartner.name}
               </Chip>
             ) : (
-              <SearchInput
-                value={partnerSearch}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPartnerSearch(e.target.value)}
+              <Combobox
+                label={null}
+                ariaLabel="Filter by advisor"
+                id="finance-advisor-filter"
                 placeholder="Filter by advisor..."
+                value={null}
+                options={partners.map((partner) => ({ value: partner.id, label: partner.name, description: partner.email }))}
+                onChange={(id) => {
+                  setSelectedPartner(partners.find((partner) => partner.id === id) ?? null);
+                  setPartnerSearch("");
+                }}
+                searchValue={partnerSearch}
+                onSearchChange={setPartnerSearch}
+                serverResults
+                resultsVisible={showPartnerResults}
+                loading={partnersLoading}
+                emptyMessage={() => "No advisors found."}
+                compact
               />
-            )}
-            {showPartnerResults && (
-              <div className="absolute z-10 mt-2 max-h-72 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg">
-                {partnersLoading ? (
-                  <p className="p-4 text-sm text-slate-500">Searching...</p>
-                ) : partners.length === 0 ? (
-                  <p className="p-4 text-sm text-slate-500">No advisors found.</p>
-                ) : (
-                  partners.map((p) => (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedPartner(p);
-                        setPartnerSearch("");
-                      }}
-                      className="flex w-full flex-col items-start px-4 py-3 text-left hover:bg-slate-50"
-                    >
-                      <span className="text-sm font-medium text-slate-900">{p.name}</span>
-                      <span className="text-xs text-slate-500">{p.email}</span>
-                    </button>
-                  ))
-                )}
-              </div>
             )}
           </div>
 
@@ -321,6 +309,6 @@ export default function FinanceQueuePage() {
           onSuccess={handleActionSuccess}
         />
       )}
-    </div>
+    </Card>
   );
 }
