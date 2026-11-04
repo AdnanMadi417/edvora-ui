@@ -7,11 +7,11 @@ import { ChevronLeft, Ban, Wallet } from "lucide-react";
 import Skeleton from "components/ub/feedback/states/Skeleton";
 import AsyncStateView from "components/ub/feedback/states/AsyncStateView";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
-import Tag from "components/ub/data/badges/Tag";
+import StatusTag from "components/ub/dashboard/shared/StatusTag";
 import DescriptionList from "components/ub/data/display/DescriptionList";
 import DataTable from "components/ub/data/tables/DataTable";
 import IconTile from "components/ub/dashboard/shared/IconTile";
-import { card } from "components/ub/recipes";
+import Card from "components/ub/data/cards/Card";
 import Button from "components/ub/core/buttons/Button";
 import ActionsDropdown from "components/ub/navigation/menus/ActionsDropdown";
 import DocumentActions from "features/applications/shared/DocumentActions";
@@ -74,7 +74,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
 
   return (
     <div className="mx-auto mt-6 ">
-      <div className={card}>
+      <Card>
         <AsyncStateView
           status={status}
           skeleton={<PayoutDetailSkeleton />}
@@ -95,7 +95,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
                 {paymentMethodName} · <AppDate value={payout?.paid_at} format="short" />
               </p>
             </div>
-            {isVoided ? <Tag tone="danger">Voided</Tag> : <Tag tone="success">Active</Tag>}
+            <StatusTag status={isVoided ? "Voided" : "Active"} tone={isVoided ? "danger" : "success"} size="md" />
             {!isVoided && (
               <ActionsDropdown
                 items={[
@@ -149,7 +149,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
             />
           </div>
         </AsyncStateView>
-      </div>
+      </Card>
 
       {payout && (
         <React.Suspense fallback={null}>
