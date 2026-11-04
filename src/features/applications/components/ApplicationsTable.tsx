@@ -6,10 +6,9 @@ import Button from "components/ub/core/buttons/Button";
 import AppDate from "components/ub/data/formatting/AppDate";
 import DataTable, { type DataTableColumn, type DataTableDensity } from "components/ub/data/tables/DataTable";
 import PresignedImage from "components/ub/data/media/PresignedImage";
-import { STATUS_BADGE_TONE } from "components/ub/data/badges/StatusBadge";
 import Tag from "components/ub/data/badges/Tag";
-import { getInitials } from "components/ub/data/media/Avatar";
-import { getStatusVariant } from "utils/getStatusVariant";
+import { Avatar } from "components/ub/data/media/Avatar";
+import StatusTag from "components/ub/dashboard/shared/StatusTag";
 
 /** The fields every role's list endpoint returns (admin adds account_manager_name). */
 export interface ApplicationListRow {
@@ -76,7 +75,8 @@ function StudentCell({ row }: { row: ApplicationListRow }) {
         fileKey={row.student_photo_file_key ?? undefined}
         alt=""
         className="h-8 w-8 shrink-0 rounded-ub-full object-cover"
-        fallback={<span className="grid h-8 w-8 shrink-0 place-items-center rounded-ub-full bg-ub-brand-subtle-bg text-ub-label-sm text-ub-brand-subtle-text">{getInitials(row.student_name ?? "?")}</span>}
+        fallback={<Avatar name={row.student_name ?? "?"} size={32} alt="" />}
+        renderImage={(src) => <Avatar name={row.student_name ?? "?"} src={src} size={32} alt="" />}
       />
       <span className="min-w-0">
         <span className="block truncate text-ub-label-md text-ub-text-primary">{row.student_name}</span>
@@ -147,9 +147,7 @@ export default function ApplicationsTable({
           <span className="flex min-w-0 flex-col items-end gap-1 md:items-start">
             <span className="truncate text-ub-caption text-ub-text-tertiary">{r.stage}</span>
             <span className="flex flex-wrap items-center gap-1.5">
-              <Tag tone={STATUS_BADGE_TONE[getStatusVariant(r.status)]} size="sm">
-                {statusLabel(r.status)}
-              </Tag>
+              <StatusTag status={r.status} label={statusLabel(r.status)} size="sm" />
               {needsAction(r.status) && (
                 <Tag tone="attention" size="sm">
                   Action needed
