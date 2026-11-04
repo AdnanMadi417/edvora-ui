@@ -4,10 +4,15 @@
 // API calls live in useApplicationForm (or a mock in the style guide), so this
 // renders the same in the product and on /ui-unibexs-template-2026.
 
+import Card from "components/ub/data/cards/Card";
+import Alert from "components/ub/feedback/notifications/Alert";
+import IconTile from "components/ub/dashboard/shared/IconTile";
+import TextLink from "components/ub/core/buttons/TextLink";
+import { FieldError } from "components/ub/forms/layout/FieldChrome";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import clsx from "clsx";
-import { ArrowLeft, ArrowRight, CircleAlert, FileText, Send, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileText, Send, Trash2, Upload } from "lucide-react";
 import Button from "components/ub/core/buttons/Button";
 import Collapse from "components/ub/core/motion/Collapse";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
@@ -75,21 +80,17 @@ function ErrorSummary({ errors }: { errors: Record<string, string | undefined> }
   const all = [...items, ...required.map(([k]) => [k, "This document is required."] as [string, string])];
   return (
     <Collapse open={all.length > 0}>
-      <div role="alert" className="mb-6 rounded-ub-md border border-ub-tone-danger-border bg-ub-tone-danger-bg p-4">
-        <p className="flex items-center gap-2 text-ub-label-md text-ub-tone-danger-text">
-          <CircleAlert className="h-5 w-5 shrink-0" aria-hidden="true" />
-          {all.length === 1 ? "Fix 1 field to continue" : `Fix ${all.length} fields to continue`}
-        </p>
+      <Alert tone="danger" className="mb-6" title={all.length === 1 ? "Fix 1 field to continue" : `Fix ${all.length} fields to continue`}>
         <ul className="mt-2 grid gap-1 ps-7">
           {all.map(([path, message]) => (
             <li key={path}>
-              <a href={`#${fieldId(path)}`} className="text-ub-body-sm text-ub-tone-danger-text underline underline-offset-2 hover:no-underline">
+              <TextLink href={`#${fieldId(path)}`}>
                 {message}
-              </a>
+              </TextLink>
             </li>
           ))}
         </ul>
-      </div>
+      </Alert>
     </Collapse>
   );
 }
@@ -131,10 +132,10 @@ function StudentStep({ mode, formData, errors, update, validateField, universiti
           Programme
         </h3>
         {mode === "programme" && (
-          <div className="mt-4 grid gap-3 rounded-ub-md border border-ub-border bg-ub-surface-subtle p-4">
+          <Card extra="mt-4 gap-3 p-4">
             <DescriptionList columns={2} fallback="Not chosen" items={[{ label: "Institution", value: uni?.name }, { label: "Programme", value: programme?.name }]} />
             <Toggle checked={changeProgramme} onChange={setChangeProgramme} label="Choose a different programme" />
-          </div>
+          </Card>
         )}
         <Collapse open={changeProgramme}>
           <div className="mt-4 grid gap-x-4 sm:grid-cols-2">
@@ -244,9 +245,7 @@ function DocumentsStep({ formData, errors, upload, removeDocument, documentTypes
         </div>
       )}
       {errors.documents && (
-        <p role="alert" className="text-ub-body-sm text-ub-tone-danger-text">
-          {errors.documents}
-        </p>
+        <div role="alert"><FieldError>{errors.documents}</FieldError></div>
       )}
     </div>
   );
@@ -449,9 +448,7 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
   return (
     <section className={clsx(card, "w-full min-w-0")} aria-labelledby="af-title">
       <header className="flex items-start gap-3 border-b border-ub-border px-4 py-4 md:px-6 md:py-5">
-        <span aria-hidden="true" className="grid h-10 w-10 shrink-0 place-items-center rounded-ub-md bg-ub-tone-brand-bg text-ub-tone-brand-text">
-          <FileText className="h-5 w-5" />
-        </span>
+        <IconTile icon={FileText} />
         <div className="min-w-0">
           <Title id="af-title" className="text-ub-heading-md text-ub-text-primary">
             {mode === "programme" ? "Apply for this programme" : "New application"}

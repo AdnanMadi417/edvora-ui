@@ -5,7 +5,7 @@ import FileUpload, { FileUploadItem } from "components/ub/forms/uploads/FileUplo
 import Toggle from "components/ub/forms/choices/Toggle";
 import ProgressBar from "components/ub/feedback/states/ProgressBar";
 import Alert from "components/ub/feedback/notifications/Alert";
-import { card } from "components/ub/recipes";
+import Card from "components/ub/data/cards/Card";
 
 interface Props {
   documentTypes: DocumentType[];
@@ -101,7 +101,7 @@ export default function DocumentUploadList({
   return (
     <div className="space-y-4">
       {required.length > 0 && (
-        <div className={`${card} p-4`}>
+        <Card extra="p-4">
           <ProgressBar
             label="Required Documents"
             value={uploadedRequired}
@@ -109,7 +109,7 @@ export default function DocumentUploadList({
             valueText={`${uploadedRequired} of ${required.length}`}
             tone={allDone ? "success" : "brand"}
           />
-        </div>
+        </Card>
       )}
 
       {required.map((docType) => (
@@ -117,7 +117,7 @@ export default function DocumentUploadList({
       ))}
 
       {optional.length > 0 && (
-        <div className="rounded-ub-md border border-ub-border bg-ub-surface-subtle px-4 py-3">
+        <Card extra="px-4 py-3">
           <Toggle
             checked={showOptional}
             onChange={setShowOptional}
@@ -125,7 +125,7 @@ export default function DocumentUploadList({
             description={`${optional.length} document${optional.length !== 1 ? "s" : ""} available`}
             switchPosition="end"
           />
-        </div>
+        </Card>
       )}
 
       {optional.length > 0 &&
