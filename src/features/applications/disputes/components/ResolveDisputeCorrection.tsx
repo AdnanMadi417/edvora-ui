@@ -1,5 +1,6 @@
 "use client";
 
+import Skeleton from "components/ub/feedback/states/Skeleton";
 import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { Ban } from "lucide-react";
@@ -178,7 +179,7 @@ export default function ResolveDisputeCorrection({
 
           <div className="space-y-5">
             {loadingPayout || !payout ? (
-              <p className="text-ub-body-sm text-ub-text-tertiary">Loading payout details...</p>
+              <div role="status" aria-label="Loading payout details"><Skeleton className="h-5 w-full" /></div>
             ) : (
               <PayoutCorrectionFields
                 payout={payout}

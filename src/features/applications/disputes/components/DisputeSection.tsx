@@ -6,7 +6,7 @@ import { CheckCircle, Wrench } from "lucide-react";
 import Button from "components/ub/core/buttons/Button";
 import DescriptionList from "components/ub/data/display/DescriptionList";
 import SectionCard from "components/ub/data/cards/SectionCard";
-import Tag from "components/ub/data/badges/Tag";
+import StatusTag from "components/ub/dashboard/shared/StatusTag";
 import type { Dispute } from "features/applications/shared/applicationTypes";
 
 import ResolveNoIssue from "./ResolveNoIssue";
@@ -44,7 +44,7 @@ export default function DisputeSection({
     <SectionCard
       title="Dispute"
       description={STATUS.description}
-      action={<Tag tone={STATUS.tone}>{STATUS.label}</Tag>}
+      action={<StatusTag status={dispute.status} label={STATUS.label} tone={STATUS.tone} size="md" />}
       footer={
         canManageDispute && isActionable ? (
           <div className="flex flex-wrap justify-end gap-2">
