@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useId, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AlertTriangle, ArrowRight, Bell, CheckCheck, ExternalLink, RefreshCw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -14,12 +14,11 @@ import {
   getNotificationPhotoKey,
   getNotificationStageStatus,
 } from "../utils/notificationIcons";
-import { getNotificationCategory, type NotificationCategory } from "../utils/notificationCategory";
+import { getNotificationCategory } from "../utils/notificationCategory";
 import type { ReadStatus, Notification } from "../types";
 import NotificationAvatar from "./NotificationAvatar";
 import TablePagination from "components/ub/data/tables/TablePagination";
-import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
-import type { TabItem } from "components/ub/navigation/controls/Tabs";
+import NotificationTabs, { type UnreadCategoryFilter } from "./NotificationTabs";
 import EmptyData from "components/ub/feedback/states/EmptyData";
 
 const PAGE_SIZE = 20;
@@ -28,14 +27,6 @@ const PAGE_SIZE = 20;
 // being computed over everything loaded so far.
 const UNREAD_BATCH_SIZE = 100;
 
-type UnreadCategoryFilter = "all" | NotificationCategory;
-
-const UNREAD_CATEGORY_TABS: { key: UnreadCategoryFilter; label: string }[] = [
-  { key: "all", label: "All Unread" },
-  { key: "action_required", label: "Action Required" },
-  { key: "info", label: "System Info" },
-];
-
 function timeAgo(dateStr: string): string {
   const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
   if (diff < 60) return "Just now";
@@ -43,11 +34,6 @@ function timeAgo(dateStr: string): string {
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
   return `${Math.floor(diff / 86400)}d ago`;
 }
-
-const FILTER_TABS = (unreadCount: number): TabItem<ReadStatus>[] => [
-  { key: "all", label: "All" },
-  { key: "unread", label: unreadCount > 0 ? `Unread (${unreadCount})` : "Unread" },
-];
 
 interface NotificationsProps {
   /** When set, clicking a notification (or its external-link icon) navigates
@@ -75,8 +61,6 @@ function getNotificationHref(
 }
 
 export default function Notifications({ applicationBasePath, partnerBasePath }: NotificationsProps) {
-  const readTabsId = useId();
-  const categoryTabsId = useId();
   const [filter, setFilter] = useState<ReadStatus>("unread");
   const [page, setPage] = useState(1);
   const [unreadPage, setUnreadPage] = useState(1);
@@ -203,32 +187,18 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
         )}
       </div>
 
-      {/* Filter tabs */}
-      <Tabs<ReadStatus> tabs={FILTER_TABS(unreadCount)} active={filter} onChange={changeFilter} variant="pills" idPrefix={readTabsId} aria-label="Notification read status" className="px-6 pt-2" />
-
-      <div {...tabPanelProps(readTabsId, filter)}>
-      {/* Unread sub-filter: Action Required vs System Info */}
-      {isUnreadTab && !showFullSkeleton && !error && sorted.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-6 py-3">
-          <Tabs<UnreadCategoryFilter>
-            tabs={UNREAD_CATEGORY_TABS.map(({ key, label }) => {
-              const count = key === "all" ? sorted.length : key === "action_required" ? actionRequiredCount : infoCount;
-              return { key, label: count > 0 ? `${label} (${count})` : label };
-            })}
-            active={unreadCategory}
-            onChange={selectUnreadCategory}
-            variant="pills"
-            size="sm"
-            idPrefix={categoryTabsId}
-            aria-label="Unread notification category"
-          />
-        </div>
-      )}
-
+      <NotificationTabs
+        readStatus={filter}
+        onReadStatusChange={changeFilter}
+        unreadCount={unreadCount}
+        category={unreadCategory}
+        onCategoryChange={selectUnreadCategory}
+        categoryCounts={{ all: sorted.length, action_required: actionRequiredCount, info: infoCount }}
+        showCategories={isUnreadTab && !showFullSkeleton && !error && sorted.length > 0}
+      >
       {/* List */}
       <AnimatePresence mode="wait">
       <motion.div
-        {...(isUnreadTab && !showFullSkeleton && !error && sorted.length > 0 ? tabPanelProps(categoryTabsId, unreadCategory) : {})}
         key={`${filter}-${unreadCategory}`}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -391,7 +361,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
           itemLabel="notifications"
         />
       )}
-      </div>
+      </NotificationTabs>
     </section>
   );
 }
