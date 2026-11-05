@@ -1,8 +1,8 @@
 "use client";
 
-import { KeyboardEvent, useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import clsx from "clsx";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import { techStack } from "lib/content";
 import Container from "../ui/Container";
 import SectionHeading from "../ui/SectionHeading";
@@ -11,22 +11,7 @@ import { techIcons } from "../icons";
 /** WAI-ARIA tabs: arrow keys/Home/End move between categories. */
 export default function TechStack() {
   const [active, setActive] = useState(0);
-  const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const baseId = useId();
-  const count = techStack.categories.length;
-
-  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    const rtl = document.dir === "rtl";
-    const next = { ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1 }[e.key as "ArrowRight" | "ArrowLeft"];
-    let index: number | null = null;
-    if (next) index = (active + next + count) % count;
-    if (e.key === "Home") index = 0;
-    if (e.key === "End") index = count - 1;
-    if (index === null) return;
-    e.preventDefault();
-    setActive(index);
-    tabsRef.current[index]?.focus();
-  };
 
   const category = techStack.categories[active];
 
@@ -34,30 +19,18 @@ export default function TechStack() {
     <section aria-labelledby="stack-heading" className="py-24 md:py-32">
       <Container>
         <SectionHeading id="stack-heading" eyebrow={techStack.eyebrow} heading={techStack.heading} subheading={techStack.subheading} />
-        <div role="tablist" aria-label="Technology categories" onKeyDown={onKeyDown} className="mt-12 flex gap-1 overflow-x-auto border-b border-ub-border">
-          {techStack.categories.map((c, i) => (
-            <button
-              key={c.name}
-              ref={(el) => {
-                tabsRef.current[i] = el;
-              }}
-              id={`${baseId}-tab-${i}`}
-              role="tab"
-              type="button"
-              aria-selected={i === active}
-              aria-controls={`${baseId}-panel`}
-              tabIndex={i === active ? 0 : -1}
-              onClick={() => setActive(i)}
-              className={clsx(
-                "-mb-px h-11 shrink-0 border-b-2 px-4 text-ub-label-md transition-colors duration-ub-base focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ub-border-focus",
-                i === active ? "border-ub-blue-300 text-ub-text-primary" : "border-transparent text-ub-text-secondary hover:text-ub-text-primary",
-              )}
-            >
-              {c.name}
-            </button>
-          ))}
+        <div className="mt-12">
+          <Tabs
+            tabs={techStack.categories.map((category, index) => ({ key: String(index), label: category.name }))}
+            active={String(active)}
+            onChange={(key) => setActive(Number(key))}
+            variant="underline"
+            inset={false}
+            idPrefix={baseId}
+            aria-label="Technology categories"
+          />
         </div>
-        <div id={`${baseId}-panel`} role="tabpanel" aria-labelledby={`${baseId}-tab-${active}`} className="mt-8">
+        <div {...tabPanelProps(baseId, String(active))} className="mt-8">
           <AnimatePresence mode="wait">
             <motion.ul
               key={category.name}
