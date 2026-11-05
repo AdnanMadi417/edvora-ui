@@ -35,3 +35,15 @@ it("keeps panel IDs unique when notification views share a page", () => {
   const ids = Array.from(document.querySelectorAll('[role="tabpanel"]')).map((panel) => panel.id);
   expect(new Set(ids).size).toBe(ids.length);
 });
+
+it("lets the mobile category picker filter the same content and synchronizes desktop selection", async () => {
+  render(<Harness />);
+  const user = userEvent.setup();
+  const picker = screen.getByRole("combobox", { name: "Unread notification category" });
+  expect(picker).toHaveValue("action_required");
+  await user.selectOptions(picker, "info");
+  expect(screen.getByText("info messages")).toBeInTheDocument();
+  expect(screen.getByRole("tab", { name: /System info/ })).toHaveAttribute("aria-selected", "true");
+  const panel = document.getElementById(picker.getAttribute("aria-controls")!);
+  expect(within(panel!).getByText("info messages")).toBeInTheDocument();
+});

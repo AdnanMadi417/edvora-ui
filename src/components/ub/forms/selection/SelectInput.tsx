@@ -29,6 +29,7 @@ interface SelectInputProps {
   className?: string;
   /** Accessible name, since this control has no visible label. */
   "aria-label"?: string;
+  "aria-controls"?: string;
 }
 
 /**
@@ -48,6 +49,7 @@ export default function SelectInput({
   disabled = false,
   className = "",
   "aria-label": ariaLabel,
+  "aria-controls": ariaControls,
 }: SelectInputProps) {
   const id = useId();
   const value = getNestedValue(formData, field) ?? "";
@@ -68,6 +70,7 @@ export default function SelectInput({
           onBlur={onBlur}
           disabled={disabled}
           aria-label={ariaLabel ?? field.replace(/_/g, " ")}
+          aria-controls={ariaControls}
           aria-describedby={hasError ? `${id}-error` : undefined}
           aria-invalid={hasError || undefined}
           className={`${fieldControl} h-10 ${selectControl} ${

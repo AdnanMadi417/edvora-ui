@@ -33,8 +33,6 @@ export interface TabsProps<T extends string> {
   size?: TabsSize;
   /** Tabs share the full width equally (segmented and pills; underline on mobile). */
   fullWidth?: boolean;
-  /** Allow dense segmented labels to wrap on narrow screens. */
-  wrapLabels?: boolean;
   /** Visually hide labels and show them as tooltips (segmented and pills). Labels stay for screen readers. */
   iconOnly?: boolean;
   /** Underline only: 24px inline padding so the first tab lines up with card content. Default true. */
@@ -118,7 +116,6 @@ export default function Tabs<T extends string>({
   variant = "underline",
   size = "md",
   fullWidth = false,
-  wrapLabels = false,
   iconOnly = false,
   inset = true,
   idPrefix,
@@ -127,7 +124,6 @@ export default function Tabs<T extends string>({
 }: TabsProps<T>) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const vertical = variant === "vertical";
-  const wrap = wrapLabels && variant === "segmented";
   const hideLabels = iconOnly && (variant === "segmented" || variant === "pills");
 
   /** Moves from `from` by `step`, skipping disabled tabs, and activates the result. */
@@ -182,9 +178,9 @@ export default function Tabs<T extends string>({
             title={hideLabels ? label : undefined}
             onClick={() => onChange(key)}
             className={clsx(
-              wrap ? "inline-flex min-w-0 items-center gap-1 text-center sm:flex-none" : "inline-flex shrink-0 items-center gap-2 whitespace-nowrap",
+              "inline-flex shrink-0 items-center gap-2 whitespace-nowrap",
               transition,
-              wrap ? "min-h-9 px-2 py-1.5 text-ub-label-sm" : HEIGHT[variant][size],
+              HEIGHT[variant][size],
               tabClasses(variant, selected),
               fullWidth && variant !== "vertical" && "flex-1 justify-center",
               hideLabels && "px-0 aspect-square justify-center",
@@ -192,7 +188,7 @@ export default function Tabs<T extends string>({
             )}
           >
             {Icon && <Icon className={clsx("h-4 w-4 shrink-0", selected ? "text-current" : "text-ub-icon")} aria-hidden="true" />}
-            <span className={clsx(wrap && "min-w-0 whitespace-normal sm:whitespace-nowrap", hideLabels && "sr-only", vertical && "min-w-0 flex-1 truncate text-start")}>{label}</span>
+            <span className={clsx(hideLabels && "sr-only", vertical && "min-w-0 flex-1 truncate text-start")}>{label}</span>
             {typeof count === "number" && count > 0 && (
               <span
                 className={clsx(
