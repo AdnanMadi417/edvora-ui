@@ -1,5 +1,6 @@
 "use client";
 
+import { useId as useTabId } from "react";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -36,7 +37,7 @@ import PresignedImage from "components/ub/data/media/PresignedImage";
 import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import { parseDate, formatDate } from "components/ub/data/formatting/appDateUtils";
 
@@ -168,6 +169,7 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
 export default function ReviewerPartnerProfile({ id }: Props) {
   const router = useRouter();
   const { partner, isPartnerLoading } = usePartnerDetails(id);
+  const tabId = useTabId();
   const [tab, setTab] = useState<DetailsTab>("profile");
 
   if (isPartnerLoading) return <Loading text="Loading advisor details..." />;
@@ -241,7 +243,8 @@ export default function ReviewerPartnerProfile({ id }: Props) {
           </div>
         </div>
 
-        <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} />
+        <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} variant="underline" idPrefix={tabId} aria-label="Advisor review sections" />
+        <div {...tabPanelProps(tabId, tab)}>
 
         {tab === "profile" && (
         <div key={tab} className="animate-in fade-in duration-200">
@@ -432,6 +435,7 @@ export default function ReviewerPartnerProfile({ id }: Props) {
           </div>
         )}
       </div>
+        </div>
     </div>
   );
 }
