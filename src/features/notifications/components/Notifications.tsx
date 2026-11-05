@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import { AlertTriangle, ArrowRight, Bell, CheckCheck, ExternalLink, RefreshCw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
@@ -18,7 +18,7 @@ import { getNotificationCategory, type NotificationCategory } from "../utils/not
 import type { ReadStatus, Notification } from "../types";
 import NotificationAvatar from "./NotificationAvatar";
 import TablePagination from "components/ub/data/tables/TablePagination";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import EmptyData from "components/ub/feedback/states/EmptyData";
 
@@ -35,28 +35,6 @@ const UNREAD_CATEGORY_TABS: { key: UnreadCategoryFilter; label: string }[] = [
   { key: "action_required", label: "Action Required" },
   { key: "info", label: "System Info" },
 ];
-
-// Semantic color per sub-filter, matching StatusBadge's warning/info/neutral palette.
-const UNREAD_CATEGORY_COLORS: Record<UnreadCategoryFilter, { active: string; inactive: string; dot: string; count: string }> = {
-  all: {
-    active: "border-slate-700 bg-slate-100 text-slate-800",
-    inactive: "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50",
-    dot: "bg-slate-500",
-    count: "text-slate-400",
-  },
-  action_required: {
-    active: "border-amber-600 bg-amber-50 text-amber-700",
-    inactive: "border-slate-200 bg-white text-slate-600 hover:border-amber-200 hover:bg-amber-50",
-    dot: "bg-amber-500",
-    count: "text-amber-500",
-  },
-  info: {
-    active: "border-blue-600 bg-blue-50 text-blue-700",
-    inactive: "border-slate-200 bg-white text-slate-600 hover:border-blue-200 hover:bg-blue-50",
-    dot: "bg-blue-500",
-    count: "text-blue-500",
-  },
-};
 
 function timeAgo(dateStr: string): string {
   const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
@@ -97,6 +75,8 @@ function getNotificationHref(
 }
 
 export default function Notifications({ applicationBasePath, partnerBasePath }: NotificationsProps) {
+  const readTabsId = useId();
+  const categoryTabsId = useId();
   const [filter, setFilter] = useState<ReadStatus>("unread");
   const [page, setPage] = useState(1);
   const [unreadPage, setUnreadPage] = useState(1);
@@ -224,35 +204,31 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
       </div>
 
       {/* Filter tabs */}
-      <Tabs<ReadStatus> tabs={FILTER_TABS(unreadCount)} active={filter} onChange={changeFilter} className="pt-2" />
+      <Tabs<ReadStatus> tabs={FILTER_TABS(unreadCount)} active={filter} onChange={changeFilter} variant="pills" idPrefix={readTabsId} aria-label="Notification read status" className="px-6 pt-2" />
 
+      <div {...tabPanelProps(readTabsId, filter)}>
       {/* Unread sub-filter: Action Required vs System Info */}
       {isUnreadTab && !showFullSkeleton && !error && sorted.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 px-6 py-3">
-          {UNREAD_CATEGORY_TABS.map(({ key, label }) => {
-            const count = key === "all" ? sorted.length : key === "action_required" ? actionRequiredCount : infoCount;
-            const active = unreadCategory === key;
-            const colors = UNREAD_CATEGORY_COLORS[key];
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => selectUnreadCategory(key)}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                  active ? colors.active : colors.inactive
-                }`}
-              >
-                <span className={`h-1.5 w-1.5 rounded-full ${colors.dot}`} />
-                {label} {count > 0 && <span className={active ? colors.count : "text-slate-400"}>({count})</span>}
-              </button>
-            );
-          })}
+          <Tabs<UnreadCategoryFilter>
+            tabs={UNREAD_CATEGORY_TABS.map(({ key, label }) => {
+              const count = key === "all" ? sorted.length : key === "action_required" ? actionRequiredCount : infoCount;
+              return { key, label: count > 0 ? `${label} (${count})` : label };
+            })}
+            active={unreadCategory}
+            onChange={selectUnreadCategory}
+            variant="pills"
+            size="sm"
+            idPrefix={categoryTabsId}
+            aria-label="Unread notification category"
+          />
         </div>
       )}
 
       {/* List */}
       <AnimatePresence mode="wait">
       <motion.div
+        {...(isUnreadTab && !showFullSkeleton && !error && sorted.length > 0 ? tabPanelProps(categoryTabsId, unreadCategory) : {})}
         key={`${filter}-${unreadCategory}`}
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -415,6 +391,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
           itemLabel="notifications"
         />
       )}
+      </div>
     </section>
   );
 }
