@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Award, BookOpen, Calendar, GraduationCap, Landmark, Languages, MapPin } from "lucide-react";
 import FadeIn from "components/ub/core/motion/FadeIn";
 import PresignedImage from "components/ub/data/media/PresignedImage";
 import Loading from "components/ub/feedback/states/Loading";
 import EmptyData from "components/ub/feedback/states/EmptyTableData";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import { useUniversityDetails } from "features/universities/hooks";
 
@@ -43,6 +43,7 @@ interface Props {
 
 export default function PartnerUniversityProfile({ id }: Props) {
   const router = useRouter();
+  const tabId = useId();
   const [activeTab, setActiveTab] = useState<ProfileTab>("overview");
   const { university, branches, universityLoading } = useUniversityDetails(id);
 
@@ -119,11 +120,11 @@ export default function PartnerUniversityProfile({ id }: Props) {
             </div>
           </div>
 
-          <Tabs<ProfileTab> tabs={PROFILE_TABS} active={activeTab} onChange={setActiveTab} />
+          <Tabs<ProfileTab> tabs={PROFILE_TABS} active={activeTab} onChange={setActiveTab} variant="underline" idPrefix={tabId} aria-label="Institution sections" />
         </FadeIn>
       </div>
 
-        <div className="px-4 py-10">
+        <div className="px-4 py-10" {...tabPanelProps(tabId, activeTab)}>
 
           {/* Main content (2/3) + quick-facts sidebar (1/3). */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
