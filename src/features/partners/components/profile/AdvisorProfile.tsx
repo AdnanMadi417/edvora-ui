@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import {
   Award,
   BadgeCheck,
@@ -25,7 +25,7 @@ import Faq from "components/ub/data/display/Faq";
 import Tooltip from "components/ub/feedback/dialogs/Tooltip";
 import Input from "components/ub/forms/text/Input";
 import Textarea from "components/ub/forms/text/Textarea";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import IconButton from "components/ub/core/buttons/IconButton";
 import { TextButton } from "components/ub/core/buttons/TextButton";
 import IconTile from "components/ub/dashboard/shared/IconTile";
@@ -121,6 +121,7 @@ function EditableList({ items, onChange, itemLabel, addLabel, placeholder }: { i
  * shows this same component read-only.
  */
 export default function AdvisorProfile({ profile, draft, editing = false, spacious = false, onChange = () => undefined, errors = {} }: AdvisorProfileProps) {
+  const channelId = useId();
   const name = draft.display_name || profile.name;
   const content = profile.content;
   const students = content?.students_enrolled ?? 0;
@@ -238,13 +239,14 @@ export default function AdvisorProfile({ profile, draft, editing = false, spacio
                 <Tabs
                   variant="segmented"
                   size="sm"
-                  idPrefix="contact-channel"
+                  idPrefix={channelId}
+                  aria-label="Contact channel"
                   tabs={CHANNELS.map(({ key, label, icon }) => ({ key, label, icon }))}
                   active={draft.contact_channel}
                   onChange={(key) => onChange({ contact_channel: key, contact_value: key === "link" ? "" : draft.contact_channel === "link" ? profile.whatsapp_number ?? "" : draft.contact_value })}
                 />
               </div>
-              <div className={clsx("grid gap-3", !spacious && "sm:grid-cols-2")}>
+              <div {...tabPanelProps(channelId, draft.contact_channel)} className={clsx("grid gap-3", !spacious && "sm:grid-cols-2")}>
                 <Input label="Button text" value={draft.contact_label} placeholder={DEFAULT_CONTACT_LABEL} onChange={(v) => onChange({ contact_label: v })} maxLength={30} />
                 <Input
                   label={draft.contact_channel === "link" ? "Link" : "Phone number"}
