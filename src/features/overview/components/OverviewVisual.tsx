@@ -1,8 +1,8 @@
 "use client";
 import type { WidgetState } from "components/ub/dashboard/types";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { RefreshCw } from "lucide-react";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import BarChartCard from "components/ub/dashboard/cards/BarChartCard";
 import GaugeCard from "components/ub/dashboard/cards/GaugeCard";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
@@ -26,6 +26,7 @@ export default function OverviewVisual({
   plans: ResourcePlan[];
   onRetry: () => void;
 }) {
+  const tabId = useId();
   const [view, setView] = useState<"bars" | "pipeline">("bars");
   const menu = {
     label: "Chart options",
@@ -49,6 +50,7 @@ export default function OverviewVisual({
         onChange={setView}
         variant="segmented"
         size="sm"
+        idPrefix={tabId}
         aria-label="Application chart view"
       />
     );
@@ -56,6 +58,7 @@ export default function OverviewVisual({
       return (
           <BarChartCard
             controls={viewSwitch}
+            bodyProps={tabPanelProps(tabId, view)}
             title="Applications by stage"
             subtitle={pipeline.subtitle}
             as="h2"
@@ -100,6 +103,7 @@ export default function OverviewVisual({
     return (
         <DashboardCard
           controls={viewSwitch}
+            bodyProps={tabPanelProps(tabId, view)}
           title={pipeline.title}
           subtitle={pipeline.subtitle}
           as="h2"
