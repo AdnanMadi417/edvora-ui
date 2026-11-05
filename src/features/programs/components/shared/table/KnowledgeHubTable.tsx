@@ -86,16 +86,16 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
     {
       key: "name",
       header: "Program",
-      width: "300px",
+      width: "320px",
       cell: (program) => (
-        <div className="min-w-0 space-y-2">
-          <Tooltip content={program.name} className="max-w-full">
-            <span className="line-clamp-2 break-words text-ub-label-md text-ub-text-primary">
+        <div className="min-w-0 max-w-[320px] space-y-1.5 py-3 text-start md:min-w-[240px]">
+          <Tooltip content={program.name} className="w-full min-w-0">
+            <span className="line-clamp-2 break-words text-ub-label-md leading-snug text-ub-text-primary">
               {program.name}
             </span>
           </Tooltip>
-          <p className="text-ub-body-sm text-ub-text-secondary">{program.university?.name}</p>
-          <p className="text-ub-label-sm text-ub-text-tertiary">{[program.branch?.name, program.branch?.state].filter(Boolean).join(" · ")}</p>
+          <p className="line-clamp-1 text-ub-body-sm text-ub-text-secondary" title={program.university?.name}>{program.university?.name}</p>
+          <p className="line-clamp-1 text-ub-label-sm text-ub-text-tertiary" title={[program.branch?.name, program.branch?.state].filter(Boolean).join(" · ")}>{[program.branch?.name, program.branch?.state].filter(Boolean).join(" · ")}</p>
           <div className="flex flex-wrap gap-1.5">
             <Tag hue="indigo" size="sm">
               {program.qualification_level}
@@ -118,7 +118,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       key: "commission",
       header: "Commission",
       cell: (program) => (
-        <span className="ub-tabular text-ub-heading-sm text-ub-tone-success-text">
+        <span className="ub-tabular whitespace-nowrap text-ub-heading-sm text-ub-tone-success-text">
           {money(program.commission_amount, program.commission_currency)}
         </span>
       ),
@@ -127,7 +127,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       key: "tuition",
       header: "First-year tuition",
       cell: (program) => (
-        <span className="ub-tabular">
+        <span className="ub-tabular whitespace-nowrap">
           {money(program.first_year_tuition, program.yearly_fee_currency)}
         </span>
       ),
@@ -140,6 +140,7 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
           <IntakeMonthsChips
             months={program.intake_months}
             size="sm"
+            className="!grid grid-cols-[max-content_max-content] justify-items-start !gap-x-4 !gap-y-2"
             maxVisible={3}
           />
         ) : (
@@ -237,7 +238,10 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       aria-busy={props.isFetching || props.isSelectingAll}
       className="min-w-0"
     >
+      <p className="mb-2 text-ub-label-sm text-ub-text-tertiary md:hidden">Swipe across for more columns. Scroll within the table for more programs.</p>
       <DataTable
+        mobileLayout="scroll"
+        scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus"
         columns={columns}
         rows={props.programs}
         getRowId={(program) => program.id}

@@ -85,6 +85,9 @@ export interface DataTableProps<T> {
 
   /** table (default; stacked cards below 768px) · cards: stacked cards at every width (Knowledge Hub, mobile-first lists). */
   layout?: DataTableLayout;
+  /** Keep a horizontally scrollable table on phones instead of stacked rows. */
+  mobileLayout?: "stacked" | "scroll";
+  scrollClassName?: string;
   /** Return true, or a reason string to disable the row's checkbox (shown as its tooltip). */
   isRowSelectable?: (row: T) => true | string;
   /** Total rows across all pages (server mode). With onSelectAllMatchingChange, offers "Select all N". */
@@ -260,6 +263,8 @@ export default function DataTable<T>({
   manualSort,
   footer,
   layout = "table",
+  mobileLayout = "stacked",
+  scrollClassName,
   isRowSelectable,
   totalCount,
   allMatchingSelected = false,
@@ -353,6 +358,18 @@ export default function DataTable<T>({
     label: cards ? "shrink-0 text-ub-label-sm text-ub-text-tertiary" : "shrink-0 text-ub-label-sm text-ub-text-tertiary md:hidden",
     checkCell: cards ? "flex px-4 py-1" : "flex px-4 py-1 md:table-cell md:w-12 md:py-0 md:align-middle",
   };
+  const mobileScroll = !cards && mobileLayout === "scroll";
+  if (mobileScroll) Object.assign(t, {
+    table: "w-full min-w-[1000px] border-collapse text-start",
+    thead: "table-header-group sticky top-0 z-20 bg-ub-table-head",
+    headRow: () => "table-row",
+    tbody: "table-row-group",
+    row: "table-row border-t border-ub-border",
+    cell: "table-cell px-4 py-2 align-middle text-start text-ub-body-sm text-ub-text-primary",
+    headCell: "table-cell h-11 px-4 text-start font-medium",
+    label: "hidden",
+    checkCell: "table-cell w-12 px-4 py-2 align-middle",
+  });
   const pin = (first: boolean, head = false) =>
     stickyFirstColumn && first && !cards ? clsx("md:sticky md:z-10", selectable ? "md:start-12" : "md:start-0", head ? "md:bg-ub-table-head" : "md:bg-inherit") : "";
 
@@ -393,16 +410,16 @@ export default function DataTable<T>({
         </p>
       )}
 
-      <TableWrapper footer={footer}>
+      <TableWrapper footer={footer} scrollClassName={scrollClassName} scrollLabel={mobileScroll ? `${caption}: scroll to see all columns and rows` : undefined}>
         <table className={t.table} aria-busy={loading || undefined}>
           <caption className="sr-only">{caption}</caption>
           <thead className={`${tableHead} ${t.thead}`}>
             {/* On mobile (and in cards) only the select-all cell of the header row is shown. */}
             <tr className={t.headRow(!!selectable && showData)}>
               {selectable && (
-                <th scope="col" className={clsx("flex h-11 w-auto items-center gap-3 px-4", !cards && "md:table-cell md:w-12 md:align-middle", stickyFirstColumn && !cards && "md:sticky md:start-0 md:z-10 md:bg-ub-table-head")}>
+                <th scope="col" className={clsx(mobileScroll ? "table-cell h-11 w-12 px-4 align-middle" : "flex h-11 w-auto items-center gap-3 px-4", !cards && "md:table-cell md:w-12 md:align-middle", stickyFirstColumn && !cards && "md:sticky md:start-0 md:z-10 md:bg-ub-table-head")}>
                   <TableCheckbox checked={pageState === "all"} indeterminate={pageState === "some"} onChange={toggleAll} label="Select all rows" />
-                  <span aria-hidden="true" className={cards ? "" : "md:hidden"}>
+                  <span aria-hidden="true" className={mobileScroll ? "hidden" : cards ? "" : "md:hidden"}>
                     Select all
                   </span>
                 </th>
@@ -474,7 +491,7 @@ export default function DataTable<T>({
                             <span aria-hidden="true" className={t.label}>
                               {mobileLabel}
                             </span>
-                            <span className={clsx("min-w-0 text-end", !cards && "md:block", !cards && (end ? "md:text-end" : "md:text-start"))}>
+                            <span className={clsx(mobileScroll ? "block min-w-0 text-start" : "min-w-0 text-end", !cards && "md:block", !cards && (end ? "md:text-end" : "md:text-start"))}>
                               {/* The first column's link covers the whole row; other interactive cells sit above it (relative z-10). */}
                               {href && ci === 0 ? (
                                 <Link

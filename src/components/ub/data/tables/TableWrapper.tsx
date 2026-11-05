@@ -6,6 +6,8 @@ import { tableContainer, tableScroll } from "components/ub/recipes";
 interface TableWrapperProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
+  scrollClassName?: string;
+  scrollLabel?: string;
 }
 
 /**
@@ -14,7 +16,7 @@ interface TableWrapperProps {
  * side has more columns. Scroll edges are tracked in logical terms so the
  * hints sit on the correct side in RTL.
  */
-export default function TableWrapper({ children, footer }: TableWrapperProps) {
+export default function TableWrapper({ children, footer, scrollClassName, scrollLabel }: TableWrapperProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollStart, setCanScrollStart] = useState(false);
   const [canScrollEnd, setCanScrollEnd] = useState(false);
@@ -44,7 +46,7 @@ export default function TableWrapper({ children, footer }: TableWrapperProps) {
   return (
     <div className={tableContainer}>
       <div className="relative">
-        <div ref={scrollRef} className={tableScroll}>
+        <div ref={scrollRef} className={`${tableScroll} ${scrollClassName || ""}`} role={scrollLabel ? "region" : undefined} aria-label={scrollLabel} tabIndex={scrollLabel ? 0 : undefined}>
           {children}
         </div>
         {canScrollStart && (
