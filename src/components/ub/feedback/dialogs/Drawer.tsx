@@ -60,15 +60,15 @@ export default function Drawer({
             aria-describedby={description ? descId : undefined}
             tabIndex={-1}
             className={clsx(
-              "pointer-events-auto flex h-full w-full flex-col border-s border-ub-border-overlay bg-ub-modal shadow-ub-lg outline-none md:w-[480px] md:rounded-s-ub-xl",
-              "transition-transform duration-ub-slow motion-reduce:transition-opacity motion-reduce:duration-ub-fast",
+              "pointer-events-auto flex h-[100dvh] min-w-0 w-full flex-col border-s border-ub-border-overlay bg-ub-modal shadow-ub-lg outline-none md:w-[480px] md:rounded-s-ub-xl",
+              "transition-[transform,opacity] duration-ub-slow motion-reduce:transition-opacity motion-reduce:duration-ub-fast",
               visible
                 ? "translate-x-0 opacity-100 ease-ub-enter"
                 : "ease-ub-exit ltr:translate-x-full rtl:-translate-x-full motion-reduce:translate-x-0 motion-reduce:opacity-0",
               className,
             )}
           >
-            <div className="flex items-start gap-4 border-b border-ub-border px-4 py-4 md:px-6">
+            <div className="flex shrink-0 items-start gap-4 border-b border-ub-border px-4 py-4 md:px-6">
               <div className="min-w-0 flex-1 pt-1.5">
                 <h2 id={titleId} className="text-ub-heading-sm text-ub-text-primary">
                   {title}
@@ -81,9 +81,9 @@ export default function Drawer({
               </div>
               <OverlayCloseButton onClick={onClose} label={closeLabel} />
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5 text-ub-body-md text-ub-text-primary md:px-6">{children}</div>
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-5 text-ub-body-md text-ub-text-primary md:px-6">{children}</div>
             {footer && (
-              <div className="flex flex-wrap items-center justify-end gap-3 border-t border-ub-border bg-ub-modal px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 md:px-6">
+              <div className="grid shrink-0 grid-cols-1 items-center gap-3 border-t border-ub-border bg-ub-modal px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 sm:flex sm:flex-wrap sm:justify-end md:px-6 [&>button]:min-h-[44px]">
                 {footer}
               </div>
             )}

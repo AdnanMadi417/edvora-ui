@@ -24,6 +24,26 @@ const imp = (name: string, path: string) => `import ${name} from "components/ub/
 const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
 
 export const CATALOG: Record<string, CatalogEntry> = {
+  "Program table & filters": {
+    category: "data",
+    imports: ['import KnowledgeHubTable from "features/programs/components/shared/table/KnowledgeHubTable";', 'import ProgramFilterPanel from "features/programs/components/shared/filters/ProgramFilterPanel";'],
+    useFor: "Manage programs with responsive DataTable rows, business amounts, selection and mobile filter drawers.",
+    usedIn: ["Admin Knowledge Hub", "Data-entry Knowledge Hub", "Partner program filters"],
+  },
+  CurrencyButton: {
+    category: "core",
+    imports: [imp("CurrencyButton", "core/buttons/CurrencyButton")],
+    useFor: "Switch the display currency for fees, tuition and commission.",
+    usedIn: ["Program details", "Fee summaries"],
+    avoid: "Editing an amount’s stored currency: use a form select.",
+  },
+  "Program details": {
+    category: "data",
+    imports: ['import ProgramDetails from "features/programs/components/shared/details/ProgramDetails";'],
+    useFor: "Program study details, fees, scholarships and application documents with role-specific actions.",
+    usedIn: ["Admin program details", "Partner program details", "Data-entry program details"],
+    avoid: "Browsing multiple programs: use ProgramCard or the Knowledge Hub table.",
+  },
   ProgramCard: {
     category: "data",
     imports: [imp("ProgramCard", "data/cards/ProgramCard")],

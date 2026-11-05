@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion, type Variants, type Transition } from "framer-motion";
+import { motion, useReducedMotion, type Variants, type Transition } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 
 /**
@@ -47,8 +47,9 @@ type AnimatedTableRowProps = React.ComponentProps<typeof motion.tr>;
  * use popLayout safely there since div/flex elements don't blockify.
  */
 export default function AnimatedTableRow({ children, ...props }: AnimatedTableRowProps) {
+  const reducedMotion = useReducedMotion();
   return (
-    <motion.tr layout variants={ROW_VARIANTS} initial="initial" animate="animate" exit="exit" transition={ROW_TRANSITION} {...props}>
+    <motion.tr layout={!reducedMotion} variants={ROW_VARIANTS} initial={reducedMotion ? false : "initial"} animate="animate" exit="exit" transition={reducedMotion ? { duration: 0 } : ROW_TRANSITION} {...props}>
       {children}
     </motion.tr>
   );

@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { SlidersHorizontal, Globe, GraduationCap, Award, Layers, MonitorSmartphone, X, RotateCcw, EyeOff } from "lucide-react";
-import { MdSchool } from "react-icons/md";
-import { AiOutlineBank } from "react-icons/ai";
-import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
+import React, { useEffect, useMemo, useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
+import SelectInput from "components/ub/forms/selection/SelectInput";
+import Drawer from "components/ub/feedback/dialogs/Drawer";
+import Button from "components/ub/core/buttons/Button";
 import SearchInput from "components/ub/forms/selection/SearchInput";
 import FilterChip from "components/ub/data/badges/FilterChip";
 import SortButton from "features/programs/components/shared/filters/SortButton";
@@ -27,7 +29,9 @@ const CLASS_TYPE_OPTIONS: Option[] = [
   { label: "Online", value: "online" },
 ];
 
-const HIDDEN_OPTIONS: Option[] = [{ label: "Hidden programs only", value: "true" }];
+const HIDDEN_OPTIONS: Option[] = [
+  { label: "Hidden programs only", value: "true" },
+];
 
 export interface ProgramFilterValues {
   state: string;
@@ -101,9 +105,9 @@ export default function ProgramFilterPanel({
   resultsCount,
   children,
 }: ProgramFilterPanelProps) {
+  const reducedMotion = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<ProgramFilterValues>(filters);
-  const ref = useRef<HTMLDivElement>(null);
 
   const close = () => setOpen(false);
 
@@ -120,21 +124,6 @@ export default function ProgramFilterPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, filtersKey]);
 
-  useEffect(() => {
-    const onMouse = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) close();
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-    };
-    document.addEventListener("mousedown", onMouse);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onMouse);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, []);
-
   const activeFilterCount = [
     filters.state !== "all",
     filters.field !== "all",
@@ -147,14 +136,40 @@ export default function ProgramFilterPanel({
   ].filter(Boolean).length;
 
   const chips: { key: keyof ProgramFilterValues; label: string }[] = [];
-  if (filters.state !== "all") chips.push({ key: "state", label: findLabel(stateOptions, filters.state) });
-  if (filters.field !== "all") chips.push({ key: "field", label: findLabel(fieldOptions, filters.field) });
-  if (filters.university !== "all") chips.push({ key: "university", label: findLabel(universityOptions, filters.university) });
-  if (filters.qualId !== null) chips.push({ key: "qualId", label: findLabel(qualificationOptions, filters.qualId) });
-  if (filters.scholarship !== "all") chips.push({ key: "scholarship", label: findLabel(SCHOLARSHIP_OPTIONS, filters.scholarship) });
-  if (filters.courseType !== "all") chips.push({ key: "courseType", label: findLabel(COURSE_TYPE_FILTER_OPTIONS, filters.courseType) });
-  if (filters.classType !== "all") chips.push({ key: "classType", label: findLabel(CLASS_TYPE_OPTIONS, filters.classType) });
-  if (showHiddenFilter && (filters.hidden ?? "all") !== "all") chips.push({ key: "hidden", label: findLabel(HIDDEN_OPTIONS, filters.hidden ?? "all") });
+  if (filters.state !== "all")
+    chips.push({ key: "state", label: findLabel(stateOptions, filters.state) });
+  if (filters.field !== "all")
+    chips.push({ key: "field", label: findLabel(fieldOptions, filters.field) });
+  if (filters.university !== "all")
+    chips.push({
+      key: "university",
+      label: findLabel(universityOptions, filters.university),
+    });
+  if (filters.qualId !== null)
+    chips.push({
+      key: "qualId",
+      label: findLabel(qualificationOptions, filters.qualId),
+    });
+  if (filters.scholarship !== "all")
+    chips.push({
+      key: "scholarship",
+      label: findLabel(SCHOLARSHIP_OPTIONS, filters.scholarship),
+    });
+  if (filters.courseType !== "all")
+    chips.push({
+      key: "courseType",
+      label: findLabel(COURSE_TYPE_FILTER_OPTIONS, filters.courseType),
+    });
+  if (filters.classType !== "all")
+    chips.push({
+      key: "classType",
+      label: findLabel(CLASS_TYPE_OPTIONS, filters.classType),
+    });
+  if (showHiddenFilter && (filters.hidden ?? "all") !== "all")
+    chips.push({
+      key: "hidden",
+      label: findLabel(HIDDEN_OPTIONS, filters.hidden ?? "all"),
+    });
 
   const handleApply = () => {
     onApplyFilters(draft);
@@ -167,179 +182,146 @@ export default function ProgramFilterPanel({
     close();
   };
 
+  const fields = [
+    {
+      key: "state",
+      label: "Location",
+      options: stateOptions,
+      placeholder: "All locations",
+    },
+    {
+      key: "field",
+      label: "Field of study",
+      options: fieldOptions,
+      placeholder: "All fields",
+    },
+    {
+      key: "university",
+      label: "University",
+      options: universityOptions,
+      placeholder: "All universities",
+    },
+    {
+      key: "qualId",
+      label: "Qualification",
+      options: qualificationOptions,
+      placeholder: "All qualifications",
+    },
+    {
+      key: "scholarship",
+      label: "Scholarship",
+      options: SCHOLARSHIP_OPTIONS,
+      placeholder: "All scholarships",
+    },
+    {
+      key: "courseType",
+      label: "Course type",
+      options: COURSE_TYPE_FILTER_OPTIONS,
+      placeholder: "All course types",
+    },
+    {
+      key: "classType",
+      label: "Delivery mode",
+      options: CLASS_TYPE_OPTIONS,
+      placeholder: "All delivery modes",
+    },
+    ...(showHiddenFilter
+      ? [
+          {
+            key: "hidden",
+            label: "Visibility",
+            options: HIDDEN_OPTIONS,
+            placeholder: "Visible programs",
+          },
+        ]
+      : []),
+  ];
+
   return (
-    <div className="flex flex-col gap-3">
-      {/* Search on its own row, filters/sort/results on a second row —
-          mobile only. sm:contents unwraps each row div at that breakpoint
-          so its children rejoin the outer sm:flex-row as one row, same as
-          before this split (desktop is unchanged). */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
-      <div className="flex items-center gap-3 sm:contents">
+    <div className="flex min-w-0 flex-col gap-4">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <SearchInput
           value={searchTerm}
           onChange={onSearchChange}
           placeholder={searchPlaceholder}
-          className="flex-1"
+          className="min-w-0 flex-1 sm:min-w-[220px]"
         />
-      </div>
-
-      <div className="flex items-center gap-4 sm:contents">
-        <div className="relative flex-1 sm:flex-none" ref={ref}>
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-haspopup="true"
-            className={`relative flex h-10 w-full items-center justify-center gap-2 rounded-lg border px-4 text-sm font-medium transition sm:w-auto ${
-              open
-                ? "border-blue-300 bg-blue-50 text-blue-700"
-                : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-            }`}
-          >
-            <SlidersHorizontal className="h-4 w-4" />
-            Filters
-            {activeFilterCount > 0 && (
-              <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-xs font-bold text-white">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-
-          {open && (
-            <>
-              {/* Mobile backdrop for the bottom-sheet variant */}
-              <div className="fixed inset-0 z-[90] bg-black/30 sm:hidden" onClick={close} />
-
-              <div
-                role="dialog"
-                aria-label="Filters"
-                className="fixed inset-x-0 bottom-0 z-[100] max-h-[80vh] overflow-y-auto rounded-t-2xl border-t border-slate-200 bg-white p-5 shadow-2xl sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-[calc(100vh-120px)] sm:w-[420px] sm:rounded-xl sm:border sm:shadow-xl"
-              >
-                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                  <h4 className="text-sm font-semibold text-slate-900">Filters</h4>
-                  <button type="button" onClick={close} className="text-slate-400 hover:text-slate-600 sm:hidden">
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-
-                <div className="flex flex-col gap-3 py-4">
-                  <FilterSelectField
-                    value={draft.state}
-                    onChange={(val: string) => setDraft((d) => ({ ...d, state: val }))}
-                    options={stateOptions}
-                    icon={Globe}
-                    defaultOption="All Locations"
-                  />
-                  <FilterSelectField
-                    value={draft.field}
-                    onChange={(val: string) => setDraft((d) => ({ ...d, field: val }))}
-                    options={fieldOptions}
-                    icon={MdSchool}
-                    defaultOption="All Fields"
-                  />
-                  <FilterSelectField
-                    value={draft.university}
-                    onChange={(val: string) => setDraft((d) => ({ ...d, university: val }))}
-                    options={universityOptions}
-                    icon={AiOutlineBank}
-                    defaultOption="All Universities"
-                  />
-                  <FilterSelectField
-                    value={draft.qualId ?? "all"}
-                    onChange={(val: string) => setDraft((d) => ({ ...d, qualId: val === "all" ? null : val }))}
-                    options={qualificationOptions}
-                    icon={GraduationCap}
-                    defaultOption="All Qualifications"
-                  />
-                  <FilterSelectField
-                    value={draft.scholarship}
-                    onChange={(val: string) => setDraft((d) => ({ ...d, scholarship: val }))}
-                    options={SCHOLARSHIP_OPTIONS}
-                    icon={Award}
-                    defaultOption="All Scholarships"
-                  />
-                  <FilterSelectField
-                    value={draft.courseType}
-                    onChange={(val: string) => setDraft((d) => ({ ...d, courseType: val }))}
-                    options={COURSE_TYPE_FILTER_OPTIONS}
-                    icon={Layers}
-                    defaultOption="All Course Types"
-                  />
-                  <FilterSelectField
-                    value={draft.classType}
-                    onChange={(val: string) => setDraft((d) => ({ ...d, classType: val }))}
-                    options={CLASS_TYPE_OPTIONS}
-                    icon={MonitorSmartphone}
-                    defaultOption="All Delivery Modes"
-                  />
-                  {showHiddenFilter && (
-                    <FilterSelectField
-                      value={draft.hidden ?? "all"}
-                      onChange={(val: string) => setDraft((d) => ({ ...d, hidden: val }))}
-                      options={HIDDEN_OPTIONS}
-                      icon={EyeOff}
-                      defaultOption="Visible programs"
-                    />
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
-                  <button
-                    type="button"
-                    onClick={handleReset}
-                    className="flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-slate-700"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" />
-                    Reset
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleApply}
-                    className="rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-                  >
-                    Apply
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
+        <div className="grid grid-cols-2 gap-3 sm:flex sm:items-center">
+          <Button
+            onClick={() => setOpen(true)}
+            variant="secondary"
+            icon={<SlidersHorizontal className="h-4 w-4" />}
+            text={
+              activeFilterCount ? `Filters (${activeFilterCount})` : "Filters"
+            }
+            className="min-h-[44px]"
+          />
+          <SortButton value={sortBy} onChange={onSortChange} />
         </div>
-
-        <SortButton value={sortBy} onChange={onSortChange} />
-
         {resultsCount !== undefined && (
-          <span className="hidden shrink-0 items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 sm:inline-flex">
-            {resultsCount.toLocaleString()}
-            <span className="font-normal text-blue-500">results</span>
-          </span>
+          <p role="status" className="text-ub-label-sm text-ub-text-secondary">
+            {resultsCount.toLocaleString()} programs
+          </p>
         )}
       </div>
-      </div>
-
-      {chips.length > 0 && (
-        // Mobile: one scrollable row (chips are shrink-0/nowrap so they
-        // stay compact pills instead of each claiming a near-full-width
-        // row) — several active filters were stacking one per line and
-        // eating most of the visible screen before any results appeared.
-        // Desktop keeps the original wrapping layout, where there's
-        // enough width for that to look fine.
-        <div className="-mx-6 flex items-center gap-2 overflow-x-auto px-6 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
-          {chips.map((chip) => (
-            <FilterChip key={chip.key} label={chip.label} onRemove={() => onRemoveFilter(chip.key)} />
-          ))}
-          {chips.length >= 2 && (
-            <button
-              type="button"
-              onClick={onClearAll}
-              className="shrink-0 whitespace-nowrap text-sm font-medium text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline"
-            >
-              Clear all
-            </button>
-          )}
-        </div>
-      )}
-
+      <AnimatePresence initial={false}>
+        {chips.length > 0 && <motion.div key="filters" initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: reducedMotion ? 0 : MICRO_DURATION, ease: EASE }}>
+          <div className="flex flex-nowrap items-center gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+            <AnimatePresence initial={false}>
+              {chips.map((chip) => <motion.div key={chip.key} layout={!reducedMotion} initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: reducedMotion ? 1 : 0.95 }} transition={{ duration: reducedMotion ? 0 : MICRO_DURATION, ease: EASE }} className="shrink-0">
+                <FilterChip label={chip.label} onRemove={() => onRemoveFilter(chip.key)} />
+              </motion.div>)}
+            </AnimatePresence>
+            <Button size="sm" variant="tertiary" text="Clear filters" onClick={onClearAll} className="shrink-0" />
+          </div>
+        </motion.div>}
+      </AnimatePresence>
       {children}
+      <Drawer
+        open={open}
+        onClose={close}
+        title="Filter programs"
+        description="Narrow the Knowledge Hub by university, qualification and study preferences."
+        footer={
+          <div className="grid w-full grid-cols-2 gap-3">
+            <Button
+              variant="secondary"
+              text="Clear filters"
+              onClick={handleReset}
+              className="min-h-[44px]"
+            />
+            <Button
+              variant="primary"
+              text="Apply filters"
+              onClick={handleApply}
+              className="min-h-[44px]"
+            />
+          </div>
+        }
+      >
+        <div className="space-y-5">
+          {fields.map(({ key, label, options, placeholder }, index) => (
+            <motion.div key={key} initial={reducedMotion ? false : { opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reducedMotion ? 0 : MICRO_DURATION, delay: reducedMotion ? 0 : index * 0.025, ease: EASE }}>
+              <p className="mb-2 text-ub-label-md text-ub-text-primary">
+                {label}
+              </p>
+              <SelectInput
+                className="min-h-[44px]"
+                field={key}
+                aria-label={label}
+                options={[{ value: "all", label: placeholder }, ...options]}
+                formData={{ ...draft, qualId: draft.qualId ?? "all" }}
+                updateFormData={(_, value) =>
+                  setDraft((previous) => ({
+                    ...previous,
+                    [key]: key === "qualId" && value === "all" ? null : value,
+                  }))
+                }
+              />
+            </motion.div>
+          ))}
+        </div>
+      </Drawer>
     </div>
   );
 }

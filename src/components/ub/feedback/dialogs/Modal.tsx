@@ -65,9 +65,15 @@ export function useOverlay({ open, onClose, panelRef, initialFocusRef, closeOnEs
     if (open) {
       openerRef.current = (document.activeElement as HTMLElement) ?? null;
       setPresent(true);
-      // Next frame, so the "from" state paints before the transition starts.
-      const raf = requestAnimationFrame(() => setVisible(true));
-      return () => cancelAnimationFrame(raf);
+      // Let the mounted panel paint its initial position before entering.
+      let enterFrame = 0;
+      const mountFrame = requestAnimationFrame(() => {
+        enterFrame = requestAnimationFrame(() => setVisible(true));
+      });
+      return () => {
+        cancelAnimationFrame(mountFrame);
+        cancelAnimationFrame(enterFrame);
+      };
     }
     setVisible(false);
     const t = window.setTimeout(() => setPresent(false), OVERLAY_EXIT_MS);

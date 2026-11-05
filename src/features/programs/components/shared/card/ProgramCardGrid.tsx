@@ -220,7 +220,7 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
 
           {!programsError && programs.length > 0 && (
             <div className="block">
-              <div className={`grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3 transition-opacity duration-150 ${programsFetching && !programsLoading ? "opacity-50 pointer-events-none" : ""}`}>
+              <div className={`grid grid-cols-1 gap-4 p-3 sm:p-6 md:grid-cols-2 lg:grid-cols-3 transition-opacity duration-150 ${programsFetching && !programsLoading ? "opacity-50 pointer-events-none" : ""}`}>
                 {programs.map((program) => (
                   <ProgramCard
                     key={program.id}
@@ -243,7 +243,7 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
 
               <div className="grid grid-cols-1 items-center gap-4 border-t border-slate-200 p-4 sm:p-6 md:flex md:justify-between">
                 {total > 0 && (
-                  <div className="flex items-center gap-1 text-sm font-medium text-slate-500">
+                  <div className="flex flex-wrap items-center gap-1 text-sm font-medium text-slate-500">
                     Showing
                     <span className="font-medium">
                       {(currentPage - 1) * ITEMS_PER_PAGE + 1}
@@ -258,7 +258,7 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                   </div>
                 )}
 
-                <div className="flex justify-end gap-2">
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end">
                   <PrevButton
                     onClick={() =>
                       setCurrentPage((prev) => Math.max(prev - 1, 1))

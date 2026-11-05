@@ -23,7 +23,9 @@ import { useAllFields } from "features/knowledge-hub/field-of-study/hooks";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
 import { useUniversities } from "features/universities/hooks";
 
-import Link from "next/link";
+import LinkBtn from "components/ub/core/buttons/LinkBtn";
+import Button from "components/ub/core/buttons/Button";
+import Drawer from "components/ub/feedback/dialogs/Drawer";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import ProgramFilterPanel from "features/programs/components/shared/filters/ProgramFilterPanel";
 import KnowledgeHubTable from "features/programs/components/shared/table/KnowledgeHubTable";
@@ -240,24 +242,34 @@ const DataEntryProgramsTable = () => {
     setCurrentPage(1);
   };
 
+  const bulkActions = (<div className="flex flex-wrap items-center gap-2">
+            <Button variant="secondary" size="sm" text="Bulk update" icon={<Settings className="h-4 w-4" />} onClick={() => setIsBulkMenuOpen(true)} />
+            <Drawer open={isBulkMenuOpen} onClose={() => setIsBulkMenuOpen(false)} title="Bulk update programs" description={`${selectedCount} programs selected. Choose what to update.`}>
+              <div className="flex flex-col gap-3">{[
+                        { label: "Commission", icon: Pencil, onClick: () => setActiveModal("commission") },
+                        { label: "IELTS Scores", icon: ClipboardCheck, onClick: () => setActiveModal("ielts") },
+                        { label: "Intakes", icon: CalendarDays, onClick: () => setActiveModal("intakes") },
+                        { label: "Scholarship", icon: Sliders, onClick: () => setActiveModal("scholarship") },
+                        { label: "Delete Scholarships", icon: Trash2, onClick: () => setActiveModal("deleteScholarships") },
+                        { label: "Tuition Fees", icon: DollarSign, onClick: () => setActiveModal("fees") },
+                        { label: "Visa Fee", icon: DollarSign, onClick: () => setActiveModal("visaFee") },
+                        ...(sharedUniversityId ? [{ label: "Branch", icon: GitBranch, onClick: () => setActiveModal("branch") }] : []),
+                      ].map(({ label, icon: Icon, onClick }) => <Button key={label} variant="secondary" text={label} icon={<Icon className="h-4 w-4" />} onClick={() => { onClick(); setIsBulkMenuOpen(false); }} className="min-h-[44px] justify-start" />)}</div>
+            </Drawer>
+          </div>);
+
   return (
-    <div className="mt-6 text-p2 rounded-lg border border-slate-200 bg-white">
+    <div className="mt-6 min-w-0 rounded-ub-lg border border-ub-border bg-ub-surface text-ub-body-md">
 
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 border-b border-ub-border">
         <div>
           <p className="mt-1 text-sm text-slate-500">Explore and manage all programs, universities, and learning resources</p>
         </div>
-        <Link
-          href="/data-entry/knowledge-hub/create"
-          className="flex items-center justify-center gap-2 rounded-lg border border-blue-600 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition hover:border-blue-700 hover:text-blue-800"
-        >
-          <Plus className="h-4 w-4" />
-          Create Program
-        </Link>
+        <LinkBtn href="/data-entry/knowledge-hub/create" variant="primary" icon={<Plus className="h-4 w-4" />} label="Create program" className="min-h-[44px]" />
       </div>
 
-      <div className="p-6 border-b border-slate-200">
+      <div className="p-4 sm:p-6 border-b border-ub-border">
 
         {/* Filters */}
         <ProgramFilterPanel
@@ -307,65 +319,16 @@ const DataEntryProgramsTable = () => {
           resultsCount={total}
         >
           {/* Bulk operations */}
-          {selectedCount > 0 && (
-            <div className="flex items-center gap-2 rounded-lg border border-slate-100 bg-slate-50/60 px-3 py-1.5">
-              <span className="flex items-center gap-1.5 text-sm font-semibold text-slate-700">
-                <CheckCircle className="h-4 w-4" />
-                {selectedCount} selected
-              </span>
-
-              <div className="mx-1 h-4 w-px bg-slate-200" />
-
-              <div className="relative">
-                <button
-                  onClick={() => setIsBulkMenuOpen((prev) => !prev)}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition ${isBulkMenuOpen ? "bg-white text-blue-700 shadow-sm" : "text-slate-600 hover:bg-white hover:text-blue-700 hover:shadow-sm"}`}
-                >
-                  <Settings className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Bulk Update</span>
-                  <svg className={`h-3 w-3 transition-transform ${isBulkMenuOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-
-                {isBulkMenuOpen && (
-                  <>
-                    <div className="fixed inset-0 z-[90]" onClick={() => setIsBulkMenuOpen(false)} />
-                    <div className="absolute left-0 top-full z-[100] mt-2 w-52 rounded-lg border border-slate-100 bg-white p-1.5 shadow-xl shadow-slate-200/60">
-                      {[
-                        { label: "Commission", icon: <Pencil className="h-3.5 w-3.5 text-blue-600" />, bg: "bg-blue-50", onClick: () => setActiveModal("commission") },
-                        { label: "IELTS Scores", icon: <ClipboardCheck className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("ielts") },
-                        { label: "Intakes", icon: <CalendarDays className="h-3.5 w-3.5 text-emerald-600" />, bg: "bg-emerald-50", onClick: () => setActiveModal("intakes") },
-                        { label: "Scholarship", icon: <Sliders className="h-3.5 w-3.5 text-amber-600" />, bg: "bg-amber-50", onClick: () => setActiveModal("scholarship") },
-                        { label: "Delete Scholarships", icon: <Trash2 className="h-3.5 w-3.5 text-red-600" />, bg: "bg-red-50", onClick: () => setActiveModal("deleteScholarships") },
-                        { label: "Tuition Fees", icon: <DollarSign className="h-3.5 w-3.5 text-green-600" />, bg: "bg-green-50", onClick: () => setActiveModal("fees") },
-                        { label: "Visa Fee", icon: <DollarSign className="h-3.5 w-3.5 text-indigo-600" />, bg: "bg-indigo-50", onClick: () => setActiveModal("visaFee") },
-                        ...(sharedUniversityId ? [{ label: "Branch", icon: <GitBranch className="h-3.5 w-3.5 text-violet-600" />, bg: "bg-violet-50", onClick: () => setActiveModal("branch") }] : []),
-                      ].map(({ label, icon, bg, onClick }) => (
-                        <button
-                          key={label}
-                          onClick={() => { onClick(); setIsBulkMenuOpen(false); }}
-                          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50"
-                        >
-                          <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${bg}`}>{icon}</span>
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-          </div>
-        )}
       </ProgramFilterPanel>
 
       </div>
 
       <div>
 
-        <div className="p-6">
+        <div className="min-w-0 p-3 sm:p-6">
 
           <KnowledgeHubTable
+            bulkActions={bulkActions}
             programs={programs}
             loading={loading}
             isFetching={isFetching}

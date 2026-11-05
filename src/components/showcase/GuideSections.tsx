@@ -18,7 +18,10 @@ import NewScreenParts from "./sections/NewScreenParts";
 import ApplicationKit from "./sections/ApplicationKit";
 import PopupForms from "./patterns/PopupForms";
 import TableOptions from "./sections/TableOptions";
+import ProgramTableDemo from "./patterns/ProgramTableDemo";
 import ProgramCards from "./sections/ProgramCards";
+import CurrencyButtons from "./sections/CurrencyButtons";
+import ProgramDetailsDemo from "./patterns/ProgramDetailsDemo";
 import ApplicationFormDemo from "./patterns/ApplicationFormDemo";
 import { ApplicationDetailsDemo } from "./patterns/ApplicationDetailsPattern";
 import { AdvisorProfileDemo } from "./patterns/AdvisorProfileDemo";
@@ -34,6 +37,7 @@ export function ButtonsSection() {
       <Pick demos={["Button", "IconButton", "PillButton", "NextButton / PrevButton", "LinkBtn", "ApproveRejectToggle", "ActionsDropdown"]}>
         <LegacyButtons />
       </Pick>
+      <CurrencyButtons />
       <Pick demos={["TextButton", "ButtonGroup"]}>
         <NewCoreForms />
       </Pick>
@@ -143,6 +147,7 @@ export function ContentSection() {
         <ApplicationFormDemo />
       </Pick>
       <ProgramCards />
+      <ProgramDetailsDemo />
       <ApplicationDetailsDemo />
       <AdvisorProfileDemo />
     </ShowcaseSection>
@@ -211,6 +216,7 @@ export function TablesSection() {
       title="Tables"
       description="Tables for managing records: sorting, selecting rows and acting on them in bulk. Rows are 56px (44px compact), amounts are right-aligned with tabular numerals, and below 768px rows stack."
     >
+      <ProgramTableDemo />
       <Pick demos={["Table: Standard", "Table: Selectable", "Table: Card list", "DataTableToolbar"]}>
         <TableOptions />
       </Pick>

@@ -1,165 +1,70 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
-  CreditCard,
-  Banknote,
-  Calendar,
-  CircleDollarSign,
-  Award,
-  GraduationCap,
-  Building2,
-  FileText,
-  ChevronLeft,
-  Copy,
-  Globe,
-  MapPin,
-  BookOpen,
-  Languages,
-  Clock,
-  Pencil,
+  ArrowLeft,
   CopyPlus,
-  MoreVertical,
-  Trash2,
-  Layers,
   Eye,
   EyeOff,
+  Pencil,
+  Send,
+  Trash2,
 } from "lucide-react";
-
-import { useProgram, useCopyTargetBranches, useDeletePrograms, useSetProgramHidden } from "features/programs/hooks";
-import { getIeltsLabel } from "constants/lists";
-
-import Link from "next/link";
-import Loading from "components/ub/feedback/states/Loading";
-import CatalogueQuotaNotice from "features/programs/components/shared/CatalogueQuotaNotice";
-import PresignedImage from "components/ub/data/media/PresignedImage";
-import Button from "components/ub/core/buttons/Button";
-import RichTextDisplay from "components/ub/data/display/RichTextDisplay";
-import CurrencySelector from "features/programs/components/shared/CurrencySelector";
-import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
-import CopyProgramToBranch from "features/programs/components/admin/popups/CopyProgramToBranch";
-import DeleteProgramsConfirmation from "features/programs/components/admin/popups/DeleteProgramsConfirmation";
-import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import {
+  useProgram,
+  useCopyTargetBranches,
+  useDeletePrograms,
+  useSetProgramHidden,
+} from "features/programs/hooks";
+import {
+  nextIntakeMonth,
+  resolveIntakeDate,
+} from "features/programs/utils/intakeMonths";
 import { parseApiError } from "utils/parseApiError";
-import { getCurrencyOptions, formatMoney as formatMoneyRate, formatCommission as formatCommissionRate, formatFeeAmount } from "features/programs/utils/exchangeRate";
-import { monthLabel, nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
-import { courseTypeLabel } from "features/programs/utils/courseType";
-
-type RequiredDocument = {
-  id: string;
-  type: string;
-  description: string;
-  is_required_for_init: boolean | null;
-  is_required_init_app_doc: boolean;
-};
-
-function DocumentsSection({ requiredDocuments }: { requiredDocuments: RequiredDocument[] }) {
-  const [showOptional, setShowOptional] = useState(false);
-  const isReq = (d: RequiredDocument) => d.is_required_for_init ?? d.is_required_init_app_doc;
-  const required = requiredDocuments.filter(isReq);
-  const optional = requiredDocuments.filter((d) => !isReq(d));
-
-  return (
-    <div className="p-6 border-b border-slate-200">
-      <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
-        <div className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
-              <FileText className="h-5 w-5 text-blue-600" />
-            </div>
-            <h4 className="text-base font-bold text-slate-900">Required Documents</h4>
-          </div>
-
-          {!requiredDocuments.length ? (
-            <p className="mt-6 text-sm text-slate-400">No documents configured for this program.</p>
-          ) : (
-            <div className="mt-6 space-y-3">
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                {required.map((doc) => (
-                  <div key={doc.id} className="flex items-center gap-3 rounded-lg border border-slate-100 bg-white px-4 py-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                      <FileText className="h-5 w-5 text-slate-400" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex min-w-0 items-center gap-2">
-                        <p className="truncate text-sm font-bold text-slate-900">{doc.type}</p>
-                        <span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-700">
-                          Required
-                        </span>
-                      </div>
-                      {doc.description && <p className="mt-0.5 text-xs text-slate-400">{doc.description}</p>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {optional.length > 0 && (
-                <div className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
-                  <div>
-                    <p className="text-sm font-medium text-slate-700">Optional Documents</p>
-                    <p className="text-xs text-slate-400">{optional.length} document{optional.length !== 1 ? "s" : ""} available</p>
-                  </div>
-                  <button
-                    type="button"
-                    role="switch"
-                    aria-checked={showOptional}
-                    onClick={() => setShowOptional((v) => !v)}
-                    className={`relative h-6 w-11 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${showOptional ? "bg-blue-600" : "bg-slate-300"}`}
-                  >
-                    <span className={`absolute top-1 left-1 h-4 w-4 rounded-full bg-white shadow transition-transform duration-200 ${showOptional ? "translate-x-5" : "translate-x-0"}`} />
-                  </button>
-                </div>
-              )}
-
-              {showOptional && (
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                  {optional.map((doc) => (
-                    <div key={doc.id} className="flex items-center gap-3 rounded-lg border border-slate-100 bg-white px-4 py-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                        <FileText className="h-5 w-5 text-slate-400" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex min-w-0 items-center gap-2">
-                          <p className="truncate text-sm font-bold text-slate-900">{doc.type}</p>
-                          <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-slate-500">
-                            Optional
-                          </span>
-                        </div>
-                        {doc.description && <p className="mt-0.5 text-xs text-slate-400">{doc.description}</p>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+import Button from "components/ub/core/buttons/Button";
+import Loading from "components/ub/feedback/states/Loading";
+import EmptyData from "components/ub/feedback/states/EmptyData";
+import { buttonBase, buttonSizes, buttonVariants } from "components/ub/recipes";
+import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import CatalogueQuotaNotice from "../CatalogueQuotaNotice";
+import CopyProgramToBranch from "../../admin/popups/CopyProgramToBranch";
+import DeleteProgramsConfirmation from "../../admin/popups/DeleteProgramsConfirmation";
+import ProgramDetailsView from "./ProgramDetailsView";
 
 interface ProgramDetailsProps {
   id: string;
   basePath?: string;
   showApplyAction?: boolean;
-  /** When set, shows an "Edit Program" button linking here — for roles
-   * (e.g. data entry) that can edit but shouldn't see the Apply action. */
+  /** Enables management actions for admin and data-entry views. */
   editPath?: string;
 }
 
-const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, editPath }: ProgramDetailsProps) => {
+export default function ProgramDetails({
+  id,
+  basePath = "/partner",
+  showApplyAction = true,
+  editPath,
+}: ProgramDetailsProps) {
   const router = useRouter();
-  const handleBack = () => router.push(`${basePath}/knowledge-hub/`);
-
-  const { program, requiredDocuments, commission, exchangeRates, loading, error, quota } = useProgram(id);
-  const [copied, setCopied] = useState(false);
+  const { showToast } = useToast();
+  const {
+    program,
+    requiredDocuments,
+    commission,
+    exchangeRates,
+    loading,
+    error,
+    quota,
+  } = useProgram(id);
   const [isCopyOpen, setIsCopyOpen] = useState(false);
-  const [currency, setCurrency] = useState<string | null>(null);
-
-  // The copy action only ever renders under `showActions` below — skip its
-  // fetches entirely for viewers (e.g. partners) who can't see the button.
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [hiddenOverride, setHiddenOverride] = useState<boolean | null>(null);
+  const { deletePrograms } = useDeletePrograms();
+  const { setProgramHidden, loading: isTogglingHidden } = useSetProgramHidden();
+  const isHidden = hiddenOverride ?? program?.is_hidden ?? false;
   const copyTargets = useCopyTargetBranches({
     programId: program?.id ?? "",
     programName: program?.name ?? "",
@@ -168,628 +73,144 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
     currentBranchId: program?.branch?.id,
     enabled: !!editPath,
   });
-  const copyDisabled = !!editPath && !copyTargets.loading && copyTargets.emptyReason !== null;
+  const copyDisabled = copyTargets.loading || copyTargets.emptyReason !== null;
   const copyDisabledReason =
     copyTargets.emptyReason === "single"
       ? "This university has only one branch"
       : copyTargets.emptyReason === "all-taken"
       ? "This program is already in every other branch"
       : undefined;
+  const back = () => router.push(`${basePath}/knowledge-hub`);
 
-  // Admin-style Actions dropdown, shown only for the management view
-  // (data-entry passes `editPath`; the partner view does not).
-  const showActions = !!editPath;
-  const { showToast } = useToast();
-  const { deletePrograms } = useDeletePrograms();
-  const [openActions, setOpenActions] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const { setProgramHidden, loading: isTogglingHidden } = useSetProgramHidden();
-  // Local override so the badge/button flip immediately without refetching
-  // (which would flash the whole page back to its loading state).
-  const [hiddenOverride, setHiddenOverride] = useState<boolean | null>(null);
-  const isHidden = hiddenOverride ?? program?.is_hidden ?? false;
-
-  const handleToggleHidden = async () => {
+  const toggleHidden = async () => {
     if (!program) return;
-    const nextHidden = !isHidden;
     try {
-      await setProgramHidden(program.id, nextHidden);
-      setHiddenOverride(nextHidden);
-      showToast(nextHidden ? "Program hidden" : "Program is visible again", "success");
+      await setProgramHidden(program.id, !isHidden);
+      setHiddenOverride(!isHidden);
+      showToast(
+        isHidden ? "Program is visible again" : "Program hidden",
+        "success"
+      );
     } catch (err: unknown) {
-      showToast(parseApiError(err, nextHidden ? "Failed to hide program" : "Failed to unhide program"), "error");
+      showToast(
+        parseApiError(err, "Failed to update program visibility"),
+        "error"
+      );
     }
   };
-
-  const handleUpdate = () => {
-    if (editPath) router.push(editPath);
-  };
-  const handleDelete = async () => {
+  const deleteProgram = async () => {
     if (!program) return;
+    setIsDeleting(true);
     try {
-      setIsDeleting(true);
       await deletePrograms([program.id]);
       showToast("Deleted successfully", "success");
       setIsDeleteOpen(false);
-      router.push(`${basePath}/knowledge-hub`);
+      back();
     } catch (err: unknown) {
-      showToast(`Delete failed. ${parseApiError(err, "Please try again.")}`, "error");
+      showToast(parseApiError(err, "Delete failed"), "error");
     } finally {
       setIsDeleting(false);
     }
   };
 
-  const currencyOptions = getCurrencyOptions(exchangeRates);
-  const formatMoney = (fee: number | string) => formatMoneyRate(fee, currency, exchangeRates);
-  const formatCommission = (amount: number, curr?: string | null) => formatCommissionRate(amount, curr, currency, exchangeRates);
-  const formatFee = (fee: number | string, feeCurrency?: string | null) => formatFeeAmount(fee, feeCurrency, currency, exchangeRates);
-
-  const getOrdinal = (n: number) => {
-    const s = ["th", "st", "nd", "rd"];
-    const v = n % 100;
-    return n + (s[(v - 20) % 10] || s[v] || s[0]);
-  };
-
-  const formatMonth = (dateStr: string) => {
-    try {
-      return new Date(dateStr).toLocaleString("en-US", { month: "short" });
-    } catch {
-      return dateStr;
-    }
-  };
-
-  const handleCopyAll = async () => {
-    const lines: string[] = [];
-
-    lines.push(program?.university?.name ?? "");
-    lines.push(program?.name ?? "");
-    lines.push("");
-
-    if (program?.duration) lines.push(`Duration: ${program.duration} year(s)`);
-    if (program?.english_required_score) lines.push(`English requirement: IELTS ${getIeltsLabel(program.english_required_score)}`);
-    lines.push("");
-
-    if (program?.intake_months && program.intake_months.length > 0) {
-      const months = [...program.intake_months].sort((a, b) => a - b).map((m) => monthLabel(m));
-      lines.push(`Intake: ${months.join(" / ")}`);
-    }
-    lines.push("");
-
-    lines.push("Course fee for international students");
-    lines.push("");
-    lines.push("Yearly Tuition fees");
-    lines.push("");
-
-    [...(program?.yearly_fees ?? [])].sort((a, b) => a.year - b.year).forEach((item) => {
-      lines.push(`${getOrdinal(item.year)} year: ${formatFee(item.fee, program?.yearly_fee_currency)}`);
-    });
-
-    lines.push("");
-    lines.push("");
-    lines.push("Other fees");
-    lines.push("");
-
-    (program?.one_time_fees ?? []).forEach((item) => {
-      lines.push(`${item.description ?? "Fee"} : ${formatFee(item.fee, item.currency)}`);
-    });
-
-    lines.push("");
-    lines.push("University fees for this course exclude 6% tax (SST)");
-
-    await navigator.clipboard.writeText(lines.join("\n"));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
   if (loading) return <Loading text="Loading program details..." />;
   if (quota) return <CatalogueQuotaNotice quota={quota} />;
-  if (error || !program) return <div className="mt-10 text-center text-sm text-slate-500">{error ?? "Program not found."}</div>;
+  if (error || !program)
+    return (
+      <EmptyData
+        title="Program unavailable"
+        subtitle={error || "This program could not be found."}
+        action={<Button onClick={back} text="Back to programs" />}
+      />
+    );
 
+  const month =
+    program.next_intake_month ??
+    nextIntakeMonth(program.intake_months) ??
+    nextIntakeMonth(program.university.intake_months);
   return (
-    <div className="mt-6">
-
-      <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
-
-        {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-3 p-6 border-b border-slate-200">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="relative shrink-0">
-              <div className="h-11 w-11 overflow-hidden rounded-full ring-2 ring-slate-200 ring-offset-2 shadow-sm">
-                <PresignedImage
-                  fileKey={program.university?.logo_file_key}
-                  alt={program.university?.name}
-                  className="h-full w-full object-cover"
-                  fallback={
-                    <div className="flex h-full w-full items-center justify-center bg-blue-50 text-sm font-bold text-blue-700">
-                      {program.university?.name ? program.university.name.slice(0, 2).toUpperCase() : <Building2 className="h-5 w-5 text-blue-700" />}
-                    </div>
-                  }
-                />
-              </div>
-              <span className={`absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full border-2 border-white ${program.university?.is_active ? "bg-emerald-500" : "bg-red-500"}`} />
-            </div>
-
-            <div className="min-w-0">
-              <h3 className="truncate text-sm font-semibold text-slate-900 sm:text-base">
-                {program?.name ?? "Not Provided"}
-              </h3>
-              {showActions && isHidden && (
-                <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-amber-200">
-                  <EyeOff className="h-3 w-3" />
-                  Hidden
-                </span>
-              )}
-              <p className="mt-0.5 flex items-center gap-1 text-xs text-slate-500 sm:text-sm">
-                <Building2 className="h-3.5 w-3.5 shrink-0" />
-                {program?.university?.name ?? "Not Provided"}
-              </p>
-            </div>
-          </div>
-
-          {showActions && (
-            <div className="flex shrink-0 items-center gap-2">
-              <div className="relative">
-                <Button
-                  onClick={() => setOpenActions((v) => !v)}
-                  icon={<MoreVertical className="h-4 w-4" />}
-                  text="Actions"
-                  bgColor="bg-white"
-                  textColor="text-slate-700"
-                  borderColor="border-slate-200"
-                  hoverTextColor="hover:text-slate-700"
-                  hoverBorderColor="hover:border-slate-300"
-                  className="h-10 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-blue-400"
-                />
-
-                {openActions && (
-                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-lg border border-slate-200 bg-white ring-1 ring-black/5">
-                    <div className="space-y-2 p-2">
-                      <button
-                        aria-label="Update Program Details"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-amber-200 hover:bg-amber-50 hover:shadow-sm"
-                        onClick={() => { handleUpdate(); setOpenActions(false); }}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-100 text-amber-600 transition-colors group-hover:bg-amber-200">
-                          <Clock className="h-4 w-4" />
-                        </div>
-                        <span className="font-semibold text-slate-900">Update Details</span>
-                      </button>
-
-                      <button
-                        aria-label="Copy to another branch"
-                        disabled={copyDisabled}
-                        title={copyDisabledReason}
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-blue-200 hover:bg-blue-50 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-transparent disabled:hover:bg-white disabled:hover:shadow-none"
-                        onClick={() => { setIsCopyOpen(true); setOpenActions(false); }}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-100 text-blue-600 transition-colors group-hover:bg-blue-200">
-                          <CopyPlus className="h-4 w-4" />
-                        </div>
-                        <span className="flex flex-col">
-                          <span className="font-semibold text-slate-900">Copy to another branch</span>
-                          {copyDisabled && copyDisabledReason && (
-                            <span className="text-xs font-normal text-slate-500">{copyDisabledReason}</span>
-                          )}
-                        </span>
-                      </button>
-
-                      <button
-                        aria-label={isHidden ? "Unhide Program" : "Hide Program"}
-                        disabled={isTogglingHidden}
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
-                        onClick={() => { handleToggleHidden(); setOpenActions(false); }}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
-                          {isHidden ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-                        </div>
-                        <span className="font-semibold text-slate-900">{isHidden ? "Unhide Program" : "Hide Program"}</span>
-                      </button>
-
-                      <button
-                        aria-label="Delete Program"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-red-200 hover:bg-red-50 hover:shadow-sm"
-                        onClick={() => { setIsDeleteOpen(true); setOpenActions(false); }}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
-                          <Trash2 className="h-4 w-4" />
-                        </div>
-                        <span className="font-semibold text-red-700">Delete Program</span>
-                      </button>
-
-                      <button
-                        aria-label="Back to Knowledge Hub"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
-                        onClick={() => { handleBack(); setOpenActions(false); }}
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
-                          <ChevronLeft className="h-4 w-4" />
-                        </div>
-                        <span className="font-semibold text-slate-900">Back to Knowledge Hub</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-        </div>
-
-        {/* Stats */}
-        <div className={`p-6 border-b border-slate-200 grid grid-cols-2 gap-3 ${commission?.amount != null ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}>
-          {commission?.amount != null && (
-            <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-green-200 bg-green-50 p-5 text-center">
-              <CircleDollarSign className="h-5 w-5 text-green-600" />
-              <p className="text-xs text-green-600">Commission</p>
-              <p className="text-xl font-bold text-green-700">
-                {formatCommission(commission.amount, commission.currency)}
-              </p>
-            </div>
-          )}
-
-          <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white p-5 text-center">
-            <Banknote className="h-5 w-5 text-slate-400" />
-            <p className="text-xs text-slate-500">First Year</p>
-            <p className="text-xl font-bold text-slate-800">
-              {program?.first_year_tuition != null ? formatFee(program.first_year_tuition, program.yearly_fee_currency) : "—"}
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white p-5 text-center">
-            <Clock className="h-5 w-5 text-slate-400" />
-            <p className="text-xs text-slate-500">Duration</p>
-            <p className="text-xl font-bold text-slate-800">
-              {program?.duration ? `${program.duration} Years` : "—"}
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white p-5 text-center">
-            <Calendar className="h-5 w-5 text-slate-400" />
-            <p className="text-xs text-slate-500">Next Intake</p>
-            <p className="text-xl font-bold text-slate-800">
-              {program?.next_intake_month ? monthLabel(program.next_intake_month) : "—"}
-            </p>
-          </div>
-        </div>
-
-        {/* Program Details */}
-        <div className="p-6 border-b border-slate-200">
-          <h4 className="mb-4 text-base font-bold text-slate-900">Program Details</h4>
-          <div className="grid grid-cols-1 gap-4 rounded-lg bg-slate-50 p-4 md:grid-cols-2">
-
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                <Globe className="h-5 w-5 text-slate-500" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Country</p>
-                <p className="text-sm font-semibold text-slate-900">{program?.university?.country ?? "Not Provided"}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                <MapPin className="h-5 w-5 text-slate-500" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Location</p>
-                <p className="text-sm font-semibold text-slate-900">{program?.branch?.state ?? "Not Provided"}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                <BookOpen className="h-5 w-5 text-slate-500" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Level</p>
-                <p className="text-sm font-semibold text-slate-900">{program?.qualification_level ?? "Not Provided"}</p>
-              </div>
-            </div>
-
-            {program?.course_type && (
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                  <Layers className="h-5 w-5 text-slate-500" />
-                </div>
-                <div>
-                  <p className="text-xs text-slate-500">Course Type</p>
-                  <p className="text-sm font-semibold text-slate-900">{courseTypeLabel(program.course_type)}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                <GraduationCap className="h-5 w-5 text-slate-500" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Field</p>
-                <p className="text-sm font-semibold text-slate-900">{program?.field_of_study?.name ?? "Not Provided"}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                <Building2 className="h-5 w-5 text-slate-500" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">Campus</p>
-                <p className="text-sm font-semibold text-slate-900">{program?.is_on_campus ? "On-Campus" : "Online"}</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                <Languages className="h-5 w-5 text-slate-500" />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500">English</p>
-                <p className="text-sm font-semibold text-slate-900">
-                  {program?.english_required_score ? `IELTS ${getIeltsLabel(program.english_required_score)}` : "Not Provided"}
-                </p>
-              </div>
-            </div>
-
-            {program?.intake_months && program.intake_months.length > 0 && (
-              <div className="col-span-1 flex items-start gap-3 md:col-span-2">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100">
-                  <Calendar className="h-5 w-5 text-slate-500" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs text-slate-500">Intake Months</p>
-                  <div className="mt-1.5">
-                    <IntakeMonthsChips months={program.intake_months} />
-                  </div>
-                </div>
-              </div>
-            )}
-
-          </div>
-        </div>
-
-        {/* Tuition Fees */}
-        <div className="p-6 border-b border-slate-200">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-blue-50">
-                <CreditCard className="h-5 w-5 text-blue-600" />
-              </div>
-              <h4 className="text-base font-bold text-slate-900">Tuition Fees</h4>
-            </div>
-            <div className="ml-auto flex shrink-0 items-center gap-2.5">
-              <CurrencySelector value={currency} options={currencyOptions} onChange={setCurrency} />
+    <>
+      <ProgramDetailsView
+        program={program}
+        requiredDocuments={requiredDocuments}
+        commission={commission}
+        exchangeRates={exchangeRates}
+        hidden={!!editPath && isHidden}
+        onCopyError={() =>
+          showToast("Couldn't copy the fee summary. Please try again.", "error")
+        }
+        managementActions={
+          editPath ? (
+            <>
               <Button
-                onClick={handleCopyAll}
-                title={copied ? "Copied!" : "Copy program info"}
-                icon={<Copy className="h-4 w-4" />}
-                text={copied ? "Copied!" : "Copy"}
-                bgColor={copied ? "bg-green-50" : "bg-white"}
-                textColor={copied ? "text-green-700" : "text-slate-600"}
-                borderColor={copied ? "border-green-300" : "border-slate-200"}
-                hoverTextColor={copied ? "hover:text-green-700" : "hover:text-slate-600"}
-                hoverBorderColor={copied ? "hover:border-green-300" : "hover:border-slate-300"}
-                className={copied ? "" : "hover:bg-slate-50"}
+                size="sm"
+                variant="secondary"
+                text="Copy to branch"
+                icon={<CopyPlus className="h-4 w-4" />}
+                onClick={() => setIsCopyOpen(true)}
+                disabled={copyDisabled}
+                title={copyDisabledReason}
               />
-            </div>
-          </div>
-
-          <div className="mt-4 grid grid-cols-1 items-start gap-4 md:grid-cols-2">
-            <div>
-              <h4 className="text-base tracking-tight text-slate-600">Per Year</h4>
-              <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
-                <div className="grid grid-cols-2 bg-slate-50">
-                  <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">Year</div>
-                  <div className="flex items-center gap-3 px-5 py-4 font-semibold text-slate-800 md:justify-end md:text-sm">Tuition Fee</div>
-                </div>
-                <div className="overflow-hidden">
-                  {program?.yearly_fees?.length ? (
-                    [...program.yearly_fees].sort((a, b) => a.year - b.year).map((item) => (
-                      <div key={item.year} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
-                        <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">Year {item.year}</div>
-                        <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                          {formatFee(item.fee, program?.yearly_fee_currency)}
-                        </div>
-                      </div>
-                    ))
+              <Button
+                size="sm"
+                variant="secondary"
+                text={isHidden ? "Unhide program" : "Hide program"}
+                icon={
+                  isHidden ? (
+                    <Eye className="h-4 w-4" />
                   ) : (
-                    <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
-                      No yearly fees available
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-base tracking-tight text-slate-600">Other Fees</h4>
-              <div className="mt-4 overflow-hidden rounded-lg border border-slate-200">
-                <div className="grid grid-cols-2 bg-slate-50">
-                  <div className="flex items-center gap-3 px-5 py-4 text-xs font-semibold text-slate-800 md:text-sm">Fees Type</div>
-                  <div className="flex items-center gap-3 px-5 py-4 text-sm font-semibold text-slate-800 md:justify-end">Amount</div>
-                </div>
-                <div className="overflow-hidden">
-                  {program?.one_time_fees?.length ? (
-                    program.one_time_fees.map((item, index) => (
-                      <div key={index} className="grid grid-cols-2 border-t border-slate-100 transition hover:bg-slate-50">
-                        <div className="px-5 py-4 text-xs text-slate-700 md:text-sm">{item.description ?? "Fee"}</div>
-                        <div className="px-5 py-4 text-xs font-medium text-slate-900 md:text-right md:text-sm">
-                          {formatFee(item.fee, item.currency)}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="col-span-2 px-5 py-4 text-center text-xs text-slate-500 md:text-sm">
-                      No one-time fees available
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Scholarships */}
-        {program?.has_scholarship && (program?.scholarships?.length ?? 0) > 0 && (
-          <div className="p-6 border-b border-slate-200">
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-100">
-                      <Award className="h-5 w-5 text-amber-600" />
-                    </div>
-                    <div>
-                      <h4 className="text-base font-bold text-slate-900">Scholarships & Discounts</h4>
-                      <p className="text-xs text-slate-500">{program.scholarships.length} available</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 text-xs text-slate-400 select-none">
-                    <span>&#8249;</span>
-                    <span>Scroll</span>
-                    <span>&#8250;</span>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 overflow-x-auto pb-2">
-                  {program.scholarships.map((item, index) => (
-                    <div key={item.id ?? index} className="flex w-72 shrink-0 flex-col gap-3 rounded-lg border border-amber-100 bg-white p-5">
-                      <div className="flex items-start justify-between gap-2">
-                        <h5 className="text-sm font-bold text-slate-900">{item.name}</h5>
-                        {item.coverage_percent > 0 && (
-                          <span className="shrink-0 rounded-md bg-amber-500 px-2.5 py-0.5 text-xs font-bold text-white">
-                            {item.coverage_percent}%
-                          </span>
-                        )}
-                      </div>
-                      {item.description && <RichTextDisplay html={item.description} />}
-                      {item.max_amount > 0 && (
-                        <p className="text-base font-bold text-amber-600">Up to {formatMoney(item.max_amount)}</p>
-                      )}
-                      {item.conditions && item.conditions.length > 0 && (
-                        <div className="border-t border-slate-100 pt-3">
-                          <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-amber-600">
-                            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20A10 10 0 0012 2z" />
-                            </svg>
-                            Conditions
-                          </p>
-                          <ul className="space-y-1.5">
-                            {item.conditions.map((condition, i) => (
-                              <li key={i} className="flex items-start gap-2 text-xs text-slate-600">
-                                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-md bg-amber-500" />
-                                {condition}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-            </div>
-          </div>
-        )}
-
-        <DocumentsSection requiredDocuments={requiredDocuments} />
-
-
-          {/* Commission */}
-        {commission && commission.amount != null && (
-          <div className="p-6 border-b border-slate-200">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-green-50">
-                <CircleDollarSign className="h-5 w-5 text-green-600" />
-              </div>
-              <div>
-                <h4 className="text-base font-bold text-slate-900">Your Commission</h4>
-                
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-green-200 bg-green-50 p-5">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <p className="text-xs font-medium text-green-600">Commission Amount</p>
-                  <p className="mt-1 text-2xl font-bold text-green-700">
-                    {formatCommission(commission.amount, commission.currency)}
-                  </p>
-                </div>
-
-                {(commission.expected_commission_from || commission.expected_commission_to) && (
-                  <div>
-                    <p className="text-xs font-medium text-green-600">Payment Timeline</p>
-                    <p className="mt-1 text-sm font-semibold text-green-700">
-                      {commission.expected_commission_from && commission.expected_commission_to
-                        ? `Within ${commission.expected_commission_from} – ${commission.expected_commission_to} months after enrollment`
-                        : commission.expected_commission_from
-                        ? `From ${commission.expected_commission_from} months after enrollment`
-                        : `Up to ${commission.expected_commission_to} months after enrollment`}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {commission.notes && (
-                <div className="mt-4 border-t border-green-200 pt-4">
-                  <p className="text-xs font-medium text-green-600">Notes</p>
-                  <p className="mt-1 text-sm text-green-800">{commission.notes}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="p-6 border-t border-slate-200 flex gap-3">
-          <Button
-            text="Back"
-            onClick={handleBack}
-            bgColor="bg-white"
-            textColor="text-slate-700"
-            borderColor="border-slate-200"
-            hoverTextColor="hover:text-slate-900"
-            hoverBorderColor="hover:border-slate-300"
-            icon={<ChevronLeft className="h-4 w-4" />}
-            className="flex-1"
-          />
-          {showApplyAction && (
-            <Link
-              href={{
-                pathname: "/partner/applications/apply-for-program",
-                query: {
-                  program_id: program.id,
-                  university_id: program.university.id,
-                  intake_date: (() => {
-                    const month = program.next_intake_month ?? nextIntakeMonth(program.intake_months) ?? nextIntakeMonth(program.university.intake_months);
-                    return month ? resolveIntakeDate(month) : "";
-                  })(),
-                },
-              }}
-              className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-            >
-              Apply Now 
-            </Link>
-          )}
-          {editPath && (
+                    <EyeOff className="h-4 w-4" />
+                  )
+                }
+                onClick={toggleHidden}
+                loading={isTogglingHidden}
+              />
+              <Button
+                size="sm"
+                variant="tertiary"
+                text="Delete program"
+                icon={<Trash2 className="h-4 w-4" />}
+                onClick={() => setIsDeleteOpen(true)}
+              />
+            </>
+          ) : undefined
+        }
+        actions={
+          <>
+            {showApplyAction && (
+              <Link
+                href={{
+                  pathname: "/partner/applications/apply-for-program",
+                  query: {
+                    program_id: program.id,
+                    university_id: program.university.id,
+                    intake_date: month ? resolveIntakeDate(month) : "",
+                  },
+                }}
+                className={`${buttonBase} ${buttonSizes.md} ${buttonVariants.primary}`}
+              >
+                <Send className="h-4 w-4" aria-hidden="true" />
+                Apply now
+              </Link>
+            )}
+            {editPath && (
+              <Button
+                variant="primary"
+                text="Edit program"
+                icon={<Pencil className="h-4 w-4" />}
+                onClick={() => router.push(editPath)}
+              />
+            )}
             <Button
-              text="Edit Program"
-              onClick={() => router.push(editPath)}
-              icon={<Pencil className="h-4 w-4" />}
-              bgColor="bg-blue-600"
-              textColor="text-white"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-white"
-              hoverBorderColor="hover:border-blue-700"
-              className="flex-1 !bg-blue-600 hover:!bg-blue-700"
+              variant="secondary"
+              text="Back to programs"
+              icon={<ArrowLeft className="h-4 w-4" />}
+              onClick={back}
             />
-          )}
-        </div>
-
-      </div>
-
-      {program && isCopyOpen && (
+          </>
+        }
+      />
+      {editPath && isCopyOpen && (
         <CopyProgramToBranch
           isOpen={isCopyOpen}
           onClose={() => setIsCopyOpen(false)}
@@ -805,18 +226,15 @@ const ProgramDetails = ({ id, basePath = "/partner", showApplyAction = true, edi
           }}
         />
       )}
-
-      {program && showActions && (
+      {editPath && (
         <DeleteProgramsConfirmation
           isOpen={isDeleteOpen}
           onClose={() => setIsDeleteOpen(false)}
-          onConfirm={handleDelete}
+          onConfirm={deleteProgram}
           isDeleting={isDeleting}
-          programNames={program.name ? [program.name] : []}
+          programNames={[program.name]}
         />
       )}
-    </div>
+    </>
   );
-};
-
-export default ProgramDetails;
+}
