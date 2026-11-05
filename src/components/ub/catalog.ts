@@ -24,6 +24,25 @@ const imp = (name: string, path: string) => `import ${name} from "components/ub/
 const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
 
 export const CATALOG: Record<string, CatalogEntry> = {
+  UniversityCard: {
+    category: "data",
+    imports: [imp("UniversityCard", "data/cards/UniversityCard")],
+    useFor: "Browse institutions and open their profiles or filtered programs.",
+    usedIn: ["Adviser Universities directory"],
+    avoid: "Editing institutional records: use the management directory and university forms.",
+  },
+  "University table & filters": {
+    category: "data",
+    imports: ['import UniversitiesDataTable from "features/universities/components/shared/UniversitiesDataTable";'],
+    useFor: "Browse and manage institutions with responsive scrolling, sorting and drawer filters.",
+    usedIn: ["Admin universities", "Data-entry universities", "Partner universities"],
+  },
+  "University profile": {
+    category: "data",
+    imports: ['import UniversityProfileView from "features/universities/components/shared/UniversityProfileView";'],
+    useFor: "Show institution details, campuses, intakes and management-only payment methods.",
+    usedIn: ["University details", "Partner university profile"],
+  },
   "Program table & filters": {
     category: "data",
     imports: ['import KnowledgeHubTable from "features/programs/components/shared/table/KnowledgeHubTable";', 'import ProgramFilterPanel from "features/programs/components/shared/filters/ProgramFilterPanel";'],

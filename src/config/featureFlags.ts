@@ -1,7 +1,6 @@
 // Build-time kill switches for features that are merged but not ready to
-// ship. Each one is OFF unless its variable is explicitly "true", so a
-// deploy that sets nothing keeps the feature hidden — the safe default for
-// a release branch.
+// ship. Public profiles are opt-in; university browsing and dark mode
+// are enabled unless explicitly switched off.
 //
 // These are NEXT_PUBLIC_* because the same flag is read from three
 // runtimes: the partner sidebar (client) and the
@@ -16,10 +15,10 @@ export const FEATURES = {
    *  shareable public page it links to (/p/[slug]). UBX-317/331. */
   partnerPublicProfile: enabled(process.env.NEXT_PUBLIC_ENABLE_PARTNER_PUBLIC_PROFILE),
 
-  /** Partner-facing read-only Universities list and details
+  /** ON by default. Partner-facing read-only Universities list and details
    *  (/partner/universities). The admin and data-entry university
    *  management screens are a separate feature and stay enabled. */
-  partnerUniversities: enabled(process.env.NEXT_PUBLIC_ENABLE_PARTNER_UNIVERSITIES),
+  partnerUniversities: process.env.NEXT_PUBLIC_ENABLE_PARTNER_UNIVERSITIES !== "false",
 
   /** Near-black dark mode (docs/unibexs-dark-mode-guide.md). ON unless
    *  NEXT_PUBLIC_ENABLE_DARK_MODE is "false" — a kill switch while the guide

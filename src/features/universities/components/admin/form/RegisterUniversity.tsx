@@ -239,8 +239,9 @@ export default function RegisterUniversity({
 
   return (
     <SteppedFormPage
-      title="Register university"
+      title="Create university"
       description="Build the institution profile, set its availability, then add its campuses."
+      className="mx-auto max-w-5xl"
       icon={GraduationCap}
       currentStep={currentStep}
       onStepChange={setCurrentStep}

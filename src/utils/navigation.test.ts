@@ -1,3 +1,4 @@
+import type { IRoute } from "types/navigation";
 import {
   isWindowAvailable,
   findCurrentRoute,
@@ -70,14 +71,10 @@ describe('Navigation Utilities', () => {
     })
 
     it('finds a nested route', () => {
-      // Note: The function uses regex matching with pathname.match(route.path)
-      // Since '/applications' matches '/applications/new', the first nested route is returned
-      // This is the actual behavior of the function - it returns the first match in order
       const route = findCurrentRoute(mockRoutes, '/applications/new')
       expect(route).toBeDefined()
-      // The nested route '/applications' matches first, so it returns that
-      expect(route?.name).toBe('All Applications')
-      expect(route?.path).toBe('/applications')
+      expect(route?.name).toBe('New Application')
+      expect(route?.path).toBe('/applications/new')
     })
 
     it('finds a more specific nested route when it comes first', () => {
@@ -225,3 +222,22 @@ describe('Navigation Utilities', () => {
   })
 })
 
+
+const routes: IRoute[] = [{ name: "Knowledge Hub", layout: "/admin", path: "/knowledge-hub", children: [
+  { name: "Programs", layout: "/admin", path: "/knowledge-hub" },
+  { name: "Universities", layout: "/admin", path: "/universities" },
+  { name: "Configuration", layout: "/admin/config-universities", path: "" },
+  { name: "Payment methods", layout: "/admin/config-universities", path: "/payment-methods" },
+] }];
+it("resolves nested universities and detail pages", () => {
+  expect(findCurrentRoute(routes, "/admin/universities/uni_001")?.name).toBe("Universities");
+  expect(findCurrentRoute(routes, "/admin/knowledge-hub")?.name).toBe("Programs");
+});
+it("prefers the most specific full route and avoids partial matches", () => {
+  expect(findCurrentRoute(routes, "/admin/config-universities/payment-methods/1")?.name).toBe("Payment methods");
+  expect(findCurrentRoute(routes, "/admin/universities-other")).toBeUndefined();
+});
+
+it("names directly linked sections omitted from sidebar routes", () => {
+  expect(getActiveRoute([], "/partner/universities/uni_001")).toBe("Universities");
+});

@@ -19,7 +19,9 @@ import ApplicationKit from "./sections/ApplicationKit";
 import PopupForms from "./patterns/PopupForms";
 import TableOptions from "./sections/TableOptions";
 import ProgramTableDemo from "./patterns/ProgramTableDemo";
+import { UniversityTableDemo, UniversityProfileDemo } from "./patterns/UniversityDemos";
 import ProgramCards from "./sections/ProgramCards";
+import UniversityCards from "./sections/UniversityCards";
 import CurrencyButtons from "./sections/CurrencyButtons";
 import ProgramDetailsDemo from "./patterns/ProgramDetailsDemo";
 import ApplicationFormDemo from "./patterns/ApplicationFormDemo";
@@ -147,7 +149,9 @@ export function ContentSection() {
         <ApplicationFormDemo />
       </Pick>
       <ProgramCards />
+      <UniversityCards />
       <ProgramDetailsDemo />
+      <UniversityProfileDemo />
       <ApplicationDetailsDemo />
       <AdvisorProfileDemo />
     </ShowcaseSection>
@@ -217,6 +221,7 @@ export function TablesSection() {
       description="Tables for managing records: sorting, selecting rows and acting on them in bulk. Rows are 56px (44px compact), amounts are right-aligned with tabular numerals, and below 768px rows stack."
     >
       <ProgramTableDemo />
+      <UniversityTableDemo />
       <Pick demos={["Table: Standard", "Table: Selectable", "Table: Card list", "DataTableToolbar"]}>
         <TableOptions />
       </Pick>

@@ -36,7 +36,8 @@ export default function ProgramCard({ program, href, applyHref }: ProgramCardPro
   const logoFallback = <span className="text-ub-heading-sm text-ub-tone-brand-text">{initials || "U"}</span>;
 
   return (
-    <article aria-labelledby={titleId} className="flex h-full min-w-0 flex-col break-words overflow-hidden rounded-ub-lg border border-ub-border bg-ub-surface shadow-ub-xs transition-[border-color,box-shadow] hover:border-ub-border-hover hover:shadow-ub-sm motion-reduce:transition-none">
+    <article aria-labelledby={titleId} className="relative flex h-full min-w-0 flex-col break-words overflow-hidden rounded-ub-lg border border-ub-border bg-ub-surface shadow-ub-xs transition-[border-color,box-shadow] hover:border-ub-border-hover hover:shadow-ub-sm motion-reduce:transition-none">
+      <Link href={href} target="_blank" rel="noopener noreferrer" aria-label={`View ${program.name} (opens in a new tab)`} title={program.name} className={`absolute inset-0 z-10 rounded-ub-lg ${focusRing}`} />
       <div className="flex items-start gap-3 px-5 pt-5">
         <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-ub-md border border-ub-border bg-ub-tone-brand-bg">
           {program.university.logo_file_key ? <PresignedImage fileKey={program.university.logo_file_key} alt="" className="h-full w-full object-contain" fallback={logoFallback} /> : logoFallback}
@@ -54,7 +55,7 @@ export default function ProgramCard({ program, href, applyHref }: ProgramCardPro
         </div>
         <h3 id={titleId} className="min-h-[2.8em] text-ub-heading-md text-ub-text-primary">
           <Tooltip content={program.name} position="bottom" className="w-full min-w-0 [&_[role=tooltip]]:max-w-full [&_[role=tooltip]]:break-words">
-            <Link href={href} target="_blank" rel="noopener noreferrer" className={`line-clamp-2 min-w-0 w-full break-words rounded-ub-xs hover:text-ub-text-link ${focusRing}`}>{program.name}</Link>
+            <Link href={href} target="_blank" rel="noopener noreferrer" className={`relative z-20 line-clamp-2 min-w-0 w-full break-words rounded-ub-xs hover:text-ub-text-link ${focusRing}`}>{program.name}</Link>
           </Tooltip>
         </h3>
         {program.course_type && <p className="mt-1 text-ub-body-sm text-ub-text-secondary">{courseTypeLabel(program.course_type)}</p>}
@@ -88,8 +89,8 @@ export default function ProgramCard({ program, href, applyHref }: ProgramCardPro
 
         <div className="mt-auto space-y-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-            <Link href={href} target="_blank" rel="noopener noreferrer" className={`${buttonBase} ${buttonSizes.sm} ${buttonVariants.secondary} min-h-[44px] shrink-0 sm:min-h-[32px] sm:flex-1`} aria-label={`View ${program.name} (opens in a new tab)`}>View program<ArrowUpRight className="h-4 w-4" aria-hidden="true" /></Link>
-            {applyHref && <Link href={applyHref} className={`${buttonBase} ${buttonSizes.sm} ${buttonVariants.primary} min-h-[44px] shrink-0 sm:min-h-[32px] sm:flex-1`} aria-label={`Apply for ${program.name}`}><Send className="h-4 w-4" aria-hidden="true" />Apply now</Link>}
+            <Link href={href} target="_blank" rel="noopener noreferrer" className={`relative z-20 ${buttonBase} ${buttonSizes.sm} ${buttonVariants.secondary} min-h-[44px] shrink-0 sm:min-h-[32px] sm:flex-1`} aria-label={`View ${program.name} (opens in a new tab)`}>View program<ArrowUpRight className="h-4 w-4" aria-hidden="true" /></Link>
+            {applyHref && <Link href={applyHref} className={`relative z-20 ${buttonBase} ${buttonSizes.sm} ${buttonVariants.primary} min-h-[44px] shrink-0 sm:min-h-[32px] sm:flex-1`} aria-label={`Apply for ${program.name}`}><Send className="h-4 w-4" aria-hidden="true" />Apply now</Link>}
           </div>
         </div>
       </div>

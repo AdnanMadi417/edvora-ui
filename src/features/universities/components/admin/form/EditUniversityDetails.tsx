@@ -1,5 +1,8 @@
 ﻿"use client";
 
+import { motion, useReducedMotion } from "framer-motion";
+import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
+import SectionCard from "components/ub/data/cards/SectionCard";
 import InstitutionTypeField from "components/ub/forms/choices/InstitutionTypeField";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -32,21 +35,27 @@ import {
 import { useAllPaymentMethods } from "features/knowledge-hub/payment-methods/hooks";
 import { useStates } from "features/programs/hooks";
 import InputField from "components/ub/forms/text/InputField";
-import TextareaField from "components/ub/forms/text/TextareaField";
 import RichTextEditor from "components/ub/forms/text/RichTextEditor";
 import SelectField from "components/ub/forms/selection/SelectField";
 import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
 import ToggleInput from "components/ub/forms/choices/ToggleInput";
 import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
 import ImageUploadField from "components/ub/forms/uploads/ImageUploadField";
-import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
+import {
+  getPresignedUploads,
+  uploadFilesToSpaces,
+} from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
 import Button from "components/ub/core/buttons/Button";
 import Loading from "components/ub/feedback/states/Loading";
 import IconButton from "components/ub/core/buttons/IconButton";
 import EmptyData from "components/ub/feedback/states/EmptyTableData";
 import NoMessagesFound from "components/ub/feedback/states/NoMessagesFound";
-import { validateUniversity, isUniversityComplete, universityFieldMap } from "./validateUniversity";
+import {
+  validateUniversity,
+  isUniversityComplete,
+  universityFieldMap,
+} from "./validateUniversity";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -158,12 +167,22 @@ interface Props {
   redirectPath?: string;
 }
 
-const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Props) => {
+const UniversityEdit = ({
+  id,
+  redirectPath = `/admin/universities/${id}`,
+}: Props) => {
   const { showToast } = useToast();
+  const reducedMotion = useReducedMotion();
   const router = useRouter();
 
-  const { university, branches, universityLoading, refetch: refetchUniversity } = useUniversityDetails(id);
-  const { universityPaymentMethods, refetch: refetchPayments } = useUniversityPaymentMethods(id);
+  const {
+    university,
+    branches,
+    universityLoading,
+    refetch: refetchUniversity,
+  } = useUniversityDetails(id);
+  const { universityPaymentMethods, refetch: refetchPayments } =
+    useUniversityPaymentMethods(id);
   const { paymentMethods } = useAllPaymentMethods();
   const { assignUniversityType } = useAssignUniversityType(id);
   const { universities: universityTypes } = useUniversityTypes();
@@ -177,11 +196,14 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
   const [initialFormData, setInitialFormData] = useState<FormData | null>(null);
   const [paymentRows, setPaymentRows] = useState<PaymentRow[]>([]);
-  const [addPaymentForm, setAddPaymentForm] = useState<AddPaymentForm>(INITIAL_ADD_PAYMENT);
+  const [addPaymentForm, setAddPaymentForm] =
+    useState<AddPaymentForm>(INITIAL_ADD_PAYMENT);
   const [showAddPayment, setShowAddPayment] = useState(false);
   const [logo, setLogo] = useState<LogoState>(INITIAL_LOGO);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [paymentErrors, setPaymentErrors] = useState<Record<string, string>>({});
+  const [paymentErrors, setPaymentErrors] = useState<Record<string, string>>(
+    {}
+  );
 
   const handleSaveApiError = useApiFormErrors({
     fieldMap: universityFieldMap,
@@ -189,7 +211,8 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
       setErrors((prev) => ({ ...prev, ...patch }));
       scrollToFirstError(patch);
     },
-    onUnmappedError: (message) => showToast(`Update failed. ${message}`, "error"),
+    onUnmappedError: (message) =>
+      showToast(`Update failed. ${message}`, "error"),
   });
 
   const handleAssignApiError = useApiFormErrors({
@@ -197,7 +220,8 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
       setPaymentErrors((prev) => ({ ...prev, ...patch }));
       scrollToFirstError(patch);
     },
-    onUnmappedError: (message) => showToast(`Failed to assign payment method. ${message}`, "error"),
+    onUnmappedError: (message) =>
+      showToast(`Failed to assign payment method. ${message}`, "error"),
   });
 
   const stateOptions = useMemo(
@@ -232,7 +256,10 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
 
     setFormData(data);
     setInitialFormData(data);
-    setLogo((prev) => ({ ...prev, existingKey: university.logo_file_key ?? "" }));
+    setLogo((prev) => ({
+      ...prev,
+      existingKey: university.logo_file_key ?? "",
+    }));
 
     if (university.logo_file_key) {
       getDocumentDownloadUrl(university.logo_file_key)
@@ -276,7 +303,10 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const isFormValid = useMemo(() => isUniversityComplete(formData as any), [formData]);
+  const isFormValid = useMemo(
+    () => isUniversityComplete(formData as any),
+    [formData]
+  );
 
   // ID-based comparison so deletions don't corrupt the diff
   const isFormChanged = useMemo(() => {
@@ -298,7 +328,13 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
     });
 
     return universityChanged || logo.modified || paymentChanged;
-  }, [formData, initialFormData, logo.modified, paymentRows, universityPaymentMethods]);
+  }, [
+    formData,
+    initialFormData,
+    logo.modified,
+    paymentRows,
+    universityPaymentMethods,
+  ]);
 
   // ─── Branches ─────────────────────────────────────────────────────────────
 
@@ -312,7 +348,9 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
   const updateBranchField = (index: number, field: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
-      branches: prev.branches.map((b, i) => (i === index ? { ...b, [field]: value } : b)),
+      branches: prev.branches.map((b, i) =>
+        i === index ? { ...b, [field]: value } : b
+      ),
     }));
   };
 
@@ -404,7 +442,10 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
       refetchPayments();
     } catch (error: unknown) {
       showToast(
-        `Failed to delete payment method. ${parseApiError(error, "Please try again.")}`,
+        `Failed to delete payment method. ${parseApiError(
+          error,
+          "Please try again."
+        )}`,
         "error"
       );
     }
@@ -440,7 +481,9 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
       return;
     }
 
-    const { isValid, errors: validationErrors } = validateUniversity(formData as any);
+    const { isValid, errors: validationErrors } = validateUniversity(
+      formData as any
+    );
     if (!isValid) {
       setErrors(validationErrors);
       scrollToFirstError(validationErrors);
@@ -451,10 +494,16 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
       const logo_file_key = logo.file ? logo.fileKey : logo.existingKey;
       const logo_file_url = logo.file ? logo.fileUrl : logo.existingUrl;
 
-      await updateUniversity({ ...normalizePayload(formData), logo_file_key, logo_file_url });
+      await updateUniversity({
+        ...normalizePayload(formData),
+        logo_file_key,
+        logo_file_url,
+      });
 
       if (formData.university_type_id) {
-        await assignUniversityType({ university_type_id: formData.university_type_id });
+        await assignUniversityType({
+          university_type_id: formData.university_type_id,
+        });
       }
 
       // Save only rows that actually changed, in parallel
@@ -484,15 +533,20 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
-  if (universityLoading) return <Loading text="Loading university details..." />;
+  if (universityLoading)
+    return <Loading text="Loading university details..." />;
   if (!university) return <EmptyData />;
 
   return (
-    <div className="mt-6 max-w-5xl mx-auto rounded-md border bg-white">
-
+    <motion.div
+      initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: reducedMotion ? 0 : MICRO_DURATION, ease: EASE }}
+      className="mx-auto mt-6 w-full min-w-0 max-w-5xl space-y-5 break-words"
+    >
       {/* Header */}
-      <div className="flex justify-between border-b p-6">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-wrap justify-between gap-4 rounded-ub-lg border border-ub-border bg-ub-surface p-4 shadow-ub-xs sm:p-6">
+        <div className="flex min-w-0 flex-wrap items-center gap-4">
           <div className="shrink-0">
             <ImageUploadField
               label=""
@@ -501,20 +555,34 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
               simpleFile={logo.file}
               onSimpleFileChange={handleLogoSelect}
               onSimpleRemove={() =>
-                setLogo((prev) => ({ ...prev, file: null, fileKey: "", fileUrl: "" }))
+                setLogo((prev) => ({
+                  ...prev,
+                  file: null,
+                  fileKey: "",
+                  fileUrl: "",
+                }))
               }
               simpleUploading={logo.uploading}
               simpleProgress={logo.progress}
               existingUrl={logo.existingUrl}
               onExistingRemove={() =>
-                setLogo((prev) => ({ ...prev, existingUrl: "", existingKey: "", modified: true }))
+                setLogo((prev) => ({
+                  ...prev,
+                  existingUrl: "",
+                  existingKey: "",
+                  modified: true,
+                }))
               }
               errors={errors}
             />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">{university.name}</h2>
-            <p className="text-sm text-slate-500">{university.country}</p>
+            <h2 className="break-words text-ub-heading-md text-ub-text-primary">
+              {university.name}
+            </h2>
+            <p className="text-sm text-ub-text-tertiary">
+              {university.country}
+            </p>
             {logo.file && !logo.uploading && (
               <span className="mt-1 inline-block rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
                 Logo ready — click Save Changes
@@ -522,13 +590,14 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
             )}
           </div>
         </div>
-
       </div>
 
       {/* University details */}
-      <div className="space-y-5 px-6 py-6">
-        <h3 className="text-sm font-semibold uppercase text-slate-500">Edit University</h3>
-
+      <SectionCard
+        title="Institution details"
+        as="h2"
+        description="Update the university profile, intakes and availability."
+      >
         <div className="block">
           <div className="grid grid-cols-1 gap-x-4 md:grid-cols-2">
             <InputField
@@ -550,7 +619,7 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
               onBlur={() => validateField("country")}
             />
             <div className="md:col-span-2">
-              <TextareaField
+              <RichTextEditor
                 label="Description"
                 field="description"
                 placeholder="Brief university description..."
@@ -599,7 +668,10 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
             disabledDescription="This university is hidden and unavailable for new applications."
           />
 
-          <InstitutionTypeField value={formData.is_public} onChange={(value) => updateFormData("is_public", value)} />
+          <InstitutionTypeField
+            value={formData.is_public}
+            onChange={(value) => updateFormData("is_public", value)}
+          />
 
           <ToggleInput
             label="Language Center"
@@ -625,19 +697,19 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
             disabledDescription="Visible to advisors."
           />
         </div>
-      </div>
+      </SectionCard>
 
       {/* Branches */}
-      <div className="border-t px-6 py-6" data-field="branches">
+      <section
+        aria-label="Campuses and branches"
+        className="rounded-ub-lg border border-ub-border bg-ub-surface p-4 sm:p-6"
+        data-field="branches"
+      >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-semibold uppercase text-slate-500">Branches</h3>
+          <h3 className="text-ub-heading-md text-ub-text-primary">Branches</h3>
           <IconButton
+            title="Add branch"
             icon={<CalendarPlus className="h-4 w-4" />}
-            bgColor="bg-blue-50"
-            textColor="text-blue-700"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-blue-800"
-            hoverBorderColor="hover:border-blue-700"
             onClick={handleAddBranch}
           />
         </div>
@@ -650,18 +722,16 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
           {formData.branches.map((branch, index) => (
             <div
               key={branch.id ?? index}
-              className="space-y-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+              className="space-y-5 rounded-xl border border-ub-border bg-ub-surface p-5 shadow-sm"
             >
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h4 className="text-sm font-semibold text-slate-700">Branch {index + 1}</h4>
+              <div className="flex items-center justify-between border-b border-ub-border pb-3">
+                <h4 className="text-sm font-semibold text-ub-text-secondary">
+                  Branch {index + 1}
+                </h4>
                 <IconButton
+                  title={`Remove branch ${index + 1}`}
                   icon={<Trash2 className="h-4 w-4" />}
                   disabled={formData.branches.length === 1}
-                  bgColor="bg-red-50"
-                  textColor="text-red-700"
-                  borderColor="border-red-200"
-                  hoverTextColor="hover:text-red-800"
-                  hoverBorderColor="hover:border-red-300"
                   onClick={() => handleRemoveBranch(index)}
                 />
               </div>
@@ -716,25 +786,25 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
                     });
                     updateBranchField(index, f, v);
                   }}
-
                 />
               </div>
             </div>
           ))}
         </div>
-      </div>
+      </section>
 
       {/* Payment methods */}
-      <div className="space-y-6 border-t px-6 py-6">
+      <section
+        aria-label="University payment methods"
+        className="space-y-6 rounded-ub-lg border border-ub-border bg-ub-surface p-4 sm:p-6"
+      >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="mb-4 text-sm font-semibold uppercase text-slate-500">Payment Methods</h3>
+          <h3 className="mb-4 text-ub-heading-md text-ub-text-primary">
+            Payment Methods
+          </h3>
           <IconButton
+            title="Assign payment method"
             icon={<Landmark className="h-4 w-4" />}
-            bgColor="bg-blue-50"
-            textColor="text-blue-700"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-blue-800"
-            hoverBorderColor="hover:border-blue-700"
             onClick={() => {
               setAddPaymentForm(INITIAL_ADD_PAYMENT);
               setPaymentErrors({});
@@ -747,19 +817,15 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
           {paymentRows.map((method, index) => (
             <div
               key={method.id}
-              className="space-y-4 rounded-md border bg-white p-4 shadow-sm"
+              className="space-y-4 rounded-md border bg-ub-surface p-4 shadow-sm"
             >
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h4 className="text-sm font-semibold text-slate-700">
+              <div className="flex items-center justify-between border-b border-ub-border pb-3">
+                <h4 className="text-sm font-semibold text-ub-text-secondary">
                   Payment Method {index + 1}
                 </h4>
                 <IconButton
+                  title={`Remove payment method ${index + 1}`}
                   icon={<Trash2 className="h-4 w-4" />}
-                  bgColor="bg-red-50"
-                  textColor="text-red-700"
-                  borderColor="border-red-200"
-                  hoverTextColor="hover:text-red-800"
-                  hoverBorderColor="hover:border-red-300"
                   onClick={() => handleDeletePaymentMethod(method.id)}
                 />
               </div>
@@ -775,15 +841,22 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
                   }))}
                   formData={method}
                   errors={{}}
-                  updateFormData={(field, value) => updatePaymentRow(method.id, field, value)}
+                  updateFormData={(field, value) =>
+                    updatePaymentRow(method.id, field, value)
+                  }
                 />
                 <SelectField
                   label="Currency"
                   field="currency"
                   formData={method}
                   errors={{}}
-                  options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
-                  updateFormData={(field, value) => updatePaymentRow(method.id, field, value)}
+                  options={CURRENCY.map((c) => ({
+                    value: c.value,
+                    label: c.label,
+                  }))}
+                  updateFormData={(field, value) =>
+                    updatePaymentRow(method.id, field, value)
+                  }
                   required={false}
                 />
                 <div className="md:col-span-2">
@@ -792,7 +865,9 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
                     field="instructions"
                     formData={method}
                     errors={{}}
-                    updateFormData={(field, value) => updatePaymentRow(method.id, field, value)}
+                    updateFormData={(field, value) =>
+                      updatePaymentRow(method.id, field, value)
+                    }
                     required={false}
                   />
                 </div>
@@ -803,7 +878,9 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
                 field="is_active"
                 formData={method}
                 errors={{}}
-                updateFormData={(field, value) => updatePaymentRow(method.id, field, value)}
+                updateFormData={(field, value) =>
+                  updatePaymentRow(method.id, field, value)
+                }
                 enabledText="Active"
                 disabledText="Inactive"
                 enabledDescription="This payment method is available for use."
@@ -822,7 +899,7 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
         </div>
 
         {showAddPayment && (
-          <div className="space-y-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="space-y-5 rounded-xl border border-ub-border bg-ub-surface p-5 shadow-sm">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <SearchableDropdown
                 label="Payment Method"
@@ -844,7 +921,10 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
               <SelectField
                 label="Currency"
                 field="currency"
-                options={CURRENCY.map((c) => ({ value: c.value, label: c.label }))}
+                options={CURRENCY.map((c) => ({
+                  value: c.value,
+                  label: c.label,
+                }))}
                 formData={addPaymentForm}
                 errors={paymentErrors}
                 required={false}
@@ -875,55 +955,42 @@ const UniversityEdit = ({ id, redirectPath = `/admin/universities/${id}` }: Prop
                   setPaymentErrors({});
                 }}
                 text="Cancel"
-                bgColor="bg-slate-50"
-                textColor="text-slate-700"
-                borderColor="border-slate-600"
-                hoverTextColor="hover:text-slate-800"
-                hoverBorderColor="hover:border-slate-700"
               />
               <Button
                 onClick={handleAssign}
                 icon={<Landmark className="h-4 w-4" />}
                 text="Assign"
-                bgColor="bg-blue-50"
-                textColor="text-blue-700"
-                borderColor="border-blue-600"
-                hoverTextColor="hover:text-blue-800"
-                hoverBorderColor="hover:border-blue-700"
               />
             </div>
           </div>
         )}
-      </div>
+      </section>
 
       {/* Footer */}
-      <div className="flex gap-3 border-t border-slate-200 px-6 py-4">
+      <div className="sticky bottom-20 z-20 grid grid-cols-2 gap-3 rounded-ub-lg border border-ub-border bg-ub-surface-raised p-4 shadow-ub-md md:bottom-4">
         <Button
           onClick={handleBack}
           icon={<ArrowLeft className="h-5 w-5" />}
           text="Back"
-          bgColor="bg-white"
-          textColor="text-slate-600"
-          borderColor="border-slate-300"
-          hoverTextColor="hover:text-slate-800"
-          hoverBorderColor="hover:border-slate-400"
-          className="flex-1 hover:bg-slate-50"
+          variant="secondary"
+          className="min-h-[44px]"
         />
         <Button
           onClick={handleSave}
-          disabled={logo.uploading || updateLoading || !isFormChanged || (isFormChanged && !isFormValid)}
+          disabled={
+            logo.uploading ||
+            updateLoading ||
+            !isFormChanged ||
+            (isFormChanged && !isFormValid)
+          }
           icon={<Pencil className="h-5 w-5" />}
-          text={updateLoading ? "Updating..." : "Save Changes"}
-          bgColor="bg-blue-600"
-          textColor="text-white"
-          borderColor="border-blue-600"
-          hoverTextColor="hover:text-white"
-          hoverBorderColor="hover:border-blue-700"
-          className="flex-1 hover:bg-blue-700"
+          text="Save changes"
+          variant="primary"
+          loading={updateLoading}
+          className="min-h-[44px]"
         />
       </div>
-
-    </div>
+    </motion.div>
   );
 };
 

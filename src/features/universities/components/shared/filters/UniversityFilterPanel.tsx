@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { SlidersHorizontal, X, RotateCcw, EyeOff, Languages, Building2 } from "lucide-react";
-import { MdOutlineCategory } from "react-icons/md";
-import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
+import React, { useEffect, useMemo, useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
+import Drawer from "components/ub/feedback/dialogs/Drawer";
+import Button from "components/ub/core/buttons/Button";
+import SelectInput from "components/ub/forms/selection/SelectInput";
 import SearchInput from "components/ub/forms/selection/SearchInput";
 import FilterChip from "components/ub/data/badges/FilterChip";
 
@@ -56,16 +59,14 @@ interface UniversityFilterPanelProps {
   resultsCount?: number;
 
   children?: React.ReactNode;
+  showVisibility?: boolean;
 }
 
 function findLabel(options: Option[], value: string): string {
   return options.find((o) => o.value === value)?.label ?? value;
 }
 
-// Same "Filters" button + slide-down panel + removable chip row pattern as
-// ProgramFilterPanel (features/programs/components/shared/filters) — reused
-// here so the Universities tables (admin, data-entry) match the Programs
-// table's filter UX instead of a bespoke always-visible dropdown row.
+/** Shared university search and animated filter drawer. */
 export default function UniversityFilterPanel({
   searchTerm,
   onSearchChange,
@@ -77,10 +78,11 @@ export default function UniversityFilterPanel({
   onClearAll,
   resultsCount,
   children,
+  showVisibility = true,
 }: UniversityFilterPanelProps) {
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState<UniversityFilterValues>(filters);
-  const ref = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
 
   const close = () => setOpen(false);
 
@@ -95,33 +97,31 @@ export default function UniversityFilterPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, filtersKey]);
 
-  useEffect(() => {
-    const onMouse = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) close();
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
-    };
-    document.addEventListener("mousedown", onMouse);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onMouse);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, []);
-
   const activeFilterCount = [
     filters.type !== "all",
     filters.isPublic !== "all",
     filters.hasLanguageCenter !== "all",
-    filters.isHidden !== "all",
+    showVisibility && filters.isHidden !== "all",
   ].filter(Boolean).length;
 
   const chips: { key: keyof UniversityFilterValues; label: string }[] = [];
-  if (filters.type !== "all") chips.push({ key: "type", label: findLabel(typeOptions, filters.type) });
-  if (filters.isPublic !== "all") chips.push({ key: "isPublic", label: findLabel(PUBLIC_OPTIONS, filters.isPublic) });
-  if (filters.hasLanguageCenter !== "all") chips.push({ key: "hasLanguageCenter", label: findLabel(LANGUAGE_CENTER_OPTIONS, filters.hasLanguageCenter) });
-  if (filters.isHidden !== "all") chips.push({ key: "isHidden", label: findLabel(HIDDEN_OPTIONS, filters.isHidden) });
+  if (filters.type !== "all")
+    chips.push({ key: "type", label: findLabel(typeOptions, filters.type) });
+  if (filters.isPublic !== "all")
+    chips.push({
+      key: "isPublic",
+      label: findLabel(PUBLIC_OPTIONS, filters.isPublic),
+    });
+  if (filters.hasLanguageCenter !== "all")
+    chips.push({
+      key: "hasLanguageCenter",
+      label: findLabel(LANGUAGE_CENTER_OPTIONS, filters.hasLanguageCenter),
+    });
+  if (showVisibility && filters.isHidden !== "all")
+    chips.push({
+      key: "isHidden",
+      label: findLabel(HIDDEN_OPTIONS, filters.isHidden),
+    });
 
   const handleApply = () => {
     onApplyFilters(draft);
@@ -134,136 +134,142 @@ export default function UniversityFilterPanel({
     close();
   };
 
+  const fields = [
+    {
+      key: "type",
+      label: "University type",
+      options: typeOptions,
+      placeholder: "All types",
+    },
+    {
+      key: "isPublic",
+      label: "Institution",
+      options: PUBLIC_OPTIONS,
+      placeholder: "Public & private",
+    },
+    {
+      key: "hasLanguageCenter",
+      label: "Language center",
+      options: LANGUAGE_CENTER_OPTIONS,
+      placeholder: "Any language center",
+    },
+    ...(showVisibility
+      ? [
+          {
+            key: "isHidden",
+            label: "Visibility",
+            options: HIDDEN_OPTIONS,
+            placeholder: "Any visibility",
+          },
+        ]
+      : []),
+  ];
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3">
-        <div className="flex items-center gap-3 sm:contents">
-          <SearchInput
-            value={searchTerm}
-            onChange={onSearchChange}
-            placeholder={searchPlaceholder}
-            className="flex-1"
-          />
-        </div>
-
-        <div className="flex items-center gap-3 sm:contents">
-          <div className="relative" ref={ref}>
-            <button
-              type="button"
-              onClick={() => setOpen((v) => !v)}
-              aria-expanded={open}
-              aria-haspopup="true"
-              className={`relative flex h-10 shrink-0 items-center gap-2 rounded-lg border px-4 text-sm font-medium transition ${
-                open
-                  ? "border-blue-300 bg-blue-50 text-blue-700"
-                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-              {activeFilterCount > 0 && (
-                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-blue-600 px-1 text-xs font-bold text-white">
-                  {activeFilterCount}
-                </span>
-              )}
-            </button>
-
-            {open && (
-              <>
-                <div className="fixed inset-0 z-[90] bg-black/30 sm:hidden" onClick={close} />
-
-                <div
-                  role="dialog"
-                  aria-label="Filters"
-                  className="fixed inset-x-0 bottom-0 z-[100] max-h-[80vh] overflow-y-auto rounded-t-2xl border-t border-slate-200 bg-white p-5 shadow-2xl sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-[calc(100vh-120px)] sm:w-[380px] sm:rounded-xl sm:border sm:shadow-xl"
-                >
-                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h4 className="text-sm font-semibold text-slate-900">Filters</h4>
-                    <button type="button" onClick={close} className="text-slate-400 hover:text-slate-600 sm:hidden">
-                      <X className="h-5 w-5" />
-                    </button>
-                  </div>
-
-                  <div className="flex flex-col gap-3 py-4">
-                    <FilterSelectField
-                      value={draft.type}
-                      onChange={(val: string) => setDraft((d) => ({ ...d, type: val }))}
-                      options={typeOptions}
-                      icon={MdOutlineCategory}
-                      defaultOption="All Types"
-                    />
-                    <FilterSelectField
-                      value={draft.isPublic}
-                      onChange={(val: string) => setDraft((d) => ({ ...d, isPublic: val }))}
-                      options={PUBLIC_OPTIONS}
-                      icon={Building2}
-                      defaultOption="Any Institution Type"
-                    />
-                    <FilterSelectField
-                      value={draft.hasLanguageCenter}
-                      onChange={(val: string) => setDraft((d) => ({ ...d, hasLanguageCenter: val }))}
-                      options={LANGUAGE_CENTER_OPTIONS}
-                      icon={Languages}
-                      defaultOption="Any Language Center"
-                    />
-                    <FilterSelectField
-                      value={draft.isHidden}
-                      onChange={(val: string) => setDraft((d) => ({ ...d, isHidden: val }))}
-                      options={HIDDEN_OPTIONS}
-                      icon={EyeOff}
-                      defaultOption="Any Visibility"
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-3">
-                    <button
-                      type="button"
-                      onClick={handleReset}
-                      className="flex items-center gap-1.5 text-sm font-medium text-slate-500 transition hover:text-slate-700"
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" />
-                      Reset
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleApply}
-                      className="rounded-lg border border-blue-600 bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-
-          {resultsCount !== undefined && (
-            <span className="hidden shrink-0 items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700 sm:inline-flex">
-              {resultsCount.toLocaleString()}
-              <span className="font-normal text-blue-500">results</span>
-            </span>
-          )}
-        </div>
+    <div className="min-w-0 space-y-4">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <SearchInput
+          value={searchTerm}
+          onChange={onSearchChange}
+          placeholder={searchPlaceholder}
+          className="min-w-0 flex-1 sm:min-w-[220px]"
+        />
+        <Button
+          variant="secondary"
+          icon={<SlidersHorizontal className="h-4 w-4" />}
+          text={
+            activeFilterCount ? `Filters (${activeFilterCount})` : "Filters"
+          }
+          onClick={() => setOpen(true)}
+          className="min-h-[44px]"
+        />
+        {resultsCount !== undefined && (
+          <p role="status" className="text-ub-label-sm text-ub-text-secondary">
+            {resultsCount} universities
+          </p>
+        )}
       </div>
-
-      {chips.length > 0 && (
-        <div className="-mx-6 flex items-center gap-2 overflow-x-auto px-6 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
-          {chips.map((chip) => (
-            <FilterChip key={chip.key} label={chip.label} onRemove={() => onRemoveFilter(chip.key)} />
-          ))}
-          {chips.length >= 2 && (
-            <button
-              type="button"
-              onClick={onClearAll}
-              className="shrink-0 whitespace-nowrap text-sm font-medium text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline"
-            >
-              Clear all
-            </button>
-          )}
-        </div>
-      )}
-
+      <AnimatePresence initial={false}>
+        {chips.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{
+              duration: reducedMotion ? 0 : MICRO_DURATION,
+              ease: EASE,
+            }}
+          >
+            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+              {chips.map((chip) => (
+                <FilterChip
+                  key={chip.key}
+                  label={chip.label}
+                  onRemove={() => onRemoveFilter(chip.key)}
+                />
+              ))}
+              <Button
+                size="sm"
+                variant="tertiary"
+                text="Clear filters"
+                onClick={onClearAll}
+                className="shrink-0"
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {children}
+      <Drawer
+        open={open}
+        onClose={close}
+        title="Filter universities"
+        description="Find institutions by type, language support and availability."
+        footer={
+          <div className="grid w-full grid-cols-2 gap-3">
+            <Button
+              variant="secondary"
+              text="Clear filters"
+              onClick={handleReset}
+              className="min-h-[44px]"
+            />
+            <Button
+              variant="primary"
+              text="Apply filters"
+              onClick={handleApply}
+              className="min-h-[44px]"
+            />
+          </div>
+        }
+      >
+        <div className="space-y-5">
+          {fields.map(({ key, label, options, placeholder }, index) => (
+            <motion.div
+              key={key}
+              initial={reducedMotion ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: reducedMotion ? 0 : MICRO_DURATION,
+                delay: reducedMotion ? 0 : index * 0.025,
+                ease: EASE,
+              }}
+            >
+              <p className="mb-2 text-ub-label-md text-ub-text-primary">
+                {label}
+              </p>
+              <SelectInput
+                field={key}
+                aria-label={label}
+                className="min-h-[44px]"
+                formData={draft}
+                options={[{ value: "all", label: placeholder }, ...options]}
+                updateFormData={(_, value) =>
+                  setDraft((previous) => ({ ...previous, [key]: value }))
+                }
+              />
+            </motion.div>
+          ))}
+        </div>
+      </Drawer>
     </div>
   );
 }

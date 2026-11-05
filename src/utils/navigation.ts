@@ -1,5 +1,4 @@
 import { IRoute } from 'types/navigation';
-import Router from 'next/router';
 
 // NextJS Requirement
 export const isWindowAvailable = () => typeof window !== 'undefined';
@@ -8,20 +7,32 @@ export const findCurrentRoute = (
   routes: IRoute[],
   pathname: string,
 ): IRoute => {
-  // Pure on `pathname` (usePathname works during SSR too), so server and
-  // client resolve the same route and the navbar title hydrates cleanly.
-  for (let route of routes) {
-    if (!!route.items) {
-      const found = findCurrentRoute(route.items, pathname);
-      if (!!found) return found;
+  let active: IRoute | undefined;
+  let longest = -1;
+  const visit = (entries: IRoute[]) => {
+    for (const route of entries) {
+      const href = `${route.layout ?? ""}${route.path}`.replace(/\/$/, "") || "/";
+      const matches = pathname === href || (href !== "/" && pathname?.startsWith(`${href}/`));
+      if (matches && href.length >= longest) {
+        active = route;
+        longest = href.length;
+      }
+      if (route.children) visit(route.children);
+      if (route.items) visit(route.items);
     }
-    if (pathname?.match(route.path) && route) return route;
-  }
+  };
+  visit(routes);
+  return active;
 };
 
 export const getActiveRoute = (routes: IRoute[], pathname: string): string => {
   const route = findCurrentRoute(routes, pathname);
-  return route?.name || 'Main Dashboard';
+  if (route) return route.name;
+  // Direct links can target a section hidden from the sidebar by a feature flag.
+  const section = pathname?.split("/")[2];
+  return section
+    ? section.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
+    : "Main Dashboard";
 };
 
 export const getActiveNavbar = (
