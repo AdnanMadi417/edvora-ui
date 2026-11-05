@@ -18,6 +18,7 @@ import NewScreenParts from "./sections/NewScreenParts";
 import ApplicationKit from "./sections/ApplicationKit";
 import PopupForms from "./patterns/PopupForms";
 import TableOptions from "./sections/TableOptions";
+import ProgramCards from "./sections/ProgramCards";
 import ApplicationFormDemo from "./patterns/ApplicationFormDemo";
 import { ApplicationDetailsDemo } from "./patterns/ApplicationDetailsPattern";
 import { AdvisorProfileDemo } from "./patterns/AdvisorProfileDemo";
@@ -141,6 +142,7 @@ export function ContentSection() {
       <Pick demos={["Collapse"]}>
         <ApplicationFormDemo />
       </Pick>
+      <ProgramCards />
       <ApplicationDetailsDemo />
       <AdvisorProfileDemo />
     </ShowcaseSection>

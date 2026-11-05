@@ -24,6 +24,13 @@ const imp = (name: string, path: string) => `import ${name} from "components/ub/
 const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
 
 export const CATALOG: Record<string, CatalogEntry> = {
+  ProgramCard: {
+    category: "data",
+    imports: [imp("ProgramCard", "data/cards/ProgramCard")],
+    useFor: "Compare programs by university, tuition, study details, intake and commission.",
+    usedIn: ["Knowledge Hub", "Program catalogue"],
+    avoid: "Dense comparisons across many programs: use the Knowledge Hub table.",
+  },
   RequirementSelector: {
     category: "forms",
     imports: [imp("RequirementSelector", "forms/choices/RequirementSelector")],

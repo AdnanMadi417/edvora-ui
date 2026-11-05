@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import { ArrowRight, ArrowLeft, Award, Send, GraduationCap, AlertCircle } from 'lucide-react';
-import PresignedImage from "components/ub/data/media/PresignedImage";
+import { ArrowRight, ArrowLeft, GraduationCap, AlertCircle } from 'lucide-react';
+import ProgramCard from "components/ub/data/cards/ProgramCard";
 
 import Loading from "components/ub/feedback/states/Loading";
 import NoMessagesFound from "components/ub/feedback/states/NoMessagesFound";
@@ -16,12 +16,9 @@ import { useUniversities } from "features/universities/hooks";
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import ProgramFilterPanel from "features/programs/components/shared/filters/ProgramFilterPanel";
-import IntakeMonthsChips from "features/programs/components/shared/IntakeMonthsChips";
 import { nextIntakeMonth, resolveIntakeDate } from "features/programs/utils/intakeMonths";
-import { courseTypeLabel } from "features/programs/utils/courseType";
 import NextButton from "components/ub/core/buttons/NextButton";
 import PrevButton from "components/ub/core/buttons/PrevButton";
-import Link from "next/link";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -225,137 +222,22 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
             <div className="block">
               <div className={`grid grid-cols-1 gap-4 p-6 md:grid-cols-2 lg:grid-cols-3 transition-opacity duration-150 ${programsFetching && !programsLoading ? "opacity-50 pointer-events-none" : ""}`}>
                 {programs.map((program) => (
-                  <div
+                  <ProgramCard
                     key={program.id}
-                    onClick={() => window.open(`${basePath}/knowledge-hub/${program.id}`, "_blank")}
-                    className="group relative cursor-pointer flex flex-col overflow-hidden rounded-2xl border border-blue-200 bg-white shadow-sm hover:border-blue-400 hover:bg-blue-50/40 hover:shadow-md"
-                  >
-                    {/* Header */}
-                    <div className="flex items-start gap-3 px-4 pt-5 pb-4">
-
-                      <div className="flex-shrink-0 h-14 w-14 rounded-full overflow-hidden">
-                        {program.university?.logo_file_key ? (
-                          <PresignedImage
-                            fileKey={program.university.logo_file_key}
-                            alt={program.university.name}
-                            className="h-full w-full object-cover"
-                            fallback={
-                              <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
-                                {program.university?.name?.slice(0, 2).toUpperCase()}
-                              </div>
-                            }
-                          />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center bg-accent-light text-h6 font-medium text-blue-700">
-                            {program.university?.name?.slice(0, 2).toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <h3 className="text-sm font-bold text-slate-900 leading-snug line-clamp-2 group-hover:text-blue-600 " title={program.name}>
-                          {program.name}
-                        </h3>
-                        <p className="mt-0.5 text-xs text-slate-500 truncate">
-                          {program.university?.name}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Divider */}
-                    <div className="mx-4 border-t border-slate-100" />
-
-                    {/* Details Grid */}
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-3 px-4 py-4">
-                      <div>
-                        <p className="text-xs text-slate-400">First Year</p>
-                        <p className="text-sm font-bold text-slate-900">
-                          {program.first_year_tuition
-                            ? `${program.yearly_fee_currency || "MYR"} ${program.first_year_tuition.toLocaleString()}`
-                            : "N/A"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-400">Level</p>
-                        <p className="text-sm font-bold text-slate-900">
-                          {program.qualification_level ?? "N/A"}
-                          {program.course_type && (
-                            <span className="block text-xs font-medium text-slate-500">
-                              {courseTypeLabel(program.course_type)}
-                            </span>
-                          )}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-400">Location</p>
-                        <p className="text-sm font-bold text-slate-900">
-                          {program.branch?.state ?? "N/A"}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-slate-400">Duration</p>
-                        <p className="text-sm font-bold text-slate-900">
-                          {program.duration ?? "N/A"}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Intake Dates */}
-                    {program.intake_months && program.intake_months.length > 0 && (
-                      <div className="px-4 pb-3">
-                        <p className="mb-1.5 text-xs text-slate-400">Intakes</p>
-                        <IntakeMonthsChips months={program.intake_months} size="sm" showDot={false} maxVisible={3} />
-                      </div>
-                    )}
-
-                    {/* Scholarship badge */}
-                    <div className="px-4 pb-3">
-                      {program.has_scholarship ? (
-                        <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-600">
-                          <Award className="h-4 w-4" />
-                          Scholarship Available
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
-                          <Award className="h-4 w-4" />
-                          No Scholarship
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Commission */}
-                    {program.commission_amount != null && (
-                      <div className="mx-4 mb-4 flex items-center justify-between rounded-xl bg-emerald-50 px-4 py-3">
-                        <span className="text-sm font-medium text-emerald-700">Your Commission</span>
-                        <span className="text-lg font-bold text-emerald-600">
-                          {`${(program.commission_currency || "RM").toUpperCase()} ${program.commission_amount.toLocaleString()}`}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Apply Now */}
-                    {showApplyAction && (
-                      <div className="px-4 pb-4">
-                        <Link
-                          href={{
-                            pathname: "/partner/applications/apply-for-program",
-                            query: {
-                              program_id: program.id,
-                              university_id: program.university.id,
-                              intake_date: (() => {
-                                const month = program.next_intake_month ?? nextIntakeMonth(program.intake_months) ?? nextIntakeMonth(program.university.intake_months);
-                                return month ? resolveIntakeDate(month) : new Date().toISOString().split("T")[0];
-                              })(),
-                            },
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex w-full items-center justify-center gap-2 rounded-md bg-blue-700 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-800"
-                        >
-                          <Send className="h-4 w-4" />
-                          Apply Now
-                        </Link>
-                      </div>
-                    )}
-                  </div>
+                    program={program}
+                    href={`${basePath}/knowledge-hub/${program.id}`}
+                    applyHref={showApplyAction ? {
+                      pathname: "/partner/applications/apply-for-program",
+                      query: {
+                        program_id: program.id,
+                        university_id: program.university.id,
+                        intake_date: (() => {
+                          const month = program.next_intake_month ?? nextIntakeMonth(program.intake_months) ?? nextIntakeMonth(program.university.intake_months);
+                          return month ? resolveIntakeDate(month) : new Date().toISOString().split("T")[0];
+                        })(),
+                      },
+                    } : undefined}
+                  />
                 ))}
               </div>
 
