@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import Button from "components/ub/core/buttons/Button";
 import StickyActionBar from "components/ub/navigation/controls/StickyActionBar";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
@@ -25,14 +25,13 @@ export interface ApplicationDetailsLayoutProps {
   children?: ReactNode;
 }
 
-const ID = "application-details";
-
 /**
  * Application Details page frame (brief §6): header, alerts, tracker, then
  * Overview · Documents · Offer & visa · Commission · Activity. Tabs scroll
  * horizontally on mobile, where the Primary action moves to a sticky bar.
  */
 export default function ApplicationDetailsLayout({ header, alerts, tracker, activeTab, onTabChange, panels, tabCounts = {}, primaryAction, stickyAction = true, children }: ApplicationDetailsLayoutProps) {
+  const tabId = useId();
   const sticky = !!primaryAction && stickyAction;
   const tabs = APPLICATION_DETAILS_TABS.map((t) => ({ ...t, count: tabCounts[t.key] }));
   return (
@@ -41,8 +40,8 @@ export default function ApplicationDetailsLayout({ header, alerts, tracker, acti
       {alerts}
       {tracker}
       <div className="min-w-0">
-        <Tabs<ApplicationDetailsTab> tabs={tabs} active={activeTab} onChange={onTabChange} idPrefix={ID} inset={false} aria-label="Application sections" />
-        <div {...tabPanelProps(ID, activeTab)} className="mt-4 min-w-0 focus-visible:outline-none md:mt-6">
+        <Tabs<ApplicationDetailsTab> tabs={tabs} active={activeTab} onChange={onTabChange} variant="underline" idPrefix={tabId} inset={false} aria-label="Application sections" />
+        <div {...tabPanelProps(tabId, activeTab)} className="mt-4 min-w-0 focus-visible:outline-none md:mt-6">
           {panels[activeTab]}
         </div>
       </div>
