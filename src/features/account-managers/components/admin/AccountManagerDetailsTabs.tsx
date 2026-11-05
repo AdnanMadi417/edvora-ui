@@ -1,9 +1,10 @@
 "use client";
 
+import { useId as useTabId } from "react";
 import React, { useState } from "react";
 import { AlertCircle, CheckCircle2, Share2, Users, XCircle } from "lucide-react";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import type { AccountManager } from "../../types";
 import AccountManagerPartnersTable from "../AccountManagerPartnersTable";
@@ -22,6 +23,7 @@ const TABS: TabItem<DetailsTab>[] = [
 ];
 
 export default function AccountManagerDetailsTabs({ manager, onManagerChanged }: Props) {
+  const tabId = useTabId();
   const [tab, setTab] = useState<DetailsTab>("profile");
 
   return (
@@ -46,7 +48,8 @@ export default function AccountManagerDetailsTabs({ manager, onManagerChanged }:
         </div>
       </div>
 
-      <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} />
+      <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} variant="underline" idPrefix={tabId} aria-label="Account manager sections" />
+      <div {...tabPanelProps(tabId, tab)}>
 
       {tab === "profile" && (
         <div key={tab} className="animate-in fade-in duration-200 p-6 text-sm">
@@ -83,5 +86,6 @@ export default function AccountManagerDetailsTabs({ manager, onManagerChanged }:
         </div>
       )}
     </div>
+      </div>
   );
 }
