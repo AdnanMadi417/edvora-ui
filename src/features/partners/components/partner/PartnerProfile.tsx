@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { useId as useTabId } from "react";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -23,7 +24,7 @@ import {
   Users,
 } from "lucide-react";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import { usePartnerProfile, useUpdatePartnerProfile } from "features/partners";
 import { PartnerBankAccountSection } from "features/partners/bank-accounts";
@@ -152,6 +153,7 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
 const PartnerDetails = ({ id }: PartnerDetailsProps) => {
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const tabId = useTabId();
   const [tab, setTab] = useState<ProfileTab>("profile");
   const router = useRouter();
   const { showToast } = useToast();
@@ -293,7 +295,8 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
             </div>
           </div>
 
-          <Tabs<ProfileTab> tabs={profileTabs} active={tab} onChange={setTab} />
+          <Tabs<ProfileTab> tabs={profileTabs} active={tab} onChange={setTab} variant="underline" idPrefix={tabId} aria-label="My profile sections" />
+          <div {...tabPanelProps(tabId, tab)}>
 
           {/* Account Overview */}
           {tab === "profile" && (
@@ -409,6 +412,7 @@ const PartnerDetails = ({ id }: PartnerDetailsProps) => {
           )}
 
         </div>
+          </div>
       </div>
     </>
   );
