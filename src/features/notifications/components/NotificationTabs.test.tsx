@@ -36,14 +36,17 @@ it("keeps panel IDs unique when notification views share a page", () => {
   expect(new Set(ids).size).toBe(ids.length);
 });
 
-it("lets the mobile category picker filter the same content and synchronizes desktop selection", async () => {
+it("lets mobile chips filter the same content and keeps the selected category pressed", async () => {
   render(<Harness />);
   const user = userEvent.setup();
-  const picker = screen.getByRole("combobox", { name: "Unread notification category" });
-  expect(picker).toHaveValue("action_required");
-  await user.selectOptions(picker, "info");
-  expect(screen.getByText("info messages")).toBeInTheDocument();
+  const group = screen.getByRole("group", { name: "Unread notification categories" });
+  const chip = within(group).getByRole("button", { name: "System info (3)" });
+  await user.click(chip);
+  expect(chip).toHaveAttribute("aria-pressed", "true");
+  expect(within(group).getByRole("button", { name: "Action required (5)" })).toHaveAttribute("aria-pressed", "false");
   expect(screen.getByRole("tab", { name: /System info/ })).toHaveAttribute("aria-selected", "true");
-  const panel = document.getElementById(picker.getAttribute("aria-controls")!);
+  const panel = document.getElementById(chip.getAttribute("aria-controls")!);
   expect(within(panel!).getByText("info messages")).toBeInTheDocument();
+  await user.click(chip);
+  expect(chip).toHaveAttribute("aria-pressed", "true");
 });
