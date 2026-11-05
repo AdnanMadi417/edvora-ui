@@ -50,6 +50,8 @@ function Panel({ title, action, children, className }: { title: string; action?:
   );
 }
 
+import ApplicationPipelineDemo from "./ApplicationPipelineDemo";
+
 export default function DashboardPatterns() {
   return (
     <ShowcaseSection
@@ -63,6 +65,8 @@ export default function DashboardPatterns() {
           <AdvisorHomeScreen headingLevel={2} />
         </div>
       </Demo>
+
+      <ApplicationPipelineDemo />
 
       {/* Dashboard widget library (components/ub/dashboard). */}
       <Pick demos={["DashboardHeader and PeriodSelect", "DashboardCard, CardMenu, CardLinkButton and CardFooterStats", "StatCard, DeltaPill and IconTile", "PillBarChart and ChartLegend", "CategoryColumnChart", "GaugeChart and GaugeLegendStats", "ActivityHeatmap", "Sparkline and PipelineBar", "PipelineFlow", "TaskList and PeopleList", "BreakdownTable and StatusTag", "ReminderCard, CountdownCard and ProgressCard", "Admin dashboard"]}>

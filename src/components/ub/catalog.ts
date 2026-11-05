@@ -24,6 +24,13 @@ const imp = (name: string, path: string) => `import ${name} from "components/ub/
 const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
 
 export const CATALOG: Record<string, CatalogEntry> = {
+  "Application pipeline & statistics": {
+    category: "data",
+    imports: ['import PipelineCard from "features/applications/partner/components/PipelineCard";', 'import ApplicationStatistics from "features/applications/components/ApplicationStatistics";'],
+    useFor: "Show role-scoped application totals and filter the list by stage.",
+    usedIn: ["Adviser applications", "Admin applications", "Account-manager applications"],
+    avoid: "Showing a single student’s progress: use ApplicationTrackerCard.",
+  },
   UniversityCard: {
     category: "data",
     imports: [imp("UniversityCard", "data/cards/UniversityCard")],

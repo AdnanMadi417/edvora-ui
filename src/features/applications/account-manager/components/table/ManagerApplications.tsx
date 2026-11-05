@@ -16,17 +16,16 @@ import DashboardHeader from "components/ub/dashboard/shared/DashboardHeader";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
 
-
 const ACTION_REQUIRED_STATUSES = new Set([
-  'new_application',
-  'payment_submitted',
-  'eval_under_review',
-  'e-visa_under_review',
-  'visa_documents_under_review',
-  'arrival_confirmed',
-  'extra_arrival_documents_under_review',
-  'issue_response_received',
-  'commission_disputed',
+  "new_application",
+  "payment_submitted",
+  "eval_under_review",
+  "e-visa_under_review",
+  "visa_documents_under_review",
+  "arrival_confirmed",
+  "extra_arrival_documents_under_review",
+  "issue_response_received",
+  "commission_disputed",
 ]);
 
 const ModernApplicationsTable = () => {
@@ -36,7 +35,12 @@ const ModernApplicationsTable = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const { universities } = useUniversities();
-  const { stages } = useAllStages();
+  const {
+    stages,
+    stagesLoading,
+    stagesError,
+    refetch: refetchStages,
+  } = useAllStages();
   const { stageStatuses, stageStatusesLoading } = useAllStageStatuses();
 
   const [selectedUniversity, setSelectedUniversity] = useState<string>("all");
@@ -44,8 +48,15 @@ const ModernApplicationsTable = () => {
   const [selectedStageStatus, setSelectedStageStatus] = useState<string>("all");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [stageCounts, setStageCounts] = useState<Record<string, number>>({});
-  const [stageActionRequired, setStageActionRequired] = useState<Record<string, boolean>>({});
-  const [selectedLifecycle, setSelectedLifecycle] = useState<"active" | "hold" | "cancel" | "all">("active");
+  const [stageActionRequired, setStageActionRequired] = useState<
+    Record<string, boolean>
+  >({});
+  const [pipelineLoading, setPipelineLoading] = useState(true);
+  const [pipelineError, setPipelineError] = useState<string | null>(null);
+  const [pipelineRetry, setPipelineRetry] = useState(0);
+  const [selectedLifecycle, setSelectedLifecycle] = useState<
+    "active" | "hold" | "cancel" | "all"
+  >("active");
 
   const itemsPerPage = 10;
 
@@ -58,50 +69,77 @@ const ModernApplicationsTable = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    if (stages.length === 0) return;
+    if (stages.length === 0) {
+      setPipelineLoading(false);
+      return;
+    }
     let cancelled = false;
+    setPipelineLoading(true);
+    setPipelineError(null);
     Promise.all(
       stages.map((s) =>
-        api.get(`/account-managers/applications`, { params: { stage_id: s.id, limit: 10, status: selectedLifecycle } })
+        api
+          .get(`/account-managers/applications`, {
+            params: { stage_id: s.id, limit: 10, status: selectedLifecycle },
+          })
           .then((res) => ({
             id: s.id,
             count: (res.data as any)?.total ?? 0,
+            failed: false,
             hasAction: ((res.data as any)?.items ?? []).some((app: any) =>
-              ACTION_REQUIRED_STATUSES.has(app.status?.toLowerCase().replace(/\s+/g, '_'))
+              ACTION_REQUIRED_STATUSES.has(
+                app.status?.toLowerCase().replace(/\s+/g, "_")
+              )
             ),
           }))
-          .catch(() => ({ id: s.id, count: 0, hasAction: false }))
+          .catch(() => ({ id: s.id, count: 0, hasAction: false, failed: true }))
       )
     ).then((results) => {
       if (cancelled) return;
       const counts: Record<string, number> = {};
       const actionMap: Record<string, boolean> = {};
-      results.forEach((r) => { counts[r.id] = r.count; actionMap[r.id] = r.hasAction; });
+      results.forEach((r) => {
+        counts[r.id] = r.count;
+        actionMap[r.id] = r.hasAction;
+      });
       setStageCounts(counts);
       setStageActionRequired(actionMap);
+      setPipelineError(
+        results.some((result) => result.failed)
+          ? "Some application stage totals could not load."
+          : null
+      );
+      setPipelineLoading(false);
     });
-    return () => { cancelled = true; };
-  }, [stages.length, selectedLifecycle]);
+    return () => {
+      cancelled = true;
+    };
+  }, [stages.length, selectedLifecycle, pipelineRetry, stages]);
 
-  const { total: grandTotal } = useAccountManagerApplications({ limit: 1, status: selectedLifecycle });
+  const {
+    total: grandTotal,
+    loading: totalsLoading,
+    error: totalsError,
+    refetch: refetchTotals,
+  } = useAccountManagerApplications({ limit: 1, status: selectedLifecycle });
 
-  const { items: applications, total, loading, error, refetch } = useAccountManagerApplications({
+  const {
+    items: applications,
+    total,
+    loading,
+    error,
+    refetch,
+  } = useAccountManagerApplications({
     limit: itemsPerPage,
     offset: (currentPage - 1) * itemsPerPage,
     status: selectedLifecycle,
     stage_id: selectedStages ?? undefined,
-    stage_status_id: selectedStageStatus !== "all" ? selectedStageStatus : undefined,
+    stage_status_id:
+      selectedStageStatus !== "all" ? selectedStageStatus : undefined,
     search: debouncedSearch || undefined,
-    university_id: selectedUniversity !== "all" ? selectedUniversity : undefined,
+    university_id:
+      selectedUniversity !== "all" ? selectedUniversity : undefined,
   });
-
-
-  const totalActionRequired = useMemo(
-    () => stages
-      .filter((s) => stageActionRequired[s.id])
-      .reduce((sum, s) => sum + (stageCounts[s.id] ?? 0), 0),
-    [stages, stageActionRequired, stageCounts]
-  );
 
   const handleSort = (key: string) => {
     setSortConfig((prev) => ({
@@ -132,26 +170,37 @@ const ModernApplicationsTable = () => {
     }
 
     return filtered;
-  }, [applications, selectedUniversity, sortConfig]);
+  }, [applications, sortConfig]);
 
   const needsAction = (status: string) =>
-    ACTION_REQUIRED_STATUSES.has(status?.toLowerCase().replace(/\s+/g, '_'));
+    ACTION_REQUIRED_STATUSES.has(status?.toLowerCase().replace(/\s+/g, "_"));
 
   const totalPages = Math.ceil(total / itemsPerPage);
   const paginatedApplications = filteredAndSortedApplications;
-  const displayTotal = paginatedApplications.length < itemsPerPage
-    ? (currentPage - 1) * itemsPerPage + paginatedApplications.length
-    : grandTotal;
+  const displayTotal =
+    paginatedApplications.length < itemsPerPage
+      ? (currentPage - 1) * itemsPerPage + paginatedApplications.length
+      : grandTotal;
 
-  const status = getAsyncStatus(loading, error, paginatedApplications, (r) => r.length === 0);
+  const status = getAsyncStatus(
+    loading,
+    error,
+    paginatedApplications,
+    (r) => r.length === 0
+  );
 
   // Display name for a status code, from the stage-status list.
   const statusLabel = (status: string) => {
     const normalized = status?.toLowerCase().replace(/\s+/g, "_") ?? "";
-    const match = stageStatuses.find((s) => s.name.toLowerCase().replace(/\s+/g, "_") === normalized);
-    return match?.name ?? (normalized.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Unknown");
+    const match = stageStatuses.find(
+      (s) => s.name.toLowerCase().replace(/\s+/g, "_") === normalized
+    );
+    return (
+      match?.name ??
+      (normalized.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) ||
+        "Unknown")
+    );
   };
-
 
   const handleClearFilters = () => {
     setSearchTerm("");
@@ -165,33 +214,64 @@ const ModernApplicationsTable = () => {
 
   return (
     <Card extra="mt-6 ">
-
       {/* Header */}
-      <DashboardHeader hideTitle as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" className="border-b border-ub-border p-4 sm:p-6" />
+      <DashboardHeader
+        hideTitle
+        as="h2"
+        title="Applications Dashboard"
+        subtitle="Manage and track student applications"
+        className="border-b border-ub-border p-4 sm:p-6"
+      />
 
-      {grandTotal > 0 && (
+      {
         <div className="min-w-0 p-4 sm:p-6 border-b border-ub-border">
           <PipelineCard
             stages={stages}
             stageCounts={stageCounts}
             stageActionRequired={stageActionRequired}
             selectedId={selectedStages}
-            onSelect={(id) => { setSelectedStages(id); setCurrentPage(1); }}
+            onSelect={(id) => {
+              setSelectedStages(id);
+              setCurrentPage(1);
+            }}
+            loading={pipelineLoading || stagesLoading || totalsLoading}
+            error={pipelineError || stagesError || totalsError}
+            onRetry={() => {
+              setPipelineRetry((value) => value + 1);
+              void refetchTotals();
+              if (stagesError) void refetchStages();
+            }}
+            scopeLabel={
+              selectedLifecycle === "active"
+                ? "Active applications"
+                : selectedLifecycle === "hold"
+                ? "Applications on hold"
+                : selectedLifecycle === "cancel"
+                ? "Cancelled applications"
+                : "All applications"
+            }
             totalCount={grandTotal}
-            totalActionRequired={totalActionRequired}
             title="Applications Pipeline"
             onViewCommission={() => {
-              const commStage = stages.find((s) => s.name.toLowerCase().includes('commission'));
-              if (commStage) { setSelectedStages(commStage.id); setCurrentPage(1); }
+              const commStage = stages.find((s) =>
+                s.name.toLowerCase().includes("commission")
+              );
+              if (commStage) {
+                setSelectedStages(commStage.id);
+                setCurrentPage(1);
+              }
             }}
           />
         </div>
-      )}
+      }
 
       <div className="border-b border-ub-border p-4 sm:p-6">
         <ApplicationFilterBar
           searchTerm={searchTerm}
-          onSearchChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+          onSearchChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1);
+          }}
           selectedStages={selectedStages ?? "all"}
           onStagesChange={(val) => {
             setSelectedStages(val === "all" ? null : val);
@@ -199,15 +279,30 @@ const ModernApplicationsTable = () => {
           }}
           stageOptions={stages.map((s) => ({ label: s.name, value: s.id }))}
           selectedUniversity={selectedUniversity}
-          onUniversityChange={(val) => { setSelectedUniversity(val); setCurrentPage(1); }}
-          universityOptions={universities.map((u) => ({ label: u.name, value: u.id }))}
+          onUniversityChange={(val) => {
+            setSelectedUniversity(val);
+            setCurrentPage(1);
+          }}
+          universityOptions={universities.map((u) => ({
+            label: u.name,
+            value: u.id,
+          }))}
           selectedStageStatus={selectedStageStatus}
-          onStageStatusChange={(val) => { setSelectedStageStatus(val); setCurrentPage(1); }}
-          stageStatusOptions={stageStatuses.map((s) => ({ label: s.name, value: s.id }))}
+          onStageStatusChange={(val) => {
+            setSelectedStageStatus(val);
+            setCurrentPage(1);
+          }}
+          stageStatusOptions={stageStatuses.map((s) => ({
+            label: s.name,
+            value: s.id,
+          }))}
           stageStatusLoading={stageStatusesLoading}
           showLifecycleFilter
           selectedLifecycle={selectedLifecycle}
-          onLifecycleChange={(val) => { setSelectedLifecycle(val as "active" | "hold" | "cancel" | "all"); setCurrentPage(1); }}
+          onLifecycleChange={(val) => {
+            setSelectedLifecycle(val as "active" | "hold" | "cancel" | "all");
+            setCurrentPage(1);
+          }}
           resultsCount={displayTotal}
           activeFiltersCount={activeFiltersCount}
           onClearFilters={handleClearFilters}
@@ -228,7 +323,14 @@ const ModernApplicationsTable = () => {
           needsAction={needsAction}
           defaultDensity="compact"
           selectable={true}
-          selectionResetKey={[selectedLifecycle, selectedStages, selectedStageStatus, selectedUniversity, debouncedSearch, currentPage].join("|")}
+          selectionResetKey={[
+            selectedLifecycle,
+            selectedStages,
+            selectedStageStatus,
+            selectedUniversity,
+            debouncedSearch,
+            currentPage,
+          ].join("|")}
           footer={
             <TablePagination
               currentPage={currentPage}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import api from "lib/useApi";
 import Cookies from "js-cookie";
 
@@ -14,26 +14,26 @@ export function useAllStages() {
   const [stagesLoading, setLoading] = useState<boolean>(false);
   const [stagesError, setError] = useState<string>("");
 
-  useEffect(() => {
-    const fetchStages = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const token = Cookies.get("token");
-        const res = await api.get("/applications/stages", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        setStages(res.data || []);
-      } catch (err) {
-        console.error(err);
-        setError("Failed to fetch stages");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchStages();
+  const fetchStages = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const token = Cookies.get("token");
+      const res = await api.get("/applications/stages", {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      setStages(res.data || []);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch stages");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  return { stages, stagesLoading, stagesError };
+  useEffect(() => {
+    void fetchStages();
+  }, [fetchStages]);
+
+  return { stages, stagesLoading, stagesError, refetch: fetchStages };
 }
