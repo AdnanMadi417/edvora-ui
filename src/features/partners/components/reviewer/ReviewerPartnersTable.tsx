@@ -1,5 +1,6 @@
 "use client";
 
+import { useId as useTabId } from "react";
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -15,7 +16,7 @@ import { useAccountManagers } from "features/account-managers/hooks";
 import ReviewPartnerPopup from "../admin/ReviewPartnerPopup";
 import SuspendActivatePartner from "../admin/SuspendActivatePartner";
 import PendingRegistrationOtpsTable from "../admin/PendingRegistrationOtpsTable";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import StatsFilterCards, { type FilterCardItem } from "components/ub/navigation/controls/StatsFilterCards";
 import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
@@ -53,6 +54,7 @@ function statusToParams(status: StatusFilter): { is_active?: boolean; type?: str
 
 export default function ReviewerPartnersTable() {
   const router = useRouter();
+  const tabId = useTabId();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedManager, setSelectedManager] = useState("all");
@@ -164,7 +166,8 @@ export default function ReviewerPartnersTable() {
         </div>
       </div>
 
-      <Tabs<ReviewerPartnersTab> tabs={TABS} active={activeTab} onChange={setActiveTab} />
+      <Tabs<ReviewerPartnersTab> tabs={TABS} active={activeTab} onChange={setActiveTab} variant="underline" idPrefix={tabId} aria-label="Advisor registration sections" />
+      <div {...tabPanelProps(tabId, activeTab)}>
 
       {activeTab === "pending-otps" && <PendingRegistrationOtpsTable />}
 
@@ -458,5 +461,6 @@ export default function ReviewerPartnersTable() {
         />
       )}
     </div>
+      </div>
   );
 }
