@@ -1,5 +1,6 @@
 "use client";
 
+import { useId as useTabId } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
@@ -10,7 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 import AppDate from "components/ub/data/formatting/AppDate";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import { useRouter } from "next/navigation";
 import { usePartners, useDeletePartner, useUpdatePartner, useResendApprovalEmail } from "features/partners/hooks";
@@ -58,6 +59,7 @@ export default function PartnersTable() {
   const router = useRouter();
   const { showToast } = useToast();
 
+  const tabId = useTabId();
   const [activeTab, setActiveTab] = useState<PartnersTab>("partners");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -241,7 +243,8 @@ export default function PartnersTable() {
         </div>
       </div>
 
-      <Tabs<PartnersTab> tabs={TABS} active={activeTab} onChange={setActiveTab} />
+      <Tabs<PartnersTab> tabs={TABS} active={activeTab} onChange={setActiveTab} variant="underline" idPrefix={tabId} aria-label="Advisor directory sections" />
+      <div {...tabPanelProps(tabId, activeTab)}>
 
       <AnimatePresence mode="wait">
       <motion.div
@@ -606,5 +609,6 @@ export default function PartnersTable() {
         />
       )}
     </div>
+      </div>
   );
 }
