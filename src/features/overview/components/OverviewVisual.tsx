@@ -54,9 +54,8 @@ export default function OverviewVisual({
     );
     if (view === "bars")
       return (
-        <div className="space-y-3">
-          {viewSwitch}
           <BarChartCard
+            controls={viewSwitch}
             title="Applications by stage"
             subtitle={pipeline.subtitle}
             as="h2"
@@ -97,12 +96,10 @@ export default function OverviewVisual({
               </>
             }
           />
-        </div>
       );
     return (
-      <div className="space-y-3">
-        {viewSwitch}
         <DashboardCard
+          controls={viewSwitch}
           title={pipeline.title}
           subtitle={pipeline.subtitle}
           as="h2"
@@ -143,7 +140,6 @@ export default function OverviewVisual({
             }))}
           />
         </DashboardCard>
-      </div>
     );
   }
   const catalogue = role === "data_entry";
