@@ -50,7 +50,7 @@ export default function PipelineFlow({ stages, onSelect, selectedId = null, labe
   const peak = Math.max(1, ...stages.map((s) => s.count));
 
   return (
-    <div className={clsx("-mx-1 overflow-x-auto px-1 pb-1", className)}>
+    <div role="region" aria-label={label} tabIndex={0} className={clsx("-mx-1 overflow-x-auto rounded-ub-sm px-1 pb-1", focusRing, className)}>
       <ol aria-label={label} className="grid min-w-[44rem]" style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(0, 1fr))` }}>
         {stages.map((s, i) => {
           const color = stageColor(s.stageId);

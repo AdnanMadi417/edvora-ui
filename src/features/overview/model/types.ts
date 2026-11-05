@@ -25,6 +25,12 @@ export interface OverviewItem {
 export interface OverviewData {
   total: number;
   items: OverviewItem[];
+  distribution?: {
+    key: string;
+    label: string;
+    value: number;
+    stageId?: string;
+  }[];
 }
 export interface OverviewResource {
   state: WidgetState;

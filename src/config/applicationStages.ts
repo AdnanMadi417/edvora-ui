@@ -8,7 +8,15 @@
 // a one-line edit here. Do not hard-code stage names anywhere else.
 
 /** Tag hues from the guide (brief §2.1), plus the success role for closed-won stages. */
-export type StageHue = "grey" | "amber" | "indigo" | "sky" | "teal" | "plum" | "pink" | "success";
+export type StageHue =
+  | "grey"
+  | "amber"
+  | "indigo"
+  | "sky"
+  | "teal"
+  | "plum"
+  | "pink"
+  | "success";
 
 export interface ApplicationStage {
   /** Stable id, safe to persist and to map to backend values. */
@@ -61,3 +69,31 @@ export const GLASS_BOX_STEPS: readonly TrackerStepConfig[] = [
   ...STUDENT_PROFILE_STEPS,
   { id: "arrival", label: "Arrival", stageId: "arrival-logistics" },
 ];
+
+/** Backend stage codes mapped to the shared visual palette; API labels stay authoritative. */
+const API_STAGE_TAGS: Record<string, ApplicationStageId> = {
+  APPLICATION_SUBMISSION: "documents-pending",
+  INSTITUTION_REVIEW: "institution-review",
+  OFFER_AND_VISA_PAYMENT: "offer-received",
+  VISA_PROCESSING: "visa-in-progress",
+  ARRIVAL_AND_ENROLLMENT: "arrival-logistics",
+  PARTNER_COMMISSION_INVOICING: "enrolled",
+};
+export function getApiStageTagId(stage: {
+  id: string;
+  name: string;
+  code?: string;
+}): ApplicationStageId | undefined {
+  const code = (stage.code || stage.name)
+    .toUpperCase()
+    .replace(/&/g, "AND")
+    .replace(/[^A-Z0-9]+/g, "_");
+  return (
+    API_STAGE_TAGS[code] ??
+    APPLICATION_STAGES.find(
+      (item) =>
+        item.id === stage.id ||
+        item.label.toLowerCase() === stage.name.toLowerCase()
+    )?.id
+  );
+}

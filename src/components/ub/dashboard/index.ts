@@ -29,3 +29,6 @@ export * from "./types";
 
 export { default as QuickActions } from "./lists/QuickActions";
 export type { QuickAction } from "./lists/QuickActions";
+
+export { default as BarChartCard, type BarChartCardProps } from "./cards/BarChartCard";
+export { default as GaugeCard, type GaugeCardProps } from "./cards/GaugeCard";

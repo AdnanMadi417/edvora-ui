@@ -1,3 +1,4 @@
+import { getApiStageTagId } from "config/applicationStages";
 import Cookies from "js-cookie";
 import api from "lib/useApi";
 import { partnersApi } from "features/partners/services";
@@ -152,6 +153,69 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
       });
     }
   }
+  if (
+    role === "admin" ||
+    role === "account_manager" ||
+    (role === "partner" && partnerId)
+  ) {
+    const endpoint =
+      role === "admin"
+        ? "/admin/applications"
+        : role === "account_manager"
+        ? "/account-managers/applications"
+        : `/partners/${encodeURIComponent(partnerId!)}/applications`;
+    add({
+      id: "pipeline",
+      title: "Application pipeline",
+      subtitle: "All active applications, grouped by their current stage.",
+      href: `${base}/applications`,
+      emptyMessage: "No active applications in your pipeline yet.",
+      load: async () => {
+        const response = await api.get("/applications/stages", {
+          headers: auth(),
+        });
+        const stages = Array.isArray(response.data)
+          ? response.data
+          : collection(response.data).items;
+        if (
+          stages.some(
+            (stage) =>
+              typeof stage.id !== "string" || typeof stage.name !== "string"
+          )
+        )
+          throw new Error("Invalid application stages");
+        const distribution = await Promise.all(
+          [...stages]
+            .sort((a, b) => (a.order_index ?? 0) - (b.order_index ?? 0))
+            .map(async (stage) => {
+              const result = await api.get(endpoint, {
+                headers: auth(),
+                params: {
+                  status: "active",
+                  stage_id: stage.id,
+                  limit: 1,
+                  offset: 0,
+                  ...(role === "partner" && agencyAdmin
+                    ? { include_members: true }
+                    : {}),
+                },
+              });
+              return {
+                key: stage.id,
+                label: stage.name,
+                value: collection(result.data).total,
+                stageId: getApiStageTagId(stage),
+              };
+            })
+        );
+        return {
+          total: distribution.reduce((sum, stage) => sum + stage.value, 0),
+          items: [],
+          distribution,
+        };
+      },
+    });
+  }
   if (role === "admin" || role === "reviewer") {
     add({
       id: "reviews",
@@ -182,6 +246,23 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
             at: item.created_at,
           })),
         };
+      },
+    });
+  }
+  if (role === "reviewer") {
+    add({
+      id: "verified",
+      title: "Verified advisors",
+      subtitle: "Verified advisor profiles",
+      href: `${base}/advisors`,
+      emptyMessage: "No verified advisors yet.",
+      load: async () => {
+        const response = await partnersApi.list({
+          is_verified: true,
+          page: 1,
+          page_size: 1,
+        });
+        return { total: collection(response.data).total, items: [] };
       },
     });
   }

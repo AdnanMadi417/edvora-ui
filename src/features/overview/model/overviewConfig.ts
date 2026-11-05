@@ -5,6 +5,9 @@ import {
   ClipboardList,
   Clock3,
   Handshake,
+  Plus,
+  Search,
+  Settings,
   Users,
   Wallet,
 } from "lucide-react";
@@ -16,6 +19,19 @@ export function overviewConfig(context: OverviewContext) {
     label,
     href: `${base}${path}`,
     description,
+    icon: /create|apply-now/.test(path)
+      ? Plus
+      : /knowledge-hub$/.test(path)
+      ? Search
+      : /universit/.test(path)
+      ? Building2
+      : /advisors|team|account-managers/.test(path)
+      ? Users
+      : /finance|commission/.test(path)
+      ? Wallet
+      : /configuration/.test(path)
+      ? Settings
+      : ClipboardList,
   });
   switch (context.role) {
     case "admin":

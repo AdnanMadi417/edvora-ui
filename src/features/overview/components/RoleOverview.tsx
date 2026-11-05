@@ -1,15 +1,15 @@
 "use client";
-import Link from "next/link";
-import { buttonBase, buttonSizes, buttonVariants } from "components/ub/recipes";
+import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import DashboardHeader from "components/ub/dashboard/shared/DashboardHeader";
 import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import StatCard from "components/ub/dashboard/cards/StatCard";
 import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
-import TaskList, { TaskListItem } from "components/ub/dashboard/lists/TaskList";
+import CardFooterStats from "components/ub/dashboard/cards/CardFooterStats";
+import OverviewVisual from "./OverviewVisual";
+import OverviewItems from "./OverviewItems";
 import QuickActions from "components/ub/dashboard/lists/QuickActions";
 import { TextButton } from "components/ub/core/buttons/TextButton";
-import AppDate from "components/ub/data/formatting/AppDate";
 import { useRoleOverview } from "../hooks/useRoleOverview";
 import {
   metricCaptions,
@@ -42,16 +42,16 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
           </TextButton>
         }
         primaryAction={
-          <Link
-            className={`${buttonBase} ${buttonSizes.md} ${buttonVariants.primary}`}
+          <LinkBtn
+            variant="primary"
             href={config.actions[0].href}
-          >
-            {config.actions[0].label}
-          </Link>
+            label={config.actions[0].label}
+            icon={null}
+          />
         }
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {config.metrics.map((id) => {
+        {config.metrics.map((id, index) => {
           const plan = plans.find((item) => item.id === id);
           const resource = resources[id];
           if (!plan) return null;
@@ -65,7 +65,7 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
               }
               value={resource?.data?.total.toLocaleString()}
               caption={metricCaptions[id]}
-              variant="icon"
+              variant={index === 0 ? "highlighted" : "icon"}
               icon={metricIcons[id]}
               state={resource?.state ?? "loading"}
               errorMessage={resource?.error}
@@ -77,10 +77,24 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
           );
         })}
       </div>
-      <DashboardCard title="Quick actions" as="h2">
-        <QuickActions actions={config.actions} />
-      </DashboardCard>
-      <div className="grid items-start gap-4 xl:grid-cols-2">
+      <div className="grid items-start gap-4 xl:grid-cols-3">
+        <div className="min-w-0 xl:col-span-2">
+          <OverviewVisual
+            role={role}
+            plans={plans}
+            resources={resources}
+            onRetry={refresh}
+          />
+        </div>
+        <DashboardCard
+          title="Quick actions"
+          subtitle="Your everyday tools, one click away."
+          as="h2"
+        >
+          <QuickActions actions={config.actions} className="xl:grid-cols-1" />
+        </DashboardCard>
+      </div>
+      <div className="grid items-start gap-4 xl:grid-cols-3">
         {[...config.panels, "updates"].map((id) => {
           const plan = plans.find((item) => item.id === id);
           if (!plan) return null;
@@ -93,6 +107,13 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
           return (
             <DashboardCard
               key={id}
+              className={
+                id === config.panels[0]
+                  ? "xl:col-span-2"
+                  : id === "updates"
+                  ? "xl:col-span-2"
+                  : undefined
+              }
               title={plan.title}
               subtitle={plan.subtitle}
               as="h2"
@@ -101,6 +122,26 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
               errorMessage={resource?.error}
               onRetry={refresh}
               skeleton="list"
+              footer={
+                resource?.data && state === "ready" ? (
+                  <CardFooterStats
+                    items={[
+                      {
+                        label:
+                          id === "active" ? "Actions shown" : "Items shown",
+                        value: items.length,
+                      },
+                      {
+                        label:
+                          id === "active"
+                            ? "Active applications"
+                            : "Total items",
+                        value: resource.data.total.toLocaleString(),
+                      },
+                    ]}
+                  />
+                ) : undefined
+              }
               actions={
                 <CardLinkButton
                   href={plan.href}
@@ -108,33 +149,7 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
                 />
               }
             >
-              <TaskList count={items.length} label={plan.title}>
-                {items.map((item) => (
-                  <TaskListItem
-                    key={item.id}
-                    title={
-                      <TextButton
-                        href={item.href}
-                        className="max-w-full text-left"
-                      >
-                        <span className="whitespace-normal break-words">
-                          {item.title}
-                        </span>
-                      </TextButton>
-                    }
-                    meta={
-                      <span className="block whitespace-normal break-words">
-                        {item.description}
-                        {item.at && Number.isFinite(Date.parse(item.at)) && (
-                          <span className="mt-1 block">
-                            <AppDate value={item.at} />
-                          </span>
-                        )}
-                      </span>
-                    }
-                  />
-                ))}
-              </TaskList>
+              <OverviewItems resourceId={id} title={plan.title} items={items} />
             </DashboardCard>
           );
         })}

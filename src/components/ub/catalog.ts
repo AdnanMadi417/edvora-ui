@@ -204,6 +204,12 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "Search, filters, result count, density and column controls above a table.",
     usedIn: ["Application Tracker", "Advisors", "Finance queue"],
   },
+  "BarChartCard and GaugeCard": {
+    category: "data",
+    imports: ['import { BarChartCard, GaugeCard } from "components/ub/dashboard";'],
+    useFor: "Reference dashboard chart cards with menus, accessible charts, optional footer statistics and loading, empty and error states.",
+    usedIn: ["Role dashboards: applications, catalogue and advisor verification"],
+  },
   QuickActions: {
     category: "data",
     imports: ['import { QuickActions } from "components/ub/dashboard";'],

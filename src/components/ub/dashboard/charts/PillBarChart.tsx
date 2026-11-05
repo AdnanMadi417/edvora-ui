@@ -64,7 +64,7 @@ export default function PillBarChart({ data, highlightIndex, formatValue = compa
               className="group relative flex h-full flex-1 cursor-default flex-col items-center justify-end rounded-ub-md outline-none focus-visible:ring-2 focus-visible:ring-ub-border-focus"
             >
               {show && (
-                <span aria-hidden="true" className="ub-tabular absolute z-10 -translate-y-full whitespace-nowrap rounded-ub-full bg-ub-tooltip px-2 py-0.5 text-ub-label-sm text-ub-text-on-action" style={{ bottom: `${(d.value / max) * 100}%` }}>
+                <span aria-hidden="true" className="ub-tabular absolute z-10 -translate-y-full whitespace-nowrap rounded-ub-full bg-ub-tooltip px-2 py-0.5 text-ub-label-sm text-ub-text-on-action" style={{ bottom: `${(d.value / max) * 100}%`, ...(i === 0 ? { left: 0 } : i === data.length - 1 ? { right: 0 } : {}) }}>
                   {text}
                 </span>
               )}
@@ -74,7 +74,7 @@ export default function PillBarChart({ data, highlightIndex, formatValue = compa
                   "w-full max-w-6 rounded-ub-full transition-[height,background-color] duration-ub-slow ease-ub-standard motion-reduce:transition-none",
                   d.status === "pending" ? "ub-chart-hatch" : active ? "bg-ub-chart-cat-1" : hover === i ? "bg-ub-chart-hatch" : "bg-ub-chart-muted",
                 )}
-                style={{ height: `${Math.max(6, (d.value / max) * 100)}%` }}
+                style={{ height: `${d.value === 0 ? 0 : Math.max(6, (d.value / max) * 100)}%` }}
               />
             </li>
           );
@@ -82,7 +82,7 @@ export default function PillBarChart({ data, highlightIndex, formatValue = compa
       </ul>
       <div aria-hidden="true" className="mt-2 flex gap-2">
         {data.map((d, i) => (
-          <span key={`${d.label}-${i}`} className={clsx("flex-1 truncate text-center text-ub-caption", i === hi ? "font-medium text-ub-text-primary" : "text-ub-text-tertiary")}>
+          <span key={`${d.label}-${i}`} className={clsx("min-w-0 flex-1 break-words text-center text-ub-caption", i === hi ? "font-medium text-ub-text-primary" : "text-ub-text-tertiary")}>
             {d.label}
           </span>
         ))}

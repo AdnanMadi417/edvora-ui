@@ -26,4 +26,15 @@ Each resource has independent loading, empty, error and retry behavior. Permissi
 
 ## Organization
 
-`src/features/overview` contains role configuration, resource planning, the session-aware hook and the shared role page. `src/components/ub/dashboard/lists/QuickActions.tsx` is reusable outside this feature. Existing dashboard headers, statistic cards, panels, task lists, status states and date formatting are reused.
+`src/features/overview` contains role configuration, resource planning, the session-aware hook and the shared role page. `src/components/ub/dashboard/lists/QuickActions.tsx` is reusable outside this feature. Existing dashboard headers, statistic cards, panels, task lists, people lists, timelines, status tags, footer statistics and date formatting are reused.
+
+
+## Template dashboard composition
+
+The role pages follow `/ui-unibexs-template-2026#dashboard`: one highlighted lead metric, a responsive three-column desktop layout with wide primary panels, icon quick actions, and specialized lists. Application roles use `BarChartCard` with a `PipelineFlow` alternate view; reviewers use `GaugeCard`; data entry uses `BarChartCard` for programme visibility.
+
+Pipeline stages come from `/applications/stages`, ordered by the API's `order_index`. Each stage count comes from the role-scoped application endpoint with `status=active`, `stage_id`, and a one-row page whose pagination total supplies the count. Agency administrators include member applications; member and individual dashboards keep their own scope. A failed stage request fails the pipeline panel rather than drawing a zero. Known backend stage codes map to the shared stage palette; unknown stages retain their API names with neutral styling.
+
+The reviewer chart uses verified and unverified profile totals, including inactive accounts. The catalogue chart uses visible and hidden programme totals. Both charts wait for all their sources and expose failures without calculating partial percentages. Historical trends, deadline countdowns and placement targets remain excluded until corresponding data is available.
+
+`BarChartCard` and `GaugeCard` live in `components/ub/dashboard/cards`. They compose the reference card, menu, chart, legend and footer into reusable UI, with optional caller-supplied actions, statistics, and state handling. Existing `StatCard` variants provide the metric-card designs; no duplicate metric implementation is introduced. Bar-card data can include pending values for hatching when actual forecast data exists. Chart menus on role dashboards refresh real data.

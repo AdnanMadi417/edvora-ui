@@ -36,14 +36,36 @@ test("uses API totals and rejects incomplete payloads instead of showing false z
 test.each([
   [
     "reviewer",
-    ["reviews", "registrations", "advisors", "managers", "unread", "updates"],
+    [
+      "reviews",
+      "verified",
+      "registrations",
+      "advisors",
+      "managers",
+      "unread",
+      "updates",
+    ],
   ],
   [
     "data_entry",
     ["programs", "hiddenPrograms", "institutions", "unread", "updates"],
   ],
-  ["account_manager", ["active", "hold", "advisors", "unread", "updates"]],
-  ["admin", ["active", "hold", "reviews", "commission", "unread", "updates"]],
+  [
+    "account_manager",
+    ["active", "hold", "pipeline", "advisors", "unread", "updates"],
+  ],
+  [
+    "admin",
+    [
+      "active",
+      "hold",
+      "pipeline",
+      "reviews",
+      "commission",
+      "unread",
+      "updates",
+    ],
+  ],
 ] as const)("%s requests only its role resources", (role, ids) => {
   expect(createOverviewPlan({ role }).map((plan) => plan.id)).toEqual(ids);
 });
@@ -173,4 +195,62 @@ test("member profile suppresses finance requests even with a legacy agency user"
   expect(get.mock.calls.some(([url]) => /statement|finance/.test(url))).toBe(
     false
   );
+});
+
+test("pipeline uses scoped stage totals and backend order instead of counting a sampled page", async () => {
+  get.mockImplementation((url: string, config: any) =>
+    Promise.resolve({
+      data:
+        url === "/applications/stages"
+          ? [
+              {
+                id: "b",
+                name: "Institution Review",
+                code: "INSTITUTION_REVIEW",
+                order_index: 2,
+              },
+              {
+                id: "a",
+                name: "Application Submission",
+                code: "APPLICATION_SUBMISSION",
+                order_index: 1,
+              },
+            ]
+          : { total: config.params.stage_id === "a" ? 150 : 40, items: [] },
+    })
+  );
+  const result = await createOverviewPlan({
+    role: "partner",
+    partnerId: "p",
+    agencyAdmin: true,
+  })
+    .find((plan) => plan.id === "pipeline")!
+    .load();
+  expect(result.total).toBe(190);
+  expect(
+    result.distribution?.map((stage) => [stage.key, stage.value, stage.stageId])
+  ).toEqual([
+    ["a", 150, "documents-pending"],
+    ["b", 40, "institution-review"],
+  ]);
+  expect(
+    get.mock.calls
+      .slice(1)
+      .every(
+        ([url, config]) =>
+          url === "/partners/p/applications" &&
+          config.params.include_members === true &&
+          config.params.status === "active"
+      )
+  ).toBe(true);
+});
+test("a failed stage count fails the pipeline rather than drawing a false zero", async () => {
+  get
+    .mockResolvedValueOnce({ data: [{ id: "a", name: "Stage" }] })
+    .mockRejectedValueOnce(new Error("Unavailable"));
+  await expect(
+    createOverviewPlan({ role: "admin" })
+      .find((plan) => plan.id === "pipeline")!
+      .load()
+  ).rejects.toThrow("Unavailable");
 });
