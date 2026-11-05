@@ -206,7 +206,7 @@ export default function FinanceQueuePage() {
 
   return (
     <Card extra="mx-auto mt-5 ">
-      <DashboardHeader as="h2" title="Finance Queue" subtitle="Every commission, who's waiting on it, and how to settle it." className="border-b border-ub-border p-6" />
+      <DashboardHeader hideTitle as="h2" title="Finance Queue" subtitle="Every commission, who's waiting on it, and how to settle it." className="border-b border-ub-border p-6" />
 
       {/* Filters */}
       <div className="flex flex-col gap-2 border-b border-ub-border p-6 sm:flex-row sm:flex-wrap sm:items-center">

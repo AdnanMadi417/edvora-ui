@@ -99,7 +99,6 @@ export default function StatementPage() {
           <Receipt className="text-blue-700" size={24} />
         </div>
         <div>
-          <h3 className="text-xl font-semibold text-slate-900">Commission Tracker</h3>
           <p className="text-sm text-slate-500">
             Every commission and where it stands.
           </p>

@@ -33,7 +33,7 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
   const config = overviewConfig(context);
   return (
     <div className="mx-auto w-full min-w-0 space-y-6 pb-8">
-      <DashboardHeader
+      <DashboardHeader hideTitle
         title={config.title}
         subtitle={config.subtitle}
         secondaryActions={

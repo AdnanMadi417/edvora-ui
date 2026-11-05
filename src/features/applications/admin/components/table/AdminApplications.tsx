@@ -166,7 +166,7 @@ const ModernApplicationsTable = () => {
     <Card extra="mt-6 ">
 
       {/* Header */}
-      <DashboardHeader as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" className="border-b border-ub-border p-6" />
+      <DashboardHeader hideTitle as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" className="border-b border-ub-border p-6" />
 
       {grandTotal > 0 && (
         <div className="hidden sm:block p-6 border-b border-ub-border">

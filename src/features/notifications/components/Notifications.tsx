@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { AlertTriangle, ArrowRight, Bell, CheckCheck, ExternalLink, RefreshCw } from "lucide-react";
+import { AlertTriangle, ArrowRight, Bell, ExternalLink, RefreshCw } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -17,6 +17,7 @@ import {
 import { getNotificationCategory } from "../utils/notificationCategory";
 import type { ReadStatus, Notification } from "../types";
 import NotificationAvatar from "./NotificationAvatar";
+import MarkAllAsReadButton from "./MarkAllAsReadButton";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import NotificationTabs, { type UnreadCategoryFilter } from "./NotificationTabs";
 import EmptyData from "components/ub/feedback/states/EmptyData";
@@ -164,27 +165,19 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
   const hasMoreUnread = isUnreadTab && accumulatedUnread.length < total;
 
   return (
-    <section className="mb-6 mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
+    <section aria-label="Notifications" className="mb-6 mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">Notifications</h2>
-          {unreadCount > 0 && (
-            <p className="mt-0.5 text-sm text-slate-500">
-              {unreadCount} new {unreadCount === 1 ? "notification" : "notifications"}
-            </p>
-          )}
-        </div>
-        {unreadCount > 0 && (
-          <button
-            onClick={handleMarkAllAsRead}
-            disabled={markingAll}
-            className="flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <CheckCheck className="h-4 w-4" />
-            {markingAll ? "Marking..." : "Mark all as read"}
-          </button>
-        )}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6">
+        <p className="text-sm text-slate-500">
+          {unreadCount > 0
+            ? `${unreadCount} new ${unreadCount === 1 ? "notification" : "notifications"}`
+            : "You're all caught up"}
+        </p>
+        <MarkAllAsReadButton
+          onClick={handleMarkAllAsRead}
+          loading={markingAll}
+          disabled={unreadCount === 0}
+        />
       </div>
 
       <NotificationTabs

@@ -88,7 +88,7 @@ const Navbar = ({
         <Menu className="h-5 w-5" aria-hidden />
       </button>
 
-      <p className="min-w-0 flex-1 truncate text-ub-heading-sm text-ub-text-primary md:text-ub-heading-md">{brandText}</p>
+      <h1 className="min-w-0 flex-1 truncate text-ub-heading-sm text-ub-text-primary md:text-ub-heading-md">{brandText}</h1>
 
       <div className="flex shrink-0 items-center gap-1 sm:gap-2">
         <NotificationsPreviewPopover

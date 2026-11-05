@@ -2,7 +2,6 @@
 
 import { useId, type ReactNode } from "react";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
-import Chip from "components/ub/data/badges/Chip";
 import type { ReadStatus } from "../types";
 import type { NotificationCategory } from "../utils/notificationCategory";
 
@@ -57,34 +56,16 @@ export default function NotificationTabs({
       <div {...tabPanelProps(readId, readStatus)}>
         {categoriesVisible && (
           <div className="border-b border-ub-border bg-ub-surface-subtle px-4 py-3 sm:px-6">
-            <div
-              role="group"
-              aria-label="Unread notification categories"
-              className="flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain pb-1 sm:hidden"
-            >
-              {categories.map(({ key, label, count }) => (
-                <Chip
-                  key={key}
-                  size="sm"
-                  selected={category === key}
-                  onSelectedChange={() => onCategoryChange(key)}
-                  aria-controls={`${categoryId}-panel-${key}`}
-                >
-                  {label} ({count})
-                </Chip>
-              ))}
-            </div>
-            <div className="hidden sm:block">
-              <Tabs<UnreadCategoryFilter>
-                tabs={categories}
-                active={category}
-                onChange={onCategoryChange}
-                variant="segmented"
-                size="sm"
-                idPrefix={categoryId}
-                aria-label="Unread notification category"
-              />
-            </div>
+            <Tabs<UnreadCategoryFilter>
+              tabs={categories}
+              active={category}
+              onChange={onCategoryChange}
+              variant="pills"
+              className="!flex-nowrap overflow-x-auto overscroll-x-contain pb-1"
+              size="sm"
+              idPrefix={categoryId}
+              aria-label="Unread notification category"
+            />
           </div>
         )}
         <div {...(categoriesVisible ? tabPanelProps(categoryId, category) : {})}>

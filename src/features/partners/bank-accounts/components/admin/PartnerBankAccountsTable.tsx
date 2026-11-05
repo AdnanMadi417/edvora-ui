@@ -82,7 +82,6 @@ export default function PartnerBankAccountsTable() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6">
         <div>
-          <h3 className="text-xl font-semibold text-slate-900">Bank Accounts</h3>
           <p className="mt-1 text-sm text-slate-500">Every partner&apos;s current payout bank account</p>
         </div>
       </div>

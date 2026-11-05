@@ -75,7 +75,6 @@ const SetStaticTemplatePage = () => {
             <FileText className="h-6 w-6 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold">Document Templates</h2>
             <p className="text-sm text-slate-500">Upload the blank template partners download for a document type.</p>
           </div>
         </div>

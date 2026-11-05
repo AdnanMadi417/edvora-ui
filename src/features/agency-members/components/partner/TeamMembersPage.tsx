@@ -65,7 +65,6 @@ export default function TeamMembersPage() {
         {/* Header */}
         <div className="flex flex-col gap-4 border-b border-slate-200 p-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-xl font-semibold text-slate-900">Agency Scaler</h3>
             <p className="mt-0.5 text-sm text-slate-500">Invite colleagues to join your agency</p>
           </div>
           <Button

@@ -68,7 +68,6 @@ export default function AccountManagerPartnersList() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
         <div>
-          <h3 className="text-xl font-semibold text-slate-900">Advisors</h3>
           <p className="mt-0.5 text-sm text-slate-500">Advisors assigned to you</p>
         </div>
       </div>

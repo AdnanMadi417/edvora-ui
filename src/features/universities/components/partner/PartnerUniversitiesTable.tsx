@@ -72,7 +72,6 @@ export default function PartnerUniversitiesTable() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
         <div>
-          <h3 className="text-xl font-semibold text-slate-900">Universities</h3>
           <p className="mt-0.5 text-sm text-slate-500">Browse university listings and their branches</p>
         </div>
       </div>

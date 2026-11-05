@@ -3,7 +3,7 @@
 import React, { useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCheck } from "lucide-react";
+import MarkAllAsReadButton from "./MarkAllAsReadButton";
 
 import { useAllNotifications, useMarkAsRead, useMarkAllAsRead } from "../hooks";
 import { getNotificationIconConfig, getSenderName, getNotificationPhotoKey } from "../utils/notificationIcons";
@@ -145,15 +145,7 @@ function PreviewContent({
       <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
         <p className="text-sm font-semibold text-slate-900">Notifications</p>
         {notifications.length > 0 && (
-          <button
-            type="button"
-            onClick={handleMarkAllAsRead}
-            disabled={markingAll}
-            className="flex items-center gap-1 text-xs font-medium text-blue-600 transition hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <CheckCheck className="h-3.5 w-3.5" />
-            {markingAll ? "Marking..." : "Mark all as read"}
-          </button>
+          <MarkAllAsReadButton onClick={handleMarkAllAsRead} loading={markingAll} />
         )}
       </div>
 

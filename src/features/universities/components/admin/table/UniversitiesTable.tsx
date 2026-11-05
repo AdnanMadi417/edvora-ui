@@ -244,7 +244,6 @@ const UniversitiesTable = () => {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6">
         <div>
-          <h3 className="text-xl font-semibold text-slate-900">Universities</h3>
           <p className="mt-1 text-sm text-slate-500">Manage university listings and their payment methods</p>
         </div>
         <Link

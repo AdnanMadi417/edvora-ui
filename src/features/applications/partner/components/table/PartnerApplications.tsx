@@ -200,7 +200,7 @@ const PartnerApplications = () => {
   return (
     <Card extra="mt-6 ">
 
-      <DashboardHeader as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" primaryAction={<Button variant="primary" onClick={() => router.push("/partner/applications/apply-now")} icon={<FilePlus className="h-4 w-4" aria-hidden="true" />} text="Create application" />} className="border-b border-ub-border p-6" />
+      <DashboardHeader hideTitle as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" primaryAction={<Button variant="primary" onClick={() => router.push("/partner/applications/apply-now")} icon={<FilePlus className="h-4 w-4" aria-hidden="true" />} text="Create application" />} className="border-b border-ub-border p-6" />
 
       {grandTotal > 0 && (
         <div className="hidden sm:block p-6 border-b border-ub-border">

@@ -116,7 +116,6 @@ export default function BanksTable({ basePath = "/admin/advisors/banks" }: Props
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6">
         <div>
-          <h3 className="text-xl font-semibold text-slate-900">Banks</h3>
           <p className="mt-1 text-sm text-slate-500">Manage the bank reference list used on partner account forms</p>
         </div>
         <Button

@@ -126,7 +126,6 @@ export default function DataEntryUniversitiesTable() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6">
         <div>
-          <h3 className="text-xl font-semibold text-slate-900">Universities</h3>
           <p className="mt-1 text-sm text-slate-500">Create and edit university records</p>
         </div>
         <Link
