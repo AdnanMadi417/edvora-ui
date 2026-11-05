@@ -3,7 +3,6 @@
 import { useId } from "react";
 import { ArrowUpRight, Layers, RotateCcw } from "lucide-react";
 import Button from "components/ub/core/buttons/Button";
-import Tag from "components/ub/data/badges/Tag";
 import PipelineBar from "components/ub/dashboard/pipeline/PipelineBar";
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
 import { focusRing } from "components/ub/recipes";
@@ -147,28 +146,24 @@ export default function PipelineCard({
                           : "border-ub-border bg-ub-surface-subtle hover:border-ub-border-hover hover:bg-ub-action-ghost-hover"
                       }`}
                     >
-                      <div className="flex w-full items-center justify-between gap-2">
-                        <span className="ub-tabular text-ub-heading-xl-mobile text-ub-text-primary">
+                      <div className="flex w-full flex-wrap items-center justify-between gap-2">
+                        <span className="ub-tabular min-w-0 max-w-full break-words text-ub-heading-md text-ub-text-primary sm:text-ub-heading-xl-mobile">
                           {count.toLocaleString()}
                         </span>
                         <span className="ub-tabular text-ub-label-sm text-ub-text-tertiary">
                           {share}%
                         </span>
                       </div>
-                      <span className="min-h-[2.8em] break-words text-ub-label-md text-ub-text-primary">
+                      <span className="min-h-[2.8em] w-full min-w-0 max-w-full break-words text-ub-label-md text-ub-text-primary">
                         {stage.name}
                       </span>
-                      <div className="flex flex-wrap gap-1">
+                      <div className="flex w-full min-w-0 flex-wrap gap-1">
                         {stageActionRequired[stage.id] &&
                           !isCommissionStage(stage) && (
-                            <Tag tone="attention" size="sm">
-                              Action flagged
-                            </Tag>
+                            <span className="min-w-0 max-w-full break-words text-ub-label-sm text-ub-tone-warning-text">Action flagged</span>
                           )}
                         {isCommissionStage(stage) && (
-                          <Tag hue="teal" size="sm">
-                            Commission
-                          </Tag>
+                          <span className="min-w-0 max-w-full break-words text-ub-label-sm text-ub-tone-success-text">Commission</span>
                         )}
                       </div>
                     </button>
