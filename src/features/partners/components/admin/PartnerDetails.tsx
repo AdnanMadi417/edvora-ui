@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { useId as useTabId } from "react";
 import React, { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -45,7 +46,7 @@ import PresignedImage from "components/ub/data/media/PresignedImage";
 import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import PartnerApplicationsTable from "./PartnerApplicationsTable";
@@ -190,6 +191,7 @@ export default function PartnerDetails({ id }: Props) {
   // Lets a link from elsewhere (e.g. "Add a bank account" from a payout
   // flow with no account on file) land straight on the right tab.
   const requestedTab = searchParams.get("tab") as DetailsTab | null;
+  const tabId = useTabId();
   const [tab, setTab] = useState<DetailsTab>(
     requestedTab && VALID_TABS.includes(requestedTab) ? requestedTab : "profile"
   );
@@ -348,7 +350,8 @@ export default function PartnerDetails({ id }: Props) {
           </div>
         </div>
 
-        <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} />
+        <Tabs<DetailsTab> tabs={TABS} active={tab} onChange={setTab} variant="underline" idPrefix={tabId} aria-label="Advisor sections" />
+        <div {...tabPanelProps(tabId, tab)}>
 
         <AnimatePresence mode="wait">
         <motion.div
@@ -600,6 +603,7 @@ export default function PartnerDetails({ id }: Props) {
         </motion.div>
         </AnimatePresence>
       </div>
+        </div>
     </div>
     </>
   );
