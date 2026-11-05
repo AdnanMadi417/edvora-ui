@@ -1,11 +1,12 @@
 "use client";
 
+import { useId as useTabId } from "react";
 import React, { useState } from "react";
 import { ShieldX, UserPlus } from "lucide-react";
 
 import Button from "components/ub/core/buttons/Button";
 import Loading from "components/ub/feedback/states/Loading";
-import Tabs from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import { usePartnerProfile } from "features/partners/hooks";
 import AgencyMembersTable from "./AgencyMembersTable";
@@ -20,6 +21,7 @@ const TABS: TabItem<Tab>[] = [
 ];
 
 export default function TeamMembersPage() {
+  const tabId = useTabId();
   const [tab, setTab] = useState<Tab>("members");
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -78,7 +80,8 @@ export default function TeamMembersPage() {
           />
         </div>
 
-        <Tabs<Tab> tabs={TABS} active={tab} onChange={setTab} />
+        <Tabs<Tab> tabs={TABS} active={tab} onChange={setTab} variant="underline" idPrefix={tabId} aria-label="Agency team sections" />
+        <div {...tabPanelProps(tabId, tab)}>
 
         <div key={tab} className="animate-in fade-in duration-200">
           {tab === "members" ? (
@@ -88,6 +91,7 @@ export default function TeamMembersPage() {
           )}
         </div>
       </div>
+        </div>
 
       <InviteAgencyMemberModal
         isOpen={isInviteOpen}
