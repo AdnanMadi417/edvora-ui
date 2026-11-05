@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import {
   Award,
   BookOpen,
@@ -16,7 +16,7 @@ import SiteFooter from "components/ub/navigation/layout/SiteFooter";
 import FadeIn from "components/ub/core/motion/FadeIn";
 import Faq from "components/ub/data/display/Faq";
 import type { FaqItem } from "components/ub/data/display/Faq";
-import Tabs, { type TabItem } from "components/ub/navigation/controls/Tabs";
+import Tabs, { tabPanelProps, type TabItem } from "components/ub/navigation/controls/Tabs";
 import CourseList, { type Course } from "components/ub/data/display/CourseList";
 
 // Same gradient/dot-grid/glow banner as the partner public profile
@@ -149,6 +149,7 @@ interface Props {
  */
 export default function UniversityPublicProfile({ university }: Props) {
   const hasLanguageCenter = Boolean(university.languageCenter);
+  const tabId = useId();
   const [activeTab, setActiveTab] = useState<ProfileTab>("overview");
   const showLanguageCenter = hasLanguageCenter && activeTab === "language-center";
 
@@ -229,6 +230,7 @@ export default function UniversityPublicProfile({ university }: Props) {
               tabs={PROFILE_TABS}
               active={activeTab}
               onChange={(key: ProfileTab) => setActiveTab(key)}
+              variant="underline" idPrefix={tabId} aria-label="Institution sections"
             />
           )}
 
@@ -241,7 +243,7 @@ export default function UniversityPublicProfile({ university }: Props) {
 
       {/* Main content (2/3) + quick-facts sidebar (1/3) — full details for
           whichever tab is active, not a squeezed-in subsection. */}
-      <div className="mx-auto max-w-6xl grid grid-cols-1 gap-6 pt-16 md:grid-cols-3">
+      <div className="mx-auto max-w-6xl grid grid-cols-1 gap-6 pt-16 md:grid-cols-3" {...(hasLanguageCenter ? tabPanelProps(tabId, activeTab) : {})}>
         {showLanguageCenter && university.languageCenter ? (
           <>
             <div className="md:col-span-2">
