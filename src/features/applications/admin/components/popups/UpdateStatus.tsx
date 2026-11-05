@@ -1,5 +1,6 @@
 "use client";
 
+import SectionCard from "components/ub/data/cards/SectionCard";
 import RadioCardGroup from "components/ub/forms/choices/RadioCardGroup";
 import { FieldLabel } from "components/ub/forms/layout/FieldChrome";
 import Card from "components/ub/data/cards/Card";
@@ -582,10 +583,11 @@ export default function UpdateStatusPopup({
       onClose={handleClose}
       size="lg"
       icon={Clock}
-      title="Update Application Status"
+      title="Update application status"
       description={`Stage: ${application?.stage?.name || "No Stage"}   ·   Status: ${application?.stage?.statuses?.[0]?.name || "No Status"}`}
       onSubmit={handleConfirm}
-      submitLabel="Update Status"
+      submitLabel="Update status"
+      footerNote="Review the selected status and any required uploads before saving."
       submitting={isSubmitting}
       submitDisabled={!selectedStatus || !!error || (requiresReason && !reason.trim()) || (isUniversityApproved && !offerLetterFile) || (isVisaIssued && !visaDocumentFile) || (isCommissionPaid &&
                 (!partnerBankAccount || !payoutFormData.payment_method_id.trim() || !payoutFormData.bank_reference.trim() || !payoutFormData.paid_at || !payoutFormData.paid_amount || !payoutReceiptFile)) || (hasArrivalFormSelected && !arrivalFormTemplateFile) || (isCommissionReady &&
@@ -604,13 +606,7 @@ export default function UpdateStatusPopup({
             <Alert tone="warning" title="Correction Reason">{actions.correction_reason}</Alert>
           )}
 
-          <div className="space-y-3">
-            <FieldLabel as="span">
-              <span className="flex items-center gap-1">
-                Select New Status
-              </span>
-            </FieldLabel>
-
+          <SectionCard title="Choose next status" description="Select an available transition for this application.">
             {statusOptions.length === 0 ? (
               <NoDocumentsRequired
                 title="No status"
@@ -634,7 +630,7 @@ export default function UpdateStatusPopup({
                 }))}
               />
             )}
-          </div>
+          </SectionCard>
 
           {shouldShowDocumentSection && (
             <DocumentRequestList

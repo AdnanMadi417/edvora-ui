@@ -124,6 +124,7 @@ export default function ApplicationDetailsScreen({
 
   const header = (
     <ApplicationHeader
+      titleAs="h2"
       breadcrumbs={<Breadcrumbs items={[{ label: "Applications", href: backHref }, { label: view.student.name }]} />}
       studentName={view.student.name}
       photoUrl={view.student.photoUrl}
@@ -222,7 +223,7 @@ export default function ApplicationDetailsScreen({
     <ApplicationDetailsLayout
       header={header}
       alerts={<ApplicationAlerts alerts={buildApplicationAlerts(view, correctionReason)} />}
-      tracker={<ApplicationTrackerCard stage={resolved} nextStep={view.nextStep} statusName={view.stage.statusName} />}
+      tracker={(navigation) => <ApplicationTrackerCard stage={resolved} nextStep={view.nextStep} statusName={view.stage.statusName} navigation={navigation} />}
       activeTab={tab}
       onTabChange={setTab}
       tabCounts={{ documents: replaceCount }}

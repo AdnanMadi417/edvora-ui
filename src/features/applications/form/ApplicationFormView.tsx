@@ -434,7 +434,7 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
   const move = (fn: () => unknown) => {
     fn();
     requestAnimationFrame(() => {
-      top.current?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+      top.current?.scrollIntoView?.({ block: "start", behavior: reduce ? "auto" : "smooth" });
       top.current?.focus({ preventScroll: true });
     });
   };
@@ -446,7 +446,7 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
   if (step === "review") body = <ReviewStep {...props} />;
 
   return (
-    <section className={clsx(card, "w-full min-w-0")} aria-labelledby="af-title">
+    <section className={clsx(card, "mx-auto w-full min-w-0 max-w-5xl")} aria-labelledby="af-title" aria-busy={submitting || undefined}>
       <header className="flex items-start gap-3 border-b border-ub-border px-4 py-4 md:px-6 md:py-5">
         <IconTile icon={FileText} />
         <div className="min-w-0">
@@ -483,12 +483,12 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
         </AnimatePresence>
       </div>
 
-      <footer className="flex flex-col-reverse gap-3 border-t border-ub-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between md:px-6">
+      <footer className="sticky bottom-16 z-20 flex flex-col-reverse gap-3 border-t border-ub-border bg-ub-surface-raised px-4 py-3 shadow-ub-sm sm:flex-row md:bottom-0 sm:items-center sm:justify-between md:px-6">
         <p className="ub-tabular text-ub-caption text-ub-text-tertiary">
           Step {index + 1} of {steps.length}
           {completed.length > 0 && ` · ${completed.length} done`}
         </p>
-        <div className="grid grid-cols-2 gap-2 sm:flex">
+        <div className="grid grid-cols-2 gap-2 sm:flex [&>button]:min-h-[44px]">
           {index > 0 ? <Button variant="secondary" text="Back" icon={<ArrowLeft className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} onClick={() => move(back)} disabled={submitting} /> : <span />}
           {last ? (
             <Button variant="primary" text="Submit application" icon={<Send className="h-4 w-4 rtl:-scale-x-100" aria-hidden="true" />} onClick={() => submit()} loading={submitting} />

@@ -268,7 +268,7 @@ export default function ApplicationComponents() {
       <Demo name="ApplicationDetailsLayout" path="features/applications/components/ApplicationDetailsLayout.tsx" description="Page frame: header, alerts, tracker, then the five tabs (scroll on mobile) and their panels; OverviewGrid is 2/3 + 1/3 from 992px; the Primary repeats in a sticky bar below 768px unless stickyAction is false." code={`<ApplicationDetailsLayout header={header} alerts={alerts} tracker={tracker} activeTab={tab} onTabChange={setTab} panels={panels} primaryAction={next} />`}>
         <ApplicationDetailsLayout
           header={<ApplicationHeader studentName="Nur Aisyah Binti Kamal" titleAs="h3" stageId="offer-received" institution="Sunway University" />}
-          tracker={<ApplicationTrackerCard stage={resolveStage({ stageCode: "OFFER_AND_VISA_PAYMENT" })} nextStep="Pay the visa fee and upload the receipt." />}
+          tracker={(navigation) => <ApplicationTrackerCard stage={resolveStage({ stageCode: "OFFER_AND_VISA_PAYMENT" })} nextStep="Pay the visa fee and upload the receipt." navigation={navigation} />}
           activeTab={tab}
           onTabChange={setTab}
           tabCounts={{ documents: 1 }}

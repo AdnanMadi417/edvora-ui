@@ -162,6 +162,7 @@ export default function Navigation() {
             setStage("");
             setUni("");
             setStatus("");
+            setLifecycle("all");
           }}
           showFilters={showFilters}
           onToggleFilters={() => setShowFilters((s) => !s)}

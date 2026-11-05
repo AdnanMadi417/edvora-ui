@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Alert from "components/ub/feedback/notifications/Alert";
 import ApplicationTracker, { TRACKER_COPY, trackerStepsAt, type TrackerStep } from "components/ub/brand/ApplicationTracker";
 import SectionCard, { type SectionCardState } from "components/ub/data/cards/SectionCard";
@@ -23,10 +24,11 @@ export interface ApplicationTrackerCardProps {
   state?: SectionCardState;
   onRetry?: () => void;
   className?: string;
+  navigation?: ReactNode;
 }
 
 /** Progress card (brief §6): horizontal tracker from md, vertical below, with the next step. */
-export default function ApplicationTrackerCard({ stage, nextStep, statusName, state = "ready", onRetry, className }: ApplicationTrackerCardProps) {
+export default function ApplicationTrackerCard({ stage, nextStep, statusName, state = "ready", onRetry, className, navigation }: ApplicationTrackerCardProps) {
   return (
     <SectionCard
       title="Application progress"
@@ -36,6 +38,7 @@ export default function ApplicationTrackerCard({ stage, nextStep, statusName, st
       errorMessage="Progress couldn't load."
       onRetry={onRetry}
       className={className}
+      footer={navigation}
     >
       <ApplicationTracker steps={trackerStepsFor(stage)} orientation="auto" />
       {/* Its own line (not under the current step) so it also shows on attention and completed states. */}

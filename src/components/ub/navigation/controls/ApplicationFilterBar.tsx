@@ -1,10 +1,14 @@
 "use client";
 
-import React from "react";
-import { SlidersHorizontal, Building, GitBranch, Flag, RefreshCw, Activity } from "lucide-react";
-import { focusRing, tagBase, tagTones } from "components/ub/recipes";
-import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
+import { useEffect, useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
+import Drawer from "components/ub/feedback/dialogs/Drawer";
+import Button from "components/ub/core/buttons/Button";
+import SelectInput from "components/ub/forms/selection/SelectInput";
 import SearchInput from "components/ub/forms/selection/SearchInput";
+import FilterChip from "components/ub/data/badges/FilterChip";
 
 interface Option {
   label: string;
@@ -47,133 +51,210 @@ interface ApplicationFilterBarProps {
   onToggleFilters: () => void;
 }
 
-export default function ApplicationFilterBar({
-  searchTerm,
-  onSearchChange,
-  selectedStages,
-  onStagesChange,
-  stageOptions,
-  showStageFilter = true,
-  selectedUniversity,
-  onUniversityChange,
-  universityOptions,
-  selectedStageStatus,
-  onStageStatusChange,
-  stageStatusOptions,
-  selectedLifecycle = "all",
-  onLifecycleChange,
-  showLifecycleFilter = false,
-  resultsCount,
-  activeFiltersCount,
-  onClearFilters,
-  showFilters,
-  onToggleFilters,
-}: ApplicationFilterBarProps) {
+export default function ApplicationFilterBar(props: ApplicationFilterBarProps) {
+  const {
+    showFilters,
+    onToggleFilters,
+    selectedStages,
+    selectedUniversity,
+    selectedStageStatus,
+    selectedLifecycle = "all",
+    showStageFilter = true,
+    showLifecycleFilter = false,
+  } = props;
+  const reducedMotion = useReducedMotion();
+  const [draft, setDraft] = useState({
+    stage: selectedStages || "all",
+    university: selectedUniversity || "all",
+    status: selectedStageStatus || "all",
+    lifecycle: selectedLifecycle,
+  });
+  useEffect(() => {
+    if (showFilters)
+      setDraft({
+        stage: selectedStages || "all",
+        university: selectedUniversity || "all",
+        status: selectedStageStatus || "all",
+        lifecycle: selectedLifecycle,
+      });
+  }, [
+    showFilters,
+    selectedStages,
+    selectedUniversity,
+    selectedStageStatus,
+    selectedLifecycle,
+  ]);
+  const fields = [
+    ...(showLifecycleFilter && props.onLifecycleChange
+      ? [
+          {
+            key: "lifecycle",
+            label: "Application status",
+            options: LIFECYCLE_OPTIONS,
+            placeholder: "Any status",
+          },
+        ]
+      : []),
+    ...(showStageFilter
+      ? [
+          {
+            key: "stage",
+            label: "Stage",
+            options: props.stageOptions,
+            placeholder: "All stages",
+          },
+        ]
+      : []),
+    {
+      key: "university",
+      label: "University",
+      options: props.universityOptions,
+      placeholder: "All universities",
+    },
+    {
+      key: "status",
+      label: "Stage status",
+      options: props.stageStatusOptions,
+      placeholder: props.stageStatusLoading
+        ? "Loading statuses…"
+        : "All stage statuses",
+    },
+  ];
+  const selected = {
+    stage: selectedStages || "all",
+    university: selectedUniversity || "all",
+    status: selectedStageStatus || "all",
+    lifecycle: selectedLifecycle,
+  };
+  const change = (key: string, value: string) => {
+    if (key === "stage") props.onStagesChange(value);
+    if (key === "university") props.onUniversityChange(value);
+    if (key === "status") props.onStageStatusChange(value);
+    if (key === "lifecycle") props.onLifecycleChange?.(value);
+  };
+  const apply = () => {
+    if (showStageFilter) props.onStagesChange(draft.stage);
+    props.onUniversityChange(draft.university);
+    props.onLifecycleChange?.(draft.lifecycle);
+    props.onStageStatusChange(draft.status);
+    onToggleFilters();
+  };
   return (
-    <div>
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-
-        {/* Search + mobile toggle */}
-        <div className="flex items-center gap-2 sm:contents">
-          <SearchInput
-            value={searchTerm}
-            onChange={onSearchChange}
-            placeholder="Search applications"
-            className="sm:w-56 sm:flex-none"
-          />
-          <button
-            type="button"
-            className={`relative flex h-10 w-10 shrink-0 items-center justify-center rounded-ub-full border border-ub-border-control bg-ub-surface text-ub-text-secondary hover:bg-ub-surface-subtle sm:hidden ${focusRing}`}
-            onClick={onToggleFilters}
-            aria-label={showFilters ? "Hide filters" : "Show filters"}
-            aria-expanded={showFilters}
-          >
-            <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
-            {activeFiltersCount > 0 && (
-              <span className="ub-tabular absolute -end-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-ub-full bg-ub-action-primary px-1 text-ub-label-sm text-ub-action-primary-text">
-                {activeFiltersCount}
-              </span>
-            )}
-          </button>
-          {activeFiltersCount > 0 && (
-            <button
-              type="button"
-              onClick={onClearFilters}
-              aria-label="Clear filters"
-              className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-ub-full text-ub-text-link hover:bg-ub-action-secondary-hover sm:hidden ${focusRing}`}
-            >
-              <RefreshCw className="h-4 w-4" aria-hidden="true" />
-            </button>
-          )}
-        </div>
-
-        {/* Collapsible dropdowns */}
-        <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-ub-base ease-ub-standard motion-reduce:transition-none sm:contents ${showFilters ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
-
-          {showLifecycleFilter && onLifecycleChange && (
-            <div className="w-full shrink-0 sm:w-40">
-              <FilterSelectField
-                value={selectedLifecycle}
-                onChange={onLifecycleChange}
-                options={LIFECYCLE_OPTIONS}
-                icon={Activity}
-                defaultOption="Any status"
-              />
-            </div>
-          )}
-
-          {showStageFilter && (
-            <div className="w-full shrink-0 sm:w-40">
-              <FilterSelectField
-                value={selectedStages}
-                onChange={onStagesChange}
-                options={stageOptions}
-                icon={GitBranch}
-                defaultOption="All stages"
-              />
-            </div>
-          )}
-
-          <div className="w-full shrink-0 sm:w-40">
-            <FilterSelectField
-              value={selectedUniversity}
-              onChange={onUniversityChange}
-              options={universityOptions}
-              icon={Building}
-              defaultOption="All Institutions"
-            />
-          </div>
-
-          <div className="w-full shrink-0 sm:w-40">
-            <FilterSelectField
-              value={selectedStageStatus}
-              onChange={onStageStatusChange}
-              options={stageStatusOptions}
-              icon={Flag}
-              defaultOption="All statuses"
-            />
-          </div>
-
-          {resultsCount !== undefined && (activeFiltersCount > 0 || searchTerm !== "") && (
-            <span aria-live="polite" className={`${tagBase} ${tagTones.brand} ub-tabular hidden sm:inline-flex`}>
-              {resultsCount.toLocaleString()}
-              <span className="font-normal">{resultsCount === 1 ? "result" : "results"}</span>
-            </span>
-          )}
-
-          {activeFiltersCount > 0 && (
-            <button
-              type="button"
-              onClick={onClearFilters}
-              className={`hidden h-10 shrink-0 items-center justify-center gap-2 rounded-ub-full px-4 text-ub-label-md text-ub-text-link transition-colors duration-ub-fast ease-ub-standard hover:bg-ub-action-secondary-hover active:bg-ub-action-secondary-pressed sm:inline-flex ${focusRing}`}
-            >
-              <RefreshCw className="h-4 w-4" aria-hidden="true" />
-              Clear filters
-            </button>
-          )}
-        </div>
-
+    <div className="min-w-0 space-y-4">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <SearchInput
+          value={props.searchTerm}
+          onChange={props.onSearchChange}
+          placeholder="Search applications"
+          className="min-w-0 flex-1 sm:min-w-[220px]"
+        />
+        <Button
+          variant="secondary"
+          icon={<SlidersHorizontal className="h-4 w-4" />}
+          text={
+            props.activeFiltersCount
+              ? `Filters (${props.activeFiltersCount})`
+              : "Filters"
+          }
+          onClick={onToggleFilters}
+          className="min-h-[44px]"
+        />
+        {props.resultsCount !== undefined && (
+          <p role="status" className="text-ub-label-sm text-ub-text-secondary">
+            {props.resultsCount.toLocaleString()} applications
+          </p>
+        )}
       </div>
+      <div className="flex flex-nowrap gap-2 overflow-x-auto pb-1 sm:flex-wrap">
+        {fields
+          .filter(
+            ({ key }) =>
+              selected[key] !== "all" &&
+              selected[key] &&
+              !(key === "lifecycle" && selected[key] === "active")
+          )
+          .map(({ key, label, options }) => (
+            <FilterChip
+              key={key}
+              label={`${label}: ${
+                options.find((option) => option.value === selected[key])
+                  ?.label || selected[key]
+              }`}
+              onRemove={() =>
+                change(key, key === "lifecycle" ? "active" : "all")
+              }
+            />
+          ))}
+        {props.activeFiltersCount > 0 && (
+          <Button
+            variant="tertiary"
+            size="sm"
+            text="Clear filters"
+            onClick={props.onClearFilters}
+            className="shrink-0"
+          />
+        )}
+      </div>
+      <Drawer
+        open={showFilters}
+        onClose={onToggleFilters}
+        title="Filter applications"
+        description="Narrow applications by institution, stage and status."
+        footer={
+          <div className="grid w-full grid-cols-2 gap-3">
+            <Button
+              variant="secondary"
+              text="Clear filters"
+              onClick={() => {
+                props.onClearFilters();
+                onToggleFilters();
+              }}
+              className="min-h-[44px]"
+            />
+            <Button
+              variant="primary"
+              text="Apply filters"
+              onClick={apply}
+              disabled={props.stageStatusLoading}
+              className="min-h-[44px]"
+            />
+          </div>
+        }
+      >
+        <div className="space-y-5">
+          {fields.map(({ key, label, options, placeholder }, index) => (
+            <motion.div
+              key={key}
+              initial={reducedMotion ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: reducedMotion ? 0 : MICRO_DURATION,
+                delay: reducedMotion ? 0 : index * 0.025,
+                ease: EASE,
+              }}
+            >
+              <p className="mb-2 text-ub-label-md text-ub-text-primary">
+                {label}
+              </p>
+              <SelectInput
+                field={key}
+                aria-label={label}
+                options={[{ value: "all", label: placeholder }, ...options]}
+                formData={draft}
+                disabled={key === "status" && props.stageStatusLoading}
+                className="min-h-[44px]"
+                updateFormData={(_, value) =>
+                  setDraft((previous) => ({
+                    ...previous,
+                    [key]: value,
+                    ...(key === "stage" ? { status: "all" } : {}),
+                  }))
+                }
+              />
+            </motion.div>
+          ))}
+        </div>
+      </Drawer>
     </div>
   );
 }

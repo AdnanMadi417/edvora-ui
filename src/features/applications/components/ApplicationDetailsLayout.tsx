@@ -1,16 +1,21 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
+import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
 import { useId, type ReactNode } from "react";
 import Button from "components/ub/core/buttons/Button";
 import StickyActionBar from "components/ub/navigation/controls/StickyActionBar";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
-import { APPLICATION_DETAILS_TABS, type ApplicationDetailsTab } from "features/applications/shared/applicationDetailTabs";
+import {
+  APPLICATION_DETAILS_TABS,
+  type ApplicationDetailsTab,
+} from "features/applications/shared/applicationDetailTabs";
 import type { HeaderAction } from "./ApplicationHeader";
 
 export interface ApplicationDetailsLayoutProps {
   header: ReactNode;
   alerts?: ReactNode;
-  tracker: ReactNode;
+  tracker: ReactNode | ((navigation: ReactNode) => ReactNode);
   activeTab: ApplicationDetailsTab;
   onTabChange: (tab: ApplicationDetailsTab) => void;
   /** Panel content per tab; only the active one renders. */
@@ -30,27 +35,73 @@ export interface ApplicationDetailsLayoutProps {
  * Overview · Documents · Offer & visa · Commission · Activity. Tabs scroll
  * horizontally on mobile, where the Primary action moves to a sticky bar.
  */
-export default function ApplicationDetailsLayout({ header, alerts, tracker, activeTab, onTabChange, panels, tabCounts = {}, primaryAction, stickyAction = true, children }: ApplicationDetailsLayoutProps) {
+export default function ApplicationDetailsLayout({
+  header,
+  alerts,
+  tracker,
+  activeTab,
+  onTabChange,
+  panels,
+  tabCounts = {},
+  primaryAction,
+  stickyAction = true,
+  children,
+}: ApplicationDetailsLayoutProps) {
   const tabId = useId();
+  const reducedMotion = useReducedMotion();
   const sticky = !!primaryAction && stickyAction;
-  const tabs = APPLICATION_DETAILS_TABS.map((t) => ({ ...t, count: tabCounts[t.key] }));
+  const tabs = APPLICATION_DETAILS_TABS.map((t) => ({
+    ...t,
+    count: tabCounts[t.key],
+  }));
+  const navigation = (
+        <Tabs<ApplicationDetailsTab>
+          tabs={tabs}
+          active={activeTab}
+          onChange={onTabChange}
+          variant="underline"
+          idPrefix={tabId}
+          inset={false}
+          aria-label="Application sections"
+          className="min-w-0 bg-ub-surface"
+        />
+  );
   return (
-    <div className={sticky ? "mx-auto grid gap-4 pb-20 md:gap-6 md:pb-0" : "mx-auto grid gap-4 md:gap-6"}>
+    <div
+      className={
+        sticky
+          ? "mx-auto grid w-full min-w-0 max-w-7xl gap-4 pb-20 md:gap-6 md:pb-0"
+          : "mx-auto grid w-full min-w-0 max-w-7xl gap-4 md:gap-6"
+      }
+    >
       {header}
       {alerts}
-      {tracker}
+      {typeof tracker === "function" ? tracker(navigation) : <>{tracker}{navigation}</>}
       <div className="min-w-0">
-        <Tabs<ApplicationDetailsTab> tabs={tabs} active={activeTab} onChange={onTabChange} variant="underline" idPrefix={tabId} inset={false} aria-label="Application sections" />
-        <div {...tabPanelProps(tabId, activeTab)} className="mt-4 min-w-0 focus-visible:outline-none md:mt-6">
+        <motion.div
+          key={activeTab}
+          initial={reducedMotion ? false : { opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            duration: reducedMotion ? 0 : MICRO_DURATION,
+            ease: EASE,
+          }}
+          {...tabPanelProps(tabId, activeTab)}
+          className="mt-4 min-w-0 focus-visible:outline-none md:mt-6"
+        >
           {panels[activeTab]}
-        </div>
+        </motion.div>
       </div>
       {sticky && primaryAction && (
         <StickyActionBar aria-label="Next action">
           <Button
             variant="primary"
             text={primaryAction.label}
-            icon={primaryAction.icon ? <primaryAction.icon className="h-4 w-4" aria-hidden="true" /> : undefined}
+            icon={
+              primaryAction.icon ? (
+                <primaryAction.icon className="h-4 w-4" aria-hidden="true" />
+              ) : undefined
+            }
             onClick={primaryAction.onClick}
             loading={primaryAction.loading}
             disabled={primaryAction.disabled}
@@ -64,10 +115,18 @@ export default function ApplicationDetailsLayout({ header, alerts, tracker, acti
 }
 
 /** Overview grid: wide left column and a narrow right column from 992px; one column below. */
-export function OverviewGrid({ main, aside }: { main: ReactNode; aside: ReactNode }) {
+export function OverviewGrid({
+  main,
+  aside,
+}: {
+  main: ReactNode;
+  aside: ReactNode;
+}) {
   return (
     <div className="grid gap-4 md:gap-6 lg:grid-cols-3">
-      <div className="grid min-w-0 content-start gap-4 md:gap-6 lg:col-span-2">{main}</div>
+      <div className="grid min-w-0 content-start gap-4 md:gap-6 lg:col-span-2">
+        {main}
+      </div>
       <div className="grid min-w-0 content-start gap-4 md:gap-6">{aside}</div>
     </div>
   );

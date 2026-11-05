@@ -226,8 +226,9 @@ export function ApplicationDetailsPreview({
           ]}
         />
       }
-      tracker={
+      tracker={(navigation) =>
         <ApplicationTrackerCard
+          navigation={navigation}
           stage={STAGE}
           statusName="Correction requested"
           nextStep="Replace the academic transcript with a certified true copy."
@@ -390,7 +391,7 @@ export function ApplicationDetailsDemo() {
       code={`<ApplicationDetailsLayout
   header={<ApplicationHeader studentName="Nur Aisyah Binti Kamal" reference="UBX-2026-0412" stageId="institution-review" primaryAction={next} />}
   alerts={<ApplicationAlerts alerts={alerts} />}
-  tracker={<ApplicationTrackerCard stage={resolveStage(stageInput)} nextStep={view.nextStep} />}
+  tracker={(navigation) => <ApplicationTrackerCard stage={resolveStage(stageInput)} nextStep={view.nextStep} navigation={navigation} />}
   activeTab={tab}
   onTabChange={setTab}
   panels={{ overview, documents, "offer-visa": offerVisa, commission, activity }}

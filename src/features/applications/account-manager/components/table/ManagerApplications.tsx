@@ -167,10 +167,10 @@ const ModernApplicationsTable = () => {
     <Card extra="mt-6 ">
 
       {/* Header */}
-      <DashboardHeader hideTitle as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" className="border-b border-ub-border p-6" />
+      <DashboardHeader hideTitle as="h2" title="Applications Dashboard" subtitle="Manage and track student applications" className="border-b border-ub-border p-4 sm:p-6" />
 
       {grandTotal > 0 && (
-        <div className="hidden sm:block p-6 border-b border-ub-border">
+        <div className="min-w-0 p-4 sm:p-6 border-b border-ub-border">
           <PipelineCard
             stages={stages}
             stageCounts={stageCounts}
@@ -188,7 +188,7 @@ const ModernApplicationsTable = () => {
         </div>
       )}
 
-      <div className="border-b border-ub-border p-6">
+      <div className="border-b border-ub-border p-4 sm:p-6">
         <ApplicationFilterBar
           searchTerm={searchTerm}
           onSearchChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}

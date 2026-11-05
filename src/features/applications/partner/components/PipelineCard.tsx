@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useId } from "react";
 import { ArrowUpRight } from "lucide-react";
 import PipelineFlow, { type PipelineFlowStage } from "components/ub/dashboard/pipeline/PipelineFlow";
 import Button from "components/ub/core/buttons/Button";
@@ -40,6 +40,7 @@ export default function PipelineCard({
   title = "Your Pipeline",
   subtitle,
 }: PipelineCardProps) {
+  const titleId = useId();
   const items: PipelineFlowStage[] = stages.map((stage) => {
     const isComm = stage.name.toLowerCase().includes("commission");
     return {
@@ -53,10 +54,10 @@ export default function PipelineCard({
   });
 
   return (
-    <section aria-labelledby="pipeline-title">
+    <section aria-labelledby={titleId}>
       <div className="mb-4">
-        <h3 id="pipeline-title" className="text-ub-heading-sm text-ub-text-primary">{title}</h3>
-        <p className="mt-0.5 truncate text-ub-body-sm text-ub-text-secondary">
+        <h3 id={titleId} className="text-ub-heading-sm text-ub-text-primary">{title}</h3>
+        <p className="mt-0.5 break-words text-ub-body-sm text-ub-text-secondary">
           {subtitle ?? `${totalCount} active application${totalCount !== 1 ? "s" : ""} — move students right to unlock commission`}
         </p>
       </div>

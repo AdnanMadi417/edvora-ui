@@ -104,6 +104,7 @@ export default function UpdateCorrectionRequest({
       size="lg"
       icon={FilePlus2}
       title="Update correction request"
+      footerNote="Review the reason and requested documents before saving."
       description={statusName
                 ? `Request more documents for "${statusName}" without changing the status.`
                 : "Request more documents without changing the status."}
@@ -143,8 +144,8 @@ export default function UpdateCorrectionRequest({
                         checked={selectedIds.includes(d.id)}
                         onChange={() => toggle(d.id)}
                         label={
-                          <span className="flex items-center gap-2">
-                            <span className="truncate">{d.type}</span>
+                          <span className="flex min-w-0 flex-wrap items-center gap-2">
+                            <span className="break-words">{d.type}</span>
                             {d.is_required_for_current_upload && (
                               <Tag tone="neutral" size="sm">
                                 Already requested

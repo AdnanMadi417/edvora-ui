@@ -5,7 +5,7 @@ import StudentManualApplicationForm from "features/applications/partner/componen
 
 export default function StudentApplicationForm() {
   return (
-    <section className="min-[100vh]">
+    <section className="w-full min-w-0">
       <StudentManualApplicationForm/>
     </section>
   );
