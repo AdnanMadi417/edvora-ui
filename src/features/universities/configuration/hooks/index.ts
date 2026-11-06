@@ -1,0 +1,11 @@
+export { useUpdateUniversityType } from "./useUpdateUniversityType";
+export { useCreateUniversityType } from "./useCreateUniversityType";
+export { useUniversityTypeDetails } from "./useUniversityTypeDetails";
+export { useAssignUniversityType } from "./useAssignUniversityType";
+export { useDeleteUniversityType } from "./useDeleteUniversityType";
+export { useUniversityTypes } from "./useUniversityTypes";
+export { useApplicationSubmissionFields } from "./useApplicationSubmissionFields";
+export { useApplicationRequiredFields } from "./useApplicationRequiredFields";
+export { useUpdateApplicationRequiredFields } from "./useUpdateApplicationRequiredFields";
+export { useApplicationRequiredFieldById } from "./useApplicationRequiredFieldById";
+export { useAdminUniversities } from "./useAdminUniversities";

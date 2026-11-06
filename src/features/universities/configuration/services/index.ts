@@ -1,0 +1,1 @@
+export { universityConfigurationApi } from "./universityConfigurationApi";

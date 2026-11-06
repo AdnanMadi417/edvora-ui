@@ -1,6 +1,6 @@
 "use client";
 
-import UniversityManagementTable from "features/universities/components/admin/tables/UniversityManagementTable";
+import UniversityManagementTable from "features/universities/configuration/components/admin/table/UniversityManagementTable";
 
 const universityManagementTableOverview = () => {
   return (

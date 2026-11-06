@@ -21,6 +21,8 @@ export interface FormPageProps {
   showActions?: boolean;
   children: ReactNode;
   className?: string;
+  /** Keep form actions reachable while scrolling a long form. */
+  stickyActions?: boolean;
 }
 
 /** Single-page counterpart to ApplicationFormView: shared header, body and action footer. */
@@ -38,6 +40,7 @@ export default function FormPage({
   showActions = true,
   children,
   className,
+  stickyActions = false,
 }: FormPageProps) {
   const titleId = useId();
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -75,7 +78,7 @@ export default function FormPage({
           {children}
         </fieldset>
         {showActions && (
-          <footer className="flex flex-col gap-3 border-t border-ub-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6">
+          <footer className={clsx("flex flex-col gap-3 border-t border-ub-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6", stickyActions && "sticky bottom-16 z-20 bg-ub-surface-raised shadow-ub-sm md:bottom-4")}>
             <p className="text-ub-caption text-ub-text-tertiary">
               Optional fields are marked.
             </p>

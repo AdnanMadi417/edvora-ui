@@ -1,0 +1,11 @@
+export { default as UniversityTypeDirectory } from "./shared/UniversityTypeDirectory";
+export { default as UniversityTypeEditor } from "./shared/UniversityTypeEditor";
+export type { UniversityTypeEditorData } from "./shared/UniversityTypeEditor";
+export { default as UniversityTypeDetailsView } from "./shared/UniversityTypeDetailsView";
+export { default as UniversityTypeForm } from "./admin/form/UniversityTypeForm";
+export { default as EditUniversityForm } from "./admin/form/EditUniversityForm";
+export { default as UniversityConfigDetails } from "./admin/details/UniversityConfigDetails";
+export { default as UniversityManagementTable } from "./admin/table/UniversityManagementTable";
+export { default as DataEntryUniversityConfigurationTable } from "./data-entry/DataEntryUniversityConfigurationTable";
+export { default as CreateUniversityType } from "./admin/popups/CreateUniversityType";
+export { default as AssignUniversityTypeModal } from "./admin/popups/UpdateUniversityType";

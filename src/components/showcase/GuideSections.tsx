@@ -19,6 +19,7 @@ import ApplicationKit from "./sections/ApplicationKit";
 import PopupForms from "./patterns/PopupForms";
 import TableOptions from "./sections/TableOptions";
 import ProgramTableDemo from "./patterns/ProgramTableDemo";
+import { UniversityTypeFormDemo, UniversityTypeDetailsDemo } from "./patterns/UniversityConfigurationDemos";
 import { UniversityTableDemo, UniversityProfileDemo } from "./patterns/UniversityDemos";
 import ProgramCards from "./sections/ProgramCards";
 import UniversityCards from "./sections/UniversityCards";
@@ -61,6 +62,7 @@ export function FormInputsSection() {
       <Pick demos={["InputField and TextareaField","SelectField, SelectInput and RadioField","CheckBoxGroup and CheckSimpleBoxGroup","SearchableDropdown, MultiSelect and SearchableSelect","Toggles","Password and OTP","Phone, commission and fee rows","IntakeDatePicker","RichTextEditor","RadioCardGroup","SearchableChecklist","File uploads"]}>
         <Forms />
       </Pick>
+      <UniversityTypeFormDemo />
     </ShowcaseSection>
   );
 }
@@ -152,6 +154,7 @@ export function ContentSection() {
       <UniversityCards />
       <ProgramDetailsDemo />
       <UniversityProfileDemo />
+      <UniversityTypeDetailsDemo />
       <ApplicationDetailsDemo />
       <AdvisorProfileDemo />
     </ShowcaseSection>

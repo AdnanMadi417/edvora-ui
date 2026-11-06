@@ -24,6 +24,18 @@ const imp = (name: string, path: string) => `import ${name} from "components/ub/
 const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
 
 export const CATALOG: Record<string, CatalogEntry> = {
+  "University type create & edit": {
+    category: "forms",
+    imports: ['import UniversityTypeEditor from "features/universities/configuration/components/shared/UniversityTypeEditor";'],
+    useFor: "Create or update university categories and required application fields.",
+    usedIn: ["Admin university configuration", "Data-entry university configuration"],
+  },
+  "University type details": {
+    category: "data",
+    imports: ['import UniversityTypeDetailsView from "features/universities/configuration/components/shared/UniversityTypeDetailsView";'],
+    useFor: "Inspect and search required and optional fields for an institution category.",
+    usedIn: ["University configuration details"],
+  },
   "Application pipeline & statistics": {
     category: "data",
     imports: ['import PipelineCard from "features/applications/partner/components/PipelineCard";', 'import ApplicationStatistics from "features/applications/components/ApplicationStatistics";'],
