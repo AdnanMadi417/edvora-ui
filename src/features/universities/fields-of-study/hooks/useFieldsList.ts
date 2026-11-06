@@ -1,13 +1,8 @@
 import { useState, useEffect } from "react";
-import api from "lib/useApi";
-import Cookies from "js-cookie";
+import { fieldsOfStudyApi } from "../services";
 
-export type FieldOfStudy = {
-  id: string;
-  name: string;
-  code: string;
-  is_active: boolean;
-};
+import type { FieldOfStudy } from "../types";
+export type { FieldOfStudy } from "../types";
 
 export function useAllFields() {
   const [fields, setFields] = useState<FieldOfStudy[]>([]);
@@ -20,10 +15,7 @@ export function useAllFields() {
       setLoading(true);
       setError("");
       try {
-        const token = Cookies.get("token");
-        const res = await api.get("/knowledge-hub/fields-of-study", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
+        const res = await fieldsOfStudyApi.list();
         setFields(res.data || []);
       } catch (err) {
         console.error(err);
@@ -35,5 +27,10 @@ export function useAllFields() {
     fetchFields();
   }, [refetchCounter]);
 
-  return { fields, fieldsLoading, fieldsError, refetch: () => setRefetchCounter((c) => c + 1) };
+  return {
+    fields,
+    fieldsLoading,
+    fieldsError,
+    refetch: () => setRefetchCounter((c) => c + 1),
+  };
 }

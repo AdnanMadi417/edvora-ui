@@ -1,6 +1,5 @@
 import { useState } from "react";
-import api from "lib/useApi";
-import Cookies from "js-cookie";
+import { fieldsOfStudyApi } from "../services";
 import { parseApiError } from "utils/parseApiError";
 
 export function useDeleteField() {
@@ -13,10 +12,7 @@ export function useDeleteField() {
     setError("");
     setSuccess(false);
     try {
-      const token = Cookies.get("token");
-      await api.delete(`/knowledge-hub/fields-of-study/${fieldId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      await fieldsOfStudyApi.delete(fieldId);
       setSuccess(true);
     } catch (err: unknown) {
       setError(parseApiError(err, "Failed to delete field of study"));

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import api from "lib/useApi";
-import Cookies from "js-cookie";
+import { fieldsOfStudyApi } from "../services";
 import { parseApiError } from "utils/parseApiError";
 
 export type CreateFieldOfStudyPayload = {
@@ -18,10 +17,7 @@ export function useCreateFieldOfStudy() {
     setError("");
     setSuccess(false);
     try {
-      const token = Cookies.get("token");
-      const res = await api.post("/knowledge-hub/fields-of-study", data, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const res = await fieldsOfStudyApi.create(data);
       setSuccess(true);
       return res.data;
     } catch (err: unknown) {

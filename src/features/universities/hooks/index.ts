@@ -13,8 +13,17 @@ export { useUniversityPaymentMethods } from "./payment-methods/useUniversityPaym
 export { useAssignUniversityPaymentMethod } from "./payment-methods/useAssignUniversityPaymentMethod";
 export { useUpdateUniversityPaymentMethod } from "./payment-methods/useUpdateUniversityPaymentMethod";
 export { useDeleteUniversityPaymentMethod } from "./payment-methods/useDeleteUniversityPaymentMethod";
-
-
-
 // Compatibility facade for university consumers.
-export { useUpdateUniversityType, useCreateUniversityType, useUniversityTypeDetails, useAssignUniversityType, useDeleteUniversityType, useUniversityTypes, useApplicationSubmissionFields, useApplicationRequiredFields, useUpdateApplicationRequiredFields, useApplicationRequiredFieldById, useAdminUniversities } from "../configuration/hooks";
+export {
+  useUpdateUniversityType,
+  useCreateUniversityType,
+  useUniversityTypeDetails,
+  useAssignUniversityType,
+  useDeleteUniversityType,
+  useUniversityTypes,
+  useApplicationSubmissionFields,
+  useApplicationRequiredFields,
+  useUpdateApplicationRequiredFields,
+  useApplicationRequiredFieldById,
+  useAdminUniversities,
+} from "../configuration/hooks";

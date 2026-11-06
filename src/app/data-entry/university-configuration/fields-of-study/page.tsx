@@ -1,6 +1,6 @@
 "use client";
 
-import DataEntryFieldsOfStudyTable from "features/universities/components/data-entry/DataEntryFieldsOfStudyTable";
+import DataEntryFieldsOfStudyTable from "features/universities/fields-of-study/components/data-entry/DataEntryFieldsOfStudyTable";
 
 const DataEntryFieldsOfStudyPage = () => {
   return (

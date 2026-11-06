@@ -1,28 +1,39 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Tag } from "lucide-react";
+import { Edit3 } from "lucide-react";
 
-import { useCreateFieldOfStudy } from "features/knowledge-hub/field-of-study/hooks";
+import { useUpdateFieldOfStudy } from "features/universities/fields-of-study/hooks";
 
 import FormModal from "components/ub/feedback/dialogs/FormModal";
 import InputField from "components/ub/forms/text/InputField";
+import ToggleInput from "components/ub/forms/choices/ToggleInput";
+
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 
-interface CreateFieldOfStudyProps {
+interface UpdateFieldProps {
   isOpen: boolean;
   onClose: () => void;
+  selectedField: {
+    id: string;
+    name: string;
+    is_active?: boolean;
+  } | null;
   onSuccess?: () => void;
 }
 
-export default function CreateFieldOfStudy({
+export default function UpdateFieldOfStudy({
   isOpen,
   onClose,
+  selectedField,
   onSuccess,
-}: CreateFieldOfStudyProps) {
-  const { CreateFieldOfStudy, fieldLoading } = useCreateFieldOfStudy();
+}: UpdateFieldProps) {
+  const { updateFieldOfStudy, fieldLoading } = useUpdateFieldOfStudy(
+    selectedField?.id
+  );
+  const [initialFormData, setInitialFormData] = useState<any>(null);
 
   const { showToast } = useToast();
 
@@ -38,15 +49,31 @@ export default function CreateFieldOfStudy({
       setErrors((prev) => ({ ...prev, ...patch }));
       scrollToFirstError(patch);
     },
-    // This form has just one real input — attach any unrecognized error
-    // (e.g. a duplicate-name conflict) straight to it rather than only toasting.
-    onUnmappedError: (message) => {
-      showToast(`Failed to create Field Of Study. ${message}`, "error");
-      const e = { name: message };
-      setErrors(e);
-      scrollToFirstError(e);
-    },
+    onUnmappedError: (message) =>
+      showToast(`Update failed. ${message}`, "error"),
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        name: "",
+        is_active: true,
+      });
+      setErrors({});
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!selectedField || !isOpen) return;
+
+    const initial = {
+      name: selectedField.name || "",
+      is_active: selectedField.is_active ?? true,
+    };
+
+    setFormData(initial);
+    setInitialFormData(initial);
+  }, [selectedField, isOpen]);
 
   const validateName = (name: string): string => {
     if (!name.trim()) return "Field of study name is required";
@@ -73,7 +100,12 @@ export default function CreateFieldOfStudy({
     }
   };
 
-  const handleCreate = async () => {
+  const isFormChanged = React.useMemo(() => {
+    if (!initialFormData) return false;
+    return JSON.stringify(formData) !== JSON.stringify(initialFormData);
+  }, [formData, initialFormData]);
+
+  const handleUpdate = async () => {
     const nameErr = validateName(formData.name);
     if (nameErr) {
       const e = { name: nameErr };
@@ -83,12 +115,12 @@ export default function CreateFieldOfStudy({
     }
 
     try {
-      await CreateFieldOfStudy({
+      await updateFieldOfStudy({
         name: formData.name.trim(),
         is_active: formData.is_active,
       });
 
-      showToast("Field Of Study created successfully.", "success");
+      showToast("Field of study updated successfully.", "success");
 
       onClose();
       onSuccess?.();
@@ -97,33 +129,23 @@ export default function CreateFieldOfStudy({
     }
   };
 
-  useEffect(() => {
-    if (isOpen) {
-      setFormData({
-        name: "",
-        is_active: true,
-      });
-
-      setErrors({});
-    }
-  }, [isOpen]);
-
   return (
     <FormModal
       open={isOpen}
       onClose={onClose}
       size="md"
-      icon={Tag}
-      title="Create field of study"
-      description="Add a study area to help advisors find the right programmes."
+      icon={Edit3}
+      title="Edit field of study"
+      description="Update the study area and whether it is available for selection."
       onSubmit={async () => {
-        await handleCreate();
+        await handleUpdate();
       }}
-      submitLabel="Create field of study"
+      submitLabel="Save changes"
       submitting={fieldLoading}
       submitDisabled={
+        !isFormChanged ||
         !formData.name.trim() ||
-        formData.name.trim().length < 5 ||
+        formData.name.trim().length < 3 ||
         formData.name.trim().length > 100
       }
     >
@@ -131,12 +153,23 @@ export default function CreateFieldOfStudy({
         <InputField
           label="Field Of Study Name"
           field="name"
-          placeholder="e.g. Computer Science"
           required
           formData={formData}
           errors={errors}
           updateFormData={updateFormData}
           onBlur={() => validateField("name")}
+        />
+
+        <ToggleInput
+          label="Status"
+          field="is_active"
+          formData={formData}
+          errors={errors}
+          updateFormData={updateFormData}
+          enabledText="Active"
+          disabledText="Inactive"
+          enabledDescription="This field of study is visible and selectable."
+          disabledDescription="This field of study is hidden from selection."
         />
       </fieldset>
     </FormModal>
