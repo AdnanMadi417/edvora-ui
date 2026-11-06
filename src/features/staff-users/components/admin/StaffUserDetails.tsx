@@ -2,13 +2,28 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Ban, CheckCircle, ChevronLeft, Power, ShieldCheck, XCircle } from "lucide-react";
+import {
+  Ban,
+  CheckCircle,
+  ChevronLeft,
+  Power,
+  ShieldCheck,
+  XCircle,
+  Mail,
+  UserRound,
+} from "lucide-react";
 
-import { useStaffUserDetails, useSuspendStaffUser, useReactivateStaffUser } from "../../hooks";
+import {
+  useStaffUserDetails,
+  useSuspendStaffUser,
+  useReactivateStaffUser,
+} from "../../hooks";
 
 import Loading from "components/ub/feedback/states/Loading";
 import EmptyData from "components/ub/feedback/states/EmptyTableData";
 import Button from "components/ub/core/buttons/Button";
+import Alert from "components/ub/feedback/notifications/Alert";
+import DescriptionList from "components/ub/data/display/DescriptionList";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -23,9 +38,10 @@ export default function StaffUserDetails({ userId }: StaffUserDetailsProps) {
   const router = useRouter();
   const { showToast } = useToast();
 
-  const { staffUser, loading, refetch } = useStaffUserDetails(userId);
+  const { staffUser, loading, error, refetch } = useStaffUserDetails(userId);
   const { suspendStaffUser, loading: isSuspending } = useSuspendStaffUser();
-  const { reactivateStaffUser, loading: isReactivating } = useReactivateStaffUser();
+  const { reactivateStaffUser, loading: isReactivating } =
+    useReactivateStaffUser();
   const [isSuspendOpen, setIsSuspendOpen] = useState(false);
 
   const handleToggleActive = async () => {
@@ -47,77 +63,135 @@ export default function StaffUserDetails({ userId }: StaffUserDetailsProps) {
   };
 
   if (loading && !staffUser) return <Loading text="Loading staff user..." />;
+  if (error)
+    return (
+      <div className="mt-5">
+        <Alert
+          tone="danger"
+          title="Couldn’t load staff details"
+          action={{ label: "Try again", onClick: refetch }}
+        >
+          {error}
+        </Alert>
+      </div>
+    );
   if (!staffUser) return <EmptyData />;
 
   const isSubmitting = isSuspending || isReactivating;
 
   return (
-    <section className="mx-auto mt-6 ">
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        {/* Header */}
-        <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-5">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-light text-lg font-semibold text-slate-700">
-              {staffUser.name?.slice(0, 2).toUpperCase() ?? "?"}
-            </div>
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl font-semibold text-slate-900">{staffUser.name}</h1>
-                {staffUser.is_active ? (
-                  <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
-                ) : (
-                  <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Suspended</StatusBadge>
-                )}
+    <section className="mx-auto mt-5 min-w-0 space-y-5">
+      <Button
+        onClick={() => router.push("/admin/staff-users")}
+        icon={<ChevronLeft className="h-4 w-4" />}
+        text="Back to staff users"
+        variant="secondary"
+      />
+      <header className="overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface">
+        <div className="h-2 bg-ub-tone-brand-bg" />
+        <div className="flex flex-col gap-5 p-4 sm:p-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex min-w-0 items-start gap-4">
+            <span className="grid h-16 w-16 shrink-0 place-items-center rounded-ub-lg bg-ub-tone-brand-bg text-ub-heading-lg text-ub-tone-brand-text">
+              {staffUser.name
+                ?.split(/\s+/)
+                .filter(Boolean)
+                .slice(0, 2)
+                .map((part) => part[0])
+                .join("")
+                .toUpperCase() || "?"}
+            </span>
+            <div className="min-w-0 space-y-2">
+              <p className="text-ub-caption text-ub-text-secondary">
+                Staff profile
+              </p>
+              <h1 className="break-words text-ub-heading-lg">
+                {staffUser.name}
+              </h1>
+              <div className="flex flex-wrap gap-2">
+                <StatusBadge
+                  variant="info"
+                  icon={<ShieldCheck className="h-3 w-3" />}
+                >
+                  {staffUser.role?.name ?? "No role assigned"}
+                </StatusBadge>
+                <StatusBadge
+                  variant={staffUser.is_active ? "success" : "neutral"}
+                  icon={
+                    staffUser.is_active ? (
+                      <CheckCircle className="h-3 w-3" />
+                    ) : (
+                      <XCircle className="h-3 w-3" />
+                    )
+                  }
+                >
+                  {staffUser.is_active ? "Active" : "Suspended"}
+                </StatusBadge>
               </div>
-              <p className="break-all text-sm text-slate-500">{staffUser.email}</p>
-            </div>
-          </div>
-
-          <Button
-            onClick={() => router.push("/admin/staff-users")}
-            icon={<ChevronLeft className="h-4 w-4" />}
-            text="Back"
-            bgColor="bg-white"
-            textColor="text-slate-700"
-            borderColor="border-slate-200"
-            hoverTextColor="hover:text-slate-900"
-            hoverBorderColor="hover:border-slate-300"
-          />
-        </div>
-
-        <div className="h-px w-full bg-slate-200" />
-
-        {/* Role */}
-        <div className="p-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Role
-          </p>
-          <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-slate-900">{staffUser.role?.name ?? "—"}</p>
-              <code className="mt-0.5 inline-block rounded bg-white px-1.5 py-0.5 text-xs text-slate-500">
-                {staffUser.role?.code}
-              </code>
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-slate-200 bg-white px-6 py-4">
-          <Button
-            onClick={() => setIsSuspendOpen(true)}
-            icon={staffUser.is_active ? <Ban className="h-4 w-4" /> : <Power className="h-4 w-4" />}
-            text={staffUser.is_active ? "Suspend Account" : "Reactivate Account"}
-            bgColor={staffUser.is_active ? "bg-red-50" : "bg-emerald-50"}
-            textColor={staffUser.is_active ? "text-red-700" : "text-emerald-700"}
-            borderColor={staffUser.is_active ? "border-red-600" : "border-emerald-600"}
-            hoverTextColor={staffUser.is_active ? "hover:text-red-800" : "hover:text-emerald-800"}
-            hoverBorderColor={staffUser.is_active ? "hover:border-red-700" : "hover:border-emerald-700"}
-          />
-        </div>
+      </header>
+      <div className="grid min-w-0 gap-5 lg:grid-cols-3">
+        <section className="min-w-0 overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface lg:col-span-2">
+          <div className="flex items-center gap-3 border-b border-ub-border p-4 sm:p-6">
+            <UserRound className="h-5 w-5 text-ub-icon-interactive" />
+            <h2 className="text-ub-heading-sm">Account details</h2>
+          </div>
+          <div className="p-4 sm:p-6">
+            <DescriptionList
+              className="[&_dd]:break-words"
+              items={[
+                {
+                  label: "Email address",
+                  value: (
+                    <span className="flex min-w-0 items-start gap-2">
+                      <Mail className="mt-1 h-4 w-4 shrink-0 text-ub-text-tertiary" />
+                      <span className="break-all">
+                        {staffUser.email || "—"}
+                      </span>
+                    </span>
+                  ),
+                },
+                { label: "Assigned role", value: staffUser.role?.name },
+              ]}
+              divided
+            />
+          </div>
+        </section>
+        <section className="min-w-0 overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface">
+          <div className="flex items-center gap-3 border-b border-ub-border p-4 sm:p-6">
+            <ShieldCheck className="h-5 w-5 text-ub-icon-interactive" />
+            <h2 className="text-ub-heading-sm">Account access</h2>
+          </div>
+          <div className="space-y-5 p-4 sm:p-6">
+            <Alert
+              tone={staffUser.is_active ? "info" : "warning"}
+              title={
+                staffUser.is_active ? "Access enabled" : "Access suspended"
+              }
+            >
+              {staffUser.is_active
+                ? "This staff member can sign in with their assigned role."
+                : "This staff member cannot sign in until their account is reactivated."}
+            </Alert>
+            <Button
+              onClick={() => setIsSuspendOpen(true)}
+              icon={
+                staffUser.is_active ? (
+                  <Ban className="h-4 w-4" />
+                ) : (
+                  <Power className="h-4 w-4" />
+                )
+              }
+              text={
+                staffUser.is_active ? "Suspend Account" : "Reactivate Account"
+              }
+              variant="secondary"
+              className="w-full"
+              disabled={isSubmitting}
+            />
+          </div>
+        </section>
       </div>
 
       <SuspendReactivateStaffUserModal
