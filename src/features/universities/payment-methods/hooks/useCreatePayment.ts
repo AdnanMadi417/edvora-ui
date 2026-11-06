@@ -1,12 +1,8 @@
 import { useState } from "react";
-import api from "lib/useApi";
-import Cookies from "js-cookie";
+import { paymentMethodsApi } from "../services";
 import { parseApiError } from "utils/parseApiError";
 
-interface CreatePaymentPayload {
-  name: string;
-  description: string;
-}
+import type { PaymentMethodPayload as CreatePaymentPayload } from "../types";
 
 export function useCreatePayment() {
   const [paymentLoading, setLoading] = useState<boolean>(false);
@@ -18,10 +14,7 @@ export function useCreatePayment() {
     setError("");
     setSuccess(false);
     try {
-      const token = Cookies.get("token");
-      const response = await api.post("/admin/payment-methods", payload, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const response = await paymentMethodsApi.create(payload);
       setSuccess(true);
       return response.data;
     } catch (err: unknown) {

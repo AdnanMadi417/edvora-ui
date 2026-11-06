@@ -5,4 +5,4 @@ export { default as AssignPaymentUniversity } from "./admin/popups/AssignPayment
 export { default as AssignUniversityTypeModal } from "features/universities/configuration/components/admin/popups/UpdateUniversityType";
 export { default as RegisterUniversity } from "./admin/form/RegisterUniversity";
 export { default as EditUniversityDetails } from "./admin/form/EditUniversityDetails";
-export { default as BatchAssignPaymentMethod } from "./admin/payment-methods/BatchAssignPaymentMethod";
+export { default as BatchAssignPaymentMethod } from "../payment-methods/components/admin/BatchAssignPaymentMethod";

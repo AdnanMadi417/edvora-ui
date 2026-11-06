@@ -1,6 +1,6 @@
 "use client";
 
-import PaymentMethodsTable from "features/universities/components/admin/payment-methods/PaymentMethodsTable";
+import PaymentMethodsTable from "features/universities/payment-methods/components/admin/PaymentMethodsTable";
 
 const PaymentMethodsTableOverview = () => {
   return (

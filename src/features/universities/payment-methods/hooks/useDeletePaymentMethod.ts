@@ -1,9 +1,8 @@
 import { useState } from "react";
-import api from "lib/useApi";
-import Cookies from "js-cookie";
+import { paymentMethodsApi } from "../services";
 import { parseApiError } from "utils/parseApiError";
 
-export function useDeleteUniversity() {
+export function useDeletePaymentMethod() {
   const [isDeleting, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState<boolean>(false);
@@ -13,10 +12,7 @@ export function useDeleteUniversity() {
     setError("");
     setSuccess(false);
     try {
-      const token = Cookies.get("token");
-      await api.delete(`/admin/payment-methods/${paymentId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      await paymentMethodsApi.delete(paymentId);
       setSuccess(true);
     } catch (err: unknown) {
       setError(parseApiError(err, "Failed to delete payment method"));

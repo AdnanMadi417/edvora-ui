@@ -1,6 +1,5 @@
 import { useState } from "react";
-import api from "lib/useApi";
-import Cookies from "js-cookie";
+import { paymentMethodsApi } from "../services";
 import { parseApiError } from "utils/parseApiError";
 
 export interface UpdatePaymentMethodPayload {
@@ -13,17 +12,17 @@ export function useUpdatePaymentMethods() {
   const [updating, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const updatePaymentMethods = async (payloads: UpdatePaymentMethodPayload[]) => {
+  const updatePaymentMethods = async (
+    payloads: UpdatePaymentMethodPayload[]
+  ) => {
     setLoading(true);
     setError(null);
     try {
-      const token = Cookies.get("token");
       for (const payload of payloads) {
-        await api.put(
-          `/admin/payment-methods/${payload.id}`,
-          { name: payload.name, description: payload.description },
-          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-        );
+        await paymentMethodsApi.update(payload.id, {
+          name: payload.name,
+          description: payload.description,
+        });
       }
     } catch (err: unknown) {
       setError(parseApiError(err, "Failed to update payment methods"));

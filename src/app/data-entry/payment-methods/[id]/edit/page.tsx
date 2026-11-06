@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EditPaymentMethodDetails from "features/universities/components/admin/payment-methods/EditPaymentMethodDetails";
+import EditPaymentMethodDetails from "features/universities/payment-methods/components/admin/EditPaymentMethodDetails";
 
 export default function DataEntryEditPaymentMethodPage() {
   const params = useParams();
@@ -12,7 +12,7 @@ export default function DataEntryEditPaymentMethodPage() {
   return (
     <EditPaymentMethodDetails
       id={paymentMethodId}
-      redirectPath={`/data-entry/payment-methods/${paymentMethodId}/edit`}
+      redirectPath={`/data-entry/payment-methods/${paymentMethodId}`}
       listPath="/data-entry/payment-methods"
       hideDelete
     />
