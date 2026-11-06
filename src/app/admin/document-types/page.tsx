@@ -1,13 +1,4 @@
-"use client";
-
-import SetStaticTemplatePage from "features/document-types/components/admin/SetStaticTemplatePage";
-
-const DocumentTypesPage = () => {
-  return (
-    <div>
-      <SetStaticTemplatePage />
-    </div>
-  );
-};
-
-export default DocumentTypesPage;
+import DocumentTypesDirectory from "features/universities/document-types/components/shared/DocumentTypesDirectory";
+export default function DocumentTypesPage() {
+  return <DocumentTypesDirectory />;
+}
