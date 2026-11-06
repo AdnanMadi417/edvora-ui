@@ -1,11 +1,32 @@
 "use client";
+import LinkBtn from "components/ub/core/buttons/LinkBtn";
+import DataTable, {
+  type DataTableColumn,
+} from "components/ub/data/tables/DataTable";
+import type { Partner } from "features/partners/types";
+import AdvisorDirectoryToolbar from "../shared/AdvisorDirectoryToolbar";
 
 import { useId as useTabId } from "react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ChevronRight,
-  Pencil, RefreshCw, SlidersHorizontal, Building2,
-  UserCog, Users, CheckCircle, XCircle, BadgeCheck, User, ShieldCheck, CalendarDays, Mail, Ban, Power, Trash2, Handshake,
+  Pencil,
+  RefreshCw,
+  SlidersHorizontal,
+  Building2,
+  UserCog,
+  Users,
+  CheckCircle,
+  XCircle,
+  BadgeCheck,
+  User,
+  ShieldCheck,
+  CalendarDays,
+  Mail,
+  Ban,
+  Power,
+  Trash2,
+  Handshake,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
@@ -14,22 +35,22 @@ import StatusBadge from "components/ub/data/badges/StatusBadge";
 import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import { useRouter } from "next/navigation";
-import { usePartners, useDeletePartner, useUpdatePartner, useResendApprovalEmail } from "features/partners/hooks";
+import {
+  usePartners,
+  useDeletePartner,
+  useUpdatePartner,
+  useResendApprovalEmail,
+} from "features/partners/hooks";
 import { useAccountManagers } from "features/account-managers/hooks";
 import ReviewPartnerPopup from "./ReviewPartnerPopup";
 import ResendApprovalEmailConfirmation from "./ResendApprovalEmailConfirmation";
 import PendingRegistrationOtpsTable from "./PendingRegistrationOtpsTable";
 import SuspendActivatePartner from "./SuspendActivatePartner";
 import DeletePartner from "./DeletePartner";
-import StatsFilterCards, { type FilterCardItem } from "components/ub/navigation/controls/StatsFilterCards";
-import FilterSelectField from "components/ub/forms/selection/FilterSelectField";
-import SearchInput from "components/ub/forms/selection/SearchInput";
-import TableWrapper from "components/ub/data/tables/TableWrapper";
-import TableSkeletonRows from "components/ub/data/tables/TableSkeletonRows";
-import TableEmptyRow from "components/ub/data/tables/TableEmptyRow";
-import TableErrorRow from "components/ub/data/tables/TableErrorRow";
+import StatsFilterCards, {
+  type FilterCardItem,
+} from "components/ub/navigation/controls/StatsFilterCards";
 import TablePagination from "components/ub/data/tables/TablePagination";
-import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
 import PresignedImage from "components/ub/data/media/PresignedImage";
 import Button from "components/ub/core/buttons/Button";
 import IconButton from "components/ub/core/buttons/IconButton";
@@ -47,11 +68,14 @@ const TABS: TabItem<PartnersTab>[] = [
 
 type StatusFilter = "active" | "inactive" | "individual" | "agency" | null;
 
-function statusToParams(status: StatusFilter): { is_active?: boolean; type?: string } {
-  if (status === "active")     return { is_active: true };
-  if (status === "inactive")   return { is_active: false };
+function statusToParams(status: StatusFilter): {
+  is_active?: boolean;
+  type?: string;
+} {
+  if (status === "active") return { is_active: true };
+  if (status === "inactive") return { is_active: false };
   if (status === "individual") return { type: "individual" };
-  if (status === "agency")     return { type: "agency" };
+  if (status === "agency") return { type: "agency" };
   return {};
 }
 
@@ -65,39 +89,58 @@ export default function PartnersTable() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedManager, setSelectedManager] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState<StatusFilter>(null);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const { accountManagers } = useAccountManagers();
   const { updatePartner, isUpdatingPartner } = useUpdatePartner();
-  const { resendApprovalEmail, loading: isResendingEmail } = useResendApprovalEmail();
+  const { resendApprovalEmail, loading: isResendingEmail } =
+    useResendApprovalEmail();
   const { deletePartner, loading: isDeletingPartner } = useDeletePartner();
 
   const [isReviewOpen, setIsReviewOpen] = useState(false);
-  const [reviewPartner, setReviewPartner] = useState<{ id: string; name: string; assignedManagerId?: string } | null>(null);
+  const [reviewPartner, setReviewPartner] = useState<{
+    id: string;
+    name: string;
+    assignedManagerId?: string;
+  } | null>(null);
   const [isResendOpen, setIsResendOpen] = useState(false);
-  const [resendTarget, setResendTarget] = useState<{ id: string; name: string } | null>(null);
+  const [resendTarget, setResendTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [isSuspendOpen, setIsSuspendOpen] = useState(false);
   const [suspendTarget, setSuspendTarget] = useState<any>(null);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
   // partnerId -> epoch ms when the 60s resend-approval-email cooldown ends
-  const [resendCooldowns, setResendCooldowns] = useState<Record<string, number>>({});
+  const [resendCooldowns, setResendCooldowns] = useState<
+    Record<string, number>
+  >({});
   const [cooldownTick, setCooldownTick] = useState(() => Date.now());
 
   useEffect(() => {
-    const hasActive = Object.values(resendCooldowns).some((end) => end > Date.now());
+    const hasActive = Object.values(resendCooldowns).some(
+      (end) => end > Date.now()
+    );
     if (!hasActive) return;
     const id = setInterval(() => {
       const now = Date.now();
       setCooldownTick(now);
       setResendCooldowns((prev) => {
-        const next = Object.fromEntries(Object.entries(prev).filter(([, end]) => end > now));
-        return Object.keys(next).length === Object.keys(prev).length ? prev : next;
+        const next = Object.fromEntries(
+          Object.entries(prev).filter(([, end]) => end > now)
+        );
+        return Object.keys(next).length === Object.keys(prev).length
+          ? prev
+          : next;
       });
     }, 1000);
+
     return () => clearInterval(id);
   }, [resendCooldowns]);
 
@@ -120,7 +163,8 @@ export default function PartnersTable() {
     page: currentPage,
     page_size: ITEMS_PER_PAGE,
     search: debouncedSearch || undefined,
-    assigned_manager_id: selectedManager !== "all" ? selectedManager : undefined,
+    assigned_manager_id:
+      selectedManager !== "all" ? selectedManager : undefined,
     ...statusToParams(selectedStatus),
   });
 
@@ -136,16 +180,44 @@ export default function PartnersTable() {
   const isInitialLoad = !hasLoadedOnce;
   const isRefetching = loading && hasLoadedOnce;
 
-  const statsCards = useMemo<FilterCardItem[]>(() => [
-    { id: "active",      label: "Active",          count: stats?.active     ?? 0, icon: CheckCircle, colorScheme: "emerald" },
-    { id: "inactive",    label: "Suspended",       count: stats?.inactive   ?? 0, icon: XCircle,     colorScheme: "rose" },
-    { id: "individual",  label: "Individual",      count: stats?.individual ?? 0, icon: User,        colorScheme: "violet" },
-    { id: "agency",      label: "Company",         count: stats?.agency     ?? 0, icon: Building2,   colorScheme: "cyan" },
-  ], [stats]);
+  const statsCards = useMemo<FilterCardItem[]>(
+    () => [
+      {
+        id: "active",
+        label: "Active",
+        count: stats?.active ?? 0,
+        icon: CheckCircle,
+        colorScheme: "emerald",
+      },
+      {
+        id: "inactive",
+        label: "Suspended",
+        count: stats?.inactive ?? 0,
+        icon: XCircle,
+        colorScheme: "rose",
+      },
+      {
+        id: "individual",
+        label: "Individual",
+        count: stats?.individual ?? 0,
+        icon: User,
+        colorScheme: "violet",
+      },
+      {
+        id: "agency",
+        label: "Company",
+        count: stats?.agency ?? 0,
+        icon: Building2,
+        colorScheme: "cyan",
+      },
+    ],
+    [stats]
+  );
 
-  const displayTotal = partners.length < ITEMS_PER_PAGE
-    ? (currentPage - 1) * ITEMS_PER_PAGE + partners.length
-    : total;
+  const displayTotal =
+    partners.length < ITEMS_PER_PAGE
+      ? (currentPage - 1) * ITEMS_PER_PAGE + partners.length
+      : total;
 
   // The stats card is a real filter too: it narrows every search, so it has
   // to count here and be reset by Clear, or a search can come back empty
@@ -156,7 +228,10 @@ export default function PartnersTable() {
     selectedStatus !== null,
   ].filter(Boolean).length;
 
-  const managerOptions = accountManagers.map((m) => ({ label: m.name, value: m.id }));
+  const managerOptions = accountManagers.map((m) => ({
+    label: m.name,
+    value: m.id,
+  }));
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -175,21 +250,31 @@ export default function PartnersTable() {
     if (!resendTarget) return;
     try {
       const res = await resendApprovalEmail(resendTarget.id);
-      showToast(res?.message || "Approval email resent successfully", "success");
+      showToast(
+        res?.message || "Approval email resent successfully",
+        "success"
+      );
       setIsResendOpen(false);
       // A fresh send starts its own 60s cooldown window on the backend.
-      setResendCooldowns((prev) => ({ ...prev, [resendTarget.id]: Date.now() + 60_000 }));
+      setResendCooldowns((prev) => ({
+        ...prev,
+        [resendTarget.id]: Date.now() + 60_000,
+      }));
       refetch();
     } catch (err: any) {
       if (err?.response?.data?.code === "partner_already_logged_in") {
         // Stale frontend check, not a real failure — the partner already logged in.
-        showToast(parseApiError(err, "This advisor has already logged in. 12"), "error");
+        showToast(
+          parseApiError(err, "This advisor has already logged in."),
+          "error"
+        );
         setIsResendOpen(false);
         refetch();
         return;
       }
       if (err?.response?.status === 429) {
-        const retryAfterSeconds = err?.response?.data?.details?.retry_after_seconds;
+        const retryAfterSeconds =
+          err?.response?.data?.details?.retry_after_seconds;
         if (typeof retryAfterSeconds === "number") {
           setResendCooldowns((prev) => ({
             ...prev,
@@ -211,11 +296,18 @@ export default function PartnersTable() {
       await updatePartner(suspendTarget.id, {
         is_active: !suspendTarget.is_active,
       });
-      showToast(suspendTarget.is_active ? "Advisor account suspended" : "Advisor account activated", "success");
+      showToast(
+        suspendTarget.is_active
+          ? "Advisor account suspended"
+          : "Advisor account activated",
+        "success"
+      );
       setIsSuspendOpen(false);
       refetch();
     } catch (err: unknown) {
-      const fallback = suspendTarget.is_active ? "Failed to suspend account" : "Failed to activate account";
+      const fallback = suspendTarget.is_active
+        ? "Failed to suspend account"
+        : "Failed to activate account";
       showToast(parseApiError(err, fallback), "error");
     }
   };
@@ -232,382 +324,357 @@ export default function PartnersTable() {
     }
   };
 
-  return (
-    <div className="mt-6 text-p2 bg-white rounded-lg border border-slate-200">
+  const columns: DataTableColumn<Partner>[] = [
+    {
+      key: "0",
+      header: "Advisor",
+      cell: (partner) => (
+        <>
+          <div className="flex items-center gap-2">
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+              <PresignedImage
+                fileKey={
+                  (partner.type === "individual"
+                    ? partner.individual_details?.profile_photo_file_key
+                    : partner.company_details?.logo_file_key) ?? undefined
+                }
+                alt={partner.name}
+                className="h-full w-full object-cover"
+                fallback={
+                  partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"
+                }
+              />
+              <span
+                className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${
+                  partner.is_active ? "bg-emerald-500" : "bg-slate-300"
+                }`}
+              />
+            </div>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-medium text-slate-900">
+                {partner.type === "agency"
+                  ? partner.company_details?.company_name ||
+                    partner.name ||
+                    "Unknown Advisor"
+                  : partner.name || "Unknown Advisor"}
+              </div>
+              <div className="truncate text-xs text-slate-500 capitalize">
+                {partner.type === "agency" &&
+                partner.company_details?.company_name
+                  ? `${partner.name} · `
+                  : ""}
+                {partner.type || "—"} · {partner.country || "—"}
+              </div>
+            </div>
+          </div>
+        </>
+      ),
+    },
+    {
+      key: "1",
+      header: "Contact info",
+      cell: (partner) => (
+        <>
+          <div className="truncate text-sm text-slate-900">
+            {partner.phone || "—"}
+          </div>
+          <div className="truncate text-xs text-slate-500">
+            {partner.email || "—"}
+          </div>
+        </>
+      ),
+    },
+    {
+      key: "2",
+      header: "Assigned manager",
+      cell: (partner) => (
+        <>
+          <div className="truncate text-sm text-slate-900">
+            {partner.assigned_manager_name || (
+              <span className="text-slate-400">Unassigned</span>
+            )}
+          </div>
+        </>
+      ),
+    },
+    {
+      key: "3",
+      header: "Status",
+      cell: (partner) => (
+        <>
+          <div className="flex flex-wrap items-center gap-2">
+            {partner.is_active ? (
+              <StatusBadge
+                variant="success"
+                icon={<CheckCircle className="h-3 w-3" />}
+              >
+                Active
+              </StatusBadge>
+            ) : (
+              <StatusBadge
+                variant="neutral"
+                icon={<XCircle className="h-3 w-3" />}
+              >
+                Inactive
+              </StatusBadge>
+            )}
+            {partner.agency_membership && (
+              <StatusBadge
+                variant="info"
+                icon={<Building2 className="h-3 w-3" />}
+              >
+                Member of {partner.agency_membership.agency_name}
+              </StatusBadge>
+            )}
+          </div>
+        </>
+      ),
+    },
+    {
+      key: "4",
+      header: "Registered",
+      cell: (partner) => (
+        <>
+          <div className="text-sm text-slate-900">
+            <AppDate value={partner.created_at} format="short" fallback="—" />
+          </div>
+        </>
+      ),
+    },
+    {
+      key: "5",
+      header: "Actions",
+      cell: (partner) => (
+        <>
+          <div
+            className="flex flex-wrap items-center gap-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {!partner.is_verified && !partner.is_active && (
+              <>
+                <IconButton
+                  onClick={() => {
+                    setReviewPartner({
+                      id: partner.id,
+                      name: partner.name || "",
+                      assignedManagerId:
+                        partner.assigned_manager_id || undefined,
+                    });
+                    setIsReviewOpen(true);
+                  }}
+                  title="Review registration"
+                  icon={<ShieldCheck className="h-4 w-4" />}
+                  bgColor="bg-transparent"
+                  textColor="text-amber-400"
+                  borderColor="border-transparent"
+                  hoverTextColor="hover:text-amber-600"
+                  hoverBorderColor="hover:border-transparent"
+                  className="hover:bg-amber-50"
+                />
+                <div className="h-5 border-l border-slate-200" />
+              </>
+            )}
 
+            <LinkBtn
+              href={`/admin/advisors/${partner.id}/edit`}
+              title="Edit advisor"
+              variant="secondary"
+              icon={<Pencil className="h-4 w-4" />}
+            />
+            {partner.is_active && !partner.last_login && (
+              <>
+                <div className="h-5 border-l border-slate-200" />
+                <IconButton
+                  onClick={() => {
+                    setResendTarget({
+                      id: partner.id,
+                      name: partner.name || "",
+                    });
+                    setIsResendOpen(true);
+                  }}
+                  title="Resend approval email"
+                  icon={<Mail className="h-4 w-4" />}
+                  bgColor="bg-transparent"
+                  textColor="text-slate-400"
+                  borderColor="border-transparent"
+                  hoverTextColor="hover:text-blue-600"
+                  hoverBorderColor="hover:border-transparent"
+                  className="hover:bg-blue-50"
+                />
+              </>
+            )}
+
+            <div className="h-5 border-l border-slate-200" />
+            <IconButton
+              onClick={() => {
+                setSuspendTarget(partner);
+                setIsSuspendOpen(true);
+              }}
+              title={partner.is_active ? "Suspend account" : "Activate account"}
+              icon={
+                partner.is_active ? (
+                  <Ban className="h-4 w-4" />
+                ) : (
+                  <Power className="h-4 w-4" />
+                )
+              }
+              bgColor="bg-transparent"
+              textColor="text-slate-400"
+              borderColor="border-transparent"
+              hoverTextColor={
+                partner.is_active
+                  ? "hover:text-red-600"
+                  : "hover:text-emerald-600"
+              }
+              hoverBorderColor="hover:border-transparent"
+              className={
+                partner.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"
+              }
+            />
+          </div>
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <div className="mt-6 min-w-0 overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
         <div>
-          <p className="mt-0.5 text-sm text-slate-500">Manage and view all advisor organizations</p>
+          <p className="mt-0.5 text-sm text-slate-500">
+            Manage and view all advisor organizations
+          </p>
         </div>
       </div>
 
-      <Tabs<PartnersTab> tabs={TABS} active={activeTab} onChange={setActiveTab} variant="underline" idPrefix={tabId} aria-label="Advisor directory sections" />
+      <Tabs<PartnersTab>
+        tabs={TABS}
+        active={activeTab}
+        onChange={setActiveTab}
+        variant="underline"
+        idPrefix={tabId}
+        aria-label="Advisor directory sections"
+      />
       <div {...tabPanelProps(tabId, activeTab)}>
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: MICRO_DURATION, ease: EASE }}
+          >
+            {activeTab === "pending-otps" && <PendingRegistrationOtpsTable />}
 
-      <AnimatePresence mode="wait">
-      <motion.div
-        key={activeTab}
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -8 }}
-        transition={{ duration: MICRO_DURATION, ease: EASE }}
-      >
-      {activeTab === "pending-otps" && <PendingRegistrationOtpsTable />}
+            {activeTab === "partners" && (
+              <>
+                {/* Stats Cards */}
+                <div className="border-b border-ub-border p-4 sm:p-6">
+                  <StatsFilterCards
+                    className="grid grid-cols-2 gap-3 lg:grid-cols-4 [&_button]:gap-2 [&_button]:p-3"
+                    cards={statsCards}
+                    selectedId={selectedStatus}
+                    onSelect={handleCardSelect}
+                  />
+                </div>
 
-      {activeTab === "partners" && (
-      <>
-      {/* Stats Cards */}
-      <div className="hidden sm:block p-6 border-b border-slate-200">
-        <StatsFilterCards
-          cards={statsCards}
-          selectedId={selectedStatus}
-          onSelect={handleCardSelect}
-        />
-      </div>
+                <div className="border-b border-ub-border p-4 sm:p-6">
+                  <AdvisorDirectoryToolbar
+                    search={searchTerm}
+                    onSearch={setSearchTerm}
+                    total={total}
+                    loading={isRefetching}
+                    onClear={clearFilters}
+                    manager={selectedManager}
+                    status={selectedStatus}
+                    managers={managerOptions}
+                    onApply={(manager, status) => {
+                      setSelectedManager(manager);
+                      setSelectedStatus(status);
+                      setCurrentPage(1);
+                    }}
+                  />
+                </div>
 
-      {/* Filter Bar */}
-      <div className="p-6 border-b border-slate-200">
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-
-          {/* Search + mobile toggle */}
-          <div className="flex items-center gap-2 sm:contents">
-            <SearchInput
-              value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-              placeholder="Search by name or email..."
-              className="sm:w-64 sm:flex-none"
-            />
-            {isRefetching && (
-              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
-            )}
-            <button
-              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
-              onClick={() => setShowMobileFilters((v) => !v)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              {activeFiltersCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
-                  {activeFiltersCount}
-                </span>
-              )}
-            </button>
-            {activeFiltersCount > 0 && (
-              <div className="sm:hidden">
-                <IconButton
-                  onClick={clearFilters}
-                  icon={<RefreshCw className="h-4 w-4" />}
-                  bgColor="bg-white"
-                  textColor="text-red-500"
-                  borderColor="border-red-200"
-                  hoverTextColor="hover:text-red-500"
-                  hoverBorderColor="hover:border-red-200"
-                  className="hover:bg-red-50"
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Collapsible dropdowns */}
-          <div className={`flex w-full flex-col gap-2 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
-            <div className="w-full sm:w-44 flex-shrink-0">
-              <FilterSelectField
-                value={selectedManager}
-                onChange={(v: string) => { setSelectedManager(v); setCurrentPage(1); }}
-                options={managerOptions}
-                icon={UserCog}
-                defaultOption="All Managers"
-              />
-            </div>
-
-            {(activeFiltersCount > 0 || debouncedSearch !== "") && (
-              <span className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1.5 text-sm font-medium text-blue-700">
-                {displayTotal.toLocaleString()}
-                <span className="font-normal text-blue-500">results</span>
-              </span>
-            )}
-
-            {activeFiltersCount > 0 && (
-              <div className="hidden sm:block">
-                <Button
-                  onClick={clearFilters}
-                  icon={<RefreshCw className="h-4 w-4" />}
-                  text="Clear"
-                  bgColor="bg-white"
-                  textColor="text-red-600"
-                  borderColor="border-red-200"
-                  hoverTextColor="hover:text-red-600"
-                  hoverBorderColor="hover:border-red-200"
-                  className="hover:bg-red-50"
-                />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="p-6">
-
-        {/* Table */}
-        <TableWrapper
-          footer={
-            <TablePagination
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-              itemsPerPage={ITEMS_PER_PAGE}
-              itemCount={partners.length}
-              totalCount={total}
-              itemLabel="advisors"
-              loading={loading}
-            />
-          }
-        >
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
-                {[
-                  { icon: Users,      label: "Advisor",          minW: "min-w-[180px] sm:min-w-[250px]" },
-                  { icon: Users,      label: "Contact Info",     minW: "min-w-[160px] sm:min-w-[220px]", hide: "hidden sm:table-cell" },
-                  { icon: UserCog,    label: "Assigned Manager", minW: "min-w-[130px] sm:min-w-[180px]", hide: "hidden md:table-cell" },
-                  { icon: BadgeCheck, label: "Status" },
-                  { icon: CalendarDays, label: "Registered", hide: "hidden lg:table-cell" },
-                  { icon: Pencil,     label: "Actions" },
-                ].map(({ icon: Icon, label, minW, hide }) => (
-                  <th key={label} className={`${minW ?? ""} ${hide ?? ""} px-6 py-4 text-start text-sm font-semibold tracking-wider text-slate-900`}>
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4 text-slate-400" />
-                      {label}
-                    </div>
-                  </th>
-                ))}
-                <th className="w-10 px-4 py-4" />
-              </tr>
-            </thead>
-
-            <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
-              {isInitialLoad && <TableSkeletonRows columns={7} rows={ITEMS_PER_PAGE} />}
-
-              {!isInitialLoad && error && (
-                <TableErrorRow colSpan={7} message={error} onRetry={refetch} />
-              )}
-
-              {!isInitialLoad && !error && partners.length === 0 && (
-                <TableEmptyRow
-                  colSpan={7}
-                  title="No advisors found"
-                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No advisors have registered yet."}
-                  icon={<Handshake className="h-8 w-8 text-slate-400" />}
-                  action={
-                    activeFiltersCount > 0 ? (
-                      <Button
-                        onClick={clearFilters}
-                        icon={<RefreshCw className="h-3.5 w-3.5" />}
-                        text="Clear filters"
-                        bgColor="bg-white"
-                        textColor="text-slate-700"
-                        borderColor="border-slate-200"
-                        hoverTextColor="hover:text-slate-700"
-                        hoverBorderColor="hover:border-slate-200"
-                        className="hover:bg-slate-50"
+                <div className="min-w-0 p-3 sm:p-6">
+                  {/* Table */}
+                  <DataTable
+                    columns={columns}
+                    rows={partners}
+                    getRowId={(partner) => partner.id}
+                    getRowHref={(partner) => `/admin/advisors/${partner.id}`}
+                    caption="Advisor directory"
+                    loading={isInitialLoad}
+                    error={error}
+                    onRetry={refetch}
+                    getRowClassName={() => "md:[&>td]:py-4"}
+                    scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+                    empty={{
+                      title: "No advisors found",
+                      description: "Try another search or adjust your filters.",
+                    }}
+                    footer={
+                      <TablePagination
+                        currentPage={currentPage}
+                        onPageChange={setCurrentPage}
+                        itemsPerPage={ITEMS_PER_PAGE}
+                        itemCount={partners.length}
+                        totalCount={total}
+                        itemLabel="advisors"
+                        loading={loading}
                       />
-                    ) : undefined
-                  }
-                />
-              )}
+                    }
+                  />
+                </div>
+              </>
+            )}
+          </motion.div>
+        </AnimatePresence>
 
-              <AnimatePresence>
-              {!isInitialLoad && !error && partners.map((partner) => (
-                  <AnimatedTableRow
-                    key={partner.id}
-                    className="group cursor-pointer transition-colors hover:bg-slate-100/50"
-                    onClick={() => router.push(`/admin/advisors/${partner.id}`)}
-                  >
-                    <td className="min-w-[180px] max-w-[180px] px-6 py-4 sm:min-w-[250px] sm:max-w-[250px]">
-                      <div className="flex items-center gap-2">
-                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                          <PresignedImage
-                            fileKey={(partner.type === "individual" ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
-                            alt={partner.name}
-                            className="h-full w-full object-cover"
-                            fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
-                          />
-                          <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-slate-900">
-                            {partner.type === "agency" ? partner.company_details?.company_name || partner.name || "Unknown Advisor" : partner.name || "Unknown Advisor"}
-                          </div>
-                          <div className="truncate text-xs text-slate-500 capitalize">
-                            {partner.type === "agency" && partner.company_details?.company_name ? `${partner.name} · ` : ""}
-                            {partner.type || "—"} · {partner.country || "—"}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
+        {reviewPartner && (
+          <ReviewPartnerPopup
+            isOpen={isReviewOpen}
+            onClose={() => setIsReviewOpen(false)}
+            onSuccess={refetch}
+            partnerId={reviewPartner.id}
+            partnerName={reviewPartner.name}
+            managerOptions={managerOptions}
+            currentManagerId={reviewPartner.assignedManagerId}
+          />
+        )}
 
-                    <td className="hidden min-w-[160px] max-w-[160px] px-6 py-4 sm:table-cell sm:min-w-[220px] sm:max-w-[220px]">
-                      <div className="truncate text-sm text-slate-900">{partner.phone || "—"}</div>
-                      <div className="truncate text-xs text-slate-500">{partner.email || "—"}</div>
-                    </td>
+        {resendTarget && (
+          <ResendApprovalEmailConfirmation
+            isOpen={isResendOpen}
+            onClose={() => setIsResendOpen(false)}
+            onConfirm={handleResendEmail}
+            isSending={isResendingEmail}
+            partnerName={resendTarget.name}
+            cooldownSeconds={getResendCooldownSeconds(resendTarget.id)}
+          />
+        )}
 
-                    <td className="hidden max-w-[180px] px-6 py-4 md:table-cell">
-                      <div className="truncate text-sm text-slate-900">
-                        {partner.assigned_manager_name || <span className="text-slate-400">Unassigned</span>}
-                      </div>
-                    </td>
+        {suspendTarget && (
+          <SuspendActivatePartner
+            isOpen={isSuspendOpen}
+            onClose={() => setIsSuspendOpen(false)}
+            onConfirm={handleSuspendActivate}
+            isSubmitting={isUpdatingPartner}
+            partnerName={suspendTarget.name || ""}
+            isActive={!!suspendTarget.is_active}
+          />
+        )}
 
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap items-center gap-2">
-                        {partner.is_active ? (
-                          <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
-                        ) : (
-                          <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Inactive</StatusBadge>
-                        )}
-                        {partner.agency_membership && (
-                          <StatusBadge variant="info" icon={<Building2 className="h-3 w-3" />}>
-                            Member of {partner.agency_membership.agency_name}
-                          </StatusBadge>
-                        )}
-                      </div>
-                    </td>
-
-                    <td className="hidden px-6 py-4 lg:table-cell">
-                      <div className="text-sm text-slate-900">
-                        <AppDate value={partner.created_at} format="short" fallback="—" />
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-center gap-2" onClick={(e) => e.stopPropagation()}>
-                        {!partner.is_verified && !partner.is_active && (
-                          <>
-                            <IconButton
-                              onClick={() => { setReviewPartner({ id: partner.id, name: partner.name || "", assignedManagerId: partner.assigned_manager_id || undefined }); setIsReviewOpen(true); }}
-                              title="Review registration"
-                              icon={<ShieldCheck className="h-4 w-4" />}
-                              bgColor="bg-transparent"
-                              textColor="text-amber-400"
-                              borderColor="border-transparent"
-                              hoverTextColor="hover:text-amber-600"
-                              hoverBorderColor="hover:border-transparent"
-                              className="hover:bg-amber-50"
-                            />
-                            <div className="h-5 border-l border-slate-200" />
-                          </>
-                        )}
-
-                        <a
-                          href={`/admin/advisors/${partner.id}/edit`}
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center justify-center rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-                          title="Edit advisor"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </a>
-                        {partner.is_active && !partner.last_login && (
-                          <>
-                            <div className="h-5 border-l border-slate-200" />
-                            <IconButton
-                              onClick={() => { setResendTarget({ id: partner.id, name: partner.name || "" }); setIsResendOpen(true); }}
-                              title="Resend approval email"
-                              icon={<Mail className="h-4 w-4" />}
-                              bgColor="bg-transparent"
-                              textColor="text-slate-400"
-                              borderColor="border-transparent"
-                              hoverTextColor="hover:text-blue-600"
-                              hoverBorderColor="hover:border-transparent"
-                              className="hover:bg-blue-50"
-                            />
-                          </>
-                        )}
-
-                        <div className="h-5 border-l border-slate-200" />
-                        <IconButton
-                          onClick={() => { setSuspendTarget(partner); setIsSuspendOpen(true); }}
-                          title={partner.is_active ? "Suspend account" : "Activate account"}
-                          icon={partner.is_active ? <Ban className="h-4 w-4" /> : <Power className="h-4 w-4" />}
-                          bgColor="bg-transparent"
-                          textColor="text-slate-400"
-                          borderColor="border-transparent"
-                          hoverTextColor={partner.is_active ? "hover:text-red-600" : "hover:text-emerald-600"}
-                          hoverBorderColor="hover:border-transparent"
-                          className={partner.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"}
-                        />
-
-                        {/* <div className="h-5 border-l border-slate-200" />
-                        <IconButton
-                          onClick={() => { setDeleteTarget({ id: partner.id, name: partner.name || "" }); setIsDeleteOpen(true); }}
-                          title="Delete advisor"
-                          icon={<Trash2 className="h-4 w-4" />}
-                          bgColor="bg-transparent"
-                          textColor="text-slate-400"
-                          borderColor="border-transparent"
-                          hoverTextColor="hover:text-red-600"
-                          hoverBorderColor="hover:border-transparent"
-                          className="hover:bg-red-50"
-                        /> */}
-                      </div>
-                    </td>
-
-                    <td className="px-4 py-4">
-                      <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
-                    </td>
-                  </AnimatedTableRow>
-                ))}
-              </AnimatePresence>
-            </tbody>
-          </table>
-        </TableWrapper>
-
+        {deleteTarget && (
+          <DeletePartner
+            isOpen={isDeleteOpen}
+            onClose={() => setIsDeleteOpen(false)}
+            onConfirm={handleDelete}
+            isDeleting={isDeletingPartner}
+          />
+        )}
       </div>
-      </>
-      )}
-      </motion.div>
-      </AnimatePresence>
-
-      {reviewPartner && (
-        <ReviewPartnerPopup
-          isOpen={isReviewOpen}
-          onClose={() => setIsReviewOpen(false)}
-          onSuccess={refetch}
-          partnerId={reviewPartner.id}
-          partnerName={reviewPartner.name}
-          managerOptions={managerOptions}
-          currentManagerId={reviewPartner.assignedManagerId}
-        />
-      )}
-
-      {resendTarget && (
-        <ResendApprovalEmailConfirmation
-          isOpen={isResendOpen}
-          onClose={() => setIsResendOpen(false)}
-          onConfirm={handleResendEmail}
-          isSending={isResendingEmail}
-          partnerName={resendTarget.name}
-          cooldownSeconds={getResendCooldownSeconds(resendTarget.id)}
-        />
-      )}
-
-      {suspendTarget && (
-        <SuspendActivatePartner
-          isOpen={isSuspendOpen}
-          onClose={() => setIsSuspendOpen(false)}
-          onConfirm={handleSuspendActivate}
-          isSubmitting={isUpdatingPartner}
-          partnerName={suspendTarget.name || ""}
-          isActive={!!suspendTarget.is_active}
-        />
-      )}
-
-      {deleteTarget && (
-        <DeletePartner
-          isOpen={isDeleteOpen}
-          onClose={() => setIsDeleteOpen(false)}
-          onConfirm={handleDelete}
-          isDeleting={isDeletingPartner}
-        />
-      )}
     </div>
-      </div>
   );
 }
