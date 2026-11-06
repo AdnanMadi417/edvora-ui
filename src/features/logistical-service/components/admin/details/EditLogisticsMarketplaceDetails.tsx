@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronLeft, Edit2, Pencil, Plus, Trash2, X } from "lucide-react";
+import { Check, Pencil, Plus, Trash2, Truck, X } from "lucide-react";
 
 import {
   useLogisticProviderDetails,
@@ -13,11 +13,19 @@ import {
   useEditLogisticService,
 } from "features/logistical-service/hooks";
 import { useStates as useAllStates } from "features/programs/hooks";
-import { getPresignedUploads, uploadFilesToSpaces } from "services/uploadService";
+import {
+  getPresignedUploads,
+  uploadFilesToSpaces,
+} from "services/uploadService";
 import { getDocumentDownloadUrl } from "services/documentService";
-import type { PackageOffered, ServiceEntry } from "features/logistical-service/types";
+import type {
+  PackageOffered,
+  ServiceEntry,
+} from "features/logistical-service/types";
 
-import EmptyData from "components/ub/feedback/states/EmptyData";
+import FormPage from "components/ub/forms/layout/FormPage";
+import Loading from "components/ub/feedback/states/Loading";
+import ToggleInput from "components/ub/forms/choices/ToggleInput";
 import CheckSimpleBoxGroup from "components/ub/forms/choices/CheckSimpleBoxGroup";
 import InputField from "components/ub/forms/text/InputField";
 import SelectField from "components/ub/forms/selection/SelectField";
@@ -60,13 +68,29 @@ const EditLogisticsMarketplaceDetails = ({
   const router = useRouter();
   const { showToast } = useToast();
 
-  const { service, errorService } = useLogisticProviderDetails(id);
-  const { logisticServices } = useLogisticServices();
-  const { states } = useAllStates();
-  const { logisticLanguages } = useLogisticLanguages();
-  const { logisticUniversities } = useLogisticUniversities();
-  const { editLogisticsProvider, loadingEditLogisticsProvider, errorEditLogisticsProvider } = useEditLogisticProvider();
-  const { editLogisticService, loadingEditLogisticService } = useEditLogisticService();
+  const { service, loadingService, errorService } =
+    useLogisticProviderDetails(id);
+  const {
+    logisticServices,
+    loadingLogisticServices,
+    errorLogisticServices,
+    refetchLogisticServices,
+  } = useLogisticServices();
+  const { states, stateLoading, stateError } = useAllStates();
+  const { logisticLanguages, loadingLogisticLanguage, errorLogisticLanguage } =
+    useLogisticLanguages();
+  const {
+    logisticUniversities,
+    loadingLogisticUniversity,
+    errorLogisticUniversity,
+  } = useLogisticUniversities();
+  const {
+    editLogisticsProvider,
+    loadingEditLogisticsProvider,
+    errorEditLogisticsProvider,
+  } = useEditLogisticProvider();
+  const { editLogisticService, loadingEditLogisticService } =
+    useEditLogisticService();
 
   const [initialFormData, setInitialFormData] = useState<FormData | null>(null);
   const [initialLogoKey, setInitialLogoKey] = useState("");
@@ -83,14 +107,33 @@ const EditLogisticsMarketplaceDetails = ({
   const [existingLogoKey, setExistingLogoKey] = useState("");
 
   const [formData, setFormData] = useState<FormData>({
-    name: "", nationality: "", main_location: "", phone_number: "", whatsapp: "",
-    is_active: true, packages_offered: [], selectedServices: [],
-    selectedLanguages: [], selectedUniversities: [], selectedLocations: [],
+    name: "",
+    nationality: "",
+    main_location: "",
+    phone_number: "",
+    whatsapp: "",
+    is_active: true,
+    packages_offered: [],
+    selectedServices: [],
+    selectedLanguages: [],
+    selectedUniversities: [],
+    selectedLocations: [],
   });
 
-  useEffect(() => {
-    if (!service || !logisticServices.length || !logisticLanguages.length || !logisticUniversities.length) return;
+  const initializedProvider = useRef<string | null>(null);
 
+  useEffect(() => {
+    if (
+      !service ||
+      loadingLogisticServices ||
+      loadingLogisticLanguage ||
+      loadingLogisticUniversity ||
+      stateLoading
+    )
+      return;
+
+    if (initializedProvider.current === service.id) return;
+    initializedProvider.current = service.id;
     setExistingLogoKey(service.picture_file_key || "");
     setInitialLogoKey(service.picture_file_key || "");
     if (service.picture_file_key) {
@@ -124,7 +167,17 @@ const EditLogisticsMarketplaceDetails = ({
 
     setFormData(initial);
     setInitialFormData(initial);
-  }, [service, logisticServices, logisticLanguages, logisticUniversities, states]);
+  }, [
+    service,
+    logisticServices,
+    logisticLanguages,
+    logisticUniversities,
+    states,
+    loadingLogisticServices,
+    loadingLogisticLanguage,
+    loadingLogisticUniversity,
+    stateLoading,
+  ]);
 
   const isChanged =
     !initialFormData ||
@@ -136,22 +189,31 @@ const EditLogisticsMarketplaceDetails = ({
     let error = "";
     if (field === "name") {
       if (!value.trim()) error = "Name is required";
-      else if (value.trim().length < 5) error = "Name must be at least 5 characters";
-      else if (value.trim().length > 255) error = "Name must not exceed 255 characters";
+      else if (value.trim().length < 5)
+        error = "Name must be at least 5 characters";
+      else if (value.trim().length > 255)
+        error = "Name must not exceed 255 characters";
     } else if (field === "phone_number") {
       if (!value.trim()) error = "Phone number is required";
-      else if (value.trim().length > 50) error = "Phone number must not exceed 50 characters";
+      else if (value.trim().length > 50)
+        error = "Phone number must not exceed 50 characters";
     } else if (field === "whatsapp") {
-      if (value.trim().length > 50) error = "WhatsApp number must not exceed 50 characters";
+      if (value.trim().length > 50)
+        error = "WhatsApp number must not exceed 50 characters";
     } else if (field.endsWith(".name")) {
       if (!value.trim()) error = "Package name is required";
-      else if (value.trim().length < 5) error = "Package name must be at least 5 characters";
-      else if (value.trim().length > 255) error = "Package name must not exceed 255 characters";
+      else if (value.trim().length < 5)
+        error = "Package name must be at least 5 characters";
+      else if (value.trim().length > 255)
+        error = "Package name must not exceed 255 characters";
     }
     setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
-  const updateFormData = <K extends keyof FormData>(field: K, value: FormData[K]) => {
+  const updateFormData = <K extends keyof FormData>(
+    field: K,
+    value: FormData[K]
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
@@ -164,8 +226,13 @@ const EditLogisticsMarketplaceDetails = ({
     setLogoFileUrl("");
 
     try {
-      const presigned = await getPresignedUploads([file], "logistic-provider-pictures");
-      const results = await uploadFilesToSpaces([file], presigned, (_, pct) => setLogoProgress(pct));
+      const presigned = await getPresignedUploads(
+        [file],
+        "logistic-provider-pictures"
+      );
+      const results = await uploadFilesToSpaces([file], presigned, (_, pct) =>
+        setLogoProgress(pct)
+      );
       const uploaded = results?.[0];
 
       if (!uploaded?.file_key || !uploaded?.public_url) {
@@ -203,7 +270,7 @@ const EditLogisticsMarketplaceDetails = ({
       showToast("Service name updated.", "success");
       setEditingServiceId(null);
       setEditingServiceName("");
-      setTimeout(() => location.reload(), 1500);
+      refetchLogisticServices();
     } catch (err: unknown) {
       showToast(parseApiError(err, "Failed to update service name."), "error");
     }
@@ -211,11 +278,24 @@ const EditLogisticsMarketplaceDetails = ({
 
   const toggleService = (serviceId: string) => {
     setFormData((prev) => {
-      const exists = prev.selectedServices.find((s) => s.service_id === serviceId);
+      const exists = prev.selectedServices.find(
+        (s) => s.service_id === serviceId
+      );
       if (exists) {
-        return { ...prev, selectedServices: prev.selectedServices.filter((s) => s.service_id !== serviceId) };
+        return {
+          ...prev,
+          selectedServices: prev.selectedServices.filter(
+            (s) => s.service_id !== serviceId
+          ),
+        };
       }
-      return { ...prev, selectedServices: [...prev.selectedServices, { service_id: serviceId, price: 0 }] };
+      return {
+        ...prev,
+        selectedServices: [
+          ...prev.selectedServices,
+          { service_id: serviceId, price: 0 },
+        ],
+      };
     });
   };
 
@@ -231,11 +311,18 @@ const EditLogisticsMarketplaceDetails = ({
   const addPackage = () => {
     setFormData((prev) => ({
       ...prev,
-      packages_offered: [...prev.packages_offered, { name: "", description: "", price: 0, includes: [] }],
+      packages_offered: [
+        ...prev.packages_offered,
+        { name: "", description: "", price: 0, includes: [] },
+      ],
     }));
   };
 
-  const updatePackage = (index: number, field: keyof PackageOffered, value: any) => {
+  const updatePackage = (
+    index: number,
+    field: keyof PackageOffered,
+    value: any
+  ) => {
     const updated = [...formData.packages_offered];
     updated[index] = { ...updated[index], [field]: value };
     setFormData((prev) => ({ ...prev, packages_offered: updated }));
@@ -285,14 +372,19 @@ const EditLogisticsMarketplaceDetails = ({
       if (!pkg.name.trim()) {
         newErrors[`packages_offered[${i}].name`] = "Package name is required";
       } else if (pkg.name.trim().length < 5) {
-        newErrors[`packages_offered[${i}].name`] = "Package name must be at least 5 characters";
+        newErrors[`packages_offered[${i}].name`] =
+          "Package name must be at least 5 characters";
       } else if (pkg.name.trim().length > 255) {
-        newErrors[`packages_offered[${i}].name`] = "Package name must not exceed 255 characters";
+        newErrors[`packages_offered[${i}].name`] =
+          "Package name must not exceed 255 characters";
       }
     });
-    if (!formData.selectedServices.length) newErrors.selectedServices = "Please select at least one service";
-    if (!formData.selectedLanguages.length) newErrors.selectedLanguages = "Please select at least one language";
-    if (!formData.selectedUniversities.length) newErrors.selectedUniversities = "Please select at least one university";
+    if (!formData.selectedServices.length)
+      newErrors.selectedServices = "Please select at least one service";
+    if (!formData.selectedLanguages.length)
+      newErrors.selectedLanguages = "Please select at least one language";
+    if (!formData.selectedUniversities.length)
+      newErrors.selectedUniversities = "Please select at least one university";
 
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
@@ -325,187 +417,410 @@ const EditLogisticsMarketplaceDetails = ({
     }
   };
 
-  if (errorService) return <EmptyData />;
-
+  const loading =
+    loadingService ||
+    loadingLogisticServices ||
+    loadingLogisticLanguage ||
+    loadingLogisticUniversity ||
+    stateLoading;
+  const loadError =
+    errorService ||
+    errorLogisticServices ||
+    errorLogisticLanguage ||
+    errorLogisticUniversity ||
+    stateError;
+  if (loading)
+    return <Loading text="Loading provider and service options..." />;
+  if (loadError)
+    return (
+      <p role="alert" className="p-6">
+        {loadError}
+      </p>
+    );
+  if (!service) return <p className="p-6">Provider not found.</p>;
   return (
-    <div className="mt-6 max-w-5xl mx-auto">
-      <div className="rounded-md border border-slate-200 bg-white shadow-sm">
-        <div className="flex justify-between border-b border-gray-200 p-6">
-          <div className="flex items-center gap-4">
-            <div className="shrink-0">
-              <ImageUploadField
-                label=""
-                field="picture"
-                imageOnly
-                simpleFile={logoFile}
-                onSimpleFileChange={handleLogoSelect}
-                onSimpleRemove={() => { setLogoFile(null); setLogoFileKey(""); setLogoFileUrl(""); }}
-                simpleUploading={logoUploading}
-                simpleProgress={logoProgress}
-                existingUrl={existingLogoUrl}
-                onExistingRemove={() => { setExistingLogoUrl(""); setExistingLogoKey(""); }}
-                errors={{}}
-              />
-            </div>
-            <div className="min-w-0">
-              <h3 className="text-lg font-semibold text-slate-900">Edit Marketplace Listing</h3>
-              <p className="mt-1 text-sm text-slate-500">Modify provider information and service coverage</p>
-              {logoFile && !logoUploading && (
-                <span className="mt-1 inline-block rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
-                  Picture ready — click Update Service
-                </span>
-              )}
-            </div>
-          </div>
+    <FormPage
+      title="Edit logistics provider"
+      description="Update contact details, services, coverage, and packages."
+      icon={Truck}
+      onSubmit={handleSubmit}
+      onCancel={() => router.push(listPath)}
+      submitLabel="Save changes"
+      submitting={loadingEditLogisticsProvider}
+      submitDisabled={logoUploading || !isChanged || !initialFormData}
+      cancelDisabled={logoUploading}
+      stickyActions
+    >
+      <div className="min-w-0 space-y-6">
+        <ImageUploadField
+          label="Provider picture"
+          field="picture"
+          imageOnly
+          simpleFile={logoFile}
+          onSimpleFileChange={handleLogoSelect}
+          onSimpleRemove={() => {
+            setLogoFile(null);
+            setLogoFileKey("");
+            setLogoFileUrl("");
+          }}
+          simpleUploading={logoUploading}
+          simpleProgress={logoProgress}
+          existingUrl={existingLogoUrl}
+          onExistingRemove={() => {
+            setExistingLogoUrl("");
+            setExistingLogoKey("");
+          }}
+          errors={{}}
+        />
+        <div className="grid grid-cols-1 gap-x-3">
+          <InputField
+            label="Provider Name"
+            field="name"
+            placeholder={service?.name}
+            required
+            formData={formData}
+            errors={errors}
+            updateFormData={updateFormData}
+            onBlur={() => validateField("name", formData.name)}
+          />
+          <SearchableDropdown
+            label="Nationality"
+            field="nationality"
+            options={NATIONALITIES.map((c) => ({
+              label: c.name,
+              value: c.name,
+            }))}
+            formData={formData}
+            errors={errors}
+            updateFormData={updateFormData}
+          />
+          <SelectField
+            label="Current Residence"
+            field="main_location"
+            options={states.map((u) => ({ value: u.name, label: u.name }))}
+            formData={formData}
+            errors={errors}
+            updateFormData={updateFormData}
+          />
+          <InputField
+            label="Primary Contact Number"
+            field="phone_number"
+            placeholder="e.g. +60 12 345 6789"
+            required
+            formData={formData}
+            errors={errors}
+            updateFormData={updateFormData}
+            onBlur={() => validateField("phone_number", formData.phone_number)}
+          />
+          <InputField
+            label="WhatsApp Contact"
+            field="whatsapp"
+            placeholder="e.g. +60 12 345 6789"
+            formData={formData}
+            errors={errors}
+            updateFormData={updateFormData}
+            onBlur={() => validateField("whatsapp", formData.whatsapp)}
+          />
 
-          <div className="flex items-center gap-2 sm:gap-6">
-            <button
-              onClick={() => router.push(listPath)}
-              className="group flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-slate-100 hover:text-slate-900"
-            >
-              <ChevronLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span className="hidden sm:inline">Back to services</span>
-            </button>
-          </div>
+          <ToggleInput
+            label="Provider status"
+            field="is_active"
+            formData={formData}
+            updateFormData={updateFormData}
+            errors={errors}
+            enabledText="Active"
+            disabledText="Inactive"
+            enabledDescription="This provider is available in the marketplace."
+            disabledDescription="This provider is inactive."
+          />
         </div>
 
-        <div className="space-y-6 px-6 py-5">
-          <div className="grid grid-cols-1 gap-x-3">
-            <InputField label="Provider Name" field="name" placeholder={service?.name} required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("name", formData.name)} />
-            <SearchableDropdown label="Nationality" field="nationality" options={NATIONALITIES.map((c) => ({ label: c.name, value: c.name }))} formData={formData} errors={errors} updateFormData={updateFormData} />
-            <SelectField label="Current Residence" field="main_location" options={states.map((u) => ({ value: u.name, label: u.name }))} formData={formData} errors={errors} updateFormData={updateFormData} />
-            <InputField label="Primary Contact Number" field="phone_number" placeholder="e.g. +60 12 345 6789" required formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("phone_number", formData.phone_number)} />
-            <InputField label="WhatsApp Contact" field="whatsapp" placeholder="e.g. +60 12 345 6789" formData={formData} errors={errors} updateFormData={updateFormData} onBlur={() => validateField("whatsapp", formData.whatsapp)} />
-
-            <label className={`group relative flex cursor-pointer items-center justify-between rounded-md border px-4 py-4 transition-all ${formData.is_active ? "border-blue-600 bg-blue-50 shadow-sm" : "border-slate-200 bg-white hover:border-slate-300"}`}>
-              <div className="flex flex-col">
-                <span className="text-sm font-medium text-slate-800">Active</span>
-                <span className="text-xs text-slate-400">{formData.is_active ? "Active" : "Inactive"}</span>
-              </div>
-              <div className="relative">
-                <input type="checkbox" checked={formData.is_active} onChange={(e) => updateFormData("is_active", e.target.checked)} className="peer sr-only" />
-                <div className="h-6 w-11 rounded-md bg-slate-300 transition-colors peer-checked:bg-blue-600" />
-                <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-md bg-white shadow transition-transform peer-checked:translate-x-5" />
-              </div>
-              {formData.is_active && <span className="absolute right-3 top-3 h-2 w-2 rounded-md bg-blue-600" />}
-            </label>
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <h4 className="text-lg font-semibold text-slate-900">
+              Packages Offered
+            </h4>
+            <Button
+              icon={<Plus className="h-5 w-5" />}
+              text="Add Package"
+              bgColor="bg-amber-50"
+              textColor="text-amber-700"
+              borderColor="border-amber-600"
+              hoverTextColor="hover:text-amber-800"
+              hoverBorderColor="hover:border-amber-700"
+              onClick={addPackage}
+            />
           </div>
 
-          <div>
-            <div className="mb-4 flex items-center justify-between">
-              <h4 className="text-lg font-semibold text-slate-900">Packages Offered</h4>
-              <Button icon={<Plus className="h-5 w-5" />} text="Add Package" bgColor="bg-amber-50" textColor="text-amber-700" borderColor="border-amber-600" hoverTextColor="hover:text-amber-800" hoverBorderColor="hover:border-amber-700" onClick={addPackage} />
+          {formData.packages_offered.length === 0 && (
+            <div className="mb-3 rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
+              <p className="text-sm font-medium text-slate-700">
+                No packages added yet
+              </p>
+              <p className="mt-1 text-xs text-slate-400">
+                Add a package to get started
+              </p>
             </div>
+          )}
 
-            {formData.packages_offered.length === 0 && (
-              <div className="mb-3 rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-                <p className="text-sm font-medium text-slate-700">No packages added yet</p>
-                <p className="mt-1 text-xs text-slate-400">Add a package to get started</p>
+          {formData.packages_offered.map((pkg, index) => (
+            <div key={index} className="mb-6 rounded-md border bg-white p-5">
+              <div className="mb-4 flex items-center justify-between">
+                <h5 className="font-medium text-slate-800">
+                  Package {index + 1}
+                </h5>
+                <Button
+                  type="button"
+                  onClick={() => removePackage(index)}
+                  icon={<Trash2 className="h-4 w-4" />}
+                  text="Remove"
+                  bgColor="bg-white"
+                  textColor="text-red-600"
+                  borderColor="border-red-600"
+                  hoverTextColor="hover:text-red-700"
+                  hoverBorderColor="hover:border-red-700"
+                />
               </div>
-            )}
-
-            {formData.packages_offered.map((pkg, index) => (
-              <div key={index} className="mb-6 rounded-md border bg-white p-5">
-                <div className="mb-4 flex items-center justify-between">
-                  <h5 className="font-medium text-slate-800">Package {index + 1}</h5>
+              <div className="grid grid-cols-1 gap-x-3 md:grid-cols-2">
+                <InputField
+                  label="Package Name"
+                  field="name"
+                  required
+                  formData={{ name: pkg.name }}
+                  errors={{
+                    name: errors[`packages_offered[${index}].name`] || "",
+                  }}
+                  updateFormData={(_: string, value: string) => {
+                    updatePackage(index, "name", value);
+                    setErrors((prev) => ({
+                      ...prev,
+                      [`packages_offered[${index}].name`]: "",
+                    }));
+                  }}
+                  onBlur={() =>
+                    validateField(
+                      `packages_offered[${index}].name`,
+                      formData.packages_offered[index].name
+                    )
+                  }
+                />
+                <InputField
+                  label="Price (RM)"
+                  field="price"
+                  type="number"
+                  formData={{ price: pkg.price }}
+                  errors={{}}
+                  updateFormData={(_: string, value: string) =>
+                    updatePackage(index, "price", Number(value))
+                  }
+                />
+              </div>
+              <InputField
+                label="Description"
+                field="description"
+                formData={{ description: pkg.description }}
+                errors={{}}
+                updateFormData={(_: string, value: string) =>
+                  updatePackage(index, "description", value)
+                }
+              />
+              <div className="mt-4">
+                <label className="mb-2 block text-sm font-medium text-slate-700">
+                  Includes
+                </label>
+                <div className="space-y-2">
+                  {pkg.includes.map((item, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2"
+                    >
+                      <input
+                        type="text"
+                        value={item}
+                        onChange={(e) => {
+                          const updated = [...pkg.includes];
+                          updated[i] = e.target.value;
+                          updatePackage(index, "includes", updated);
+                        }}
+                        className="flex-1 px-2 py-1 text-sm focus:outline-none"
+                        placeholder={`Include item ${i + 1}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          updatePackage(
+                            index,
+                            "includes",
+                            pkg.includes.filter((_, idx) => idx !== i)
+                          )
+                        }
+                        className="flex items-center justify-center rounded-md border border-red-600 p-1 text-red-600 transition hover:border-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 flex justify-end">
                   <Button
-                    type="button"
-                    onClick={() => removePackage(index)}
-                    icon={<Trash2 className="h-4 w-4" />}
-                    text="Remove"
-                    bgColor="bg-white"
-                    textColor="text-red-600"
-                    borderColor="border-red-600"
-                    hoverTextColor="hover:text-red-700"
-                    hoverBorderColor="hover:border-red-700"
+                    icon={<Plus className="h-4 w-4" />}
+                    text="Add Item"
+                    bgColor="bg-amber-50"
+                    textColor="text-amber-700"
+                    borderColor="border-amber-600"
+                    hoverTextColor="hover:text-amber-800"
+                    hoverBorderColor="hover:border-amber-700"
+                    onClick={() =>
+                      updatePackage(index, "includes", [...pkg.includes, ""])
+                    }
                   />
                 </div>
-                <div className="grid grid-cols-1 gap-x-3 md:grid-cols-2">
-                  <InputField label="Package Name" field="name" required formData={{ name: pkg.name }} errors={{ name: errors[`packages_offered[${index}].name`] || "" }} updateFormData={(_: string, value: string) => { updatePackage(index, "name", value); setErrors((prev) => ({ ...prev, [`packages_offered[${index}].name`]: "" })); }} onBlur={() => validateField(`packages_offered[${index}].name`, formData.packages_offered[index].name)} />
-                  <InputField label="Price (RM)" field="price" type="number" formData={{ price: pkg.price }} errors={{}} updateFormData={(_: string, value: string) => updatePackage(index, "price", Number(value))} />
-                </div>
-                <InputField label="Description" field="description" formData={{ description: pkg.description }} errors={{}} updateFormData={(_: string, value: string) => updatePackage(index, "description", value)} />
-                <div className="mt-4">
-                  <label className="mb-2 block text-sm font-medium text-slate-700">Includes</label>
-                  <div className="space-y-2">
-                    {pkg.includes.map((item, i) => (
-                      <div key={i} className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2">
-                        <input type="text" value={item} onChange={(e) => { const updated = [...pkg.includes]; updated[i] = e.target.value; updatePackage(index, "includes", updated); }} className="flex-1 px-2 py-1 text-sm focus:outline-none" placeholder={`Include item ${i + 1}`} />
-                        <button type="button" onClick={() => updatePackage(index, "includes", pkg.includes.filter((_, idx) => idx !== i))} className="flex items-center justify-center rounded-md border border-red-600 p-1 text-red-600 transition hover:border-red-700">
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 flex justify-end">
-                    <Button icon={<Plus className="h-4 w-4" />} text="Add Item" bgColor="bg-amber-50" textColor="text-amber-700" borderColor="border-amber-600" hoverTextColor="hover:text-amber-800" hoverBorderColor="hover:border-amber-700" onClick={() => updatePackage(index, "includes", [...pkg.includes, ""])} />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div>
-            <div className="mb-3 flex items-center justify-between">
-              <div>
-                <label className="text-sm font-semibold text-slate-900">
-                  Logistic Services <span className="text-red-600">*</span>
-                </label>
-                <p className="mt-0.5 text-xs text-slate-500">Select services, set prices, and rename types</p>
               </div>
             </div>
-            {errors.selectedServices && <p className="mb-2 text-xs font-medium text-red-600">{errors.selectedServices}</p>}
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {logisticServices.map((svc) => {
-                const selected = formData.selectedServices.find((s) => s.service_id === svc.id);
-                return (
-                  <div key={svc.id} className={`rounded-xl border p-4 transition-all ${selected ? "border-amber-400 bg-amber-50 shadow-sm" : "border-slate-200 bg-white hover:border-slate-300"}`}>
-                    <div className="flex items-start justify-between gap-2">
-                      <label htmlFor={`svc-${svc.id}`} className="flex cursor-pointer items-center gap-2.5">
-                        <input type="checkbox" id={`svc-${svc.id}`} checked={!!selected} onChange={() => toggleService(svc.id)} className="h-4 w-4 shrink-0 rounded border-slate-300 text-amber-600" />
-                        {editingServiceId === svc.id ? (
-                          <div className="flex items-center gap-1.5">
-                            <input type="text" value={editingServiceName} onChange={(e) => setEditingServiceName(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") saveEditService(svc.id); if (e.key === "Escape") cancelEditService(); }} autoFocus className="w-32 rounded-md border border-blue-400 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
-                            <button onClick={() => saveEditService(svc.id)} disabled={loadingEditLogisticService} aria-label="Save" className="flex items-center justify-center rounded-md border border-green-500 p-1 text-green-600 transition hover:bg-green-50 disabled:opacity-50"><Check className="h-3.5 w-3.5" /></button>
-                            <button onClick={cancelEditService} aria-label="Cancel" className="flex items-center justify-center rounded-md border border-slate-300 p-1 text-slate-500 transition hover:bg-slate-50"><X className="h-3.5 w-3.5" /></button>
-                          </div>
-                        ) : (
-                          <span className="text-sm font-medium text-slate-800">{svc.name}</span>
-                        )}
-                      </label>
-                      {editingServiceId !== svc.id && (
-                        <button onClick={() => startEditService(svc.id, svc.name)} aria-label="Rename" className="shrink-0 rounded-md p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
+          ))}
+        </div>
+
+        <div>
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <label className="text-sm font-semibold text-slate-900">
+                Logistic Services <span className="text-red-600">*</span>
+              </label>
+              <p className="mt-0.5 text-xs text-slate-500">
+                Select services, set prices, and rename types
+              </p>
+            </div>
+          </div>
+          {errors.selectedServices && (
+            <p className="mb-2 text-xs font-medium text-red-600">
+              {errors.selectedServices}
+            </p>
+          )}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {logisticServices.map((svc) => {
+              const selected = formData.selectedServices.find(
+                (s) => s.service_id === svc.id
+              );
+              return (
+                <div
+                  key={svc.id}
+                  className={`rounded-xl border p-4 transition-all ${
+                    selected
+                      ? "border-amber-400 bg-amber-50 shadow-sm"
+                      : "border-slate-200 bg-white hover:border-slate-300"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <label
+                      htmlFor={`svc-${svc.id}`}
+                      className="flex cursor-pointer items-center gap-2.5"
+                    >
+                      <input
+                        type="checkbox"
+                        id={`svc-${svc.id}`}
+                        checked={!!selected}
+                        onChange={() => toggleService(svc.id)}
+                        className="h-4 w-4 shrink-0 rounded border-slate-300 text-amber-600"
+                      />
+                      {editingServiceId === svc.id ? (
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            type="text"
+                            value={editingServiceName}
+                            onChange={(e) =>
+                              setEditingServiceName(e.target.value)
+                            }
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") saveEditService(svc.id);
+                              if (e.key === "Escape") cancelEditService();
+                            }}
+                            autoFocus
+                            className="w-32 rounded-md border border-blue-400 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => saveEditService(svc.id)}
+                            disabled={loadingEditLogisticService}
+                            aria-label="Save"
+                            className="flex items-center justify-center rounded-md border border-green-500 p-1 text-green-600 transition hover:bg-green-50 disabled:opacity-50"
+                          >
+                            <Check className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={cancelEditService}
+                            aria-label="Cancel"
+                            className="flex items-center justify-center rounded-md border border-slate-300 p-1 text-slate-500 transition hover:bg-slate-50"
+                          >
+                            <X className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-sm font-medium text-slate-800">
+                          {svc.name}
+                        </span>
                       )}
-                    </div>
-                    {selected && (
-                      <div className="mt-3 flex items-center overflow-hidden rounded-lg border border-amber-200 focus-within:border-amber-400">
-                        <span className="border-r border-amber-200 bg-amber-100 px-2.5 py-1.5 text-xs font-semibold text-amber-700">RM</span>
-                        <input type="number" min={0} value={selected.price} onChange={(e) => updateServicePrice(svc.id, Number(e.target.value))} className="flex-1 bg-transparent px-2.5 py-1.5 text-sm focus:outline-none" placeholder="0.00" />
-                      </div>
+                    </label>
+                    {editingServiceId !== svc.id && (
+                      <button
+                        type="button"
+                        onClick={() => startEditService(svc.id, svc.name)}
+                        aria-label="Rename"
+                        className="shrink-0 rounded-md p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                      </button>
                     )}
                   </div>
-                );
-              })}
-            </div>
+                  {selected && (
+                    <div className="mt-3 flex items-center overflow-hidden rounded-lg border border-amber-200 focus-within:border-amber-400">
+                      <span className="border-r border-amber-200 bg-amber-100 px-2.5 py-1.5 text-xs font-semibold text-amber-700">
+                        RM
+                      </span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={selected.price}
+                        onChange={(e) =>
+                          updateServicePrice(svc.id, Number(e.target.value))
+                        }
+                        className="flex-1 bg-transparent px-2.5 py-1.5 text-sm focus:outline-none"
+                        placeholder="0.00"
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
-
-          <div className="grid grid-cols-1 gap-x-3">
-            <CheckSimpleBoxGroup label="Languages" field="selectedLanguages" options={logisticLanguages} formData={formData} updateFormData={updateFormData} errors={errors} required />
-            <CheckSimpleBoxGroup label="Universities" field="selectedUniversities" options={logisticUniversities} formData={formData} updateFormData={updateFormData} errors={errors} required />
-          </div>
-
-          {errorEditLogisticsProvider && <p className="text-sm text-red-600">{errorEditLogisticsProvider}</p>}
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-gray-200 px-6 py-5">
-          <Button onClick={() => router.push(listPath)} icon={<X className="h-5 w-5" />} text="Cancel" bgColor="bg-slate-50" textColor="text-slate-700" borderColor="border-slate-600" hoverTextColor="hover:text-slate-800" hoverBorderColor="hover:border-slate-700" />
-          <Button icon={<Edit2 className="h-5 w-5" />} text={loadingEditLogisticsProvider ? "Updating..." : "Update Service"} bgColor="bg-amber-50" textColor="text-amber-700" borderColor="border-amber-600" hoverTextColor="hover:text-amber-800" hoverBorderColor="hover:border-amber-700" onClick={handleSubmit} disabled={loadingEditLogisticsProvider || logoUploading || !isChanged} />
+        <div className="grid grid-cols-1 gap-x-3">
+          <CheckSimpleBoxGroup
+            label="Languages"
+            field="selectedLanguages"
+            options={logisticLanguages}
+            formData={formData}
+            updateFormData={updateFormData}
+            errors={errors}
+            required
+          />
+          <CheckSimpleBoxGroup
+            label="Universities"
+            field="selectedUniversities"
+            options={logisticUniversities}
+            formData={formData}
+            updateFormData={updateFormData}
+            errors={errors}
+            required
+          />
         </div>
+
+        {errorEditLogisticsProvider && (
+          <p className="text-sm text-red-600">{errorEditLogisticsProvider}</p>
+        )}
       </div>
-    </div>
+    </FormPage>
   );
 };
-
 export default EditLogisticsMarketplaceDetails;

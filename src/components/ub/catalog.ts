@@ -24,6 +24,12 @@ const imp = (name: string, path: string) => `import ${name} from "components/ub/
 const named = (names: string, path: string) => `import { ${names} } from "components/ub/${path}";`;
 
 export const CATALOG: Record<string, CatalogEntry> = {
+  LogisticsProviderCard: {
+    category: "data",
+    imports: [imp("LogisticsProviderCard", "data/cards/LogisticsProviderCard")],
+    useFor: "Compare logistics providers, service pricing, and contact options with a restricted-access state.",
+    usedIn: ["Adviser logistics marketplace", "Account-manager logistics marketplace"],
+  },
   "University type create & edit": {
     category: "forms",
     imports: ['import UniversityTypeEditor from "features/universities/configuration/components/shared/UniversityTypeEditor";'],

@@ -29,7 +29,7 @@ import Button from "components/ub/core/buttons/Button";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { useRouter } from "next/navigation";
-import CreateLogisticsMarketplacePopup from "../CreateLogisticsMarketplacePopup";
+import CreateLogisticsMarketplacePopup from "features/logistical-service/service-types/components/admin/popups/CreateServiceType";
 import type {
   PackageOffered,
   ServiceEntry,

@@ -1,6 +1,6 @@
 "use client";
 
-import LogisticsMarketplaceServicesConfig from "features/logistical-service/components/admin/config/LogisticServicesConfig";
+import LogisticsMarketplaceServicesConfig from "features/logistical-service/service-types/components/admin/table/LogisticServicesConfig";
 
 const LogisticServicesPage = () => {
   return (

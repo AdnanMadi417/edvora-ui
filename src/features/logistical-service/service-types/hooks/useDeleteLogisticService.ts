@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { logisticServiceApi } from "../services";
+import { serviceTypesApi } from "../services";
 import { parseApiError } from "utils/parseApiError";
 
 export function useDeleteLogisticService() {
@@ -13,7 +13,7 @@ export function useDeleteLogisticService() {
     setSuccess(false);
 
     try {
-      await logisticServiceApi.services.delete(id);
+      await serviceTypesApi.delete(id);
       setSuccess(true);
     } catch (err: unknown) {
       setError(parseApiError(err, "Failed to delete service."));

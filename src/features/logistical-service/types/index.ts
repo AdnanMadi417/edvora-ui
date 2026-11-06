@@ -38,13 +38,6 @@ export interface ServiceProvider {
 
 export type ServiceProviders = ServiceProvider[];
 
-export interface LogisticService {
-  id: string;
-  name: string;
-}
-
-export type LogisticServices = LogisticService[];
-
 export interface LogisticLanguage {
   id: string;
   name: string;
@@ -87,12 +80,12 @@ export interface CreateLogisticsProviderPayload {
   language_ids: string[];
 }
 
-export type EditLogisticsProviderPayload = Partial<CreateLogisticsProviderPayload>;
+export type EditLogisticsProviderPayload =
+  Partial<CreateLogisticsProviderPayload>;
 
-export interface CreateLogisticServicePayload {
-  name: string;
-}
-
-export interface EditLogisticServicePayload {
-  name: string;
-}
+export type {
+  LogisticService,
+  LogisticServices,
+  CreateLogisticServicePayload,
+  EditLogisticServicePayload,
+} from "../service-types/types";

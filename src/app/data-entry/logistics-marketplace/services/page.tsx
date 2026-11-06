@@ -1,6 +1,6 @@
 "use client";
 
-import DataEntryLogisticServicesTable from "features/logistical-service/components/data-entry/DataEntryLogisticServicesTable";
+import DataEntryLogisticServicesTable from "features/logistical-service/service-types/components/data-entry/DataEntryLogisticServicesTable";
 
 const DataEntryLogisticServicesPage = () => {
   return (

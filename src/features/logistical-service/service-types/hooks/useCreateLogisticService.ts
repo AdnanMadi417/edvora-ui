@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { logisticServiceApi } from "../services";
+import { serviceTypesApi } from "../services";
 import type { CreateLogisticServicePayload } from "../types";
 import { parseApiError } from "utils/parseApiError";
 
@@ -7,11 +7,13 @@ export function useCreateLogisticService() {
   const [loadingCreateLogisticService, setLoading] = useState(false);
   const [errorCreateLogisticService, setError] = useState<string | null>(null);
 
-  const createLogisticService = async (payload: CreateLogisticServicePayload) => {
+  const createLogisticService = async (
+    payload: CreateLogisticServicePayload
+  ) => {
     try {
       setLoading(true);
       setError(null);
-      const res = await logisticServiceApi.services.create(payload);
+      const res = await serviceTypesApi.create(payload);
       return res.data;
     } catch (err) {
       setError(parseApiError(err, "Failed to create logistic service"));
@@ -21,5 +23,9 @@ export function useCreateLogisticService() {
     }
   };
 
-  return { createLogisticService, loadingCreateLogisticService, errorCreateLogisticService };
+  return {
+    createLogisticService,
+    loadingCreateLogisticService,
+    errorCreateLogisticService,
+  };
 }
