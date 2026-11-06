@@ -14,7 +14,7 @@ import TableErrorRow from "components/ub/data/tables/TableErrorRow";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import AnimatedTableRow from "components/ub/data/tables/AnimatedTableRow";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
-import { useBanks } from "features/banks/hooks";
+import { useBanks } from "features/partners/banks/hooks";
 import { usePartnerBankAccountsList } from "../../hooks";
 
 const CURRENCY_OPTIONS = [

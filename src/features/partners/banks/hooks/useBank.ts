@@ -5,7 +5,12 @@ import { useBanks } from "./useBanks";
 // (including inactive, so a retired bank's view/edit page still resolves)
 // and find the matching record client-side.
 export function useBank(id: string) {
-  const { banks, loading, error, refetch } = useBanks({ include_inactive: true });
-  const bank = useMemo(() => banks.find((b) => b.id === id) ?? null, [banks, id]);
+  const { banks, loading, error, refetch } = useBanks({
+    include_inactive: true,
+  });
+  const bank = useMemo(
+    () => banks.find((b) => b.id === id) ?? null,
+    [banks, id]
+  );
   return { bank, loading, error, refetch };
 }

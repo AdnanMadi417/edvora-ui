@@ -181,6 +181,7 @@ export default function EditBankDetails({
 
   return (
     <FormPage
+      stickyActions
       title="Edit bank"
       description="Update the bank details and control whether advisors can select it."
       icon={Landmark}

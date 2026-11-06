@@ -62,7 +62,7 @@ export default function TablePagination({
           type="button"
           className={pageButton}
           onClick={() => onPageChange(currentPage + 1)}
-          disabled={itemCount < itemsPerPage}
+          disabled={currentPage >= totalPages || itemCount < itemsPerPage}
           aria-label="Next page"
         >
           Next

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { useBanks } from "features/banks/hooks";
+import { useBanks } from "features/partners/banks/hooks";
 import type { PartnerBankAccount } from "../../types";
 
 interface Props {

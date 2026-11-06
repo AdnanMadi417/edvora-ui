@@ -14,7 +14,7 @@ import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
 import { scrollToFirstError } from "utils/scrollToError";
 import { getApiErrorCode, getApiErrorDetails } from "utils/parseApiError";
-import { useBanks } from "features/banks/hooks";
+import { useBanks } from "features/partners/banks/hooks";
 import { ISO_COUNTRIES, getCountryName } from "constants/lists";
 import type { PartnerDetails } from "features/partners/types";
 import { usePartnerBankAccount, useCreatePartnerBankAccount, useUpdatePartnerBankAccount } from "../../hooks";

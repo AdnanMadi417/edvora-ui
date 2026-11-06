@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import BankDetails from "features/banks/components/BankDetails";
+import BankDetails from "features/partners/banks/components/BankDetails";
 
 export default function DataEntryBankDetailsPage() {
   const params = useParams();

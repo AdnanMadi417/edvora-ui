@@ -9,7 +9,7 @@ import Skeleton from "components/ub/feedback/states/Skeleton";
 import AsyncStateView from "components/ub/feedback/states/AsyncStateView";
 import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
 import AppDate from "components/ub/data/formatting/AppDate";
-import { useBanks } from "features/banks/hooks";
+import { useBanks } from "features/partners/banks/hooks";
 import { usePartnerBankAccountHistory } from "../../hooks";
 
 interface Props {

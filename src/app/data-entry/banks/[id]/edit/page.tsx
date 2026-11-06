@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import EditBankDetails from "features/banks/components/EditBankDetails";
+import EditBankDetails from "features/partners/banks/components/EditBankDetails";
 
 export default function DataEntryEditBankPage() {
   const params = useParams();

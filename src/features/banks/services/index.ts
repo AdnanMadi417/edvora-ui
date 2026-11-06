@@ -1,1 +1,1 @@
-export { banksApi } from "./banksApi";
+export * from "features/partners/banks/services";

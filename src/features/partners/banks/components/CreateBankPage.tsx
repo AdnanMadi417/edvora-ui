@@ -123,6 +123,7 @@ export default function CreateBankPage({
 
   return (
     <FormPage
+      stickyActions
       title="Add bank"
       description="Add a bank to the reference list used for advisor payout accounts."
       icon={Landmark}

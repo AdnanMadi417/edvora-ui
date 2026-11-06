@@ -2,7 +2,7 @@ import { mock, httpError, reply } from "../router";
 import { table, newId, daysAgo, nowIso } from "../db";
 import { PARTNERS } from "../seed";
 import { partners } from "./partners";
-import type { Bank } from "features/banks/types";
+import type { Bank } from "features/partners/banks/types";
 import type { PartnerBankAccount } from "features/partners/bank-accounts/types";
 
 // Curated banks list (admin/advisors/banks) and Advisor payout bank accounts
