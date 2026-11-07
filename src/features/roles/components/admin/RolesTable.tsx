@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ShieldCheck, KeyRound, BadgeCheck, Trash2, Plus,
@@ -28,6 +30,7 @@ import DeleteRoleConfirmation from "./DeleteRoleConfirmation";
 const ITEMS_PER_PAGE = 10;
 
 export default function RolesTable() {
+  const router = useRouter();
   const { showToast } = useToast();
   const { roles, loading, error, refetch } = useRoles();
   const { deleteRole, loading: isDeleting } = useDeleteRole();
@@ -162,9 +165,11 @@ export default function RolesTable() {
 
               <AnimatePresence>
               {!isInitialLoad && !error && pagedRoles.map((role) => (
-                <AnimatedTableRow key={role.id} className="transition-colors hover:bg-slate-50/50">
+                <AnimatedTableRow key={role.id} className="cursor-pointer transition-colors hover:bg-slate-50/50" onClick={(event) => {
+                  if (!(event.target as HTMLElement).closest("a, button, input, select, textarea") && !window.getSelection()?.toString()) router.push(`/admin/roles/${role.id}`);
+                }}>
                   <td className="min-w-[200px] px-6 py-4">
-                    <div className="truncate text-sm font-medium text-slate-900">{role.name}</div>
+                    <Link href={`/admin/roles/${role.id}`} className="text-sm font-medium text-slate-900 hover:underline">{role.name}</Link>
                   </td>
 
                   <td className="min-w-[160px] px-6 py-4">

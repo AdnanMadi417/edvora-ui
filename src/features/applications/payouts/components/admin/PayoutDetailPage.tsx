@@ -139,6 +139,7 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
               density="compact"
               rows={payout?.items ?? []}
               getRowId={(item) => item.application_commission_id}
+              getRowHref={(item) => `/admin/applications/${item.application_id}`}
               manualSort
               empty={{ title: "No applications", description: "This payout covers no applications." }}
               columns={[

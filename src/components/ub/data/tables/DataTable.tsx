@@ -469,6 +469,12 @@ export default function DataTable<T>({
                   return (
                     <AnimatedTableRow
                       key={id}
+                      onClick={href ? (event) => {
+                        const target = event.target as HTMLElement;
+                        if (event.defaultPrevented || target.closest('a, button, input, select, textarea, label, [role="button"], [role="checkbox"], [role="switch"], [contenteditable="true"], [data-row-action]') || window.getSelection()?.toString()) return;
+                        const link = event.currentTarget.querySelector<HTMLAnchorElement>('a[data-row-link]');
+                        link?.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, ctrlKey: event.ctrlKey, metaKey: event.metaKey, shiftKey: event.shiftKey, altKey: event.altKey }));
+                      } : undefined}
                       data-selected={isSelected || undefined}
                       className={clsx(t.row, href && "relative cursor-pointer", isSelected ? "bg-ub-selected" : clsx("bg-ub-surface", cards ? "hover:bg-ub-row-hover" : "md:hover:bg-ub-row-hover"), getRowClassName?.(row, index))}
                     >
@@ -495,6 +501,7 @@ export default function DataTable<T>({
                               {/* The first column's link covers the whole row; other interactive cells sit above it (relative z-10). */}
                               {href && ci === 0 ? (
                                 <Link
+                                  data-row-link
                                   href={href}
                                   target={rowLinkTarget === "_blank" ? "_blank" : undefined}
                                   rel={rowLinkTarget === "_blank" ? "noopener noreferrer" : undefined}

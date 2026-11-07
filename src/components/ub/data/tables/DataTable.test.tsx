@@ -110,3 +110,26 @@ describe("DataTable states", () => {
     expect(onRetry).toHaveBeenCalled();
   });
 });
+
+describe("Details row navigation", () => {
+  it("opens the row link from another column and preserves modifier keys", () => {
+    render(<DataTable caption="Linked rows" columns={COLUMNS} rows={ROWS} getRowId={(r) => r.id} getRowHref={(r) => `/details/${r.id}`} />);
+    const link = screen.getByRole("link", { name: ROWS[0].student });
+    const clicked = jest.fn((event: Event) => event.preventDefault());
+    link.addEventListener("click", clicked);
+    fireEvent.click(screen.getByText("RM4,200"), { ctrlKey: true });
+    expect(clicked).toHaveBeenCalledTimes(1);
+    expect((clicked.mock.calls[0][0] as MouseEvent).ctrlKey).toBe(true);
+  });
+
+  it("keeps buttons and checkboxes independent of navigation", () => {
+    const action = jest.fn();
+    render(<DataTable caption="Linked rows" columns={[...COLUMNS, { key: "action", header: "Actions", cell: () => <button onClick={action}>Edit</button> }]} rows={ROWS} getRowId={(r) => r.id} getRowHref={(r) => `/details/${r.id}`} selectable />);
+    const clicked = jest.fn((event: Event) => event.preventDefault());
+    screen.getByRole("link", { name: ROWS[0].student }).addEventListener("click", clicked);
+    fireEvent.click(screen.getAllByRole("button", { name: "Edit" })[0]);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Select row 1" }));
+    expect(action).toHaveBeenCalledTimes(1);
+    expect(clicked).not.toHaveBeenCalled();
+  });
+});
