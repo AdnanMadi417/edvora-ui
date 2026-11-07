@@ -48,5 +48,8 @@ export function useFileDrop({ onFiles, disabled = false }: UseFileDropOptions) {
     if (files.length) onFiles(files);
   };
 
-  return { isDragging, dropHandlers: { onDragEnter, onDragLeave, onDragOver, onDrop } };
+  return {
+    isDragging,
+    dropHandlers: { onDragEnter, onDragLeave, onDragOver, onDrop },
+  };
 }

@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import { motion, useReducedMotion } from "framer-motion";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
@@ -94,8 +97,22 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
               {program.name}
             </span>
           </Tooltip>
-          <p className="line-clamp-1 text-ub-body-sm text-ub-text-secondary" title={program.university?.name}>{program.university?.name}</p>
-          <p className="line-clamp-1 text-ub-label-sm text-ub-text-tertiary" title={[program.branch?.name, program.branch?.state].filter(Boolean).join(" · ")}>{[program.branch?.name, program.branch?.state].filter(Boolean).join(" · ")}</p>
+          <p
+            className="line-clamp-1 text-ub-body-sm text-ub-text-secondary"
+            title={program.university?.name}
+          >
+            {program.university?.name}
+          </p>
+          <p
+            className="line-clamp-1 text-ub-label-sm text-ub-text-tertiary"
+            title={[program.branch?.name, program.branch?.state]
+              .filter(Boolean)
+              .join(" · ")}
+          >
+            {[program.branch?.name, program.branch?.state]
+              .filter(Boolean)
+              .join(" · ")}
+          </p>
           <div className="flex flex-wrap gap-1.5">
             <Tag hue="indigo" size="sm">
               {program.qualification_level}
@@ -171,40 +188,29 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       cell: (program) => {
         const copy = props.copyEligibility?.(program);
         return (
-          <div className="flex max-w-full flex-nowrap items-center gap-1 overflow-x-auto pb-1">
-            <LinkBtn
-              href={props.editHref(program.id)}
+          <TableActions>
+            <TableAction
+              label={"Edit"}
               icon={<Pencil className="h-4 w-4" />}
-              title="Edit"
-              size="sm"
-              variant="secondary"
+              href={props.editHref(program.id)}
+              primary
             />
-            <IconButton
-              size="sm"
-              variant="tertiary"
-              aria-label="Share"
-              title="Share program"
+            <TableAction
+              label={"Share"}
               icon={<Share2 className="h-4 w-4" />}
-              onClick={() => share(program)}
+              onSelect={() => share(program)}
             />
             {props.onCopyToBranchClick && (
-              <IconButton
-                size="sm"
-                variant="secondary"
-                aria-label="Copy to branch"
-                title={copy?.title || "Copy to another branch"}
-                disabled={copy?.disabled}
+              <TableAction
+                label={"Copy to branch"}
                 icon={<CopyPlus className="h-4 w-4" />}
-                onClick={() => props.onCopyToBranchClick?.(program)}
+                onSelect={() => props.onCopyToBranchClick?.(program)}
+                disabled={copy?.disabled}
               />
             )}
             {props.onToggleHiddenClick && (
-              <IconButton
-                size="sm"
-                variant="tertiary"
-                aria-label={program.is_hidden ? "Unhide program" : "Hide program"}
-                title={program.is_hidden ? "Unhide program" : "Hide program"}
-                disabled={props.togglingHiddenId === program.id}
+              <TableAction
+                label={program.is_hidden ? "Unhide program" : "Hide program"}
                 icon={
                   program.is_hidden ? (
                     <Eye className="h-4 w-4" />
@@ -212,20 +218,19 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
                     <EyeOff className="h-4 w-4" />
                   )
                 }
-                onClick={() => props.onToggleHiddenClick?.(program)}
+                onSelect={() => props.onToggleHiddenClick?.(program)}
+                disabled={props.togglingHiddenId === program.id}
               />
             )}
             {!props.hideDelete && props.onDeleteClick && (
-              <IconButton
-                size="sm"
-                variant="tertiary"
-                aria-label="Delete program"
-                title="Delete program"
+              <TableAction
+                label={"Delete program"}
                 icon={<Trash2 className="h-4 w-4" />}
-                onClick={() => props.onDeleteClick?.(program)}
+                onSelect={() => props.onDeleteClick?.(program)}
+                danger
               />
             )}
-          </div>
+          </TableActions>
         );
       },
     },
@@ -238,7 +243,10 @@ export default function KnowledgeHubTable(props: KnowledgeHubTableProps) {
       aria-busy={props.isFetching || props.isSelectingAll}
       className="min-w-0"
     >
-      <p className="mb-2 text-ub-label-sm text-ub-text-tertiary md:hidden">Swipe across for more columns. Scroll within the table for more programs.</p>
+      <p className="mb-2 text-ub-label-sm text-ub-text-tertiary md:hidden">
+        Swipe across for more columns. Scroll within the table for more
+        programs.
+      </p>
       <DataTable
         mobileLayout="scroll"
         scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain focus-visible:outline focus-visible:outline-2 focus-visible:outline-ub-border-focus"

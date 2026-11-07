@@ -9,7 +9,7 @@ import Combobox from "components/ub/forms/selection/Combobox";
 import Alert from "components/ub/feedback/notifications/Alert";
 import React from "react";
 
-import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
+import DocumentUpload from "components/ub/forms/uploads/DocumentUpload";
 import type { Payout } from "../../types";
 import type { PartnerBankAccount } from "features/partners/bank-accounts";
 import { BankAccountPayoutSummary } from "features/partners/bank-accounts";
@@ -107,7 +107,7 @@ export default function PayoutCorrectionFields({
         <FieldError>{formErrors.lines}</FieldError>
       </div>
 
-      <CompactFileUpload
+      <DocumentUpload
         id="payout-correction-receipt"
         label="Corrected Receipt"
         description="Upload the corrected proof of payment"

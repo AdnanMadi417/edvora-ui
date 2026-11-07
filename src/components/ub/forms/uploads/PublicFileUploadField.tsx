@@ -23,7 +23,17 @@ interface Props {
 }
 
 /** Public registration adapter; uses the same picker as authenticated forms. */
-export default function PublicFileUploadField({ label, fieldId, field, required, result, fileName, onUpload, onRemove, error }: Props) {
+export default function PublicFileUploadField({
+  label,
+  fieldId,
+  field,
+  required,
+  result,
+  fileName,
+  onUpload,
+  onRemove,
+  error,
+}: Props) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -43,7 +53,12 @@ export default function PublicFileUploadField({ label, fieldId, field, required,
       setFile(null);
     } catch (err: unknown) {
       setFile(null);
-      setUploadError(parseApiError(err, "The upload didn't finish. Check your connection and try again."));
+      setUploadError(
+        parseApiError(
+          err,
+          "The upload didn't finish. Check your connection and try again."
+        )
+      );
     } finally {
       busy.current = false;
       setUploading(false);
@@ -56,7 +71,24 @@ export default function PublicFileUploadField({ label, fieldId, field, required,
     onRemove();
   };
 
-  return <div data-field={field ?? fieldId}>
-    <DocumentUpload id={fieldId} label={label} description={result && fileName ? fileName : undefined} file={file} existingUrl={result?.file_url} onFileChange={upload} onRemove={remove} onExistingRemove={remove} required={required} uploading={uploading} disabled={uploading} progress={progress} error={uploadError || error} onError={() => setUploadError("")} />
-  </div>;
+  return (
+    <div data-field={field ?? fieldId}>
+      <DocumentUpload
+        id={fieldId}
+        label={label}
+        description={result && fileName ? fileName : undefined}
+        file={file}
+        existingUrl={result?.file_url}
+        onFileChange={upload}
+        onRemove={remove}
+        onExistingRemove={remove}
+        required={required}
+        uploading={uploading}
+        disabled={uploading}
+        progress={progress}
+        error={uploadError || error}
+        onError={() => setUploadError("")}
+      />
+    </div>
+  );
 }

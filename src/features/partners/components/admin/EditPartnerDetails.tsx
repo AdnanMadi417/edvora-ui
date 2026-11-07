@@ -1,12 +1,10 @@
 "use client";
 
+import StoredDocumentUpload from "components/ub/forms/uploads/StoredDocumentUpload";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Camera,
   ChevronLeft,
-  ExternalLink,
-  FileText,
   Pencil,
   Upload,
   Globe2,
@@ -28,16 +26,13 @@ import SelectField from "components/ub/forms/selection/SelectField";
 import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
 import MultiSelect from "components/ub/forms/selection/MultiSelect";
 import Button from "components/ub/core/buttons/Button";
-import IconButton from "components/ub/core/buttons/IconButton";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import {
   getPresignedUploads,
   uploadFilesToSpaces,
   ALLOWED_FILE_TYPES,
 } from "services/uploadService";
-import { getDocumentDownloadUrl } from "services/documentService";
 import PresignedImage from "components/ub/data/media/PresignedImage";
-import { useFileDrop } from "components/ub/forms/uploads/useFileDrop";
 import {
   COUNTRIES,
   COUNTRY_OPTIONS,
@@ -122,207 +117,13 @@ type DocState = {
   error: string;
 };
 
-function DocUploadField({
-  label,
-  doc,
-  fieldId,
-  onUpload,
-}: {
-  label: string;
-  doc: DocState;
-  fieldId: string;
-  onUpload: (file: File) => void;
-}) {
-  const { showToast } = useToast();
-  const [downloading, setDownloading] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) onUpload(file);
-    e.target.value = "";
-  };
-
-  const { isDragging, dropHandlers } = useFileDrop({
-    onFiles: (files) => onUpload(files[0]),
-  });
-
-  const handleView = async () => {
-    if (!doc.file_key || downloading) return;
-    setDownloading(true);
-    try {
-      const url = await getDocumentDownloadUrl(doc.file_key);
-      window.open(url, "_blank");
-    } catch {
-      showToast("Failed to load document.", "error");
-    } finally {
-      setDownloading(false);
-    }
-  };
-
-  return (
-    <div className="mb-4">
-      <label className="mb-1.5 block text-sm font-medium text-slate-900">
-        {label}
-      </label>
-      {doc.uploading ? (
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
-          <div className="flex items-center justify-between text-sm text-slate-600">
-            <span>Uploading…</span>
-            <span className="font-medium text-blue-600">{doc.progress}%</span>
-          </div>
-          <div className="mt-2 h-1.5 w-full rounded-full bg-slate-200">
-            <div
-              className="h-full rounded-full bg-blue-500 transition-all"
-              style={{ width: `${doc.progress}%` }}
-            />
-          </div>
-        </div>
-      ) : doc.file_key ? (
-        <div className="flex flex-col gap-2 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex min-w-0 items-center gap-2 sm:flex-1">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
-              <FileText className="h-5 w-5" />
-            </div>
-            <p className="truncate text-sm font-semibold text-slate-800">
-              {label}
-            </p>
-          </div>
-          <div className="flex shrink-0 items-center gap-2 sm:ml-4">
-            <IconButton
-              onClick={handleView}
-              disabled={downloading}
-              title="View document"
-              icon={
-                <ExternalLink
-                  className={`h-4 w-4 ${downloading ? "animate-pulse" : ""}`}
-                />
-              }
-              bgColor="bg-green-50"
-              textColor="text-green-600"
-              borderColor="border-transparent"
-              hoverTextColor="hover:text-green-600"
-              hoverBorderColor="hover:border-green-200"
-              className="hover:bg-green-100"
-            />
-            <label
-              htmlFor={fieldId}
-              {...dropHandlers}
-              className={`flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border px-3 text-xs font-medium transition-colors ${
-                isDragging
-                  ? "border-blue-400 bg-blue-50 text-blue-700"
-                  : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
-              }`}
-            >
-              <Upload className="h-3.5 w-3.5" /> Replace
-              <input
-                id={fieldId}
-                type="file"
-                accept={ALLOWED_FILE_TYPES.extensions.join(",")}
-                className="hidden"
-                onChange={handleChange}
-              />
-            </label>
-          </div>
-        </div>
-      ) : (
-        <label
-          htmlFor={fieldId}
-          {...dropHandlers}
-          className={`flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed px-4 py-6 text-sm transition-colors ${
-            isDragging
-              ? "border-blue-400 bg-blue-50 text-blue-600"
-              : "border-slate-300 bg-white text-slate-500 hover:border-blue-400 hover:bg-blue-50/40"
-          }`}
-        >
-          <Upload className="h-4 w-4" /> Upload {label}
-          <input
-            id={fieldId}
-            type="file"
-            accept={ALLOWED_FILE_TYPES.extensions.join(",")}
-            className="hidden"
-            onChange={handleChange}
-          />
-        </label>
-      )}
-      {doc.error && <p className="mt-1 text-xs text-red-600">{doc.error}</p>}
-    </div>
-  );
-}
-
-const EMPTY_DOC: DocState = {
-  file_key: "",
-  file_url: "",
-  uploading: false,
-  progress: 0,
-  error: "",
-};
-
+const EMPTY_DOC: DocState = { file_key: "", file_url: "", uploading: false, progress: 0, error: "" };
 const PROFILE_PHOTO_UPLOAD_ENABLED = true;
 
-function AvatarUpload({
-  doc,
-  name,
-  isActive,
-  onUpload,
-}: {
-  doc: DocState;
-  name: string;
-  isActive: boolean;
-  onUpload: (file: File) => void;
-}) {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) onUpload(file);
-    e.target.value = "";
-  };
-
-  const { isDragging, dropHandlers } = useFileDrop({
-    onFiles: (files) => onUpload(files[0]),
-  });
-
-  return (
-    // The whole avatar circle is the drop target, not just the small camera
-    // badge — a badge-sized hit area is impractical to drop a file onto.
-    <div className="relative shrink-0" {...dropHandlers}>
-      <div
-        className={`flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700 transition-colors ${
-          isDragging ? "ring-2 ring-blue-400 ring-offset-2" : ""
-        }`}
-      >
-        <PresignedImage
-          fileKey={doc.file_key}
-          alt="Profile"
-          className="h-full w-full object-cover"
-          fallback={name?.slice(0, 2).toUpperCase() || "NA"}
-        />
-        {doc.uploading && (
-          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 text-[10px] font-medium text-white">
-            {doc.progress}%
-          </div>
-        )}
-      </div>
-      <span
-        className={`absolute -bottom-0.5 left-0 h-3.5 w-3.5 rounded-full border-2 border-white ${
-          isActive ? "bg-emerald-500" : "bg-slate-300"
-        }`}
-      />
-      <label
-        htmlFor="profile-photo"
-        className="absolute -bottom-1 -right-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-blue-600 text-white transition-colors hover:bg-blue-700"
-        title="Change photo"
-      >
-        <Camera className="h-3 w-3" />
-        <input
-          id="profile-photo"
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          className="hidden"
-          onChange={handleChange}
-        />
-      </label>
-    </div>
-  );
+function AvatarUpload({ doc, name, onUpload }: { doc: DocState; name: string; isActive: boolean; onUpload: (file: File) => void }) {
+  return <StoredDocumentUpload id="profile-photo" label={`${name} photo`} document={doc} onUpload={onUpload} imageOnly />;
 }
+
 
 export default function EditPartnerDetails({
   id,
@@ -1063,10 +864,10 @@ export default function EditPartnerDetails({
               updateFormData={updateFormData}
             />
           </div>
-          <DocUploadField
+          <StoredDocumentUpload
             label="Passport Photo"
-            doc={passportPhoto}
-            fieldId="passport-photo"
+            document={passportPhoto}
+            id="passport-photo"
             onUpload={(f) => handleUpload(f, setPassportPhoto)}
           />
         </div>
@@ -1192,16 +993,16 @@ export default function EditPartnerDetails({
               updateFormData={updateFormData}
             />
           </div>
-          <DocUploadField
+          <StoredDocumentUpload
             label="Company Registration Document"
-            doc={companyRegDoc}
-            fieldId="company-reg-doc"
+            document={companyRegDoc}
+            id="company-reg-doc"
             onUpload={(f) => handleUpload(f, setCompanyRegDoc)}
           />
-          <DocUploadField
+          <StoredDocumentUpload
             label="Passport Photo"
-            doc={passportPhoto}
-            fieldId="comp-passport-photo"
+            document={passportPhoto}
+            id="comp-passport-photo"
             onUpload={(f) => handleUpload(f, setPassportPhoto)}
           />
         </div>

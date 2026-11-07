@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -172,14 +175,9 @@ export default function StaffUsersTable() {
       key: "actions",
       header: "Actions",
       cell: (user) => (
-        <div className="flex items-center gap-2">
-          <IconButton
-            title={`View ${user.name}`}
-            icon={<Eye className="h-4 w-4" />}
-            onClick={() => router.push(`/admin/staff-users/${user.id}`)}
-          />
-          <IconButton
-            title={user.is_active ? "Suspend account" : "Reactivate account"}
+        <TableActions>
+          <TableAction
+            label={user.is_active ? "Suspend account" : "Reactivate account"}
             icon={
               user.is_active ? (
                 <Ban className="h-4 w-4" />
@@ -187,12 +185,12 @@ export default function StaffUsersTable() {
                 <Power className="h-4 w-4" />
               )
             }
-            onClick={() => {
+            onSelect={() => {
               setSuspendTarget(user);
               setIsSuspendOpen(true);
             }}
           />
-        </div>
+        </TableActions>
       ),
     },
   ];

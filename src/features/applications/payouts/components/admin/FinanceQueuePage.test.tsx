@@ -151,7 +151,8 @@ it("opens the existing pay-in form only from its row action", async () => {
   const user = userEvent.setup();
   render(<FinanceQueuePage />);
   expect(mockPayIn).not.toHaveBeenCalled();
-  await user.click(screen.getByRole("button", { name: "Record pay-in" }));
+  await user.click(screen.getByRole("button", { name: "More actions for E, Student E" }));
+  await user.click(screen.getByRole("menuitem", { name: "Record pay-in" }));
   expect(mockPayIn).toHaveBeenCalledWith({
     application_id: "app-E",
     reference: "E",
@@ -161,7 +162,8 @@ it("opens the existing pay-in form only from its row action", async () => {
 it("shows commission amounts and application navigation in the preview", async () => {
   const user = userEvent.setup();
   render(<FinanceQueuePage />);
-  await user.click(screen.getByRole("button", { name: "View commission A" }));
+  await user.click(screen.getByRole("button", { name: "More actions for A, Student A" }));
+  await user.click(screen.getByRole("menuitem", { name: "View commission A" }));
   const drawer = screen.getByRole("dialog", { name: "Commission details" });
   expect(
     within(drawer).getByRole("link", { name: "Open application" })

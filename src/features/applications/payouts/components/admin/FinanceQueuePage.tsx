@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -316,38 +319,28 @@ export default function FinanceQueuePage() {
       key: "actions",
       header: "Actions",
       cell: (item) => (
-        <div className="flex items-center gap-2">
-          <IconButton
-            title={`View commission ${item.reference}`}
-            variant="secondary"
+        <TableActions>
+          <TableAction
+            label={`View commission ${item.reference}`}
             icon={<Eye className="h-4 w-4" />}
-            onClick={() => setPreview(item)}
+            onSelect={() => setPreview(item)}
           />
           {item.waiting_on === "university" ? (
             <Tooltip content="Record pay-in" position="left">
-              <IconButton
-                variant="tertiary"
-                size="sm"
-                onClick={() =>
+              <TableAction
+                label={"Record pay-in"}
+                icon={<Receipt className="h-4 w-4" aria-hidden="true" />}
+                onSelect={() =>
                   setRecordPayInRow({
                     application_id: item.application_id,
                     reference: item.reference,
                     student_name: item.student_name,
                   })
                 }
-                aria-label="Record pay-in"
-                title="Record pay-in"
-                icon={<Receipt className="h-4 w-4" aria-hidden="true" />}
               />
             </Tooltip>
           ) : null}
-          <LinkBtn
-            href={`/admin/applications/${item.application_id}`}
-            title={`Open application ${item.reference}`}
-            variant="tertiary"
-            icon={<ArrowUpRight className="h-4 w-4" />}
-          />
-        </div>
+        </TableActions>
       ),
     },
   ];

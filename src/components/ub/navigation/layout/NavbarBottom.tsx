@@ -50,24 +50,25 @@ export function findActiveHref(items: { href: string }[], path: string | null | 
 const formatCount = (n: number) => (n > 99 ? "99+" : String(n));
 
 /**
- * Mobile bottom nav (brief §5): 64px plus the safe-area inset, light glass,
+ * Mobile bottom nav (brief §5): 64px plus the safe-area inset, inset rounded surface,
  * 4–5 items with an optional count badge, aria-current on the active item.
  * Hidden from md up, where the sidebar takes over.
  */
 export default function NavbarBottom({ items, action, activeHref, fixed = true, "aria-label": ariaLabel = "Main", className }: NavbarBottomProps) {
   const pathname = usePathname();
   const active = findActiveHref(items, activeHref ?? pathname);
+  const actionActive = Boolean(action && (action.expanded || !active));
 
   return (
     <nav
       aria-label={ariaLabel}
       className={clsx(
-        "ub-glass-light-strong z-40 border-t border-ub-border pb-[env(safe-area-inset-bottom)]",
-        fixed ? "fixed inset-x-0 bottom-0 md:hidden" : "relative",
+        "z-40 overflow-hidden rounded-t-ub-xl border border-b-0 border-ub-border bg-ub-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_24px_rgba(0,12,41,0.08)]",
+        fixed ? "fixed inset-x-2 bottom-0 md:hidden" : "relative",
         className,
       )}
     >
-      <ul className="grid h-16" style={{ gridTemplateColumns: `repeat(${Math.max(items.length + (action ? 1 : 0), 1)}, minmax(0, 1fr))` }}>
+      <ul className="grid h-16 gap-1 p-1" style={{ gridTemplateColumns: `repeat(${Math.max(items.length + (action ? 1 : 0), 1)}, minmax(0, 1fr))` }}>
         {items.map((item) => {
           const Icon = item.icon;
           const isActive = item.href === active;
@@ -78,28 +79,28 @@ export default function NavbarBottom({ items, action, activeHref, fixed = true, 
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
                 className={clsx(
-                  "flex h-full flex-col items-center justify-center gap-1 rounded-ub-md px-0.5 transition-colors duration-ub-fast ease-ub-standard",
+                  "flex h-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-ub-lg px-0.5 transition-colors duration-200 motion-reduce:transition-none",
                   focusRingInset,
-                  isActive ? "text-ub-text-link" : "text-ub-text-secondary hover:text-ub-text-primary",
+                  isActive ? "bg-ub-selected text-ub-text-link" : "text-ub-text-secondary hover:bg-ub-surface-subtle hover:text-ub-text-primary",
                 )}
               >
                 <span
                   className={clsx(
-                    "relative grid h-8 w-14 place-items-center rounded-ub-full transition-colors duration-ub-fast ease-ub-standard",
-                    isActive && "bg-ub-selected",
+                    "relative grid h-7 w-10 place-items-center rounded-ub-md transition-colors duration-200 motion-reduce:transition-none",
+                    isActive && "text-ub-text-link",
                   )}
                 >
                   <Icon className="h-5 w-5" aria-hidden="true" />
                   {count > 0 && (
                     <span
                       aria-hidden="true"
-                      className="ub-tabular absolute -top-1 end-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-ub-full bg-ub-danger-600 px-1 text-ub-label-sm text-ub-text-on-action ring-2 ring-ub-surface"
+                      className="ub-tabular absolute -top-0.5 -end-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-ub-full bg-ub-danger-600 px-1 text-ub-label-sm text-ub-text-on-action ring-2 ring-ub-surface"
                     >
                       {formatCount(count)}
                     </span>
                   )}
                 </span>
-                <span className={clsx("max-w-full truncate text-ub-label-sm", isActive && "font-semibold")}>{item.label}</span>
+                <span className={clsx("max-w-full truncate text-[11px] leading-4", isActive && "font-semibold")}>{item.label}</span>
                 {count > 0 && <span className="sr-only">, {item.badgeLabel ? item.badgeLabel(count) : `${count} need action`}</span>}
               </Link>
             </li>
@@ -113,14 +114,15 @@ export default function NavbarBottom({ items, action, activeHref, fixed = true, 
               aria-expanded={action.expanded}
               aria-controls={action.controls}
               className={clsx(
-                "flex h-full w-full flex-col items-center justify-center gap-1 rounded-ub-md px-0.5 text-ub-text-secondary transition-colors duration-ub-fast ease-ub-standard hover:text-ub-text-primary",
+                "flex h-full w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-ub-lg px-0.5 transition-colors duration-200 motion-reduce:transition-none",
                 focusRingInset,
+                actionActive ? "bg-ub-selected text-ub-text-link" : "text-ub-text-secondary hover:bg-ub-surface-subtle hover:text-ub-text-primary",
               )}
             >
-              <span className={clsx("grid h-8 w-14 place-items-center rounded-ub-full", action.expanded && "bg-ub-selected")}>
+              <span className="grid h-7 w-10 place-items-center">
                 <action.icon className="h-5 w-5" aria-hidden="true" />
               </span>
-              <span className="max-w-full truncate text-ub-label-sm">{action.label}</span>
+              <span className="max-w-full truncate text-[11px] leading-4">{action.label}</span>
             </button>
           </li>
         )}

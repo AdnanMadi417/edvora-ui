@@ -1,13 +1,27 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import React, { useEffect, useRef, useState } from "react";
 import {
-  User, Mail, Activity, CalendarDays,
-  RefreshCw, SlidersHorizontal, Send, KeyRound, UserPlus,
+  User,
+  Mail,
+  Activity,
+  CalendarDays,
+  RefreshCw,
+  SlidersHorizontal,
+  Send,
+  KeyRound,
+  UserPlus,
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 
-import { useAgencyInvitations, useResendSubmissionLink, useResendAgencyInvitationOtp } from "../../hooks";
+import {
+  useAgencyInvitations,
+  useResendSubmissionLink,
+  useResendAgencyInvitationOtp,
+} from "../../hooks";
 import type { AgencyInvitation, InvitationProgress } from "../../types";
 
 import SearchInput from "components/ub/forms/selection/SearchInput";
@@ -60,16 +74,27 @@ const PROGRESS_VARIANTS: Record<InvitationProgress, StatusBadgeVariant> = {
 };
 
 const PROGRESS_TOOLTIPS: Record<InvitationProgress, string> = {
-  otp_pending: "They haven't entered their verification code yet. Use “Resend Verification Code” if they say it never arrived.",
-  otp_expired: "Their verification code expired before they used it. Use “Resend Verification Code” to send a fresh one.",
-  pending_profile: "Code verified, but they haven't finished their profile yet. Use “Resend Submission Link” if their link expired or got lost.",
-  link_expired: "Their profile-completion link expired before they finished. Use “Resend Submission Link” to send a new one.",
+  otp_pending:
+    "They haven't entered their verification code yet. Use “Resend Verification Code” if they say it never arrived.",
+  otp_expired:
+    "Their verification code expired before they used it. Use “Resend Verification Code” to send a fresh one.",
+  pending_profile:
+    "Code verified, but they haven't finished their profile yet. Use “Resend Submission Link” if their link expired or got lost.",
+  link_expired:
+    "Their profile-completion link expired before they finished. Use “Resend Submission Link” to send a new one.",
   completed: "Their account has been created. No action needed.",
-  superseded: "This invitation was replaced by a newer one sent to the same email. No action needed.",
+  superseded:
+    "This invitation was replaced by a newer one sent to the same email. No action needed.",
 };
 
-const RESENDABLE_PROGRESS: InvitationProgress[] = ["link_expired", "pending_profile"];
-const OTP_RESENDABLE_PROGRESS: InvitationProgress[] = ["otp_pending", "otp_expired"];
+const RESENDABLE_PROGRESS: InvitationProgress[] = [
+  "link_expired",
+  "pending_profile",
+];
+const OTP_RESENDABLE_PROGRESS: InvitationProgress[] = [
+  "otp_pending",
+  "otp_expired",
+];
 
 export default function AgencyInvitationsTable() {
   const { showToast } = useToast();
@@ -97,12 +122,16 @@ export default function AgencyInvitationsTable() {
     progress,
   });
 
-  const { resendSubmissionLink, loading: isResending } = useResendSubmissionLink();
-  const [resendTarget, setResendTarget] = useState<AgencyInvitation | null>(null);
+  const { resendSubmissionLink, loading: isResending } =
+    useResendSubmissionLink();
+  const [resendTarget, setResendTarget] = useState<AgencyInvitation | null>(
+    null
+  );
   const [isResendOpen, setIsResendOpen] = useState(false);
 
   const { resendOtp, loading: isResendingOtp } = useResendAgencyInvitationOtp();
-  const [resendOtpTarget, setResendOtpTarget] = useState<AgencyInvitation | null>(null);
+  const [resendOtpTarget, setResendOtpTarget] =
+    useState<AgencyInvitation | null>(null);
   const [isResendOtpOpen, setIsResendOtpOpen] = useState(false);
 
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
@@ -118,7 +147,10 @@ export default function AgencyInvitationsTable() {
   const isInitialLoad = !hasLoadedOnce;
   const isRefetching = loading && hasLoadedOnce;
 
-  const activeFiltersCount = [selectedProgress !== "all", searchTerm !== ""].filter(Boolean).length;
+  const activeFiltersCount = [
+    selectedProgress !== "all",
+    searchTerm !== "",
+  ].filter(Boolean).length;
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -151,7 +183,10 @@ export default function AgencyInvitationsTable() {
       refetch();
     } catch (error: any) {
       const backendMessage = parseApiError(error, "Please try again.");
-      showToast(`Failed to resend verification code. ${backendMessage}`, "error");
+      showToast(
+        `Failed to resend verification code. ${backendMessage}`,
+        "error"
+      );
     }
   };
 
@@ -163,12 +198,17 @@ export default function AgencyInvitationsTable() {
           <div className="flex items-center gap-2 sm:contents">
             <SearchInput
               value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchTerm(e.target.value)
+              }
               placeholder="Search by name or email..."
               className="sm:w-64 sm:flex-none"
             />
             {isRefetching && (
-              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
+              <RefreshCw
+                className="h-4 w-4 shrink-0 animate-spin text-slate-400"
+                aria-label="Updating results"
+              />
             )}
             <button
               className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
@@ -183,11 +223,20 @@ export default function AgencyInvitationsTable() {
             </button>
           </div>
 
-          <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
+          <div
+            className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${
+              showMobileFilters
+                ? "max-h-[200px] opacity-100"
+                : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"
+            }`}
+          >
             <div className="w-full sm:w-48 flex-shrink-0">
               <FilterSelectField
                 value={selectedProgress}
-                onChange={(v: string) => { setSelectedProgress(v); setCurrentPage(1); }}
+                onChange={(v: string) => {
+                  setSelectedProgress(v);
+                  setCurrentPage(1);
+                }}
                 options={PROGRESS_OPTIONS}
                 icon={Activity}
                 defaultOption="All Progress"
@@ -231,12 +280,25 @@ export default function AgencyInvitationsTable() {
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: User,         label: "Name",     minW: "min-w-[140px] sm:min-w-[200px]" },
-                  { icon: Mail,         label: "Email",    minW: "min-w-[160px] sm:min-w-[200px]" },
-                  { icon: Activity,     label: "Progress" },
+                  {
+                    icon: User,
+                    label: "Name",
+                    minW: "min-w-[140px] sm:min-w-[200px]",
+                  },
+                  {
+                    icon: Mail,
+                    label: "Email",
+                    minW: "min-w-[160px] sm:min-w-[200px]",
+                  },
+                  { icon: Activity, label: "Progress" },
                   { icon: CalendarDays, label: "Invited" },
                 ].map(({ icon: Icon, label, minW }) => (
-                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
+                  <th
+                    key={label}
+                    className={`${
+                      minW ?? ""
+                    } px-6 py-4 text-start text-sm font-semibold text-slate-900`}
+                  >
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4 text-slate-400" />
                       {label}
@@ -247,8 +309,14 @@ export default function AgencyInvitationsTable() {
               </tr>
             </thead>
 
-            <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
-              {isInitialLoad && <TableSkeletonRows columns={5} rows={ITEMS_PER_PAGE} />}
+            <tbody
+              className={`divide-y divide-slate-100 bg-white ${
+                isRefetching ? "opacity-60 transition-opacity" : ""
+              }`}
+            >
+              {isInitialLoad && (
+                <TableSkeletonRows columns={5} rows={ITEMS_PER_PAGE} />
+              )}
 
               {!isInitialLoad && error && (
                 <TableErrorRow colSpan={5} message={error} onRetry={refetch} />
@@ -257,8 +325,16 @@ export default function AgencyInvitationsTable() {
               {!isInitialLoad && !error && invitations.length === 0 && (
                 <TableEmptyRow
                   colSpan={5}
-                  title={activeFiltersCount > 0 ? "No invitations found" : "No invitations yet"}
-                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Invite your first team member to get started."}
+                  title={
+                    activeFiltersCount > 0
+                      ? "No invitations found"
+                      : "No invitations yet"
+                  }
+                  subtitle={
+                    activeFiltersCount > 0
+                      ? "Try adjusting your filters."
+                      : "Invite your first team member to get started."
+                  }
                   icon={<UserPlus className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
@@ -279,60 +355,79 @@ export default function AgencyInvitationsTable() {
               )}
 
               <AnimatePresence>
-              {!isInitialLoad && !error && invitations.map((invitation) => (
-                <AnimatedTableRow key={invitation.id} className="transition-colors hover:bg-slate-50/50">
-                  <td className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
-                    <div className="truncate text-sm font-medium text-slate-900">{invitation.name}</div>
-                  </td>
+                {!isInitialLoad &&
+                  !error &&
+                  invitations.map((invitation) => (
+                    <AnimatedTableRow
+                      key={invitation.id}
+                      className="transition-colors hover:bg-slate-50/50"
+                    >
+                      <td className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
+                        <div className="truncate text-sm font-medium text-slate-900">
+                          {invitation.name}
+                        </div>
+                      </td>
 
-                  <td className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
-                    <div className="truncate text-sm text-slate-500">{invitation.email}</div>
-                  </td>
+                      <td className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
+                        <div className="truncate text-sm text-slate-500">
+                          {invitation.email}
+                        </div>
+                      </td>
 
-                  <td className="px-6 py-4">
-                    <Tooltip content={PROGRESS_TOOLTIPS[invitation.progress]} position="right">
-                      <StatusBadge variant={PROGRESS_VARIANTS[invitation.progress]}>
-                        {PROGRESS_LABELS[invitation.progress] ?? invitation.progress}
-                      </StatusBadge>
-                    </Tooltip>
-                  </td>
+                      <td className="px-6 py-4">
+                        <Tooltip
+                          content={PROGRESS_TOOLTIPS[invitation.progress]}
+                          position="right"
+                        >
+                          <StatusBadge
+                            variant={PROGRESS_VARIANTS[invitation.progress]}
+                          >
+                            {PROGRESS_LABELS[invitation.progress] ??
+                              invitation.progress}
+                          </StatusBadge>
+                        </Tooltip>
+                      </td>
 
-                  <td className="px-6 py-4">
-                    <div className="text-sm text-slate-900">
-                      <AppDate value={invitation.created_at} format="short" fallback="—" />
-                    </div>
-                  </td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-slate-900">
+                          <AppDate
+                            value={invitation.created_at}
+                            format="short"
+                            fallback="—"
+                          />
+                        </div>
+                      </td>
 
-                  <td className="px-4 py-4">
-                    {RESENDABLE_PROGRESS.includes(invitation.progress) && (
-                      <IconButton
-                        onClick={() => { setResendTarget(invitation); setIsResendOpen(true); }}
-                        title="Resend submission link"
-                        icon={<Send className="h-4 w-4" />}
-                        bgColor="bg-transparent"
-                        textColor="text-slate-400"
-                        borderColor="border-transparent"
-                        hoverTextColor="hover:text-blue-600"
-                        hoverBorderColor="hover:border-transparent"
-                        className="hover:bg-blue-50"
-                      />
-                    )}
-                    {OTP_RESENDABLE_PROGRESS.includes(invitation.progress) && (
-                      <IconButton
-                        onClick={() => { setResendOtpTarget(invitation); setIsResendOtpOpen(true); }}
-                        title="Resend verification code"
-                        icon={<KeyRound className="h-4 w-4" />}
-                        bgColor="bg-transparent"
-                        textColor="text-slate-400"
-                        borderColor="border-transparent"
-                        hoverTextColor="hover:text-blue-600"
-                        hoverBorderColor="hover:border-transparent"
-                        className="hover:bg-blue-50"
-                      />
-                    )}
-                  </td>
-                </AnimatedTableRow>
-              ))}
+                      <td className="px-4 py-4">
+                        <TableActions label={invitation.email}>
+                          {RESENDABLE_PROGRESS.includes(
+                            invitation.progress
+                          ) && (
+                            <TableAction
+                              label={"Resend submission link"}
+                              icon={<Send className="h-4 w-4" />}
+                              onSelect={() => {
+                                setResendTarget(invitation);
+                                setIsResendOpen(true);
+                              }}
+                            />
+                          )}
+                          {OTP_RESENDABLE_PROGRESS.includes(
+                            invitation.progress
+                          ) && (
+                            <TableAction
+                              label={"Resend verification code"}
+                              icon={<KeyRound className="h-4 w-4" />}
+                              onSelect={() => {
+                                setResendOtpTarget(invitation);
+                                setIsResendOtpOpen(true);
+                              }}
+                            />
+                          )}
+                        </TableActions>
+                      </td>
+                    </AnimatedTableRow>
+                  ))}
               </AnimatePresence>
             </tbody>
           </table>
@@ -341,7 +436,10 @@ export default function AgencyInvitationsTable() {
 
       <ResendSubmissionLinkConfirmation
         isOpen={isResendOpen}
-        onClose={() => { setIsResendOpen(false); setResendTarget(null); }}
+        onClose={() => {
+          setIsResendOpen(false);
+          setResendTarget(null);
+        }}
         onConfirm={handleResend}
         isSending={isResending}
         invitationName={resendTarget?.name ?? ""}
@@ -350,7 +448,10 @@ export default function AgencyInvitationsTable() {
 
       <ResendInvitationOtpConfirmation
         isOpen={isResendOtpOpen}
-        onClose={() => { setIsResendOtpOpen(false); setResendOtpTarget(null); }}
+        onClose={() => {
+          setIsResendOtpOpen(false);
+          setResendOtpTarget(null);
+        }}
         onConfirm={handleResendOtp}
         isSending={isResendingOtp}
         invitationName={resendOtpTarget?.name ?? ""}

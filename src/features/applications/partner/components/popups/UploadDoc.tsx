@@ -4,7 +4,7 @@ import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { RotateCcw } from "lucide-react";
 import Alert from "components/ub/feedback/notifications/Alert";
-import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
+import DocumentUpload from "components/ub/forms/uploads/DocumentUpload";
 
 interface ResubmitDocProps {
   isOpen: boolean;
@@ -53,7 +53,7 @@ export default function UploadDoc({
           properly formatted, and within allowed size limits.
         </Alert>
 
-        <CompactFileUpload
+        <DocumentUpload
           id="resubmitFile"
           label="Upload Document"
           file={selectedFile}

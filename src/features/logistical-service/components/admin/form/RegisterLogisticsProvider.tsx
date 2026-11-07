@@ -24,7 +24,7 @@ import Loading from "components/ub/feedback/states/Loading";
 import CheckBoxGroup from "components/ub/forms/choices/CheckBoxGroup";
 import CheckSimpleBoxGroup from "components/ub/forms/choices/CheckSimpleBoxGroup";
 import InputField from "components/ub/forms/text/InputField";
-import ImageUploadField from "components/ub/forms/uploads/ImageUploadField";
+import ImageUpload from "components/ub/forms/uploads/ImageUpload";
 import Button from "components/ub/core/buttons/Button";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -377,20 +377,19 @@ export default function RegisterLogisticsMarketplaceProvider({
             validate: () => validateStep(0),
             content: (
               <div className="space-y-4">
-                <ImageUploadField
-                  label=""
-                  field="picture"
-                  imageOnly
-                  simpleFile={logoFile}
-                  onSimpleFileChange={handleLogoSelect}
-                  onSimpleRemove={() => {
+                <ImageUpload
+                  label="Provider picture"
+                  id="picture"
+                  file={logoFile}
+                  onFileChange={handleLogoSelect}
+                  onRemove={() => {
                     setLogoFile(null);
                     setLogoFileKey("");
                     setLogoFileUrl("");
                   }}
-                  simpleUploading={logoUploading}
-                  simpleProgress={logoProgress}
-                  errors={{}}
+                  uploading={logoUploading}
+                  progress={logoProgress}
+
                 />{" "}
                 <div className="grid gap-x-4 sm:grid-cols-2">
                   <InputField

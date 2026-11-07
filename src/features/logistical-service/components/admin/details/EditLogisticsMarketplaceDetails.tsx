@@ -30,7 +30,7 @@ import CheckSimpleBoxGroup from "components/ub/forms/choices/CheckSimpleBoxGroup
 import InputField from "components/ub/forms/text/InputField";
 import SelectField from "components/ub/forms/selection/SelectField";
 import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
-import ImageUploadField from "components/ub/forms/uploads/ImageUploadField";
+import ImageUpload from "components/ub/forms/uploads/ImageUpload";
 import Button from "components/ub/core/buttons/Button";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -452,25 +452,24 @@ const EditLogisticsMarketplaceDetails = ({
       stickyActions
     >
       <div className="min-w-0 space-y-6">
-        <ImageUploadField
+        <ImageUpload
           label="Provider picture"
-          field="picture"
-          imageOnly
-          simpleFile={logoFile}
-          onSimpleFileChange={handleLogoSelect}
-          onSimpleRemove={() => {
+          id="picture"
+          file={logoFile}
+          onFileChange={handleLogoSelect}
+          onRemove={() => {
             setLogoFile(null);
             setLogoFileKey("");
             setLogoFileUrl("");
           }}
-          simpleUploading={logoUploading}
-          simpleProgress={logoProgress}
+          uploading={logoUploading}
+          progress={logoProgress}
           existingUrl={existingLogoUrl}
           onExistingRemove={() => {
             setExistingLogoUrl("");
             setExistingLogoKey("");
           }}
-          errors={{}}
+
         />
         <div className="grid grid-cols-1 gap-x-3">
           <InputField

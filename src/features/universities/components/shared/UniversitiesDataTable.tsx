@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import {
   Eye,
@@ -129,42 +132,27 @@ export default function UniversitiesDataTable(props: Props) {
       key: "actions",
       header: "Actions",
       cell: (university) => (
-        <div className="flex flex-nowrap items-center gap-1">
-          <LinkBtn
-            href={`${props.basePath}/${university.id}`}
-            icon={<Eye className="h-4 w-4" />}
-            title="View university"
-            variant="tertiary"
-            size="sm"
-          />
+        <TableActions>
           {props.canManage && (
-            <LinkBtn
-              href={`${props.basePath}/${university.id}/edit`}
+            <TableAction
+              label={"Edit university"}
               icon={<Pencil className="h-4 w-4" />}
-              title="Edit university"
-              variant="secondary"
-              size="sm"
+              href={`${props.basePath}/${university.id}/edit`}
+              primary
             />
           )}
           {props.onAssignPayment && (
-            <IconButton
-              type="button"
-              size="sm"
-              variant="tertiary"
-              title="Assign payment method"
+            <TableAction
+              label={"Assign payment method"}
               icon={<Wallet className="h-4 w-4" />}
-              onClick={() => props.onAssignPayment?.(university)}
+              onSelect={() => props.onAssignPayment?.(university)}
             />
           )}
           {props.onToggleHidden && (
-            <IconButton
-              type="button"
-              size="sm"
-              variant="tertiary"
-              title={
+            <TableAction
+              label={
                 university.is_hidden ? "Unhide university" : "Hide university"
               }
-              disabled={props.togglingId === university.id}
               icon={
                 university.is_hidden ? (
                   <Eye className="h-4 w-4" />
@@ -172,20 +160,19 @@ export default function UniversitiesDataTable(props: Props) {
                   <EyeOff className="h-4 w-4" />
                 )
               }
-              onClick={() => props.onToggleHidden?.(university)}
+              onSelect={() => props.onToggleHidden?.(university)}
+              disabled={props.togglingId === university.id}
             />
           )}
           {props.onDelete && (
-            <IconButton
-              type="button"
-              size="sm"
-              variant="tertiary"
-              title="Delete university"
+            <TableAction
+              label={"Delete university"}
               icon={<Trash2 className="h-4 w-4" />}
-              onClick={() => props.onDelete?.(university)}
+              onSelect={() => props.onDelete?.(university)}
+              danger
             />
           )}
-        </div>
+        </TableActions>
       ),
     },
   ];

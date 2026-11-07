@@ -26,7 +26,7 @@ import Alert from "components/ub/feedback/notifications/Alert";
 import IconButton from "components/ub/core/buttons/IconButton";
 import SelectField from "components/ub/forms/selection/SelectField";
 import ToggleInput from "components/ub/forms/choices/ToggleInput";
-import ImageUploadField from "components/ub/forms/uploads/ImageUploadField";
+import ImageUpload from "components/ub/forms/uploads/ImageUpload";
 import {
   getPresignedUploads,
   uploadFilesToSpaces,
@@ -258,20 +258,19 @@ export default function RegisterUniversity({
           validate: () => validateStep(false),
           content: (
             <div className="space-y-4">
-              <ImageUploadField
-                label=""
-                field="logo"
-                imageOnly
-                simpleFile={logoFile}
-                onSimpleFileChange={handleLogoSelect}
-                onSimpleRemove={() => {
+              <ImageUpload
+                label="University logo"
+                id="logo"
+                file={logoFile}
+                onFileChange={handleLogoSelect}
+                onRemove={() => {
                   setLogoFile(null);
                   setLogoFileKey("");
                   setLogoFileUrl("");
                 }}
-                simpleUploading={logoUploading}
-                simpleProgress={logoProgress}
-                errors={errors}
+                uploading={logoUploading}
+                progress={logoProgress}
+                error={errors.logo}
               />{" "}
               <InputField
                 label="University Name"

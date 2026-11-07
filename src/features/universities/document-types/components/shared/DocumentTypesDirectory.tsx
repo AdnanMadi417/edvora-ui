@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 import { useState } from "react";
 import { Eye, FileText, Upload } from "lucide-react";
 import { useDocumentType } from "../../hooks";
@@ -75,24 +78,17 @@ export default function DocumentTypesDirectory() {
       key: "actions",
       header: "Actions",
       cell: (type) => (
-        <div className="flex items-center gap-2">
-          <LinkBtn
-            href={`${base}/${type.id}`}
-            title={`View ${type.type}`}
-            variant="tertiary"
-            icon={<Eye className="h-4 w-4" />}
-          />
+        <TableActions>
           {type.has_static_template && (
-            <LinkBtn
-              href={`${base}/${type.id}/edit`}
-              title={`${type.static_template_file_key ? "Replace" : "Upload"} ${
+            <TableAction
+              label={`${type.static_template_file_key ? "Replace" : "Upload"} ${
                 type.type
               } template`}
-              variant="secondary"
               icon={<Upload className="h-4 w-4" />}
+              href={`${base}/${type.id}/edit`}
             />
           )}
-        </div>
+        </TableActions>
       ),
     },
   ];

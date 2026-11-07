@@ -9,7 +9,7 @@ import { useVisaPaymentMethods } from "hooks/usePaymentMethods";
 import { useApplicationVisaFee, useVisaPaymentUpload } from "features/applications/hooks";
 import type { ApplicationActionsResponse } from "features/applications/hooks/stages/useApplicationActions";
 import { useHealthDeclarationFormDownload } from "features/applications/shared/useHealthDeclarationFormDownload";
-import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
+import DocumentUpload from "components/ub/forms/uploads/DocumentUpload";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
 
 const VISA_PAYMENT_ERROR_MESSAGES: Record<string, string> = {
@@ -130,7 +130,7 @@ export default function VisaPaymentConfirmation({
               <Alert tone="danger">{paymentError}</Alert>
             )}
 
-            <CompactFileUpload
+            <DocumentUpload
               label="Payment Receipt"
               description="Upload your proof of visa fee payment (bank transfer slip, receipt, etc.)"
               id="payment_reference"
@@ -143,7 +143,7 @@ export default function VisaPaymentConfirmation({
             />
 
             {hasAppFormTemplate && (
-              <CompactFileUpload
+              <DocumentUpload
                 label="Application Form"
                 description="Your manager has provided a template — download it, complete it, and upload the filled form here."
                 id="app_form_document"
@@ -157,7 +157,7 @@ export default function VisaPaymentConfirmation({
             )}
 
             {hasAppForm2Template && (
-              <CompactFileUpload
+              <DocumentUpload
                 label="Application Form 2"
                 description="Your manager has provided a second template — download it, complete it, and upload the filled form here."
                 id="app_form_2_document"
@@ -179,7 +179,7 @@ export default function VisaPaymentConfirmation({
                 >
                   {downloadingHealthDeclarationForm ? "Opening..." : "Download blank Health Declaration Form template"}
                 </TextButton>
-                <CompactFileUpload
+                <DocumentUpload
                   label="Health Declaration Form"
                   description="Download the blank template above, complete it, and upload the filled form here."
                   id="health_declaration_document"
@@ -194,7 +194,7 @@ export default function VisaPaymentConfirmation({
             )}
 
             {signedOfferLetterRequired && (
-              <CompactFileUpload
+              <DocumentUpload
                 label="Signed Offer Letter"
                 description="Download your offer letter above, sign it, and upload the signed copy here."
                 id="signed_offer_letter_document"
@@ -208,7 +208,7 @@ export default function VisaPaymentConfirmation({
             )}
 
             {hasEnglishFormTemplate && (
-              <CompactFileUpload
+              <DocumentUpload
                 label="English Form"
                 description="Your manager has provided a template — download it, complete it, and upload the filled form here."
                 id="english_form_document"

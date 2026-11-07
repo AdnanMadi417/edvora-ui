@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import { useState } from "react";
 import {
@@ -95,31 +98,27 @@ export default function FieldsOfStudyDirectory({
       key: "actions",
       header: "Actions",
       cell: (field) => (
-        <div className="flex items-center gap-2">
-          <IconButton
-            aria-label={`View ${field.name}`}
-            title="View details"
-            variant="tertiary"
+        <TableActions>
+          <TableAction
+            label={`View ${field.name}`}
             icon={<Eye className="h-4 w-4" />}
-            onClick={() => setViewing(field)}
+            onSelect={() => setViewing(field)}
           />
-          <IconButton
-            aria-label={`Edit ${field.name}`}
-            title="Edit field"
-            variant="secondary"
+          <TableAction
+            label={`Edit ${field.name}`}
             icon={<Pencil className="h-4 w-4" />}
-            onClick={() => setEditing(field)}
+            onSelect={() => setEditing(field)}
+            primary
           />
           {allowDelete && (
-            <IconButton
-              aria-label={`Delete ${field.name}`}
-              title="Delete field"
-              variant="tertiary"
+            <TableAction
+              label={`Delete ${field.name}`}
               icon={<Trash2 className="h-4 w-4" />}
-              onClick={() => setDeleting(field)}
+              onSelect={() => setDeleting(field)}
+              danger
             />
           )}
-        </div>
+        </TableActions>
       ),
     },
   ];

@@ -21,7 +21,7 @@ import {
   getPresignedUploads,
   uploadFilesToSpaces,
 } from "services/uploadService";
-import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
+import DocumentUpload from "components/ub/forms/uploads/DocumentUpload";
 
 export interface BatchPayoutLine {
   application_id: string;
@@ -250,7 +250,7 @@ export default function BatchPayout({
             />
           </div>
 
-          <CompactFileUpload
+          <DocumentUpload
             id="batch-payout-receipt"
             label="Upload Payout Receipt"
             description="Upload proof of payment (receipt or transfer confirmation)"

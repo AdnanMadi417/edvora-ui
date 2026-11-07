@@ -1,14 +1,32 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  User, Mail, Percent, BadgeCheck, ChevronRight,
-  CheckCircle, XCircle, RefreshCw, SlidersHorizontal, Ban, Power, Settings, UserPlus,
+  User,
+  Mail,
+  Percent,
+  BadgeCheck,
+  ChevronRight,
+  CheckCircle,
+  XCircle,
+  RefreshCw,
+  SlidersHorizontal,
+  Ban,
+  Power,
+  Settings,
+  UserPlus,
 } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 
-import { useAgencyMembers, useSuspendMember, useReactivateMember } from "../../hooks";
+import {
+  useAgencyMembers,
+  useSuspendMember,
+  useReactivateMember,
+} from "../../hooks";
 import type { AgencyMember } from "../../types";
 
 import SearchInput from "components/ub/forms/selection/SearchInput";
@@ -45,7 +63,9 @@ interface AgencyMembersTableProps {
   onChanged?: () => void;
 }
 
-export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProps) {
+export default function AgencyMembersTable({
+  onChanged,
+}: AgencyMembersTableProps) {
   const router = useRouter();
   const { showToast } = useToast();
 
@@ -64,8 +84,18 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
     return () => clearTimeout(t);
   }, [searchTerm]);
 
-  const isActive = selectedStatus === "true" ? true : selectedStatus === "false" ? false : undefined;
-  const commissionVisible = selectedCommission === "true" ? true : selectedCommission === "false" ? false : undefined;
+  const isActive =
+    selectedStatus === "true"
+      ? true
+      : selectedStatus === "false"
+      ? false
+      : undefined;
+  const commissionVisible =
+    selectedCommission === "true"
+      ? true
+      : selectedCommission === "false"
+      ? false
+      : undefined;
 
   const { members, total, loading, error, refetch } = useAgencyMembers({
     page: currentPage,
@@ -80,7 +110,9 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
   const [suspendTarget, setSuspendTarget] = useState<AgencyMember | null>(null);
   const [isSuspendOpen, setIsSuspendOpen] = useState(false);
 
-  const [commissionTarget, setCommissionTarget] = useState<AgencyMember | null>(null);
+  const [commissionTarget, setCommissionTarget] = useState<AgencyMember | null>(
+    null
+  );
   const [isCommissionOpen, setIsCommissionOpen] = useState(false);
 
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
@@ -96,7 +128,11 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
   const isInitialLoad = !hasLoadedOnce;
   const isRefetching = loading && hasLoadedOnce;
 
-  const activeFiltersCount = [selectedStatus !== "all", selectedCommission !== "all", searchTerm !== ""].filter(Boolean).length;
+  const activeFiltersCount = [
+    selectedStatus !== "all",
+    selectedCommission !== "all",
+    searchTerm !== "",
+  ].filter(Boolean).length;
 
   const clearFilters = () => {
     setSearchTerm("");
@@ -134,12 +170,17 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
           <div className="flex items-center gap-2 sm:contents">
             <SearchInput
               value={searchTerm}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchTerm(e.target.value)
+              }
               placeholder="Search by name or email..."
               className="sm:w-64 sm:flex-none"
             />
             {isRefetching && (
-              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
+              <RefreshCw
+                className="h-4 w-4 shrink-0 animate-spin text-slate-400"
+                aria-label="Updating results"
+              />
             )}
             <button
               className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
@@ -154,11 +195,20 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
             </button>
           </div>
 
-          <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
+          <div
+            className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${
+              showMobileFilters
+                ? "max-h-[200px] opacity-100"
+                : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"
+            }`}
+          >
             <div className="w-full sm:w-36 flex-shrink-0">
               <FilterSelectField
                 value={selectedStatus}
-                onChange={(v: string) => { setSelectedStatus(v); setCurrentPage(1); }}
+                onChange={(v: string) => {
+                  setSelectedStatus(v);
+                  setCurrentPage(1);
+                }}
                 options={STATUS_OPTIONS}
                 icon={BadgeCheck}
                 defaultOption="All Status"
@@ -167,7 +217,10 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
             <div className="w-full sm:w-40 flex-shrink-0">
               <FilterSelectField
                 value={selectedCommission}
-                onChange={(v: string) => { setSelectedCommission(v); setCurrentPage(1); }}
+                onChange={(v: string) => {
+                  setSelectedCommission(v);
+                  setCurrentPage(1);
+                }}
                 options={COMMISSION_OPTIONS}
                 icon={Percent}
                 defaultOption="All Commission"
@@ -211,12 +264,25 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
-                  { icon: User,       label: "Name",       minW: "min-w-[140px] sm:min-w-[200px]" },
-                  { icon: Mail,       label: "Email",      minW: "min-w-[160px] sm:min-w-[200px]" },
-                  { icon: Percent,    label: "Commission" },
+                  {
+                    icon: User,
+                    label: "Name",
+                    minW: "min-w-[140px] sm:min-w-[200px]",
+                  },
+                  {
+                    icon: Mail,
+                    label: "Email",
+                    minW: "min-w-[160px] sm:min-w-[200px]",
+                  },
+                  { icon: Percent, label: "Commission" },
                   { icon: BadgeCheck, label: "Status" },
                 ].map(({ icon: Icon, label, minW }) => (
-                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
+                  <th
+                    key={label}
+                    className={`${
+                      minW ?? ""
+                    } px-6 py-4 text-start text-sm font-semibold text-slate-900`}
+                  >
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4 text-slate-400" />
                       {label}
@@ -229,8 +295,14 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
               </tr>
             </thead>
 
-            <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
-              {isInitialLoad && <TableSkeletonRows columns={7} rows={ITEMS_PER_PAGE} />}
+            <tbody
+              className={`divide-y divide-slate-100 bg-white ${
+                isRefetching ? "opacity-60 transition-opacity" : ""
+              }`}
+            >
+              {isInitialLoad && (
+                <TableSkeletonRows columns={7} rows={ITEMS_PER_PAGE} />
+              )}
 
               {!isInitialLoad && error && (
                 <TableErrorRow colSpan={7} message={error} onRetry={refetch} />
@@ -239,8 +311,16 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
               {!isInitialLoad && !error && members.length === 0 && (
                 <TableEmptyRow
                   colSpan={7}
-                  title={activeFiltersCount > 0 ? "No members found" : "No members yet"}
-                  subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "Invite your first team member to get started."}
+                  title={
+                    activeFiltersCount > 0
+                      ? "No members found"
+                      : "No members yet"
+                  }
+                  subtitle={
+                    activeFiltersCount > 0
+                      ? "Try adjusting your filters."
+                      : "Invite your first team member to get started."
+                  }
                   icon={<UserPlus className="h-8 w-8 text-slate-400" />}
                   action={
                     activeFiltersCount > 0 ? (
@@ -261,83 +341,116 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
               )}
 
               <AnimatePresence>
-              {!isInitialLoad && !error && members.map((member) => (
-                <AnimatedTableRow
-                  key={member.id}
-                  className="group cursor-pointer transition-colors hover:bg-slate-100/50"
-                  onClick={() => router.push(`/partner/team-members/${member.partner_id}`)}
-                >
-                  <td className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
-                        {member.name?.slice(0, 2).toUpperCase() ?? "?"}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-slate-900">{member.name}</div>
-                      </div>
-                    </div>
-                  </td>
+                {!isInitialLoad &&
+                  !error &&
+                  members.map((member) => (
+                    <AnimatedTableRow
+                      key={member.id}
+                      className="group cursor-pointer transition-colors hover:bg-slate-100/50"
+                      onClick={() =>
+                        router.push(
+                          `/partner/team-members/${member.partner_id}`
+                        )
+                      }
+                    >
+                      <td className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                            {member.name?.slice(0, 2).toUpperCase() ?? "?"}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="truncate text-sm font-medium text-slate-900">
+                              {member.name}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
 
-                  <td className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
-                    <div className="truncate text-sm text-slate-500">{member.email}</div>
-                  </td>
+                      <td className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
+                        <div className="truncate text-sm text-slate-500">
+                          {member.email}
+                        </div>
+                      </td>
 
-                  <td className="px-6 py-4">
-                    {member.commission_visible ? (
-                      <Tooltip
-                        position="right"
-                        content={`This member can see ${member.commission_display_percentage}% of their commission. Use the settings icon to change this.`}
+                      <td className="px-6 py-4">
+                        {member.commission_visible ? (
+                          <Tooltip
+                            position="right"
+                            content={`This member can see ${member.commission_display_percentage}% of their commission. Use the settings icon to change this.`}
+                          >
+                            <StatusBadge variant="info">
+                              {member.commission_display_percentage}% Visible
+                            </StatusBadge>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip
+                            position="right"
+                            content="This member can't see any commission info. Use the settings icon to make it visible."
+                          >
+                            <StatusBadge variant="neutral">Hidden</StatusBadge>
+                          </Tooltip>
+                        )}
+                      </td>
+
+                      <td className="px-6 py-4">
+                        {member.is_active ? (
+                          <StatusBadge
+                            variant="success"
+                            icon={<CheckCircle className="h-3 w-3" />}
+                          >
+                            Active
+                          </StatusBadge>
+                        ) : (
+                          <StatusBadge
+                            variant="neutral"
+                            icon={<XCircle className="h-3 w-3" />}
+                          >
+                            Suspended
+                          </StatusBadge>
+                        )}
+                      </td>
+
+                      <td
+                        colSpan={2}
+                        className="px-4 py-4"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        <StatusBadge variant="info">{member.commission_display_percentage}% Visible</StatusBadge>
-                      </Tooltip>
-                    ) : (
-                      <Tooltip position="right" content="This member can't see any commission info. Use the settings icon to make it visible.">
-                        <StatusBadge variant="neutral">Hidden</StatusBadge>
-                      </Tooltip>
-                    )}
-                  </td>
+                        <TableActions label={member.name}>
+                          <TableAction
+                            label={"Edit commission settings"}
+                            icon={<Settings className="h-4 w-4" />}
+                            onSelect={() => {
+                              setCommissionTarget(member);
+                              setIsCommissionOpen(true);
+                            }}
+                          />
 
-                  <td className="px-6 py-4">
-                    {member.is_active ? (
-                      <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
-                    ) : (
-                      <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Suspended</StatusBadge>
-                    )}
-                  </td>
+                          <TableAction
+                            label={
+                              member.is_active
+                                ? "Suspend member"
+                                : "Reactivate member"
+                            }
+                            icon={
+                              member.is_active ? (
+                                <Ban className="h-4 w-4" />
+                              ) : (
+                                <Power className="h-4 w-4" />
+                              )
+                            }
+                            onSelect={() => {
+                              setSuspendTarget(member);
+                              setIsSuspendOpen(true);
+                            }}
+                          />
+                        </TableActions>
+                      </td>
 
-                  <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
-                    <IconButton
-                      onClick={() => { setCommissionTarget(member); setIsCommissionOpen(true); }}
-                      title="Edit commission settings"
-                      icon={<Settings className="h-4 w-4" />}
-                      bgColor="bg-transparent"
-                      textColor="text-slate-400"
-                      borderColor="border-transparent"
-                      hoverTextColor="hover:text-blue-600"
-                      hoverBorderColor="hover:border-transparent"
-                      className="hover:bg-blue-50"
-                    />
-                  </td>
-
-                  <td className="px-4 py-4" onClick={(e) => e.stopPropagation()}>
-                    <IconButton
-                      onClick={() => { setSuspendTarget(member); setIsSuspendOpen(true); }}
-                      title={member.is_active ? "Suspend member" : "Reactivate member"}
-                      icon={member.is_active ? <Ban className="h-4 w-4" /> : <Power className="h-4 w-4" />}
-                      bgColor="bg-transparent"
-                      textColor="text-slate-400"
-                      borderColor="border-transparent"
-                      hoverTextColor={member.is_active ? "hover:text-red-600" : "hover:text-emerald-600"}
-                      hoverBorderColor="hover:border-transparent"
-                      className={member.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"}
-                    />
-                  </td>
-
-                  <td className="px-4 py-4">
-                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
-                  </td>
-                </AnimatedTableRow>
-              ))}
+                      <td className="px-4 py-4">
+                        <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </td>
+                    </AnimatedTableRow>
+                  ))}
               </AnimatePresence>
             </tbody>
           </table>
@@ -346,7 +459,10 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
 
       <SuspendReactivateMemberModal
         isOpen={isSuspendOpen}
-        onClose={() => { setIsSuspendOpen(false); setSuspendTarget(null); }}
+        onClose={() => {
+          setIsSuspendOpen(false);
+          setSuspendTarget(null);
+        }}
         onConfirm={handleToggleActive}
         isSubmitting={isSuspending || isReactivating}
         memberName={suspendTarget?.name ?? ""}
@@ -355,8 +471,14 @@ export default function AgencyMembersTable({ onChanged }: AgencyMembersTableProp
 
       <EditMemberCommissionModal
         isOpen={isCommissionOpen}
-        onClose={() => { setIsCommissionOpen(false); setCommissionTarget(null); }}
-        onSuccess={() => { refetch(); onChanged?.(); }}
+        onClose={() => {
+          setIsCommissionOpen(false);
+          setCommissionTarget(null);
+        }}
+        onSuccess={() => {
+          refetch();
+          onChanged?.();
+        }}
         member={commissionTarget}
       />
     </>

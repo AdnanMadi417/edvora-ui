@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import { useMemo, useState, type ReactNode } from "react";
 import { ClipboardList, Download, Eye } from "lucide-react";
@@ -247,24 +250,12 @@ export default function ApplicationsTable({
       key: "actions",
       header: "Actions",
       cell: (row) => (
-        <div className="flex flex-nowrap items-center gap-1">
-          <LinkBtn
-            href={hrefFor(row.id)}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="View application"
-            variant="tertiary"
-            size="sm"
-            icon={<Eye className="h-4 w-4" />}
-          />
+        <TableActions>
           {selectable && (
-            <IconButton
-              type="button"
-              variant="tertiary"
-              size="sm"
-              title="Export application as CSV"
+            <TableAction
+              label={"Export application as CSV"}
               icon={<Download className="h-4 w-4" />}
-              onClick={() =>
+              onSelect={() =>
                 download(
                   applicationsCsv([row], statusLabel),
                   `application-${row.id}.csv`
@@ -272,11 +263,11 @@ export default function ApplicationsTable({
               }
             />
           )}
-        </div>
+        </TableActions>
       ),
     });
     return cols;
-  }, [ownership, statusLabel, needsAction, hrefFor, selectable]);
+  }, [ownership, statusLabel, needsAction, selectable]);
 
   return (
     <>

@@ -5,7 +5,7 @@ import Input from "components/ub/forms/text/Input";
 import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { XCircle, Plane, CheckCircle, AlertCircle } from 'lucide-react';
-import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
+import DocumentUpload from "components/ub/forms/uploads/DocumentUpload";
 import { useArrivalDateUpload } from "features/applications/hooks";
 
 
@@ -104,7 +104,7 @@ export default function ArrivalDateConfirmation({
                 }} value={String(formData.arrival_date ?? "")} onChange={(v) => updateFormData("arrival_date", v)} error={formErrors.arrival_date || undefined} required />
             </div>
 
-            <CompactFileUpload
+            <DocumentUpload
               label="Travel Ticket"
               description="Upload your flight ticket or booking confirmation"
               id="ticket_file"
@@ -116,7 +116,7 @@ export default function ArrivalDateConfirmation({
               disabled={isSubmitting}
             />
 
-            <CompactFileUpload
+            <DocumentUpload
               label="E-Visa Document (if required)"
               description="Upload your e-visa if entry requires one — check with immigration before travelling"
               id="e_visa_file"

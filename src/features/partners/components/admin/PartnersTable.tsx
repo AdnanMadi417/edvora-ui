@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import DataTable, {
   type DataTableColumn,
@@ -446,14 +449,13 @@ export default function PartnersTable() {
       header: "Actions",
       cell: (partner) => (
         <>
-          <div
-            className="flex flex-wrap items-center gap-2"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <TableActions>
             {!partner.is_verified && !partner.is_active && (
               <>
-                <IconButton
-                  onClick={() => {
+                <TableAction
+                  label={"Review registration"}
+                  icon={<ShieldCheck className="h-4 w-4" />}
+                  onSelect={() => {
                     setReviewPartner({
                       id: partner.id,
                       name: partner.name || "",
@@ -462,55 +464,37 @@ export default function PartnersTable() {
                     });
                     setIsReviewOpen(true);
                   }}
-                  title="Review registration"
-                  icon={<ShieldCheck className="h-4 w-4" />}
-                  bgColor="bg-transparent"
-                  textColor="text-amber-400"
-                  borderColor="border-transparent"
-                  hoverTextColor="hover:text-amber-600"
-                  hoverBorderColor="hover:border-transparent"
-                  className="hover:bg-amber-50"
                 />
                 <div className="h-5 border-l border-slate-200" />
               </>
             )}
 
-            <LinkBtn
-              href={`/admin/advisors/${partner.id}/edit`}
-              title="Edit advisor"
-              variant="secondary"
+            <TableAction
+              label={"Edit advisor"}
               icon={<Pencil className="h-4 w-4" />}
+              href={`/admin/advisors/${partner.id}/edit`}
+              primary
             />
             {partner.is_active && !partner.last_login && (
               <>
                 <div className="h-5 border-l border-slate-200" />
-                <IconButton
-                  onClick={() => {
+                <TableAction
+                  label={"Resend approval email"}
+                  icon={<Mail className="h-4 w-4" />}
+                  onSelect={() => {
                     setResendTarget({
                       id: partner.id,
                       name: partner.name || "",
                     });
                     setIsResendOpen(true);
                   }}
-                  title="Resend approval email"
-                  icon={<Mail className="h-4 w-4" />}
-                  bgColor="bg-transparent"
-                  textColor="text-slate-400"
-                  borderColor="border-transparent"
-                  hoverTextColor="hover:text-blue-600"
-                  hoverBorderColor="hover:border-transparent"
-                  className="hover:bg-blue-50"
                 />
               </>
             )}
 
             <div className="h-5 border-l border-slate-200" />
-            <IconButton
-              onClick={() => {
-                setSuspendTarget(partner);
-                setIsSuspendOpen(true);
-              }}
-              title={partner.is_active ? "Suspend account" : "Activate account"}
+            <TableAction
+              label={partner.is_active ? "Suspend account" : "Activate account"}
               icon={
                 partner.is_active ? (
                   <Ban className="h-4 w-4" />
@@ -518,20 +502,12 @@ export default function PartnersTable() {
                   <Power className="h-4 w-4" />
                 )
               }
-              bgColor="bg-transparent"
-              textColor="text-slate-400"
-              borderColor="border-transparent"
-              hoverTextColor={
-                partner.is_active
-                  ? "hover:text-red-600"
-                  : "hover:text-emerald-600"
-              }
-              hoverBorderColor="hover:border-transparent"
-              className={
-                partner.is_active ? "hover:bg-red-50" : "hover:bg-emerald-50"
-              }
+              onSelect={() => {
+                setSuspendTarget(partner);
+                setIsSuspendOpen(true);
+              }}
             />
-          </div>
+          </TableActions>
         </>
       ),
     },

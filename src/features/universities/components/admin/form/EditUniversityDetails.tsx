@@ -40,7 +40,7 @@ import SelectField from "components/ub/forms/selection/SelectField";
 import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
 import ToggleInput from "components/ub/forms/choices/ToggleInput";
 import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown";
-import ImageUploadField from "components/ub/forms/uploads/ImageUploadField";
+import ImageUpload from "components/ub/forms/uploads/ImageUpload";
 import {
   getPresignedUploads,
   uploadFilesToSpaces,
@@ -548,13 +548,12 @@ const UniversityEdit = ({
       <div className="flex flex-wrap justify-between gap-4 rounded-ub-xl border border-ub-border bg-ub-surface p-4 shadow-ub-xs sm:p-6">
         <div className="flex min-w-0 flex-wrap items-center gap-4">
           <div className="shrink-0">
-            <ImageUploadField
-              label=""
-              field="logo"
-              imageOnly
-              simpleFile={logo.file}
-              onSimpleFileChange={handleLogoSelect}
-              onSimpleRemove={() =>
+            <ImageUpload
+              label="University logo"
+              id="logo"
+              file={logo.file}
+              onFileChange={handleLogoSelect}
+              onRemove={() =>
                 setLogo((prev) => ({
                   ...prev,
                   file: null,
@@ -562,8 +561,8 @@ const UniversityEdit = ({
                   fileUrl: "",
                 }))
               }
-              simpleUploading={logo.uploading}
-              simpleProgress={logo.progress}
+              uploading={logo.uploading}
+              progress={logo.progress}
               existingUrl={logo.existingUrl}
               onExistingRemove={() =>
                 setLogo((prev) => ({
@@ -573,7 +572,7 @@ const UniversityEdit = ({
                   modified: true,
                 }))
               }
-              errors={errors}
+              error={errors.logo}
             />
           </div>
           <div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Upload } from "lucide-react";
-import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
+import DocumentUpload from "components/ub/forms/uploads/DocumentUpload";
 import Alert from "components/ub/feedback/notifications/Alert";
 import FormModal from "components/ub/feedback/dialogs/FormModal";
 import { getApiErrorCode, parseApiError } from "utils/parseApiError";
@@ -75,7 +75,7 @@ export default function FormReuploadDialog({ isOpen, onClose, applicationId, cor
             {correctionReason}
           </Alert>
         )}
-        <CompactFileUpload
+        <DocumentUpload
           label={label}
           description={`Upload the corrected ${formName}`}
           id={fieldId}

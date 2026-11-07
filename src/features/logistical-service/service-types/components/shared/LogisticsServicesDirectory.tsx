@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 import { useState } from "react";
 import { Pencil, Plus, Trash2, Truck } from "lucide-react";
 import { useLogisticServices, useDeleteLogisticService } from "../../hooks";
@@ -59,24 +62,24 @@ export default function LogisticsServicesDirectory({
       header: "Actions",
       width: "144px",
       cell: (service) => (
-        <div className="flex items-center gap-2">
-          <IconButton
-            title={`Edit ${service.name}`}
-            variant="secondary"
+        <TableActions>
+          <TableAction
+            label={`Edit ${service.name}`}
             icon={<Pencil className="h-4 w-4" />}
-            onClick={() => {
+            onSelect={() => {
               setEditing(service);
             }}
+            primary
           />
           {allowDelete && (
-            <IconButton
-              title={`Delete ${service.name}`}
-              variant="tertiary"
+            <TableAction
+              label={`Delete ${service.name}`}
               icon={<Trash2 className="h-4 w-4" />}
-              onClick={() => setTarget(service)}
+              onSelect={() => setTarget(service)}
+              danger
             />
           )}
-        </div>
+        </TableActions>
       ),
     },
   ];

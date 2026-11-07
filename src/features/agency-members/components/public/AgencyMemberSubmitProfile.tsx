@@ -14,7 +14,7 @@ import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown
 import PhoneInputField from "components/ub/forms/text/PhoneInputField";
 import { isValidWebsiteUrl } from "utils/socialMedia";
 import PublicFileUploadField, { type PublicUploadResult } from "components/ub/forms/uploads/PublicFileUploadField";
-import ImageUploadField from "components/ub/forms/uploads/ImageUploadField";
+import ImageUpload from "components/ub/forms/uploads/ImageUpload";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
 import { parseApiError } from "utils/parseApiError";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
@@ -227,17 +227,16 @@ export default function AgencyMemberSubmitProfile() {
           </div>
 
           <SectionCard title="Basic Information">
-            <ImageUploadField
+            <ImageUpload
               label="Profile Photo"
-              field="profile_photo"
+              id="profile_photo"
               required
-              imageOnly
-              simpleFile={profilePhoto.file}
-              onSimpleFileChange={profilePhoto.handleSelect}
-              onSimpleRemove={profilePhoto.handleRemove}
-              simpleUploading={profilePhoto.uploading}
-              simpleProgress={profilePhoto.progress}
-              errors={{ profile_photo: profilePhoto.error || errors.profile_photo }}
+              file={profilePhoto.file}
+              onFileChange={profilePhoto.handleSelect}
+              onRemove={profilePhoto.handleRemove}
+              uploading={profilePhoto.uploading}
+              progress={profilePhoto.progress}
+              error={profilePhoto.error || errors.profile_photo}
             />
             <PhoneInputField dialCodeField="phone_code" numberField="phone_number"
               formData={formData} errors={errors} updateFormData={updateForm}

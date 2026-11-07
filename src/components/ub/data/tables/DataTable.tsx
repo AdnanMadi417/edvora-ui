@@ -3,6 +3,7 @@
 import React, { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { TableRowActionLabel } from "./TableActions";
 import clsx from "clsx";
 import { ArrowDown, ArrowUp, ArrowUpDown, Check, Minus, X } from "lucide-react";
 import { pageSelectionState, selectRange, toggleId, togglePage } from "components/ub/data/tables/tableSelection";
@@ -491,7 +492,7 @@ export default function DataTable<T>({
                       {columns.map((col, ci) => {
                         const end = col.align === "end";
                         const mobileLabel = col.mobileLabel ?? (typeof col.header === "string" ? col.header : col.key);
-                        const content = col.cell(row, index);
+                        const content = <TableRowActionLabel.Provider value={label}>{col.cell(row, index)}</TableRowActionLabel.Provider>;
                         return (
                           <td key={col.key} className={clsx(t.cell, end ? clsx("ub-tabular", !cards && "md:text-end") : !cards && "md:text-start", pin(ci === 0))}>
                             <span aria-hidden="true" className={t.label}>

@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 import { useState } from "react";
 import {
   Eye,
@@ -133,28 +136,22 @@ export default function ProviderDirectory({
       key: "actions",
       header: "Actions",
       cell: (provider) => (
-        <div className="flex items-center gap-2">
-          <LinkBtn
-            href={`${basePath}/${provider.id}`}
-            title={`View ${provider.name}`}
-            variant="tertiary"
-            icon={<Eye className="h-4 w-4" />}
-          />
-          <LinkBtn
-            href={`${basePath}/${provider.id}/edit`}
-            title={`Edit ${provider.name}`}
-            variant="secondary"
+        <TableActions>
+          <TableAction
+            label={`Edit ${provider.name}`}
             icon={<Pencil className="h-4 w-4" />}
+            href={`${basePath}/${provider.id}/edit`}
+            primary
           />
           {allowDelete && (
-            <IconButton
-              title={`Delete ${provider.name}`}
-              variant="tertiary"
+            <TableAction
+              label={`Delete ${provider.name}`}
               icon={<Trash2 className="h-4 w-4" />}
-              onClick={() => setTarget(provider)}
+              onSelect={() => setTarget(provider)}
+              danger
             />
           )}
-        </div>
+        </TableActions>
       ),
     },
   ];

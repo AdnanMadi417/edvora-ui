@@ -5,7 +5,7 @@ import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { FileText } from "lucide-react";
 import { useEmgsEvalUpload } from "features/applications/hooks";
-import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
+import DocumentUpload from "components/ub/forms/uploads/DocumentUpload";
 import { parseApiError } from "utils/parseApiError";
 
 interface EmgsEvalUploadProps {
@@ -64,7 +64,7 @@ export default function EmgsEvalUpload({
       <div className="grid gap-4">
 
           <div className="space-y-6">
-            <CompactFileUpload
+            <DocumentUpload
               label="EMGS Eval Document"
               description="Upload the EMGS eval document downloaded from the EMGS portal"
               id="emgs_eval"

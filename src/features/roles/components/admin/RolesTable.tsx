@@ -1,11 +1,12 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  ShieldCheck, KeyRound, BadgeCheck, Trash2, Plus,
-} from "lucide-react";
+import { ShieldCheck, KeyRound, BadgeCheck, Trash2, Plus } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 
 import { useRoles, useDeleteRole } from "../../hooks";
@@ -61,7 +62,9 @@ export default function RolesTable() {
     const term = searchTerm.trim().toLowerCase();
     if (!term) return roles;
     return roles.filter(
-      (r) => r.name.toLowerCase().includes(term) || r.code.toLowerCase().includes(term)
+      (r) =>
+        r.name.toLowerCase().includes(term) ||
+        r.code.toLowerCase().includes(term)
     );
   }, [roles, searchTerm]);
 
@@ -89,7 +92,9 @@ export default function RolesTable() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
         <div>
-          <p className="mt-0.5 text-sm text-slate-500">Manage roles and the permissions granted to them</p>
+          <p className="mt-0.5 text-sm text-slate-500">
+            Manage roles and the permissions granted to them
+          </p>
         </div>
         <Button
           onClick={() => setIsCreateOpen(true)}
@@ -107,7 +112,9 @@ export default function RolesTable() {
       <div className="p-6 border-b border-slate-200">
         <SearchInput
           value={searchTerm}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setSearchTerm(e.target.value)
+          }
           placeholder="Search by name or code..."
           className="sm:w-64"
         />
@@ -134,10 +141,15 @@ export default function RolesTable() {
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[
                   { icon: ShieldCheck, label: "Name", minW: "min-w-[200px]" },
-                  { icon: KeyRound,    label: "Code",  minW: "min-w-[160px]" },
-                  { icon: BadgeCheck,  label: "Type" },
+                  { icon: KeyRound, label: "Code", minW: "min-w-[160px]" },
+                  { icon: BadgeCheck, label: "Type" },
                 ].map(({ icon: Icon, label, minW }) => (
-                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
+                  <th
+                    key={label}
+                    className={`${
+                      minW ?? ""
+                    } px-6 py-4 text-start text-sm font-semibold text-slate-900`}
+                  >
                     <div className="flex items-center gap-2">
                       <Icon className="h-4 w-4 text-slate-400" />
                       {label}
@@ -148,8 +160,14 @@ export default function RolesTable() {
               </tr>
             </thead>
 
-            <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
-              {isInitialLoad && <TableSkeletonRows columns={4} rows={ITEMS_PER_PAGE} />}
+            <tbody
+              className={`divide-y divide-slate-100 bg-white ${
+                isRefetching ? "opacity-60 transition-opacity" : ""
+              }`}
+            >
+              {isInitialLoad && (
+                <TableSkeletonRows columns={4} rows={ITEMS_PER_PAGE} />
+              )}
 
               {!isInitialLoad && error && (
                 <TableErrorRow colSpan={4} message={error} onRetry={refetch} />
@@ -159,49 +177,72 @@ export default function RolesTable() {
                 <TableEmptyRow
                   colSpan={4}
                   title={searchTerm ? "No roles found" : "No roles yet"}
-                  subtitle={searchTerm ? "Try adjusting your search." : "Create your first custom role to get started."}
+                  subtitle={
+                    searchTerm
+                      ? "Try adjusting your search."
+                      : "Create your first custom role to get started."
+                  }
                   icon={<ShieldCheck className="h-8 w-8 text-slate-400" />}
                 />
               )}
 
               <AnimatePresence>
-              {!isInitialLoad && !error && pagedRoles.map((role) => (
-                <AnimatedTableRow key={role.id} className="cursor-pointer transition-colors hover:bg-slate-50/50" onClick={(event) => {
-                  if (!(event.target as HTMLElement).closest("a, button, input, select, textarea") && !window.getSelection()?.toString()) router.push(`/admin/roles/${role.id}`);
-                }}>
-                  <td className="min-w-[200px] px-6 py-4">
-                    <Link href={`/admin/roles/${role.id}`} className="text-sm font-medium text-slate-900 hover:underline">{role.name}</Link>
-                  </td>
+                {!isInitialLoad &&
+                  !error &&
+                  pagedRoles.map((role) => (
+                    <AnimatedTableRow
+                      key={role.id}
+                      className="cursor-pointer transition-colors hover:bg-slate-50/50"
+                      onClick={(event) => {
+                        if (
+                          !(event.target as HTMLElement).closest(
+                            "a, button, input, select, textarea"
+                          ) &&
+                          !window.getSelection()?.toString()
+                        )
+                          router.push(`/admin/roles/${role.id}`);
+                      }}
+                    >
+                      <td className="min-w-[200px] px-6 py-4">
+                        <Link
+                          href={`/admin/roles/${role.id}`}
+                          className="text-sm font-medium text-slate-900 hover:underline"
+                        >
+                          {role.name}
+                        </Link>
+                      </td>
 
-                  <td className="min-w-[160px] px-6 py-4">
-                    <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-700">{role.code}</code>
-                  </td>
+                      <td className="min-w-[160px] px-6 py-4">
+                        <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-700">
+                          {role.code}
+                        </code>
+                      </td>
 
-                  <td className="px-6 py-4">
-                    {role.is_system ? (
-                      <StatusBadge variant="neutral">System</StatusBadge>
-                    ) : (
-                      <StatusBadge variant="info">Custom</StatusBadge>
-                    )}
-                  </td>
+                      <td className="px-6 py-4">
+                        {role.is_system ? (
+                          <StatusBadge variant="neutral">System</StatusBadge>
+                        ) : (
+                          <StatusBadge variant="info">Custom</StatusBadge>
+                        )}
+                      </td>
 
-                  <td className="px-4 py-4">
-                    {!role.is_system && (
-                      <IconButton
-                        onClick={() => { setSelectedRole(role); setIsDeleteOpen(true); }}
-                        title="Delete role"
-                        icon={<Trash2 className="h-4 w-4" />}
-                        bgColor="bg-transparent"
-                        textColor="text-slate-400"
-                        borderColor="border-transparent"
-                        hoverTextColor="hover:text-red-600"
-                        hoverBorderColor="hover:border-transparent"
-                        className="hover:bg-red-50"
-                      />
-                    )}
-                  </td>
-                </AnimatedTableRow>
-              ))}
+                      <td className="px-4 py-4">
+                        <TableActions label={role.name}>
+                          {!role.is_system && (
+                            <TableAction
+                              label={"Delete role"}
+                              icon={<Trash2 className="h-4 w-4" />}
+                              onSelect={() => {
+                                setSelectedRole(role);
+                                setIsDeleteOpen(true);
+                              }}
+                              danger
+                            />
+                          )}
+                        </TableActions>
+                      </td>
+                    </AnimatedTableRow>
+                  ))}
               </AnimatePresence>
             </tbody>
           </table>
@@ -216,7 +257,10 @@ export default function RolesTable() {
 
       <DeleteRoleConfirmation
         isOpen={isDeleteOpen}
-        onClose={() => { setIsDeleteOpen(false); setSelectedRole(null); }}
+        onClose={() => {
+          setIsDeleteOpen(false);
+          setSelectedRole(null);
+        }}
         onConfirm={handleDelete}
         isDeleting={isDeleting}
         roleName={selectedRole?.name}

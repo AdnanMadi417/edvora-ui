@@ -16,7 +16,7 @@ import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown
 import PhoneInputField from "components/ub/forms/text/PhoneInputField";
 import { isValidWebsiteUrl } from "utils/socialMedia";
 import PublicFileUploadField, { type PublicUploadResult } from "components/ub/forms/uploads/PublicFileUploadField";
-import ImageUploadField from "components/ub/forms/uploads/ImageUploadField";
+import ImageUpload from "components/ub/forms/uploads/ImageUpload";
 import { uploadPublicPartnerFile } from "services/publicUploadService";
 import { parseApiError } from "utils/parseApiError";
 import { useApiFormErrors } from "hooks/useApiFormErrors";
@@ -416,17 +416,16 @@ export default function PartnerRegisterPage() {
               {partnerType === "individual" ? (
                 <>
                   <SectionCard title="Basic Information">
-                    <ImageUploadField
+                    <ImageUpload
                       label="Profile Photo"
-                      field="ind_profile_photo"
+                      id="ind_profile_photo"
                       required
-                      imageOnly
-                      simpleFile={indProfilePhoto.file}
-                      onSimpleFileChange={indProfilePhoto.handleSelect}
-                      onSimpleRemove={indProfilePhoto.handleRemove}
-                      simpleUploading={indProfilePhoto.uploading}
-                      simpleProgress={indProfilePhoto.progress}
-                      errors={{ ind_profile_photo: indProfilePhoto.error || errors.ind_profile_photo }}
+                      file={indProfilePhoto.file}
+                      onFileChange={indProfilePhoto.handleSelect}
+                      onRemove={indProfilePhoto.handleRemove}
+                      uploading={indProfilePhoto.uploading}
+                      progress={indProfilePhoto.progress}
+                      error={indProfilePhoto.error || errors.ind_profile_photo}
                     />
                     <InputField label="Name (as per Passport)" field="name" placeholder="Ahmed Ali"
                       formData={indForm} errors={errors} updateFormData={updateInd}
@@ -509,17 +508,16 @@ export default function PartnerRegisterPage() {
               ) : (
                 <>
                   <SectionCard title="Agency Information">
-                    <ImageUploadField
+                    <ImageUpload
                       label="Agency Logo"
-                      field="comp_logo"
+                      id="comp_logo"
                       required
-                      imageOnly
-                      simpleFile={compLogo.file}
-                      onSimpleFileChange={compLogo.handleSelect}
-                      onSimpleRemove={compLogo.handleRemove}
-                      simpleUploading={compLogo.uploading}
-                      simpleProgress={compLogo.progress}
-                      errors={{ comp_logo: compLogo.error || errors.comp_logo }}
+                      file={compLogo.file}
+                      onFileChange={compLogo.handleSelect}
+                      onRemove={compLogo.handleRemove}
+                      uploading={compLogo.uploading}
+                      progress={compLogo.progress}
+                      error={compLogo.error || errors.comp_logo}
                     />
                     <InputField label="Agency Name" field="company_name" placeholder="Enter agency name."
                       formData={compForm} errors={errors} updateFormData={updateComp}

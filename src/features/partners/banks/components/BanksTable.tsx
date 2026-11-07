@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 import { useState } from "react";
 import {
   Eye,
@@ -128,23 +131,15 @@ export default function BanksTable({
       key: "actions",
       header: "Actions",
       cell: (bank) => (
-        <div className="flex items-center gap-2">
-          <LinkBtn
-            href={`${basePath}/${bank.id}`}
-            title={`View ${bank.name}`}
-            variant="tertiary"
-            icon={<Eye className="h-4 w-4" />}
-          />
-          <LinkBtn
-            href={`${basePath}/${bank.id}/edit`}
-            title={`Edit ${bank.name}`}
-            variant="secondary"
+        <TableActions>
+          <TableAction
+            label={`Edit ${bank.name}`}
             icon={<Pencil className="h-4 w-4" />}
+            href={`${basePath}/${bank.id}/edit`}
+            primary
           />
-          <IconButton
-            title={`${bank.is_active ? "Deactivate" : "Activate"} ${bank.name}`}
-            disabled={Boolean(toggling)}
-            variant="tertiary"
+          <TableAction
+            label={`${bank.is_active ? "Deactivate" : "Activate"} ${bank.name}`}
             icon={
               bank.is_active ? (
                 <EyeOff className="h-4 w-4" />
@@ -152,9 +147,10 @@ export default function BanksTable({
                 <Eye className="h-4 w-4" />
               )
             }
-            onClick={() => toggle(bank)}
+            onSelect={() => toggle(bank)}
+            disabled={Boolean(toggling)}
           />
-        </div>
+        </TableActions>
       ),
     },
   ];

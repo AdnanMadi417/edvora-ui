@@ -1,13 +1,10 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import { useState } from "react";
-import {
-  Eye,
-  Pencil,
-  Plus,
-  SlidersHorizontal,
-  Trash2,
-} from "lucide-react";
+import { Eye, Pencil, Plus, SlidersHorizontal, Trash2 } from "lucide-react";
 import {
   useUniversityTypes,
   useDeleteUniversityType,
@@ -125,32 +122,22 @@ export default function UniversityTypeDirectory({
       key: "actions",
       header: "Actions",
       cell: (type) => (
-        <div className="flex flex-nowrap items-center gap-1">
-          <LinkBtn
-            href={`${basePath}/${type.id}`}
-            title="View university type"
-            variant="tertiary"
-            size="sm"
-            icon={<Eye className="h-4 w-4" />}
-          />
-          <LinkBtn
-            href={`${basePath}/${type.id}/edit`}
-            title="Edit university type"
-            variant="secondary"
-            size="sm"
+        <TableActions>
+          <TableAction
+            label={"Edit university type"}
             icon={<Pencil className="h-4 w-4" />}
+            href={`${basePath}/${type.id}/edit`}
+            primary
           />
           {allowDelete && (
-            <IconButton
-              type="button"
-              size="sm"
-              variant="tertiary"
-              title="Delete university type"
+            <TableAction
+              label={"Delete university type"}
               icon={<Trash2 className="h-4 w-4" />}
-              onClick={() => setTarget(type)}
+              onSelect={() => setTarget(type)}
+              danger
             />
           )}
-        </div>
+        </TableActions>
       ),
     },
   ];
@@ -199,30 +186,37 @@ export default function UniversityTypeDirectory({
         />
       </header>
       <div className="border-b border-ub-border p-4 sm:p-6">
-      <DataTableToolbar
-        className="!mb-0"
-        search={{
-          value: search,
-          onChange: (value) => {
-            setSearch(value);
-            setPage(1);
-          },
-          placeholder: "Search university types...",
-        }}
-        filters={
-          <Button
-            variant="secondary"
-            text={filter === "all" ? "Filters" : "Filters (1)"}
-            icon={<SlidersHorizontal className="h-4 w-4" />}
-            onClick={() => {
-              setDraft(filter);
-              setOpen(true);
-            }}
-            className="min-h-[44px]"
-          />
-        }
-        actions={<p role="status" className="whitespace-nowrap text-ub-label-sm text-ub-text-secondary">{matching.length} types</p>}
-      />
+        <DataTableToolbar
+          className="!mb-0"
+          search={{
+            value: search,
+            onChange: (value) => {
+              setSearch(value);
+              setPage(1);
+            },
+            placeholder: "Search university types...",
+          }}
+          filters={
+            <Button
+              variant="secondary"
+              text={filter === "all" ? "Filters" : "Filters (1)"}
+              icon={<SlidersHorizontal className="h-4 w-4" />}
+              onClick={() => {
+                setDraft(filter);
+                setOpen(true);
+              }}
+              className="min-h-[44px]"
+            />
+          }
+          actions={
+            <p
+              role="status"
+              className="whitespace-nowrap text-ub-label-sm text-ub-text-secondary"
+            >
+              {matching.length} types
+            </p>
+          }
+        />
       </div>
       <div className="min-w-0 p-3 sm:p-6">
         <p className="mb-2 text-ub-label-sm text-ub-text-tertiary md:hidden">

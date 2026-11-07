@@ -5,7 +5,7 @@ import FormModal from "components/ub/feedback/dialogs/FormModal";
 import React, { useState, useEffect } from "react";
 import { ShieldCheck } from "lucide-react";
 import { useEVisaUpload } from "features/applications/hooks";
-import CompactFileUpload from "components/ub/forms/uploads/CompactFileUpload";
+import DocumentUpload from "components/ub/forms/uploads/DocumentUpload";
 import { parseApiError } from "utils/parseApiError";
 
 interface EVisaUploadProps {
@@ -63,7 +63,7 @@ export default function EVisaUpload({
       <div className="grid gap-4">
 
           <div className="space-y-6">
-            <CompactFileUpload
+            <DocumentUpload
               label="E-Visa Document"
               description="Upload your approved e-visa document issued by the relevant authority"
               id="e_visa_document"

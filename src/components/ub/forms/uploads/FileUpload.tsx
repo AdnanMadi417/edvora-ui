@@ -83,6 +83,11 @@ const TYPE_LABELS: Record<string, string> = {
   "image/jpeg": "JPG",
   ".png": "PNG",
   "image/png": "PNG",
+  ".webp": "WEBP",
+  "image/webp": "WEBP",
+  "application/msword": "DOC",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "DOCX",
   ".doc": "DOC",
   ".docx": "DOCX",
   ".heic": "HEIC",
@@ -372,7 +377,7 @@ export function FileUpload({
   };
 
   return (
-    <div className={`min-w-0 ${className}`}>
+    <div className={`min-w-0 ${className}`} data-field={idProp}>
       <FieldLabel as="span" id={`${id}-label`} required={required}>
         {label}
       </FieldLabel>

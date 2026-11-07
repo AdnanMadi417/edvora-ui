@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Eye, Receipt, SlidersHorizontal } from "lucide-react";
@@ -170,20 +173,13 @@ export default function StatementPage() {
       key: "actions",
       header: "Actions",
       cell: (item) => (
-        <div className="flex items-center gap-2">
-          <IconButton
-            title={`View commission ${item.reference}`}
-            variant="secondary"
+        <TableActions>
+          <TableAction
+            label={`View commission ${item.reference}`}
             icon={<Eye className="h-4 w-4" />}
-            onClick={() => setSelected(item)}
+            onSelect={() => setSelected(item)}
           />
-          <LinkBtn
-            href={`/partner/applications/${item.application_id}`}
-            title={`Open application ${item.reference}`}
-            variant="tertiary"
-            icon={<ArrowUpRight className="h-4 w-4" />}
-          />
-        </div>
+        </TableActions>
       ),
     },
   ];

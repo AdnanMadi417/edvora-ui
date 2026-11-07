@@ -10,11 +10,11 @@ import { FieldError } from "components/ub/forms/layout/FieldChrome";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import clsx from "clsx";
-import { ArrowLeft, ArrowRight, FileText, Send, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileText, Send } from "lucide-react";
 import Button from "components/ub/core/buttons/Button";
 import Collapse from "components/ub/core/motion/Collapse";
 import { EASE, MICRO_DURATION } from "components/ub/core/motion/FadeIn";
-import IconButton from "components/ub/core/buttons/IconButton";
+import FileUpload from "components/ub/forms/uploads/FileUpload";
 import TextButton from "components/ub/core/buttons/TextButton";
 import AppDate from "components/ub/data/formatting/AppDate";
 import DescriptionList from "components/ub/data/display/DescriptionList";
@@ -26,7 +26,6 @@ import Input from "components/ub/forms/text/Input";
 import IntakeDatePicker from "components/ub/forms/dates/IntakeDatePicker";
 import { RadioGroup } from "components/ub/forms/choices/Radio";
 import Toggle from "components/ub/forms/choices/Toggle";
-import { useFileDrop } from "components/ub/forms/uploads/useFileDrop";
 import StepIndicator from "components/ub/navigation/controls/StepIndicator";
 import { formContainer } from "components/ub/recipes";
 import { NATIONALITIES } from "constants/lists";
@@ -148,48 +147,11 @@ function StudentStep({ mode, formData, errors, update, validateField, universiti
 }
 
 function DocumentSlot({ type, formData, errors, upload, removeDocument }: { type: DocumentType } & Pick<ApplicationFormViewProps, "formData" | "errors" | "upload" | "removeDocument">) {
-  const input = useRef<HTMLInputElement>(null);
-  const [typeError, setTypeError] = useState("");
   const doc = uploadedFor(formData.documents, type.id);
-  const uploaded = !!(doc?.file_key && !doc.uploading);
-  const err = typeError || (errors[`documents.${type.id}`] === "required" ? "This document is required." : errors[`documents.${type.id}`]);
-  const take = (file?: File) => {
-    if (!file) return;
-    if (!ALLOWED_FILE_TYPES.mimeTypes.includes(file.type)) {
-      setTypeError(`This file type isn't accepted. Use ${ALLOWED_FILE_TYPES.label}.`);
-      return;
-    }
-    setTypeError("");
-    upload(file, type.id);
-  };
-  const { isDragging, dropHandlers } = useFileDrop({ onFiles: (files) => take(files[0]), disabled: !!doc?.uploading });
-  return (
-    <div id={fieldId(`documents.${type.id}`)} tabIndex={-1} {...dropHandlers} className={clsx("rounded-ub-md px-3 outline-none transition-colors duration-ub-fast", isDragging && "bg-ub-selected ring-2 ring-ub-border-focus")}>
-      <input ref={input} type="file" className="hidden" accept={ALLOWED_FILE_TYPES.extensions.join(",")} onChange={(e) => {
-        take(e.target.files?.[0]);
-        e.target.value = "";
-      }} aria-hidden="true" tabIndex={-1} />
-      <FileRow
-        asListItem={false}
-        name={type.type}
-        state={doc?.uploading ? "uploading" : uploaded ? "uploaded" : err ? "needs-replacing" : "missing"}
-        stateLabel={doc?.uploading ? undefined : uploaded ? "Uploaded" : err ? "Required" : isRequiredDocument(type) ? "Required" : "Optional"}
-        progress={doc?.progress}
-        reason={err}
-        meta={uploaded ? `${doc?.name}${doc?.size ? ` · ${doc.size}` : ""}` : type.description || "PDF, JPG or PNG. Drop a file here or choose one."}
-        actions={
-          uploaded ? (
-            <>
-              <Button size="sm" variant="secondary" text="Replace" icon={<Upload className="h-4 w-4" aria-hidden="true" />} onClick={() => input.current?.click()} />
-              <IconButton size="sm" variant="tertiary" title={`Remove ${type.type}`} icon={<Trash2 className="h-4 w-4" aria-hidden="true" />} onClick={() => removeDocument(type.id)} />
-            </>
-          ) : (
-            !doc?.uploading && <Button size="sm" variant="secondary" text="Choose file" icon={<Upload className="h-4 w-4" aria-hidden="true" />} onClick={() => input.current?.click()} />
-          )
-        }
-      />
-    </div>
-  );
+  const message = errors[`documents.${type.id}`];
+  return <div id={fieldId(`documents.${type.id}`)} tabIndex={-1} className="min-w-0 outline-none">
+    <FileUpload label={type.type} description={type.description || undefined} required={isRequiredDocument(type)} accept={[...ALLOWED_FILE_TYPES.extensions, ...ALLOWED_FILE_TYPES.mimeTypes]} files={doc ? [{ id: String(type.id), name: doc.name || type.type, status: doc.uploading ? "uploading" : doc.file_key ? "uploaded" : "needs-replacing", progress: doc.progress, previewUrl: doc.file_url || undefined }] : []} onSelect={(files) => { if (files[0]) upload(files[0], type.id); }} onReplace={(_id, file) => upload(file, type.id)} onRemove={() => removeDocument(type.id)} disabled={!!doc?.uploading} error={message === "required" ? "This document is required." : message} />
+  </div>;
 }
 
 function DocumentsStep({ formData, errors, upload, removeDocument, documentTypes, documentTypesLoading }: Pick<ApplicationFormViewProps, "formData" | "errors" | "upload" | "removeDocument" | "documentTypes" | "documentTypesLoading">) {

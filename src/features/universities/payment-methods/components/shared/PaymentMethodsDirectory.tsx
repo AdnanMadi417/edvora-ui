@@ -1,13 +1,10 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import { useState } from "react";
-import {
-  CreditCard,
-  Eye,
-  Pencil,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { CreditCard, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { useAllPaymentMethods, useDeletePaymentMethod } from "../../hooks";
 import type { PaymentMethod } from "../../types";
 import DataTable, {
@@ -49,11 +46,9 @@ export default function PaymentMethodsDirectory({
   const [sort, setSort] = useState<DataTableSort | null>(null);
   const matching = paymentMethods.filter((method) => {
     const description = descriptionText(method.description);
-    return (
-      `${method.name} ${description}`
-        .toLowerCase()
-        .includes(search.trim().toLowerCase())
-    );
+    return `${method.name} ${description}`
+      .toLowerCase()
+      .includes(search.trim().toLowerCase());
   });
   const currentPage = Math.min(
     page,
@@ -91,31 +86,22 @@ export default function PaymentMethodsDirectory({
       key: "actions",
       header: "Actions",
       cell: (method) => (
-        <div className="flex items-center gap-2">
-          <LinkBtn
-            href={`${basePath}/${method.id}`}
-            aria-label={`View ${method.name}`}
-            title={`View ${method.name}`}
-            variant="tertiary"
-            icon={<Eye className="h-4 w-4" />}
-          />
-          <LinkBtn
-            href={`${basePath}/${method.id}/edit`}
-            aria-label={`Edit ${method.name}`}
-            title={`Edit ${method.name}`}
-            variant="secondary"
+        <TableActions>
+          <TableAction
+            label={`Edit ${method.name}`}
             icon={<Pencil className="h-4 w-4" />}
+            href={`${basePath}/${method.id}/edit`}
+            primary
           />
           {allowDelete && (
-            <IconButton
-              aria-label={`Delete ${method.name}`}
-              title="Delete payment method"
-              variant="tertiary"
+            <TableAction
+              label={`Delete ${method.name}`}
               icon={<Trash2 className="h-4 w-4" />}
-              onClick={() => setTarget(method)}
+              onSelect={() => setTarget(method)}
+              danger
             />
           )}
-        </div>
+        </TableActions>
       ),
     },
   ];

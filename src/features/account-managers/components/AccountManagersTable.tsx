@@ -1,4 +1,7 @@
 "use client";
+import TableActions, {
+  TableAction,
+} from "components/ub/data/tables/TableActions";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -236,33 +239,30 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
       key: "actions",
       header: "Actions",
       cell: (m) => (
-        <div className="flex items-center gap-2">
-          <IconButton
-            title={`View ${m.name}`}
-            icon={<Eye className="h-4 w-4" />}
-            onClick={() => router.push(`${basePath}/profile/${m.id}`)}
-          />
+        <TableActions>
           {!readOnly && (
             <>
-              <IconButton
-                title={`Edit ${m.name}`}
+              <TableAction
+                label={`Edit ${m.name}`}
                 icon={<Pencil className="h-4 w-4" />}
-                onClick={() => router.push(`${basePath}/profile/${m.id}/edit`)}
+                onSelect={() => router.push(`${basePath}/profile/${m.id}/edit`)}
+                primary
               />
-              <IconButton
-                title="Transfer or share advisors"
+              <TableAction
+                label={"Transfer or share advisors"}
                 icon={<ArrowRightLeft className="h-4 w-4" />}
+                onSelect={() => openTransfer(m)}
                 disabled={(Number(m.assigned_partners_count) || 0) === 0}
-                onClick={() => openTransfer(m)}
               />
-              <IconButton
-                title={`Delete ${m.name}`}
+              <TableAction
+                label={`Delete ${m.name}`}
                 icon={<Trash2 className="h-4 w-4" />}
-                onClick={() => openDelete(m)}
+                onSelect={() => openDelete(m)}
+                danger
               />
             </>
           )}
-        </div>
+        </TableActions>
       ),
     },
   ];
@@ -356,7 +356,7 @@ const AccountManagersTable = ({ readOnly = false }: { readOnly?: boolean }) => {
       <div className="min-w-0 p-3 sm:p-6">
         <DataTable
           caption="Account managers"
-          columns={columns}
+          columns={readOnly ? columns.filter((column) => column.key !== "actions") : columns}
           rows={accountManagers}
           getRowId={(m) => m.id}
           getRowLabel={(m) => m.name}
