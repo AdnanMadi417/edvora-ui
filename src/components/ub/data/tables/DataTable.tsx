@@ -282,6 +282,7 @@ export default function DataTable<T>({
   const [sort, setSort] = useControllable<DataTableSort | null>(sortProp, defaultSort, onSortChange);
   const [announcement, setAnnouncement] = useState("");
   const anchor = useRef<string | null>(null);
+  const pointerGesture = useRef<{ x: number; y: number; moved: boolean } | null>(null);
 
   const columns = useMemo(() => (hiddenColumns?.length ? allColumns.filter((c) => !hiddenColumns.includes(c.key)) : allColumns), [allColumns, hiddenColumns]);
   const sortedRows = useMemo(() => (manualSort ? rows : sortRows(rows, allColumns, sort)), [rows, allColumns, sort, manualSort]);
@@ -412,7 +413,14 @@ export default function DataTable<T>({
       )}
 
       <TableWrapper footer={footer} scrollClassName={scrollClassName} scrollLabel={mobileScroll ? `${caption}: scroll to see all columns and rows` : undefined}>
-        <table className={t.table} aria-busy={loading || undefined}>
+        <table className={t.table} aria-busy={loading || undefined}
+          onPointerDownCapture={(event) => { pointerGesture.current = { x: event.clientX, y: event.clientY, moved: false }; }}
+          onPointerMoveCapture={(event) => {
+            const gesture = pointerGesture.current;
+            if (gesture && Math.hypot(event.clientX - gesture.x, event.clientY - gesture.y) > 8) gesture.moved = true;
+          }}
+          onPointerCancelCapture={() => { if (pointerGesture.current) pointerGesture.current.moved = true; }}
+        >
           <caption className="sr-only">{caption}</caption>
           <thead className={`${tableHead} ${t.thead}`}>
             {/* On mobile (and in cards) only the select-all cell of the header row is shown. */}
@@ -471,6 +479,7 @@ export default function DataTable<T>({
                     <AnimatedTableRow
                       key={id}
                       onClick={href ? (event) => {
+                        if (event.detail !== 0 && pointerGesture.current?.moved) { event.preventDefault(); return; }
                         const target = event.target as HTMLElement;
                         if (event.defaultPrevented || target.closest('a, button, input, select, textarea, label, [role="button"], [role="checkbox"], [role="switch"], [contenteditable="true"], [data-row-action]') || window.getSelection()?.toString()) return;
                         const link = event.currentTarget.querySelector<HTMLAnchorElement>('a[data-row-link]');
@@ -499,14 +508,14 @@ export default function DataTable<T>({
                               {mobileLabel}
                             </span>
                             <span className={clsx(mobileScroll ? "block min-w-0 text-start" : "min-w-0 text-end", !cards && "md:block", !cards && (end ? "md:text-end" : "md:text-start"))}>
-                              {/* The first column's link covers the whole row; other interactive cells sit above it (relative z-10). */}
+                              {/* Keep links in normal flow so touch scrolling has no stretched overlay. */}
                               {href && ci === 0 ? (
                                 <Link
                                   data-row-link
                                   href={href}
                                   target={rowLinkTarget === "_blank" ? "_blank" : undefined}
                                   rel={rowLinkTarget === "_blank" ? "noopener noreferrer" : undefined}
-                                  className={`rounded-ub-xs after:absolute after:inset-0 ${focusRing}`}
+                                  className={`rounded-ub-xs ${focusRing}`}
                                 >
                                   {content}
                                   {rowLinkTarget === "_blank" && <span className="sr-only"> (opens in a new tab)</span>}

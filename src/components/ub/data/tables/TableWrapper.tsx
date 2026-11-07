@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { tableContainer, tableScroll } from "components/ub/recipes";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { focusRing } from "components/ub/recipes";
 
 interface TableWrapperProps {
   children: React.ReactNode;
@@ -20,6 +22,12 @@ export default function TableWrapper({ children, footer, scrollClassName, scroll
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollStart, setCanScrollStart] = useState(false);
   const [canScrollEnd, setCanScrollEnd] = useState(false);
+  const move = (forward: boolean) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const rtl = getComputedStyle(el).direction === "rtl";
+    el.scrollBy({ left: (forward ? 1 : -1) * (rtl ? -1 : 1) * Math.max(160, el.clientWidth * 0.75), behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  };
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -46,7 +54,7 @@ export default function TableWrapper({ children, footer, scrollClassName, scroll
   return (
     <div className={`min-w-0 max-w-full ${tableContainer}`}>
       <div className="relative">
-        <div ref={scrollRef} className={`${tableScroll} ${scrollClassName ?? "max-h-[65dvh] overflow-y-auto overscroll-contain"}`} role={scrollLabel ? "region" : undefined} aria-label={scrollLabel} tabIndex={scrollLabel ? 0 : undefined}>
+        <div ref={scrollRef} style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y pinch-zoom", overscrollBehaviorY: "auto" }} className={`${tableScroll} ${scrollClassName ?? "max-h-[65dvh] overflow-y-auto overscroll-contain"}`} role={scrollLabel ? "region" : undefined} aria-label={scrollLabel} tabIndex={scrollLabel ? 0 : undefined}>
           {children}
         </div>
         {canScrollStart && (
@@ -62,6 +70,15 @@ export default function TableWrapper({ children, footer, scrollClassName, scroll
           />
         )}
       </div>
+      {(canScrollStart || canScrollEnd) && (
+        <div className="flex items-center justify-between gap-3 border-t border-ub-border bg-ub-surface px-3 py-2">
+          <span className="text-ub-caption text-ub-text-tertiary">More columns <span className="hidden sm:inline">— scroll horizontally</span></span>
+          <div className="flex gap-1">
+            <button type="button" aria-label="Scroll to previous columns" disabled={!canScrollStart} onClick={() => move(false)} className={`grid h-9 w-9 place-items-center rounded-ub-full text-ub-text-link hover:bg-ub-selected disabled:opacity-30 ${focusRing}`}><ChevronLeft className="h-4 w-4 rtl:rotate-180" /></button>
+            <button type="button" aria-label="Scroll to next columns" disabled={!canScrollEnd} onClick={() => move(true)} className={`grid h-9 w-9 place-items-center rounded-ub-full text-ub-text-link hover:bg-ub-selected disabled:opacity-30 ${focusRing}`}><ChevronRight className="h-4 w-4 rtl:rotate-180" /></button>
+          </div>
+        </div>
+      )}
       {footer}
     </div>
   );

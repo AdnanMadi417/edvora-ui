@@ -147,3 +147,21 @@ describe("Mobile table layout", () => {
     expect(screen.getByRole("table")).not.toHaveClass("min-w-[1000px]");
   });
 });
+
+it("does not activate the details link after a swipe across the row", () => {
+  const previous = window.PointerEvent;
+  window.PointerEvent = MouseEvent as typeof PointerEvent;
+  render(<DataTable caption="Swipeable rows" columns={COLUMNS} rows={ROWS} getRowId={(r) => r.id} getRowHref={(r) => `/details/${r.id}`} />);
+  const link = screen.getByRole("link", { name: ROWS[0].student });
+  const clicked = jest.fn((event: Event) => event.preventDefault());
+  link.addEventListener("click", clicked);
+  const amount = screen.getByText("RM4,200");
+  fireEvent.pointerDown(amount, { clientX: 280, clientY: 200 });
+  fireEvent.pointerMove(amount, { clientX: 80, clientY: 200 });
+  fireEvent.click(amount, { detail: 1 });
+  expect(clicked).not.toHaveBeenCalled();
+  fireEvent.pointerDown(amount, { clientX: 80, clientY: 200 });
+  fireEvent.click(amount, { detail: 1 });
+  expect(clicked).toHaveBeenCalledTimes(1);
+  window.PointerEvent = previous;
+});
