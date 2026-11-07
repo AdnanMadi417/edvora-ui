@@ -141,6 +141,7 @@ export default function PartnerBankAccountsTable() {
       {/* Table */}
       <div className="p-6">
         <TableWrapper
+          scrollLabel="Scroll to see all columns and rows"
           footer={
             <TablePagination
               currentPage={currentPage}
@@ -153,7 +154,7 @@ export default function PartnerBankAccountsTable() {
             />
           }
         >
-            <table className="w-full">
+            <table className="w-full min-w-[800px] md:min-w-0">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Advisor</th>

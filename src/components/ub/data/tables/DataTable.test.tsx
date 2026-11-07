@@ -133,3 +133,17 @@ describe("Details row navigation", () => {
     expect(clicked).not.toHaveBeenCalled();
   });
 });
+
+describe("Mobile table layout", () => {
+  it("defaults to an accessible scrolling table like Applications", () => {
+    render(<DataTable caption="Staff users" columns={COLUMNS} rows={ROWS} getRowId={(r) => r.id} />);
+    expect(screen.getByRole("region", { name: "Staff users: scroll to see all columns and rows" })).toHaveAttribute("tabindex", "0");
+    expect(screen.getByRole("table")).toHaveClass("min-w-[1000px]");
+  });
+
+  it("keeps stacked presentation available explicitly", () => {
+    render(<DataTable caption="Staff users" mobileLayout="stacked" columns={COLUMNS} rows={ROWS} getRowId={(r) => r.id} />);
+    expect(screen.queryByRole("region")).not.toBeInTheDocument();
+    expect(screen.getByRole("table")).not.toHaveClass("min-w-[1000px]");
+  });
+});

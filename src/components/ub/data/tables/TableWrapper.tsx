@@ -44,9 +44,9 @@ export default function TableWrapper({ children, footer, scrollClassName, scroll
   }, [children]);
 
   return (
-    <div className={tableContainer}>
+    <div className={`min-w-0 max-w-full ${tableContainer}`}>
       <div className="relative">
-        <div ref={scrollRef} className={`${tableScroll} ${scrollClassName || ""}`} role={scrollLabel ? "region" : undefined} aria-label={scrollLabel} tabIndex={scrollLabel ? 0 : undefined}>
+        <div ref={scrollRef} className={`${tableScroll} ${scrollClassName ?? "max-h-[65dvh] overflow-y-auto overscroll-contain"}`} role={scrollLabel ? "region" : undefined} aria-label={scrollLabel} tabIndex={scrollLabel ? 0 : undefined}>
           {children}
         </div>
         {canScrollStart && (

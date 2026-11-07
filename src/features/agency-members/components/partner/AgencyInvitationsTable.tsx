@@ -214,6 +214,7 @@ export default function AgencyInvitationsTable() {
       {/* Table */}
       <div className="p-6">
         <TableWrapper
+          scrollLabel="Scroll to see all columns and rows"
           footer={
             <TablePagination
               currentPage={currentPage}
@@ -226,7 +227,7 @@ export default function AgencyInvitationsTable() {
             />
           }
         >
-          <table className="w-full">
+          <table className="w-full min-w-[800px] md:min-w-0">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
                 {[

@@ -83,9 +83,9 @@ export interface DataTableProps<T> {
   /** Footer slot, typically <TablePagination />. */
   footer?: ReactNode;
 
-  /** table (default; stacked cards below 768px) · cards: stacked cards at every width (Knowledge Hub, mobile-first lists). */
+  /** table (default; scrolls horizontally below 768px) · cards: stacked cards at every width (Knowledge Hub, mobile-first lists). */
   layout?: DataTableLayout;
-  /** Keep a horizontally scrollable table on phones instead of stacked rows. */
+  /** Mobile table presentation. Defaults to horizontal scrolling, like Applications. */
   mobileLayout?: "stacked" | "scroll";
   scrollClassName?: string;
   /** Return true, or a reason string to disable the row's checkbox (shown as its tooltip). */
@@ -237,7 +237,7 @@ export function DataTablePrimaryCell({ name, reference, avatarSrc }: DataTablePr
 
 // ── DataTable ────────────────────────────────────────────────────────────
 
-// Below md (or always, with layout="cards") every row is a stacked card; from md up it's a real table.
+// Tables scroll on phones by default; stacked rows and card layouts remain explicit options.
 const rowHeight: Record<DataTableDensity, string> = { comfortable: "md:h-14", compact: "md:h-11" };
 
 export default function DataTable<T>({
@@ -263,7 +263,7 @@ export default function DataTable<T>({
   manualSort,
   footer,
   layout = "table",
-  mobileLayout = "stacked",
+  mobileLayout = "scroll",
   scrollClassName,
   isRowSelectable,
   totalCount,
