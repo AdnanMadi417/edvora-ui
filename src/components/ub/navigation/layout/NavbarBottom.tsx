@@ -63,12 +63,12 @@ export default function NavbarBottom({ items, action, activeHref, fixed = true, 
     <nav
       aria-label={ariaLabel}
       className={clsx(
-        "z-40 overflow-hidden rounded-t-ub-xl border border-b-0 border-ub-border bg-ub-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_24px_rgba(0,12,41,0.08)]",
-        fixed ? "fixed inset-x-2 bottom-0 md:hidden" : "relative",
+        "z-40 border-t border-ub-border bg-ub-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-2px_12px_rgba(0,12,41,0.03)]",
+        fixed ? "fixed inset-x-0 bottom-0 md:hidden" : "relative",
         className,
       )}
     >
-      <ul className="grid h-16 gap-1 p-1" style={{ gridTemplateColumns: `repeat(${Math.max(items.length + (action ? 1 : 0), 1)}, minmax(0, 1fr))` }}>
+      <ul className="grid h-16 px-2" style={{ gridTemplateColumns: `repeat(${Math.max(items.length + (action ? 1 : 0), 1)}, minmax(0, 1fr))` }}>
         {items.map((item) => {
           const Icon = item.icon;
           const isActive = item.href === active;
@@ -79,11 +79,12 @@ export default function NavbarBottom({ items, action, activeHref, fixed = true, 
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
                 className={clsx(
-                  "flex h-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-ub-lg px-0.5 transition-colors duration-200 motion-reduce:transition-none",
+                  "relative flex h-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 transition-colors duration-200 motion-reduce:transition-none",
                   focusRingInset,
-                  isActive ? "bg-ub-selected text-ub-text-link" : "text-ub-text-secondary hover:bg-ub-surface-subtle hover:text-ub-text-primary",
+                  isActive ? "text-ub-text-link" : "text-ub-text-secondary hover:bg-ub-surface-subtle hover:text-ub-text-primary",
                 )}
               >
+                {isActive && <span aria-hidden="true" className="absolute top-0 h-[3px] w-7 rounded-b-ub-full bg-ub-action-primary" />}
                 <span
                   className={clsx(
                     "relative grid h-7 w-10 place-items-center rounded-ub-md transition-colors duration-200 motion-reduce:transition-none",
@@ -114,11 +115,12 @@ export default function NavbarBottom({ items, action, activeHref, fixed = true, 
               aria-expanded={action.expanded}
               aria-controls={action.controls}
               className={clsx(
-                "flex h-full w-full min-w-0 flex-col items-center justify-center gap-0.5 rounded-ub-lg px-0.5 transition-colors duration-200 motion-reduce:transition-none",
+                "relative flex h-full w-full min-w-0 flex-col items-center justify-center gap-1 px-0.5 transition-colors duration-200 motion-reduce:transition-none",
                 focusRingInset,
-                actionActive ? "bg-ub-selected text-ub-text-link" : "text-ub-text-secondary hover:bg-ub-surface-subtle hover:text-ub-text-primary",
+                actionActive ? "text-ub-text-link" : "text-ub-text-secondary hover:bg-ub-surface-subtle hover:text-ub-text-primary",
               )}
             >
+              {actionActive && <span aria-hidden="true" className="absolute top-0 h-[3px] w-7 rounded-b-ub-full bg-ub-action-primary" />}
               <span className="grid h-7 w-10 place-items-center">
                 <action.icon className="h-5 w-5" aria-hidden="true" />
               </span>
