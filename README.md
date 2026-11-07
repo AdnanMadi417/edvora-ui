@@ -21,3 +21,4 @@ Note: The `NEXT_PUBLIC_` prefix in `NEXT_PUBLIC_API_URL` makes this environment 
 ## Project folders
 
 See [Project structure](docs/project-structure.md) for shared UI categories, feature hook groups, import conventions, and test placement.
+# edvora-ui
