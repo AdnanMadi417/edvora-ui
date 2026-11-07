@@ -55,10 +55,10 @@ export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(
         disabled={disabled}
         onClick={() => onChange(!checked)}
         {...rest}
-        // The 40×24 track is already a ≥24px target.
+        // Expand the hit area to 44px without enlarging the visual track.
         className={`${toggleTrack(
           checked
-        )} cursor-pointer motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50`}
+        )} cursor-pointer before:absolute before:inset-x-0 before:-inset-y-[9px] before:content-[''] aria-[invalid=true]:shadow-[inset_0_0_0_2px_var(--ub-field-error)] motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-60`}
       >
         <span
           aria-hidden="true"

@@ -5,9 +5,7 @@
 // renders the same in the product and on /ui-unibexs-template-2026.
 
 import Card from "components/ub/data/cards/Card";
-import Alert from "components/ub/feedback/notifications/Alert";
 import IconTile from "components/ub/dashboard/shared/IconTile";
-import TextLink from "components/ub/core/buttons/TextLink";
 import { FieldError } from "components/ub/forms/layout/FieldChrome";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -30,7 +28,7 @@ import { RadioGroup } from "components/ub/forms/choices/Radio";
 import Toggle from "components/ub/forms/choices/Toggle";
 import { useFileDrop } from "components/ub/forms/uploads/useFileDrop";
 import StepIndicator from "components/ub/navigation/controls/StepIndicator";
-import { card } from "components/ub/recipes";
+import { formContainer } from "components/ub/recipes";
 import { NATIONALITIES } from "constants/lists";
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
 import type { DocumentType, FormDataType } from "features/applications/partner/components/form/utility-functions/types";
@@ -69,31 +67,10 @@ export interface ApplicationFormViewProps {
   titleAs?: "h1" | "h2" | "h3";
 }
 
-/** Stable DOM id for a field path, used by the error summary links. */
+/** Stable DOM id for a field path, used by labels and field navigation. */
 export const fieldId = (path: string) => `af-${path.replace(/[^a-z0-9]+/gi, "-")}`;
 
 const NATIONALITY_OPTIONS = NATIONALITIES.map((n) => ({ value: String(n.label), label: n.name }));
-
-function ErrorSummary({ errors }: { errors: Record<string, string | undefined> }) {
-  const items = Object.entries(errors).filter(([, m]) => m && m !== "required") as [string, string][];
-  const required = Object.entries(errors).filter(([, m]) => m === "required");
-  const all = [...items, ...required.map(([k]) => [k, "This document is required."] as [string, string])];
-  return (
-    <Collapse open={all.length > 0}>
-      <Alert tone="danger" className="mb-6" title={all.length === 1 ? "Fix 1 field to continue" : `Fix ${all.length} fields to continue`}>
-        <ul className="mt-2 grid gap-1 ps-7">
-          {all.map(([path, message]) => (
-            <li key={path}>
-              <TextLink href={`#${fieldId(path)}`}>
-                {message}
-              </TextLink>
-            </li>
-          ))}
-        </ul>
-      </Alert>
-    </Collapse>
-  );
-}
 
 // ── Steps ────────────────────────────────────────────────────────────────
 
@@ -446,7 +423,7 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
   if (step === "review") body = <ReviewStep {...props} />;
 
   return (
-    <section className={clsx(card, "mx-auto w-full min-w-0 max-w-5xl")} aria-labelledby="af-title" aria-busy={submitting || undefined}>
+    <section className={clsx(formContainer, "mx-auto w-full max-w-5xl")} aria-labelledby="af-title" aria-busy={submitting || undefined}>
       <header className="flex items-start gap-3 border-b border-ub-border px-4 py-4 md:px-6 md:py-5">
         <IconTile icon={FileText} />
         <div className="min-w-0">
@@ -463,7 +440,6 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
 
       <div ref={top} tabIndex={-1} className="scroll-mt-24 overflow-x-clip px-4 py-6 outline-none md:px-6">
         <h2 className="sr-only">{current?.label}</h2>
-        <ErrorSummary errors={errors} />
         <AnimatePresence mode="wait" initial={false} custom={direction}>
           <motion.div
             key={step}

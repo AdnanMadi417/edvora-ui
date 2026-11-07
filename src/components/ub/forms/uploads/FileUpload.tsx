@@ -172,7 +172,7 @@ const STATUS: Record<
 
 // Local recipes: the solid file row and its 40px icon tile.
 const fileRow =
-  "flex items-start gap-3 rounded-ub-lg border bg-ub-surface p-3 md:p-4";
+  "flex min-w-0 max-w-full items-start gap-3 rounded-ub-lg border bg-ub-surface p-3 md:p-4";
 const fileTile = "grid h-10 w-10 shrink-0 place-items-center rounded-ub-md";
 const rowIconButton = `${iconButtonSizes.sm} grid shrink-0 place-items-center rounded-ub-full text-ub-icon-default ${focusRing} transition-colors duration-ub-fast ease-ub-standard hover:bg-ub-surface-subtle hover:text-ub-text-primary motion-reduce:transition-none`;
 
@@ -219,7 +219,7 @@ function FileRow({
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <p
-            className="min-w-0 truncate text-ub-label-md text-ub-text-primary"
+            className="min-w-0 max-w-full truncate text-ub-label-md text-ub-text-primary"
             title={item.name}
           >
             {item.name}

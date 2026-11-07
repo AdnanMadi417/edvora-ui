@@ -417,7 +417,7 @@ export default function EditPartnerProfile() {
 
   return (
     <div className="mx-auto mt-6 max-w-5xl">
-      <div className="rounded-lg border border-slate-200 bg-white">
+      <div className="min-w-0 overflow-clip rounded-ub-xl border border-ub-border bg-ub-surface">
 
         {/* Header */}
         <div className="flex items-center gap-4 border-b border-slate-200 px-6 py-5">

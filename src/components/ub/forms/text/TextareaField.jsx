@@ -31,7 +31,7 @@ const TextareaField = ({ label, field, required = true, placeholder = "", formDa
         aria-required={required || undefined}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(errorId, helperId)}
-        className={`${fieldControl} block min-h-[96px] resize-y py-2.5 ${error ? fieldControlError : ""}`}
+        className={`${fieldControl} block min-h-[96px] resize-y !rounded-ub-lg py-3 ${error ? fieldControlError : ""}`}
       />
 
       <FieldError id={errorId}>{error}</FieldError>

@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import RegisterProgram from "./RegisterProgram";
 
 const mockCreate = jest.fn();
-const mockClearDraft = jest.fn();
 const mockCommissionTypes = [{ id: "commission-1", name: "Fixed amount" }];
 const mockBranches = [
   {
@@ -48,14 +47,6 @@ jest.mock(
     confirmDiscard: (_dirty: boolean, action: () => void) => action(),
   })
 );
-jest.mock("features/programs/components/shared/form/useDraftAutosave", () => ({
-  useDraftAutosave: () => ({
-    hasDraft: false,
-    readDraft: jest.fn(),
-    clearDraft: mockClearDraft,
-    dismissDraft: jest.fn(),
-  }),
-}));
 jest.mock("components/ub/forms/text/RichTextEditor", () => ({
   __esModule: true,
   default: ({ label, field, formData, updateFormData }: any) => (
@@ -131,7 +122,6 @@ it("validates programme details and preserves the dependent branch through revie
       course_type: null,
     })
   );
-  expect(mockClearDraft).toHaveBeenCalledTimes(1);
 });
 
 it("blocks invalid fees and scholarship details on their own steps", async () => {

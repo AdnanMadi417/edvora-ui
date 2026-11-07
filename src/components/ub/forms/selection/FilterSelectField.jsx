@@ -1,10 +1,10 @@
 import React, { useId } from "react";
 import { ChevronDown } from "lucide-react";
 
-import { fieldControl, fieldControlError } from "components/ub/recipes";
+import { fieldControl, fieldControlError, fieldControlHeight } from "components/ub/recipes";
 import { FieldError } from "../layout/FieldChrome";
 
-const filterSelect = `${fieldControl} h-10 cursor-pointer appearance-none truncate pe-9 text-ub-body-sm`;
+const filterSelect = `${fieldControl} ${fieldControlHeight} cursor-pointer appearance-none truncate pe-9 text-ub-body-sm`;
 const optionClass = "bg-ub-surface text-ub-text-primary";
 
 export default function FilterSelectField({

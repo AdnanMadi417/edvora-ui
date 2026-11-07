@@ -65,7 +65,7 @@ export default function EnterVerificationCodeModal({ isOpen, onClose, onContinue
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
+        <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
             title="Enter Verification Code"
             description="Continue an application you already started"

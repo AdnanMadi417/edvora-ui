@@ -349,7 +349,7 @@ export default function RegisterLogisticsMarketplaceProvider({
   ) {
     return (
       <section className="mx-auto mt-5 max-w-5xl">
-        <div className="rounded-lg border border-ub-border bg-ub-surface p-6">
+        <div className="overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface p-6">
           <Loading text="Fetching Logistic Services data..." />
         </div>
       </section>
@@ -573,7 +573,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                 {formData.packages_offered.map((pkg, index) => (
                   <div
                     key={index}
-                    className="mb-6 rounded-md border bg-ub-surface p-5"
+                    className="mb-6 rounded-ub-lg border border-ub-border bg-ub-surface p-5"
                   >
                     <div className="mb-4 flex items-center justify-between">
                       <h5 className="font-medium text-ub-text-primary">

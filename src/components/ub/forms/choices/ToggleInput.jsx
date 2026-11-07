@@ -43,7 +43,7 @@ export default function ToggleInput({
         error={errors?.[field]}
         disabled={disabled}
         switchPosition="end"
-        className="rounded-ub-md border border-ub-border bg-ub-surface-subtle p-4"
+        className="rounded-ub-lg bg-[var(--ub-field-bg)] p-4 shadow-[inset_0_0_0_1px_var(--ub-field-ring)] transition-shadow duration-200 focus-within:shadow-[inset_0_0_0_2px_var(--ub-border-focus)]"
       />
     </div>
   );

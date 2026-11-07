@@ -108,7 +108,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           {...rest}
           className={[
             fieldControl,
-            size === "lg" ? "h-12" : fieldControlHeight,
+            fieldControlHeight,
             error && fieldControlError,
             (prefix || reference) && "ub-tabular",
             reference && "ub-ref uppercase placeholder:normal-case",

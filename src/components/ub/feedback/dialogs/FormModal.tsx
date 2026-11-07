@@ -254,8 +254,8 @@ export default function FormModal({
                     {footerNote && <p className="min-w-0 truncate text-ub-caption text-ub-text-tertiary">{footerNote}</p>}
                   </div>
                 )}
-                {/* Cancel then the Primary, side by side even on mobile (Primary last, brief §4.7). */}
-                <div className="grid grid-cols-2 gap-2 sm:ms-auto sm:flex">
+                {/* Stack actions on narrow phones so long labels remain readable. */}
+                <div className="grid grid-cols-1 gap-2 min-[480px]:grid-cols-2 sm:ms-auto sm:flex">
                   <Button variant="secondary" text={cancelLabel} onClick={requestClose} disabled={submitting} />
                   <Button type="submit" variant={submitTone} text={submitLabel} icon={submitIcon} loading={submitting} disabled={submitDisabled} />
                 </div>

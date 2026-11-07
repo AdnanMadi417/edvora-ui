@@ -128,7 +128,7 @@ export default function AssignPaymentUniversity({
         className="w-full max-w-lg md:max-w-xl transform transition-all duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
+        <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
             title="Assign Payment Method"
             description="Assign a payment method to the selected university."

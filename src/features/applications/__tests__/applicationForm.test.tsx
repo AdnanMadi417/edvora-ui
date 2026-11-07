@@ -68,9 +68,11 @@ describe("ApplicationFormView", () => {
     requiredFieldKeys: [],
     intakeMonths: [],
   };
-  it("shows an error summary linking to the field and calls next on Continue", () => {
+  it("shows errors beside inputs without a summary and calls next on Continue", () => {
     render(<ApplicationFormView {...base} step="student" errors={{ "student.name": "Enter the student's full name as on the passport." }} />);
-    expect(screen.getByRole("link", { name: /full name/ })).toHaveAttribute("href", `#${fieldId("student.name")}`);
+    expect(screen.queryByText(/Fix \d+ fields? to continue/)).not.toBeInTheDocument();
+    expect(screen.getByText("Enter the student's full name as on the passport.")).toBeInTheDocument();
+    expect(document.getElementById(fieldId("student.name"))).toHaveAttribute("aria-invalid", "true");
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
     expect(base.next).toHaveBeenCalled();
   });

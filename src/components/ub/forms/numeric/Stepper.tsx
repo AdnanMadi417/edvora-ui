@@ -4,7 +4,7 @@
 // spinbutton: Arrow Up/Down step, Page Up/Down step ×10, Home/End jump to
 // min/max, and typed values are clamped on blur or Enter. Tabular numerals.
 import React, { forwardRef, useEffect, useId, useState } from "react";
-import { fieldControlHeight, fieldWrapper, focusRing } from "components/ub/recipes";
+import { fieldControl, fieldControlError, fieldControlHeight, fieldWrapper, focusRing } from "components/ub/recipes";
 import { FieldError, FieldHelper, FieldLabel, describedBy } from "components/ub/forms/layout/FieldChrome";
 import { Icon } from "components/ub/icons/Icon";
 
@@ -46,12 +46,10 @@ const format = (n: number) => n.toLocaleString("en-US", { maximumFractionDigits:
 const parse = (s: string) => Number(s.replace(/,/g, "").trim());
 
 // Field recipe drawn on the wrapper, since the focusable input sits inside it.
-const shell =
-  "flex w-full items-center gap-1 rounded-ub-md border px-1 transition-[border-color,box-shadow] duration-ub-fast ease-ub-standard motion-reduce:transition-none focus-within:ring-1";
-const shellIdle =
-  "bg-ub-surface border-ub-border-control hover:border-ub-border-control-hover focus-within:border-ub-border-focus focus-within:ring-ub-border-focus";
-const shellError = "bg-ub-surface border-ub-danger-500 focus-within:border-ub-danger-500 focus-within:ring-ub-danger-500";
-const shellDisabled = "cursor-not-allowed border-ub-border bg-ub-disabled";
+const shell = `${fieldControl} flex items-center gap-1 !px-1`;
+const shellIdle = "hover:shadow-[inset_0_0_0_2px_var(--ub-border-focus)] focus-within:shadow-[inset_0_0_0_2px_var(--ub-border-focus)]";
+const shellError = fieldControlError;
+const shellDisabled = "cursor-not-allowed opacity-60";
 
 const stepButton =
   `grid h-8 w-8 shrink-0 place-items-center rounded-ub-full text-ub-icon-interactive ${focusRing} ` +
@@ -160,7 +158,7 @@ export const Stepper = forwardRef<HTMLInputElement, StepperProps>(function Stepp
             onBlur={() => commit(parse(draft))}
             onKeyDown={onKeyDown}
             size={Math.max(2, draft.length)}
-            className="ub-tabular min-w-0 bg-transparent text-center text-ub-body-md text-ub-text-primary outline-none disabled:cursor-not-allowed disabled:text-ub-text-disabled"
+            className="ub-tabular min-w-0 bg-transparent text-center text-[13px] text-[var(--ub-field-text)] outline-none disabled:cursor-not-allowed disabled:text-ub-text-disabled"
           />
           {suffix && <span className="text-ub-body-md text-ub-text-tertiary">{suffix}</span>}
         </div>

@@ -46,7 +46,7 @@ export default function OtpStep({ email, onSuccess, onRestart }: Props) {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white px-7 py-10 shadow-sm">
+      <div className="w-full max-w-sm overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface px-7 py-10 shadow-sm">
         <div className="mb-6 flex justify-center">
           <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
         </div>

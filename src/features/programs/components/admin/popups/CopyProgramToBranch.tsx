@@ -134,7 +134,7 @@ export default function CopyProgramToBranch({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
+        <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
             title="Copy to another branch"
             description={`Duplicate "${programName}" — with its fees, scholarships and commission — into another branch of the same university.`}

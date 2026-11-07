@@ -48,7 +48,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy(errorId, helperId, countId, ariaDescribedBy)}
         {...rest}
-        className={[fieldControl, "min-h-24 resize-y py-2", error && fieldControlError, className].filter(Boolean).join(" ")}
+        className={[fieldControl, "min-h-24 resize-y !rounded-ub-lg py-3", error && fieldControlError, className].filter(Boolean).join(" ")}
       />
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">

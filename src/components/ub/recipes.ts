@@ -11,7 +11,7 @@ export const focusRing =
 /** Same ring drawn inside the element, for controls flush against an edge. */
 export const focusRingInset = "focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ub-border-focus";
 
-const transition = "transition-[background-color,border-color,color,box-shadow] duration-ub-fast ease-ub-standard";
+const transition = "transition-[background-color,border-color,color,box-shadow,transform,opacity] duration-200 ease-[ease] motion-reduce:transition-none";
 
 // ── Buttons (brief §4.1): all pills; sm 32 · md 40 · lg 48 ────────────────
 
@@ -19,13 +19,13 @@ export type ButtonVariant = "primary" | "secondary" | "tertiary" | "positive" | 
 export type ButtonSize = "sm" | "md" | "lg";
 
 export const buttonBase =
-  `inline-flex min-w-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-ub-full font-medium ${transition} ${focusRing} ` +
-  "disabled:cursor-not-allowed disabled:border-transparent disabled:bg-ub-action-disabled-bg disabled:text-ub-action-disabled-text disabled:shadow-none";
+  `inline-flex min-w-0 select-none items-center justify-center gap-2 whitespace-nowrap rounded-[33px] font-semibold ${transition} enabled:active:scale-[0.98] motion-reduce:transform-none ${focusRing} ` +
+  "disabled:cursor-not-allowed disabled:opacity-60";
 
 export const buttonVariants: Record<ButtonVariant, string> = {
   // Dark guide §2.4: hover keeps the fill and adds --ub-glow-action (none in light).
   primary:
-    "bg-ub-action-primary text-ub-action-primary-text hover:bg-ub-action-primary-hover hover:shadow-ub-glow focus-visible:shadow-ub-glow active:bg-ub-action-primary-pressed",
+    "bg-ub-action-primary text-ub-action-primary-text hover:bg-ub-action-primary-hover shadow-none hover:shadow-none active:bg-ub-action-primary-pressed",
   secondary:
     "border-ub-strong border-ub-action-secondary bg-ub-surface text-ub-action-secondary-text hover:bg-ub-action-secondary-hover hover:shadow-ub-xs active:bg-ub-action-secondary-pressed",
   tertiary: "text-ub-text-link hover:bg-ub-action-secondary-hover active:bg-ub-action-secondary-pressed",
@@ -37,8 +37,8 @@ export const buttonVariants: Record<ButtonVariant, string> = {
 
 export const buttonSizes: Record<ButtonSize, string> = {
   sm: "h-8 px-3 text-ub-label-md",
-  md: "h-10 px-4 text-ub-label-md",
-  lg: "h-12 px-6 text-ub-label-lg",
+  md: "h-[50px] px-[23px] text-[14px]",
+  lg: "h-[50px] px-[23px] text-[14px]",
 };
 
 /** Circular icon buttons: 32 / 40 / 48 (brief §4.1). Always give them an aria-label. */
@@ -58,17 +58,17 @@ export const fieldWrapper = "mb-4";
 export const fieldLabel = "mb-1.5 block text-ub-label-md text-ub-text-primary";
 /** Rendered after the label of optional fields instead of a required asterisk. */
 export const fieldOptional = "font-normal text-ub-text-tertiary";
-export const fieldHelper = "mt-1.5 text-ub-body-sm text-ub-text-tertiary";
-export const fieldError = "mt-1.5 flex items-start gap-1.5 text-ub-body-sm text-ub-tone-danger-text";
+export const fieldHelper = "mt-1.5 text-[12px] text-ub-text-tertiary";
+export const fieldError = "mt-1.5 flex items-start gap-1.5 text-[12px] text-[var(--ub-field-error)]";
 
-/** Text input / select / textarea. Height 48 on mobile, 40 from md up. */
+/** Official-site field treatment: pill, inset outline, 50px height. */
 export const fieldControl =
-  `w-full rounded-ub-md border border-ub-border-control bg-ub-surface px-3 text-ub-body-md text-ub-text-primary ${transition} ` +
-  "placeholder:text-ub-text-tertiary hover:border-ub-border-control-hover " +
-  "focus:border-ub-border-focus focus:outline-none focus:ring-1 focus:ring-ub-border-focus " +
-  "disabled:cursor-not-allowed disabled:border-ub-border disabled:bg-ub-disabled disabled:text-ub-text-disabled";
-export const fieldControlHeight = "h-12 md:h-10";
-export const fieldControlError = "border-ub-danger-500 hover:border-ub-danger-500 focus:border-ub-danger-500 focus:ring-ub-danger-500";
+  `w-full rounded-[33px] border-0 bg-[var(--ub-field-bg)] px-[17px] text-[13px] font-normal text-[var(--ub-field-text)] ${transition} ` +
+  "shadow-[inset_0_0_0_1px_var(--ub-field-ring)] placeholder:text-[var(--ub-field-placeholder)] outline-none " +
+  "enabled:hover:shadow-[inset_0_0_0_2px_var(--ub-border-focus)] focus:shadow-[inset_0_0_0_2px_var(--ub-border-focus)] focus:outline-none " +
+  "disabled:cursor-not-allowed disabled:opacity-60";
+export const fieldControlHeight = "h-[50px]";
+export const fieldControlError = "!shadow-[inset_0_0_0_2px_var(--ub-field-error)]";
 
 /** 20px checkbox, radius 4 (brief §4.2). */
 export const checkbox =
@@ -79,20 +79,18 @@ export const checkbox =
 export const optionCard = `rounded-ub-md border border-ub-border bg-ub-surface ${transition} hover:border-ub-border-hover`;
 export const optionCardSelected = "border-2 border-ub-action-primary bg-ub-selected";
 
-/** 40×24 toggle track + 20px thumb (brief §4.2). */
+/** Shared 44×26 pill switch with a centered 20px thumb. */
 export const toggleTrack = (on: boolean) =>
-  `relative inline-flex h-6 w-10 shrink-0 items-center rounded-ub-full ${transition} ${focusRing} ${on ? "bg-ub-action-primary" : "bg-ub-toggle-off"}`;
+  `relative inline-flex h-[26px] w-11 shrink-0 items-center rounded-ub-full p-[3px] ${transition} ${focusRing} ${on ? "bg-ub-action-primary" : "bg-ub-toggle-off"}`;
 export const toggleThumb = (on: boolean) =>
-  `inline-block h-5 w-5 rounded-ub-full bg-white shadow-ub-sm transition-transform duration-ub-fast ease-ub-standard ${on ? "translate-x-[18px] rtl:-translate-x-[18px]" : "translate-x-0.5 rtl:-translate-x-0.5"}`;
+  `inline-block h-5 w-5 rounded-ub-full bg-white shadow-ub-sm transition-transform duration-200 ease-[ease] motion-reduce:transition-none ${on ? "translate-x-[18px] rtl:-translate-x-[18px]" : "translate-x-0"}`;
 
 /** Dashed 1.5px dropzone, radius 12 (brief §4.2). */
 export const dropzone = `rounded-ub-lg border-ub-strong border-dashed border-ub-border-control bg-ub-surface-subtle ${transition} hover:border-ub-border-focus hover:bg-ub-selected`;
 export const dropzoneActive = "border-ub-border-focus bg-ub-selected";
 
 /** Pill search field (brief §5). */
-export const searchField =
-  `h-10 w-full rounded-ub-full border border-ub-border-control bg-ub-surface ps-10 pe-4 text-ub-body-sm text-ub-text-primary ${transition} ` +
-  "placeholder:text-ub-text-tertiary hover:border-ub-border-control-hover focus:border-ub-border-focus focus:outline-none focus:ring-1 focus:ring-ub-border-focus";
+export const searchField = `${fieldControl} ${fieldControlHeight} ps-10 pe-[17px]`;
 
 // ── Tags and badges (brief §4.3): 6px radius, never pills ────────────────
 
@@ -140,6 +138,9 @@ export const tagDot: Record<TagTone, string> = {
 };
 
 // ── Surfaces (brief §3, §4.4) ────────────────────────────────────────────
+
+/** Outer form surface shared by page forms and application wizards. */
+export const formContainer = "min-w-0 overflow-clip rounded-ub-xl border border-ub-border bg-ub-surface";
 
 /** Resting card: border, no shadow, radius 12, padding 24 (16 on mobile). */
 export const card = "rounded-ub-lg border border-ub-border bg-ub-surface";

@@ -173,7 +173,7 @@ export default function MultiSelect({
               setActive(-1);
             }}
             placeholder="Search options"
-            className={`${fieldControl} h-10`}
+            className={`${fieldControl} ${fieldControlHeight}`}
             onKeyDown={(event) => {
               if (["ArrowDown", "ArrowUp"].includes(event.key)) {
                 event.preventDefault();

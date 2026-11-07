@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import UploadField from "./UploadField";
+import DocumentUpload from "./DocumentUpload";
+import ImageUpload from "./ImageUpload";
 import FileUpload from "./FileUpload";
 import { ALLOWED_FILE_TYPES } from "services/uploadService";
 import { parseApiError } from "utils/parseApiError";
@@ -69,6 +70,7 @@ export default function ImageUploadField({
       setBusy(false);
     }
   };
+  const Picker = imageOnly ? ImageUpload : DocumentUpload;
   return (
     <div data-field={field}>
       {documentTypeId ? (
@@ -107,7 +109,7 @@ export default function ImageUploadField({
           error={requestError || errors?.[field]}
         />
       ) : (
-        <UploadField
+        <Picker
           label={name}
           file={simpleFile}
           onFileChange={(file) => onSimpleFileChange?.(file)}
@@ -115,7 +117,6 @@ export default function ImageUploadField({
           existingUrl={existingUrl}
           onExistingRemove={onExistingRemove}
           accept={accepted}
-          imageOnly={imageOnly}
           required={required}
           disabled={disabled}
           uploading={simpleUploading}

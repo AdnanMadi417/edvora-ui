@@ -8,6 +8,11 @@
  */
 :root,
 [data-ub-theme="light"] {
+  --ub-field-bg: #F8F8F8;
+  --ub-field-text: #000000;
+  --ub-field-placeholder: #4A4A4A;
+  --ub-field-ring: rgba(200, 200, 200, 0.5);
+  --ub-field-error: #F04438;
   /* backgrounds */
   --ub-bg-canvas: var(--ub-neutral-50);
   --ub-bg-surface: var(--ub-neutral-0);
@@ -63,7 +68,7 @@
 
   /* actions (brief §4.1) */
   --ub-action-primary-bg: var(--ub-blue-600);
-  --ub-action-primary-bg-hover: var(--ub-blue-700);
+  --ub-action-primary-bg-hover: #0040C1;
   --ub-action-primary-bg-pressed: var(--ub-blue-800);
   --ub-action-primary-text: #ffffff;
   --ub-action-secondary-border: var(--ub-blue-600);
@@ -121,6 +126,11 @@
 
 /* ── Near-black dark mode: guide §6, verbatim ─────────────────────────── */
 [data-ub-theme="dark"] {
+  --ub-field-bg: var(--ub-bg-surface);
+  --ub-field-text: var(--ub-text-primary);
+  --ub-field-placeholder: var(--ub-text-tertiary);
+  --ub-field-ring: var(--ub-border-control);
+  --ub-field-error: var(--ub-danger-500);
   color-scheme: dark;
   --ub-bg-canvas: #07090E;
   --ub-bg-surface: #0E1118;

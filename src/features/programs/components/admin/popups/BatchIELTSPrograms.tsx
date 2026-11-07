@@ -119,7 +119,7 @@ export default function BatchPrograms({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
+        <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
         <ModalHeader
           title="Bulk IELTS Update"
           description="Update IELTS requirements for multiple programs at once."

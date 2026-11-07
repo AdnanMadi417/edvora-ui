@@ -310,7 +310,7 @@ export default function PartnerRegisterPage() {
   if (step === "success") {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
-        <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white px-7 py-10 text-center shadow-sm">
+        <div className="w-full max-w-sm overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface px-7 py-10 text-center shadow-sm">
           <div className="mb-4 flex justify-center">
             <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
           </div>
@@ -365,7 +365,7 @@ export default function PartnerRegisterPage() {
       />
 
       <div className="mx-auto max-w-3xl px-4">
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface shadow-sm">
         {/* Type switcher */}
         <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
           {([

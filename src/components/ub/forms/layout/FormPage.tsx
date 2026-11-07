@@ -3,8 +3,8 @@
 import { useId, type FormEvent, type ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import clsx from "clsx";
+import { formContainer } from "components/ub/recipes";
 import Button from "components/ub/core/buttons/Button";
-import { card } from "components/ub/recipes";
 
 export interface FormPageProps {
   title: string;
@@ -52,7 +52,7 @@ export default function FormPage({
   return (
     <section
       aria-labelledby={titleId}
-      className={clsx(card, "mt-5 w-full min-w-0", className)}
+      className={clsx(formContainer, "mt-5 w-full", className)}
     >
       <header className="flex items-start gap-3 border-b border-ub-border px-4 py-4 md:px-6 md:py-5">
         <span
@@ -82,7 +82,7 @@ export default function FormPage({
             <p className="text-ub-caption text-ub-text-tertiary">
               Optional fields are marked.
             </p>
-            <div className="grid grid-cols-2 gap-2 sm:flex">
+            <div className="grid grid-cols-1 gap-2 min-[480px]:grid-cols-2 sm:flex">
               <Button
                 variant="secondary"
                 text={cancelLabel}

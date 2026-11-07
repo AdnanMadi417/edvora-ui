@@ -39,7 +39,6 @@ import {
   useUnsavedChangesGuard,
   confirmDiscard,
 } from "features/programs/components/shared/form/useUnsavedChangesGuard";
-import { useDraftAutosave } from "features/programs/components/shared/form/useDraftAutosave";
 import {
   COURSE_TYPE_OPTIONS,
   isMasterOrPhd,
@@ -159,10 +158,6 @@ export default function RegisterProgram({
   const [dirtyBaseline, setDirtyBaseline] = useState<FormData>(emptyFormData);
   const isDirty = useIsFormDirty(formData, dirtyBaseline);
   useUnsavedChangesGuard(isDirty);
-  const { hasDraft, readDraft, clearDraft, dismissDraft } = useDraftAutosave(
-    formData,
-    isDirty
-  );
 
   useEffect(() => {
     if (commissionTypes.length > 0) {
@@ -288,7 +283,7 @@ export default function RegisterProgram({
     duration: Number(formData.duration || 0),
     qualification_id: formData.qualification_id,
     // Recomputed from the current qualification rather than trusted from
-    // formData alone — e.g. a restored draft could carry a stale pairing.
+    // formData alone — a previous university selection could leave a stale pairing.
     course_type: isMasterOrPhd(selectedQualification?.name)
       ? formData.course_type
       : null,
@@ -345,28 +340,12 @@ export default function RegisterProgram({
     }
     try {
       await createProgram(buildPayload());
-      clearDraft();
       showToast("Program created successfully", "success");
       setTimeout(() => router.push(basePath), 1500);
     } catch (error: unknown) {
       const backendMessage = parseApiError(error, "Please try again.");
       showToast(`Failed to create program. ${backendMessage}`, "error");
     }
-  };
-
-  const restoreDraft = () => {
-    const draft = readDraft();
-    // A draft saved by a build predating UBX-395 carries the old lower-case code.
-    if (draft)
-      setFormData({
-        ...draft,
-        commission_currency: normalizeCommissionCurrency(
-          draft.commission_currency
-        ),
-      });
-    setCurrentStep(0);
-    setErrors({});
-    dismissDraft();
   };
 
   // ── Live preview data ──────────────────────────────────────────────────
@@ -381,18 +360,6 @@ export default function RegisterProgram({
   );
   return (
     <>
-      {hasDraft && (
-        <Alert
-          tone="info"
-          title="Saved draft available"
-          action={{ label: "Restore draft", onClick: restoreDraft }}
-          onDismiss={dismissDraft}
-          className="mt-5 w-full min-w-0"
-        >
-          Restore your previous programme details, then check each step before
-          publishing.
-        </Alert>
-      )}
       <SteppedFormPage
         title="Create program"
         description="Define the programme, set its fees and requirements, then review before publishing."

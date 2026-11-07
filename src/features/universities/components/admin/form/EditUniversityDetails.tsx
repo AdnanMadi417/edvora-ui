@@ -545,7 +545,7 @@ const UniversityEdit = ({
       className="mx-auto mt-6 w-full min-w-0 max-w-5xl space-y-5 break-words"
     >
       {/* Header */}
-      <div className="flex flex-wrap justify-between gap-4 rounded-ub-lg border border-ub-border bg-ub-surface p-4 shadow-ub-xs sm:p-6">
+      <div className="flex flex-wrap justify-between gap-4 rounded-ub-xl border border-ub-border bg-ub-surface p-4 shadow-ub-xs sm:p-6">
         <div className="flex min-w-0 flex-wrap items-center gap-4">
           <div className="shrink-0">
             <ImageUploadField
@@ -702,7 +702,7 @@ const UniversityEdit = ({
       {/* Branches */}
       <section
         aria-label="Campuses and branches"
-        className="rounded-ub-lg border border-ub-border bg-ub-surface p-4 sm:p-6"
+        className="rounded-ub-xl border border-ub-border bg-ub-surface p-4 sm:p-6"
         data-field="branches"
       >
         <div className="mb-4 flex items-center justify-between">
@@ -722,7 +722,7 @@ const UniversityEdit = ({
           {formData.branches.map((branch, index) => (
             <div
               key={branch.id ?? index}
-              className="space-y-5 rounded-xl border border-ub-border bg-ub-surface p-5 shadow-sm"
+              className="space-y-5 rounded-ub-lg border border-ub-border bg-ub-surface p-5 shadow-sm"
             >
               <div className="flex items-center justify-between border-b border-ub-border pb-3">
                 <h4 className="text-sm font-semibold text-ub-text-secondary">
@@ -796,7 +796,7 @@ const UniversityEdit = ({
       {/* Payment methods */}
       <section
         aria-label="University payment methods"
-        className="space-y-6 rounded-ub-lg border border-ub-border bg-ub-surface p-4 sm:p-6"
+        className="space-y-6 rounded-ub-xl border border-ub-border bg-ub-surface p-4 sm:p-6"
       >
         <div className="mb-4 flex items-center justify-between">
           <h3 className="mb-4 text-ub-heading-md text-ub-text-primary">
@@ -817,7 +817,7 @@ const UniversityEdit = ({
           {paymentRows.map((method, index) => (
             <div
               key={method.id}
-              className="space-y-4 rounded-md border bg-ub-surface p-4 shadow-sm"
+              className="space-y-4 rounded-ub-lg border border-ub-border bg-ub-surface p-4 shadow-sm"
             >
               <div className="flex items-center justify-between border-b border-ub-border pb-3">
                 <h4 className="text-sm font-semibold text-ub-text-secondary">
@@ -899,7 +899,7 @@ const UniversityEdit = ({
         </div>
 
         {showAddPayment && (
-          <div className="space-y-5 rounded-xl border border-ub-border bg-ub-surface p-5 shadow-sm">
+          <div className="space-y-5 rounded-ub-lg border border-ub-border bg-ub-surface p-5 shadow-sm">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <SearchableDropdown
                 label="Payment Method"

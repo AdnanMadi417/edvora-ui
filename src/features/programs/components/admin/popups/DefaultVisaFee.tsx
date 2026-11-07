@@ -93,7 +93,7 @@ export default function DefaultVisaFee({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-black/5">
+        <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
             title="Default Visa Fee"
             description="Set the global default visa fee amount used during visa setup."
