@@ -4,8 +4,8 @@ import { CURRENT_PARTNER } from "../seed";
 import { partners, memberships, membersOf } from "./partners";
 import type { AgencyMember, AgencyMemberDetails, AgencyInvitation } from "features/agency-members/types";
 
-// Team members of the signed-in agency Advisor (partner/team-members) plus
-// the public invite flow (team/verify-otp, team/accept-invite).
+// Team members of the signed-in agency Advisor (partner/team-members) and
+// their invitations.
 
 const truthy = (v: unknown) => (v === undefined || v === null || v === "" ? undefined : v === true || v === "true");
 const pageOf = <T,>(items: T[], query: Record<string, any>) => {
@@ -131,17 +131,5 @@ mock.post("/partners/agency/members/resend-submission-link", ({ body }) => {
   return { message: `A new profile link was sent to ${body?.email}.` };
 });
 
-// ── Public invite flow ──────────────────────────────────────────────────────
-
 mock.post("/agency-invitations/resend-otp", ({ body }) => ({ message: `A new code was sent to ${body?.email}.` }));
 
-mock.post("/agency-invitations/verify-otp", ({ body }) => {
-  const inv = invitations.find((r) => r.email === body?.email && !r.is_used);
-  if (inv) Object.assign(inv, { progress: "pending_profile", otp_verified_at: nowIso() });
-  return { message: "Email verified. Check your inbox for the link to complete your profile." };
-});
-
-mock.post("/agency-invitations/submit", () => ({
-  message: "Profile submitted. You can sign in once your Advisor account is activated.",
-  reference_id: `UBX-TM-2026-${String(Math.floor(Math.random() * 9000) + 1000)}`,
-}));

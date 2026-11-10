@@ -6,8 +6,8 @@ import type { Context } from '@opentelemetry/api';
 import type { ReadableSpan, Span, SpanProcessor } from '@opentelemetry/sdk-trace-base';
 
 // Query params that must never leave this process in trace data — invitation
-// tokens (/team/accept-invite?token=...), OTP codes, and email addresses
-// (/team/verify-otp, /auth/staff-invitation) are all bearer-credential-grade
+// tokens (?token=...), OTP codes, and email addresses (e.g.
+// /auth/staff-invitation) are all bearer-credential-grade
 // or PII and end up verbatim in http.target/url.full/etc. attributes unless
 // redacted here before export.
 const SENSITIVE_QUERY_PARAMS = ['token', 'otp', 'email'];

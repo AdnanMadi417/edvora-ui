@@ -55,20 +55,3 @@ export interface UpdateMemberCommissionPayload {
   commission_display_percentage?: number;
 }
 
-export interface SubmitAgencyMemberProfilePayload {
-  submission_token: string;
-  phone: string;
-  country: string;
-  nationality: string;
-  date_of_birth: string;
-  passport_number: string;
-  profile_photo_file_key?: string;
-  profile_photo_file_url?: string;
-  passport_photo_file_key?: string;
-  passport_photo_file_url?: string;
-  id_document_file_key?: string;
-  id_document_file_url?: string;
-  background: string;
-  social_media_url?: string;
-  linkedin_url?: string;
-}
