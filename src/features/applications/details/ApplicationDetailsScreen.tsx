@@ -126,7 +126,7 @@ export default function ApplicationDetailsScreen({
 
   const header = (
     <ApplicationHeader
-      titleAs="h2"
+      titleAs="h1"
       breadcrumbs={<Breadcrumbs items={[{ label: "Applications", href: backHref }, { label: view.student.name }]} />}
       studentName={view.student.name}
       photoUrl={view.student.photoUrl}

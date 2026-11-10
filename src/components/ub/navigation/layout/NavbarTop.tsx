@@ -44,6 +44,20 @@ const Navbar = ({
 
   const { unreadCount, refetch: refetchUnreadCount } = useUnreadCount({ pollIntervalMs: 30000 });
 
+  // One main heading per page: the section name is the h1 unless the page
+  // brings its own (a student's or Advisor's name), then it's plain text.
+  const [pageHasHeading, setPageHasHeading] = useState(false);
+  useEffect(() => {
+    const main = document.getElementById("main");
+    if (!main) return;
+    const check = () => setPageHasHeading(!!main.querySelector("h1"));
+    check();
+    const observer = new MutationObserver(check);
+    observer.observe(main, { subtree: true, childList: true });
+    return () => observer.disconnect();
+  }, []);
+  const TitleTag = pageHasHeading ? "p" : "h1";
+
   useEffect(() => {
     const handler = () => refetchUnreadCount();
     window.addEventListener("notifications:refetch", handler);
@@ -88,7 +102,7 @@ const Navbar = ({
         <Menu className="h-5 w-5" aria-hidden />
       </button>
 
-      <h1 className="min-w-0 flex-1 truncate text-ub-heading-sm text-ub-text-primary md:text-ub-heading-md">{brandText}</h1>
+      <TitleTag className="min-w-0 flex-1 truncate text-ub-heading-sm text-ub-text-primary md:text-ub-heading-md">{brandText}</TitleTag>
 
       <div className="flex shrink-0 items-center gap-1 sm:gap-2">
         <NotificationsPreviewPopover
