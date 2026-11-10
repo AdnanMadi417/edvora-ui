@@ -2,7 +2,11 @@ import React, { ReactNode } from 'react';
 import AppWrappers from './AppWrappers';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
+import type { Metadata } from 'next';
 import { SIDEBAR_INIT_SCRIPT } from 'components/ub/navigation/layout/sidebarScript';
+
+// Every page gets a tab title; app pages refine it to "Page · Unibexs" (AppShell, usePageTitle).
+export const metadata: Metadata = { title: { default: 'Unibexs', template: '%s · Unibexs' } };
 
 const inter = Inter({
   subsets: ['latin'],

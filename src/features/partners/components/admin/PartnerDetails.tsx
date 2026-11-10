@@ -59,6 +59,7 @@ import PartnerApplicationsTable from "./PartnerApplicationsTable";
 import AdditionalManagersSection from "./AdditionalManagersSection";
 import { PartnerBankAccountSection } from "features/partners/bank-accounts";
 import { PayoutStatementSection } from "features/applications/payouts";
+import { usePageTitle } from "components/ub/navigation/layout/pageTitle";
 
 interface Props {
   id: string;
@@ -180,6 +181,7 @@ export default function PartnerDetails({ id }: Props) {
   const { showToast } = useToast();
   const { partner, isPartnerLoading, partnerError, refetch } =
     usePartnerDetails(id);
+  usePageTitle(partner?.name);
   const [showReview, setShowReview] = useState(false);
   // Lets a link from elsewhere (e.g. "Add a bank account" from a payout
   // flow with no account on file) land straight on the right tab.

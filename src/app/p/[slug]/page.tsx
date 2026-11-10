@@ -29,18 +29,18 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  if (!FEATURES.partnerPublicProfile) return { title: "Advisor not found | Unibexs" };
+  if (!FEATURES.partnerPublicProfile) return { title: "Advisor not found" };
 
   const { slug } = await params;
   const profile = await fetchProfile(slug);
-  if (!profile) return { title: "Advisor not found | Unibexs" };
+  if (!profile) return { title: "Advisor not found" };
 
   const name = profile.display_name || profile.name;
   const description =
     profile.bio?.slice(0, 160) || `Connect with ${name}, a Unibexs advisor.`;
 
   return {
-    title: `${name} | Unibexs`,
+    title: name,
     description,
     openGraph: {
       title: name,

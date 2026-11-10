@@ -35,6 +35,7 @@ import {
   offerStatusOf,
 } from "features/applications/components";
 import type { HeaderAction, OverflowAction } from "features/applications/components/ApplicationHeader";
+import { usePageTitle } from "components/ub/navigation/layout/pageTitle";
 
 
 /** Unibexs' official Respond.io support line, the same for every role. */
@@ -90,6 +91,7 @@ export default function ApplicationDetailsScreen({
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const { showToast } = useToast();
   const view = useMemo(() => toApplicationView(application, viewer), [application, viewer]);
+  usePageTitle(view.student.name);
   const { visaCase } = useVisaCase(application?.id || "");
   const timeline = useApplicationTimeline(application?.id, application?.updated_at);
   const events = useMemo(() => toTimelineEvents(timeline.items), [timeline.items]);

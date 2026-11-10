@@ -43,6 +43,7 @@ import Tabs, { tabPanelProps } from "components/ub/navigation/controls/Tabs";
 import type { TabItem } from "components/ub/navigation/controls/Tabs";
 import AccountManagerPartnerApplicationsTable from "./AccountManagerPartnerApplicationsTable";
 import { PayoutStatementSection } from "features/applications/payouts";
+import { usePageTitle } from "components/ub/navigation/layout/pageTitle";
 
 
 
@@ -151,6 +152,7 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
     useAccountManagerPartnerDetails(id);
   const tabId = useTabId();
   const [tab, setTab] = useState<DetailsTab>("profile");
+  usePageTitle(partner?.name);
 
   if (isPartnerLoading) return <Loading text="Loading advisor details..." />;
   if (partnerError)
