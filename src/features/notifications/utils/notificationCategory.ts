@@ -1,4 +1,5 @@
 import type { Notification } from "../types";
+import { isAdvisorAction } from "features/applications/stages";
 
 export type NotificationCategory = "action_required" | "info";
 
@@ -44,7 +45,12 @@ const STATUS_CATEGORY_MAP: Record<string, NotificationCategory> = {
 // silently buried under "System Info" while this map is out of date.
 const FALLBACK: NotificationCategory = "action_required";
 
-export function getNotificationCategory(notification: Notification): NotificationCategory {
+/**
+ * forAdvisor: an Advisor's status-change notifications use the same rule as the
+ * Applications list and Home queue (isAdvisorAction), so "Action required"
+ * means the status is the Advisor's move.
+ */
+export function getNotificationCategory(notification: Notification, { forAdvisor = false }: { forAdvisor?: boolean } = {}): NotificationCategory {
   if (notification.type === "application_message_received") return "action_required";
   if (notification.type === "new_application") return "action_required";
   if (notification.type === "manager_file_reuploaded") return "info";
@@ -54,6 +60,11 @@ export function getNotificationCategory(notification: Notification): Notificatio
   if (notification.type === "partner_signed_up") return "action_required";
 
   if (notification.type === "application_stage_changed") {
+    if (forAdvisor) {
+      const code = notification.data?.to_status_code as string | undefined;
+      const name = notification.data?.to_status_name as string | undefined;
+      if (code || name) return isAdvisorAction(code) || isAdvisorAction(name) ? "action_required" : "info";
+    }
     const statusId = notification.data?.to_status_id as string | undefined;
     return (statusId && STATUS_CATEGORY_MAP[statusId]) || FALLBACK;
   }

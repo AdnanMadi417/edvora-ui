@@ -21,6 +21,7 @@ import MarkAllAsReadButton from "./MarkAllAsReadButton";
 import TablePagination from "components/ub/data/tables/TablePagination";
 import NotificationTabs, { type UnreadCategoryFilter } from "./NotificationTabs";
 import EmptyData from "components/ub/feedback/states/EmptyData";
+import { useMe } from "hooks/useMe";
 
 const PAGE_SIZE = 20;
 // Unread notifications load in batches of this size via "Load more" (rather
@@ -62,6 +63,8 @@ function getNotificationHref(
 }
 
 export default function Notifications({ applicationBasePath, partnerBasePath }: NotificationsProps) {
+  const { user } = useMe();
+  const forAdvisor = user?.role === "partner";
   const [filter, setFilter] = useState<ReadStatus>("unread");
   const [page, setPage] = useState(1);
   const [unreadPage, setUnreadPage] = useState(1);
@@ -139,7 +142,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
   );
 
   const actionRequiredCount = isUnreadTab
-    ? sorted.filter((n) => getNotificationCategory(n) === "action_required").length
+    ? sorted.filter((n) => getNotificationCategory(n, { forAdvisor }) === "action_required").length
     : 0;
   const infoCount = isUnreadTab ? sorted.length - actionRequiredCount : 0;
 
@@ -154,7 +157,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
   }, [isUnreadTab, loading, actionRequiredCount, infoCount]);
 
   const displayed = isUnreadTab && unreadCategory !== "all"
-    ? sorted.filter((n) => getNotificationCategory(n) === unreadCategory)
+    ? sorted.filter((n) => getNotificationCategory(n, { forAdvisor }) === unreadCategory)
     : sorted;
 
   // Only show the big list-level skeleton on the very first load for a tab;

@@ -166,6 +166,8 @@ describe("isAdvisorAction", () => {
     expect(isAdvisorAction("Waiting for Arrival Date")).toBe(true);
     expect(isAdvisorAction("Extra Arrival Documents Required")).toBe(true);
     expect(isAdvisorAction("E-Visa Re-upload Required")).toBe(true);
+    expect(isAdvisorAction("Institution Requested Corrections")).toBe(true);
+    expect(isAdvisorAction("Waiting Advisor to confirm arrival date")).toBe(true);
   });
   it("leaves staff-side and finished statuses alone", () => {
     expect(isAdvisorAction("Eval Under Review")).toBe(false);

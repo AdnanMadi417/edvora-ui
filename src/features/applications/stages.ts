@@ -116,6 +116,10 @@ const ADVISOR_ACTION_STATUSES: ReadonlySet<string> = new Set([
   "waiting_for_arrival_date",
   "arrival_extra_docs_upload",
   "extra_arrival_documents_required",
+  // The same statuses as the UI words them (University → Institution, Partner → Advisor)
+  "institution_requested_corrections",
+  "waiting_advisor_to_confirm_arrival_date",
+  "immigration_requested_documents",
 ]);
 
 const normalizeStatus = (value: string) => value.trim().toLowerCase().replace(/[\s-]+/g, "_");
