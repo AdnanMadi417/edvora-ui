@@ -19,24 +19,8 @@ import { getAsyncStatus } from "components/ub/feedback/states/AsyncStatus";
 import { useUniversities } from "features/universities/hooks";
 import { useAllStages, useAllStageStatuses } from "features/applications/hooks";
 import { usePartnerApplications } from "features/applications/partner/hooks/usePartnerApplications";
+import { isAdvisorAction } from "features/applications/stages";
 
-const ACTION_REQUIRED_STATUSES = new Set([
-  "correction_requested_by_account_manager",
-  "university_requested_corrections",
-  "program_change_suggested",
-  "waiting_for_payment",
-  "payment_rejected",
-  "waiting_partner_to_confirm_arrival_date",
-  "upload_emgs_eval",
-  "eval_re-upload_required",
-  "upload_e-visa",
-  "e-visa_re-upload_required",
-  "upload_visa_stage_documents",
-  "visa_documents_re-upload_required",
-  "upload_extra_arrival_documents",
-  "extra_arrival_documents_re-upload_required",
-  "commission_ready",
-]);
 
 const PartnerApplications = () => {
   const router = useRouter();
@@ -124,9 +108,7 @@ const PartnerApplications = () => {
             count: (res.data as any)?.total ?? 0,
             failed: false,
             hasAction: ((res.data as any)?.items ?? []).some((app: any) =>
-              ACTION_REQUIRED_STATUSES.has(
-                app.status?.toLowerCase().replace(/\s+/g, "_")
-              )
+              isAdvisorAction(app.status)
             ),
           }))
           .catch(() => ({ id: s.id, count: 0, hasAction: false, failed: true }))
@@ -202,8 +184,7 @@ const PartnerApplications = () => {
     }));
   };
 
-  const needsPartnerAction = (status: string) =>
-    ACTION_REQUIRED_STATUSES.has(status?.toLowerCase().replace(/\s+/g, "_"));
+  const needsPartnerAction = (status: string) => isAdvisorAction(status);
 
   const activeFiltersCount = [
     selectedUniversity !== "all",

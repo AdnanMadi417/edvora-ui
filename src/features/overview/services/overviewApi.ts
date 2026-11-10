@@ -1,5 +1,6 @@
 import { getApiStageTagId } from "config/applicationStages";
 import Cookies from "js-cookie";
+import { isAdvisorAction } from "features/applications/stages";
 import api from "lib/useApi";
 import { partnersApi } from "features/partners/services";
 import { accountManagersApi } from "features/account-managers/services/accountManagersApi";
@@ -25,23 +26,6 @@ const STAFF_ACTIONS = new Set([
   "extra_arrival_documents_under_review",
   "issue_response_received",
   "commission_disputed",
-]);
-const PARTNER_ACTIONS = new Set([
-  "correction_requested_by_account_manager",
-  "university_requested_corrections",
-  "program_change_suggested",
-  "waiting_for_payment",
-  "payment_rejected",
-  "waiting_partner_to_confirm_arrival_date",
-  "upload_emgs_eval",
-  "eval_re-upload_required",
-  "upload_e-visa",
-  "e-visa_re-upload_required",
-  "upload_visa_stage_documents",
-  "visa_documents_re-upload_required",
-  "upload_extra_arrival_documents",
-  "extra_arrival_documents_re-upload_required",
-  "commission_ready",
 ]);
 const normalize = (value: string = "") =>
   value.toLowerCase().trim().replace(/\s+/g, "_");
@@ -126,12 +110,13 @@ export function createOverviewPlan(context: OverviewContext): ResourcePlan[] {
             },
           });
           const data = collection(response.data);
-          const actions = role === "partner" ? PARTNER_ACTIONS : STAFF_ACTIONS;
+          const needsAction = (status: string) =>
+            role === "partner" ? isAdvisorAction(status) : STAFF_ACTIONS.has(normalize(status));
           const items = data.items
             .filter(
               (item) =>
                 status !== "active" ||
-                (actions.has(normalize(item.status)) &&
+                (needsAction(item.status) &&
                   (role !== "partner" ||
                     canViewCommission ||
                     normalize(item.status) !== "commission_ready"))

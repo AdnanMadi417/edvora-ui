@@ -78,3 +78,48 @@ export function resolveStage(input: { stageCode?: string | null; statusCode?: st
   if (closed) mapping.stageId = closed;
   return { ...mapping, stage: getStage(mapping.stageId), attention: !!statusCode && ATTENTION_STATUS_CODES.has(statusCode) };
 }
+
+/**
+ * Statuses where the Advisor has to act next. The single rule behind the
+ * "Action needed" tag, the pipeline flags and the Advisor Home work queue, so
+ * every screen gives the same answer. Accepts a status code or name in any
+ * case or spacing: the backend's names ("Correction Requested by Account
+ * Manager") and its codes ("CORRECTION_REQUESTED") both match.
+ */
+const ADVISOR_ACTION_STATUSES: ReadonlySet<string> = new Set([
+  // Backend status names
+  "correction_requested_by_account_manager",
+  "university_requested_corrections",
+  "program_change_suggested",
+  "waiting_for_payment",
+  "payment_rejected",
+  "waiting_partner_to_confirm_arrival_date",
+  "upload_emgs_eval",
+  "eval_re_upload_required",
+  "upload_e_visa",
+  "e_visa_re_upload_required",
+  "upload_visa_stage_documents",
+  "visa_documents_re_upload_required",
+  "upload_extra_arrival_documents",
+  "extra_arrival_documents_re_upload_required",
+  "commission_ready",
+  // Status codes and the display names that go with them
+  "correction_requested",
+  "application_form_rejected",
+  "health_declaration_rejected",
+  "eval_partner_upload",
+  "waiting_for_emgs_eval_upload",
+  "eval_reupload_required",
+  "e_visa_partner_upload",
+  "waiting_for_e_visa_upload",
+  "waiting_partner_confirm_arrival_date",
+  "waiting_for_arrival_date",
+  "arrival_extra_docs_upload",
+  "extra_arrival_documents_required",
+]);
+
+const normalizeStatus = (value: string) => value.trim().toLowerCase().replace(/[\s-]+/g, "_");
+
+export function isAdvisorAction(status: string | null | undefined): boolean {
+  return !!status && ADVISOR_ACTION_STATUSES.has(normalizeStatus(status));
+}

@@ -1,7 +1,7 @@
 import { getDaysLevel, getDaysLabel } from "components/ub/data/badges/DaysTag";
 import { formatEventTime, groupTimeline, timelineGroupOf } from "components/ub/data/display/Timeline";
 import { getStage } from "config/applicationStages";
-import { resolveStage, API_STAGE_MAP } from "features/applications/stages";
+import { resolveStage, API_STAGE_MAP, isAdvisorAction } from "features/applications/stages";
 import { commissionStateOf, documentName, documentStateOf, toApplicationView } from "features/applications/model/applicationView";
 import { toTimelineEvents } from "features/applications/model/activity";
 import { trackerStepsFor } from "features/applications/components/ApplicationTrackerCard";
@@ -155,4 +155,23 @@ describe("partner next action", () => {
     [{ statusCode: "SUBMITTED_TO_INSTITUTION" }, null],
     [{ statusCode: "WAITING_FOR_PAYMENT", readOnly: true }, null],
   ])("%o → %s", (input, key) => expect(partnerNextAction({ ...base, ...input })).toBe(key));
+});
+
+describe("isAdvisorAction", () => {
+  it("matches backend names, status codes and display names the same way", () => {
+    expect(isAdvisorAction("Correction Requested by Account Manager")).toBe(true);
+    expect(isAdvisorAction("CORRECTION_REQUESTED")).toBe(true);
+    expect(isAdvisorAction("Correction Requested")).toBe(true);
+    expect(isAdvisorAction("Waiting Partner to confirm arrival date")).toBe(true);
+    expect(isAdvisorAction("Waiting for Arrival Date")).toBe(true);
+    expect(isAdvisorAction("Extra Arrival Documents Required")).toBe(true);
+    expect(isAdvisorAction("E-Visa Re-upload Required")).toBe(true);
+  });
+  it("leaves staff-side and finished statuses alone", () => {
+    expect(isAdvisorAction("Eval Under Review")).toBe(false);
+    expect(isAdvisorAction("Submitted to Institution")).toBe(false);
+    expect(isAdvisorAction("Application Completed")).toBe(false);
+    expect(isAdvisorAction("")).toBe(false);
+    expect(isAdvisorAction(null)).toBe(false);
+  });
 });
