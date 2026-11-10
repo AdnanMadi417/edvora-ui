@@ -130,7 +130,7 @@ function AddStudentDemo() {
         size="xl"
         icon={UserPlus}
         title="Add student"
-        description="Fields marked * are required. You can submit the application after saving."
+        description="Every field is required unless it says (optional). You can submit the application after saving."
         onSubmit={submit}
         submitting={submitting}
         submitLabel="Add student"

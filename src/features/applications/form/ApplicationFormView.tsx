@@ -392,7 +392,7 @@ export default function ApplicationFormView(props: ApplicationFormViewProps) {
           <Title id="af-title" className="text-ub-heading-md text-ub-text-primary">
             {mode === "programme" ? "Apply for this programme" : "New application"}
           </Title>
-          <p className="mt-0.5 text-ub-body-sm text-ub-text-secondary">Fields marked * are required. You can review everything before you submit.</p>
+          <p className="mt-0.5 text-ub-body-sm text-ub-text-secondary">Every field is required unless it says (optional). You can review everything before you submit.</p>
         </div>
       </header>
 
