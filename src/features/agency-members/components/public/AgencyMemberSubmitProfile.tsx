@@ -179,7 +179,7 @@ export default function AgencyMemberSubmitProfile() {
             <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
           </div>
           <AlertCircle className="mx-auto mb-4 h-8 w-8 text-red-500" />
-          <h2 className="text-xl font-bold text-slate-900">Invalid Link</h2>
+          <h1 className="text-xl font-bold text-slate-900">Invalid Link</h1>
           <p className="mt-2 text-sm text-slate-500">
             This link is missing or invalid. Please use the link from your invitation email.
           </p>
@@ -198,7 +198,7 @@ export default function AgencyMemberSubmitProfile() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
             <CheckCircle2 className="h-8 w-8 text-green-600" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Profile Submitted!</h2>
+          <h1 className="text-xl font-bold text-slate-900">Profile Submitted!</h1>
           <p className="mt-2 text-sm text-slate-500">
             Your account has been created. Check your email for your login details.
           </p>
@@ -220,7 +220,7 @@ export default function AgencyMemberSubmitProfile() {
 
         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="border-b border-slate-200 p-6">
-            <h2 className="text-xl font-bold text-blue-600">Complete Your Profile</h2>
+            <h1 className="text-xl font-bold text-blue-600">Complete Your Profile</h1>
             <p className="mt-1 text-sm text-slate-500">
               Just a few more details to finish setting up your account.
             </p>

@@ -81,7 +81,7 @@ export default function AgencyInvitationOtpStep() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600">
             <CheckCircle2 className="h-6 w-6" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Check your email</h2>
+          <h1 className="text-xl font-bold text-slate-900">Check your email</h1>
           <p className="mt-2 text-sm text-slate-500">
             We&apos;ve sent a link to <span className="font-medium text-slate-700">{email}</span> to finish
             setting up your account.
@@ -98,7 +98,7 @@ export default function AgencyInvitationOtpStep() {
           <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
         </div>
 
-        <h2 className="text-center text-xl font-bold text-slate-900">Verify your invitation</h2>
+        <h1 className="text-center text-xl font-bold text-slate-900">Verify your invitation</h1>
         <p className="mt-2 text-center text-sm text-slate-500">
           Enter the email you were invited with and the 6-digit code sent to your inbox.
         </p>
