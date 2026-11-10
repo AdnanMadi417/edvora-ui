@@ -110,7 +110,7 @@ function download(csv: string, filename: string) {
 
 function StudentCell({ row }: { row: ApplicationListRow }) {
   return (
-    <span className="flex min-w-[200px] max-w-[300px] items-center gap-3 py-2">
+    <span className="flex min-w-[150px] max-w-[280px] items-center gap-3 py-2">
       <PresignedImage
         fileKey={row.student_photo_file_key ?? undefined}
         alt=""
@@ -164,14 +164,14 @@ export default function ApplicationsTable({
         cell: (r) => <StudentCell row={r} />,
         sortable: true,
         sortValue: (r) => r.student_name,
-        width: "26%",
+        width: "22%",
       },
       {
         key: "programme",
         header: "Programme",
         mobileLabel: "Programme",
         cell: (r) => (
-          <span className="block min-w-[220px] max-w-[300px]">
+          <span className="block min-w-[150px] max-w-[300px]">
             <span
               className="line-clamp-2 text-ub-body-sm text-ub-text-primary"
               title={r.program_name}
@@ -193,8 +193,8 @@ export default function ApplicationsTable({
         header:
           ownership === "advisor-and-manager" ? "Advisor / manager" : "Advisor",
         cell: (r) => (
-          <span className="block min-w-0">
-            <span className="block truncate">{r.partner_name ?? "—"}</span>
+          <span className="block min-w-0 max-w-[170px]">
+            <span className="block truncate" title={r.partner_name ?? undefined}>{r.partner_name ?? "—"}</span>
             {ownership === "advisor-and-manager" && (
               <span className="block truncate text-ub-caption text-ub-text-tertiary">
                 {r.account_manager_name ?? "No manager"}
@@ -211,7 +211,7 @@ export default function ApplicationsTable({
         key: "status",
         header: "Stage / status",
         cell: (r) => (
-          <span className="flex min-w-[180px] flex-col items-start gap-1">
+          <span className="flex min-w-[150px] max-w-[200px] flex-col items-start gap-1">
             <span className="truncate text-ub-caption text-ub-text-tertiary">
               {r.stage}
             </span>
