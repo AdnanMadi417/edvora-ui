@@ -45,7 +45,7 @@ export default function DescriptionList({ items, columns = 1, layout = "stacked"
             )}
           >
             <dt className={clsx("text-ub-label-sm text-ub-text-tertiary", layout === "inline" && "shrink-0")}>{item.label}</dt>
-            <dd className={clsx("text-ub-body-md", empty ? "text-ub-text-disabled" : "text-ub-text-primary", layout === "stacked" ? "mt-1" : "min-w-0 text-end")}>{empty ? fallback : item.value}</dd>
+            <dd className={clsx("text-ub-body-md", empty ? "text-ub-text-tertiary" : "text-ub-text-primary", layout === "stacked" ? "mt-1" : "min-w-0 text-end")}>{empty ? fallback : item.value}</dd>
           </div>
         );
       })}

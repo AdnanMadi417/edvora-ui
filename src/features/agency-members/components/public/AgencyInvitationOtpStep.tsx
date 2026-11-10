@@ -144,7 +144,7 @@ export default function AgencyInvitationOtpStep() {
             <p className="text-sm text-red-600">You&apos;ve requested too many codes. Please wait a bit before trying again.</p>
           )}
           {resendCooldown > 0 ? (
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-ub-text-tertiary">
               Resend available in <span className="font-medium text-slate-600">{resendCooldown}s</span>
             </p>
           ) : (

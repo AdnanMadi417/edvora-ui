@@ -57,7 +57,7 @@ export default function IntakeMonthsField({
         })}
       </div>
 
-      <p className="mt-1.5 text-xs text-slate-400">Programs recur every year in the months you select here.</p>
+      <p className="mt-1.5 text-xs text-ub-text-tertiary">Programs recur every year in the months you select here.</p>
 
       {errors?.[field] && <p className="mt-1 text-xs text-red-600">{errors[field]}</p>}
     </div>

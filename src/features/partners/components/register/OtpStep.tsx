@@ -95,7 +95,7 @@ export default function OtpStep({ email, onSuccess, onRestart }: Props) {
               Restart registration
             </button>
           ) : resendCooldown > 0 ? (
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-ub-text-tertiary">
               Resend available in <span className="font-medium text-slate-600">{resendCooldown}s</span>
             </p>
           ) : (

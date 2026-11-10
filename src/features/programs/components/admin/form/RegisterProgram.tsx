@@ -580,7 +580,7 @@ export default function RegisterProgram({
                       onClick={() => updateFormData("has_scholarship", true)}
                       className={`rounded-md px-4 py-2 text-sm font-medium transition ${
                         formData.has_scholarship
-                          ? "bg-amber-500 text-white shadow-sm"
+                          ? "bg-ub-tone-warning-bg text-ub-tone-warning-text ring-1 ring-ub-tone-warning-border shadow-sm"
                           : "text-ub-text-secondary hover:bg-ub-surface-subtle"
                       }`}
                     >

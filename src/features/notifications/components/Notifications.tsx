@@ -168,7 +168,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
     <section aria-label="Notifications" className="mb-6 mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6">
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-ub-text-secondary">
           {unreadCount > 0
             ? `${unreadCount} new ${unreadCount === 1 ? "notification" : "notifications"}`
             : "You're all caught up"}
@@ -282,10 +282,10 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                       )}
                     </p>
                     {university && (
-                      <p className="mt-0.5 truncate text-xs font-medium text-slate-500">{university}</p>
+                      <p className="mt-0.5 truncate text-xs font-medium text-ub-text-secondary">{university}</p>
                     )}
                     {notification.body && (
-                      <p className="mt-0.5 truncate text-sm text-slate-500">{notification.body}</p>
+                      <p className="mt-0.5 truncate text-sm text-ub-text-secondary">{notification.body}</p>
                     )}
                     {(stage || status) && (
                       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
@@ -294,7 +294,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                             {stage}
                           </span>
                         )}
-                        {stage && status && <ArrowRight className="h-3 w-3 shrink-0 text-slate-400" />}
+                        {stage && status && <ArrowRight className="h-3 w-3 shrink-0 text-ub-text-tertiary" />}
                         {status && (
                           <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
                             {status}
@@ -302,7 +302,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                         )}
                       </div>
                     )}
-                    <p className={`mt-1 text-xs font-semibold ${isUnread ? "text-blue-600" : "text-slate-400"}`}>
+                    <p className={`mt-1 text-xs font-semibold ${isUnread ? "text-blue-600" : "text-ub-text-tertiary"}`}>
                       {timeAgo(notification.created_at)}
                     </p>
                   </div>
@@ -315,7 +315,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                         href={href}
                         onClick={(e) => e.stopPropagation()}
                         title="View application"
-                        className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-500 transition hover:bg-blue-100 hover:text-blue-600"
+                        className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-ub-text-secondary transition hover:bg-blue-100 hover:text-blue-600"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Link>

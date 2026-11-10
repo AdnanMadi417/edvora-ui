@@ -512,7 +512,7 @@ const EditKnowledgeHubProgramDetails = ({
                       updateFormData={updateFormData}
                       onBlur={() => validateField('name')}
                     />
-                    <p className="mt-1 text-xs text-slate-400">Minimum 5 characters — this is exactly what renders in the Program Info column.</p>
+                    <p className="mt-1 text-xs text-ub-text-tertiary">Minimum 5 characters — this is exactly what renders in the Program Info column.</p>
                   </div>
 
                   <SearchableDropdown
@@ -665,7 +665,7 @@ const EditKnowledgeHubProgramDetails = ({
                     <button
                       type="button"
                       onClick={() => updateFormData('has_scholarship', true)}
-                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${formData.has_scholarship ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
+                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${formData.has_scholarship ? 'bg-ub-tone-warning-bg text-ub-tone-warning-text ring-1 ring-ub-tone-warning-border shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
                     >
                       Available
                     </button>
@@ -788,7 +788,7 @@ const EditKnowledgeHubProgramDetails = ({
                         </div>
 
                         {!(formData.scholarships[index].conditions?.length) ? (
-                          <p className="text-sm text-slate-400">No conditions added yet.</p>
+                          <p className="text-sm text-ub-text-tertiary">No conditions added yet.</p>
                         ) : (
                           <div className="space-y-2">
                             {formData.scholarships[index].conditions.map((condition: string, cIndex: number) => (

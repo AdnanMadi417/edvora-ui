@@ -168,7 +168,7 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
           />
         </div>
       ) : (
-        <span className="text-xs text-slate-400 sm:ml-4">Not uploaded</span>
+        <span className="text-xs text-ub-text-tertiary sm:ml-4">Not uploaded</span>
       )}
     </div>
   );

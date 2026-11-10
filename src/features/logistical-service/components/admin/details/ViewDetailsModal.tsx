@@ -140,7 +140,7 @@ export default function ViewDetailsModal({
                     </span>
                   ))
                 ) : (
-                  <span className="text-xs text-slate-400">Not provided</span>
+                  <span className="text-xs text-ub-text-tertiary">Not provided</span>
                 )}
               </div>
             </div>
@@ -158,7 +158,7 @@ export default function ViewDetailsModal({
                     </span>
                   ))
                 ) : (
-                  <span className="text-xs text-slate-400">Not provided</span>
+                  <span className="text-xs text-ub-text-tertiary">Not provided</span>
                 )}
               </div>
             </div>
@@ -195,7 +195,7 @@ export default function ViewDetailsModal({
                     </span>
                   ))
                 ) : (
-                  <span className="text-xs text-slate-400">Not provided</span>
+                  <span className="text-xs text-ub-text-tertiary">Not provided</span>
                 )}
               </div>
             </div>

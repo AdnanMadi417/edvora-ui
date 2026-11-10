@@ -235,7 +235,7 @@ export default function UniversityPublicProfile({ university }: Props) {
           )}
 
           <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-6 py-4">
-            <p className="text-xs text-slate-400">Unibexs</p>
+            <p className="text-xs text-ub-text-tertiary">Unibexs</p>
             <span className="text-xs font-medium text-slate-400">Design preview — not live data</span>
           </div>
         </FadeIn>
@@ -291,7 +291,7 @@ export default function UniversityPublicProfile({ university }: Props) {
                     <div className="flex items-start gap-2.5">
                       <BookOpen className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                       <div>
-                        <p className="text-xs text-slate-400">Courses offered</p>
+                        <p className="text-xs text-ub-text-tertiary">Courses offered</p>
                         <p className="text-sm text-slate-700">{university.languageCenter.courses.length}</p>
                       </div>
                     </div>
@@ -299,7 +299,7 @@ export default function UniversityPublicProfile({ university }: Props) {
                     <div className="flex items-start gap-2.5">
                       <Award className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                       <div>
-                        <p className="text-xs text-slate-400">Founded</p>
+                        <p className="text-xs text-ub-text-tertiary">Founded</p>
                         <p className="text-sm text-slate-700">{university.languageCenter.founded_year}</p>
                       </div>
                     </div>
@@ -307,7 +307,7 @@ export default function UniversityPublicProfile({ university }: Props) {
                     <div className="flex items-start gap-2.5">
                       <LanguagesIcon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                       <div>
-                        <p className="text-xs text-slate-400">Students</p>
+                        <p className="text-xs text-ub-text-tertiary">Students</p>
                         <p className="text-sm text-slate-700">{university.languageCenter.student_count}</p>
                       </div>
                     </div>
@@ -373,7 +373,7 @@ export default function UniversityPublicProfile({ university }: Props) {
                     <div className="flex items-start gap-2.5">
                       <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                       <div>
-                        <p className="text-xs text-slate-400">Intake</p>
+                        <p className="text-xs text-ub-text-tertiary">Intake</p>
                         <p className="text-sm text-slate-700">{intakeLabel || "Contact university"}</p>
                       </div>
                     </div>
@@ -381,7 +381,7 @@ export default function UniversityPublicProfile({ university }: Props) {
                     <div className="flex items-start gap-2.5">
                       <Users className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                       <div>
-                        <p className="text-xs text-slate-400">Students</p>
+                        <p className="text-xs text-ub-text-tertiary">Students</p>
                         <p className="text-sm text-slate-700">{university.student_count}</p>
                       </div>
                     </div>
@@ -389,7 +389,7 @@ export default function UniversityPublicProfile({ university }: Props) {
                     <div className="flex items-start gap-2.5">
                       <Award className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
                       <div>
-                        <p className="text-xs text-slate-400">Founded</p>
+                        <p className="text-xs text-ub-text-tertiary">Founded</p>
                         <p className="text-sm text-slate-700">{university.founded_year}</p>
                       </div>
                     </div>

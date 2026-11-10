@@ -95,7 +95,7 @@ export default function StepIndicator({ steps, currentId, completedIds = [], onS
                   {text}
                 </button>
               ) : (
-                <span className={clsx("flex min-w-0 items-center p-1", compact ? "gap-2" : "gap-3", !open && !isCurrent && "opacity-80")}>
+                <span className={clsx("flex min-w-0 items-center p-1", compact ? "gap-2" : "gap-3")}>
                   {marker}
                   {text}
                 </span>
