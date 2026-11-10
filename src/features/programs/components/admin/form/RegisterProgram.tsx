@@ -758,7 +758,8 @@ export default function RegisterProgram({
                                             )
                                           )
                                         }
-                                        className="text-red-400 transition hover:text-red-600"
+                                        aria-label="Remove condition"
+                                  className="text-red-400 transition hover:text-red-600"
                                       >
                                         <Trash2 className="h-4 w-4" />
                                       </button>

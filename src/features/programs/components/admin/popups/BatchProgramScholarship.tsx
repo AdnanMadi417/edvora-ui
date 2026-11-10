@@ -205,6 +205,7 @@ export default function BatchProgramScholarships({
               </h3>
 
               <IconButton
+                aria-label="Add scholarship"
                 icon={<CalendarPlus className="h-4 w-4" />}
                 bgColor="bg-blue-50"
                 textColor="text-blue-700"
@@ -235,6 +236,7 @@ export default function BatchProgramScholarships({
 
                     {formData.scholarships.length > 1 && (
                       <IconButton
+                        aria-label={`Remove scholarship ${index + 1}`}
                         icon={<Trash2 className="h-4 w-4" />}
                         onClick={() => removeScholarship(index)}
                         bgColor="bg-red-50"
@@ -301,6 +303,7 @@ export default function BatchProgramScholarships({
                           Conditions
                         </h3>
                         <IconButton
+                          aria-label="Add condition"
                           icon={<Plus className="h-4 w-4" />}
                           bgColor="bg-blue-50"
                           textColor="text-blue-700"
@@ -342,7 +345,8 @@ export default function BatchProgramScholarships({
                                   );
                                   updateFormData(`scholarships[${index}].conditions`, updated);
                                 }}
-                                className="text-red-400 transition hover:text-red-600"
+                                aria-label={`Remove condition ${cIndex + 1}`}
+                                  className="text-red-400 transition hover:text-red-600"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>

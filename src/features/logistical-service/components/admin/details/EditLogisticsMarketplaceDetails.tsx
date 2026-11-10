@@ -653,7 +653,8 @@ const EditLogisticsMarketplaceDetails = ({
                             pkg.includes.filter((_, idx) => idx !== i)
                           )
                         }
-                        className="flex items-center justify-center rounded-md border border-red-600 p-1 text-red-600 transition hover:border-red-700"
+                        aria-label={`Remove included item ${i + 1}`}
+                                  className="flex items-center justify-center rounded-md border border-red-600 p-1 text-red-600 transition hover:border-red-700"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>

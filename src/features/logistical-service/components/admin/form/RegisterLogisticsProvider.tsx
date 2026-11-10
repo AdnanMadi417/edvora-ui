@@ -660,6 +660,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                               placeholder={`Include item ${i + 1}`}
                             />
                             <button
+                              aria-label={`Remove included item ${i + 1}`}
                               type="button"
                               onClick={() =>
                                 updatePackage(

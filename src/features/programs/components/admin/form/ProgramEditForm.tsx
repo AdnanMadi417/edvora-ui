@@ -679,6 +679,7 @@ const EditKnowledgeHubProgramDetails = ({
                   </div>
                   {formData.has_scholarship && (
                     <IconButton
+                      aria-label="Add scholarship"
                       icon={<CalendarPlus className="h-4 w-4" />}
                       bgColor="bg-blue-50"
                       textColor="text-blue-700"
@@ -709,6 +710,7 @@ const EditKnowledgeHubProgramDetails = ({
                       </div>
 
                       <IconButton
+                        aria-label={`Remove scholarship ${index + 1}`}
                         icon={<Trash2 className="h-4 w-4" />}
                         onClick={() => removeScholarship(index)}
                         bgColor="bg-red-50"
@@ -771,6 +773,7 @@ const EditKnowledgeHubProgramDetails = ({
                             Conditions
                           </h3>
                           <IconButton
+                            aria-label="Add condition"
                             icon={<Plus className="h-4 w-4" />}
                             bgColor="bg-blue-50"
                             textColor="text-blue-700"
@@ -802,6 +805,7 @@ const EditKnowledgeHubProgramDetails = ({
                                     const updated = formData.scholarships[index].conditions.filter((_: any, i: number) => i !== cIndex);
                                     updateFormData(`scholarships[${index}].conditions`, updated);
                                   }}
+                                  aria-label={`Remove condition ${cIndex + 1}`}
                                   className="text-red-400 transition hover:text-red-600"
                                 >
                                   <Trash2 className="h-4 w-4" />
