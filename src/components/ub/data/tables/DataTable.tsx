@@ -201,7 +201,7 @@ function TableCheckbox({
         aria-describedby={disabledReason ? reasonId : undefined}
         aria-label={label}
         aria-checked={indeterminate ? "mixed" : checked}
-        className={`peer ${checkbox} indeterminate:border-ub-action-primary indeterminate:bg-ub-action-primary`}
+        className={`peer ${checkbox} [@media(pointer:coarse)]:h-6 [@media(pointer:coarse)]:w-6 indeterminate:border-ub-action-primary indeterminate:bg-ub-action-primary`}
       />
       <Check aria-hidden="true" strokeWidth={3} className="pointer-events-none absolute inset-0 m-auto hidden h-3.5 w-3.5 text-ub-action-primary-text peer-checked:block" />
       <Minus aria-hidden="true" strokeWidth={3} className="pointer-events-none absolute inset-0 m-auto hidden h-3.5 w-3.5 text-ub-action-primary-text peer-indeterminate:block" />

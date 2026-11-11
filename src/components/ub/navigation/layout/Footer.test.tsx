@@ -1,6 +1,5 @@
 import React from 'react'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import Footer from 'components/ub/navigation/layout/Footer'
 
 describe('Footer Component', () => {
@@ -12,27 +11,10 @@ describe('Footer Component', () => {
     expect(screen.getByText(/All rights reserved/)).toBeInTheDocument()
   })
 
-  it('renders Unibexs link', () => {
-    render(<Footer />)
-    
-    const link = screen.getByText('Unibexs')
-    expect(link).toBeInTheDocument()
-    expect(link.tagName).toBe('A')
-  })
-
-  it('has correct link href', () => {
-    render(<Footer />)
-    
-    const link = screen.getByText('Unibexs')
-    expect(link).toHaveAttribute('href', '#')
-  })
-
-  it('is keyboard reachable', async () => {
-    const user = userEvent.setup()
+  it('names Unibexs as plain text, not a link to nowhere', () => {
     render(<Footer />)
 
-    await user.tab()
-    expect(screen.getByText('Unibexs')).toHaveFocus()
+    expect(screen.getByText('Unibexs').tagName).toBe('SPAN')
+    expect(screen.queryByRole('link')).not.toBeInTheDocument()
   })
 })
-

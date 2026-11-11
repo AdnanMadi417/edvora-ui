@@ -97,3 +97,20 @@ input.defaultCheckbox::before path {
 input:checked.defaultCheckbox::before {
   opacity: 1;
 }
+
+/* === Touch screens: tap targets in tables (WCAG 2.5.8, 24px minimum) ===
+   Links in cells get taller tap boxes; on inline links the padding doesn't move the text. */
+@media (pointer: coarse) {
+  :is(td, th) a[href] {
+    padding-block: 4px;
+  }
+  :is(td, th) button {
+    min-height: 24px;
+  }
+  /* Row links can wrap block content, where inline padding has no effect;
+     the negative margin keeps the row height unchanged. */
+  [data-row-link] {
+    display: inline-block;
+    margin-block: -4px;
+  }
+}

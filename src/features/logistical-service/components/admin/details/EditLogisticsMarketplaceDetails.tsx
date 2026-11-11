@@ -713,7 +713,7 @@ const EditLogisticsMarketplaceDetails = ({
                   <div className="flex items-start justify-between gap-2">
                     <label
                       htmlFor={`svc-${svc.id}`}
-                      className="flex cursor-pointer items-center gap-2.5"
+                      className="-my-1 flex cursor-pointer items-center gap-2.5 py-1"
                     >
                       <input
                         type="checkbox"

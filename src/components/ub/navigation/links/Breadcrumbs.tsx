@@ -21,7 +21,7 @@ export interface BreadcrumbsProps {
 }
 
 // Local constants.
-const crumbLink = `max-w-[16rem] truncate rounded-ub-xs text-ub-body-sm text-ub-text-secondary underline-offset-2 transition-colors duration-ub-fast ease-ub-standard hover:text-ub-text-primary hover:underline ${focusRing}`;
+const crumbLink = `-my-0.5 max-w-[16rem] truncate rounded-ub-xs py-0.5 text-ub-body-sm text-ub-text-secondary underline-offset-2 transition-colors duration-ub-fast ease-ub-standard hover:text-ub-text-primary hover:underline ${focusRing}`;
 const crumbCurrent = "max-w-[16rem] truncate text-ub-body-sm font-medium text-ub-text-primary";
 
 function Separator({ className }: { className?: string }) {

@@ -43,7 +43,7 @@ function CardTextTooltip({
     >
       <Link
         href={href}
-        className={`block w-full min-w-0 rounded-ub-xs ${focusRing}`}
+        className={`block w-full min-w-0 rounded-ub-xs py-1 ${focusRing}`}
       >
         {children}
       </Link>
