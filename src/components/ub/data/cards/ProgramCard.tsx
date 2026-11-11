@@ -84,7 +84,7 @@ export default function ProgramCard({
         title={program.name}
         className={`absolute inset-0 z-10 rounded-ub-lg ${focusRing}`}
       />
-      <div className="flex items-start gap-3 px-5 pt-5">
+      <div className="flex items-center gap-3 px-4 pt-4 sm:items-start sm:px-5 sm:pt-5">
         <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-ub-md border border-ub-border bg-ub-tone-brand-bg">
           {program.university.logo_file_key ? (
             <PresignedImage
@@ -98,14 +98,14 @@ export default function ProgramCard({
           )}
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-ub-label-sm text-ub-text-tertiary">University</p>
-          <p className="mt-0.5 text-ub-label-md text-ub-text-secondary">
+          <p className="hidden text-ub-label-sm text-ub-text-tertiary sm:block">University</p>
+          <p className="text-ub-label-md text-ub-text-secondary sm:mt-0.5">
             {program.university.name}
           </p>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
+      <div className="flex flex-1 flex-col px-4 pb-4 pt-3 sm:px-5 sm:pb-5 sm:pt-4">
         <div className="mb-3 flex flex-wrap gap-2">
           <Tag hue="indigo" size="sm" className="capitalize">
             {program.qualification_level || "Level to be confirmed"}
@@ -118,7 +118,7 @@ export default function ProgramCard({
         </div>
         <h3
           id={titleId}
-          className="min-h-[2.8em] text-ub-heading-md text-ub-text-primary"
+          className="text-ub-heading-md text-ub-text-primary sm:min-h-[2.8em]"
         >
           <Tooltip
             content={program.name}
@@ -141,7 +141,8 @@ export default function ProgramCard({
           </p>
         )}
 
-        <dl className="my-5 grid grid-cols-2 gap-4 border-y border-ub-border py-4">
+        {/* Phones: the three facts in one row; from sm, tuition gets its own line. */}
+        <dl className="my-4 grid grid-cols-3 gap-3 border-y border-ub-border py-3 sm:my-5 sm:grid-cols-2 sm:gap-4 sm:py-4">
           <div>
             <dt className="flex items-center gap-1.5 text-ub-label-sm text-ub-text-tertiary">
               <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
@@ -164,12 +165,14 @@ export default function ProgramCard({
                 : "To be confirmed"}
             </dd>
           </div>
-          <div className="col-span-2">
+          <div className="sm:col-span-2">
             <dt className="flex items-center gap-1.5 text-ub-label-sm text-ub-text-tertiary">
               <GraduationCap className="h-3.5 w-3.5" aria-hidden="true" />
-              First-year tuition
+              {/* Short on phones so it fits its column on one line. */}
+              <span className="sm:hidden">1st-year fee</span>
+              <span className="hidden sm:inline">First-year tuition</span>
             </dt>
-            <dd className="ub-tabular mt-1 text-ub-heading-md text-ub-text-primary">
+            <dd className="ub-tabular mt-1 text-ub-label-md text-ub-text-primary sm:text-ub-heading-md">
               {program.first_year_tuition != null
                 ? money(
                     program.first_year_tuition,
@@ -180,7 +183,7 @@ export default function ProgramCard({
           </div>
         </dl>
 
-        <div className="mb-5">
+        <div className="mb-4 sm:mb-5">
           <p className="mb-2 flex items-center gap-1.5 text-ub-label-sm text-ub-text-tertiary">
             <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
             Intakes
@@ -198,13 +201,13 @@ export default function ProgramCard({
           )}
         </div>
 
-        <div className="mt-auto space-y-4">
+        <div className="mt-auto space-y-3 sm:space-y-4">
           {program.commission_amount != null && (
-            <div className="flex flex-col items-start gap-1 rounded-ub-md border border-ub-tone-success-border bg-ub-tone-success-bg px-4 py-4">
+            <div className="flex items-center justify-between gap-3 rounded-ub-md border border-ub-tone-success-border bg-ub-tone-success-bg px-4 py-3 sm:flex-col sm:items-start sm:gap-1 sm:py-4">
               <span className="text-ub-label-sm text-ub-tone-success-text">
                 Your commission
               </span>
-              <span className="ub-tabular text-ub-heading-xl-mobile text-ub-tone-success-text">
+              <span className="ub-tabular text-ub-heading-md text-ub-tone-success-text sm:text-ub-heading-xl-mobile">
                 {money(
                   program.commission_amount,
                   program.commission_currency || "MYR"
@@ -212,12 +215,12 @@ export default function ProgramCard({
               </span>
             </div>
           )}
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="flex flex-wrap items-center gap-2">
             <Link
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className={`relative z-20 ${buttonBase} ${buttonSizes.sm} ${buttonVariants.secondary} min-h-[44px] shrink-0 sm:min-h-[32px] sm:flex-1`}
+              className={`relative z-20 ${buttonBase} ${buttonSizes.sm} ${buttonVariants.secondary} min-h-[44px] flex-1 sm:min-h-[32px]`}
               aria-label={`View ${program.name} (opens in a new tab)`}
             >
               View program
@@ -226,7 +229,7 @@ export default function ProgramCard({
             {applyHref && (
               <Link
                 href={applyHref}
-                className={`relative z-20 ${buttonBase} ${buttonSizes.sm} ${buttonVariants.primary} min-h-[44px] shrink-0 sm:min-h-[32px] sm:flex-1`}
+                className={`relative z-20 ${buttonBase} ${buttonSizes.sm} ${buttonVariants.primary} min-h-[44px] flex-1 sm:min-h-[32px]`}
                 aria-label={`Apply for ${program.name}`}
               >
                 <Send className="h-4 w-4" aria-hidden="true" />

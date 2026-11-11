@@ -78,8 +78,8 @@ export default function LogisticsProviderCard({
           className={`absolute inset-0 z-10 rounded-ub-xl ${focusRing}`}
         />
       )}
-      <div className="flex items-start justify-between gap-3 p-5 pb-0">
-        <span className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-ub-lg border border-ub-border bg-ub-tone-brand-bg text-ub-tone-brand-text">
+      <div className="flex items-start justify-between gap-3 p-4 pb-0 sm:p-5 sm:pb-0">
+        <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-ub-lg sm:h-14 sm:w-14 border border-ub-border bg-ub-tone-brand-bg text-ub-tone-brand-text">
           <PresignedImage
             fileKey={locked ? undefined : provider.picture_file_key}
             alt=""
@@ -104,7 +104,7 @@ export default function LogisticsProviderCard({
             : "Inactive"}
         </Tag>
       </div>
-      <div className="flex flex-1 flex-col gap-4 p-5">
+      <div className="flex flex-1 flex-col gap-3 p-4 sm:gap-4 sm:p-5">
         <div className="space-y-2">
           <h3 id={titleId} className="text-ub-heading-md text-ub-text-primary">
             {locked ? (
@@ -159,7 +159,7 @@ export default function LogisticsProviderCard({
             </div>
           ))}
         </dl>
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           <p className="text-ub-caption font-medium uppercase tracking-wider text-ub-text-tertiary">
             Services offered
           </p>
@@ -195,7 +195,7 @@ export default function LogisticsProviderCard({
             )}
           </div>
         </div>
-        <div className="space-y-2.5 border-t border-ub-border pt-4 text-ub-body-sm text-ub-text-secondary">
+        <div className="space-y-2 border-t border-ub-border pt-3 text-ub-body-sm sm:space-y-2.5 sm:pt-4 text-ub-text-secondary">
           <p className="flex items-start gap-2">
             <Languages className="mt-0.5 h-4 w-4 shrink-0" />
             {locked ? (
