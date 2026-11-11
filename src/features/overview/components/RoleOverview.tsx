@@ -32,7 +32,9 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
   if (waiting) return <WidgetStatus state="loading" skeleton="list" />;
   const config = overviewConfig(context);
   return (
-    <div className="mx-auto w-full min-w-0 space-y-6 pb-8">
+    // Phones lead with the work (queue, lists, activity), then totals, then the
+    // chart; from 768px the sections keep their reading order.
+    <div className="mx-auto flex w-full min-w-0 flex-col gap-6 pb-8">
       <DashboardHeader hideTitle
         title={config.title}
         subtitle={config.subtitle}
@@ -50,7 +52,7 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
           />
         }
       />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="order-2 grid gap-4 sm:grid-cols-2 md:order-none xl:grid-cols-4">
         {config.metrics.map((id, index) => {
           const plan = plans.find((item) => item.id === id);
           const resource = resources[id];
@@ -77,7 +79,7 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
           );
         })}
       </div>
-      <div className="grid items-start gap-4 xl:grid-cols-3">
+      <div className="order-3 grid items-start gap-4 md:order-none xl:grid-cols-3">
         <div className="min-w-0 xl:col-span-2">
           <OverviewVisual
             role={role}
@@ -94,7 +96,7 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
           <QuickActions actions={config.actions} className="xl:grid-cols-1" />
         </DashboardCard>
       </div>
-      <div className="grid items-start gap-4 xl:grid-cols-3">
+      <div className="order-1 grid items-start gap-4 md:order-none xl:grid-cols-3">
         {[...config.panels, "updates"].map((id) => {
           const plan = plans.find((item) => item.id === id);
           if (!plan) return null;
