@@ -1,9 +1,9 @@
 "use client";
 
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import { useId } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
-  ArrowLeft,
   BookOpen,
   Building2,
   GraduationCap,
@@ -69,9 +69,7 @@ export default function UniversityProfileView({
                 />
               </div>
               <div className="min-w-0">
-                <p className="text-ub-label-sm text-ub-text-tertiary">
-                  University profile
-                </p>
+                <Breadcrumbs items={[{ label: "Universities", href: basePath }, { label: university.name }]} />
                 <h2 className="mt-1 text-ub-heading-xl-mobile text-ub-text-primary sm:text-ub-heading-xl">
                   {university.name}
                 </h2>
@@ -231,12 +229,6 @@ export default function UniversityProfileView({
                   icon={<BookOpen className="h-4 w-4" />}
                 />
               )}
-              <LinkBtn
-                href={basePath}
-                label="Back to universities"
-                variant="secondary"
-                icon={<ArrowLeft className="h-4 w-4" />}
-              />
             </div>
           </SectionCard>
         </aside>

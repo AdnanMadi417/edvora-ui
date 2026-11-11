@@ -60,7 +60,7 @@ it("hides edit controls for read-only profiles", () => {
     screen.queryByRole("link", { name: "Edit advisor details" })
   ).not.toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: "Back to advisors" })
+    screen.getByRole("link", { name: "Advisors" })
   ).toHaveAttribute("href", "/account-manager/advisors");
   view.rerender(
     <AdvisorProfileHeader

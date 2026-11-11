@@ -49,6 +49,8 @@ interface Props {
   exchangeRates: ExchangeRate[];
   hidden?: boolean;
   managementActions?: ReactNode;
+  /** Trail above the title, e.g. Programs › Bachelor of Computer Science. */
+  breadcrumbs?: ReactNode;
   actions: ReactNode;
   onCopyError?: () => void;
 }
@@ -98,6 +100,7 @@ export default function ProgramDetailsView({
   exchangeRates,
   hidden,
   managementActions,
+  breadcrumbs,
   actions,
   onCopyError,
 }: Props) {
@@ -229,6 +232,7 @@ export default function ProgramDetailsView({
               </Tag>
             </div>
           </div>
+          {breadcrumbs}
           <div className="mt-5 flex flex-wrap gap-2">
             <Tag hue="indigo" className="capitalize">
               {program.qualification_level}

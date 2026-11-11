@@ -6,6 +6,7 @@ import DescriptionList from "components/ub/data/display/DescriptionList";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import Tag from "components/ub/data/badges/Tag";
 import Loading from "components/ub/feedback/states/Loading";
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import { getCountryName } from "constants/lists";
 export default function BankDetails({
   id,
@@ -53,9 +54,7 @@ export default function BankDetails({
             <Landmark className="h-7 w-7" />
           </span>
           <div className="min-w-0 space-y-2">
-            <p className="text-ub-caption font-medium uppercase tracking-wider text-ub-text-tertiary">
-              Bank reference
-            </p>
+            <Breadcrumbs items={[{ label: "Banks", href: basePath }, { label: bank.name }]} />
             <h1 className="break-words text-ub-heading-lg">{bank.name}</h1>
             <p className="text-ub-body-sm text-ub-text-secondary">
               {getCountryName(bank.country)} · {bank.code}
@@ -64,16 +63,10 @@ export default function BankDetails({
         </div>
         <div className="flex items-center gap-2 self-end sm:self-auto">
           <LinkBtn
-            href={basePath}
-            title="Back to banks"
-            variant="tertiary"
-            icon={<ArrowLeft className="h-4 w-4" />}
-          />
-          <LinkBtn
             href={`${basePath}/${id}/edit`}
-            title="Edit bank"
+            label="Edit bank"
             variant="secondary"
-            icon={<Pencil className="h-4 w-4" />}
+            icon={<Pencil className="h-4 w-4" aria-hidden="true" />}
           />
         </div>
       </header>

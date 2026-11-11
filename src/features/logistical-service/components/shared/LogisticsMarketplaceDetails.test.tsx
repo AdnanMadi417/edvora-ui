@@ -58,7 +58,7 @@ it("shows package-only pricing and inclusions without edit controls", () => {
     screen.queryByRole("heading", { name: "Services offered" })
   ).not.toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: "Back to providers" })
+    screen.getByRole("link", { name: "Logistics providers" })
   ).toHaveAttribute("href", "/partner/logistics-marketplace");
   expect(
     screen.queryByRole("link", { name: "Edit provider" })
@@ -72,7 +72,7 @@ it("preserves account-manager navigation", () => {
     <LogisticsMarketplaceDetails id="lgp_008" basePath="/account-manager" />
   );
   expect(
-    screen.getByRole("link", { name: "Back to providers" })
+    screen.getByRole("link", { name: "Logistics providers" })
   ).toHaveAttribute("href", "/account-manager/logistics-marketplace");
   expect(
     screen.queryByRole("link", { name: "Edit provider" })

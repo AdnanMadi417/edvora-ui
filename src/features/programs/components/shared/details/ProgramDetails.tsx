@@ -1,10 +1,10 @@
 "use client";
 
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  ArrowLeft,
   CopyPlus,
   Eye,
   EyeOff,
@@ -131,6 +131,7 @@ export default function ProgramDetails({
   return (
     <>
       <ProgramDetailsView
+        breadcrumbs={<Breadcrumbs items={[{ label: "Programs", href: `${basePath}/knowledge-hub` }, { label: program.name }]} />}
         program={program}
         requiredDocuments={requiredDocuments}
         commission={commission}
@@ -201,12 +202,6 @@ export default function ProgramDetails({
                 onClick={() => router.push(editPath)}
               />
             )}
-            <Button
-              variant="secondary"
-              text="Back to programs"
-              icon={<ArrowLeft className="h-4 w-4" />}
-              onClick={back}
-            />
           </>
         }
       />

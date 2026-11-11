@@ -1,7 +1,8 @@
 "use client";
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, CreditCard, Pencil, Trash2 } from "lucide-react";
+import { CreditCard, Pencil, Trash2 } from "lucide-react";
 import { usePaymentMethod, useDeletePaymentMethod } from "../../hooks";
 import Loading from "components/ub/feedback/states/Loading";
 import RichTextDisplay from "components/ub/data/display/RichTextDisplay";
@@ -51,6 +52,7 @@ export default function PaymentMethodDetails({
           <CreditCard className="h-6 w-6" />
         </span>
         <div className="min-w-0 flex-1">
+          <Breadcrumbs className="mb-1" items={[{ label: "Payment methods", href: basePath }, { label: paymentMethod.name }]} />
           <h1 className="break-words text-ub-heading-md text-ub-text-primary">
             {paymentMethod.name}
           </h1>
@@ -60,18 +62,10 @@ export default function PaymentMethodDetails({
         </div>
         <div className="flex items-center gap-2">
           <LinkBtn
-            href={basePath}
-            aria-label="Back to payment methods"
-            title="Back"
-            variant="tertiary"
-            icon={<ArrowLeft className="h-4 w-4" />}
-          />
-          <LinkBtn
             href={`${basePath}/${id}/edit`}
-            aria-label="Edit payment method"
-            title="Edit payment method"
+            label="Edit payment method"
             variant="secondary"
-            icon={<Pencil className="h-4 w-4" />}
+            icon={<Pencil className="h-4 w-4" aria-hidden="true" />}
           />
           {allowDelete && (
             <IconButton

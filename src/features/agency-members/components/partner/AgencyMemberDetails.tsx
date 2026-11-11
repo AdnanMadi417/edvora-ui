@@ -1,7 +1,7 @@
 "use client";
 
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   MdCategory,
   MdEmail,
@@ -14,7 +14,6 @@ import {
   Ban,
   Briefcase,
   CalendarDays,
-  ChevronLeft,
   Clock,
   Download,
   Eye,
@@ -175,7 +174,6 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
 }
 
 export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsProps) {
-  const router = useRouter();
   const { showToast } = useToast();
 
   const { member, loading, error, refetch } = useAgencyMemberDetails(memberId);
@@ -278,6 +276,10 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
               />
             </div>
             <div className="min-w-0">
+              <Breadcrumbs
+                className="mb-1"
+                items={[{ label: "Team members", href: "/partner/team-members" }, { label: member.name || "Team member" }]}
+              />
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="truncate text-lg font-semibold text-slate-900">{member.name || "Unknown Member"}</h2>
                 {member.is_active ? (
@@ -290,17 +292,6 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
             </div>
           </div>
 
-          <Button
-            className="shrink-0 self-end sm:self-auto"
-            onClick={() => router.push("/partner/team-members")}
-            icon={<ChevronLeft className="h-4 w-4" />}
-            text="Back"
-            bgColor="bg-white"
-            textColor="text-slate-700"
-            borderColor="border-slate-200"
-            hoverTextColor="hover:text-slate-900"
-            hoverBorderColor="hover:border-slate-300"
-          />
         </div>
 
         {/* Account Overview */}

@@ -1,5 +1,6 @@
 "use client";
 
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, Ban, Wallet } from "lucide-react";
@@ -90,6 +91,14 @@ export default function PayoutDetailPage({ partnerId, payoutId }: Props) {
           <div className="flex items-center gap-4 border-b border-ub-border p-6">
             <IconTile icon={Wallet} tone="brand" size="lg" />
             <div className="min-w-0 flex-1">
+              <Breadcrumbs
+                className="mb-1"
+                items={[
+                  { label: "Advisors", href: "/admin/advisors" },
+                  { label: "Advisor", href: `/admin/advisors/${partnerId}` },
+                  { label: payout?.bank_reference ?? "Payout" },
+                ]}
+              />
               <h2 className="ub-ref truncate text-ub-heading-md text-ub-text-primary">{payout?.bank_reference}</h2>
               <p className="text-ub-body-sm text-ub-text-secondary">
                 {paymentMethodName} · <AppDate value={payout?.paid_at} format="short" />

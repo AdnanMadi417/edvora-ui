@@ -1,7 +1,8 @@
 "use client";
 
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import { useState } from "react";
-import { ArrowLeft, Layers, Pencil } from "lucide-react";
+import { Layers, Pencil } from "lucide-react";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import Tag from "components/ub/data/badges/Tag";
 import SectionCard from "components/ub/data/cards/SectionCard";
@@ -41,9 +42,7 @@ export default function UniversityTypeDetailsView({
               />
             </span>
             <div className="min-w-0">
-              <p className="text-ub-label-sm text-ub-text-tertiary">
-                University type
-              </p>
+              <Breadcrumbs items={[{ label: "University types", href: basePath }, { label: university.name }]} />
               <h2 className="mt-1 break-words text-ub-heading-xl-mobile text-ub-text-primary sm:text-ub-heading-xl">
                 {university.name}
               </h2>
@@ -136,13 +135,6 @@ export default function UniversityTypeDetailsView({
           )}
         </div>
       </SectionCard>
-      <LinkBtn
-        href={basePath}
-        label="Back to types"
-        icon={<ArrowLeft className="h-4 w-4" />}
-        variant="secondary"
-        className="min-h-[44px]"
-      />
     </div>
   );
 }

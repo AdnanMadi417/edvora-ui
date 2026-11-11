@@ -1,5 +1,6 @@
 "use client";
 
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -104,9 +105,7 @@ export default function ProviderProfileDetails({
               }
             />
             <div className="min-w-0 space-y-2">
-              <p className="text-ub-caption font-medium uppercase tracking-wider text-ub-text-tertiary">
-                Logistics provider
-              </p>
+              <Breadcrumbs items={[{ label: "Logistics providers", href: basePath }, { label: service.name }]} />
               <h1 className="break-words text-ub-heading-lg text-ub-text-primary">
                 {service.name}
               </h1>
@@ -128,18 +127,12 @@ export default function ProviderProfileDetails({
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-2 self-end md:self-auto">
-            <LinkBtn
-              href={basePath}
-              title="Back to providers"
-              variant="tertiary"
-              icon={<ArrowLeft className="h-4 w-4" />}
-            />
             {editable && (
               <LinkBtn
                 href={`${basePath}/${id}/edit`}
-                title="Edit provider"
+                label="Edit provider"
                 variant="secondary"
-                icon={<Pencil className="h-4 w-4" />}
+                icon={<Pencil className="h-4 w-4" aria-hidden="true" />}
               />
             )}
             {!editable && service.whatsapp && (

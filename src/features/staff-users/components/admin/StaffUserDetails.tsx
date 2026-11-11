@@ -1,11 +1,10 @@
 "use client";
 
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Ban,
   CheckCircle,
-  ChevronLeft,
   Power,
   ShieldCheck,
   XCircle,
@@ -35,7 +34,6 @@ interface StaffUserDetailsProps {
 }
 
 export default function StaffUserDetails({ userId }: StaffUserDetailsProps) {
-  const router = useRouter();
   const { showToast } = useToast();
 
   const { staffUser, loading, error, refetch } = useStaffUserDetails(userId);
@@ -81,12 +79,6 @@ export default function StaffUserDetails({ userId }: StaffUserDetailsProps) {
 
   return (
     <section className="mx-auto mt-5 min-w-0 space-y-5">
-      <Button
-        onClick={() => router.push("/admin/staff-users")}
-        icon={<ChevronLeft className="h-4 w-4" />}
-        text="Back to staff users"
-        variant="secondary"
-      />
       <header className="overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface">
         <div className="h-2 bg-ub-tone-brand-bg" />
         <div className="flex flex-col gap-5 p-4 sm:p-6 md:flex-row md:items-center md:justify-between">
@@ -101,9 +93,7 @@ export default function StaffUserDetails({ userId }: StaffUserDetailsProps) {
                 .toUpperCase() || "?"}
             </span>
             <div className="min-w-0 space-y-2">
-              <p className="text-ub-caption text-ub-text-secondary">
-                Staff profile
-              </p>
+              <Breadcrumbs items={[{ label: "Staff users", href: "/admin/staff-users" }, { label: staffUser.name || "Staff user" }]} />
               <h1 className="break-words text-ub-heading-lg">
                 {staffUser.name}
               </h1>

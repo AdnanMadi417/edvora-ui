@@ -1,8 +1,8 @@
 "use client";
 
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { ChevronLeft, KeyRound, Save, ShieldCheck } from "lucide-react";
+import { KeyRound, Save, ShieldCheck } from "lucide-react";
 
 import { useRoles, useRenameRole } from "../../hooks";
 
@@ -19,7 +19,6 @@ interface RoleDetailsProps {
 }
 
 export default function RoleDetails({ roleId }: RoleDetailsProps) {
-  const router = useRouter();
   const { showToast } = useToast();
 
   const { roles, loading: rolesLoading, refetch: refetchRoles } = useRoles();
@@ -63,6 +62,7 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div className="space-y-1">
+              <Breadcrumbs items={[{ label: "Roles", href: "/admin/roles" }, { label: role.name }]} />
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-xl font-semibold text-slate-900">{role.name}</h1>
                 {role.is_system ? (
@@ -77,17 +77,6 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
               </p>
             </div>
           </div>
-
-          <Button
-            onClick={() => router.push("/admin/roles")}
-            icon={<ChevronLeft className="h-4 w-4" />}
-            text="Back"
-            bgColor="bg-white"
-            textColor="text-slate-700"
-            borderColor="border-slate-200"
-            hoverTextColor="hover:text-slate-900"
-            hoverBorderColor="hover:border-slate-300"
-          />
         </div>
 
         <div className="h-px w-full bg-slate-200" />

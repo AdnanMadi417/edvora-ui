@@ -1,4 +1,5 @@
 "use client";
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import { ArrowLeft, Download, FileText, Upload } from "lucide-react";
 import { useDocumentType } from "../../hooks";
 import { useTemplateDownload } from "../../hooks/useTemplateDownload";
@@ -39,18 +40,13 @@ export default function DocumentTypeDetails({ id }: { id: string }) {
           <FileText className="h-6 w-6" />
         </span>
         <div className="min-w-0 flex-1">
+          <Breadcrumbs className="mb-1" items={[{ label: "Document templates", href: base }, { label: type.type }]} />
           <h1 className="break-words text-ub-heading-md">{type.type}</h1>
           <p className="mt-1 break-all text-ub-body-sm text-ub-text-secondary">
             {type.code}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <LinkBtn
-            href={base}
-            title="Back to document types"
-            variant="tertiary"
-            icon={<ArrowLeft className="h-4 w-4" />}
-          />
           {type.static_template_file_key && (
             <IconButton
               title="View template"
@@ -63,13 +59,13 @@ export default function DocumentTypeDetails({ id }: { id: string }) {
           {type.has_static_template && (
             <LinkBtn
               href={`${base}/${id}/edit`}
-              title={
+              label={
                 type.static_template_file_key
                   ? "Replace template"
                   : "Upload template"
               }
               variant="secondary"
-              icon={<Upload className="h-4 w-4" />}
+              icon={<Upload className="h-4 w-4" aria-hidden="true" />}
             />
           )}
         </div>

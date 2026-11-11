@@ -1,5 +1,6 @@
+import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import type { ReactNode } from "react";
-import { ArrowLeft, Pencil, MapPin, Building2, User } from "lucide-react";
+import { Pencil, MapPin, Building2, User } from "lucide-react";
 import type { PartnerDetails } from "features/partners/types";
 import PresignedImage from "components/ub/data/media/PresignedImage";
 import LinkBtn from "components/ub/core/buttons/LinkBtn";
@@ -62,6 +63,9 @@ export default function AdvisorProfileHeader({
           </div>
         )}
         <div className="min-w-0 space-y-2">
+          {backHref !== null && (
+            <Breadcrumbs items={[{ label: "Advisors", href: backHref || basePath }, { label: name }]} />
+          )}
           <p className="text-ub-caption font-medium uppercase tracking-wider text-ub-text-tertiary">
             {company ? "Company advisor" : "Individual advisor"}
           </p>
@@ -93,20 +97,12 @@ export default function AdvisorProfileHeader({
       </div>
       <div className="flex shrink-0 items-center gap-2 self-end sm:self-auto">
         {actions}
-        {backHref !== null && (
-          <LinkBtn
-            href={backHref || basePath}
-            title="Back to advisors"
-            variant="tertiary"
-            icon={<ArrowLeft className="h-4 w-4" />}
-          />
-        )}
         {editable && (
           <LinkBtn
             href={editHref || `${basePath}/${partner.id}/edit`}
-            title={editLabel}
+            label={editLabel}
             variant="secondary"
-            icon={<Pencil className="h-4 w-4" />}
+            icon={<Pencil className="h-4 w-4" aria-hidden="true" />}
           />
         )}
       </div>
