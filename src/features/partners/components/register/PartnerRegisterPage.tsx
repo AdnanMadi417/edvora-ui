@@ -4,7 +4,9 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { User, Building2, AlertCircle, CheckCircle2, ChevronRight } from "lucide-react";
+import { User, Building2, AlertCircle, CheckCircle2, ChevronRight, Briefcase, Presentation, GraduationCap, UserRound } from "lucide-react";
+import RadioCardGroup from "components/ub/forms/choices/RadioCardGroup";
+import { FieldError } from "components/ub/forms/layout/FieldChrome";
 import { usePartnerRegistration } from "features/partners/hooks";
 import OtpStep from "./OtpStep";
 import EnterVerificationCodeModal from "./EnterVerificationCodeModal";
@@ -103,6 +105,14 @@ function usePublicPhotoUpload() {
 
   return { file, fileKey, fileUrl, uploading, progress, error, handleSelect, handleRemove };
 }
+
+// One icon per "Which best describes you?" option.
+const BACKGROUND_ICONS: Record<string, typeof UserRound> = {
+  agent: Briefcase,
+  teacher: Presentation,
+  student: GraduationCap,
+  other: UserRound,
+};
 
 export default function PartnerRegisterPage() {
   const router = useRouter();
@@ -470,27 +480,21 @@ export default function PartnerRegisterPage() {
                   </SectionCard>
 
                   <SectionCard title="Background" subtitle="Which best describes you?">
-                    <div className="flex flex-col gap-2" data-field="background">
-                      {BACKGROUND_OPTIONS.map((opt) => (
-                        <label key={opt.value}
-                          className={`flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-3 transition ${
-                            indForm.background === opt.value
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-slate-200 bg-white hover:bg-slate-50"
-                          }`}>
-                          <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                            indForm.background === opt.value ? "border-blue-500" : "border-slate-300"
-                          }`}>
-                            {indForm.background === opt.value && <div className="h-2 w-2 rounded-full bg-blue-500" />}
-                          </div>
-                          <input type="radio" name="background" value={opt.value} className="hidden"
-                            checked={indForm.background === opt.value}
-                            onChange={() => updateInd("background", opt.value)} />
-                          <span className="text-sm text-slate-700">{opt.label}</span>
-                        </label>
-                      ))}
+                    <div data-field="background">
+                      <RadioCardGroup
+                        ariaLabel="Which best describes you?"
+                        compact
+                        options={BACKGROUND_OPTIONS.map((opt) => ({
+                          value: opt.value,
+                          label: opt.label,
+                          hint: "",
+                          icon: BACKGROUND_ICONS[opt.value] ?? UserRound,
+                        }))}
+                        value={indForm.background}
+                        onChange={(value) => updateInd("background", value)}
+                      />
+                      <FieldError>{errors.background}</FieldError>
                     </div>
-                    {errors.background && <p className="mt-2 text-xs text-red-600">{errors.background}</p>}
                   </SectionCard>
 
                   <SectionCard title="Identity Verification"
