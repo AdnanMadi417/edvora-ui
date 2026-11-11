@@ -76,22 +76,22 @@ function InfoRow({
   href?: string;
 }) {
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-slate-500">
+    <div className="flex items-start gap-3 rounded-lg border border-ub-border bg-ub-surface-subtle p-3">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ub-surface text-ub-text-secondary">
         {icon}
       </div>
-      <div className="min-w-0">
-        <p className="text-xs text-slate-500">{label}</p>
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-ub-text-secondary">{label}</p>
         {href && value ? (
           <button
             type="button"
             onClick={() => window.open(encodeURI(href), "_blank", "noopener,noreferrer")}
-            className="mt-0.5 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline"
+            className="mt-0.5 inline-flex items-center gap-1 text-sm font-medium text-ub-text-link hover:underline"
           >
             Visit Link <ExternalLink className="h-3 w-3" />
           </button>
         ) : (
-          <p className="mt-0.5 text-sm font-medium text-slate-900">
+          <p className="mt-0.5 break-words text-sm font-medium text-ub-text-primary [overflow-wrap:anywhere]">
             {value || "Not provided"}
           </p>
         )}
@@ -132,12 +132,12 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-lg border border-ub-border p-4 transition-colors hover:bg-ub-surface-subtle sm:flex-row sm:items-center sm:justify-between">
       <div className="flex min-w-0 items-center gap-3 sm:flex-1">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ub-surface-subtle text-ub-text-secondary">
           <FileText className="h-5 w-5" />
         </div>
-        <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
+        <p className="truncate text-sm font-semibold text-ub-text-primary">{label}</p>
       </div>
       {fileKey ? (
         <div className="flex shrink-0 items-center gap-2 sm:ml-4">
@@ -146,24 +146,24 @@ function DocRow({ label, fileKey, personName }: { label: string; fileKey?: strin
             disabled={!!loading}
             title="View document"
             icon={<Eye className={`h-4 w-4 ${loading === "view" ? "animate-pulse" : ""}`} />}
-            bgColor="bg-slate-100"
-            textColor="text-slate-600"
+            bgColor="bg-ub-surface-subtle"
+            textColor="text-ub-text-secondary"
             borderColor="border-transparent"
-            hoverTextColor="hover:text-slate-600"
-            hoverBorderColor="hover:border-slate-200"
-            className="hover:bg-slate-200"
+            hoverTextColor="hover:text-ub-text-secondary"
+            hoverBorderColor="hover:border-ub-border"
+            className="hover:bg-ub-surface-subtle"
           />
           <IconButton
             onClick={handleDownload}
             disabled={!!loading}
             title="Download document"
             icon={<Download className={`h-4 w-4 ${loading === "download" ? "animate-pulse" : ""}`} />}
-            bgColor="bg-green-50"
-            textColor="text-green-600"
+            bgColor="bg-ub-tone-success-bg"
+            textColor="text-ub-tone-success-text"
             borderColor="border-transparent"
-            hoverTextColor="hover:text-green-600"
-            hoverBorderColor="hover:border-green-200"
-            className="hover:bg-green-100"
+            hoverTextColor="hover:text-ub-tone-success-text"
+            hoverBorderColor="hover:border-ub-tone-success-border"
+            className="hover:bg-ub-tone-success-bg"
           />
         </div>
       ) : (
@@ -239,7 +239,7 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
           <button
             type="button"
             onClick={refetch}
-            className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+            className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-ub-border px-3 py-1.5 text-xs font-medium text-ub-text-secondary transition hover:bg-ub-surface-subtle"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             Retry
@@ -255,13 +255,13 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
 
   return (
     <div className="mx-auto mt-6 ">
-      <div className="rounded-lg border border-slate-200 bg-white">
+      <div className="rounded-lg border border-ub-border bg-ub-surface">
 
         {/* Header */}
-        <div className="flex flex-col gap-4 border-b border-slate-200 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 border-b border-ub-border px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-4">
             <div className="relative shrink-0">
-              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
                 <PresignedImage
                   fileKey={member.individual_details?.profile_photo_file_key ?? undefined}
                   alt="Profile"
@@ -270,8 +270,8 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
                 />
               </div>
               <span
-                className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${
-                  member.is_active ? "bg-emerald-500" : "bg-slate-300"
+                className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-ub-surface ${
+                  member.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"
                 }`}
               />
             </div>
@@ -281,22 +281,22 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
                 items={[{ label: "Team members", href: "/partner/team-members" }, { label: member.name || "Team member" }]}
               />
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="truncate text-lg font-semibold text-slate-900">{member.name || "Unknown Member"}</h2>
+                <h2 className="truncate text-lg font-semibold text-ub-text-primary">{member.name || "Unknown Member"}</h2>
                 {member.is_active ? (
                   <StatusBadge variant="success" icon={<CheckCircle className="h-3 w-3" />}>Active</StatusBadge>
                 ) : (
                   <StatusBadge variant="neutral" icon={<XCircle className="h-3 w-3" />}>Suspended</StatusBadge>
                 )}
               </div>
-              <p className="truncate text-sm text-slate-500">{member.email}</p>
+              <p className="truncate text-sm text-ub-text-secondary">{member.email}</p>
             </div>
           </div>
 
         </div>
 
         {/* Account Overview */}
-        <div className="border-b border-slate-200 p-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <div className="border-b border-ub-border p-6">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
             Account Overview
           </p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -323,10 +323,10 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
         </div>
 
         {/* Individual Details */}
-        <div className="border-b border-slate-200 p-6">
+        <div className="border-b border-ub-border p-6">
           <div className="mb-4 flex items-center gap-2">
-            <Briefcase className="h-4 w-4 text-slate-500" />
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+            <Briefcase className="h-4 w-4 text-ub-text-secondary" />
+            <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
               Individual Details
             </p>
           </div>
@@ -380,22 +380,14 @@ export default function AgencyMemberDetails({ memberId }: AgencyMemberDetailsPro
               onClick={() => setIsResendWelcomeOpen(true)}
               icon={<Mail className="h-4 w-4" />}
               text="Resend Welcome Email"
-              bgColor="bg-white"
-              textColor="text-slate-700"
-              borderColor="border-slate-200"
-              hoverTextColor="hover:text-slate-900"
-              hoverBorderColor="hover:border-slate-300"
+              variant="secondary"
             />
           )}
           <Button
             onClick={() => setIsSuspendOpen(true)}
             icon={member.is_active ? <Ban className="h-4 w-4" /> : <Power className="h-4 w-4" />}
             text={member.is_active ? "Suspend Member" : "Reactivate Member"}
-            bgColor={member.is_active ? "bg-red-50" : "bg-emerald-50"}
-            textColor={member.is_active ? "text-red-700" : "text-emerald-700"}
-            borderColor={member.is_active ? "border-red-600" : "border-emerald-600"}
-            hoverTextColor={member.is_active ? "hover:text-red-800" : "hover:text-emerald-800"}
-            hoverBorderColor={member.is_active ? "hover:border-red-700" : "hover:border-emerald-700"}
+            variant="secondary"
           />
         </div>
       </div>

@@ -193,7 +193,7 @@ export default function AgencyInvitationsTable() {
   return (
     <>
       {/* Filter Bar */}
-      <div className="p-6 border-b border-slate-200">
+      <div className="p-6 border-b border-ub-border">
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <div className="flex items-center gap-2 sm:contents">
             <SearchInput
@@ -206,17 +206,17 @@ export default function AgencyInvitationsTable() {
             />
             {isRefetching && (
               <RefreshCw
-                className="h-4 w-4 shrink-0 animate-spin text-slate-400"
+                className="h-4 w-4 shrink-0 animate-spin text-ub-text-tertiary"
                 aria-label="Updating results"
               />
             )}
             <button
-              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-ub-border bg-ub-surface text-ub-text-secondary hover:bg-ub-surface-subtle"
               onClick={() => setShowMobileFilters((v) => !v)}
             >
               <SlidersHorizontal className="h-4 w-4" />
               {activeFiltersCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-ub-action-primary text-[10px] font-bold text-white">
                   {activeFiltersCount}
                 </span>
               )}
@@ -248,12 +248,8 @@ export default function AgencyInvitationsTable() {
                 onClick={clearFilters}
                 icon={<RefreshCw className="h-4 w-4" />}
                 text="Clear"
-                bgColor="bg-white"
-                textColor="text-red-600"
-                borderColor="border-red-200"
-                hoverTextColor="hover:text-red-600"
-                hoverBorderColor="hover:border-red-200"
-                className="hover:bg-red-50 sm:w-auto"
+                variant="secondary"
+                className="hover:bg-ub-tone-danger-bg sm:w-auto"
               />
             )}
           </div>
@@ -278,7 +274,7 @@ export default function AgencyInvitationsTable() {
         >
           <table className="w-full min-w-[800px] md:min-w-0">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
+              <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
                   {
                     icon: User,
@@ -297,10 +293,10 @@ export default function AgencyInvitationsTable() {
                     key={label}
                     className={`${
                       minW ?? ""
-                    } px-6 py-4 text-start text-sm font-semibold text-slate-900`}
+                    } px-6 py-4 text-start text-sm font-semibold text-ub-text-primary`}
                   >
                     <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4 text-slate-400" />
+                      <Icon className="h-4 w-4 text-ub-text-tertiary" />
                       {label}
                     </div>
                   </th>
@@ -310,7 +306,7 @@ export default function AgencyInvitationsTable() {
             </thead>
 
             <tbody
-              className={`divide-y divide-slate-100 bg-white ${
+              className={`divide-y divide-ub-border bg-ub-surface ${
                 isRefetching ? "opacity-60 transition-opacity" : ""
               }`}
             >
@@ -335,19 +331,15 @@ export default function AgencyInvitationsTable() {
                       ? "Try adjusting your filters."
                       : "Invite your first team member to get started."
                   }
-                  icon={<UserPlus className="h-8 w-8 text-slate-400" />}
+                  icon={<UserPlus className="h-8 w-8 text-ub-text-tertiary" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button
                         onClick={clearFilters}
                         icon={<RefreshCw className="h-3.5 w-3.5" />}
                         text="Clear filters"
-                        bgColor="bg-white"
-                        textColor="text-slate-700"
-                        borderColor="border-slate-200"
-                        hoverTextColor="hover:text-slate-700"
-                        hoverBorderColor="hover:border-slate-200"
-                        className="hover:bg-slate-50"
+                        variant="secondary"
+                        className="hover:bg-ub-surface-subtle"
                       />
                     ) : undefined
                   }
@@ -360,16 +352,16 @@ export default function AgencyInvitationsTable() {
                   invitations.map((invitation) => (
                     <AnimatedTableRow
                       key={invitation.id}
-                      className="transition-colors hover:bg-slate-50/50"
+                      className="transition-colors hover:bg-ub-surface-subtle"
                     >
                       <td className="min-w-[140px] px-6 py-4 sm:min-w-[200px]">
-                        <div className="truncate text-sm font-medium text-slate-900">
+                        <div className="truncate text-sm font-medium text-ub-text-primary">
                           {invitation.name}
                         </div>
                       </td>
 
                       <td className="min-w-[160px] px-6 py-4 sm:min-w-[200px]">
-                        <div className="truncate text-sm text-slate-500">
+                        <div className="truncate text-sm text-ub-text-secondary">
                           {invitation.email}
                         </div>
                       </td>
@@ -389,7 +381,7 @@ export default function AgencyInvitationsTable() {
                       </td>
 
                       <td className="px-6 py-4">
-                        <div className="text-sm text-slate-900">
+                        <div className="text-sm text-ub-text-primary">
                           <AppDate
                             value={invitation.created_at}
                             format="short"

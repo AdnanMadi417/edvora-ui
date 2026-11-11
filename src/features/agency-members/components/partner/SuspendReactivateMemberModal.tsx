@@ -39,8 +39,8 @@ export default function SuspendReactivateMemberModal({
   const action = isActive ? "Suspend" : "Reactivate";
   const Icon = isActive ? Ban : Power;
   const colorClasses = isActive
-    ? { bg: "bg-red-50", text: "text-red-700", border: "border-red-600", hoverText: "hover:text-red-800", hoverBorder: "hover:border-red-700", iconBg: "bg-red-50", iconColor: "text-red-600", iconBorder: "border-red-200" }
-    : { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-600", hoverText: "hover:text-emerald-800", hoverBorder: "hover:border-emerald-700", iconBg: "bg-emerald-50", iconColor: "text-emerald-600", iconBorder: "border-emerald-200" };
+    ? { variant: "destructive" as const, iconBg: "bg-ub-tone-danger-bg", iconColor: "text-ub-tone-danger-text", iconBorder: "border-ub-tone-danger-border" }
+    : { variant: "positive" as const, iconBg: "bg-ub-tone-success-bg", iconColor: "text-ub-tone-success-text", iconBorder: "border-ub-tone-success-border" };
 
   return (
     <div
@@ -67,14 +67,14 @@ export default function SuspendReactivateMemberModal({
             iconBg={colorClasses.iconBg}
             iconColor={colorClasses.iconColor}
             iconBorder={colorClasses.iconBorder}
-            titleColor="text-gray-900"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
           <div className="space-y-4 px-7 py-6">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900">Confirm {action}</h3>
-              <p className="text-sm text-slate-500">
+              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm {action}</h3>
+              <p className="text-sm text-ub-text-secondary">
                 {isActive ? (
                   <>Are you sure you want to suspend <strong>{memberName}</strong>&apos;s account? They will lose access immediately.</>
                 ) : (
@@ -84,29 +84,21 @@ export default function SuspendReactivateMemberModal({
             </div>
           </div>
 
-          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-3 border-t border-ub-border px-6 py-4 sm:flex-row sm:justify-end">
             <Button
               className="w-full sm:w-auto"
               onClick={onClose}
               disabled={isSubmitting}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
               className="w-full sm:w-auto"
               icon={<Icon className="h-5 w-5" />}
               text={isSubmitting ? `${action === "Suspend" ? "Suspending" : "Reactivating"}...` : `${action} Member`}
-              bgColor={colorClasses.bg}
-              textColor={colorClasses.text}
-              borderColor={colorClasses.border}
-              hoverTextColor={colorClasses.hoverText}
-              hoverBorderColor={colorClasses.hoverBorder}
+              variant={colorClasses.variant}
               onClick={onConfirm}
               disabled={isSubmitting}
             />

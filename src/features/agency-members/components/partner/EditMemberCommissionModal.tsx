@@ -109,10 +109,10 @@ export default function EditMemberCommissionModal({
             title="Edit Commission Settings"
             description={member ? `Update commission visibility for "${member.name}".` : undefined}
             icon={Percent}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
@@ -139,18 +139,14 @@ export default function EditMemberCommissionModal({
             )}
           </div>
 
-          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-3 border-t border-ub-border px-6 py-4 sm:flex-row sm:justify-end">
             <Button
               className="w-full sm:w-auto"
               onClick={onClose}
               disabled={loading}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
@@ -159,11 +155,7 @@ export default function EditMemberCommissionModal({
               disabled={loading}
               icon={<Percent className="h-5 w-5" />}
               text={loading ? "Saving..." : "Save Changes"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
             />
           </div>
         </div>

@@ -56,51 +56,43 @@ export default function ResendMemberWelcomeEmailConfirmation({
             title="Resend Welcome Email"
             description="Send a fresh temporary password to this member."
             icon={Mail}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
           <div className="space-y-4 px-7 py-6">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900">Confirm Resend</h3>
-              <p className="text-sm text-slate-500">
+              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm Resend</h3>
+              <p className="text-sm text-ub-text-secondary">
                 Are you sure you want to resend the welcome email to <strong>{memberName}</strong>?
                 This issues a new temporary password, replacing the previous one.
               </p>
             </div>
             {isCoolingDown && (
-              <p className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-700">
+              <p className="rounded-md border border-ub-tone-warning-border bg-ub-tone-warning-bg px-3 py-2 text-sm text-ub-tone-warning-text">
                 A welcome email was sent recently. You can resend again in {cooldownSeconds}s.
               </p>
             )}
           </div>
 
-          <div className="flex flex-col-reverse gap-3 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-3 border-t border-ub-border px-6 py-4 sm:flex-row sm:justify-end">
             <Button
               className="w-full sm:w-auto"
               onClick={onClose}
               disabled={isSending}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
               className="w-full sm:w-auto"
               icon={<Mail className="h-5 w-5" />}
               text={isSending ? "Sending..." : isCoolingDown ? `Retry in ${cooldownSeconds}s` : "Resend Email"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
               onClick={onConfirm}
               disabled={isDisabled}
             />

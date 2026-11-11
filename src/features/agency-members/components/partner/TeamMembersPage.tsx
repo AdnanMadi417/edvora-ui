@@ -40,7 +40,7 @@ export default function TeamMembersPage() {
   if (isPartnerLoading) {
     return (
       <div className="mt-6 text-p2">
-        <div className="rounded-lg border border-slate-200 bg-white">
+        <div className="rounded-lg border border-ub-border bg-ub-surface">
           <Loading text="Loading..." />
         </div>
       </div>
@@ -49,10 +49,10 @@ export default function TeamMembersPage() {
   if (partner?.agency_role === "member") {
     return (
       <div className="mt-6 text-p2">
-        <div className="flex flex-col items-center gap-3 rounded-lg border border-slate-200 bg-white p-12 text-center">
-          <ShieldX className="h-10 w-10 text-slate-300" />
-          <p className="text-sm font-medium text-slate-700">Your team is managed by your agency admin.</p>
-          <p className="text-sm text-slate-500">You don&apos;t have access to invite or manage team members.</p>
+        <div className="flex flex-col items-center gap-3 rounded-lg border border-ub-border bg-ub-surface p-12 text-center">
+          <ShieldX className="h-10 w-10 text-ub-text-tertiary" />
+          <p className="text-sm font-medium text-ub-text-secondary">Your team is managed by your agency admin.</p>
+          <p className="text-sm text-ub-text-secondary">You don&apos;t have access to invite or manage team members.</p>
         </div>
       </div>
     );
@@ -60,22 +60,18 @@ export default function TeamMembersPage() {
 
   return (
     <div className="mt-6 text-p2">
-      <div className="rounded-lg border border-slate-200 bg-white">
+      <div className="rounded-lg border border-ub-border bg-ub-surface">
 
         {/* Header */}
-        <div className="flex flex-col gap-4 border-b border-slate-200 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 border-b border-ub-border p-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="mt-0.5 text-sm text-slate-500">Invite colleagues to join your agency</p>
+            <p className="mt-0.5 text-sm text-ub-text-secondary">Invite colleagues to join your agency</p>
           </div>
           <Button
             onClick={() => setIsInviteOpen(true)}
             icon={<UserPlus className="h-4 w-4" />}
             text="Invite Member"
-            bgColor="bg-blue-50"
-            textColor="text-blue-700"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-blue-800"
-            hoverBorderColor="hover:border-blue-700"
+            variant="primary"
           />
         </div>
 
