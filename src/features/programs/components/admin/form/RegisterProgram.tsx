@@ -592,7 +592,7 @@ export default function RegisterProgram({
                       onClick={() => updateFormData("has_scholarship", false)}
                       className={`rounded-ub-full px-4 py-2 text-sm font-medium transition ${
                         !formData.has_scholarship
-                          ? "bg-slate-700 text-white shadow-sm"
+                          ? "bg-ub-tone-neutral-bg text-ub-tone-neutral-text ring-1 ring-ub-tone-neutral-border shadow-sm"
                           : "text-ub-text-secondary hover:bg-ub-surface-subtle"
                       }`}
                     >
@@ -603,11 +603,7 @@ export default function RegisterProgram({
                     <IconButton
                       title="Add scholarship"
                       icon={<CalendarPlus className="h-4 w-4" />}
-                      bgColor="bg-blue-50"
-                      textColor="text-blue-700"
-                      borderColor="border-blue-600"
-                      hoverTextColor="hover:text-blue-800"
-                      hoverBorderColor="hover:border-blue-700"
+                      variant="secondary"
                       onClick={addScholarship}
                     />
                   )}
@@ -622,7 +618,7 @@ export default function RegisterProgram({
                       >
                         <div className="mb-5 flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-50 text-sm font-semibold text-amber-600">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-ub-tone-warning-bg text-sm font-semibold text-ub-tone-warning-text">
                               {index + 1}
                             </div>
                             <div>
@@ -639,11 +635,11 @@ export default function RegisterProgram({
                               title="Remove scholarship"
                               icon={<Trash2 className="h-4 w-4" />}
                               onClick={() => removeScholarship(index)}
-                              bgColor="bg-red-50"
-                              textColor="text-red-600"
-                              borderColor="border-red-200"
-                              hoverTextColor="hover:text-red-700"
-                              hoverBorderColor="hover:border-red-300"
+                              bgColor="bg-ub-tone-danger-bg"
+                              textColor="text-ub-tone-danger-text"
+                              borderColor="border-ub-tone-danger-border"
+                              hoverTextColor="hover:text-ub-tone-danger-text"
+                              hoverBorderColor="hover:border-ub-tone-danger-border"
                             />
                           )}
                         </div>
@@ -705,11 +701,7 @@ export default function RegisterProgram({
                               <IconButton
                                 title="Add condition"
                                 icon={<Plus className="h-4 w-4" />}
-                                bgColor="bg-blue-50"
-                                textColor="text-blue-700"
-                                borderColor="border-blue-600"
-                                hoverTextColor="hover:text-blue-800"
-                                hoverBorderColor="hover:border-blue-700"
+                                variant="secondary"
                                 onClick={() =>
                                   updateFormData(
                                     `scholarships[${index}].conditions`,
@@ -760,7 +752,7 @@ export default function RegisterProgram({
                                           )
                                         }
                                         aria-label="Remove condition"
-                                  className="text-red-400 transition hover:text-red-600"
+                                  className="text-ub-tone-danger-text transition hover:text-ub-tone-danger-text"
                                       >
                                         <Trash2 className="h-4 w-4" />
                                       </button>

@@ -53,10 +53,10 @@ export default function DeleteProgramsConfirmation({
             title="Delete Program"
             description="This action will permanently delete this program and all related data."
             icon={Trash2}
-            iconBg="bg-red-50"
-            iconColor="text-red-600"
-            iconBorder="border-red-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-danger-bg"
+            iconColor="text-ub-tone-danger-text"
+            iconBorder="border-ub-tone-danger-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
@@ -64,24 +64,24 @@ export default function DeleteProgramsConfirmation({
             <div className="space-y-5">
 
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">
+                <h3 className="text-lg font-semibold text-ub-text-primary">
                   Confirm Deletion
                 </h3>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-ub-text-secondary">
                   Are you sure you want to permanently delete the selected program(s) from the system?
                 </p>
               </div>
 
               {programNames && programNames.length > 0 && (
                 <div>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ub-text-tertiary">
                     {programNames.length} program{programNames.length !== 1 ? "s" : ""} selected
                   </p>
                   <ul className="max-h-40 overflow-y-auto flex flex-wrap gap-2 pr-1">
                     {programNames.map((name, index) => (
                       <li
                         key={index}
-                        className="inline-flex max-w-xs items-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700"
+                        className="inline-flex max-w-xs items-center rounded-md border border-ub-border bg-ub-surface px-3 py-1.5 text-sm font-medium text-ub-text-secondary"
                       >
                         <span className="truncate">{name}</span>
                       </li>
@@ -93,18 +93,14 @@ export default function DeleteProgramsConfirmation({
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
 
             <DeleteBtn
               icon={<XCircle className="h-5 w-5" />}
               text={
                 isDeleting ? "Cancelling..." : "Cancel Deletion"
               }
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
               onClick={onClose}
               disabled={isDeleting}
             />
@@ -114,11 +110,7 @@ export default function DeleteProgramsConfirmation({
               text={
                 isDeleting ? "Deleting..." : "Delete Program"
               }
-              bgColor="bg-red-50"
-              textColor="text-red-700"
-              borderColor="border-red-600"
-              hoverTextColor="hover:text-red-800"
-              hoverBorderColor="hover:border-red-700"
+              variant="destructive"
               onClick={onConfirm}
               disabled={isDeleting}
             />

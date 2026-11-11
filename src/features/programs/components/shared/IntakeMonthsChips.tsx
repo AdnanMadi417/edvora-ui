@@ -46,10 +46,10 @@ export default function IntakeMonthsChips({
           <span
             key={month}
             className={`inline-flex items-center rounded-full border font-medium ${SIZE_CLASSES[size]} ${
-              isNext ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 bg-slate-50 text-slate-600"
+              isNext ? "border-ub-tone-success-border bg-ub-tone-success-bg text-ub-tone-success-text" : "border-ub-border bg-ub-surface-subtle text-ub-text-secondary"
             }`}
           >
-            {showDot && isNext && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />}
+            {showDot && isNext && <span className="h-1.5 w-1.5 rounded-full bg-ub-tone-success-dot" />}
             {CALENDAR_MONTHS.find((m) => m.value === month)?.short ?? month}
           </span>
         );
@@ -57,7 +57,7 @@ export default function IntakeMonthsChips({
       {hiddenCount > 0 && (
         <span
           title={sorted.slice(maxVisible).map((m) => CALENDAR_MONTHS.find((cm) => cm.value === m)?.label ?? m).join(", ")}
-          className={`inline-flex items-center rounded-full border border-slate-200 bg-slate-50 font-medium text-slate-500 ${SIZE_CLASSES[size]}`}
+          className={`inline-flex items-center rounded-full border border-ub-border bg-ub-surface-subtle font-medium text-ub-text-secondary ${SIZE_CLASSES[size]}`}
         >
           +{hiddenCount}
         </span>

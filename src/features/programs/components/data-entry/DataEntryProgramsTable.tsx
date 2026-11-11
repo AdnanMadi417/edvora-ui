@@ -264,7 +264,7 @@ const DataEntryProgramsTable = () => {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 sm:p-6 border-b border-ub-border">
         <div>
-          <p className="mt-1 text-sm text-slate-500">Explore and manage all programs, universities, and learning resources</p>
+          <p className="mt-1 text-sm text-ub-text-secondary">Explore and manage all programs, universities, and learning resources</p>
         </div>
         <LinkBtn href="/data-entry/knowledge-hub/create" variant="primary" icon={<Plus className="h-4 w-4" />} label="Create program" className="min-h-[44px]" />
       </div>

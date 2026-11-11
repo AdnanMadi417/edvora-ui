@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, Landmark } from "lucide-react";
@@ -98,10 +98,10 @@ export default function DefaultVisaFee({
             title="Default Visa Fee"
             description="Set the global default visa fee amount used during visa setup."
             icon={Landmark}
-            iconBg="bg-indigo-50"
-            iconColor="text-indigo-600"
-            iconBorder="border-indigo-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-tone-brand-text"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
@@ -117,16 +117,12 @@ export default function DefaultVisaFee({
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
@@ -134,11 +130,7 @@ export default function DefaultVisaFee({
               disabled={!isFormValid || loading}
               icon={<Landmark className="h-5 w-5" />}
               text={loading ? "Updating..." : "Set Visa Fee"}
-              bgColor="bg-indigo-50"
-              textColor="text-indigo-700"
-              borderColor="border-indigo-600"
-              hoverTextColor="hover:text-indigo-800"
-              hoverBorderColor="hover:border-indigo-700"
+              variant="primary"
             />
           </div>
         </div>

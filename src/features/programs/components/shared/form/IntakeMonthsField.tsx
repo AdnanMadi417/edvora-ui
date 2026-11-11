@@ -32,8 +32,8 @@ export default function IntakeMonthsField({
 
   return (
     <div data-field={field}>
-      <label className="mb-2 block text-sm font-semibold text-slate-900">
-        {label} {required && <span className="text-red-600">*</span>}
+      <label className="mb-2 block text-sm font-semibold text-ub-text-primary">
+        {label} {required && <span className="text-ub-tone-danger-text">*</span>}
       </label>
 
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
@@ -47,8 +47,8 @@ export default function IntakeMonthsField({
               aria-pressed={isSelected}
               className={`rounded-ub-full border px-3 py-2 text-sm font-medium transition ${
                 isSelected
-                  ? "border-blue-600 bg-blue-50 text-blue-700"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
+                  ? "border-ub-action-primary bg-ub-tone-brand-bg text-ub-text-link"
+                  : "border-ub-border bg-ub-surface text-ub-text-secondary hover:border-ub-border hover:bg-ub-surface-subtle"
               }`}
             >
               {m.short}
@@ -59,7 +59,7 @@ export default function IntakeMonthsField({
 
       <p className="mt-1.5 text-xs text-ub-text-tertiary">Programs recur every year in the months you select here.</p>
 
-      {errors?.[field] && <p className="mt-1 text-xs text-red-600">{errors[field]}</p>}
+      {errors?.[field] && <p className="mt-1 text-xs text-ub-tone-danger-text">{errors[field]}</p>}
     </div>
   );
 }

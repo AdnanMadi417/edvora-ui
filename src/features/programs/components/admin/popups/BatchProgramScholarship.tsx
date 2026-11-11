@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, GraduationCap, CalendarPlus, Plus, Trash2 } from "lucide-react";
@@ -191,28 +191,24 @@ export default function BatchProgramScholarships({
             title="Bulk Scholarship Update"
             description="Update scholarship details for multiple programs at once."
             icon={GraduationCap}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
 
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-ub-text-secondary">
                 Scholarship
               </h3>
 
               <IconButton
                 aria-label="Add scholarship"
                 icon={<CalendarPlus className="h-4 w-4" />}
-                bgColor="bg-blue-50"
-                textColor="text-blue-700"
-                borderColor="border-blue-600"
-                hoverTextColor="hover:text-blue-800"
-                hoverBorderColor="hover:border-blue-700"
+                variant="secondary"
                 onClick={addScholarship}
               />
 
@@ -222,16 +218,16 @@ export default function BatchProgramScholarships({
               {formData.scholarships.map((_, index) => (
                 <div
                   key={index}
-                  className="rounded-xl border border-slate-200 bg-white p-6 transition"
+                  className="rounded-xl border border-ub-border bg-ub-surface p-6 transition"
                 >
                   <div className="mb-5 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-50 text-sm font-semibold text-blue-600">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-md bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
                         {index + 1}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-slate-800">Scholarship</p>
-                        <p className="text-xs text-slate-500">Configure scholarship details</p>
+                        <p className="text-sm font-semibold text-ub-text-primary">Scholarship</p>
+                        <p className="text-xs text-ub-text-secondary">Configure scholarship details</p>
                       </div>
                     </div>
 
@@ -240,11 +236,11 @@ export default function BatchProgramScholarships({
                         aria-label={`Remove scholarship ${index + 1}`}
                         icon={<Trash2 className="h-4 w-4" />}
                         onClick={() => removeScholarship(index)}
-                        bgColor="bg-red-50"
-                        textColor="text-red-600"
-                        borderColor="border-red-200"
-                        hoverTextColor="hover:text-red-700"
-                        hoverBorderColor="hover:border-red-300"
+                        bgColor="bg-ub-tone-danger-bg"
+                        textColor="text-ub-tone-danger-text"
+                        borderColor="border-ub-tone-danger-border"
+                        hoverTextColor="hover:text-ub-tone-danger-text"
+                        hoverBorderColor="hover:border-ub-tone-danger-border"
                       />
                     )}
                   </div>
@@ -300,17 +296,13 @@ export default function BatchProgramScholarships({
 
                     <div className="md:col-span-2 space-y-3">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-semibold tracking-wide text-slate-500">
+                        <h3 className="text-sm font-semibold tracking-wide text-ub-text-secondary">
                           Conditions
                         </h3>
                         <IconButton
                           aria-label="Add condition"
                           icon={<Plus className="h-4 w-4" />}
-                          bgColor="bg-blue-50"
-                          textColor="text-blue-700"
-                          borderColor="border-blue-600"
-                          hoverTextColor="hover:text-blue-800"
-                          hoverBorderColor="hover:border-blue-700"
+                          variant="secondary"
                           onClick={() => {
                             const updated = [...formData.scholarships[index].conditions, ""];
                             updateFormData(`scholarships[${index}].conditions`, updated);
@@ -319,7 +311,7 @@ export default function BatchProgramScholarships({
                       </div>
 
                       {formData.scholarships[index].conditions.length === 0 ? (
-                        <p className="text-sm text-slate-400">No conditions added yet.</p>
+                        <p className="text-sm text-ub-text-tertiary">No conditions added yet.</p>
                       ) : (
                         <div className="space-y-2">
                           {formData.scholarships[index].conditions.map((condition, cIndex) => (
@@ -347,7 +339,7 @@ export default function BatchProgramScholarships({
                                   updateFormData(`scholarships[${index}].conditions`, updated);
                                 }}
                                 aria-label={`Remove condition ${cIndex + 1}`}
-                                  className="text-red-400 transition hover:text-red-600"
+                                  className="text-ub-tone-danger-text transition hover:text-ub-tone-danger-text"
                               >
                                 <Trash2 className="h-4 w-4" />
                               </button>
@@ -363,16 +355,12 @@ export default function BatchProgramScholarships({
 
             </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
               text={"Cancel"}
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
@@ -380,11 +368,7 @@ export default function BatchProgramScholarships({
               disabled={!isFormValid || loading}
               icon={<GraduationCap className="h-5 w-5" />}
               text={loading ? "Updating..." : "Update Scholarships"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
             />
           </div>
         </div>

@@ -123,19 +123,19 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
 
   return (
     <div className="mt-6 overflow-hidden text-p2">
-      <div className="relative mb-8 overflow-hidden rounded-lg border border-slate-200 bg-white ">
+      <div className="relative mb-8 overflow-hidden rounded-lg border border-ub-border bg-ub-surface ">
 
-      <div className="relative border-b border-slate-200">
-          <div className="flex flex-col gap-6 rounded-t-xl md:flex-row md:items-center md:justify-between p-6 border-b border-slate-200">
+      <div className="relative border-b border-ub-border">
+          <div className="flex flex-col gap-6 rounded-t-xl md:flex-row md:items-center md:justify-between p-6 border-b border-ub-border">
             <div>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-ub-text-secondary">
                 Explore and manage all programs, universities, and learning
                 resources
               </p>
             </div>
           </div>
 
-          <div className="p-6 border-b border-slate-200">
+          <div className="p-6 border-b border-ub-border">
 
             <ProgramFilterPanel
             searchTerm={searchTerm}
@@ -200,7 +200,7 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                 <button
                   type="button"
                   onClick={refetchPrograms}
-                  className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                  className="rounded-ub-full bg-ub-action-primary px-4 py-2 text-sm font-medium text-ub-action-primary-text transition-colors hover:bg-ub-action-primary-hover"
                 >
                   Try again
                 </button>
@@ -214,7 +214,7 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
               <NoMessagesFound
                 title="No programs found"
                 subtitle="Try adjusting your search or filters."
-                icon={<GraduationCap className="h-8 w-8 text-slate-400" />}
+                icon={<GraduationCap className="h-8 w-8 text-ub-text-tertiary" />}
               />
             )}
 
@@ -241,9 +241,9 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 items-center gap-4 border-t border-slate-200 p-4 sm:p-6 md:flex md:justify-between">
+              <div className="grid grid-cols-1 items-center gap-4 border-t border-ub-border p-4 sm:p-6 md:flex md:justify-between">
                 {total > 0 && (
-                  <div className="flex flex-wrap items-center gap-1 text-sm font-medium text-slate-500">
+                  <div className="flex flex-wrap items-center gap-1 text-sm font-medium text-ub-text-secondary">
                     Showing
                     <span className="font-medium">
                       {(currentPage - 1) * ITEMS_PER_PAGE + 1}
@@ -268,7 +268,7 @@ const ProgramsCards = ({ basePath = "/partner", showApplyAction = true }: Progra
                     icon={<ArrowLeft className="h-4 w-4" />}
                   />
 
-                  <span className="px-3 py-1 font-medium text-slate-500">
+                  <span className="px-3 py-1 font-medium text-ub-text-secondary">
                     Page {currentPage} of{" "}
                     {Math.ceil(total / ITEMS_PER_PAGE)}
                   </span>

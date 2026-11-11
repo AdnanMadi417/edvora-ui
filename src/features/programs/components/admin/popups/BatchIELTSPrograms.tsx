@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, GraduationCap } from "lucide-react";
@@ -124,10 +124,10 @@ export default function BatchPrograms({
           title="Bulk IELTS Update"
           description="Update IELTS requirements for multiple programs at once."
           icon={GraduationCap}
-          iconBg="bg-blue-50"
-          iconColor="text-blue-600"
-          iconBorder="border-blue-200"
-          titleColor="text-gray-900"
+          iconBg="bg-ub-tone-brand-bg"
+          iconColor="text-ub-text-link"
+          iconBorder="border-ub-tone-brand-border"
+          titleColor="text-ub-text-primary"
           onClose={onClose}
         />
 
@@ -147,16 +147,12 @@ export default function BatchPrograms({
 
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
               text={"Cancel"}
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
@@ -164,11 +160,7 @@ export default function BatchPrograms({
               disabled={!isFormValid || loading}
               icon={<GraduationCap className="h-5 w-5" />}
               text={loading ? "Updating..." : "Update IELTS"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
             />
           </div>
         </div>

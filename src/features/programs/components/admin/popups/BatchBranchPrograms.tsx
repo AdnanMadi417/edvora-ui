@@ -93,10 +93,10 @@ export default function BatchBranchPrograms({
             title="Bulk Branch Update"
             description={`Assign a branch to ${selectedProgramIds.length} selected program${selectedProgramIds.length !== 1 ? "s" : ""}.`}
             icon={GitBranch}
-            iconBg="bg-violet-50"
-            iconColor="text-violet-600"
-            iconBorder="border-violet-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-plum-bg"
+            iconColor="text-ub-tone-plum-text"
+            iconBorder="border-ub-tone-plum-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
@@ -113,16 +113,12 @@ export default function BatchBranchPrograms({
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
@@ -130,11 +126,7 @@ export default function BatchBranchPrograms({
               disabled={!isFormValid}
               icon={<GitBranch className="h-5 w-5" />}
               text={loading ? "Updating..." : "Update Branch"}
-              bgColor="bg-violet-50"
-              textColor="text-violet-700"
-              borderColor="border-violet-600"
-              hoverTextColor="hover:text-violet-800"
-              hoverBorderColor="hover:border-violet-700"
+              variant="primary"
             />
           </div>
         </div>

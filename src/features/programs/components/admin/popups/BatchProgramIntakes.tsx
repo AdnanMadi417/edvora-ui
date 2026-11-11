@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, CalendarDays } from "lucide-react";
@@ -122,15 +122,15 @@ export default function BatchProgramIntakes({
             title="Bulk Intake Update"
             description="Update intake dates for multiple programs at once."
             icon={CalendarDays}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
           <div className="max-h-[60vh] space-y-6 overflow-y-auto px-6 py-6">
-            <h3 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+            <h3 className="text-sm font-semibold uppercase tracking-wide text-ub-text-secondary">
               Intake Schedule
             </h3>
 
@@ -145,16 +145,12 @@ export default function BatchProgramIntakes({
 
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
               text={"Cancel"}
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
@@ -162,11 +158,7 @@ export default function BatchProgramIntakes({
               disabled={!isFormValid || loading}
               icon={<CalendarDays className="h-5 w-5" />}
               text={loading ? "Updating..." : "Update Intakes"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
             />
           </div>
         </div>

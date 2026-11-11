@@ -99,18 +99,18 @@ export default function BatchCourseTypePrograms({
             title="Bulk Course Type Update"
             description={`Set the course type for ${selectedPrograms.length} selected program${selectedPrograms.length !== 1 ? "s" : ""}.`}
             icon={Layers}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
           <div className="space-y-4 px-6 py-6">
             {ineligible.length > 0 && (
-              <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-                <div className="text-sm text-amber-800">
+              <div className="flex items-start gap-3 rounded-lg border border-ub-tone-warning-border bg-ub-tone-warning-bg px-4 py-3">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-ub-tone-warning-text" />
+                <div className="text-sm text-ub-tone-warning-text">
                   <p className="font-medium">Course type only applies to Master's/PhD programs.</p>
                   <p className="mt-1">Deselect these to continue: {ineligible.map((p) => p.name).join(", ")}</p>
                 </div>
@@ -129,16 +129,12 @@ export default function BatchCourseTypePrograms({
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
@@ -146,11 +142,7 @@ export default function BatchCourseTypePrograms({
               disabled={!isFormValid}
               icon={<Layers className="h-5 w-5" />}
               text={loading ? "Updating..." : "Update Course Type"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
             />
           </div>
         </div>

@@ -415,17 +415,17 @@ const EditKnowledgeHubProgramDetails = ({
   return (
     <>
       <div className="mt-5 min-w-0 max-w-6xl mx-auto overflow-clip rounded-ub-xl border border-ub-border bg-ub-surface">
-          <div className="flex justify-between border-b p-6">
+          <div className="flex justify-between border-b border-ub-border p-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-md bg-gradient-to-r from-blue-600 to-indigo-700">
-                <GraduationCap className="h-8 w-8 text-white" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-ub-md bg-ub-tone-brand-bg">
+                <GraduationCap className="h-8 w-8 text-ub-tone-brand-text" />
               </div>
 
               <div>
                 <h3 className="text-lg font-semibold">
                   {program?.name ?? "Not Provided"}
                 </h3>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-ub-text-secondary">
                   {program?.university?.name ?? "Not Provided"}
                 </p>
               </div>
@@ -441,32 +441,28 @@ const EditKnowledgeHubProgramDetails = ({
                   }
                   icon={<MoreVertical className="h-4 w-4" />}
                   text="Actions"
-                  bgColor="bg-white"
-                  textColor="text-slate-800"
-                  borderColor="border-gray-200"
-                  hoverTextColor="hover:text-slate-800"
-                  hoverBorderColor="hover:border-gray-200"
-                  className="hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-blue-400"
+                  variant="secondary"
+                  className="hover:bg-ub-surface-subtle focus-visible:ring-2 focus-visible:ring-ub-border-focus"
                 />
 
                 {openDropdownId === program.id && (
-                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-gray-200 bg-white ring-1 ring-black/5">
+                  <div className="animate-in fade-in slide-in-from-top-2 absolute right-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-ub-border bg-ub-surface ring-1 ring-black/5">
                     <div className="space-y-2 p-2">
                       {!hideDelete && (
                         <button
                           aria-label="Delete Program"
-                          className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-red-200 hover:bg-red-50 hover:shadow-sm"
+                          className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-ub-surface px-4 py-3 text-left text-sm transition-all hover:border-ub-tone-danger-border hover:bg-ub-tone-danger-bg hover:shadow-sm"
                           onClick={(e) => {
                             e.stopPropagation();
                             setIsDeleteOpen(true);
                             setOpenDropdownId(null);
                           }}
                         >
-                          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-red-100 text-red-600 transition-colors group-hover:bg-red-200">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-ub-tone-danger-bg text-ub-tone-danger-text transition-colors group-hover:bg-ub-tone-danger-bg">
                             <Trash2 className="h-4 w-4" />
                           </div>
 
-                          <span className="font-semibold text-red-700">
+                          <span className="font-semibold text-ub-tone-danger-text">
                           Delete Program
                         </span>
                         </button>
@@ -474,14 +470,14 @@ const EditKnowledgeHubProgramDetails = ({
 
                       <button
                         aria-label="Back to Knowledge Hub"
-                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-white px-4 py-3 text-left text-sm transition-all hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm"
+                        className="group flex w-full items-center gap-3 rounded-md border border-transparent bg-ub-surface px-4 py-3 text-left text-sm transition-all hover:border-ub-border hover:bg-ub-surface-subtle hover:shadow-sm"
                         onClick={handleBack}
                       >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors group-hover:bg-slate-200">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-ub-surface-subtle text-ub-text-secondary transition-colors group-hover:bg-ub-surface-subtle">
                           <ChevronLeft className="h-4 w-4" />
                         </div>
 
-                        <span className="font-semibold text-slate-900">
+                        <span className="font-semibold text-ub-text-primary">
                         Back to Knowledge Hub
                       </span>
                       </button>
@@ -611,9 +607,9 @@ const EditKnowledgeHubProgramDetails = ({
                   />
 
                   <div className="md:col-span-2">
-                    <label className="mb-1.5 block text-sm font-medium text-slate-700">Location</label>
+                    <label className="mb-1.5 block text-sm font-medium text-ub-text-secondary">Location</label>
                     <div className="flex h-[50px] items-center gap-2 rounded-ub-full border border-dashed border-ub-border bg-ub-surface-subtle px-[17px] text-[13px] text-ub-text-secondary">
-                      <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
+                      <MapPin className="h-4 w-4 shrink-0 text-ub-text-tertiary" />
                       {location || 'Select a university and branch to see its location'}
                     </div>
                   </div>
@@ -668,14 +664,14 @@ const EditKnowledgeHubProgramDetails = ({
                     <button
                       type="button"
                       onClick={() => updateFormData('has_scholarship', true)}
-                      className={`rounded-ub-full px-4 py-2 text-sm font-medium transition ${formData.has_scholarship ? 'bg-ub-tone-warning-bg text-ub-tone-warning-text ring-1 ring-ub-tone-warning-border shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
+                      className={`rounded-ub-full px-4 py-2 text-sm font-medium transition ${formData.has_scholarship ? 'bg-ub-tone-warning-bg text-ub-tone-warning-text ring-1 ring-ub-tone-warning-border shadow-sm' : 'text-ub-text-secondary hover:bg-ub-surface-subtle'}`}
                     >
                       Available
                     </button>
                     <button
                       type="button"
                       onClick={() => updateFormData('has_scholarship', false)}
-                      className={`rounded-ub-full px-4 py-2 text-sm font-medium transition ${!formData.has_scholarship ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
+                      className={`rounded-ub-full px-4 py-2 text-sm font-medium transition ${!formData.has_scholarship ? 'bg-ub-tone-neutral-bg text-ub-tone-neutral-text ring-1 ring-ub-tone-neutral-border shadow-sm' : 'text-ub-text-secondary hover:bg-ub-surface-subtle'}`}
                     >
                       None
                     </button>
@@ -684,29 +680,25 @@ const EditKnowledgeHubProgramDetails = ({
                     <IconButton
                       aria-label="Add scholarship"
                       icon={<CalendarPlus className="h-4 w-4" />}
-                      bgColor="bg-blue-50"
-                      textColor="text-blue-700"
-                      borderColor="border-blue-600"
-                      hoverTextColor="hover:text-blue-800"
-                      hoverBorderColor="hover:border-blue-700"
+                      variant="secondary"
                       onClick={addScholarship}
                     />
                   )}
                 </div>
 
                 {(formData.scholarships ?? []).map((scholarship: any, index: number) => (
-                  <div key={index} className="rounded-xl border border-slate-200 bg-white p-6 transition">
+                  <div key={index} className="rounded-xl border border-ub-border bg-ub-surface p-6 transition">
                     <div className="mb-5 flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-amber-50 text-sm font-semibold text-amber-600">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-md bg-ub-tone-warning-bg text-sm font-semibold text-ub-tone-warning-text">
                           {index + 1}
                         </div>
 
                         <div>
-                          <p className="text-sm font-semibold text-slate-800">
+                          <p className="text-sm font-semibold text-ub-text-primary">
                             Scholarship
                           </p>
-                          <p className="text-xs text-slate-500">
+                          <p className="text-xs text-ub-text-secondary">
                             Configure scholarship details
                           </p>
                         </div>
@@ -716,11 +708,11 @@ const EditKnowledgeHubProgramDetails = ({
                         aria-label={`Remove scholarship ${index + 1}`}
                         icon={<Trash2 className="h-4 w-4" />}
                         onClick={() => removeScholarship(index)}
-                        bgColor="bg-red-50"
-                        textColor="text-red-600"
-                        borderColor="border-red-200"
-                        hoverTextColor="hover:text-red-700"
-                        hoverBorderColor="hover:border-red-300"
+                        bgColor="bg-ub-tone-danger-bg"
+                        textColor="text-ub-tone-danger-text"
+                        borderColor="border-ub-tone-danger-border"
+                        hoverTextColor="hover:text-ub-tone-danger-text"
+                        hoverBorderColor="hover:border-ub-tone-danger-border"
                       />
                     </div>
 
@@ -772,17 +764,13 @@ const EditKnowledgeHubProgramDetails = ({
 
                       <div className="md:col-span-2 space-y-3">
                         <div className="flex items-center justify-between">
-                          <h3 className="text-sm font-semibold tracking-wide text-slate-500">
+                          <h3 className="text-sm font-semibold tracking-wide text-ub-text-secondary">
                             Conditions
                           </h3>
                           <IconButton
                             aria-label="Add condition"
                             icon={<Plus className="h-4 w-4" />}
-                            bgColor="bg-blue-50"
-                            textColor="text-blue-700"
-                            borderColor="border-blue-600"
-                            hoverTextColor="hover:text-blue-800"
-                            hoverBorderColor="hover:border-blue-700"
+                            variant="secondary"
                             onClick={() => {
                               const updated = [...(formData.scholarships[index].conditions ?? []), ""];
                               updateFormData(`scholarships[${index}].conditions`, updated);
@@ -809,7 +797,7 @@ const EditKnowledgeHubProgramDetails = ({
                                     updateFormData(`scholarships[${index}].conditions`, updated);
                                   }}
                                   aria-label={`Remove condition ${cIndex + 1}`}
-                                  className="text-red-400 transition hover:text-red-600"
+                                  className="text-ub-tone-danger-text transition hover:text-ub-tone-danger-text"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </button>
@@ -826,34 +814,26 @@ const EditKnowledgeHubProgramDetails = ({
                   <NoMessagesFound
                     title="No scholarships found"
                     subtitle="There are currently no scholarships available."
-                    icon={<Award className="h-8 w-8 text-slate-400" />}
+                    icon={<Award className="h-8 w-8 text-ub-text-tertiary" />}
                   />
                 )}
               </CollapsibleSection>
             </div>
           </div>
 
-          <div className="flex justify-end gap-2 border-t px-6 py-5">
+          <div className="flex justify-end gap-2 border-t px-6 py-5 border-ub-border">
             <Button
               onClick={handleBack}
               disabled={updateProgrLoading}
               icon={<ChevronLeft className="h-5 w-5" />}
               text={"Back"}
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
               icon={<Pencil className="h-5 w-5" />}
               text={updateProgrLoading ? "Updating..." : "Save Change"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
               onClick={handleUpdate}
               disabled={updateProgrLoading || !isFormChanged}
             />

@@ -139,18 +139,18 @@ export default function CopyProgramToBranch({
             title="Copy to another branch"
             description={`Duplicate "${programName}" — with its fees, scholarships and commission — into another branch of the same university.`}
             icon={CopyPlus}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
           <div className="space-y-4 px-6 py-6">
             {emptyReason ? (
-              <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-                <div className="text-sm text-amber-800">
+              <div className="flex items-start gap-3 rounded-lg border border-ub-tone-warning-border bg-ub-tone-warning-bg px-4 py-3">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-ub-tone-warning-text" />
+                <div className="text-sm text-ub-tone-warning-text">
                   {emptyReason === "single" ? (
                     <>
                       <p className="font-medium">No other branch to copy into.</p>
@@ -185,23 +185,19 @@ export default function CopyProgramToBranch({
             )}
 
             {formError && (
-              <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
-                <p className="text-sm text-red-700">{formError}</p>
+              <div className="flex items-start gap-3 rounded-lg border border-ub-tone-danger-border bg-ub-tone-danger-bg px-4 py-3">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-ub-tone-danger-text" />
+                <p className="text-sm text-ub-tone-danger-text">{formError}</p>
               </div>
             )}
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
@@ -209,11 +205,7 @@ export default function CopyProgramToBranch({
               disabled={!isFormValid}
               icon={<CopyPlus className="h-5 w-5" />}
               text={loading ? "Copying..." : justSucceeded ? "Copied" : "Copy program"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
             />
           </div>
         </div>

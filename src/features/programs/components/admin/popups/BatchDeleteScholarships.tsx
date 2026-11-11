@@ -106,10 +106,10 @@ export default function BatchDeleteScholarships({
             title="Delete Scholarships"
             description={`Select scholarships to remove from ${selectedProgramIds.length} selected program${selectedProgramIds.length !== 1 ? "s" : ""}.`}
             icon={GraduationCap}
-            iconBg="bg-red-50"
-            iconColor="text-red-600"
-            iconBorder="border-red-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-danger-bg"
+            iconColor="text-ub-tone-danger-text"
+            iconBorder="border-ub-tone-danger-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
@@ -117,7 +117,7 @@ export default function BatchDeleteScholarships({
             {fetching && <Loading text="Fetching scholarships..." />}
 
             {!fetching && fetchError && (
-              <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="flex items-center gap-2 rounded-lg border border-ub-tone-danger-border bg-ub-tone-danger-bg px-4 py-3 text-sm text-ub-tone-danger-text">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 {fetchError}
               </div>
@@ -125,24 +125,24 @@ export default function BatchDeleteScholarships({
 
             {!fetching && !fetchError && scholarships.length === 0 && (
               <div className="flex flex-col items-center gap-2 py-8 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
-                  <GraduationCap className="h-6 w-6 text-slate-400" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ub-surface-subtle">
+                  <GraduationCap className="h-6 w-6 text-ub-text-tertiary" />
                 </div>
-                <p className="text-sm font-medium text-slate-600">No scholarships found</p>
-                <p className="text-xs text-slate-400">The selected programs have no scholarships attached.</p>
+                <p className="text-sm font-medium text-ub-text-secondary">No scholarships found</p>
+                <p className="text-xs text-ub-text-tertiary">The selected programs have no scholarships attached.</p>
               </div>
             )}
 
             {!fetching && scholarships.length > 0 && (
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-ub-text-tertiary">
                     {scholarships.length} scholarship{scholarships.length !== 1 ? "s" : ""} found
                   </span>
                   <button
                     type="button"
                     onClick={toggleAll}
-                    className="text-xs font-medium text-red-600 hover:text-red-700"
+                    className="text-xs font-medium text-ub-tone-danger-text hover:text-ub-tone-danger-text"
                   >
                     {allSelected ? "Deselect all" : "Select all"}
                   </button>
@@ -156,34 +156,34 @@ export default function BatchDeleteScholarships({
                         key={s.name}
                         className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all ${
                           isChecked
-                            ? "border-red-200 bg-red-50"
-                            : "border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50"
+                            ? "border-ub-tone-danger-border bg-ub-tone-danger-bg"
+                            : "border-ub-border bg-ub-surface hover:border-ub-border hover:bg-ub-surface-subtle"
                         }`}
                       >
                         <input
                           type="checkbox"
                           checked={isChecked}
                           onChange={() => toggleOne(s.name)}
-                          className="mt-0.5 h-4 w-4 shrink-0 rounded border-slate-300 text-red-600 focus:ring-red-500"
+                          className="mt-0.5 h-4 w-4 shrink-0 rounded border-ub-border text-ub-tone-danger-text focus:ring-ub-tone-danger-text"
                         />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-2">
-                            <p className={`truncate text-sm font-semibold ${isChecked ? "text-red-800" : "text-slate-800"}`}>
+                            <p className={`truncate text-sm font-semibold ${isChecked ? "text-ub-tone-danger-text" : "text-ub-text-primary"}`}>
                               {s.name}
                             </p>
                             {s.coverage_percent > 0 && (
                               <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                                isChecked ? "bg-red-100 text-red-700" : "bg-blue-50 text-blue-700"
+                                isChecked ? "bg-ub-tone-danger-bg text-ub-tone-danger-text" : "bg-ub-tone-brand-bg text-ub-text-link"
                               }`}>
                                 {s.coverage_percent}%
                               </span>
                             )}
                           </div>
                           {s.description && (
-                            <RichTextDisplay html={s.description} className="mt-0.5 line-clamp-2 text-xs text-slate-500" />
+                            <RichTextDisplay html={s.description} className="mt-0.5 line-clamp-2 text-xs text-ub-text-secondary" />
                           )}
                           {s.max_amount > 0 && (
-                            <p className={`mt-1 text-xs font-medium ${isChecked ? "text-red-600" : "text-slate-400"}`}>
+                            <p className={`mt-1 text-xs font-medium ${isChecked ? "text-ub-tone-danger-text" : "text-ub-text-tertiary"}`}>
                               Up to {s.currency} {s.max_amount.toLocaleString()}
                             </p>
                           )}
@@ -196,17 +196,13 @@ export default function BatchDeleteScholarships({
             )}
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               disabled={deleting}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
             <Button
               onClick={handleDelete}
@@ -219,11 +215,7 @@ export default function BatchDeleteScholarships({
                   ? `Delete ${selected.size} Scholarship${selected.size !== 1 ? "s" : ""}`
                   : "Delete Scholarships"
               }
-              bgColor="bg-red-50"
-              textColor="text-red-700"
-              borderColor="border-red-600"
-              hoverTextColor="hover:text-red-800"
-              hoverBorderColor="hover:border-red-700"
+              variant="destructive"
             />
           </div>
         </div>

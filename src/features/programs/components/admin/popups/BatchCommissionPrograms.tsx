@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { XCircle, Percent } from "lucide-react";
@@ -136,10 +136,10 @@ export default function BatchCommissionPrograms({
             title="Bulk Commission Update"
             description="Update commission values for multiple programs at once."
             icon={Percent}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
@@ -147,15 +147,15 @@ export default function BatchCommissionPrograms({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="mb-4">
-                <label className="block text-p2 font-medium text-slate-900">
-                  Commission Amount <span className="text-red-600">*</span>
+                <label className="block text-p2 font-medium text-ub-text-primary">
+                  Commission Amount <span className="text-ub-tone-danger-text">*</span>
                 </label>
                 <div
-                  className={`mt-2 flex h-12 w-full items-center overflow-hidden rounded-md border focus-within:ring-1 focus-within:ring-blue-500 ${
-                    errors.commission_amount ? "border-red-500" : "border-slate-200"
+                  className={`mt-2 flex h-12 w-full items-center overflow-hidden rounded-md border focus-within:ring-1 focus-within:ring-ub-border-focus ${
+                    errors.commission_amount ? "border-ub-tone-danger-border" : "border-ub-border"
                   }`}
                 >
-                  <span className="flex h-full items-center border-r border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-500">
+                  <span className="flex h-full items-center border-r border-ub-border bg-ub-surface-subtle px-3 text-sm font-medium text-ub-text-secondary">
                     {(CURRENCY.find((c) => c.value === formData.commission_currency)?.label ?? formData.commission_currency).toUpperCase()}
                   </span>
                   <input
@@ -167,7 +167,7 @@ export default function BatchCommissionPrograms({
                   />
                 </div>
                 {errors.commission_amount && (
-                  <p className="mt-1 text-xs text-red-600">{errors.commission_amount}</p>
+                  <p className="mt-1 text-xs text-ub-tone-danger-text">{errors.commission_amount}</p>
                 )}
               </div>
 
@@ -221,16 +221,12 @@ export default function BatchCommissionPrograms({
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
@@ -238,11 +234,7 @@ export default function BatchCommissionPrograms({
               disabled={!isFormValid || loading}
               icon={<Percent className="h-5 w-5" />}
               text={loading ? "Updating..." : "Update Commission"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
             />
           </div>
         </div>
