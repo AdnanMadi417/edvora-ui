@@ -72,7 +72,7 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
 
   return (
     <section className="mx-auto mt-6 ">
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-ub-border bg-ub-surface shadow-sm">
         {/* Header */}
         <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-5">
@@ -82,22 +82,22 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
             <div className="space-y-1">
               <Breadcrumbs items={[{ label: "Roles", href: "/admin/roles" }, { label: role.name }]} />
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-xl font-semibold text-slate-900">{role.name}</h1>
+                <h1 className="text-xl font-semibold text-ub-text-primary">{role.name}</h1>
                 {role.is_system ? (
                   <StatusBadge variant="neutral">System</StatusBadge>
                 ) : (
                   <StatusBadge variant="info">Custom</StatusBadge>
                 )}
               </div>
-              <p className="flex items-center gap-1.5 text-sm text-slate-500">
+              <p className="flex items-center gap-1.5 text-sm text-ub-text-secondary">
                 <KeyRound className="h-3.5 w-3.5" />
-                <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-700">{role.code}</code>
+                <code className="rounded bg-ub-surface-subtle px-1.5 py-0.5 text-xs text-ub-text-secondary">{role.code}</code>
               </p>
             </div>
           </div>
         </div>
 
-        <div className="h-px w-full bg-slate-200" />
+        <div className="h-px w-full bg-ub-border" />
 
         {/* Role Name */}
         <div className="p-6">
@@ -114,7 +114,7 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
           />
         </div>
 
-        <div className="h-px w-full bg-slate-200" />
+        <div className="h-px w-full bg-ub-border" />
 
         {/* What this role can do (read-only) */}
         <section aria-labelledby="role-permissions" className="space-y-4 p-6">
@@ -155,17 +155,13 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
 
         {/* Footer: only custom roles can change (they can be renamed). */}
         {!role.is_system && (
-        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-slate-200 bg-white px-6 py-4">
+        <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-ub-border bg-ub-surface px-6 py-4">
           <Button
             onClick={handleSave}
             disabled={!isDirty || saving}
             icon={<Save className="h-4 w-4" />}
             text={saving ? "Saving..." : "Save Changes"}
-            bgColor="bg-blue-50"
-            textColor="text-blue-700"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-blue-800"
-            hoverBorderColor="hover:border-blue-700"
+            variant="primary"
           />
         </div>
         )}

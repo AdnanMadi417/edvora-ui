@@ -75,7 +75,7 @@ export default function NotificationsPreviewPopover({
       {children}
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl ring-1 ring-black/5">
+        <div className="absolute right-0 top-full z-50 mt-2 w-80 overflow-hidden rounded-2xl border border-ub-border bg-ub-surface shadow-xl ring-1 ring-black/5">
           {hasOpenedOnce && (
             <PreviewContent
               notificationsPath={notificationsPath}
@@ -142,8 +142,8 @@ function PreviewContent({
 
   return (
     <>
-      <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-        <p className="text-sm font-semibold text-slate-900">Notifications</p>
+      <div className="flex items-center justify-between border-b border-ub-border px-4 py-3">
+        <p className="text-sm font-semibold text-ub-text-primary">Notifications</p>
         {notifications.length > 0 && (
           <MarkAllAsReadButton onClick={handleMarkAllAsRead} loading={markingAll} />
         )}
@@ -154,18 +154,18 @@ function PreviewContent({
           <div className="flex flex-col">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-start gap-3 px-4 py-3">
-                <div className="h-9 w-9 shrink-0 animate-pulse rounded-md bg-slate-100" />
+                <div className="h-9 w-9 shrink-0 animate-pulse rounded-md bg-ub-surface-subtle" />
                 <div className="flex-1 space-y-2 pt-0.5">
-                  <div className="h-3.5 w-3/4 animate-pulse rounded bg-slate-100" />
-                  <div className="h-3 w-1/3 animate-pulse rounded bg-slate-100" />
+                  <div className="h-3.5 w-3/4 animate-pulse rounded bg-ub-surface-subtle" />
+                  <div className="h-3 w-1/3 animate-pulse rounded bg-ub-surface-subtle" />
                 </div>
               </div>
             ))}
           </div>
         ) : error ? (
-          <p className="px-4 py-8 text-center text-sm text-red-500">{error}</p>
+          <p className="px-4 py-8 text-center text-sm text-ub-tone-danger-text">{error}</p>
         ) : notifications.length === 0 ? (
-          <p className="px-4 py-8 text-center text-sm text-slate-400">You&apos;re all caught up.</p>
+          <p className="px-4 py-8 text-center text-sm text-ub-text-tertiary">You&apos;re all caught up.</p>
         ) : (
           notifications.map((notification, index) => {
             const config = getNotificationIconConfig(notification);
@@ -175,8 +175,8 @@ function PreviewContent({
                 key={notification.id}
                 type="button"
                 onClick={() => handleRowClick(notification)}
-                className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 ${
-                  index !== notifications.length - 1 ? "border-b border-slate-50" : ""
+                className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-ub-surface-subtle ${
+                  index !== notifications.length - 1 ? "border-b border-ub-border" : ""
                 }`}
               >
                 <NotificationAvatar
@@ -188,13 +188,13 @@ function PreviewContent({
                   size="sm"
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm leading-snug text-slate-900">
+                  <p className="truncate text-sm leading-snug text-ub-text-primary">
                     <span className="font-semibold">{sender}</span>
-                    {notification.title && <span className="ml-1 font-normal text-slate-700">{notification.title}</span>}
+                    {notification.title && <span className="ml-1 font-normal text-ub-text-secondary">{notification.title}</span>}
                   </p>
-                  <p className="mt-0.5 text-xs font-medium text-blue-600">{timeAgo(notification.created_at)}</p>
+                  <p className="mt-0.5 text-xs font-medium text-ub-text-link">{timeAgo(notification.created_at)}</p>
                 </div>
-                <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+                <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-ub-action-primary" />
               </button>
             );
           })
@@ -204,7 +204,7 @@ function PreviewContent({
       <Link
         href={notificationsPath}
         onClick={onNavigate}
-        className="flex items-center justify-center border-t border-slate-100 px-4 py-3 text-sm font-medium text-blue-600 transition hover:bg-slate-50"
+        className="flex items-center justify-center border-t border-ub-border px-4 py-3 text-sm font-medium text-ub-text-link transition hover:bg-ub-surface-subtle"
       >
         View all notifications
       </Link>

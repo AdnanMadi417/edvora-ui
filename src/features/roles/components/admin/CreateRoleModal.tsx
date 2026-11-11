@@ -89,10 +89,10 @@ export default function CreateRoleModal({
             title="Create New Role"
             description="Add a new custom role that can be granted permissions."
             icon={ShieldPlus}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
@@ -118,17 +118,13 @@ export default function CreateRoleModal({
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               disabled={loading}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
@@ -136,11 +132,7 @@ export default function CreateRoleModal({
               disabled={loading || !formData.code.trim() || !formData.name.trim()}
               icon={<ShieldPlus className="h-5 w-5" />}
               text={loading ? "Creating..." : "Create Role"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
             />
           </div>
         </div>

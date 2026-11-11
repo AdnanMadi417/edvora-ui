@@ -70,7 +70,7 @@ export default function NotificationAvatar({
       <img
         src={src}
         alt=""
-        className="h-full w-full rounded-full object-cover ring-1 ring-slate-100"
+        className="h-full w-full rounded-full object-cover ring-1 ring-ub-border"
         onError={() => setBroken(true)}
       />
       <span

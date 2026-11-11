@@ -88,11 +88,11 @@ export default function RolesTable() {
   };
 
   return (
-    <div className="mt-6 text-p2 bg-white rounded-lg border border-slate-200">
+    <div className="mt-6 text-p2 bg-ub-surface rounded-lg border border-ub-border">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-ub-border">
         <div>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <p className="mt-0.5 text-sm text-ub-text-secondary">
             Manage roles and the permissions granted to them
           </p>
         </div>
@@ -100,16 +100,12 @@ export default function RolesTable() {
           onClick={() => setIsCreateOpen(true)}
           icon={<Plus className="h-4 w-4" />}
           text="Create Role"
-          bgColor="bg-blue-50"
-          textColor="text-blue-700"
-          borderColor="border-blue-600"
-          hoverTextColor="hover:text-blue-800"
-          hoverBorderColor="hover:border-blue-700"
+          variant="primary"
         />
       </div>
 
       {/* Filter Bar */}
-      <div className="p-6 border-b border-slate-200">
+      <div className="p-6 border-b border-ub-border">
         <SearchInput
           value={searchTerm}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -138,7 +134,7 @@ export default function RolesTable() {
         >
           <table className="w-full min-w-[800px] md:min-w-0">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
+              <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
                   { icon: ShieldCheck, label: "Name", minW: "min-w-[200px]" },
                   { icon: KeyRound, label: "Code", minW: "min-w-[160px]" },
@@ -148,10 +144,10 @@ export default function RolesTable() {
                     key={label}
                     className={`${
                       minW ?? ""
-                    } px-6 py-4 text-start text-sm font-semibold text-slate-900`}
+                    } px-6 py-4 text-start text-sm font-semibold text-ub-text-primary`}
                   >
                     <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4 text-slate-400" />
+                      <Icon className="h-4 w-4 text-ub-text-tertiary" />
                       {label}
                     </div>
                   </th>
@@ -161,7 +157,7 @@ export default function RolesTable() {
             </thead>
 
             <tbody
-              className={`divide-y divide-slate-100 bg-white ${
+              className={`divide-y divide-ub-border bg-ub-surface ${
                 isRefetching ? "opacity-60 transition-opacity" : ""
               }`}
             >
@@ -182,7 +178,7 @@ export default function RolesTable() {
                       ? "Try adjusting your search."
                       : "Create your first custom role to get started."
                   }
-                  icon={<ShieldCheck className="h-8 w-8 text-slate-400" />}
+                  icon={<ShieldCheck className="h-8 w-8 text-ub-text-tertiary" />}
                 />
               )}
 
@@ -192,7 +188,7 @@ export default function RolesTable() {
                   pagedRoles.map((role) => (
                     <AnimatedTableRow
                       key={role.id}
-                      className="cursor-pointer transition-colors hover:bg-slate-50/50"
+                      className="cursor-pointer transition-colors hover:bg-ub-surface-subtle/50"
                       onClick={(event) => {
                         if (
                           !(event.target as HTMLElement).closest(
@@ -206,14 +202,14 @@ export default function RolesTable() {
                       <td className="min-w-[200px] px-6 py-4">
                         <Link
                           href={`/admin/roles/${role.id}`}
-                          className="text-sm font-medium text-slate-900 hover:underline"
+                          className="text-sm font-medium text-ub-text-primary hover:underline"
                         >
                           {role.name}
                         </Link>
                       </td>
 
                       <td className="min-w-[160px] px-6 py-4">
-                        <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-700">
+                        <code className="rounded bg-ub-surface-subtle px-1.5 py-0.5 text-xs text-ub-text-secondary">
                           {role.code}
                         </code>
                       </td>

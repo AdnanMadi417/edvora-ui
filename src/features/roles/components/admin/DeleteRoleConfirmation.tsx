@@ -51,49 +51,41 @@ export default function DeleteRoleConfirmation({
             title="Delete Role"
             description="This action will permanently delete this role and revoke all of its permissions."
             icon={Trash2}
-            iconBg="bg-red-50"
-            iconColor="text-red-600"
-            iconBorder="border-red-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-danger-bg"
+            iconColor="text-ub-tone-danger-text"
+            iconBorder="border-ub-tone-danger-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
           <div className="px-7 py-6 space-y-2 text-sm">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900">Confirm Deletion</h3>
-              <p className="text-sm text-slate-500">
+              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm Deletion</h3>
+              <p className="text-sm text-ub-text-secondary">
                 Are you sure you want to permanently delete this role?
               </p>
             </div>
 
             {roleName && (
-              <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
-                <p className="text-sm font-medium text-slate-800">{roleName}</p>
+              <div className="rounded-md border border-ub-border bg-ub-surface-subtle px-4 py-3">
+                <p className="text-sm font-medium text-ub-text-primary">{roleName}</p>
               </div>
             )}
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               disabled={isDeleting}
               icon={<XCircle className="h-5 w-5" />}
               text={isDeleting ? "Cancelling..." : "Cancel"}
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
               icon={<Trash2 className="h-5 w-5" />}
               text={isDeleting ? "Deleting..." : "Delete Role"}
-              bgColor="bg-red-50"
-              textColor="text-red-700"
-              borderColor="border-red-600"
-              hoverTextColor="hover:text-red-800"
-              hoverBorderColor="hover:border-red-700"
+              variant="destructive"
               onClick={onConfirm}
               disabled={isDeleting}
             />

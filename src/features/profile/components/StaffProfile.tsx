@@ -46,45 +46,41 @@ export default function StaffProfile() {
   const roleLabel = ROLE_LABELS[user.role] ?? user.role;
 
   return (
-    <div className="mx-auto mt-5 overflow-hidden rounded-lg border border-slate-200 bg-white">
-      <div className="flex items-center gap-4 border-b border-slate-200 p-6">
+    <div className="mx-auto mt-5 overflow-hidden rounded-lg border border-ub-border bg-ub-surface">
+      <div className="flex items-center gap-4 border-b border-ub-border p-6">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-ub-tone-brand-bg text-xl font-semibold text-ub-tone-brand-text">
           {user.name?.[0]?.toUpperCase() ?? "?"}
         </div>
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-semibold text-slate-900">{user.name}</h1>
-          <p className="text-sm text-slate-500">{roleLabel}</p>
+          <h1 className="truncate text-xl font-semibold text-ub-text-primary">{user.name}</h1>
+          <p className="text-sm text-ub-text-secondary">{roleLabel}</p>
         </div>
       </div>
 
-      <div className="divide-y divide-slate-200">
+      <div className="divide-y divide-ub-border">
         <div className="flex items-center justify-between gap-4 p-6">
-          <span className="flex items-center gap-2 text-sm text-slate-600">
+          <span className="flex items-center gap-2 text-sm text-ub-text-secondary">
             <Mail className="h-4 w-4" />
             Email
           </span>
-          <span className="truncate text-sm font-medium text-slate-900">{user.email}</span>
+          <span className="truncate text-sm font-medium text-ub-text-primary">{user.email}</span>
         </div>
         <div className="flex items-center justify-between gap-4 p-6">
-          <span className="flex items-center gap-2 text-sm text-slate-600">
+          <span className="flex items-center gap-2 text-sm text-ub-text-secondary">
             <ShieldCheck className="h-4 w-4" />
             Role
           </span>
-          <span className="text-sm font-medium text-slate-900">{roleLabel}</span>
+          <span className="text-sm font-medium text-ub-text-primary">{roleLabel}</span>
         </div>
       </div>
 
-      <div className="flex justify-end border-t border-slate-200 p-6">
+      <div className="flex justify-end border-t border-ub-border p-6">
         <Button
           onClick={handleSendResetLink}
           disabled={sending}
           icon={<KeyRound className="h-4 w-4" />}
           text={sending ? "Sending..." : "Send Password Reset Link"}
-          bgColor="bg-white"
-          textColor="text-slate-700"
-          borderColor="border-slate-300"
-          hoverTextColor="hover:text-slate-900"
-          hoverBorderColor="hover:border-slate-400"
+          variant="secondary"
         />
       </div>
     </div>
