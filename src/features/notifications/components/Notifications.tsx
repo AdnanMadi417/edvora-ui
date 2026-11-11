@@ -19,8 +19,11 @@ import type { ReadStatus, Notification } from "../types";
 import NotificationAvatar from "./NotificationAvatar";
 import MarkAllAsReadButton from "./MarkAllAsReadButton";
 import TablePagination from "components/ub/data/tables/TablePagination";
-import NotificationTabs, { type UnreadCategoryFilter } from "./NotificationTabs";
+import NotificationTabs, { type NotificationView } from "./NotificationTabs";
+import type { NotificationCategory } from "../utils/notificationCategory";
 import EmptyData from "components/ub/feedback/states/EmptyData";
+import Skeleton from "components/ub/feedback/states/Skeleton";
+import Button from "components/ub/core/buttons/Button";
 import { useMe } from "hooks/useMe";
 
 const PAGE_SIZE = 20;
@@ -35,6 +38,25 @@ function timeAgo(dateStr: string): string {
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
   return `${Math.floor(diff / 86400)}d ago`;
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  account_manager: "Account manager",
+  admin: "Admin",
+  finance: "Finance",
+  reviewer: "Reviewer",
+  data_entry: "Data entry",
+  partner: "Advisor",
+};
+
+/** The event without the student's name, which the first line already shows:
+ *  "moved Sara Ochieng's application to X" → "moved the application to X". */
+function eventText(title: string, student?: string): string {
+  if (!student) return title;
+  const name = student.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return title
+    .replace(new RegExp(`${name}['’]s application`), "the application")
+    .replace(new RegExp(`\\s+(for|about)\\s+${name}$`), "");
 }
 
 interface NotificationsProps {
@@ -69,7 +91,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
   const [page, setPage] = useState(1);
   const [unreadPage, setUnreadPage] = useState(1);
   const [accumulatedUnread, setAccumulatedUnread] = useState<Notification[]>([]);
-  const [unreadCategory, setUnreadCategory] = useState<UnreadCategoryFilter>("action_required");
+  const [unreadCategory, setUnreadCategory] = useState<NotificationCategory>("action_required");
   const autoSelectedRef = useRef(false);
   const router = useRouter();
 
@@ -100,14 +122,23 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
     setFilter(next);
     setPage(1);
     setUnreadPage(1);
-    setAccumulatedUnread([]);
+    // Keep the loaded unread list while viewing All, so the tab counts stay.
+    if (next === "unread") setAccumulatedUnread([]);
     setUnreadCategory("action_required");
     autoSelectedRef.current = false;
   };
 
-  const selectUnreadCategory = (next: UnreadCategoryFilter) => {
+  const selectUnreadCategory = (next: NotificationCategory) => {
     setUnreadCategory(next);
     autoSelectedRef.current = true;
+  };
+
+  // One row of tabs: Action needed and Updates show unread items, All shows everything.
+  const view: NotificationView = filter === "all" ? "all" : unreadCategory;
+  const changeView = (next: NotificationView) => {
+    if (next === "all") return changeFilter("all");
+    if (filter === "all") changeFilter("unread");
+    selectUnreadCategory(next);
   };
 
   const loadMoreUnread = () => setUnreadPage((p) => p + 1);
@@ -141,10 +172,10 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
-  const actionRequiredCount = isUnreadTab
-    ? sorted.filter((n) => getNotificationCategory(n, { forAdvisor }) === "action_required").length
-    : 0;
-  const infoCount = isUnreadTab ? sorted.length - actionRequiredCount : 0;
+  const actionRequiredCount = accumulatedUnread.filter(
+    (n) => getNotificationCategory(n, { forAdvisor }) === "action_required"
+  ).length;
+  const infoCount = accumulatedUnread.length - actionRequiredCount;
 
   // Default the Unread tab to Action Required; if there's nothing needing
   // action, fall back to System Info instead of landing on an empty tab.
@@ -156,7 +187,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
     }
   }, [isUnreadTab, loading, actionRequiredCount, infoCount]);
 
-  const displayed = isUnreadTab && unreadCategory !== "all"
+  const displayed = isUnreadTab
     ? sorted.filter((n) => getNotificationCategory(n, { forAdvisor }) === unreadCategory)
     : sorted;
 
@@ -168,10 +199,10 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
   const hasMoreUnread = isUnreadTab && accumulatedUnread.length < total;
 
   return (
-    <section aria-label="Notifications" className="mb-6 mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-black/5">
+    <section aria-label="Notifications" className="mb-6 mt-6 overflow-hidden rounded-ub-lg border border-ub-border bg-ub-surface">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6">
-        <p className="text-sm text-ub-text-secondary">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ub-border px-4 py-4 sm:px-6">
+        <p className="text-ub-body-sm text-ub-text-secondary">
           {unreadCount > 0
             ? `${unreadCount} new ${unreadCount === 1 ? "notification" : "notifications"}`
             : "You're all caught up"}
@@ -184,13 +215,9 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
       </div>
 
       <NotificationTabs
-        readStatus={filter}
-        onReadStatusChange={changeFilter}
-        unreadCount={unreadCount}
-        category={unreadCategory}
-        onCategoryChange={selectUnreadCategory}
-        categoryCounts={{ all: sorted.length, action_required: actionRequiredCount, info: infoCount }}
-        showCategories={isUnreadTab && !showFullSkeleton && !error && sorted.length > 0}
+        view={view}
+        onViewChange={changeView}
+        counts={{ action_required: actionRequiredCount, info: infoCount }}
       >
       {/* List */}
       <AnimatePresence mode="wait">
@@ -205,11 +232,11 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
           <div className="flex flex-col">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-start gap-4 px-4 py-4">
-                <div className="h-11 w-11 animate-pulse rounded-md bg-slate-100" />
+                <Skeleton className="h-11 w-11" />
                 <div className="flex-1 space-y-2 pt-1">
-                  <div className="h-4 w-3/4 animate-pulse rounded bg-slate-100" />
-                  <div className="h-3 w-1/2 animate-pulse rounded bg-slate-100" />
-                  <div className="h-3 w-1/4 animate-pulse rounded bg-slate-100" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
+                  <Skeleton className="h-3 w-1/4" />
                 </div>
               </div>
             ))}
@@ -221,14 +248,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
             title="Something went wrong"
             subtitle="We couldn't load your notifications. Please try again."
             action={
-              <button
-                type="button"
-                onClick={() => refetchNotifications()}
-                className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
-              >
-                <RefreshCw className="h-3.5 w-3.5" />
-                Retry
-              </button>
+              <Button variant="secondary" size="sm" icon={<RefreshCw className="h-4 w-4" aria-hidden="true" />} text="Retry" onClick={() => refetchNotifications()} className="mt-2" />
             }
           />
         ) : displayed.length === 0 ? (
@@ -242,7 +262,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
               : "No notifications yet"
             }
             subtitle={
-              isUnreadTab && sorted.length > 0 && unreadCategory !== "all" ? "Switch tabs to see other unread notifications."
+              isUnreadTab && sorted.length > 0 ? "Switch tabs to see other notifications."
               : isUnreadTab ? "You're all caught up."
               : "You'll see updates here as they happen."
             }
@@ -256,6 +276,8 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
               const href = getNotificationHref(notification, applicationBasePath, partnerBasePath);
               const university = notification.data?.university_name;
               const { stage, status } = getNotificationStageStatus(notification);
+              const student = notification.data?.student_name as string | undefined;
+              const role = ROLE_LABELS[(notification.data?.actor_role as string) ?? ""];
 
               return (
                 <div
@@ -265,8 +287,8 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                     if (href) router.push(href);
                   }}
                   className={`flex cursor-pointer items-start gap-4 px-4 py-3 transition-colors ${
-                    index !== displayed.length - 1 ? "border-b border-slate-50" : ""
-                  } ${isUnread ? "bg-blue-50 hover:bg-blue-100/60" : "hover:bg-slate-50"}`}
+                    index !== displayed.length - 1 ? "border-b border-ub-border" : ""
+                  } ${isUnread ? "bg-ub-selected hover:bg-ub-row-hover" : "hover:bg-ub-row-hover"}`}
                 >
                   <NotificationAvatar
                     photoKey={getNotificationPhotoKey(notification)}
@@ -276,49 +298,57 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                     badgeBg={config.badgeBg}
                   />
 
-                  {/* Content */}
+                  {/* Content: student and task first, then who did what. */}
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm leading-snug text-slate-900">
-                      <span className="font-bold">{sender}</span>
-                      {notification.title && (
-                        <span className="ml-1 font-normal text-slate-700">{notification.title}</span>
-                      )}
-                    </p>
-                    {university && (
-                      <p className="mt-0.5 truncate text-xs font-medium text-ub-text-secondary">{university}</p>
+                    {student ? (
+                      <p className="truncate text-ub-label-md text-ub-text-primary">
+                        {student}
+                        {university && <span className="font-normal text-ub-text-secondary"> · {university}</span>}
+                      </p>
+                    ) : (
+                      <p className="text-ub-body-sm text-ub-text-primary">
+                        <span className="font-semibold">{sender}</span> {notification.title}
+                      </p>
                     )}
                     {notification.body && (
-                      <p className="mt-0.5 truncate text-sm text-ub-text-secondary">{notification.body}</p>
+                      <p className="mt-0.5 text-ub-body-sm text-ub-text-primary">{notification.body}</p>
+                    )}
+                    {student && (
+                      <p className="mt-1 text-ub-caption text-ub-text-secondary">
+                        <span className="font-medium">{sender}</span>
+                        {role && <span>, {role}</span>} {eventText(notification.title ?? "", student)}
+                      </p>
                     )}
                     {(stage || status) && (
                       <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
                         {stage && (
-                          <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
+                          <span className="inline-flex items-center rounded-ub-full bg-ub-surface-subtle px-2 py-0.5 text-ub-caption text-ub-text-secondary">
                             {stage}
                           </span>
                         )}
-                        {stage && status && <ArrowRight className="h-3 w-3 shrink-0 text-ub-text-tertiary" />}
+                        {stage && status && <ArrowRight className="h-3 w-3 shrink-0 text-ub-text-tertiary rtl:-scale-x-100" aria-hidden="true" />}
                         {status && (
-                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
+                          <span className="inline-flex items-center rounded-ub-full bg-ub-tone-brand-bg px-2 py-0.5 text-ub-caption text-ub-tone-brand-text">
                             {status}
                           </span>
                         )}
                       </div>
                     )}
-                    <p className={`mt-1 text-xs font-semibold ${isUnread ? "text-blue-600" : "text-ub-text-tertiary"}`}>
+                    <p className={`mt-1 text-ub-caption ${isUnread ? "font-medium text-ub-text-link" : "text-ub-text-tertiary"}`}>
                       {timeAgo(notification.created_at)}
                     </p>
                   </div>
 
                   {/* Actions */}
                   <div className="flex flex-shrink-0 items-center gap-2 self-center">
-                    {isUnread && <div className="h-3 w-3 rounded-full bg-blue-500" />}
+                    {isUnread && <span className="h-2.5 w-2.5 rounded-ub-full bg-ub-action-primary" aria-label="Unread" role="img" />}
                     {href && (
                       <Link
                         href={href}
                         onClick={(e) => e.stopPropagation()}
                         title="View application"
-                        className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-ub-text-secondary transition hover:bg-blue-100 hover:text-blue-600"
+                        aria-label="View application"
+                        className="flex h-11 w-11 items-center justify-center rounded-ub-md text-ub-text-secondary transition hover:bg-ub-surface-subtle hover:text-ub-text-link"
                       >
                         <ExternalLink className="h-3.5 w-3.5" />
                       </Link>
@@ -333,17 +363,8 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
       </AnimatePresence>
 
       {!error && hasMoreUnread && (
-        <div className="border-t border-slate-100 p-3 text-center">
-          <button
-            type="button"
-            onClick={loadMoreUnread}
-            disabled={isLoadingMoreUnread}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isLoadingMoreUnread
-              ? "Loading more…"
-              : `Load more (${total - accumulatedUnread.length} remaining)`}
-          </button>
+        <div className="flex justify-center border-t border-ub-border p-3">
+          <Button variant="secondary" size="sm" onClick={loadMoreUnread} loading={isLoadingMoreUnread} text={`Load more (${total - accumulatedUnread.length} remaining)`} />
         </div>
       )}
 

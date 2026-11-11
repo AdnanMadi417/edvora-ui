@@ -1,33 +1,33 @@
 import { useState } from "react";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import NotificationTabs, { type UnreadCategoryFilter } from "./NotificationTabs";
-import type { ReadStatus } from "../types";
+import NotificationTabs, { type NotificationView } from "./NotificationTabs";
 
 function Harness() {
-  const [read, setRead] = useState<ReadStatus>("unread");
-  const [category, setCategory] = useState<UnreadCategoryFilter>("action_required");
-  return <NotificationTabs readStatus={read} onReadStatusChange={setRead} unreadCount={8} category={category} onCategoryChange={setCategory} categoryCounts={{ all: 8, action_required: 5, info: 3 }} showCategories>
-    <p>{read === "all" ? "All messages" : `${category} messages`}</p>
-  </NotificationTabs>;
+  const [view, setView] = useState<NotificationView>("action_required");
+  return (
+    <NotificationTabs view={view} onViewChange={setView} counts={{ action_required: 5, info: 3 }}>
+      <p>{view} messages</p>
+    </NotificationTabs>
+  );
 }
 
-it("separates read status from category selection and keeps each active panel associated", async () => {
+it("shows one row of tabs and keeps the active panel associated", async () => {
   render(<Harness />);
   const user = userEvent.setup();
-  const categories = screen.getByRole("tablist", { name: "Unread notification category" });
-  const info = within(categories).getByRole("tab", { name: /System info/ });
-  await user.click(info);
-  expect(screen.getByText("info messages")).toBeInTheDocument();
-  const panel = document.getElementById(info.getAttribute("aria-controls")!);
-  expect(panel).toHaveAttribute("aria-labelledby", info.id);
+  const tabs = screen.getByRole("tablist", { name: "Notifications" });
+  expect(within(tabs).getAllByRole("tab").map((t) => t.textContent)).toEqual([
+    expect.stringContaining("Action needed"),
+    expect.stringContaining("Updates"),
+    "All",
+  ]);
+  const updates = within(tabs).getByRole("tab", { name: /Updates/ });
+  await user.click(updates);
+  const panel = document.getElementById(updates.getAttribute("aria-controls")!);
+  expect(panel).toHaveAttribute("aria-labelledby", updates.id);
   expect(within(panel!).getByText("info messages")).toBeInTheDocument();
-  const primary = screen.getByRole("tablist", { name: "Notification read status" });
-  await user.click(within(primary).getByRole("tab", { name: "All" }));
-  expect(screen.queryByRole("tablist", { name: "Unread notification category" })).not.toBeInTheDocument();
-  expect(screen.getByText("All messages")).toBeInTheDocument();
-  await user.click(within(primary).getByRole("tab", { name: /Unread/ }));
-  expect(screen.getByText("info messages")).toBeInTheDocument();
+  await user.click(within(tabs).getByRole("tab", { name: "All" }));
+  expect(screen.getByText("all messages")).toBeInTheDocument();
 });
 
 it("keeps panel IDs unique when notification views share a page", () => {
@@ -36,14 +36,13 @@ it("keeps panel IDs unique when notification views share a page", () => {
   expect(new Set(ids).size).toBe(ids.length);
 });
 
-it("supports keyboard category selection", async () => {
+it("supports keyboard tab selection", async () => {
   render(<Harness />);
   const user = userEvent.setup();
-  const action = screen.getByRole("tab", { name: /Action required/ });
-  action.focus();
+  screen.getByRole("tab", { name: /Action needed/ }).focus();
   await user.keyboard("{ArrowRight}");
-  const info = screen.getByRole("tab", { name: /System info/ });
-  expect(info).toHaveFocus();
-  expect(info).toHaveAttribute("aria-selected", "true");
+  const updates = screen.getByRole("tab", { name: /Updates/ });
+  expect(updates).toHaveFocus();
+  expect(updates).toHaveAttribute("aria-selected", "true");
   expect(screen.getByText("info messages")).toBeInTheDocument();
 });
