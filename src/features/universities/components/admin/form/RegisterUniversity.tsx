@@ -2,7 +2,7 @@
 
 import InstitutionTypeField from "components/ub/forms/choices/InstitutionTypeField";
 import React, { useState } from "react";
-import { GraduationCap, CalendarPlus, Trash2 } from "lucide-react";
+import { Plus, GraduationCap, Trash2 } from "lucide-react";
 
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
@@ -364,12 +364,8 @@ export default function RegisterUniversity({
 
                 <IconButton
                   title="Add branch"
-                  icon={<CalendarPlus className="h-4 w-4" />}
-                  bgColor="bg-blue-50"
-                  textColor="text-blue-700"
-                  borderColor="border-blue-600"
-                  hoverTextColor="hover:text-blue-800"
-                  hoverBorderColor="hover:border-blue-700"
+                  icon={<Plus className="h-4 w-4" />}
+                  variant="secondary"
                   onClick={handleAddBranch}
                 />
               </div>
@@ -395,11 +391,11 @@ export default function RegisterUniversity({
                         title={`Remove branch ${index + 1}`}
                         icon={<Trash2 className="h-4 w-4" />}
                         disabled={formData.branches.length === 1}
-                        bgColor="bg-red-50"
-                        textColor="text-red-700"
-                        borderColor="border-red-200"
-                        hoverTextColor="hover:text-red-800"
-                        hoverBorderColor="hover:border-red-300"
+                        bgColor="bg-ub-tone-danger-bg"
+                        textColor="text-ub-tone-danger-text"
+                        borderColor="border-ub-tone-danger-border"
+                        hoverTextColor="hover:text-ub-tone-danger-text"
+                        hoverBorderColor="hover:border-ub-tone-danger-border"
                         onClick={() => handleRemoveBranch(index)}
                       />
                     </div>

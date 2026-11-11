@@ -133,10 +133,10 @@ export default function AssignPaymentUniversity({
             title="Assign Payment Method"
             description="Assign a payment method to the selected university."
             icon={CreditCard}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
@@ -173,23 +173,19 @@ export default function AssignPaymentUniversity({
             />
           </div>
 
-          <div className="flex justify-end gap-3 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-3 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
+              variant="secondary"
             />
             <Button
               onClick={handleAssign}
               disabled={!isFormValid}
               icon={<CreditCard className="h-5 w-5" />}
               text={assigning ? "Assigning..." : "Assign Payment Method"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
+              variant="primary"
             />
           </div>
         </div>

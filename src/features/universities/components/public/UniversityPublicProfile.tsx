@@ -11,7 +11,7 @@ import {
   MapPin,
   Users,
 } from "lucide-react";
-import PillButton from "components/ub/core/buttons/PillButton";
+import LinkBtn from "components/ub/core/buttons/LinkBtn";
 import SiteFooter from "components/ub/navigation/layout/SiteFooter";
 import FadeIn from "components/ub/core/motion/FadeIn";
 import Faq from "components/ub/data/display/Faq";
@@ -171,16 +171,16 @@ export default function UniversityPublicProfile({ university }: Props) {
   const faqItems = hasLanguageCenter ? [...UNIVERSITY_FAQ, ...LANGUAGE_CENTER_FAQ] : UNIVERSITY_FAQ;
 
   return (
-    <main className="min-h-screen bg-white px-4 py-10">
+    <main className="min-h-screen bg-ub-surface px-4 py-10">
       {/* Hero — identity + the one primary CTA. Shared by both tabs: the
           language center, in this preview, is part of the same
           institution rather than a separate entity with its own hero. */}
       <div className="mx-auto max-w-6xl">
-        <FadeIn className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <FadeIn className="overflow-hidden rounded-2xl border border-ub-border bg-ub-surface shadow-sm">
           <div className="h-28 w-full sm:h-36" style={BANNER_STYLE} role="presentation" />
 
-          <div className="flex flex-col items-center gap-3 border-b border-slate-100 px-6 pb-6 text-center sm:flex-row sm:items-end sm:gap-4 sm:text-left">
-            <div className="-mt-12 h-24 w-24 shrink-0 overflow-hidden rounded-full bg-white p-1 shadow-md sm:-mt-10 sm:h-28 sm:w-28">
+          <div className="flex flex-col items-center gap-3 border-b border-ub-border px-6 pb-6 text-center sm:flex-row sm:items-end sm:gap-4 sm:text-left">
+            <div className="-mt-12 h-24 w-24 shrink-0 overflow-hidden rounded-full bg-ub-surface p-1 shadow-md sm:-mt-10 sm:h-28 sm:w-28">
               {university.logo_file_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -189,20 +189,20 @@ export default function UniversityPublicProfile({ university }: Props) {
                   className="h-full w-full rounded-full object-cover"
                 />
               ) : (
-                <div className="flex h-full w-full items-center justify-center rounded-full bg-blue-600 text-2xl font-bold text-white">
+                <div className="flex h-full w-full items-center justify-center rounded-full bg-ub-action-primary text-2xl font-bold text-white">
                   {initials}
                 </div>
               )}
             </div>
 
             <div className="min-w-0 pt-2 sm:pb-1">
-              <h1 className="text-xl font-bold text-slate-900">{university.name}</h1>
+              <h1 className="text-xl font-bold text-ub-text-primary">{university.name}</h1>
               <div className="mt-1 flex flex-col items-center gap-1 sm:flex-row sm:items-center sm:gap-3 sm:justify-start">
-                <p className="flex items-center gap-1.5 text-sm text-slate-500">
+                <p className="flex items-center gap-1.5 text-sm text-ub-text-secondary">
                   <MapPin className="h-3.5 w-3.5 shrink-0" />
                   {university.country}
                 </p>
-                <p className="flex items-center gap-1.5 text-sm text-slate-500">
+                <p className="flex items-center gap-1.5 text-sm text-ub-text-secondary">
                   <GraduationCap className="h-3.5 w-3.5 shrink-0" />
                   {university.university_type_name}
                 </p>
@@ -211,17 +211,13 @@ export default function UniversityPublicProfile({ university }: Props) {
           </div>
 
           <div className="flex justify-center p-6 sm:justify-start">
-            <PillButton
-              onClick={() => window.open(university.website_url, "_blank", "noopener,noreferrer")}
-              icon={<ExternalLink className="h-4.5 w-4.5" />}
-              text="Visit Website"
-              bgColor="bg-blue-600"
-              textColor="text-white"
-              borderColor="border-blue-600"
-              hoverBgColor="hover:bg-blue-700"
-              hoverTextColor="hover:text-white"
-              hoverBorderColor="hover:border-blue-700"
-              className="text-sm font-semibold"
+            <LinkBtn
+              href={university.website_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              icon={<ExternalLink className="h-4 w-4" aria-hidden="true" />}
+              label="Visit website"
+              variant="primary"
             />
           </div>
 
@@ -234,9 +230,9 @@ export default function UniversityPublicProfile({ university }: Props) {
             />
           )}
 
-          <div className="flex items-center justify-between gap-3 border-t border-slate-100 px-6 py-4">
+          <div className="flex items-center justify-between gap-3 border-t border-ub-border px-6 py-4">
             <p className="text-xs text-ub-text-tertiary">Unibexs</p>
-            <span className="text-xs font-medium text-slate-400">Design preview — not live data</span>
+            <span className="text-xs font-medium text-ub-text-tertiary">Design preview — not live data</span>
           </div>
         </FadeIn>
       </div>
@@ -247,16 +243,16 @@ export default function UniversityPublicProfile({ university }: Props) {
         {showLanguageCenter && university.languageCenter ? (
           <>
             <div className="md:col-span-2">
-              <FadeIn className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <FadeIn className="divide-y divide-ub-border overflow-hidden rounded-2xl border border-ub-border bg-ub-surface shadow-sm">
                 <div className="p-6">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">About</p>
-                  <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ub-text-tertiary">About</p>
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-ub-text-secondary">
                     {university.languageCenter.description}
                   </p>
                 </div>
 
                 <div className="p-6">
-                  <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ub-text-tertiary">
                     <BookOpen className="h-3.5 w-3.5" />
                     Courses
                   </p>
@@ -264,7 +260,7 @@ export default function UniversityPublicProfile({ university }: Props) {
                 </div>
 
                 <div className="p-6">
-                  <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ub-text-tertiary">
                     <MapPin className="h-3.5 w-3.5" />
                     Centers
                   </p>
@@ -272,7 +268,7 @@ export default function UniversityPublicProfile({ university }: Props) {
                     {university.languageCenter.locations.map((location) => (
                       <span
                         key={`${location.name}-${location.area}`}
-                        className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
+                        className="rounded-full bg-ub-tone-brand-bg px-3 py-1 text-xs font-medium text-ub-text-link"
                       >
                         {location.name} — {location.area}, {location.state}
                       </span>
@@ -284,31 +280,31 @@ export default function UniversityPublicProfile({ university }: Props) {
 
             <div className="md:col-span-1">
               <FadeIn delay={0.1} className="md:sticky md:top-6">
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="overflow-hidden rounded-2xl border border-ub-border bg-ub-surface shadow-sm">
                   <div className="space-y-4 p-6">
-                    <p className="text-sm font-semibold text-slate-900">Quick facts</p>
+                    <p className="text-sm font-semibold text-ub-text-primary">Quick facts</p>
 
                     <div className="flex items-start gap-2.5">
-                      <BookOpen className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <BookOpen className="mt-0.5 h-4 w-4 shrink-0 text-ub-text-tertiary" />
                       <div>
                         <p className="text-xs text-ub-text-tertiary">Courses offered</p>
-                        <p className="text-sm text-slate-700">{university.languageCenter.courses.length}</p>
+                        <p className="text-sm text-ub-text-secondary">{university.languageCenter.courses.length}</p>
                       </div>
                     </div>
 
                     <div className="flex items-start gap-2.5">
-                      <Award className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <Award className="mt-0.5 h-4 w-4 shrink-0 text-ub-text-tertiary" />
                       <div>
                         <p className="text-xs text-ub-text-tertiary">Founded</p>
-                        <p className="text-sm text-slate-700">{university.languageCenter.founded_year}</p>
+                        <p className="text-sm text-ub-text-secondary">{university.languageCenter.founded_year}</p>
                       </div>
                     </div>
 
                     <div className="flex items-start gap-2.5">
-                      <LanguagesIcon className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <LanguagesIcon className="mt-0.5 h-4 w-4 shrink-0 text-ub-text-tertiary" />
                       <div>
                         <p className="text-xs text-ub-text-tertiary">Students</p>
-                        <p className="text-sm text-slate-700">{university.languageCenter.student_count}</p>
+                        <p className="text-sm text-ub-text-secondary">{university.languageCenter.student_count}</p>
                       </div>
                     </div>
                   </div>
@@ -319,14 +315,14 @@ export default function UniversityPublicProfile({ university }: Props) {
         ) : (
           <>
             <div className="md:col-span-2">
-              <FadeIn className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <FadeIn className="divide-y divide-ub-border overflow-hidden rounded-2xl border border-ub-border bg-ub-surface shadow-sm">
                 <div className="p-6">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">About</p>
-                  <p className="whitespace-pre-line text-sm leading-relaxed text-slate-700">{university.description}</p>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ub-text-tertiary">About</p>
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-ub-text-secondary">{university.description}</p>
                 </div>
 
                 <div className="p-6">
-                  <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ub-text-tertiary">
                     <BookOpen className="h-3.5 w-3.5" />
                     Notable programs
                   </p>
@@ -334,10 +330,10 @@ export default function UniversityPublicProfile({ university }: Props) {
                     {university.programs.map((program) => (
                       <div
                         key={program.name}
-                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-100 px-4 py-2.5"
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-ub-border px-4 py-2.5"
                       >
-                        <p className="text-sm font-medium text-slate-800">{program.name}</p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-sm font-medium text-ub-text-primary">{program.name}</p>
+                        <p className="text-xs text-ub-text-secondary">
                           {program.level} · {program.duration}
                         </p>
                       </div>
@@ -346,7 +342,7 @@ export default function UniversityPublicProfile({ university }: Props) {
                 </div>
 
                 <div className="p-6">
-                  <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ub-text-tertiary">
                     <MapPin className="h-3.5 w-3.5" />
                     Campuses
                   </p>
@@ -354,7 +350,7 @@ export default function UniversityPublicProfile({ university }: Props) {
                     {university.branches.map((branch) => (
                       <span
                         key={`${branch.name}-${branch.location}`}
-                        className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700"
+                        className="rounded-full bg-ub-tone-brand-bg px-3 py-1 text-xs font-medium text-ub-text-link"
                       >
                         {branch.name} — {branch.location}, {branch.state}
                       </span>
@@ -366,31 +362,31 @@ export default function UniversityPublicProfile({ university }: Props) {
 
             <div className="md:col-span-1">
               <FadeIn delay={0.1} className="md:sticky md:top-6">
-                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="overflow-hidden rounded-2xl border border-ub-border bg-ub-surface shadow-sm">
                   <div className="space-y-4 p-6">
-                    <p className="text-sm font-semibold text-slate-900">Quick facts</p>
+                    <p className="text-sm font-semibold text-ub-text-primary">Quick facts</p>
 
                     <div className="flex items-start gap-2.5">
-                      <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-ub-text-tertiary" />
                       <div>
                         <p className="text-xs text-ub-text-tertiary">Intake</p>
-                        <p className="text-sm text-slate-700">{intakeLabel || "Contact university"}</p>
+                        <p className="text-sm text-ub-text-secondary">{intakeLabel || "Contact university"}</p>
                       </div>
                     </div>
 
                     <div className="flex items-start gap-2.5">
-                      <Users className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <Users className="mt-0.5 h-4 w-4 shrink-0 text-ub-text-tertiary" />
                       <div>
                         <p className="text-xs text-ub-text-tertiary">Students</p>
-                        <p className="text-sm text-slate-700">{university.student_count}</p>
+                        <p className="text-sm text-ub-text-secondary">{university.student_count}</p>
                       </div>
                     </div>
 
                     <div className="flex items-start gap-2.5">
-                      <Award className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <Award className="mt-0.5 h-4 w-4 shrink-0 text-ub-text-tertiary" />
                       <div>
                         <p className="text-xs text-ub-text-tertiary">Founded</p>
-                        <p className="text-sm text-slate-700">{university.founded_year}</p>
+                        <p className="text-sm text-ub-text-secondary">{university.founded_year}</p>
                       </div>
                     </div>
                   </div>
@@ -402,8 +398,8 @@ export default function UniversityPublicProfile({ university }: Props) {
       </div>
 
       <div className="mx-auto max-w-4xl pt-16 text-center">
-        <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">
-          Frequently Asked <span className="text-blue-600">Questions</span>
+        <h2 className="text-3xl font-bold text-ub-text-primary sm:text-4xl">
+          Frequently Asked <span className="text-ub-text-link">Questions</span>
         </h2>
         <div className="mt-8 text-left">
           <Faq items={faqItems} />

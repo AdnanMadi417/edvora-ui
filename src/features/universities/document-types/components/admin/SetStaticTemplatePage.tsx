@@ -169,14 +169,14 @@ export default function SetStaticTemplatePage({ id }: { id?: string }) {
             />
           )}
           {fileError && (
-            <p role="alert" className="text-ub-body-sm text-red-700">
+            <p role="alert" className="text-ub-body-sm text-ub-tone-danger-text">
               {fileError}
             </p>
           )}
           {submitError && (
             <p
               role="alert"
-              className="rounded-ub-md border border-red-200 bg-red-50 p-4 text-red-700"
+              className="rounded-ub-md border border-ub-tone-danger-border bg-ub-tone-danger-bg p-4 text-ub-tone-danger-text"
             >
               {submitError}
             </p>

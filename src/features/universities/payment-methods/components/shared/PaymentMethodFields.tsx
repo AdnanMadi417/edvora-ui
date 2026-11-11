@@ -17,7 +17,7 @@ export default function PaymentMethodFields({
       {apiError && (
         <p
           role="alert"
-          className="rounded-ub-md border border-red-200 bg-red-50 p-4 text-red-700"
+          className="rounded-ub-md border border-ub-tone-danger-border bg-ub-tone-danger-bg p-4 text-ub-tone-danger-text"
         >
           {apiError}
         </p>

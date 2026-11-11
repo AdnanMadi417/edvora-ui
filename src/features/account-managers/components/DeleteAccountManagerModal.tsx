@@ -50,10 +50,10 @@ export default function DeleteAccountManagerModal({
     >
       <div className="space-y-4">
         {isBlocked ? (
-          <div className="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 px-4 py-3">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+          <div className="flex items-start gap-3 rounded-md border border-ub-tone-warning-border bg-ub-tone-warning-bg px-4 py-3">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-ub-tone-warning-text" />
             <div className="space-y-3">
-              <p className="text-sm text-amber-900">
+              <p className="text-sm text-ub-tone-warning-text">
                 This account manager still has {blockedPartnersCount} assigned{" "}
                 {blockedPartnersCount === 1 ? "advisor" : "advisors"}. Transfer
                 them before deleting.
@@ -70,10 +70,10 @@ export default function DeleteAccountManagerModal({
           </div>
         ) : (
           <div>
-            <h3 className="text-lg font-semibold text-slate-900">
+            <h3 className="text-lg font-semibold text-ub-text-primary">
               Confirm Deletion
             </h3>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-ub-text-secondary">
               Are you sure you want to remove this account manager from the
               system?
             </p>
@@ -81,8 +81,8 @@ export default function DeleteAccountManagerModal({
         )}
 
         {AccountManager && (
-          <div className="rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
-            <p className="text-sm font-medium text-slate-800">
+          <div className="rounded-md border border-ub-border bg-ub-surface-subtle px-4 py-3">
+            <p className="text-sm font-medium text-ub-text-primary">
               {AccountManager}
             </p>
           </div>

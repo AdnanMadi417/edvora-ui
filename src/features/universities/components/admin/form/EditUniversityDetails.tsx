@@ -583,7 +583,7 @@ const UniversityEdit = ({
               {university.country}
             </p>
             {logo.file && !logo.uploading && (
-              <span className="mt-1 inline-block rounded-md bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+              <span className="mt-1 inline-block rounded-md bg-ub-tone-warning-bg px-2 py-0.5 text-[10px] font-medium text-ub-tone-warning-text">
                 Logo ready — click Save Changes
               </span>
             )}
@@ -714,7 +714,7 @@ const UniversityEdit = ({
         </div>
 
         {errors.branches && (
-          <p className="mb-3 text-xs text-red-600">{errors.branches}</p>
+          <p className="mb-3 text-xs text-ub-tone-danger-text">{errors.branches}</p>
         )}
 
         <div className="grid grid-cols-1 gap-4">
@@ -892,7 +892,7 @@ const UniversityEdit = ({
             <NoMessagesFound
               title="No payment methods assigned"
               subtitle="Assign a payment method to allow universities to accept payments."
-              icon={<CreditCard className="h-8 w-8 text-slate-400" />}
+              icon={<CreditCard className="h-8 w-8 text-ub-text-tertiary" />}
             />
           )}
         </div>

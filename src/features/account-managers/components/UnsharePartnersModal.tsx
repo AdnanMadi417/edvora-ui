@@ -137,9 +137,9 @@ function UnsharePartnersBody({
     >
       <fieldset disabled={submitting} className="min-w-0">
         <div className="space-y-5">
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-ub-text-secondary">
             Choose the account manager who should no longer see{" "}
-            <span className="font-medium text-slate-900">{sourceName}</span>
+            <span className="font-medium text-ub-text-primary">{sourceName}</span>
             &apos;s advisors. {sourceName} stays their primary manager; nothing
             else changes.
           </p>
@@ -165,12 +165,12 @@ function UnsharePartnersBody({
               disabled={managersLoading || submitting}
             />
             {managersError && (
-              <p className="-mt-2 text-xs text-red-600">{managersError}</p>
+              <p className="-mt-2 text-xs text-ub-tone-danger-text">{managersError}</p>
             )}
           </div>
 
           {formError && targetId && (
-            <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="flex items-start gap-2 rounded-md border border-ub-tone-danger-border bg-ub-tone-danger-bg px-4 py-3 text-sm text-ub-tone-danger-text">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{formError}</span>
             </div>

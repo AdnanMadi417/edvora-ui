@@ -355,22 +355,22 @@ function TransferPartnersBody({
 
           <div className="rounded-ub-lg bg-ub-surface-subtle p-3 text-ub-body-sm">
             {count === 0 ? (
-              <p className="text-sm text-slate-600">
-                <span className="font-medium text-slate-900">{sourceName}</span>{" "}
+              <p className="text-sm text-ub-text-secondary">
+                <span className="font-medium text-ub-text-primary">{sourceName}</span>{" "}
                 has no advisors to {verb.toLowerCase()}.
               </p>
             ) : isSubset ? (
               isShare ? (
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-ub-text-secondary">
                   Share only the advisors you tick below with another account
                   manager. {sourceFirst} keeps them; the other manager will also
                   see and manage them. Advisors assigned to {sourceFirst} later
                   are not shared automatically.
                 </p>
               ) : (
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-ub-text-secondary">
                   Move only the advisors you tick below from{" "}
-                  <span className="font-medium text-slate-900">
+                  <span className="font-medium text-ub-text-primary">
                     {sourceName}
                   </span>{" "}
                   to another account manager. {sourceFirst} will no longer see
@@ -378,11 +378,11 @@ function TransferPartnersBody({
                 </p>
               )
             ) : isShare ? (
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-ub-text-secondary">
                 {count === 1
                   ? "Share the only advisor assigned to "
                   : `Share all ${count} advisors of `}
-                <span className="font-medium text-slate-900">{sourceName}</span>{" "}
+                <span className="font-medium text-ub-text-primary">{sourceName}</span>{" "}
                 with another account manager. {sourceFirst} keeps{" "}
                 {count === 1 ? "this advisor" : "these advisors"}; the other
                 manager will also see and manage {count === 1 ? "it" : "them"}.
@@ -390,11 +390,11 @@ function TransferPartnersBody({
                 automatically.
               </p>
             ) : (
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-ub-text-secondary">
                 {count === 1
                   ? "Move the only advisor assigned to "
                   : `Move all ${count} advisors from `}
-                <span className="font-medium text-slate-900">{sourceName}</span>{" "}
+                <span className="font-medium text-ub-text-primary">{sourceName}</span>{" "}
                 to another account manager. {sourceFirst} will no longer see{" "}
                 {count === 1 ? "this advisor" : "these advisors"}.
               </p>
@@ -412,15 +412,15 @@ function TransferPartnersBody({
           )}
 
           {!isSubset && count > 0 && partners.length > 0 && (
-            <div className="rounded-md border border-slate-200 bg-slate-50">
+            <div className="rounded-md border border-ub-border bg-ub-surface-subtle">
               <button
                 type="button"
                 onClick={() => setShowList((v) => !v)}
-                className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-slate-700 hover:text-slate-900"
+                className="flex w-full items-center justify-between px-4 py-2.5 text-sm font-medium text-ub-text-secondary hover:text-ub-text-primary"
                 aria-expanded={showList}
               >
                 <span className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-slate-400" />
+                  <Users className="h-4 w-4 text-ub-text-tertiary" />
                   {showList ? "Hide advisors" : "Show advisors"} (
                   {partners.length})
                 </span>
@@ -431,7 +431,7 @@ function TransferPartnersBody({
                 )}
               </button>
               {showList && (
-                <ul className="max-h-40 overflow-y-auto border-t border-slate-200 px-4 py-2 text-sm text-slate-700">
+                <ul className="max-h-40 overflow-y-auto border-t border-ub-border px-4 py-2 text-sm text-ub-text-secondary">
                   {partners.map((p) => (
                     <li key={p.id} className="truncate py-1">
                       {p.name || "Unnamed advisor"}
@@ -464,10 +464,10 @@ function TransferPartnersBody({
                 disabled={managersLoading || submitting}
               />
               {managersError && (
-                <p className="-mt-2 text-xs text-red-600">{managersError}</p>
+                <p className="-mt-2 text-xs text-ub-tone-danger-text">{managersError}</p>
               )}
               {!managersLoading && !managersError && targets.length === 0 && (
-                <p className="-mt-2 text-xs text-slate-500">
+                <p className="-mt-2 text-xs text-ub-text-secondary">
                   There is no other active account manager to{" "}
                   {verb.toLowerCase()} to.
                 </p>
@@ -476,7 +476,7 @@ function TransferPartnersBody({
           )}
 
           {formError && targetId && (
-            <div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div className="flex items-start gap-2 rounded-md border border-ub-tone-danger-border bg-ub-tone-danger-bg px-4 py-3 text-sm text-ub-tone-danger-text">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <span>{formError}</span>
             </div>

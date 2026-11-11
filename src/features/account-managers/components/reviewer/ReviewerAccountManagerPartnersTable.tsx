@@ -94,17 +94,17 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
   };
 
   return (
-    <div className="mb-5 rounded-lg border border-slate-200 bg-white">
+    <div className="mb-5 rounded-lg border border-ub-border bg-ub-surface">
       {/* Header */}
-      <div className="flex flex-col gap-4 border-b border-slate-200 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-ub-border p-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">Assigned Advisors</h3>
-          <p className="mt-0.5 text-sm text-slate-500">Advisors managed by this account manager</p>
+          <h3 className="text-base font-semibold text-ub-text-primary">Assigned Advisors</h3>
+          <p className="mt-0.5 text-sm text-ub-text-secondary">Advisors managed by this account manager</p>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="border-b border-slate-200 p-6">
+      <div className="border-b border-ub-border p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
           <div className="flex items-center gap-2 sm:contents">
             <SearchInput
@@ -114,15 +114,15 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
               className="sm:w-64 sm:flex-none"
             />
             {isRefetching && (
-              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
+              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-ub-text-tertiary" aria-label="Updating results" />
             )}
             <button
-              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-ub-border bg-ub-surface text-ub-text-secondary hover:bg-ub-surface-subtle"
               onClick={() => setShowMobileFilters((v) => !v)}
             >
               <SlidersHorizontal className="h-4 w-4" />
               {activeFiltersCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-ub-action-primary text-[10px] font-bold text-white">
                   {activeFiltersCount}
                 </span>
               )}
@@ -145,12 +145,8 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
                 onClick={clearFilters}
                 icon={<RefreshCw className="h-4 w-4" />}
                 text="Clear"
-                bgColor="bg-white"
-                textColor="text-red-600"
-                borderColor="border-red-200"
-                hoverTextColor="hover:text-red-600"
-                hoverBorderColor="hover:border-red-200"
-                className="hover:bg-red-50 sm:w-auto"
+                variant="secondary"
+                className="hover:bg-ub-tone-danger-bg sm:w-auto"
               />
             )}
           </div>
@@ -174,15 +170,15 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
         >
           <table className="w-full min-w-[800px] md:min-w-0">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
+              <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
                   { icon: Users,      label: "Advisor",      minW: "min-w-[220px]" },
                   { icon: Mail,       label: "Contact Info", minW: "min-w-[200px]" },
                   { icon: BadgeCheck, label: "Status" },
                 ].map(({ icon: Icon, label, minW }) => (
-                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
+                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-ub-text-primary`}>
                     <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4 text-slate-400" />
+                      <Icon className="h-4 w-4 text-ub-text-tertiary" />
                       {label}
                     </div>
                   </th>
@@ -191,7 +187,7 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
               </tr>
             </thead>
 
-            <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
+            <tbody className={`divide-y divide-ub-border bg-ub-surface ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
               {isInitialLoad && <TableSkeletonRows columns={4} rows={ITEMS_PER_PAGE} />}
 
               {!isInitialLoad && error && (
@@ -203,19 +199,15 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
                   colSpan={4}
                   title="No advisors found"
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This manager has no assigned advisors yet."}
-                  icon={<Handshake className="h-8 w-8 text-slate-400" />}
+                  icon={<Handshake className="h-8 w-8 text-ub-text-tertiary" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button
                         onClick={clearFilters}
                         icon={<RefreshCw className="h-3.5 w-3.5" />}
                         text="Clear filters"
-                        bgColor="bg-white"
-                        textColor="text-slate-700"
-                        borderColor="border-slate-200"
-                        hoverTextColor="hover:text-slate-700"
-                        hoverBorderColor="hover:border-slate-200"
-                        className="hover:bg-slate-50"
+                        variant="secondary"
+                        className="hover:bg-ub-surface-subtle"
                       />
                     ) : undefined
                   }
@@ -226,30 +218,30 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
               {!isInitialLoad && !error && partners.map((partner) => (
                 <AnimatedTableRow
                   key={partner.id}
-                  className="group cursor-pointer transition-colors hover:bg-slate-50/50"
+                  className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle/50"
                   onClick={() => router.push(`/reviewer/advisors/${partner.id}`)}
                 >
                   <td className="min-w-[220px] px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                      <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
                         <PresignedImage
                           fileKey={(partner.type === "individual" ? partner.individual_details?.profile_photo_file_key : partner.company_details?.logo_file_key) ?? undefined}
                           alt={partner.name}
                           className="h-full w-full object-cover"
                           fallback={partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
                         />
-                        <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
+                        <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-ub-surface ${partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"}`} />
                       </div>
                       <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-slate-900">{partner.name || "Unknown Advisor"}</div>
-                        <div className="truncate text-xs text-slate-500 capitalize">{partner.type || "—"} · {partner.country || "—"}</div>
+                        <div className="truncate text-sm font-medium text-ub-text-primary">{partner.name || "Unknown Advisor"}</div>
+                        <div className="truncate text-xs text-ub-text-secondary capitalize">{partner.type || "—"} · {partner.country || "—"}</div>
                       </div>
                     </div>
                   </td>
 
                   <td className="px-6 py-4">
-                    <div className="truncate text-sm text-slate-900">{partner.phone || "—"}</div>
-                    <div className="truncate text-xs text-slate-500">{partner.email || "—"}</div>
+                    <div className="truncate text-sm text-ub-text-primary">{partner.phone || "—"}</div>
+                    <div className="truncate text-xs text-ub-text-secondary">{partner.email || "—"}</div>
                   </td>
 
                   <td className="px-6 py-4">
@@ -261,7 +253,7 @@ export default function ReviewerAccountManagerPartnersTable({ managerId }: Revie
                   </td>
 
                   <td className="px-4 py-4">
-                    <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                    <ChevronRight className="h-4 w-4 text-ub-text-tertiary opacity-0 transition-opacity group-hover:opacity-100" />
                   </td>
                 </AnimatedTableRow>
               ))}
