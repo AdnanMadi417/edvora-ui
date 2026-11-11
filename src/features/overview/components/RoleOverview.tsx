@@ -7,8 +7,6 @@ import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
 import OverviewVisual from "./OverviewVisual";
 import OverviewItems from "./OverviewItems";
-import QuickActions from "components/ub/dashboard/lists/QuickActions";
-import { TextButton } from "components/ub/core/buttons/TextButton";
 import { useRoleOverview } from "../hooks/useRoleOverview";
 import {
   metricCaptions,
@@ -18,8 +16,13 @@ import {
 } from "../model/overviewConfig";
 import type { OverviewRole } from "../model/types";
 
+// Exceptions: these cards only matter when something is there, so a zero hides them.
+const HIDE_WHEN_ZERO = new Set(["hold", "hiddenPrograms", "unread"]);
+const GRID_COLS = ["", "xl:grid-cols-1", "xl:grid-cols-2", "xl:grid-cols-3", "xl:grid-cols-4"];
+
 export default function RoleOverview({ role }: { role: OverviewRole }) {
-  const { context, plans, resources, refresh, waiting, denied, refreshing } =
+  // The overview refreshes by itself (see useRoleOverview), so there's no refresh button.
+  const { context, plans, resources, refresh, waiting, denied } =
     useRoleOverview(role);
   if (denied)
     return (
@@ -30,6 +33,10 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
     );
   if (waiting) return <WidgetStatus state="loading" skeleton="list" />;
   const config = overviewConfig(context);
+  const metrics = config.metrics.filter((id) => {
+    const resource = resources[id];
+    return !(HIDE_WHEN_ZERO.has(id) && resource?.state === "ready" && resource.data?.total === 0);
+  });
   // Data entry's only chart would repeat the visible/hidden cards, so it has none.
   const hasChart = role !== "data_entry";
   return (
@@ -39,11 +46,6 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
       <DashboardHeader hideTitle
         title={config.title}
         subtitle={config.subtitle}
-        secondaryActions={
-          <TextButton onClick={refresh} disabled={refreshing}>
-            {refreshing ? "Refreshing…" : "Refresh overview"}
-          </TextButton>
-        }
         primaryAction={
           <LinkBtn
             variant="primary"
@@ -53,8 +55,8 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
           />
         }
       />
-      <div className="order-2 grid gap-4 sm:grid-cols-2 md:order-none xl:grid-cols-4">
-        {config.metrics.map((id, index) => {
+      <div className={`order-2 grid gap-4 md:order-none ${metrics.length > 1 ? "sm:grid-cols-2" : ""} ${GRID_COLS[metrics.length] ?? "xl:grid-cols-4"}`}>
+        {metrics.map((id, index) => {
           const plan = plans.find((item) => item.id === id);
           const resource = resources[id];
           if (!plan) return null;
@@ -80,26 +82,16 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
           );
         })}
       </div>
-      <div className="order-3 grid items-start gap-4 md:order-none xl:grid-cols-3">
-        {hasChart && (
-          <div className="min-w-0 xl:col-span-2">
-            <OverviewVisual
-              role={role}
-              plans={plans}
-              resources={resources}
-              onRetry={refresh}
-            />
-          </div>
-        )}
-        <DashboardCard
-          title="Quick actions"
-          subtitle="Your everyday tools, one click away."
-          as="h2"
-          className={hasChart ? undefined : "xl:col-span-3"}
-        >
-          <QuickActions actions={config.actions} className={hasChart ? "xl:grid-cols-1" : "xl:grid-cols-4"} />
-        </DashboardCard>
-      </div>
+      {hasChart && (
+        <div className="order-3 min-w-0 md:order-none">
+          <OverviewVisual
+            role={role}
+            plans={plans}
+            resources={resources}
+            onRetry={refresh}
+          />
+        </div>
+      )}
       <div className="order-1 grid items-start gap-4 md:order-none xl:grid-cols-3">
         {[...config.panels, "updates"].map((id) => {
           const plan = plans.find((item) => item.id === id);

@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "components/context/SessionContext";
 import { createOverviewPlan } from "../services/overviewApi";
 import type {
@@ -63,14 +63,20 @@ export function useRoleOverview(role: OverviewRole) {
     resources: Record<string, OverviewResource>;
   }>({ key: "", resources: {} });
   const refresh = useCallback(() => setRound((value) => value + 1), []);
+  // The first load for a user/context shows skeletons; later refreshes run in
+  // the background and keep the numbers on screen until new ones arrive.
+  const loadedKey = useRef("");
   useEffect(() => {
     let cancelled = false;
-    setResult({
-      key,
-      resources: Object.fromEntries(
-        plans.map((plan) => [plan.id, { state: "loading" }])
-      ),
-    });
+    const background = loadedKey.current === key;
+    loadedKey.current = key;
+    if (!background)
+      setResult({
+        key,
+        resources: Object.fromEntries(
+          plans.map((plan) => [plan.id, { state: "loading" }])
+        ),
+      });
     plans.forEach((plan) => {
       plan
         .load()
@@ -85,26 +91,52 @@ export function useRoleOverview(role: OverviewRole) {
             }));
         })
         .catch((error) => {
-          if (!cancelled)
-            setResult((current) => ({
-              key,
-              resources: {
-                ...current.resources,
-                [plan.id]: {
-                  state: "error",
-                  error:
-                    error?.response?.status === 403
-                      ? "You don't have access to this information."
-                      : "Couldn't load this information. Please try again.",
-                },
-              },
-            }));
+          if (cancelled) return;
+          setResult((current) =>
+            // A failed background refresh keeps the last good numbers.
+            background && current.resources[plan.id]?.state === "ready"
+              ? current
+              : {
+                  key,
+                  resources: {
+                    ...current.resources,
+                    [plan.id]: {
+                      state: "error",
+                      error:
+                        error?.response?.status === 403
+                          ? "You don't have access to this information."
+                          : "Couldn't load this information. Please try again.",
+                    },
+                  },
+                }
+          );
         });
     });
     return () => {
       cancelled = true;
     };
   }, [key, plans, round]);
+
+  // Refresh by itself: every minute while the tab is visible, and on return to
+  // the tab, at most once every 30 seconds.
+  useEffect(() => {
+    if (!enabled) return;
+    let last = Date.now();
+    const tick = () => {
+      if (document.visibilityState !== "visible" || Date.now() - last < 30_000)
+        return;
+      last = Date.now();
+      refresh();
+    };
+    const timer = window.setInterval(tick, 60_000);
+    window.addEventListener("focus", tick);
+    document.addEventListener("visibilitychange", tick);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener("focus", tick);
+      document.removeEventListener("visibilitychange", tick);
+    };
+  }, [enabled, refresh]);
   const resources = result.key === key ? result.resources : {};
   return {
     session,

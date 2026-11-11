@@ -254,3 +254,36 @@ test("a failed stage count fails the pipeline rather than drawing a false zero",
       .load()
   ).rejects.toThrow("Unavailable");
 });
+
+describe("refreshing in the background", () => {
+  const wrapperFor = (role: string) => {
+    const value = session(role);
+    const Wrapper = ({ children }: { children: React.ReactNode }) => (
+      <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
+    );
+    return Wrapper;
+  };
+
+  test("keeps the numbers on screen while it reloads", async () => {
+    get.mockResolvedValue({ data: { total: 7, items: [], count: 7 } });
+    const { result } = renderHook(() => useRoleOverview("admin"), { wrapper: wrapperFor("admin") });
+    await waitFor(() => expect(result.current.resources.active?.state).toBe("ready"));
+    get.mockReturnValue(new Promise(() => {})); // the next load never settles
+    act(() => result.current.refresh());
+    expect(result.current.resources.active?.state).toBe("ready");
+    expect(result.current.resources.active?.data?.total).toBe(7);
+  });
+
+  test("a failed background load keeps the last good numbers", async () => {
+    get.mockResolvedValue({ data: { total: 7, items: [], count: 7 } });
+    const { result } = renderHook(() => useRoleOverview("admin"), { wrapper: wrapperFor("admin") });
+    await waitFor(() => expect(result.current.resources.active?.state).toBe("ready"));
+    get.mockRejectedValue(new Error("network"));
+    await act(async () => {
+      result.current.refresh();
+    });
+    await waitFor(() => expect(get).toHaveBeenCalled());
+    expect(result.current.resources.active?.state).toBe("ready");
+    expect(result.current.resources.active?.data?.total).toBe(7);
+  });
+});
