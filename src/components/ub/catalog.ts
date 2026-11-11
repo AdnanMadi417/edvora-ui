@@ -665,6 +665,13 @@ export const CATALOG: Record<string, CatalogEntry> = {
     useFor: "One choice from 2–3 options that need an icon and a hint.",
     usedIn: ["Transfer Advisors (move or share)", "Choose application type"],
   },
+  CollapsibleSection: {
+    category: "forms",
+    imports: [imp("CollapsibleSection", "forms/layout/CollapsibleSection")],
+    useFor: "Split a long form into sections that open and close, each with a one-line summary while closed.",
+    usedIn: ["Edit programme", "Edit logistics provider"],
+    avoid: "Short forms: if the whole form fits in about two phone screens, keep every field visible.",
+  },
   SearchableChecklist: {
     category: "forms",
     imports: [imp("SearchableChecklist", "forms/selection/SearchableChecklist")],

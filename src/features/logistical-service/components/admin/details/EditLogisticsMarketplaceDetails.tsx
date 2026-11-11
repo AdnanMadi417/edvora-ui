@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Pencil, Plus, Trash2, Truck, X } from "lucide-react";
+import { Check, Globe, ListChecks, Package, Pencil, Plus, Trash2, Truck, X } from "lucide-react";
 
 import {
   useLogisticProviderDetails,
@@ -36,6 +36,15 @@ import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { NATIONALITIES } from "constants/lists";
 import { fieldGroup } from "components/ub/recipes";
+import CollapsibleSection from "components/ub/forms/layout/CollapsibleSection";
+
+type SectionKey = "details" | "packages" | "services" | "coverage";
+/** Which section holds a validation error key. */
+const sectionOf = (key: string): SectionKey =>
+  key.startsWith("packages_offered") ? "packages"
+  : key === "selectedServices" ? "services"
+  : key === "selectedLanguages" || key === "selectedUniversities" ? "coverage"
+  : "details";
 
 interface Props {
   id: string;
@@ -98,6 +107,12 @@ const EditLogisticsMarketplaceDetails = ({
   const [editingServiceId, setEditingServiceId] = useState<string | null>(null);
   const [editingServiceName, setEditingServiceName] = useState("");
   const [errors, setErrors] = useState<FormErrors>({});
+  // Only the first section starts open; the rest show a summary and open on click or on error.
+  const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
+    details: true, packages: false, services: false, coverage: false,
+  });
+  const toggleSection = (key: SectionKey) => setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  const sectionHasError = (key: SectionKey) => Object.entries(errors).some(([k, v]) => v && sectionOf(k) === key);
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoUploading, setLogoUploading] = useState(false);
@@ -388,7 +403,11 @@ const EditLogisticsMarketplaceDetails = ({
       newErrors.selectedUniversities = "Please select at least one university";
 
     setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
+    if (Object.keys(newErrors).length > 0) {
+      const withErrors = Object.keys(newErrors).map(sectionOf);
+      setOpenSections((prev) => ({ ...prev, ...Object.fromEntries(withErrors.map((k) => [k, true])) }));
+      return;
+    }
 
     const picture_file_key = logoFile ? logoFileKey : existingLogoKey;
     const picture_file_url = logoFile ? logoFileUrl : existingLogoUrl;
@@ -452,7 +471,15 @@ const EditLogisticsMarketplaceDetails = ({
       cancelDisabled={logoUploading}
       stickyActions
     >
-      <div className="min-w-0 space-y-6">
+      <div className="min-w-0 space-y-4">
+        <CollapsibleSection
+          icon={Truck}
+          title="Provider details"
+          summary={[formData.name, formData.main_location].filter(Boolean).join(" · ") || "Not started"}
+          hasError={sectionHasError("details")}
+          open={openSections.details}
+          onToggle={() => toggleSection("details")}
+        >
         <ImageUpload
           label="Provider picture"
           id="picture"
@@ -535,11 +562,21 @@ const EditLogisticsMarketplaceDetails = ({
           />
         </div>
 
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          icon={Package}
+          title="Packages"
+          summary={formData.packages_offered.length ? `${formData.packages_offered.length} package${formData.packages_offered.length === 1 ? "" : "s"}` : "No packages"}
+          hasError={sectionHasError("packages")}
+          open={openSections.packages}
+          onToggle={() => toggleSection("packages")}
+        >
         <div>
-          <div className="mb-4 flex items-center justify-between">
-            <h4 className="text-lg font-semibold text-slate-900">
-              Packages Offered
-            </h4>
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <p className="text-ub-body-sm text-ub-text-secondary">
+              Services sold together for one price.
+            </p>
             <Button
               icon={<Plus className="h-5 w-5" />}
               text="Add Package"
@@ -681,6 +718,16 @@ const EditLogisticsMarketplaceDetails = ({
           ))}
         </div>
 
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          icon={ListChecks}
+          title="Services and prices"
+          summary={`${formData.selectedServices.length} service${formData.selectedServices.length === 1 ? "" : "s"} selected`}
+          hasError={sectionHasError("services")}
+          open={openSections.services}
+          onToggle={() => toggleSection("services")}
+        >
         <div>
           <div className="mb-3 flex items-center justify-between">
             <div>
@@ -797,6 +844,16 @@ const EditLogisticsMarketplaceDetails = ({
           </div>
         </div>
 
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          icon={Globe}
+          title="Languages and universities"
+          summary={`${formData.selectedLanguages.length} language${formData.selectedLanguages.length === 1 ? "" : "s"} · ${formData.selectedUniversities.length} universit${formData.selectedUniversities.length === 1 ? "y" : "ies"}`}
+          hasError={sectionHasError("coverage")}
+          open={openSections.coverage}
+          onToggle={() => toggleSection("coverage")}
+        >
         <div className="grid grid-cols-1 gap-x-3">
           <CheckSimpleBoxGroup
             label="Languages"
@@ -817,6 +874,8 @@ const EditLogisticsMarketplaceDetails = ({
             required
           />
         </div>
+
+        </CollapsibleSection>
 
         {errorEditLogisticsProvider && (
           <p className="text-sm text-red-600">{errorEditLogisticsProvider}</p>

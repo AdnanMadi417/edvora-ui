@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, User, ArrowRightLeft, Copy } from "lucide-react";
+import { Building2, User, ArrowRightLeft, Copy, BookOpen, CircleDollarSign } from "lucide-react";
+import CollapsibleSection from "components/ub/forms/layout/CollapsibleSection";
 import InputField from "components/ub/forms/text/InputField";
 import TextareaField from "components/ub/forms/text/TextareaField";
 import SelectField from "components/ub/forms/selection/SelectField";
@@ -140,6 +141,7 @@ export default function Forms() {
   });
   const [intake, setIntake] = useState("2026-09-01");
   const [mode, setMode] = useState<"move" | "copy">("move");
+  const [openPart, setOpenPart] = useState<"details" | "fees" | null>("details");
   const [selected, setSelected] = useState<Set<string>>(new Set(["ptn_002"]));
   const compact = useUpload();
   const imageUpload = useUpload();
@@ -440,6 +442,33 @@ export default function Forms() {
             },
           ]}
         />
+      </Demo>
+
+      <Demo
+        name="CollapsibleSection"
+        path="components/ub/forms/layout/CollapsibleSection.tsx"
+      >
+        <div className="space-y-3">
+          <CollapsibleSection
+            icon={BookOpen}
+            title="Program details"
+            summary="Bachelor of Computer Science (Hons) · Bachelor's Degree"
+            open={openPart === "details"}
+            onToggle={() => setOpenPart(openPart === "details" ? null : "details")}
+          >
+            <p className="text-ub-body-sm text-ub-text-secondary">The section's fields go here.</p>
+          </CollapsibleSection>
+          <CollapsibleSection
+            icon={CircleDollarSign}
+            title="Fees & Commission"
+            summary="First year MYR 6,000"
+            hasError
+            open={openPart === "fees"}
+            onToggle={() => setOpenPart(openPart === "fees" ? null : "fees")}
+          >
+            <p className="text-ub-body-sm text-ub-text-secondary">A section with an error shows "Needs attention" while closed.</p>
+          </CollapsibleSection>
+        </div>
       </Demo>
 
       <Demo

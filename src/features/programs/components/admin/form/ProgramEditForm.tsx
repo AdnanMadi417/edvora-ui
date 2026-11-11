@@ -42,7 +42,7 @@ import SearchableDropdown from "components/ub/forms/selection/SearchableDropdown
 import SelectField from "components/ub/forms/selection/SelectField";
 import YearlyFeesField from "features/programs/components/shared/YearlyFeesField";
 import OneTimeFeesField from "features/programs/components/shared/OneTimeFeesField";
-import AccordionSection from "features/programs/components/shared/form/AccordionSection";
+import CollapsibleSection from "components/ub/forms/layout/CollapsibleSection";
 import IntakeMonthsField from "features/programs/components/shared/form/IntakeMonthsField";
 import { useUnsavedChangesGuard, confirmDiscard } from "features/programs/components/shared/form/useUnsavedChangesGuard";
 import { COURSE_TYPE_OPTIONS, isMasterOrPhd } from "features/programs/utils/courseType";
@@ -495,7 +495,7 @@ const EditKnowledgeHubProgramDetails = ({
           <div className="p-6">
             <div className="space-y-4">
 
-              <AccordionSection
+              <CollapsibleSection
                 icon={BookOpen}
                 title="Program Details"
                 hasError={sectionHasError(errors, 'details')}
@@ -579,9 +579,9 @@ const EditKnowledgeHubProgramDetails = ({
                     />
                   </div>
                 </div>
-              </AccordionSection>
+              </CollapsibleSection>
 
-              <AccordionSection
+              <CollapsibleSection
                 icon={MapPin}
                 title="University & Location"
                 hasError={sectionHasError(errors, 'university')}
@@ -618,9 +618,9 @@ const EditKnowledgeHubProgramDetails = ({
                     </div>
                   </div>
                 </div>
-              </AccordionSection>
+              </CollapsibleSection>
 
-              <AccordionSection
+              <CollapsibleSection
                 icon={DollarSign}
                 title="Fees & Commission"
                 hasError={sectionHasError(errors, 'fees')}
@@ -632,9 +632,9 @@ const EditKnowledgeHubProgramDetails = ({
                 <OneTimeFeesField formData={formData} errors={errors} updateFormData={updateFormData} />
 
                 <CommissionFields formData={formData} errors={errors} updateFormData={updateFormData} validateField={validateField} />
-              </AccordionSection>
+              </CollapsibleSection>
 
-              <AccordionSection
+              <CollapsibleSection
                 icon={CalendarRange}
                 title="Intakes & Requirements"
                 hasError={sectionHasError(errors, 'intakes')}
@@ -653,9 +653,9 @@ const EditKnowledgeHubProgramDetails = ({
                   errors={errors}
                   updateFormData={updateFormData}
                 />
-              </AccordionSection>
+              </CollapsibleSection>
 
-              <AccordionSection
+              <CollapsibleSection
                 icon={Award}
                 title="Scholarship"
                 hasError={sectionHasError(errors, 'scholarship')}
@@ -829,7 +829,7 @@ const EditKnowledgeHubProgramDetails = ({
                     icon={<Award className="h-8 w-8 text-slate-400" />}
                   />
                 )}
-              </AccordionSection>
+              </CollapsibleSection>
             </div>
           </div>
 

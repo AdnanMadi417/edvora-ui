@@ -60,7 +60,7 @@ export function FormInputsSection() {
       <Pick demos={["Input", "Textarea", "Checkbox", "Radio and RadioGroup", "Toggle", "Stepper", "Combobox", "FileUpload"]}>
         <NewCoreForms />
       </Pick>
-      <Pick demos={["InputField and TextareaField","SelectField, SelectInput and RadioField","CheckBoxGroup and CheckSimpleBoxGroup","SearchableDropdown, MultiSelect and SearchableSelect","Toggles","Password and OTP","Phone, commission and fee rows","IntakeDatePicker","RichTextEditor","RadioCardGroup","SearchableChecklist","File uploads"]}>
+      <Pick demos={["InputField and TextareaField","SelectField, SelectInput and RadioField","CheckBoxGroup and CheckSimpleBoxGroup","SearchableDropdown, MultiSelect and SearchableSelect","Toggles","Password and OTP","Phone, commission and fee rows","IntakeDatePicker","RichTextEditor","RadioCardGroup","CollapsibleSection","SearchableChecklist","File uploads"]}>
         <Forms />
       </Pick>
       <UniversityTypeFormDemo />
