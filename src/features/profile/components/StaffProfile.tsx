@@ -48,7 +48,7 @@ export default function StaffProfile() {
   return (
     <div className="mx-auto mt-5 overflow-hidden rounded-lg border border-slate-200 bg-white">
       <div className="flex items-center gap-4 border-b border-slate-200 p-6">
-        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-accent-light text-xl font-semibold text-blue-700">
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-ub-tone-brand-bg text-xl font-semibold text-ub-tone-brand-text">
           {user.name?.[0]?.toUpperCase() ?? "?"}
         </div>
         <div className="min-w-0">

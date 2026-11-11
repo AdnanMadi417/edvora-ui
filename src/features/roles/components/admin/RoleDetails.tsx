@@ -76,7 +76,7 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
         {/* Header */}
         <div className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-5">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent-light text-slate-700">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ub-tone-brand-bg text-ub-tone-brand-text">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div className="space-y-1">

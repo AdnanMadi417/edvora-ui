@@ -271,7 +271,6 @@ module.exports = {
         'card-hover': '#FFFFFF',
 
         accent: '#0348D1',
-        'accent-light': '#EBF1FF',
 
         // WhatsApp brand green (official dark shade; white icon on it passes
         // the 3:1 non-text contrast rule, the bright #25D366 does not).
