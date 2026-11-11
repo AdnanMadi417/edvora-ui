@@ -68,6 +68,11 @@ export const fieldControl =
   "enabled:hover:shadow-[inset_0_0_0_2px_var(--ub-border-focus)] focus:shadow-[inset_0_0_0_2px_var(--ub-border-focus)] focus:outline-none " +
   "disabled:cursor-not-allowed disabled:opacity-60";
 export const fieldControlHeight = "h-[50px]";
+/** The field look for a control built from several parts (dial code + number,
+ *  text + remove button): pill, field fill, inset outline, shared hover/focus rings. */
+export const fieldGroup =
+  `rounded-[33px] bg-[var(--ub-field-bg)] text-[13px] text-[var(--ub-field-text)] ${transition} ` +
+  "shadow-[inset_0_0_0_1px_var(--ub-field-ring)] hover:shadow-[inset_0_0_0_2px_var(--ub-border-focus)] focus-within:shadow-[inset_0_0_0_2px_var(--ub-border-focus)]";
 export const fieldControlError = "!shadow-[inset_0_0_0_2px_var(--ub-field-error)]";
 
 /** 20px checkbox, radius 4 (brief §4.2). */
@@ -76,7 +81,7 @@ export const checkbox =
   "checked:border-ub-action-primary checked:bg-ub-action-primary disabled:cursor-not-allowed disabled:bg-ub-disabled";
 
 /** Selectable option chip / card (radio cards, check chips). */
-export const optionCard = `rounded-ub-md border border-ub-border bg-ub-surface ${transition} hover:border-ub-border-hover`;
+export const optionCard = `rounded-ub-lg border border-ub-border bg-ub-surface ${transition} hover:border-ub-border-hover`;
 export const optionCardSelected = "border-2 border-ub-action-primary bg-ub-selected";
 
 /** Shared 44×26 pill switch with a centered 20px thumb. */

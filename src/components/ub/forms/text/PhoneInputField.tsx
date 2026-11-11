@@ -1,7 +1,7 @@
 import React, { useId } from "react";
 import { ChevronDown } from "lucide-react";
 import { DIAL_CODES } from "constants/lists";
-import { fieldControlError, fieldWrapper } from "components/ub/recipes";
+import { fieldControlError, fieldGroup, fieldWrapper } from "components/ub/recipes";
 import { FieldError, FieldLabel, describedBy } from "components/ub/forms/layout/FieldChrome";
 
 interface PhoneInputFieldProps {
@@ -19,10 +19,7 @@ interface PhoneInputFieldProps {
 // One control holding the dial-code select and the number input, so the pair
 // hovers, focuses and errors as a single field. Same pill, height, fill,
 // outline and text as fieldControl, so it lines up with the fields beside it.
-const group =
-  "flex h-[50px] w-full items-stretch rounded-[33px] bg-[var(--ub-field-bg)] text-[13px] text-[var(--ub-field-text)] " +
-  "shadow-[inset_0_0_0_1px_var(--ub-field-ring)] transition-shadow duration-200 ease-[ease] motion-reduce:transition-none " +
-  "hover:shadow-[inset_0_0_0_2px_var(--ub-border-focus)] focus-within:shadow-[inset_0_0_0_2px_var(--ub-border-focus)]";
+const group = `flex h-[50px] w-full items-stretch ${fieldGroup}`;
 
 export default function PhoneInputField({
   label = "Phone number",

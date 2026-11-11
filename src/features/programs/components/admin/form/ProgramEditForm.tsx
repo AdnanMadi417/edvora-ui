@@ -53,6 +53,7 @@ import IconButton from "components/ub/core/buttons/IconButton";
 import NoMessagesFound from "components/ub/feedback/states/NoMessagesFound";
 import { validateProgram } from "./validateProgram";
 import type { FormData as ProgramFormData } from "./RegisterProgram";
+import { fieldGroup } from "components/ub/recipes";
 
 const SCHOLARSHIP_TYPE_MAP: Record<string, number> = { full: 1, partial: 2, mixed: 3 };
 const toScholarshipTypeInt = (t: any): number | null => {
@@ -609,7 +610,7 @@ const EditKnowledgeHubProgramDetails = ({
 
                   <div className="md:col-span-2">
                     <label className="mb-1.5 block text-sm font-medium text-slate-700">Location</label>
-                    <div className="flex h-11 items-center gap-2 rounded-lg border border-dashed border-slate-200 bg-slate-50 px-3 text-sm text-slate-500">
+                    <div className="flex h-[50px] items-center gap-2 rounded-ub-full border border-dashed border-ub-border bg-ub-surface-subtle px-[17px] text-[13px] text-ub-text-secondary">
                       <MapPin className="h-4 w-4 shrink-0 text-slate-400" />
                       {location || 'Select a university and branch to see its location'}
                     </div>
@@ -661,18 +662,18 @@ const EditKnowledgeHubProgramDetails = ({
                 onToggle={() => toggleSection('scholarship')}
               >
                 <div className="flex items-center gap-3">
-                  <div className="inline-flex rounded-lg border border-slate-200 p-1">
+                  <div className="inline-flex rounded-ub-full border border-ub-border p-1">
                     <button
                       type="button"
                       onClick={() => updateFormData('has_scholarship', true)}
-                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${formData.has_scholarship ? 'bg-ub-tone-warning-bg text-ub-tone-warning-text ring-1 ring-ub-tone-warning-border shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
+                      className={`rounded-ub-full px-4 py-2 text-sm font-medium transition ${formData.has_scholarship ? 'bg-ub-tone-warning-bg text-ub-tone-warning-text ring-1 ring-ub-tone-warning-border shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
                     >
                       Available
                     </button>
                     <button
                       type="button"
                       onClick={() => updateFormData('has_scholarship', false)}
-                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${!formData.has_scholarship ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
+                      className={`rounded-ub-full px-4 py-2 text-sm font-medium transition ${!formData.has_scholarship ? 'bg-slate-700 text-white shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}
                     >
                       None
                     </button>
@@ -792,12 +793,12 @@ const EditKnowledgeHubProgramDetails = ({
                         ) : (
                           <div className="space-y-2">
                             {formData.scholarships[index].conditions.map((condition: string, cIndex: number) => (
-                              <div key={cIndex} className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
+                              <div key={cIndex} className={`${fieldGroup} flex min-h-[50px] items-center gap-2 ps-[17px] pe-2`}>
                                 <input
                                   value={condition}
                                   onChange={(e) => updateFormData(`scholarships[${index}].conditions[${cIndex}]`, e.target.value)}
                                   placeholder={`Condition ${cIndex + 1}`}
-                                  className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
+                                  className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--ub-field-placeholder)]"
                                 />
                                 <button
                                   type="button"

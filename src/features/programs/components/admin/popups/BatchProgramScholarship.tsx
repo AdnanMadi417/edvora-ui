@@ -13,6 +13,7 @@ import RichTextEditor from "components/ub/forms/text/RichTextEditor";
 
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { fieldGroup } from "components/ub/recipes";
 
 interface BatchProgramScholarshipsProps {
   isOpen: boolean;
@@ -324,7 +325,7 @@ export default function BatchProgramScholarships({
                           {formData.scholarships[index].conditions.map((condition, cIndex) => (
                             <div
                               key={cIndex}
-                              className="flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-2"
+                              className={`${fieldGroup} flex min-h-[50px] items-center gap-2 ps-[17px] pe-2`}
                             >
                               <input
                                 value={condition}
@@ -335,7 +336,7 @@ export default function BatchProgramScholarships({
                                   )
                                 }
                                 placeholder={`Condition ${cIndex + 1}`}
-                                className="flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
+                                className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--ub-field-placeholder)]"
                               />
                               <button
                                 type="button"

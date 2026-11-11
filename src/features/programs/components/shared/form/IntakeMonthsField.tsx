@@ -45,7 +45,7 @@ export default function IntakeMonthsField({
               type="button"
               onClick={() => toggleMonth(m.value)}
               aria-pressed={isSelected}
-              className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+              className={`rounded-ub-full border px-3 py-2 text-sm font-medium transition ${
                 isSelected
                   ? "border-blue-600 bg-blue-50 text-blue-700"
                   : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"

@@ -48,6 +48,7 @@ import { useIsFormDirty } from "features/programs/components/shared/form/useIsFo
 
 import IconButton from "components/ub/core/buttons/IconButton";
 import { validateProgram } from "./validateProgram";
+import { fieldGroup } from "components/ub/recipes";
 
 export interface FormData {
   name: string;
@@ -574,11 +575,11 @@ export default function RegisterProgram({
             content: (
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
-                  <div className="inline-flex rounded-lg border border-ub-border p-1">
+                  <div className="inline-flex rounded-ub-full border border-ub-border p-1">
                     <button
                       type="button"
                       onClick={() => updateFormData("has_scholarship", true)}
-                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${
+                      className={`rounded-ub-full px-4 py-2 text-sm font-medium transition ${
                         formData.has_scholarship
                           ? "bg-ub-tone-warning-bg text-ub-tone-warning-text ring-1 ring-ub-tone-warning-border shadow-sm"
                           : "text-ub-text-secondary hover:bg-ub-surface-subtle"
@@ -589,7 +590,7 @@ export default function RegisterProgram({
                     <button
                       type="button"
                       onClick={() => updateFormData("has_scholarship", false)}
-                      className={`rounded-md px-4 py-2 text-sm font-medium transition ${
+                      className={`rounded-ub-full px-4 py-2 text-sm font-medium transition ${
                         !formData.has_scholarship
                           ? "bg-slate-700 text-white shadow-sm"
                           : "text-ub-text-secondary hover:bg-ub-surface-subtle"
@@ -733,7 +734,7 @@ export default function RegisterProgram({
                                   (condition, cIndex) => (
                                     <div
                                       key={cIndex}
-                                      className="flex items-center gap-2 rounded-md border border-ub-border bg-ub-surface-subtle px-3 py-2"
+                                      className={`${fieldGroup} flex min-h-[50px] items-center gap-2 ps-[17px] pe-2`}
                                     >
                                       <input
                                         value={condition}
@@ -744,7 +745,7 @@ export default function RegisterProgram({
                                           )
                                         }
                                         placeholder={`Condition ${cIndex + 1}`}
-                                        className="flex-1 bg-transparent text-sm outline-none placeholder:text-ub-text-tertiary"
+                                        className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--ub-field-placeholder)]"
                                       />
                                       <button
                                         type="button"

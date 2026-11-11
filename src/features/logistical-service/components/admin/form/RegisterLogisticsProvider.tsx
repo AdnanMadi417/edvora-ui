@@ -34,6 +34,7 @@ import type {
   PackageOffered,
   ServiceEntry,
 } from "features/logistical-service/types";
+import { fieldGroup } from "components/ub/recipes";
 
 interface FormData {
   name: string;
@@ -646,7 +647,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                         {pkg.includes.map((item, i) => (
                           <div
                             key={i}
-                            className="flex items-center gap-2 rounded-md border border-ub-border px-3 py-2"
+                            className={`${fieldGroup} flex min-h-[50px] items-center gap-2 ps-[17px] pe-2`}
                           >
                             <input
                               type="text"
@@ -656,7 +657,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                                 updated[i] = e.target.value;
                                 updatePackage(index, "includes", updated);
                               }}
-                              className="flex-1 px-2 py-1 text-sm focus:outline-none"
+                              className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--ub-field-placeholder)]"
                               placeholder={`Include item ${i + 1}`}
                             />
                             <button
@@ -669,7 +670,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                                   pkg.includes.filter((_, idx) => idx !== i)
                                 )
                               }
-                              className="flex items-center justify-center rounded-md border border-red-600 p-1 text-ub-tone-danger-text transition hover:border-red-700 hover:text-red-700"
+                              className="flex items-center justify-center rounded-ub-full border border-red-600 p-1 text-ub-tone-danger-text transition hover:border-red-700 hover:text-red-700"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>

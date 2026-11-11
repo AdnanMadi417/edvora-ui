@@ -35,6 +35,7 @@ import Button from "components/ub/core/buttons/Button";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
 import { NATIONALITIES } from "constants/lists";
+import { fieldGroup } from "components/ub/recipes";
 
 interface Props {
   id: string;
@@ -631,7 +632,7 @@ const EditLogisticsMarketplaceDetails = ({
                   {pkg.includes.map((item, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2"
+                      className={`${fieldGroup} flex min-h-[50px] items-center gap-2 ps-[17px] pe-2`}
                     >
                       <input
                         type="text"
@@ -641,7 +642,7 @@ const EditLogisticsMarketplaceDetails = ({
                           updated[i] = e.target.value;
                           updatePackage(index, "includes", updated);
                         }}
-                        className="flex-1 px-2 py-1 text-sm focus:outline-none"
+                        className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-[var(--ub-field-placeholder)]"
                         placeholder={`Include item ${i + 1}`}
                       />
                       <button
@@ -654,7 +655,7 @@ const EditLogisticsMarketplaceDetails = ({
                           )
                         }
                         aria-label={`Remove included item ${i + 1}`}
-                                  className="flex items-center justify-center rounded-md border border-red-600 p-1 text-red-600 transition hover:border-red-700"
+                                  className="flex items-center justify-center rounded-ub-full border border-red-600 p-1 text-red-600 transition hover:border-red-700"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -773,10 +774,11 @@ const EditLogisticsMarketplaceDetails = ({
                     )}
                   </div>
                   {selected && (
-                    <div className="mt-3 flex items-center overflow-hidden rounded-lg border border-amber-200 focus-within:border-amber-400">
-                      <span className="border-r border-amber-200 bg-amber-100 px-2.5 py-1.5 text-xs font-semibold text-amber-700">
+                    <div className={`${fieldGroup} mt-3 flex h-10 items-center`}>
+                      <span className="ps-4 pe-3 font-semibold text-ub-text-secondary">
                         RM
                       </span>
+                      <span aria-hidden="true" className="h-5 w-px shrink-0 bg-[var(--ub-field-ring)]" />
                       <input
                         type="number"
                         min={0}
@@ -784,7 +786,7 @@ const EditLogisticsMarketplaceDetails = ({
                         onChange={(e) =>
                           updateServicePrice(svc.id, Number(e.target.value))
                         }
-                        className="flex-1 bg-transparent px-2.5 py-1.5 text-sm focus:outline-none"
+                        className="min-w-0 flex-1 rounded-e-[33px] bg-transparent ps-3 pe-4 outline-none placeholder:text-[var(--ub-field-placeholder)]"
                         placeholder="0.00"
                       />
                     </div>
