@@ -20,6 +20,7 @@ const rows = Array.from({ length: 20 }, (_, i) => ({
 }));
 jest.mock("../hooks", () => ({
   useStatement: (params: any) => mockUseStatement(params),
+  useStatementCounts: () => ({ us: 38, university: 1, nobody: 1, disputed: 0 }),
 }));
 jest.mock("features/partners/hooks/profile/usePartnerProfile", () => ({
   usePartnerProfile: () => ({
@@ -107,11 +108,22 @@ it("restricts team-member filters to agency admins", async () => {
   mockAgency = true;
   render(<StatementPage />);
   await user.click(screen.getByRole("button", { name: "Filters" }));
-  expect(screen.getByText("Team member", { exact: true })).toBeInTheDocument();
+  // The column header also says "Team member"; look for the filter field inside the drawer.
+  const drawer = screen.getByRole("dialog", { name: "Filter commissions" });
+  expect(within(drawer).getByText("Team member", { exact: true })).toBeInTheDocument();
 });
 it("stops pagination at the last full page", async () => {
   const user = userEvent.setup();
   render(<StatementPage />);
   await user.click(screen.getByRole("button", { name: "Next page" }));
   expect(screen.getByRole("button", { name: "Next page" })).toBeDisabled();
+});
+
+it("summarises commissions by status and filters from a tile", async () => {
+  const user = userEvent.setup();
+  render(<StatementPage />);
+  const due = screen.getByRole("button", { name: /Due to you\s*38/ });
+  expect(screen.getByRole("button", { name: /Paid\s*1/ })).toBeInTheDocument();
+  await user.click(due);
+  expect(mockUseStatement).toHaveBeenLastCalledWith(expect.objectContaining({ waiting_on: "us", page: 1 }));
 });
