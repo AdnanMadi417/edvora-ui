@@ -4,7 +4,8 @@ import TableActions, {
 } from "components/ub/data/tables/TableActions";
 
 import { useEffect, useState } from "react";
-import { ArrowUpRight, Eye, Receipt, SlidersHorizontal } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, CheckCircle2, Eye, Landmark, Receipt, SlidersHorizontal, Wallet } from "lucide-react";
+import StatsFilterCards, { type FilterCardItem } from "components/ub/navigation/controls/StatsFilterCards";
 import DataTable, {
   type DataTableColumn,
 } from "components/ub/data/tables/DataTable";
@@ -24,7 +25,7 @@ import DescriptionList from "components/ub/data/display/DescriptionList";
 import { formatCommissionAmount } from "features/applications/shared/commissionTypes";
 import { usePartnerProfile } from "features/partners/hooks/profile/usePartnerProfile";
 import { useAgencyMembers } from "features/agency-members/hooks/useAgencyMembers";
-import { useStatement } from "../hooks";
+import { useStatement, useStatementCounts } from "../hooks";
 import type { PartnerStatementItem, WaitingOn } from "../types";
 const PAGE_SIZE = 20;
 const STATES: Record<
@@ -36,6 +37,19 @@ const STATES: Record<
   nobody: { label: "Paid", variant: "success" },
   disputed: { label: "Disputed", variant: "danger" },
 };
+/** One line under each status: what happens next, and who does it. */
+const NEXT_STEP: Record<WaitingOn, string> = {
+  university: "Waiting for the institution to pay Unibexs.",
+  us: "Unibexs will pay this to your bank account.",
+  nobody: "Paid to your bank account.",
+  disputed: "Unibexs is reviewing the dispute.",
+};
+const SUMMARY: { id: WaitingOn; icon: FilterCardItem["icon"]; colorScheme: FilterCardItem["colorScheme"] }[] = [
+  { id: "us", icon: Wallet, colorScheme: "amber" },
+  { id: "university", icon: Landmark, colorScheme: "blue" },
+  { id: "nobody", icon: CheckCircle2, colorScheme: "emerald" },
+  { id: "disputed", icon: AlertTriangle, colorScheme: "rose" },
+];
 const stateBadge = (value: WaitingOn) => {
   const state = STATES[value];
   return (
@@ -71,6 +85,14 @@ export default function StatementPage() {
       filters.status === "all" ? undefined : (filters.status as WaitingOn),
     member_partner_id: memberFilter || undefined,
   });
+  const counts = useStatementCounts({ member_partner_id: memberFilter || undefined });
+  const summaryCards: FilterCardItem[] = SUMMARY.map(({ id, icon, colorScheme }) => ({
+    id,
+    label: STATES[id].label,
+    count: counts ? counts[id] : "–",
+    icon,
+    colorScheme,
+  }));
   const rows = items.filter((item) =>
     `${item.reference} ${item.student_name} ${item.university_name} ${
       item.program_name
@@ -107,7 +129,7 @@ export default function StatementPage() {
       ? [
           {
             key: "partner_name",
-            header: "Advisor",
+            header: "Team member",
             cell: (item: PartnerStatementItem) => (
               <p className="max-w-[180px] break-words">
                 {item.partner_name || "Not provided"}
@@ -148,7 +170,12 @@ export default function StatementPage() {
     {
       key: "status",
       header: "Status",
-      cell: (item) => stateBadge(item.waiting_on),
+      cell: (item) => (
+        <span className="flex max-w-[220px] flex-col items-start gap-1">
+          {stateBadge(item.waiting_on)}
+          <span className="text-ub-caption text-ub-text-tertiary">{NEXT_STEP[item.waiting_on]}</span>
+        </span>
+      ),
     },
     {
       key: "since_date",
@@ -199,7 +226,16 @@ export default function StatementPage() {
           </p>
         </div>
       </header>
-      <div className="space-y-3 border-b border-ub-border p-4 sm:p-6">
+      <div className="space-y-4 border-b border-ub-border p-4 sm:p-6">
+        <StatsFilterCards
+          cards={summaryCards}
+          selectedId={filters.status === "all" ? null : filters.status}
+          onSelect={(id) => {
+            setFilters((f) => ({ ...f, status: id ?? "all" }));
+            setPage(1);
+          }}
+          className="grid grid-cols-2 gap-3 lg:grid-cols-4"
+        />
         <DataTableToolbar
           className="!mb-0"
           search={{
@@ -392,7 +428,7 @@ export default function StatementPage() {
                 { label: "University", value: selected.university_name },
                 { label: "Program", value: selected.program_name },
                 ...(isAgencyAdmin
-                  ? [{ label: "Advisor", value: selected.partner_name }]
+                  ? [{ label: "Team member", value: selected.partner_name }]
                   : []),
                 {
                   label: "Status since",
