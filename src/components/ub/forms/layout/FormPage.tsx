@@ -78,11 +78,12 @@ export default function FormPage({
           {children}
         </fieldset>
         {showActions && (
-          <footer className={clsx("flex flex-col gap-3 border-t border-ub-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-6", stickyActions && "sticky bottom-16 z-20 bg-ub-surface-raised shadow-ub-sm md:bottom-4")}>
-            <p className="text-ub-caption text-ub-text-tertiary">
+          <footer className={clsx("flex flex-col gap-3 border-t border-ub-border px-4 py-3 sm:flex-row sm:py-4 sm:items-center sm:justify-between md:px-6", stickyActions && "sticky bottom-16 z-20 bg-ub-surface-raised shadow-ub-sm md:bottom-4")}>
+            {/* A sticky bar keeps only the buttons on phones, side by side, so it covers less of the form. */}
+            <p className={clsx("text-ub-caption text-ub-text-tertiary", stickyActions && "hidden sm:block")}>
               Optional fields are marked.
             </p>
-            <div className="grid grid-cols-1 gap-2 min-[480px]:grid-cols-2 sm:flex">
+            <div className="grid grid-cols-2 gap-2 sm:flex">
               <Button
                 variant="secondary"
                 text={cancelLabel}

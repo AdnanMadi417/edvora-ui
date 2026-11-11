@@ -50,7 +50,7 @@ export default function NotesPanel({ notes, onAdd, state = "ready", onRetry, now
   return (
     <SectionCard
       title="Notes"
-      description="Internal. Not shown in the Glass Box."
+      description="For staff only. Students never see these notes."
       state={resolved}
       empty={{ icon: StickyNote, title: "No notes yet" }}
       errorMessage="Notes couldn't load."

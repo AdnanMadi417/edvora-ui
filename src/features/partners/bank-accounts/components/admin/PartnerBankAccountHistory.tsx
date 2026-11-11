@@ -63,7 +63,7 @@ export default function PartnerBankAccountHistory({ isOpen, onClose, partnerId }
         <div className="overflow-hidden rounded-ub-xl border border-ub-border-overlay bg-ub-modal shadow-ub-xl">
           <ModalHeader
             title="Bank Account History"
-            description="Every version ever recorded for this advisor — editing always creates a new row and retires the old one."
+            description="Every bank account this advisor has used. Editing an account keeps the old details here and makes the new ones current."
             icon={HistoryIcon}
             iconBg="bg-blue-50"
             iconColor="text-blue-600"

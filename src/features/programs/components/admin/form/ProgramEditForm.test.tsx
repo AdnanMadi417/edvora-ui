@@ -106,11 +106,13 @@ describe("ProgramEditForm save", () => {
   });
 
   it("keeps the program's own commission type and sends the commission as a unit", async () => {
-    const payload = await saveAfter(() =>
+    const payload = await saveAfter(() => {
+      // Sections after the first start closed; open Fees & Commission like a user would.
+      fireEvent.click(screen.getByRole("button", { name: /Fees & Commission/ }));
       fireEvent.change(screen.getByRole("textbox", { name: /Commission notes/ }), {
         target: { value: "Paid yearly" },
-      })
-    );
+      });
+    });
 
     expect(payload).toEqual({
       commission_amount: 10,

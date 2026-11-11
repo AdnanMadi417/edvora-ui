@@ -78,7 +78,7 @@ export default function HoldPopup({
       size="md"
       icon={Pause}
       title="Update Application Status"
-      description="Select the desired lifecycle status."
+      description="Keep the application active, put it on hold, or cancel it."
       onSubmit={handleConfirm}
       submitLabel="Confirm"
       submitIcon={<CheckCircle className="h-4 w-4" aria-hidden="true" />}
@@ -86,7 +86,7 @@ export default function HoldPopup({
       submitDisabled={status === currentStatus}
     >
       <div className="grid gap-4">
-        <Alert tone="warning">This action will update the application's lifecycle status.</Alert>
+        <Alert tone="warning">The Advisor and the team will see the new status straight away.</Alert>
         <p className="flex items-center gap-2 text-ub-label-md text-ub-text-secondary">
           {currentStatus === "1" && <CheckCircle className="h-4 w-4" aria-hidden="true" />}
           {currentStatus === "2" && <Pause className="h-4 w-4" aria-hidden="true" />}

@@ -145,7 +145,7 @@ export default function VoidPayout({ isOpen, onClose, payout, onSuccess }: VoidP
       size="lg"
       icon={Ban}
       title="Void & Correct Payout"
-      description="Every void must include the corrected replacement — the application(s) stay at Commission Paid throughout."
+      description="Enter the corrected payout to replace this one. The applications stay at Commission Paid while you do."
       onSubmit={handleSubmit}
       submitLabel="Void & Correct"
       submitTone="destructive"

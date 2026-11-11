@@ -120,7 +120,9 @@ const EditKnowledgeHubProgramDetails = ({
   const [initialFormData, setInitialFormData] = useState<any>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [openSections, setOpenSections] = useState<Record<SectionKey, boolean>>({
-    details: true, university: true, fees: true, intakes: true, scholarship: true,
+    // Only the first section starts open; the others show a one-line summary and
+    // open on click, or by themselves when they hold a validation error.
+    details: true, university: false, fees: false, intakes: false, scholarship: false,
   });
 
   const router = useRouter();
@@ -513,7 +515,7 @@ const EditKnowledgeHubProgramDetails = ({
                       updateFormData={updateFormData}
                       onBlur={() => validateField('name')}
                     />
-                    <p className="mt-1 text-xs text-ub-text-tertiary">Minimum 5 characters — this is exactly what renders in the Program Info column.</p>
+                    <p className="mt-1 text-xs text-ub-text-tertiary">At least 5 characters. Advisors see this name in the programme list and on the programme page.</p>
                   </div>
 
                   <SearchableDropdown

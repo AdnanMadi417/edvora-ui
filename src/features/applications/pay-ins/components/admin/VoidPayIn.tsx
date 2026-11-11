@@ -110,7 +110,7 @@ export default function VoidPayIn({ isOpen, onClose, payIn, onSuccess }: VoidPay
       size="lg"
       icon={Ban}
       title="Void & Correct Pay-In"
-      description="Every void must include the corrected replacement — the application stays at Commission Ready throughout."
+      description="Enter the corrected payment to replace this one. The application stays at Commission Ready while you do."
       onSubmit={handleSubmit}
       submitLabel="Void & Correct"
       submitTone="destructive"
