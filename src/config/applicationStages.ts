@@ -70,6 +70,13 @@ export const GLASS_BOX_STEPS: readonly TrackerStepConfig[] = [
   { id: "arrival", label: "Arrival", stageId: "arrival-logistics" },
 ];
 
+/** 7-step tracker on the application page: the student's journey through arrival,
+ *  then the Advisor's commission, which is where the application ends for them. */
+export const APPLICATION_PAGE_STEPS: readonly TrackerStepConfig[] = [
+  ...GLASS_BOX_STEPS,
+  { id: "commission", label: "Commission", stageId: "commission-paid" },
+];
+
 /** Backend stage codes mapped to the shared visual palette; API labels stay authoritative. */
 const API_STAGE_TAGS: Record<string, ApplicationStageId> = {
   APPLICATION_SUBMISSION: "documents-pending",

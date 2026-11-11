@@ -6,10 +6,11 @@
 // those ids and onto the tracker steps. Components never hard-code stages:
 // change the arrays below and every screen follows.
 
-import { getStage, STUDENT_PROFILE_STEPS, type ApplicationStage, type ApplicationStageId, type TrackerStepConfig } from "config/applicationStages";
+import { APPLICATION_PAGE_STEPS, getStage, type ApplicationStage, type ApplicationStageId, type TrackerStepConfig } from "config/applicationStages";
 
-/** The steps the Application Details tracker shows (brief §6: 5-step Student profile tracker). */
-export const APPLICATION_TRACKER_STEPS: readonly TrackerStepConfig[] = STUDENT_PROFILE_STEPS;
+/** The steps the Application Details tracker shows: through Arrival and Commission,
+ *  so the tracker doesn't read "complete" while the student is still arriving. */
+export const APPLICATION_TRACKER_STEPS: readonly TrackerStepConfig[] = APPLICATION_PAGE_STEPS;
 
 export interface StageMapping {
   /** Stage tag id in config/applicationStages.ts. */
@@ -24,8 +25,8 @@ export const API_STAGE_MAP: Record<string, StageMapping> = {
   INSTITUTION_REVIEW: { stageId: "institution-review", stepId: "submitted" },
   OFFER_AND_VISA_PAYMENT: { stageId: "offer-received", stepId: "offer" },
   VISA_PROCESSING: { stageId: "visa-in-progress", stepId: "visa" },
-  ARRIVAL_AND_ENROLLMENT: { stageId: "arrival-logistics", stepId: "done" },
-  PARTNER_COMMISSION_INVOICING: { stageId: "enrolled", stepId: "done" },
+  ARRIVAL_AND_ENROLLMENT: { stageId: "arrival-logistics", stepId: "arrival" },
+  PARTNER_COMMISSION_INVOICING: { stageId: "enrolled", stepId: "commission" },
 };
 
 /** Status codes that refine the stage tag inside a backend stage. */
@@ -33,8 +34,8 @@ export const API_STATUS_STAGE_OVERRIDES: Record<string, Partial<StageMapping>> =
   SUBMITTED_TO_INSTITUTION: { stageId: "submitted" },
   UNIVERSITY_APPROVED: { stageId: "offer-received", stepId: "offer" },
   STUDENT_ENROLLED: { stageId: "enrolled" },
-  COMMISSION_PAID: { stageId: "commission-paid" },
-  APPLICATION_COMPLETE: { stageId: "commission-paid" },
+  COMMISSION_PAID: { stageId: "commission-paid", stepId: "done" },
+  APPLICATION_COMPLETE: { stageId: "commission-paid", stepId: "done" },
 };
 
 /** Statuses where the current step needs attention: a correction, rejection or re-upload. */

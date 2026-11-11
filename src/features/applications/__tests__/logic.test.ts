@@ -42,8 +42,13 @@ describe("stage → tag and hue", () => {
   });
   it("tracker steps follow the stage", () => {
     const steps = trackerStepsFor(resolveStage({ stageCode: "OFFER_AND_VISA_PAYMENT" }));
-    expect(steps.map((s) => s.state)).toEqual(["complete", "complete", "complete", "current", "upcoming"]);
-    expect(trackerStepsFor(resolveStage({ stageCode: "ARRIVAL_AND_ENROLLMENT" })).every((s) => s.state === "complete")).toBe(true);
+    expect(steps.map((s) => s.state)).toEqual(["complete", "complete", "complete", "current", "upcoming", "upcoming", "upcoming"]);
+    // Arrival and Commission are steps of their own, not "all done".
+    const at = (stageCode: string, statusCode?: string) =>
+      trackerStepsFor(resolveStage({ stageCode, statusCode })).find((s) => s.state === "current")?.id;
+    expect(at("ARRIVAL_AND_ENROLLMENT")).toBe("arrival");
+    expect(at("PARTNER_COMMISSION_INVOICING")).toBe("commission");
+    expect(trackerStepsFor(resolveStage({ stageCode: "PARTNER_COMMISSION_INVOICING", statusCode: "COMMISSION_PAID" })).every((s) => s.state === "complete")).toBe(true);
     expect(trackerStepsFor(resolveStage({ stageCode: "APPLICATION_SUBMISSION", statusCode: "CORRECTION_REQUESTED" }))[1].state).toBe("attention");
   });
 });
