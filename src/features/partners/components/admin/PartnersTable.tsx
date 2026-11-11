@@ -334,7 +334,7 @@ export default function PartnersTable() {
       cell: (partner) => (
         <>
           <div className="flex items-center gap-2">
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
               <PresignedImage
                 fileKey={
                   (partner.type === "individual"
@@ -348,20 +348,20 @@ export default function PartnersTable() {
                 }
               />
               <span
-                className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${
-                  partner.is_active ? "bg-emerald-500" : "bg-slate-300"
+                className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-ub-surface ${
+                  partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"
                 }`}
               />
             </div>
             <div className="min-w-0">
-              <div className="truncate text-sm font-medium text-slate-900">
+              <div className="truncate text-sm font-medium text-ub-text-primary">
                 {partner.type === "agency"
                   ? partner.company_details?.company_name ||
                     partner.name ||
                     "Unknown Advisor"
                   : partner.name || "Unknown Advisor"}
               </div>
-              <div className="truncate text-xs text-slate-500 capitalize">
+              <div className="truncate text-xs text-ub-text-secondary capitalize">
                 {partner.type === "agency" &&
                 partner.company_details?.company_name
                   ? `${partner.name} · `
@@ -378,10 +378,10 @@ export default function PartnersTable() {
       header: "Contact info",
       cell: (partner) => (
         <>
-          <div className="truncate text-sm text-slate-900">
+          <div className="truncate text-sm text-ub-text-primary">
             {partner.phone || "—"}
           </div>
-          <div className="truncate text-xs text-slate-500">
+          <div className="truncate text-xs text-ub-text-secondary">
             {partner.email || "—"}
           </div>
         </>
@@ -392,9 +392,9 @@ export default function PartnersTable() {
       header: "Assigned manager",
       cell: (partner) => (
         <>
-          <div className="truncate text-sm text-slate-900">
+          <div className="truncate text-sm text-ub-text-primary">
             {partner.assigned_manager_name || (
-              <span className="text-slate-400">Unassigned</span>
+              <span className="text-ub-text-tertiary">Unassigned</span>
             )}
           </div>
         </>
@@ -438,7 +438,7 @@ export default function PartnersTable() {
       header: "Registered",
       cell: (partner) => (
         <>
-          <div className="text-sm text-slate-900">
+          <div className="text-sm text-ub-text-primary">
             <AppDate value={partner.created_at} format="short" fallback="—" />
           </div>
         </>
@@ -465,7 +465,7 @@ export default function PartnersTable() {
                     setIsReviewOpen(true);
                   }}
                 />
-                <div className="h-5 border-l border-slate-200" />
+                <div className="h-5 border-l border-ub-border" />
               </>
             )}
 
@@ -477,7 +477,7 @@ export default function PartnersTable() {
             />
             {partner.is_active && !partner.last_login && (
               <>
-                <div className="h-5 border-l border-slate-200" />
+                <div className="h-5 border-l border-ub-border" />
                 <TableAction
                   label={"Resend approval email"}
                   icon={<Mail className="h-4 w-4" />}
@@ -492,7 +492,7 @@ export default function PartnersTable() {
               </>
             )}
 
-            <div className="h-5 border-l border-slate-200" />
+            <div className="h-5 border-l border-ub-border" />
             <TableAction
               label={partner.is_active ? "Suspend account" : "Activate account"}
               icon={
@@ -516,9 +516,9 @@ export default function PartnersTable() {
   return (
     <div className="mt-6 min-w-0 overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-ub-border">
         <div>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <p className="mt-0.5 text-sm text-ub-text-secondary">
             Manage and view all advisor organizations
           </p>
         </div>

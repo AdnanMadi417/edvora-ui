@@ -78,7 +78,7 @@ export default function ResendStaffInvitationOtpModal({
       }}
     >
       <div className="space-y-4">
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-ub-text-secondary">
           For invitations still stuck at email verification — enter the invited
           email and a new code will be sent.
         </p>

@@ -260,7 +260,7 @@ export default function EditPartnerProfile() {
       <div className="min-w-0 overflow-clip rounded-ub-xl border border-ub-border bg-ub-surface">
 
         {/* Header */}
-        <div className="flex items-center gap-4 border-b border-slate-200 px-6 py-5">
+        <div className="flex items-center gap-4 border-b border-ub-border px-6 py-5">
           {PROFILE_PHOTO_UPLOAD_ENABLED ? (
             <AvatarUpload
               doc={isIndividual ? profilePhoto : logo}
@@ -270,7 +270,7 @@ export default function EditPartnerProfile() {
             />
           ) : (
             <div className="relative shrink-0">
-              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
                 <PresignedImage
                   fileKey={isIndividual ? profilePhoto.file_key : logo.file_key}
                   alt="Profile"
@@ -278,14 +278,14 @@ export default function EditPartnerProfile() {
                   fallback={partner.name?.slice(0, 2).toUpperCase() || "NA"}
                 />
               </div>
-              <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${partner.is_active ? "bg-emerald-500" : "bg-slate-300"}`} />
+              <span className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-ub-surface ${partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"}`} />
             </div>
           )}
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">
+            <h2 className="text-lg font-semibold text-ub-text-primary">
               {isCompany ? formData.company_name || partner.name : partner.name}
             </h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-ub-text-secondary">
               {isCompany && formData.company_name ? `${partner.name} • ` : ""}
               {isIndividual ? "Individual Advisor" : "Agency / Company"}
             </p>
@@ -293,8 +293,8 @@ export default function EditPartnerProfile() {
         </div>
 
         {/* Base fields */}
-        <div className="border-b border-slate-200 p-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Account Details</p>
+        <div className="border-b border-ub-border p-6">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Account Details</p>
           <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
             <InputField
               label="Full Name"
@@ -336,8 +336,8 @@ export default function EditPartnerProfile() {
 
         {/* Individual details */}
         {isIndividual && (
-          <div className="border-b border-slate-200 p-6">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Individual Details</p>
+          <div className="border-b border-ub-border p-6">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Individual Details</p>
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
               <SelectField
                 label="Background"
@@ -403,8 +403,8 @@ export default function EditPartnerProfile() {
 
         {/* Company details */}
         {isCompany && (
-          <div className="border-b border-slate-200 p-6">
-            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">Company Details</p>
+          <div className="border-b border-ub-border p-6">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Company Details</p>
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
               <InputField
                 label="Company Name"
@@ -472,12 +472,8 @@ export default function EditPartnerProfile() {
             disabled={isUpdating}
             icon={<ChevronLeft className="h-4 w-4" />}
             text="Back"
-            bgColor="bg-white"
-            textColor="text-slate-700"
-            borderColor="border-slate-200"
-            hoverTextColor="hover:text-slate-700"
-            hoverBorderColor="hover:border-slate-200"
-            className="hover:bg-slate-50"
+            variant="secondary"
+            className="hover:bg-ub-surface-subtle"
           />
           <Button
             type="button"
@@ -486,12 +482,8 @@ export default function EditPartnerProfile() {
             title={saveDisabledReason}
             icon={<Save className="h-4 w-4" />}
             text={isUpdating ? "Saving…" : "Save Changes"}
-            bgColor="bg-blue-600"
-            textColor="text-white"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-white"
-            hoverBorderColor="hover:border-blue-600"
-            className="font-semibold hover:bg-blue-700"
+            variant="primary"
+            className="font-semibold hover:bg-ub-action-primary-hover"
           />
         </div>
       </div>

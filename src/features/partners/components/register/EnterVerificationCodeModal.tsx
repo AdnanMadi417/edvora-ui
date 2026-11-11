@@ -70,15 +70,15 @@ export default function EnterVerificationCodeModal({ isOpen, onClose, onContinue
             title="Enter Verification Code"
             description="Continue an application you already started"
             icon={KeyRound}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
           <div className="flex flex-col gap-4 px-7 py-6">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-ub-text-secondary">
               Enter the email address you registered with, and we'll take you to where you
               can enter the verification code from your email.
             </p>
@@ -94,26 +94,18 @@ export default function EnterVerificationCodeModal({ isOpen, onClose, onContinue
             />
           </div>
 
-          <div className="flex justify-end gap-2 border-t border-gray-200 px-6 py-4">
+          <div className="flex justify-end gap-2 border-t border-ub-border px-6 py-4">
             <Button
               onClick={onClose}
               icon={<XCircle className="h-5 w-5" />}
               text="Cancel"
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
               icon={<KeyRound className="h-5 w-5" />}
               text="Continue"
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
               onClick={handleContinue}
             />
           </div>

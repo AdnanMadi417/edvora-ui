@@ -80,19 +80,19 @@ export default function AccountManagerPartnersList() {
       cell: (partner) => (
         <>
           <div className="flex items-center gap-2">
-            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
               {partner.name ? partner.name.slice(0, 2).toUpperCase() : "NA"}
               <span
-                className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white ${
-                  partner.is_active ? "bg-emerald-500" : "bg-slate-300"
+                className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-ub-surface ${
+                  partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"
                 }`}
               />
             </div>
             <div className="min-w-0">
-              <div className="truncate text-sm font-medium text-slate-900">
+              <div className="truncate text-sm font-medium text-ub-text-primary">
                 {partner.name || "Unknown Advisor"}
               </div>
-              <div className="truncate text-xs text-slate-500 capitalize">
+              <div className="truncate text-xs text-ub-text-secondary capitalize">
                 {partner.type || "—"} · {partner.country || "—"}
               </div>
             </div>
@@ -105,10 +105,10 @@ export default function AccountManagerPartnersList() {
       header: "Contact info",
       cell: (partner) => (
         <>
-          <div className="truncate text-sm text-slate-900">
+          <div className="truncate text-sm text-ub-text-primary">
             {partner.phone || "—"}
           </div>
-          <div className="truncate text-xs text-slate-500">
+          <div className="truncate text-xs text-ub-text-secondary">
             {partner.email || "—"}
           </div>
         </>
@@ -119,7 +119,7 @@ export default function AccountManagerPartnersList() {
       header: "Applications",
       cell: (partner) => (
         <>
-          <span className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700">
+          <span className="inline-flex items-center gap-1.5 rounded-md border border-ub-border bg-ub-surface-subtle px-2.5 py-1 text-xs font-medium text-ub-text-secondary">
             {partner.applications_count}
           </span>
         </>
@@ -168,7 +168,7 @@ export default function AccountManagerPartnersList() {
       header: "Registered",
       cell: (partner) => (
         <>
-          <div className="text-sm text-slate-900">
+          <div className="text-sm text-ub-text-primary">
             <AppDate value={partner.created_at} format="short" fallback="—" />
           </div>
         </>
@@ -179,9 +179,9 @@ export default function AccountManagerPartnersList() {
   return (
     <div className="mt-6 min-w-0 overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-slate-200">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-b border-ub-border">
         <div>
-          <p className="mt-0.5 text-sm text-slate-500">
+          <p className="mt-0.5 text-sm text-ub-text-secondary">
             Advisors assigned to you
           </p>
         </div>

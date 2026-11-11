@@ -22,7 +22,7 @@ function HistorySkeleton() {
   return (
     <div className="space-y-3 px-6 py-5">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} className="rounded-lg border border-slate-200 p-4">
+        <div key={i} className="rounded-lg border border-ub-border p-4">
           <Skeleton className="h-4 w-40" />
           <Skeleton className="mt-2 h-3 w-56" />
         </div>
@@ -65,9 +65,9 @@ export default function PartnerBankAccountHistory({ isOpen, onClose, partnerId }
             title="Bank Account History"
             description="Every bank account this advisor has used. Editing an account keeps the old details here and makes the new ones current."
             icon={HistoryIcon}
-            iconBg="bg-blue-50"
-            iconColor="text-blue-600"
-            iconBorder="border-blue-200"
+            iconBg="bg-ub-tone-brand-bg"
+            iconColor="text-ub-text-link"
+            iconBorder="border-ub-tone-brand-border"
             onClose={onClose}
           />
 
@@ -87,11 +87,11 @@ export default function PartnerBankAccountHistory({ isOpen, onClose, partnerId }
                     ? bankLookup.get(entry.bank_id)?.name ?? "Curated bank"
                     : entry.intl_bank_name;
                   return (
-                    <div key={entry.id} className="rounded-lg border border-slate-200 p-4">
+                    <div key={entry.id} className="rounded-lg border border-ub-border p-4">
                       <div className="flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-slate-900">{bankName || "—"}</p>
-                          <p className="mt-0.5 text-xs text-slate-500">
+                          <p className="truncate text-sm font-semibold text-ub-text-primary">{bankName || "—"}</p>
+                          <p className="mt-0.5 text-xs text-ub-text-secondary">
                             {entry.account_holder_name} · {entry.account_number} · {entry.currency}
                           </p>
                         </div>
@@ -99,7 +99,7 @@ export default function PartnerBankAccountHistory({ isOpen, onClose, partnerId }
                           {entry.is_active ? "Active" : "Replaced"}
                         </DetailStatusBadge>
                       </div>
-                      <p className="mt-2 text-xs text-slate-400">
+                      <p className="mt-2 text-xs text-ub-text-tertiary">
                         Recorded by {entry.recorded_by_name} ({entry.recorded_by_email}) ·{" "}
                         <AppDate value={entry.created_at} format="datetime" />
                       </p>

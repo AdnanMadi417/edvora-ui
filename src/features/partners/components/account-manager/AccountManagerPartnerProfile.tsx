@@ -93,12 +93,12 @@ function DocRow({
   };
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg border border-slate-200 p-4 transition-colors hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-2 rounded-lg border border-ub-border p-4 transition-colors hover:bg-ub-surface-subtle sm:flex-row sm:items-center sm:justify-between">
       <div className="flex min-w-0 items-center gap-2 sm:flex-1">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ub-surface-subtle text-ub-text-secondary">
           <FileText className="h-5 w-5" />
         </div>
-        <p className="truncate text-sm font-semibold text-slate-800">{label}</p>
+        <p className="truncate text-sm font-semibold text-ub-text-primary">{label}</p>
       </div>
       {fileKey ? (
         <div className="flex shrink-0 items-center gap-2 sm:ml-4">
@@ -113,12 +113,12 @@ function DocRow({
                 }`}
               />
             }
-            bgColor="bg-slate-100"
-            textColor="text-slate-600"
+            bgColor="bg-ub-surface-subtle"
+            textColor="text-ub-text-secondary"
             borderColor="border-transparent"
-            hoverTextColor="hover:text-slate-600"
-            hoverBorderColor="hover:border-slate-200"
-            className="hover:bg-slate-200"
+            hoverTextColor="hover:text-ub-text-secondary"
+            hoverBorderColor="hover:border-ub-border"
+            className="hover:bg-ub-surface-subtle"
           />
           <IconButton
             onClick={handleDownload}
@@ -131,16 +131,16 @@ function DocRow({
                 }`}
               />
             }
-            bgColor="bg-green-50"
-            textColor="text-green-600"
+            bgColor="bg-ub-tone-success-bg"
+            textColor="text-ub-tone-success-text"
             borderColor="border-transparent"
-            hoverTextColor="hover:text-green-600"
-            hoverBorderColor="hover:border-green-200"
-            className="hover:bg-green-100"
+            hoverTextColor="hover:text-ub-tone-success-text"
+            hoverBorderColor="hover:border-ub-tone-success-border"
+            className="hover:bg-ub-tone-success-bg"
           />
         </div>
       ) : (
-        <span className="text-xs text-slate-400 sm:ml-4">Not uploaded</span>
+        <span className="text-xs text-ub-text-tertiary sm:ml-4">Not uploaded</span>
       )}
     </div>
   );
@@ -219,13 +219,13 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
               className="flex flex-col gap-4 p-6 animate-in fade-in duration-200"
             >
               <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 text-slate-500" />
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                <Users className="h-4 w-4 text-ub-text-secondary" />
+                <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
                   Team Members
                 </p>
               </div>
               {!partner.agency_members?.length ? (
-                <p className="py-8 text-center text-sm text-slate-500">
+                <p className="py-8 text-center text-sm text-ub-text-secondary">
                   No team members yet.
                 </p>
               ) : (
@@ -238,13 +238,13 @@ export default function AccountManagerPartnerProfile({ id }: Props) {
                           `/account-manager/advisors/${member.partner_id}`
                         )
                       }
-                      className="flex cursor-pointer items-center justify-between rounded-lg border border-slate-200 p-3 transition-colors hover:border-blue-300 hover:bg-blue-50/40"
+                      className="flex cursor-pointer items-center justify-between rounded-lg border border-ub-border p-3 transition-colors hover:border-ub-tone-brand-border hover:bg-ub-tone-brand-bg"
                     >
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-slate-900">
+                        <p className="truncate text-sm font-medium text-ub-text-primary">
                           {member.name}
                         </p>
-                        <p className="truncate text-xs text-slate-500">
+                        <p className="truncate text-xs text-ub-text-secondary">
                           {member.email}
                         </p>
                       </div>

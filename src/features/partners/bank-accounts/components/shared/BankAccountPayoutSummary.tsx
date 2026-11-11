@@ -21,14 +21,14 @@ export default function BankAccountPayoutSummary({ account }: Props) {
   const bankLookup = useMemo(() => new Map(banks.map((b) => [b.id, b])), [banks]);
 
   if (!account) {
-    return <span className="text-red-600">This advisor has no active bank account on file.</span>;
+    return <span className="text-ub-tone-danger-text">This advisor has no active bank account on file.</span>;
   }
 
   const bankName = account.bank_id ? bankLookup.get(account.bank_id)?.name ?? "Curated bank" : account.intl_bank_name;
 
   return (
     <>
-      <span className="font-medium text-slate-900">Paying to:</span> {bankName} · {account.account_number}
+      <span className="font-medium text-ub-text-primary">Paying to:</span> {bankName} · {account.account_number}
     </>
   );
 }

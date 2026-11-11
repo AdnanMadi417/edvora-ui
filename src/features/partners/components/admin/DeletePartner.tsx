@@ -44,45 +44,37 @@ export default function DeletePartner({ isOpen, onClose, onConfirm, isDeleting }
             title="Delete Advisor"
             description="This action will permanently delete this Advisor and all related data."
             icon={Trash2}
-            iconBg="bg-red-50"
-            iconColor="text-red-600"
-            iconBorder="border-red-200"
-            titleColor="text-gray-900"
+            iconBg="bg-ub-tone-danger-bg"
+            iconColor="text-ub-tone-danger-text"
+            iconBorder="border-ub-tone-danger-border"
+            titleColor="text-ub-text-primary"
             onClose={onClose}
           />
 
           <div className="space-y-4 px-7 py-6">
             <div>
-              <h3 className="text-lg font-semibold text-slate-900">Confirm Deletion</h3>
-              <p className="text-sm text-slate-500">
+              <h3 className="text-lg font-semibold text-ub-text-primary">Confirm Deletion</h3>
+              <p className="text-sm text-ub-text-secondary">
                 Are you sure you want to remove this advisor from the system?
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col-reverse gap-2 border-t border-gray-200 px-6 py-4 sm:flex-row sm:justify-end">
+          <div className="flex flex-col-reverse gap-2 border-t border-ub-border px-6 py-4 sm:flex-row sm:justify-end">
             <Button
               className="w-full sm:w-auto"
               onClick={onClose}
               disabled={isDeleting}
               icon={<XCircle className="h-5 w-5" />}
               text={isDeleting ? "Cancelling..." : "Cancel"}
-              bgColor="bg-slate-50"
-              textColor="text-slate-700"
-              borderColor="border-slate-600"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-700"
+              variant="secondary"
             />
 
             <Button
               className="w-full sm:w-auto"
               icon={<Trash2 className="h-5 w-5" />}
               text={isDeleting ? "Deleting..." : "Delete Advisor"}
-              bgColor="bg-red-50"
-              textColor="text-red-700"
-              borderColor="border-red-600"
-              hoverTextColor="hover:text-red-800"
-              hoverBorderColor="hover:border-red-700"
+              variant="destructive"
               onClick={onConfirm}
               disabled={isDeleting}
             />

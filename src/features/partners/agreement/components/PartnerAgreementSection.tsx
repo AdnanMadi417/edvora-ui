@@ -69,7 +69,7 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
 
   if (loading) {
     return (
-      <div className="flex items-center gap-3 border-t border-slate-200 p-6">
+      <div className="flex items-center gap-3 border-t border-ub-border p-6">
         <Skeleton className="h-12 w-12 rounded-full" />
         <div className="flex-1 space-y-2">
           <Skeleton className="h-4 w-40" />
@@ -81,7 +81,7 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
 
   if (error) {
     return (
-      <div className="border-t border-slate-200 p-6 text-sm text-red-600">
+      <div className="border-t border-ub-border p-6 text-sm text-ub-tone-danger-text">
         {error}
       </div>
     );
@@ -90,13 +90,13 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
   const isTerminalFailure = agreement?.status === "declined" || agreement?.status === "expired";
 
   return (
-    <div className="space-y-4 border-t border-slate-200 p-6">
+    <div className="space-y-4 border-t border-ub-border p-6">
       <div className="flex items-center gap-3">
         <SectionIconBadge icon={FileSignature} color="violet" />
         <div className="flex-1">
-          <p className="text-p3 font-semibold text-slate-900">Advisor Agreement</p>
+          <p className="text-p3 font-semibold text-ub-text-primary">Advisor Agreement</p>
           {agreement && (
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-ub-text-secondary">
               Sent <AppDate value={agreement.sent_at} format="short" />
             </span>
           )}
@@ -110,25 +110,21 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
 
       {!agreement && (
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm text-slate-500">No agreement has been sent to this advisor yet.</p>
+          <p className="text-sm text-ub-text-secondary">No agreement has been sent to this advisor yet.</p>
           {canManage && (
             <Button
               onClick={handleStart}
               disabled={starting}
               icon={<Send className="h-4 w-4" />}
               text={starting ? "Sending..." : "Sign Advisor Agreement"}
-              bgColor="bg-blue-50"
-              textColor="text-blue-700"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-blue-800"
-              hoverBorderColor="hover:border-blue-700"
+              variant="primary"
             />
           )}
         </div>
       )}
 
       {agreement?.status === "completed" && (
-        <div className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+        <div className="flex items-center justify-between gap-3 rounded-md border border-ub-border bg-ub-surface-subtle p-3 text-sm text-ub-text-secondary">
           <span>
             Signed <AppDate value={agreement.completed_at} format="short" />
           </span>
@@ -145,11 +141,7 @@ export default function PartnerAgreementSection({ partnerId, partnerName, canMan
             disabled={starting}
             icon={<RotateCcw className="h-4 w-4" />}
             text={starting ? "Sending..." : "Resend"}
-            bgColor="bg-white"
-            textColor="text-slate-600"
-            borderColor="border-slate-300"
-            hoverTextColor="hover:text-slate-800"
-            hoverBorderColor="hover:border-slate-400"
+            variant="secondary"
           />
         </div>
       )}

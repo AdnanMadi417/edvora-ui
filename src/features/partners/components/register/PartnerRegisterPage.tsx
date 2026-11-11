@@ -60,9 +60,9 @@ const COMP_FIELD_MAP: Record<string, string> = {
 
 function SectionCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <div className="border-b border-slate-200 p-6 last:border-b-0">
-      <h3 className="text-base font-semibold text-slate-900">{title}</h3>
-      {subtitle && <p className="mt-0.5 text-sm text-slate-600">{subtitle}</p>}
+    <div className="border-b border-ub-border p-6 last:border-b-0">
+      <h3 className="text-base font-semibold text-ub-text-primary">{title}</h3>
+      {subtitle && <p className="mt-0.5 text-sm text-ub-text-secondary">{subtitle}</p>}
       <div className="mt-4">{children}</div>
     </div>
   );
@@ -319,20 +319,20 @@ export default function PartnerRegisterPage() {
 
   if (step === "success") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-ub-surface-subtle px-4">
         <div className="w-full max-w-sm overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface px-7 py-10 text-center shadow-sm">
           <div className="mb-4 flex justify-center">
             <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
           </div>
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-            <CheckCircle2 className="h-8 w-8 text-green-600" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-ub-tone-success-bg">
+            <CheckCircle2 className="h-8 w-8 text-ub-tone-success-text" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Application Submitted!</h2>
-          <p className="mt-2 text-sm text-slate-500">
+          <h2 className="text-xl font-bold text-ub-text-primary">Application Submitted!</h2>
+          <p className="mt-2 text-sm text-ub-text-secondary">
             Your application has been received. Our team will review it and get back to you shortly.
           </p>
           <Link href="/"
-            className="mt-6 block w-full rounded-lg bg-blue-600 py-3 text-center text-sm font-semibold text-white transition hover:bg-blue-700">
+            className="mt-6 block w-full rounded-lg bg-ub-action-primary py-3 text-center text-sm font-semibold text-white transition hover:bg-ub-action-primary-hover">
             Back to Home
           </Link>
         </div>
@@ -341,7 +341,7 @@ export default function PartnerRegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-16">
+    <div className="min-h-screen bg-ub-surface-subtle pb-16">
       <PublicNavbar />
 
       {/* Hero */}
@@ -351,11 +351,11 @@ export default function PartnerRegisterPage() {
         <Image src={registrationIconImg} alt="" width={250} height={250}
           className="pointer-events-none absolute right-0 top-0 opacity-60" />
         <div className="relative flex flex-col items-center gap-4 text-center">
-          <h1 className="text-4xl text-slate-900 sm:text-6xl">
-            Become a Unibexs <span className="text-blue-600">Advisor</span>
+          <h1 className="text-4xl text-ub-text-primary sm:text-6xl">
+            Become a Unibexs <span className="text-ub-text-link">Advisor</span>
           </h1>
           <Image src={crosshairIconImg} alt="" width={80} height={80} className="mx-auto" />
-          <p className="max-w-xl text-base text-slate-600">
+          <p className="max-w-xl text-base text-ub-text-secondary">
             Help students apply to universities through Unibexs, and track every application and commission in one place.
           </p>
           {/* What applying involves, before the individual / agency choice below. */}
@@ -374,7 +374,7 @@ export default function PartnerRegisterPage() {
           <button
             type="button"
             onClick={() => setShowCodeEntry(true)}
-            className="text-sm font-medium text-blue-600 underline-offset-2 transition hover:text-blue-700 hover:underline"
+            className="text-sm font-medium text-ub-text-link underline-offset-2 transition hover:text-ub-text-link hover:underline"
           >
             Already have a verification code?
           </button>
@@ -399,18 +399,18 @@ export default function PartnerRegisterPage() {
               onClick={() => { setPartnerType(type); setErrors({}); }}
               className={`group flex items-center gap-4 rounded-xl border p-5 text-left transition ${
                 partnerType === type
-                  ? "border-blue-500 bg-blue-50 shadow-sm"
-                  : "border-slate-200 bg-white hover:border-blue-300 hover:bg-blue-50"
+                  ? "border-ub-action-primary bg-ub-tone-brand-bg shadow-sm"
+                  : "border-ub-border bg-ub-surface hover:border-ub-tone-brand-border hover:bg-ub-tone-brand-bg"
               }`}
             >
-              <div className={`rounded-lg p-2.5 transition-colors ${partnerType === type ? "bg-blue-100" : "bg-slate-100 group-hover:bg-blue-100"}`}>
-                <Icon className={`h-5 w-5 transition-colors ${partnerType === type ? "text-blue-600" : "text-slate-500 group-hover:text-blue-600"}`} />
+              <div className={`rounded-lg p-2.5 transition-colors ${partnerType === type ? "bg-ub-tone-brand-bg" : "bg-ub-surface-subtle group-hover:bg-ub-tone-brand-bg"}`}>
+                <Icon className={`h-5 w-5 transition-colors ${partnerType === type ? "text-ub-text-link" : "text-ub-text-secondary group-hover:text-ub-text-link"}`} />
               </div>
               <div className="flex-1">
-                <p className={`text-sm font-semibold transition-colors ${partnerType === type ? "text-blue-700" : "text-slate-800 group-hover:text-blue-700"}`}>{title}</p>
-                <p className="mt-0.5 text-xs text-slate-500">{desc}</p>
+                <p className={`text-sm font-semibold transition-colors ${partnerType === type ? "text-ub-text-link" : "text-ub-text-primary group-hover:text-ub-text-link"}`}>{title}</p>
+                <p className="mt-0.5 text-xs text-ub-text-secondary">{desc}</p>
               </div>
-              <ChevronRight className={`h-4 w-4 shrink-0 transition-all duration-200 ${partnerType === type ? "rotate-90 text-blue-500" : "text-slate-300 group-hover:text-blue-400"}`} />
+              <ChevronRight className={`h-4 w-4 shrink-0 transition-all duration-200 ${partnerType === type ? "rotate-90 text-ub-icon-interactive" : "text-ub-text-tertiary group-hover:text-ub-icon-interactive"}`} />
             </button>
           ))}
         </div>
@@ -425,11 +425,11 @@ export default function PartnerRegisterPage() {
               transition={{ duration: 0.25, ease: "easeOut" }}
               className="overflow-hidden"
             >
-              <div className="border-y border-slate-200 p-6">
-                <h2 className="text-xl font-bold text-blue-600">
+              <div className="border-y border-ub-border p-6">
+                <h2 className="text-xl font-bold text-ub-text-link">
                   {partnerType === "individual" ? "Individual Advisor" : "Company / Agency"}
                 </h2>
-                <p className="mt-1 text-sm text-slate-500">
+                <p className="mt-1 text-sm text-ub-text-secondary">
                   {partnerType === "individual"
                     ? "Apply as an independent education advisor"
                     : "Apply as an education agency or company"}
@@ -602,7 +602,7 @@ export default function PartnerRegisterPage() {
               )}
 
               {/* T&C */}
-              <div className="border-y border-slate-200 p-6" data-field="agreed">
+              <div className="border-y border-ub-border p-6" data-field="agreed">
                 <label className="flex cursor-pointer items-center gap-2">
                   <input
                     type="checkbox"
@@ -610,22 +610,22 @@ export default function PartnerRegisterPage() {
                     onChange={(e) => partnerType === "individual"
                       ? updateInd("agreed", e.target.checked)
                       : updateComp("agreed", e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 accent-blue-600"
+                    className="h-4 w-4 rounded border-ub-border accent-blue-600"
                   />
-                  <span className="text-sm text-slate-600">
+                  <span className="text-sm text-ub-text-secondary">
                     I have read and agree to the{" "}
                     <a href="https://www.unibexs.com/terms-of-service" target="_blank" rel="noopener noreferrer"
-                      className="font-medium text-blue-600 underline">
+                      className="font-medium text-ub-text-link underline">
                       Terms and Conditions
                     </a>
                   </span>
                 </label>
-                {errors.agreed && <p className="mt-2 text-xs text-red-600">{errors.agreed}</p>}
+                {errors.agreed && <p className="mt-2 text-xs text-ub-tone-danger-text">{errors.agreed}</p>}
               </div>
 
               <div className="flex flex-col gap-2 p-6">
                 {apiError && !hasFieldLevelApiError && (
-                  <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  <div className="flex items-center gap-2 rounded-lg border border-ub-tone-danger-border bg-ub-tone-danger-bg px-4 py-3 text-sm text-ub-tone-danger-text">
                     <AlertCircle className="h-4 w-4 shrink-0" />
                     {apiError}
                   </div>
@@ -634,12 +634,8 @@ export default function PartnerRegisterPage() {
                   onClick={handleSubmit}
                   disabled={submitting || !isFormComplete}
                   text={submitting ? "Submitting..." : "Submit Application"}
-                  bgColor="bg-blue-600"
-                  textColor="text-white"
-                  borderColor="border-blue-600"
-                  hoverTextColor="hover:text-white"
-                  hoverBorderColor="hover:border-blue-700"
-                  className="w-full py-3 hover:bg-blue-700"
+                  variant="primary"
+                  className="w-full py-3 hover:bg-ub-action-primary-hover"
                 />
               </div>
             </motion.div>

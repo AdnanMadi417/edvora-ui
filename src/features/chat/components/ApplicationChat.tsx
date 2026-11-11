@@ -91,24 +91,24 @@ export default function AgentPartnerChat({
     new Date(date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
   if (error) {
-    return <div className="p-4 text-sm text-red-500">{error}</div>;
+    return <div className="p-4 text-sm text-ub-tone-danger-text">{error}</div>;
   }
 
   return (
-    <div className="flex h-[70vh] max-h-[600px] min-h-[320px] flex-col bg-white">
-      <header className="bg-blue-600 px-3 py-3 text-white">
+    <div className="flex h-[70vh] max-h-[600px] min-h-[320px] flex-col bg-ub-surface">
+      <header className="bg-ub-action-primary px-3 py-3 text-ub-action-primary-text">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm">
-            <User className="h-5 w-5 text-blue-600" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-ub-surface shadow-sm">
+            <User className="h-5 w-5 text-ub-text-link" />
           </div>
           <div className="min-w-0">
             <h2 className="truncate text-sm font-semibold sm:text-base">Application</h2>
-            <p className="text-xs text-blue-100">Active now</p>
+            <p className="text-xs text-ub-action-primary-text opacity-80">Active now</p>
           </div>
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto bg-gray-50 p-3 sm:p-4">
+      <main className="flex-1 overflow-y-auto bg-ub-surface-subtle p-3 sm:p-4">
         {loading ? (
           <div className="flex h-full items-center justify-center">
             <Loading text="Getting your messages ready..." />
@@ -128,17 +128,17 @@ export default function AgentPartnerChat({
                   style={{ animation: "fadeIn 0.2s ease-out" }}
                   className={`relative max-w-[75%] break-words rounded-md px-3 py-2 text-sm ${
                     isMine
-                      ? "ml-auto rounded-br-none bg-gray-200/50"
-                      : "mr-auto rounded-bl-none border border-slate-200 bg-white"
+                      ? "ml-auto rounded-br-none bg-ub-tone-brand-bg text-ub-text-primary"
+                      : "mr-auto rounded-bl-none border border-ub-border bg-ub-surface"
                   }`}
                 >
                   {!isMine && (
-                    <span className="mb-1 block text-xs font-medium text-slate-500">
+                    <span className="mb-1 block text-xs font-medium text-ub-text-secondary">
                       {msg.sender_name || "Unknown"}
                     </span>
                   )}
                   <span>{msg.message_text}</span>
-                  <span className="mt-1 block text-right text-xs text-slate-600">
+                  <span className="mt-1 block text-right text-xs text-ub-text-secondary">
                     {formatTime(msg.created_at)}
                   </span>
                 </div>
@@ -149,7 +149,7 @@ export default function AgentPartnerChat({
         <div ref={bottomRef} />
       </main>
 
-      <footer className="border-t border-slate-200 bg-white p-2 sm:p-3">
+      <footer className="border-t border-ub-border bg-ub-surface p-2 sm:p-3">
         <ChatInput onSend={handleSendMessage} sending={sending} />
       </footer>
 
@@ -190,12 +190,12 @@ function ChatInput({
         onKeyDown={(e) => e.key === "Enter" && handleSend()}
         placeholder="Type your message..."
         disabled={sending}
-        className="w-full rounded-full border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
+        className="w-full rounded-full border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ub-border-focus disabled:opacity-50"
       />
       <button
         onClick={handleSend}
         disabled={sending || !text.trim()}
-        className="rounded-full bg-blue-600 p-2 text-white transition hover:bg-blue-700 disabled:opacity-50"
+        className="rounded-full bg-ub-action-primary p-2 text-white transition hover:bg-ub-action-primary-hover disabled:opacity-50"
       >
         <Send className="h-5 w-5" />
       </button>

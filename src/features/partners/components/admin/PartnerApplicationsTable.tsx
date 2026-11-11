@@ -80,15 +80,15 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
   return (
     <>
       {/* Header */}
-      <div className="flex flex-col gap-4 border-b border-slate-200 p-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-ub-border p-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">Applications</h3>
-          <p className="mt-0.5 text-sm text-slate-500">Student applications submitted by this advisor</p>
+          <h3 className="text-base font-semibold text-ub-text-primary">Applications</h3>
+          <p className="mt-0.5 text-sm text-ub-text-secondary">Student applications submitted by this advisor</p>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="border-b border-slate-200 p-6">
+      <div className="border-b border-ub-border p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
           <div className="flex items-center gap-2 sm:contents">
             <SearchInput
@@ -98,15 +98,15 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
               className="sm:w-64 sm:flex-none"
             />
             {isRefetching && (
-              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-slate-400" aria-label="Updating results" />
+              <RefreshCw className="h-4 w-4 shrink-0 animate-spin text-ub-text-tertiary" aria-label="Updating results" />
             )}
             <button
-              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50"
+              className="relative sm:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-ub-border bg-ub-surface text-ub-text-secondary hover:bg-ub-surface-subtle"
               onClick={() => setShowMobileFilters((v) => !v)}
             >
               <SlidersHorizontal className="h-4 w-4" />
               {activeFiltersCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+                <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-ub-action-primary text-[10px] font-bold text-white">
                   {activeFiltersCount}
                 </span>
               )}
@@ -129,12 +129,8 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                 onClick={clearFilters}
                 icon={<RefreshCw className="h-4 w-4" />}
                 text="Clear"
-                bgColor="bg-white"
-                textColor="text-red-600"
-                borderColor="border-red-200"
-                hoverTextColor="hover:text-red-600"
-                hoverBorderColor="hover:border-red-200"
-                className="hover:bg-red-50 sm:w-auto"
+                variant="secondary"
+                className="hover:bg-ub-tone-danger-bg sm:w-auto"
               />
             )}
           </div>
@@ -158,15 +154,15 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
         >
           <table className="w-full min-w-[800px] md:min-w-0">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50">
+              <tr className="border-b border-ub-border bg-ub-surface-subtle">
                 {[
                   { icon: User,          label: "Student", minW: "min-w-[160px] sm:min-w-[220px]" },
                   { icon: GraduationCap, label: "Program", minW: "min-w-[150px] sm:min-w-[200px]" },
                   { icon: Clock,         label: "Status" },
                 ].map(({ icon: Icon, label, minW }) => (
-                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-slate-900`}>
+                  <th key={label} className={`${minW ?? ""} px-6 py-4 text-start text-sm font-semibold text-ub-text-primary`}>
                     <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4 text-slate-400" />
+                      <Icon className="h-4 w-4 text-ub-text-tertiary" />
                       {label}
                     </div>
                   </th>
@@ -175,7 +171,7 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
               </tr>
             </thead>
 
-            <tbody className={`divide-y divide-slate-100 bg-white ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
+            <tbody className={`divide-y divide-ub-border bg-ub-surface ${isRefetching ? "opacity-60 transition-opacity" : ""}`}>
               {isInitialLoad && <TableSkeletonRows columns={4} rows={ITEMS_PER_PAGE} />}
 
               {!isInitialLoad && error && (
@@ -187,19 +183,15 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                   colSpan={4}
                   title="No applications found"
                   subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "This advisor hasn't submitted any applications yet."}
-                  icon={<ClipboardList className="h-8 w-8 text-slate-400" />}
+                  icon={<ClipboardList className="h-8 w-8 text-ub-text-tertiary" />}
                   action={
                     activeFiltersCount > 0 ? (
                       <Button
                         onClick={clearFilters}
                         icon={<RefreshCw className="h-3.5 w-3.5" />}
                         text="Clear filters"
-                        bgColor="bg-white"
-                        textColor="text-slate-700"
-                        borderColor="border-slate-200"
-                        hoverTextColor="hover:text-slate-700"
-                        hoverBorderColor="hover:border-slate-200"
-                        className="hover:bg-slate-50"
+                        variant="secondary"
+                        className="hover:bg-ub-surface-subtle"
                       />
                     ) : undefined
                   }
@@ -212,7 +204,7 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                 return (
                   <AnimatedTableRow
                     key={app.id}
-                    className="group cursor-pointer transition-colors hover:bg-slate-100/50"
+                    className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle"
                     onClick={() => window.open(`/admin/applications/${app.id}`, "_blank")}
                   >
                     <td className="min-w-[160px] max-w-[160px] px-6 py-4 sm:min-w-[220px] sm:max-w-[220px]">
@@ -222,21 +214,21 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                           alt={app.student_name}
                           className="h-10 w-10 shrink-0 rounded-full object-cover"
                           fallback={
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
                               {app.student_name?.[0]?.toUpperCase() ?? "?"}
                             </div>
                           }
                         />
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-slate-900">{app.student_name}</div>
-                          <div className="truncate text-xs text-slate-500">{app.student_email}</div>
+                          <div className="truncate text-sm font-medium text-ub-text-primary">{app.student_name}</div>
+                          <div className="truncate text-xs text-ub-text-secondary">{app.student_email}</div>
                         </div>
                       </div>
                     </td>
 
                     <td className="min-w-[150px] max-w-[150px] px-6 py-4 sm:min-w-[200px] sm:max-w-[200px]">
-                      <div className="truncate text-sm text-slate-900">{app.program_name}</div>
-                      <div className="truncate text-xs text-slate-500">{app.university_name}</div>
+                      <div className="truncate text-sm text-ub-text-primary">{app.program_name}</div>
+                      <div className="truncate text-xs text-ub-text-secondary">{app.university_name}</div>
                     </td>
 
                     <td className="max-w-[140px] px-6 py-4">
@@ -246,7 +238,7 @@ export default function PartnerApplicationsTable({ partnerId }: PartnerApplicati
                     </td>
 
                     <td className="px-4 py-4">
-                      <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                      <ChevronRight className="h-4 w-4 text-ub-text-tertiary opacity-0 transition-opacity group-hover:opacity-100" />
                     </td>
                   </AnimatedTableRow>
                 );

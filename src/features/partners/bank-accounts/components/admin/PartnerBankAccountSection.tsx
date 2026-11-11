@@ -86,8 +86,8 @@ const EMPTY_FORM: FormData = {
 function DetailRow({ label, value }: { label: string; value?: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-0.5 text-sm font-medium text-slate-900">{value || "—"}</p>
+      <p className="text-xs text-ub-text-secondary">{label}</p>
+      <p className="mt-0.5 text-sm font-medium text-ub-text-primary">{value || "—"}</p>
     </div>
   );
 }
@@ -320,16 +320,16 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
   return (
     <div className="" data-testid="partner-bank-account">
       <div className="mb-1 flex items-center gap-2 px-6 pt-6">
-        <Landmark className="h-4 w-4 text-slate-500" />
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Bank Account</p>
+        <Landmark className="h-4 w-4 text-ub-text-secondary" />
+        <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">Bank Account</p>
       </div>
 
       {memberSelfView && (
-        <p className="px-6 pb-6 text-sm text-slate-600">Payouts are sent to your agency&apos;s bank account.</p>
+        <p className="px-6 pb-6 text-sm text-ub-text-secondary">Payouts are sent to your agency&apos;s bank account.</p>
       )}
 
       {isAgencyMember && !memberSelfView && (
-        <p className="px-6 pb-2 text-xs text-slate-500">
+        <p className="px-6 pb-2 text-xs text-ub-text-secondary">
           This is the agency admin&apos;s bank account — payouts for this advisor are sent there.
         </p>
       )}
@@ -349,11 +349,7 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
                 onClick={openAdd}
                 icon={<Plus className="h-4 w-4" />}
                 text="Add Bank Account"
-                bgColor="bg-blue-50"
-                textColor="text-blue-700"
-                borderColor="border-blue-600"
-                hoverTextColor="hover:text-blue-800"
-                hoverBorderColor="hover:border-blue-700"
+                variant="secondary"
               />
             )
           }
@@ -378,27 +374,19 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
             )}
           </div>
 
-          <div className="flex justify-end gap-2 border-t border-slate-200 p-6">
+          <div className="flex justify-end gap-2 border-t border-ub-border p-6">
             <Button
               onClick={() => setShowHistory(true)}
               icon={<History className="h-4 w-4" />}
               text="History"
-              bgColor="bg-white"
-              textColor="text-slate-600"
-              borderColor="border-slate-300"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-400"
+              variant="secondary"
             />
             {!isAgencyMember && (
               <Button
                 onClick={openEdit}
                 icon={<Pencil className="h-4 w-4" />}
                 text="Edit"
-                bgColor="bg-white"
-                textColor="text-slate-600"
-                borderColor="border-slate-300"
-                hoverTextColor="hover:text-slate-800"
-                hoverBorderColor="hover:border-slate-400"
+                variant="secondary"
               />
             )}
           </div>
@@ -408,7 +396,7 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
       {mode === "form" && (
         <div className="grid grid-cols-1 gap-x-4 p-6 md:grid-cols-2">
           <div className="md:col-span-2 mb-2 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="whitespace-nowrap text-sm font-medium text-slate-700">
+            <p className="whitespace-nowrap text-sm font-medium text-ub-text-secondary">
               {formData.isManualBank ? "Bank details" : "Bank"}
             </p>
             <SegmentedToggleField
@@ -425,14 +413,14 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
           {formData.isManualBank ? (
             <>
               {curatedSuggestion && (
-                <div className="md:col-span-2 mb-2 flex items-center justify-between gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                <div className="md:col-span-2 mb-2 flex items-center justify-between gap-3 rounded-md border border-ub-tone-warning-border bg-ub-tone-warning-bg p-3 text-sm text-ub-tone-warning-text">
                   <span>
                     &ldquo;{curatedSuggestion.bankName}&rdquo; is already in our bank list.
                   </span>
                   <button
                     type="button"
                     onClick={useCuratedSuggestion}
-                    className="shrink-0 font-medium text-blue-600 hover:text-blue-700"
+                    className="shrink-0 font-medium text-ub-text-link hover:text-ub-text-link"
                   >
                     Use it instead
                   </button>
@@ -481,7 +469,7 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
           <div>
             <InputField label="Account Number" field="account_number" placeholder="e.g. 1234567890" formData={formData} errors={errors} updateFormData={updateFormData} />
             {!errors.account_number && accountNumberCheck.warning && (
-              <p className="-mt-3 mb-4 text-xs text-amber-700">{accountNumberCheck.warning}</p>
+              <p className="-mt-3 mb-4 text-xs text-ub-tone-warning-text">{accountNumberCheck.warning}</p>
             )}
           </div>
           <InputField label="IBAN" field="iban" required={false} placeholder="e.g. GB29 NWBK 6016 1331 9268 19" formData={formData} errors={errors} updateFormData={updateFormData} />
@@ -531,29 +519,21 @@ export default function PartnerBankAccountSection({ partner, viewer }: Props) {
             </>
           )}
 
-          <div className="flex justify-end gap-2 border-t border-slate-200 pt-4 md:col-span-2">
+          <div className="flex justify-end gap-2 border-t border-ub-border pt-4 md:col-span-2">
             <Button
               onClick={() => setMode("view")}
               disabled={saving}
               icon={<XCircle className="h-4 w-4" />}
               text="Cancel"
-              bgColor="bg-white"
-              textColor="text-slate-600"
-              borderColor="border-slate-300"
-              hoverTextColor="hover:text-slate-800"
-              hoverBorderColor="hover:border-slate-400"
+              variant="secondary"
             />
             <Button
               onClick={handleSave}
               disabled={saving}
               icon={<Landmark className="h-4 w-4" />}
               text={saving ? "Saving..." : "Save"}
-              bgColor="bg-blue-600"
-              textColor="text-white"
-              borderColor="border-blue-600"
-              hoverTextColor="hover:text-white"
-              hoverBorderColor="hover:border-blue-700"
-              className="hover:bg-blue-700"
+              variant="primary"
+              className="hover:bg-ub-action-primary-hover"
             />
           </div>
         </div>

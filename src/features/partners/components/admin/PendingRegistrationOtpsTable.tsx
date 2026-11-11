@@ -207,12 +207,12 @@ export default function PendingRegistrationOtpsTable() {
         return (
           <>
             {" "}
-            <div className="truncate text-sm font-medium text-slate-900">
+            <div className="truncate text-sm font-medium text-ub-text-primary">
               {row.full_name || "—"}
             </div>
-            <div className="truncate text-xs text-slate-500">{row.email}</div>
+            <div className="truncate text-xs text-ub-text-secondary">{row.email}</div>
             {row.company_name && (
-              <div className="truncate text-xs text-slate-500">
+              <div className="truncate text-xs text-ub-text-secondary">
                 {row.company_name}
               </div>
             )}
@@ -231,7 +231,7 @@ export default function PendingRegistrationOtpsTable() {
         return (
           <>
             {" "}
-            <span className="text-sm capitalize text-slate-700">
+            <span className="text-sm capitalize text-ub-text-secondary">
               {row.partner_type || "—"}
             </span>
           </>
@@ -284,7 +284,7 @@ export default function PendingRegistrationOtpsTable() {
           <>
             {" "}
             {row.progress === "completed" ? (
-              <span className="text-sm text-slate-400">—</span>
+              <span className="text-sm text-ub-text-tertiary">—</span>
             ) : (
               <AppDate value={row.expires_at} format="datetime" fallback="—" />
             )}
@@ -319,11 +319,11 @@ export default function PendingRegistrationOtpsTable() {
                 />
               }
               bgColor="bg-transparent"
-              textColor="text-slate-400"
+              textColor="text-ub-text-tertiary"
               borderColor="border-transparent"
-              hoverTextColor="hover:text-blue-600"
+              hoverTextColor="hover:text-ub-text-link"
               hoverBorderColor="hover:border-transparent"
-              className="hover:bg-blue-50"
+              className="hover:bg-ub-tone-brand-bg"
             />
           </>
         );

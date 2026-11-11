@@ -78,16 +78,16 @@ export default function PartnerBankAccountsTable() {
   }, [currentPage, totalPages]);
 
   return (
-    <div className="mt-6 overflow-hidden text-p2 rounded-lg border border-slate-200 bg-white">
+    <div className="mt-6 overflow-hidden text-p2 rounded-lg border border-ub-border bg-ub-surface">
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-6">
         <div>
-          <p className="mt-1 text-sm text-slate-500">Every partner&apos;s current payout bank account</p>
+          <p className="mt-1 text-sm text-ub-text-secondary">Every partner&apos;s current payout bank account</p>
         </div>
       </div>
 
       {/* Search & Filters */}
-      <div className=" border-y border-slate-200 pt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center p-6">
+      <div className=" border-y border-ub-border pt-6 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center p-6">
         <div className="flex items-center gap-2 sm:contents">
           <SearchInput
             value={searchTerm}
@@ -98,11 +98,11 @@ export default function PartnerBankAccountsTable() {
           <button
             type="button"
             onClick={() => setShowMobileFilters((v) => !v)}
-            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:bg-slate-50 sm:hidden"
+            className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-ub-border bg-ub-surface text-ub-text-secondary hover:bg-ub-surface-subtle sm:hidden"
           >
             <SlidersHorizontal className="h-4 w-4" />
             {activeFiltersCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] font-bold text-white">
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-ub-action-primary text-[10px] font-bold text-white">
                 {activeFiltersCount}
               </span>
             )}
@@ -127,12 +127,8 @@ export default function PartnerBankAccountsTable() {
               onClick={clearFilters}
               icon={<RefreshCw className="h-4 w-4" />}
               text="Clear"
-              bgColor="bg-white"
-              textColor="text-red-600"
-              borderColor="border-red-200"
-              hoverTextColor="hover:text-red-600"
-              hoverBorderColor="hover:border-red-200"
-              className="hover:bg-red-50"
+              variant="secondary"
+              className="hover:bg-ub-tone-danger-bg"
             />
           )}
         </div>
@@ -156,16 +152,16 @@ export default function PartnerBankAccountsTable() {
         >
             <table className="w-full min-w-[800px] md:min-w-0">
               <thead>
-                <tr className="border-b border-slate-200 bg-slate-50">
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Advisor</th>
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Bank</th>
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Account Holder</th>
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Account Number</th>
-                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-slate-900">Currency</th>
+                <tr className="border-b border-ub-border bg-ub-surface-subtle">
+                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Advisor</th>
+                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Bank</th>
+                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Account Holder</th>
+                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Account Number</th>
+                  <th className="px-6 py-4 text-start font-semibold tracking-wider text-ub-text-primary">Currency</th>
                   <th className="w-8" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 bg-white">
+              <tbody className="divide-y divide-ub-border bg-ub-surface">
                 {status === "loading" && <TableSkeletonRows columns={6} rows={5} />}
 
                 {status === "error" && <TableErrorRow colSpan={6} message={error ?? undefined} onRetry={refetch} />}
@@ -175,7 +171,7 @@ export default function PartnerBankAccountsTable() {
                     colSpan={6}
                     title="No bank accounts found"
                     subtitle={activeFiltersCount > 0 ? "Try adjusting your filters." : "No advisor has added a payout account yet."}
-                    icon={<Wallet className="h-8 w-8 text-slate-400" />}
+                    icon={<Wallet className="h-8 w-8 text-ub-text-tertiary" />}
                   />
                 )}
 
@@ -186,19 +182,19 @@ export default function PartnerBankAccountsTable() {
                     return (
                       <AnimatedTableRow
                         key={row.id}
-                        className="group cursor-pointer transition-colors hover:bg-slate-100/50"
+                        className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle"
                         onClick={() => router.push(`/admin/advisors/${row.partner_id}`)}
                       >
-                        <td className="px-6 py-4 text-sm font-medium text-slate-900">
+                        <td className="px-6 py-4 text-sm font-medium text-ub-text-primary">
                           <p>{row.partner_name}</p>
-                          <p className="text-xs text-slate-500">{row.partner_email}</p>
+                          <p className="text-xs text-ub-text-secondary">{row.partner_email}</p>
                         </td>
-                        <td className="px-6 py-4 text-sm text-slate-700">{bankName}</td>
-                        <td className="px-6 py-4 text-sm text-slate-700">{row.account_holder_name}</td>
-                        <td className="px-6 py-4 text-sm text-slate-700">{row.account_number}</td>
-                        <td className="px-6 py-4 text-sm text-slate-700">{row.currency}</td>
+                        <td className="px-6 py-4 text-sm text-ub-text-secondary">{bankName}</td>
+                        <td className="px-6 py-4 text-sm text-ub-text-secondary">{row.account_holder_name}</td>
+                        <td className="px-6 py-4 text-sm text-ub-text-secondary">{row.account_number}</td>
+                        <td className="px-6 py-4 text-sm text-ub-text-secondary">{row.currency}</td>
                         <td className="w-8 pr-4 py-4">
-                          <ChevronRight className="h-4 w-4 text-slate-300 opacity-0 transition-opacity group-hover:opacity-100" />
+                          <ChevronRight className="h-4 w-4 text-ub-text-tertiary opacity-0 transition-opacity group-hover:opacity-100" />
                         </td>
                       </AnimatedTableRow>
                     );

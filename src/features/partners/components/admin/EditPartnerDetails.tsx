@@ -665,7 +665,7 @@ export default function EditPartnerDetails({
             />
           ) : (
             <div className="relative shrink-0">
-              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
+              <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-ub-tone-brand-bg text-sm font-semibold text-ub-text-link">
                 <PresignedImage
                   fileKey={isIndividual ? profilePhoto.file_key : logo.file_key}
                   alt="Profile"
@@ -676,17 +676,17 @@ export default function EditPartnerDetails({
                 />
               </div>
               <span
-                className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white ${
-                  partner.is_active ? "bg-emerald-500" : "bg-slate-300"
+                className={`absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-ub-surface ${
+                  partner.is_active ? "bg-ub-tone-success-dot" : "bg-ub-tone-neutral-dot"
                 }`}
               />
             </div>
           )}
           <div className="min-w-0">
-            <h2 className="truncate text-lg font-semibold text-slate-900">
+            <h2 className="truncate text-lg font-semibold text-ub-text-primary">
               {isCompany ? formData.company_name || partner.name : partner.name}
             </h2>
-            <p className="truncate text-sm text-slate-500">
+            <p className="truncate text-sm text-ub-text-secondary">
               {isCompany && formData.company_name ? `${partner.name} • ` : ""}
               {partner.email}
             </p>
@@ -696,7 +696,7 @@ export default function EditPartnerDetails({
 
       {/* Partner Details */}
       <div className="rounded-ub-lg border border-ub-border p-4 sm:p-6">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
           Advisor Details
         </p>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -751,12 +751,12 @@ export default function EditPartnerDetails({
               disabled={isTypeLocked}
             />
             {isTypeLocked && (
-              <p className="-mt-3 mb-4 text-xs text-slate-500">
+              <p className="-mt-3 mb-4 text-xs text-ub-text-secondary">
                 A company can&apos;t be changed back to an individual partner.
               </p>
             )}
             {isConvertingToAgency && (
-              <p className="-mt-3 mb-4 text-xs text-amber-700">
+              <p className="-mt-3 mb-4 text-xs text-ub-tone-warning-text">
                 Saving will convert this advisor into a company that can invite
                 team members.
                 {partner.public_profile
@@ -791,7 +791,7 @@ export default function EditPartnerDetails({
 
       {/* Account Settings */}
       <div className="rounded-ub-lg border border-ub-border p-4 sm:p-6">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
           Account Settings
         </p>
         <ToggleInput
@@ -810,7 +810,7 @@ export default function EditPartnerDetails({
       {/* Individual Details */}
       {isIndividual && (
         <div className="rounded-ub-lg border border-ub-border p-4 sm:p-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
             Individual Details
           </p>
           <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -876,7 +876,7 @@ export default function EditPartnerDetails({
       {/* Public Profile — individual only; V1 profiles don't exist for agencies */}
       {isIndividual && partner?.public_profile && (
         <div className="rounded-ub-lg border border-ub-border p-4 sm:p-6">
-          <p className="mb-4 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <p className="mb-4 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
             <Globe2 className="h-3.5 w-3.5" />
             Public Profile
           </p>
@@ -940,7 +940,7 @@ export default function EditPartnerDetails({
             enabledDescription="This advisor's profile is live and publicly visible."
             disabledDescription="This advisor's profile is hidden from the public."
           />
-          <p className="mt-4 text-xs text-slate-400">
+          <p className="mt-4 text-xs text-ub-text-tertiary">
             Verification is granted automatically when a student this advisor
             supported gets their visa approved — there&apos;s no manual control
             for it.
@@ -951,7 +951,7 @@ export default function EditPartnerDetails({
       {/* Company Details */}
       {isCompany && (
         <div className="rounded-ub-lg border border-ub-border p-4 sm:p-6">
-          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
             Company Details
           </p>
           <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">

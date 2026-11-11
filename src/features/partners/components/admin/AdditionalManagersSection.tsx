@@ -109,12 +109,12 @@ export default function AdditionalManagersSection({
       data-testid="additional-managers"
     >
       <div className="mb-1 flex items-center gap-2">
-        <Share2 className="h-4 w-4 text-slate-500" />
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <Share2 className="h-4 w-4 text-ub-text-secondary" />
+        <p className="text-xs font-semibold uppercase tracking-wide text-ub-text-secondary">
           Additional Managers
         </p>
       </div>
-      <p className="mb-4 text-xs text-slate-500">
+      <p className="mb-4 text-xs text-ub-text-secondary">
         {isMember
           ? "Inherited from the agency — change them on the agency's page."
           : "Account managers who can see and manage this advisor alongside the assigned manager."}
@@ -122,14 +122,14 @@ export default function AdditionalManagersSection({
 
       <div className="flex flex-wrap items-center gap-2">
         {current.length === 0 && (
-          <span className="text-sm text-slate-500">
+          <span className="text-sm text-ub-text-secondary">
             No additional managers.
           </span>
         )}
         {current.map((m) => (
           <span
             key={m.id}
-            className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 py-1 pl-3 pr-1.5 text-sm text-blue-800"
+            className="inline-flex items-center gap-1.5 rounded-full border border-ub-tone-brand-border bg-ub-tone-brand-bg py-1 pl-3 pr-1.5 text-sm text-ub-text-link"
           >
             {m.name || m.email}
             {!isMember && (
@@ -139,7 +139,7 @@ export default function AdditionalManagersSection({
                 disabled={loading}
                 aria-label={`Remove ${m.name || m.email}`}
                 title="Remove shared access"
-                className="flex h-5 w-5 items-center justify-center rounded-full text-blue-500 transition hover:bg-blue-100 hover:text-blue-800 disabled:opacity-50"
+                className="flex h-5 w-5 items-center justify-center rounded-full text-ub-icon-interactive transition hover:bg-ub-tone-brand-bg hover:text-ub-text-link disabled:opacity-50"
               >
                 <X
                   className={`h-3.5 w-3.5 ${
@@ -159,7 +159,7 @@ export default function AdditionalManagersSection({
             value={selectedId}
             onChange={(e) => setSelectedId(e.target.value)}
             disabled={loading || options.length === 0}
-            className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition-colors hover:bg-slate-50 focus:ring-1 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-60 sm:w-72"
+            className="h-10 w-full rounded-lg border border-ub-border bg-ub-surface px-3 text-sm text-ub-text-primary outline-none transition-colors hover:bg-ub-surface-subtle focus:ring-1 focus:ring-ub-border-focus disabled:cursor-not-allowed disabled:opacity-60 sm:w-72"
           >
             <option value="">
               {options.length === 0
@@ -177,11 +177,7 @@ export default function AdditionalManagersSection({
             disabled={loading || !selectedId}
             icon={<UserPlus className="h-4 w-4" />}
             text={loading && selectedId ? "Adding..." : "Add manager"}
-            bgColor="bg-blue-50"
-            textColor="text-blue-700"
-            borderColor="border-blue-600"
-            hoverTextColor="hover:text-blue-800"
-            hoverBorderColor="hover:border-blue-700"
+            variant="secondary"
             className="sm:w-auto"
           />
         </div>

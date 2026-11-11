@@ -45,16 +45,16 @@ export default function OtpStep({ email, onSuccess, onRestart }: Props) {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-ub-surface-subtle px-4">
       <div className="w-full max-w-sm overflow-hidden rounded-ub-xl border border-ub-border bg-ub-surface px-7 py-10 shadow-sm">
         <div className="mb-6 flex justify-center">
           <Image src={logoImg} alt="Unibexs" width={110} height={36} className="object-contain" priority />
         </div>
 
-        <h2 className="text-center text-xl font-bold text-slate-900">Verify your email</h2>
-        <p className="mt-2 text-center text-sm text-slate-500">
+        <h2 className="text-center text-xl font-bold text-ub-text-primary">Verify your email</h2>
+        <p className="mt-2 text-center text-sm text-ub-text-secondary">
           We sent a 6-digit verification code to{" "}
-          <span className="font-medium text-slate-700">{email}</span>
+          <span className="font-medium text-ub-text-secondary">{email}</span>
         </p>
 
         <div className="mt-6">
@@ -71,39 +71,35 @@ export default function OtpStep({ email, onSuccess, onRestart }: Props) {
           onClick={handleVerify}
           disabled={verifyLoading || otp.length < 6}
           text={verifyLoading ? "Verifying..." : "Verify Code"}
-          bgColor="bg-blue-600"
-          textColor="text-white"
-          borderColor="border-blue-600"
-          hoverTextColor="hover:text-white"
-          hoverBorderColor="hover:border-blue-700"
-          className="w-full py-3 hover:bg-blue-700"
+          variant="primary"
+          className="w-full py-3 hover:bg-ub-action-primary-hover"
         />
 
         <div className="mt-4 flex flex-col items-center gap-2 text-center">
           {resendSuccess && !maxResendsReached && (
-            <p className="text-sm text-green-600">Code resent — check your inbox.</p>
+            <p className="text-sm text-ub-tone-success-text">Code resent — check your inbox.</p>
           )}
           {resendError && (
-            <p className="text-sm text-red-600">{resendError}</p>
+            <p className="text-sm text-ub-tone-danger-text">{resendError}</p>
           )}
           {maxResendsReached ? (
             <button
               type="button"
               onClick={onRestart}
-              className="text-sm font-medium text-blue-600 transition hover:text-blue-700"
+              className="text-sm font-medium text-ub-text-link transition hover:text-ub-text-link"
             >
               Restart registration
             </button>
           ) : resendCooldown > 0 ? (
             <p className="text-sm text-ub-text-tertiary">
-              Resend available in <span className="font-medium text-slate-600">{resendCooldown}s</span>
+              Resend available in <span className="font-medium text-ub-text-secondary">{resendCooldown}s</span>
             </p>
           ) : (
             <button
               type="button"
               onClick={handleResend}
               disabled={resendLoading}
-              className="text-sm text-slate-500 transition hover:text-blue-600 disabled:opacity-50"
+              className="text-sm text-ub-text-secondary transition hover:text-ub-text-link disabled:opacity-50"
             >
               {resendLoading ? "Sending..." : "Didn't receive it? Resend code"}
             </button>
