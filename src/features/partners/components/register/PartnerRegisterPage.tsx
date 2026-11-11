@@ -341,13 +341,26 @@ export default function PartnerRegisterPage() {
         <Image src={registrationIconImg} alt="" width={250} height={250}
           className="pointer-events-none absolute right-0 top-0 opacity-60" />
         <div className="relative flex flex-col items-center gap-4 text-center">
-          <h1 className="text-5xl text-slate-900 sm:text-6xl">
-            Ready to <span className="text-blue-600">connect?</span>
+          <h1 className="text-4xl text-slate-900 sm:text-6xl">
+            Become a Unibexs <span className="text-blue-600">Advisor</span>
           </h1>
           <Image src={crosshairIconImg} alt="" width={80} height={80} className="mx-auto" />
-          <p className="text-base text-slate-500">
-            Ready to connect? Drop us a message and we'll get back fast.
+          <p className="max-w-xl text-base text-slate-600">
+            Help students apply to universities through Unibexs, and track every application and commission in one place.
           </p>
+          {/* What applying involves, before the individual / agency choice below. */}
+          <ul className="grid w-full max-w-3xl gap-3 text-left sm:grid-cols-3">
+            {[
+              { title: "What you earn", text: "Commission on every student you place, with each payment tracked in your portal." },
+              { title: "What you need", text: "Individuals: passport and a profile photo. Agencies: registration document, logo and website." },
+              { title: "What happens next", text: "We check your email, our team reviews your details, and we email you the decision." },
+            ].map((point) => (
+              <li key={point.title} className="rounded-ub-lg border border-ub-border bg-ub-surface p-4">
+                <p className="text-ub-label-md text-ub-text-primary">{point.title}</p>
+                <p className="mt-1 text-ub-body-sm text-ub-text-secondary">{point.text}</p>
+              </li>
+            ))}
+          </ul>
           <button
             type="button"
             onClick={() => setShowCodeEntry(true)}
@@ -369,8 +382,8 @@ export default function PartnerRegisterPage() {
         {/* Type switcher */}
         <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2">
           {([
-            { type: "individual" as const, icon: User,     title: "Individual Advisor", desc: "Apply as an independent education advisor" },
-            { type: "agency"    as const, icon: Building2, title: "Company / Agency",  desc: "Apply as an education agency" },
+            { type: "individual" as const, icon: User,     title: "Individual Advisor", desc: "You work on your own" },
+            { type: "agency"    as const, icon: Building2, title: "Company / Agency",  desc: "You apply for a registered agency" },
           ]).map(({ type, icon: Icon, title, desc }) => (
             <button key={type} type="button"
               onClick={() => { setPartnerType(type); setErrors({}); }}
