@@ -110,7 +110,7 @@ function download(csv: string, filename: string) {
 
 function StudentCell({ row }: { row: ApplicationListRow }) {
   return (
-    <span className="flex min-w-[150px] max-w-[280px] items-center gap-3 py-2">
+    <span className="flex min-w-0 max-w-[280px] items-center gap-3 py-2 md:min-w-[150px]">
       <PresignedImage
         fileKey={row.student_photo_file_key ?? undefined}
         alt=""
@@ -171,7 +171,7 @@ export default function ApplicationsTable({
         header: "Programme",
         mobileLabel: "Programme",
         cell: (r) => (
-          <span className="block min-w-[150px] max-w-[300px]">
+          <span className="block min-w-0 max-w-[300px] md:min-w-[150px]">
             <span
               className="line-clamp-2 text-ub-body-sm text-ub-text-primary"
               title={r.program_name}
@@ -211,7 +211,7 @@ export default function ApplicationsTable({
         key: "status",
         header: "Stage / status",
         cell: (r) => (
-          <span className="flex min-w-[150px] max-w-[200px] flex-col items-start gap-1">
+          <span className="flex min-w-0 max-w-[200px] flex-col md:min-w-[150px] items-start gap-1">
             <span className="truncate text-ub-caption text-ub-text-tertiary">
               {r.stage}
             </span>
@@ -220,6 +220,8 @@ export default function ApplicationsTable({
                 status={r.status}
                 label={statusLabel(r.status)}
                 size="sm"
+                // Long statuses wrap on phones instead of running past the card.
+                className="max-w-full !h-auto min-h-5 py-0.5 !whitespace-normal text-start md:!h-5 md:!whitespace-nowrap md:py-0"
               />
               {needsAction(r.status) && (
                 <Tag tone="attention" size="sm">
@@ -246,7 +248,8 @@ export default function ApplicationsTable({
         sortValue: (r) => new Date(r.updated_at),
       }
     );
-    cols.push({
+    // The only row action is CSV export, which comes with selection (staff).
+    if (selectable) cols.push({
       key: "actions",
       header: "Actions",
       cell: (row) => (
@@ -271,13 +274,12 @@ export default function ApplicationsTable({
 
   return (
     <>
-      <p className="mb-2 text-ub-label-sm text-ub-text-tertiary md:hidden">
-        Swipe across for more columns. Scroll within the table for more
-        applications.
-      </p>
       <DataTable<ApplicationListRow>
-        mobileLayout="scroll"
-        scrollClassName="max-h-[65dvh] overflow-y-auto overscroll-contain"
+        // Phones: one stacked card per application, so the status is visible
+        // without swiping. From 768px it's a table that scrolls within 65% of
+        // the screen height.
+        mobileLayout="stacked"
+        scrollClassName="md:max-h-[65dvh] md:overflow-y-auto md:overscroll-contain"
         caption="Applications"
         columns={columns}
         rows={rows}
