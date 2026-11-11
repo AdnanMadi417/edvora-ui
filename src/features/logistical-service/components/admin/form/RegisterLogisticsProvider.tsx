@@ -465,11 +465,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                   <Button
                     icon={<Plus className="h-4 w-4" />}
                     text="New Service"
-                    bgColor="bg-blue-50"
-                    textColor="text-blue-700"
-                    borderColor="border-blue-600"
-                    hoverTextColor="hover:text-blue-800"
-                    hoverBorderColor="hover:border-blue-700"
+                    variant="secondary"
                     onClick={() => setIsCreateServiceOpen(true)}
                   />
                 </div>
@@ -490,7 +486,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                         key={svc.id}
                         className={`rounded-lg border p-4 transition ${
                           selected
-                            ? "border-blue-400 bg-blue-50"
+                            ? "border-ub-tone-brand-border bg-ub-tone-brand-bg"
                             : "border-ub-border bg-ub-surface"
                         }`}
                       >
@@ -500,7 +496,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                             id={`svc-${svc.id}`}
                             checked={!!selected}
                             onChange={() => toggleService(svc.id)}
-                            className="h-4 w-4 rounded border-ub-border-control text-blue-600"
+                            className="h-4 w-4 rounded border-ub-border-control text-ub-text-link"
                           />
                           <label
                             htmlFor={`svc-${svc.id}`}
@@ -524,7 +520,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                                   Number(e.target.value)
                                 )
                               }
-                              className="w-full rounded-md border border-ub-border px-3 py-1.5 text-sm focus:border-blue-400 focus:outline-none"
+                              className="w-full rounded-md border border-ub-border px-3 py-1.5 text-sm focus:border-ub-border-focus focus:outline-none"
                               placeholder="0"
                             />
                           </div>
@@ -550,11 +546,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                   <Button
                     icon={<Plus className="h-5 w-5" />}
                     text="Add Package"
-                    bgColor="bg-blue-50"
-                    textColor="text-blue-700"
-                    borderColor="border-blue-600"
-                    hoverTextColor="hover:text-blue-800"
-                    hoverBorderColor="hover:border-blue-700"
+                    variant="secondary"
                     onClick={addPackage}
                   />
                 </div>
@@ -584,11 +576,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                         onClick={() => removePackage(index)}
                         icon={<Trash2 className="h-4 w-4" />}
                         text="Remove"
-                        bgColor="bg-ub-surface"
-                        textColor="text-ub-tone-danger-text"
-                        borderColor="border-red-600"
-                        hoverTextColor="hover:text-red-700"
-                        hoverBorderColor="hover:border-red-700"
+                        variant="secondary"
                       />
                     </div>
 
@@ -670,7 +658,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                                   pkg.includes.filter((_, idx) => idx !== i)
                                 )
                               }
-                              className="flex items-center justify-center rounded-ub-full border border-red-600 p-1 text-ub-tone-danger-text transition hover:border-red-700 hover:text-red-700"
+                              className="flex items-center justify-center rounded-ub-full border border-ub-tone-danger-border p-1 text-ub-tone-danger-text transition hover:border-ub-tone-danger-text hover:text-ub-tone-danger-text"
                             >
                               <Trash2 className="h-4 w-4" />
                             </button>
@@ -681,11 +669,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                         <Button
                           icon={<Plus className="h-4 w-4" />}
                           text="Add Item"
-                          bgColor="bg-green-50"
-                          textColor="text-green-700"
-                          borderColor="border-green-600"
-                          hoverTextColor="hover:text-green-800"
-                          hoverBorderColor="hover:border-green-700"
+                          variant="secondary"
                           onClick={() =>
                             updatePackage(index, "includes", [
                               ...pkg.includes,

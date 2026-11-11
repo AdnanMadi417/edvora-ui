@@ -580,30 +580,26 @@ const EditLogisticsMarketplaceDetails = ({
             <Button
               icon={<Plus className="h-5 w-5" />}
               text="Add Package"
-              bgColor="bg-amber-50"
-              textColor="text-amber-700"
-              borderColor="border-amber-600"
-              hoverTextColor="hover:text-amber-800"
-              hoverBorderColor="hover:border-amber-700"
+              variant="secondary"
               onClick={addPackage}
             />
           </div>
 
           {formData.packages_offered.length === 0 && (
-            <div className="mb-3 rounded-md border border-dashed border-slate-300 bg-slate-50 p-6 text-center">
-              <p className="text-sm font-medium text-slate-700">
+            <div className="mb-3 rounded-md border border-dashed border-ub-border bg-ub-surface-subtle p-6 text-center">
+              <p className="text-sm font-medium text-ub-text-secondary">
                 No packages added yet
               </p>
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-ub-text-tertiary">
                 Add a package to get started
               </p>
             </div>
           )}
 
           {formData.packages_offered.map((pkg, index) => (
-            <div key={index} className="mb-6 rounded-md border bg-white p-5">
+            <div key={index} className="mb-6 rounded-md border border-ub-border bg-ub-surface p-5">
               <div className="mb-4 flex items-center justify-between">
-                <h5 className="font-medium text-slate-800">
+                <h5 className="font-medium text-ub-text-primary">
                   Package {index + 1}
                 </h5>
                 <Button
@@ -611,11 +607,7 @@ const EditLogisticsMarketplaceDetails = ({
                   onClick={() => removePackage(index)}
                   icon={<Trash2 className="h-4 w-4" />}
                   text="Remove"
-                  bgColor="bg-white"
-                  textColor="text-red-600"
-                  borderColor="border-red-600"
-                  hoverTextColor="hover:text-red-700"
-                  hoverBorderColor="hover:border-red-700"
+                  variant="secondary"
                 />
               </div>
               <div className="grid grid-cols-1 gap-x-3 md:grid-cols-2">
@@ -662,7 +654,7 @@ const EditLogisticsMarketplaceDetails = ({
                 }
               />
               <div className="mt-4">
-                <label className="mb-2 block text-sm font-medium text-slate-700">
+                <label className="mb-2 block text-sm font-medium text-ub-text-secondary">
                   Includes
                 </label>
                 <div className="space-y-2">
@@ -692,7 +684,7 @@ const EditLogisticsMarketplaceDetails = ({
                           )
                         }
                         aria-label={`Remove included item ${i + 1}`}
-                                  className="flex items-center justify-center rounded-ub-full border border-red-600 p-1 text-red-600 transition hover:border-red-700"
+                                  className="flex items-center justify-center rounded-ub-full border border-ub-tone-danger-border p-1 text-ub-tone-danger-text transition hover:border-ub-tone-danger-text"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -703,11 +695,7 @@ const EditLogisticsMarketplaceDetails = ({
                   <Button
                     icon={<Plus className="h-4 w-4" />}
                     text="Add Item"
-                    bgColor="bg-amber-50"
-                    textColor="text-amber-700"
-                    borderColor="border-amber-600"
-                    hoverTextColor="hover:text-amber-800"
-                    hoverBorderColor="hover:border-amber-700"
+                    variant="secondary"
                     onClick={() =>
                       updatePackage(index, "includes", [...pkg.includes, ""])
                     }
@@ -731,16 +719,16 @@ const EditLogisticsMarketplaceDetails = ({
         <div>
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <label className="text-sm font-semibold text-slate-900">
-                Logistic Services <span className="text-red-600">*</span>
+              <label className="text-sm font-semibold text-ub-text-primary">
+                Logistic Services <span className="text-ub-tone-danger-text">*</span>
               </label>
-              <p className="mt-0.5 text-xs text-slate-500">
+              <p className="mt-0.5 text-xs text-ub-text-secondary">
                 Select services, set prices, and rename types
               </p>
             </div>
           </div>
           {errors.selectedServices && (
-            <p className="mb-2 text-xs font-medium text-red-600">
+            <p className="mb-2 text-xs font-medium text-ub-tone-danger-text">
               {errors.selectedServices}
             </p>
           )}
@@ -754,8 +742,8 @@ const EditLogisticsMarketplaceDetails = ({
                   key={svc.id}
                   className={`rounded-xl border p-4 transition-all ${
                     selected
-                      ? "border-amber-400 bg-amber-50 shadow-sm"
-                      : "border-slate-200 bg-white hover:border-slate-300"
+                      ? "border-ub-tone-warning-border bg-ub-tone-warning-bg shadow-sm"
+                      : "border-ub-border bg-ub-surface hover:border-ub-border"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -768,7 +756,7 @@ const EditLogisticsMarketplaceDetails = ({
                         id={`svc-${svc.id}`}
                         checked={!!selected}
                         onChange={() => toggleService(svc.id)}
-                        className="h-4 w-4 shrink-0 rounded border-slate-300 text-amber-600"
+                        className="h-4 w-4 shrink-0 rounded border-ub-border text-ub-tone-warning-text"
                       />
                       {editingServiceId === svc.id ? (
                         <div className="flex items-center gap-1.5">
@@ -783,14 +771,14 @@ const EditLogisticsMarketplaceDetails = ({
                               if (e.key === "Escape") cancelEditService();
                             }}
                             autoFocus
-                            className="w-32 rounded-md border border-blue-400 px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            className="w-32 rounded-md border border-ub-border-focus bg-ub-surface px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ub-border-focus"
                           />
                           <button
                             type="button"
                             onClick={() => saveEditService(svc.id)}
                             disabled={loadingEditLogisticService}
                             aria-label="Save"
-                            className="flex items-center justify-center rounded-md border border-green-500 p-1 text-green-600 transition hover:bg-green-50 disabled:opacity-50"
+                            className="flex items-center justify-center rounded-md border border-ub-tone-success-border p-1 text-ub-tone-success-text transition hover:bg-ub-tone-success-bg disabled:opacity-50"
                           >
                             <Check className="h-3.5 w-3.5" />
                           </button>
@@ -798,13 +786,13 @@ const EditLogisticsMarketplaceDetails = ({
                             type="button"
                             onClick={cancelEditService}
                             aria-label="Cancel"
-                            className="flex items-center justify-center rounded-md border border-slate-300 p-1 text-slate-500 transition hover:bg-slate-50"
+                            className="flex items-center justify-center rounded-md border border-ub-border p-1 text-ub-text-secondary transition hover:bg-ub-surface-subtle"
                           >
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       ) : (
-                        <span className="text-sm font-medium text-slate-800">
+                        <span className="text-sm font-medium text-ub-text-primary">
                           {svc.name}
                         </span>
                       )}
@@ -814,7 +802,7 @@ const EditLogisticsMarketplaceDetails = ({
                         type="button"
                         onClick={() => startEditService(svc.id, svc.name)}
                         aria-label="Rename"
-                        className="shrink-0 rounded-md p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                        className="shrink-0 rounded-md p-1.5 text-ub-text-tertiary transition hover:bg-ub-surface-subtle hover:text-ub-text-secondary"
                       >
                         <Pencil className="h-3.5 w-3.5" />
                       </button>
@@ -878,7 +866,7 @@ const EditLogisticsMarketplaceDetails = ({
         </CollapsibleSection>
 
         {errorEditLogisticsProvider && (
-          <p className="text-sm text-red-600">{errorEditLogisticsProvider}</p>
+          <p className="text-sm text-ub-tone-danger-text">{errorEditLogisticsProvider}</p>
         )}
       </div>
     </FormPage>

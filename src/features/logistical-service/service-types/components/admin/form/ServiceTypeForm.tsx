@@ -87,7 +87,7 @@ export default function ServiceTypeForm({
         {apiError && (
           <p
             role="alert"
-            className="rounded-ub-md border border-red-200 bg-red-50 p-3 text-ub-body-sm text-red-700"
+            className="rounded-ub-md border border-ub-tone-danger-border bg-ub-tone-danger-bg p-3 text-ub-body-sm text-ub-tone-danger-text"
           >
             {apiError}
           </p>

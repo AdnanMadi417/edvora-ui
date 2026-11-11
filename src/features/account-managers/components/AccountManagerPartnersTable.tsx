@@ -266,7 +266,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
               {!isInitialLoad && !error && partners.map((partner) => (
                 <AnimatedTableRow
                   key={partner.id}
-                  className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle/50"
+                  className="group cursor-pointer transition-colors hover:bg-ub-surface-subtle"
                   onClick={() => router.push(`/admin/advisors/${partner.id}`)}
                 >
                   <td className="min-w-[220px] px-6 py-4">

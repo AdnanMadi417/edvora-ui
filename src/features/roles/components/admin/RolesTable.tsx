@@ -188,7 +188,7 @@ export default function RolesTable() {
                   pagedRoles.map((role) => (
                     <AnimatedTableRow
                       key={role.id}
-                      className="cursor-pointer transition-colors hover:bg-ub-surface-subtle/50"
+                      className="cursor-pointer transition-colors hover:bg-ub-surface-subtle"
                       onClick={(event) => {
                         if (
                           !(event.target as HTMLElement).closest(
