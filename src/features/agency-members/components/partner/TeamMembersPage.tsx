@@ -26,7 +26,7 @@ export default function TeamMembersPage() {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Agency Scaler is admin-only -- the nav link is hidden for members, but
+  // The Team page is admin-only -- the nav link is hidden for members, but
   // a direct link or bookmark still reaches this page. Its tables call
   // agency-admin-only endpoints unconditionally, which 403 for a member and
   // (via the global axios interceptor) bounce the whole app to
@@ -51,7 +51,7 @@ export default function TeamMembersPage() {
       <div className="mt-6 text-p2">
         <div className="flex flex-col items-center gap-3 rounded-lg border border-slate-200 bg-white p-12 text-center">
           <ShieldX className="h-10 w-10 text-slate-300" />
-          <p className="text-sm font-medium text-slate-700">Agency Scaler is managed by your agency admin.</p>
+          <p className="text-sm font-medium text-slate-700">Your team is managed by your agency admin.</p>
           <p className="text-sm text-slate-500">You don&apos;t have access to invite or manage team members.</p>
         </div>
       </div>

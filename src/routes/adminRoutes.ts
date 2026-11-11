@@ -18,6 +18,7 @@ import {
   Bell,
   Wallet,
   FileText,
+  Settings,
 } from "lucide-react";
 
 const AdminRoutes: IRoute[] = [
@@ -45,23 +46,8 @@ const AdminRoutes: IRoute[] = [
     layout: "/admin",
     path: "/advisors",
     icon: Handshake,
-    children: [
-      {
-        name: "Advisors",
-        layout: "/admin",
-        path: "/advisors",
-        icon: Handshake,
-      },
-      {
-        name: "Banks",
-        layout: "/admin/advisors",
-        path: "/banks",
-        icon: Banknote,
-      },
-      // "Bank Accounts" (admin-wide list, /admin/advisors/bank-accounts)
-      // hidden from the sidebar for now — not needed yet. Page/route still
-      // exist, just unlinked.
-    ],
+    // "Bank Accounts" (admin-wide list, /admin/advisors/bank-accounts) is
+    // unlinked for now; the page still exists. Banks moved to Settings.
   },
   {
     name: "Account Managers",
@@ -93,30 +79,6 @@ const AdminRoutes: IRoute[] = [
         path: "/universities",
         icon: Landmark,
       },
-      {
-        name: "University Types",
-        layout: "/admin/config-universities",
-        path: "",
-        icon: SlidersHorizontal,
-      },
-      {
-        name: "Fields of Study",
-        layout: "/admin/config-universities",
-        path: "/fields-of-study",
-        icon: Layers,
-      },
-      {
-        name: "Payment Methods",
-        layout: "/admin/config-universities",
-        path: "/payment-methods",
-        icon: CreditCard,
-      },
-      {
-        name: "Document Templates",
-        layout: "/admin",
-        path: "/document-types",
-        icon: FileText,
-      },
     ],
   },
   {
@@ -137,6 +99,21 @@ const AdminRoutes: IRoute[] = [
         path: "/services",
         icon: Tag,
       },
+    ],
+  },
+  {
+    // Reference data that powers forms and payouts. Pages keep their
+    // addresses; only their place in the menu changed (UX audit U7).
+    name: "Settings",
+    layout: "/admin",
+    path: "/settings",
+    icon: Settings,
+    children: [
+      { name: "University Types", layout: "/admin/config-universities", path: "", icon: SlidersHorizontal },
+      { name: "Fields of Study", layout: "/admin/config-universities", path: "/fields-of-study", icon: Layers },
+      { name: "Payment Methods", layout: "/admin/config-universities", path: "/payment-methods", icon: CreditCard },
+      { name: "Document Templates", layout: "/admin", path: "/document-types", icon: FileText },
+      { name: "Banks", layout: "/admin/advisors", path: "/banks", icon: Banknote },
     ],
   },
 ];

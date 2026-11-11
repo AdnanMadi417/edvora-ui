@@ -82,7 +82,7 @@ const partnerRoutes: IRoute[] = [
   },
 
   {
-    name: "Agency Scaler",
+    name: "Team",
     layout: "/partner",
     path: "/team-members",
     icon: UserPlus,
