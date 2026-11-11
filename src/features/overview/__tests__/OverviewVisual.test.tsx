@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import OverviewVisual from "../components/OverviewVisual";
 import type { OverviewResource, ResourcePlan } from "../model/types";
 const ready = (total: number): OverviewResource => ({
@@ -51,23 +51,16 @@ test("failed chart source exposes retry instead of a misleading percentage", () 
   expect(screen.getByRole("alert")).toHaveTextContent("Could not load reviews");
   expect(screen.queryByRole("img")).not.toBeInTheDocument();
 });
-test("empty catalogue shows the empty state without inventing bars", () => {
-  render(
+test("data entry has no chart, since the cards already show visible and hidden", () => {
+  const { container } = render(
     <OverviewVisual
       role="data_entry"
-      resources={{ programs: ready(0), hiddenPrograms: ready(0) }}
+      resources={{ programs: ready(26), hiddenPrograms: ready(2) }}
       plans={[]}
       onRetry={retry}
     />
   );
-  expect(
-    screen.getByText(
-      "Add your first programme to start building the catalogue."
-    )
-  ).toBeInTheDocument();
-  expect(
-    screen.queryByRole("list", { name: "Programmes by visibility" })
-  ).not.toBeInTheDocument();
+  expect(container).toBeEmptyDOMElement();
 });
 test("pipeline displays API counts and stage names", () => {
   const plan = {
@@ -102,7 +95,8 @@ test("pipeline displays API counts and stage names", () => {
       onRetry={retry}
     />
   );
-  fireEvent.click(screen.getByRole("tab", { name: "Pipeline" }));
+  // One view only: the pipeline, with no Bars/Pipeline switch.
+  expect(screen.queryByRole("tab")).not.toBeInTheDocument();
   expect(
     screen.getByRole("list", { name: "Applications by stage" })
   ).toHaveTextContent("50");

@@ -5,7 +5,6 @@ import DashboardCard from "components/ub/dashboard/cards/DashboardCard";
 import StatCard from "components/ub/dashboard/cards/StatCard";
 import CardLinkButton from "components/ub/dashboard/cards/CardLinkButton";
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
-import CardFooterStats from "components/ub/dashboard/cards/CardFooterStats";
 import OverviewVisual from "./OverviewVisual";
 import OverviewItems from "./OverviewItems";
 import QuickActions from "components/ub/dashboard/lists/QuickActions";
@@ -31,6 +30,8 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
     );
   if (waiting) return <WidgetStatus state="loading" skeleton="list" />;
   const config = overviewConfig(context);
+  // Data entry's only chart would repeat the visible/hidden cards, so it has none.
+  const hasChart = role !== "data_entry";
   return (
     // Phones lead with the work (queue, lists, activity), then totals, then the
     // chart; from 768px the sections keep their reading order.
@@ -80,20 +81,23 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
         })}
       </div>
       <div className="order-3 grid items-start gap-4 md:order-none xl:grid-cols-3">
-        <div className="min-w-0 xl:col-span-2">
-          <OverviewVisual
-            role={role}
-            plans={plans}
-            resources={resources}
-            onRetry={refresh}
-          />
-        </div>
+        {hasChart && (
+          <div className="min-w-0 xl:col-span-2">
+            <OverviewVisual
+              role={role}
+              plans={plans}
+              resources={resources}
+              onRetry={refresh}
+            />
+          </div>
+        )}
         <DashboardCard
           title="Quick actions"
           subtitle="Your everyday tools, one click away."
           as="h2"
+          className={hasChart ? undefined : "xl:col-span-3"}
         >
-          <QuickActions actions={config.actions} className="xl:grid-cols-1" />
+          <QuickActions actions={config.actions} className={hasChart ? "xl:grid-cols-1" : "xl:grid-cols-4"} />
         </DashboardCard>
       </div>
       <div className="order-1 grid items-start gap-4 md:order-none xl:grid-cols-3">
@@ -124,24 +128,16 @@ export default function RoleOverview({ role }: { role: OverviewRole }) {
               errorMessage={resource?.error}
               onRetry={refresh}
               skeleton="list"
+              // Only say there's more when there is. The work queue's total
+              // counts applications, not tasks, so it never gets this line.
               footer={
-                resource?.data && state === "ready" ? (
-                  <CardFooterStats
-                    items={[
-                      {
-                        label:
-                          id === "active" ? "Actions shown" : "Items shown",
-                        value: items.length,
-                      },
-                      {
-                        label:
-                          id === "active"
-                            ? "Active applications"
-                            : "Total items",
-                        value: resource.data.total.toLocaleString(),
-                      },
-                    ]}
-                  />
+                id !== "active" &&
+                resource?.data &&
+                state === "ready" &&
+                resource.data.total > items.length ? (
+                  <p className="text-ub-caption text-ub-text-tertiary">
+                    Showing {items.length} of {resource.data.total.toLocaleString()}
+                  </p>
                 ) : undefined
               }
               actions={
