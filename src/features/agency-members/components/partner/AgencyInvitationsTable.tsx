@@ -230,7 +230,7 @@ export default function AgencyInvitationsTable() {
                 : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"
             }`}
           >
-            <div className="w-full sm:w-48 flex-shrink-0">
+            <div className="w-full sm:w-48 shrink-0">
               <FilterSelectField
                 value={selectedProgress}
                 onChange={(v: string) => {

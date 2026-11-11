@@ -1,0 +1,49 @@
+/*
+ * Element defaults and app-wide behaviour. Defaults sit in the base layer so
+ * any utility class still wins (also in Tailwind v4's native cascade layers).
+ */
+@layer base {
+  html {
+    font-family: var(--font-inter), sans-serif;
+    font-feature-settings: 'kern';
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.2px;
+  }
+
+  /* Forms fill their container, including inside flex layouts. */
+  form {
+    width: 100%;
+  }
+
+  option {
+    color: black;
+  }
+
+  /* No spinner arrows on number fields. */
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+}
+
+/* Touch screens: tap targets in tables (WCAG 2.5.8, 24px minimum). Kept
+   outside a layer on purpose so it wins over the cells' own classes.
+   Links in cells get taller tap boxes; on inline links the padding doesn't move the text. */
+@media (pointer: coarse) {
+  :is(td, th) a[href] {
+    padding-block: 4px;
+  }
+  :is(td, th) button {
+    min-height: 24px;
+  }
+  /* Row links can wrap block content, where inline padding has no effect;
+     the negative margin keeps the row height unchanged. */
+  [data-row-link] {
+    display: inline-block;
+    margin-block: -4px;
+  }
+}

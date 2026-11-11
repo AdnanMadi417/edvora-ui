@@ -340,7 +340,7 @@ export default function Notifications({ applicationBasePath, partnerBasePath }: 
                   </div>
 
                   {/* Actions */}
-                  <div className="flex flex-shrink-0 items-center gap-2 self-center">
+                  <div className="flex shrink-0 items-center gap-2 self-center">
                     {isUnread && <span className="h-2.5 w-2.5 rounded-ub-full bg-ub-action-primary" aria-label="Unread" role="img" />}
                     {href && (
                       <Link

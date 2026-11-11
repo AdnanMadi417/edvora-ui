@@ -175,7 +175,7 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
           </div>
 
           <div className={`flex w-full flex-col gap-3 overflow-hidden transition-all duration-300 ease-in-out sm:contents ${showMobileFilters ? "max-h-[200px] opacity-100" : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"}`}>
-            <div className="w-full sm:w-44 flex-shrink-0">
+            <div className="w-full sm:w-44 shrink-0">
               <FilterSelectField
                 value={selectedStatus}
                 onChange={(v: string) => { setSelectedStatus(v as StatusFilter); setCurrentPage(1); }}

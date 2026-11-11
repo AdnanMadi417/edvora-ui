@@ -1,8 +1,7 @@
 'use client';
 import React, { ReactNode, useEffect } from 'react';
 import ThemeProvider from 'components/theme/ThemeProvider';
-import 'styles/index.css';
-// Unibexs design system: tokens, utilities, dark bridge (styles/globals.css).
+// The app's only stylesheet: Tailwind, legacy variables, base styles, tokens.
 import 'styles/globals.css';
 
 export default function AppWrappers({ children }: { children: ReactNode }) {

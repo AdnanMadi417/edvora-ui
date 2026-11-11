@@ -664,7 +664,7 @@ export default function EditPartnerDetails({
               }
             />
           ) : (
-            <div className="relative flex-shrink-0">
+            <div className="relative shrink-0">
               <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-blue-50 text-sm font-semibold text-blue-700">
                 <PresignedImage
                   fileKey={isIndividual ? profilePhoto.file_key : logo.file_key}

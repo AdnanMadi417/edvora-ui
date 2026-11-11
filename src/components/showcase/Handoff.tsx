@@ -115,7 +115,8 @@ function CodeBlock({ code, label }: { code: string; label: string }) {
 
 const STRUCTURE = `src/
   styles/
-    globals.css              # imports the token layers below
+    globals.css              # the only stylesheet: Tailwind, then the files below, in cascade order
+    base.css                 # element defaults (base layer) and touch tap targets
     tokens/
       primitives.css         # raw colors, spacing, radius, type, shadow, motion, dark palette
       semantic.css           # role tokens (light + dark), tone tokens

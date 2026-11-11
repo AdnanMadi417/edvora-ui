@@ -123,11 +123,7 @@ module.exports = {
   // next-themes) or on a section flips the --ub-* tokens and Tailwind's dark:
   // variant. Components should rarely need dark: — tokens do the switching.
   darkMode: ['selector', '[data-ub-theme="dark"]'],
-  content: [
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
 
@@ -256,44 +252,39 @@ module.exports = {
 
       screens: {
         sm: '576px',
-        'sm-max': { max: '576px' },
         md: '768px',
-        'md-max': { max: '768px' },
         lg: '992px',
-        'lg-max': { max: '992px' },
         xl: '1200px',
-        'xl-max': { max: '1200px' },
         '2xl': '1320px',
-        '2xl-max': { max: '1320px' },
         '3xl': '1600px',
-        '3xl-max': { max: '1600px' },
         '4xl': '1850px',
-        '4xl-max': { max: '1850px' },
       },
 
       colors: {
         ub: ubColors,
 
-        primary: 'var(--primary-bg)',
-        secondary: 'var(--secondary-bg)',
-        card: 'var(--card-bg)',
-        'card-hover': 'var(--card-hover)',
+        // Pre-design-system colours (values were :root variables in index.css).
+        // Prefer the ub-* tokens; remove each one once nothing uses its class.
+        primary: '#F8F9FB',
+        secondary: '#EEF0F6',
+        card: '#FFFFFF',
+        'card-hover': '#FFFFFF',
 
-        accent: 'var(--accent-color)',
-        'accent-light': 'var(--accent-light)',
+        accent: '#0348D1',
+        'accent-light': '#EBF1FF',
 
         // WhatsApp brand green (official dark shade; white icon on it passes
         // the 3:1 non-text contrast rule, the bright #25D366 does not).
         whatsapp: { DEFAULT: '#128C7E', dark: '#075E54' },
 
-        success: 'var(--success-color)',
-        failed: 'var(--failed-color)',
-        'failed-hover': 'var(--failed-color-hover)',
-        info: 'var(--info-color)',
+        success: '#388E3C',
+        failed: '#D32F2F',
+        'failed-hover': 'rgba(211, 47, 47, 0.85)',
+        info: '#0288D1',
 
         overlay: {
-          DEFAULT: 'var(--overlay-bg)',
-          light: 'var(--overlay-light-bg)',
+          DEFAULT: 'rgba(0, 12, 41, 0.8)',
+          light: 'rgba(3, 72, 209, 0.5)',
         },
 
         white: '#ffffff',
@@ -484,51 +475,46 @@ module.exports = {
 
       },
 
-      overlay: {
-        DEFAULT: 'var(--overlay-bg)',
-        light: 'var(--overlay-light-bg)',
-      },
-
       borderWidth: {
         'ub-strong': 'var(--ub-border-width-strong)',
-        thin: 'var(--border-thin)',
-        medium: 'var(--border-medium)',
-        thick: 'var(--border-thick)',
-        rounded: 'var(--border-rounded)',
+        thin: '1px',
+        medium: '2px',
+        thick: '12px',
+        rounded: '999px',
       },
 
       borderRadius: {
         ...prefixed({ xs: 'var(--ub-radius-xs)', sm: 'var(--ub-radius-sm)', md: 'var(--ub-radius-md)', lg: 'var(--ub-radius-lg)', xl: 'var(--ub-radius-xl)', '2xl': 'var(--ub-radius-2xl)', full: 'var(--ub-radius-full)' }),
-        sm: 'var(--radius-sm)',
-        md: 'var(--radius-md)',
-        lg: 'var(--radius-lg)',
-        full: 'var(--radius-full)',
+        sm: '4px',
+        md: '8px',
+        lg: '16px',
+        full: '9999px',
       },
 
       fontSize: {
         ...prefixed(ubType),
-        h1: 'var(--font-size-h1)',
-        h2: 'var(--font-size-h2)',
-        h3: 'var(--font-size-h3)',
-        h4: 'var(--font-size-h4)',
-        h5: 'var(--font-size-h5)',
-        h6: 'var(--font-size-h6)',
-        p1: 'var(--font-size-p1)',
-        p2: 'var(--font-size-p2)',
-        caption: 'var(--font-size-caption)',
-        overline: 'var(--font-size-overline)',
+        h1: '3rem',
+        h2: '2.5rem',
+        h3: '2rem',
+        h4: '1.5rem',
+        h5: '1.25rem',
+        h6: '1rem',
+        p1: '1rem',
+        p2: '0.875rem',
+        caption: '0.75rem',
+        overline: '0.625rem',
       },
 
       fontWeight: {
-        bold: 'var(--font-weight-bold)',
-        medium: 'var(--font-weight-medium)',
-        regular: 'var(--font-weight-regular)',
+        bold: '700',
+        medium: '600',
+        regular: '400',
       },
 
       transitionProperty: {
-        fast: 'var(--transition-fast)',
-        medium: 'var(--transition-medium)',
-        slow: 'var(--transition-slow)',
+        fast: 'all 0.2s ease-in-out',
+        medium: 'all 0.3s ease-in-out',
+        slow: 'all 0.5s ease-in-out',
       },
 
       transitionDuration: prefixed({ fast: '120ms', base: '200ms', slow: '320ms', deliberate: '480ms' }),
@@ -536,11 +522,11 @@ module.exports = {
       maxWidth: prefixed({ dashboard: '1440px', 'form-sm': '560px', form: '720px', 'form-xl': '960px', reading: '680px', marketing: '1200px', 'marketing-2xl': '1320px' }),
 
       spacing: {
-        icon: 'var(--icon-size)',
-        'icon-b': 'var(--icon-size-b)',
+        icon: '1rem',
+        'icon-b': '1.5rem',
       },
 
     },
   },
-  plugins: [require('tailwindcss-rtl'), require('@tailwindcss/typography')],
+  plugins: [require('@tailwindcss/typography')],
 };

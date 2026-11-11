@@ -202,7 +202,7 @@ export default function AgencyMembersTable({
                 : "max-h-0 opacity-0 sm:max-h-none sm:opacity-100"
             }`}
           >
-            <div className="w-full sm:w-36 flex-shrink-0">
+            <div className="w-full sm:w-36 shrink-0">
               <FilterSelectField
                 value={selectedStatus}
                 onChange={(v: string) => {
@@ -214,7 +214,7 @@ export default function AgencyMembersTable({
                 defaultOption="All Status"
               />
             </div>
-            <div className="w-full sm:w-40 flex-shrink-0">
+            <div className="w-full sm:w-40 shrink-0">
               <FilterSelectField
                 value={selectedCommission}
                 onChange={(v: string) => {

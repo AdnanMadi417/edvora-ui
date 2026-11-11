@@ -1,7 +1,20 @@
 /*
- * Unibexs design system entry point (brief §1.1): tokens, utilities and
- * the dark-mode bridge, in cascade order. Imported once from AppWrappers.
+ * The app's only stylesheet, imported once from AppWrappers. Import order is
+ * the cascade order. Tailwind v4: replace the four tailwindcss/* lines with
+ * `@import "tailwindcss";` and `@config "../../tailwind.config.js";`
+ * (see docs/tailwind-v4.md).
  */
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+/* Responsive and state variants (sm:, md:, hover:...) sit here, before the
+   files below, so token classes keep winning ties as they did before. */
+@import "tailwindcss/variants";
+
+/* Element defaults and touch tap targets */
+@import "./base.css";
+
+/* Unibexs design system: tokens, utilities, dark bridge */
 @import "./tokens/primitives.css";
 @import "./tokens/semantic.css";
 @import "./tokens/utilities.css";

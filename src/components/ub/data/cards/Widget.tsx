@@ -9,7 +9,7 @@ const Widget = (props: {
 }) => {
   const { icon, title, subtitle } = props;
   return (
-    <Card extra={`!flex-row flex-grow items-center gap-4 ${cardPadding}`}>
+    <Card extra={`!flex-row grow items-center gap-4 ${cardPadding}`}>
       <div
         className={`grid h-12 w-12 shrink-0 place-items-center rounded-ub-md [&_svg]:h-6 [&_svg]:w-6 ${iconTints.blue}`}
         aria-hidden="true"
