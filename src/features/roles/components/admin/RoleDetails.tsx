@@ -4,7 +4,10 @@ import Breadcrumbs from "components/ub/navigation/links/Breadcrumbs";
 import React, { useEffect, useState } from "react";
 import { KeyRound, Save, ShieldCheck } from "lucide-react";
 
-import { useRoles, useRenameRole } from "../../hooks";
+import { useRoles, useRenameRole, useRolePermissions } from "../../hooks";
+import Tag from "components/ub/data/badges/Tag";
+import Skeleton from "components/ub/feedback/states/Skeleton";
+import type { Permission } from "../../types";
 
 import Loading from "components/ub/feedback/states/Loading";
 import EmptyData from "components/ub/feedback/states/EmptyTableData";
@@ -13,6 +16,18 @@ import Button from "components/ub/core/buttons/Button";
 import StatusBadge from "components/ub/data/badges/StatusBadge";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+
+// Backend resource names → what staff call them in the portal.
+const AREA_LABELS: Record<string, string> = { partners: "Advisors", knowledge_hub: "Knowledge Hub" };
+const areaLabel = (resource: string) =>
+  AREA_LABELS[resource] ?? resource.charAt(0).toUpperCase() + resource.slice(1).replace(/_/g, " ");
+
+/** Permissions grouped by area, e.g. Applications → Read, Approve. */
+function groupByArea(permissions: Permission[]) {
+  const areas = new Map<string, string[]>();
+  permissions.forEach((p) => areas.set(p.resource, [...(areas.get(p.resource) ?? []), p.action]));
+  return [...areas.entries()].map(([resource, actions]) => ({ resource, label: areaLabel(resource), actions }));
+}
 
 interface RoleDetailsProps {
   roleId: number;
@@ -25,6 +40,9 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
   const role = roles.find((r) => r.id === roleId) ?? null;
 
   const { renameRole, loading: renaming } = useRenameRole();
+  // Read-only: editing permissions stays hidden (see b04e4c95); this shows what the role allows.
+  const { permissions, loading: permissionsLoading, error: permissionsError } = useRolePermissions(role?.id);
+  const areas = groupByArea(permissions);
 
   const [name, setName] = useState("");
 
@@ -96,7 +114,47 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
           />
         </div>
 
-        {/* Footer */}
+        <div className="h-px w-full bg-slate-200" />
+
+        {/* What this role can do (read-only) */}
+        <section aria-labelledby="role-permissions" className="space-y-4 p-6">
+          <div>
+            <h2 id="role-permissions" className="text-ub-heading-sm text-ub-text-primary">What this role can do</h2>
+            <p className="mt-0.5 text-ub-body-sm text-ub-text-secondary">
+              {permissionsLoading || permissionsError
+                ? "Areas of the portal this role can use, and what it can do in each."
+                : `${permissions.length} ${permissions.length === 1 ? "permission" : "permissions"} across ${areas.length} ${areas.length === 1 ? "area" : "areas"}.`}
+            </p>
+          </div>
+          {permissionsLoading ? (
+            <div className="space-y-2" aria-busy="true" aria-label="Loading permissions">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+          ) : permissionsError ? (
+            <p className="text-ub-body-sm text-ub-text-secondary">Permissions couldn&apos;t be loaded. Refresh the page to try again.</p>
+          ) : areas.length === 0 ? (
+            <p className="text-ub-body-sm text-ub-text-secondary">This role has no permissions yet.</p>
+          ) : (
+            <dl className="divide-y divide-ub-border rounded-ub-md border border-ub-border">
+              {areas.map((area) => (
+                <div key={area.resource} className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-6">
+                  <dt className="text-ub-label-md text-ub-text-primary sm:w-44 sm:shrink-0">{area.label}</dt>
+                  <dd className="flex flex-wrap gap-1.5">
+                    {area.actions.map((action) => (
+                      <Tag key={action} tone="neutral" size="sm" className="capitalize">
+                        {action}
+                      </Tag>
+                    ))}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          )}
+        </section>
+
+        {/* Footer: only custom roles can change (they can be renamed). */}
+        {!role.is_system && (
         <div className="sticky bottom-0 z-10 flex items-center justify-end gap-3 border-t border-slate-200 bg-white px-6 py-4">
           <Button
             onClick={handleSave}
@@ -110,6 +168,7 @@ export default function RoleDetails({ roleId }: RoleDetailsProps) {
             hoverBorderColor="hover:border-blue-700"
           />
         </div>
+        )}
       </div>
     </section>
   );
