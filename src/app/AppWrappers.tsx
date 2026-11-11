@@ -1,11 +1,6 @@
 'use client';
 import React, { ReactNode, useEffect } from 'react';
 import ThemeProvider from 'components/theme/ThemeProvider';
-import 'styles/App.css';
-import 'styles/Contact.css';
-// import '@asseinfo/react-kanban/dist/styles.css';
-// import 'styles/Plugins.css';
-import 'styles/MiniCalendar.css';
 import 'styles/index.css';
 // Unibexs design system: tokens, utilities, dark bridge (styles/globals.css).
 import 'styles/globals.css';
