@@ -4,6 +4,7 @@ import { APPLICATIONS, CURRENT_PARTNER, PARTNERS } from "../seed";
 import { messages } from "./chat";
 import { documentTypeByCode } from "./documentTypes";
 import type { Notification } from "features/notifications/types";
+import { WORKFLOW } from "config/workflow.generated";
 
 // Mock endpoints for the bell + /notifications pages. Each role area
 // (partner, admin, account-manager, reviewer, data-entry) gets its own feed,
@@ -12,28 +13,36 @@ import type { Notification } from "features/notifications/types";
 
 type App = (typeof APPLICATIONS)[number];
 
-// [status id, status name, stage name, body (next step)] — ids mirror utils/notificationIcons.ts.
-const STATUSES = {
-  newApplication: ["d4f9e0d7-503b-4d31-bf33-65c66fbdec12", "New Application", "Application Review"],
-  underReview: ["45cd8c15-fd9d-4903-9b41-8f89472505f3", "Under Review by Account Manager", "Application Review"],
-  correction: ["aa736b82-fd54-4e9b-8388-df72a3479969", "Correction Requested by Account Manager", "Application Review"],
-  sentToInstitution: ["3e917ca3-2808-442b-b6db-f249fd4265b7", "Sent to Institution", "Institution Review"],
-  institutionCorrections: ["3253ef4c-725c-4b7b-af1a-f8acb70d10e9", "Institution Requested Corrections", "Institution Review"],
-  programChange: ["b4155f57-36df-478c-b912-fd2d116fdbcb", "Program Change Suggested", "Institution Review"],
-  offerLetter: ["d17accbb-8b00-4dd4-a020-7a4b9a7774b1", "Offer Letter Issued", "Institution Review"],
-  waitingPayment: ["23723be3-697c-4d53-8234-42bc81562362", "Waiting for Payment", "Visa Processing"],
-  paymentSubmitted: ["bf7e2bff-e956-42d0-88a9-95f90c708a03", "Payment Submitted", "Visa Processing"],
-  immigrationDocs: ["ab04a9b8-d12a-42c1-a3b4-a4a55bc3640f", "Immigration Requested Documents", "Visa Processing"],
-  visaIssued: ["236251da-bcfe-495b-8234-2c8afdb7f3dc", "Visa Issued", "Visa Processing"],
-  confirmArrival: ["9807527d-7e22-4589-9bf6-77beaee5d990", "Waiting Advisor to confirm arrival date", "Arrival"],
-  arrivalConfirmed: ["8af06784-6f0a-4dbe-b026-0d22065435d5", "Arrival Confirmed", "Arrival"],
-  enrollmentVerified: ["61f15f9b-8193-400d-b96e-5f390d6f06f5", "Enrollment Verified", "Enrollment"],
-  commissionReady: ["39f2a833-7905-4762-852f-43c0579cee9e", "Commission Ready", "Commission"],
-  commissionPaid: ["2abfcad2-7d98-42a6-8b57-ef25f16bae99", "Commission Paid", "Commission"],
-  commissionDisputed: ["16df9f55-72d4-48c6-af48-e20b9df36f53", "Commission Disputed", "Commission"],
-  complete: ["e65b7472-e484-449d-95ea-8eec6e116a4c", "Application Complete", "Commission"],
+// Each demo status points at a real backend status (config/workflow.generated.ts);
+// its name, stage and codes come from there, so the feed reads like the real API.
+const STATUS_CODES = {
+  newApplication: "NEW",
+  underReview: "UNDER_REVIEW",
+  correction: "CORRECTION_REQUESTED",
+  sentToInstitution: "SENT_TO_UNIVERSITY",
+  institutionCorrections: "UNI_REQ_CORRECTIONS",
+  programChange: "PROGRAM_CHANGE_SUGGESTED",
+  offerLetter: "UNIVERSITY_APPROVED",
+  waitingPayment: "WAITING_FOR_PAYMENT",
+  paymentSubmitted: "PAYMENT_SUBMITTED",
+  immigrationDocs: "IMMIGRATION_REQUESTED_DOCUMENTS",
+  visaIssued: "EVAL_APPROVED",
+  confirmArrival: "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE",
+  arrivalConfirmed: "ARRIVAL_CONFIRMED",
+  enrollmentVerified: "ENROLLMENT_VERIFIED",
+  commissionReady: "COMMISSION_READY",
+  commissionPaid: "COMMISSION_PAID",
+  commissionDisputed: "DISPUTE_ISSUE_RECEIVED",
+  complete: "APPLICATION_COMPLETE",
 } as const;
-type StatusKey = keyof typeof STATUSES;
+const STATUSES = Object.fromEntries(
+  Object.entries(STATUS_CODES).map(([key, code]) => {
+    const stage = WORKFLOW.find((st) => st.statuses.some((x) => x.code === code))!;
+    const status = stage.statuses.find((x) => x.code === code)!;
+    return [key, { id: `sts_${code.toLowerCase()}`, code, name: status.name, stageCode: stage.code, stageName: stage.name }];
+  }),
+) as Record<keyof typeof STATUS_CODES, { id: string; code: string; name: string; stageCode: string; stageName: string }>;
+type StatusKey = keyof typeof STATUS_CODES;
 
 const NEXT_STEP: Record<StatusKey, string> = {
   newApplication: "Review the documents and assign it for checking.",
@@ -42,11 +51,11 @@ const NEXT_STEP: Record<StatusKey, string> = {
   sentToInstitution: "No action needed. The Institution usually responds within 10 working days.",
   institutionCorrections: "Upload the documents the Institution asked for.",
   programChange: "Discuss the suggested programme with the student and accept or decline it.",
-  offerLetter: "Share the offer letter with the student and confirm acceptance.",
+  offerLetter: "The university approved the application. Share the offer letter with the student.",
   waitingPayment: "Ask the student to pay the visa processing fee and upload the receipt.",
   paymentSubmitted: "No action needed. Payment is being verified.",
   immigrationDocs: "Upload the additional documents Immigration requested.",
-  visaIssued: "Book flights with the student and confirm the arrival date.",
+  visaIssued: "The visa stage is complete. Book flights with the student and confirm the arrival date.",
   confirmArrival: "Confirm the student's arrival date and flight details.",
   arrivalConfirmed: "No action needed. Airport pickup has been arranged.",
   enrollmentVerified: "No action needed. Commission invoicing starts next.",
@@ -71,13 +80,13 @@ function studentContext(app: App) {
 }
 
 function stageChanged(area: string, app: App, key: StatusKey, from: StatusKey, ageDays: number, read: boolean): Notification {
-  const [toStatusId, toStatusName, toStageName] = STATUSES[key];
-  const [fromStatusId, , fromStageName] = STATUSES[from];
+  const to = STATUSES[key];
+  const fromStatus = STATUSES[from];
   const created = daysAgo(ageDays, (seq * 3) % 7);
   return {
     id: nextId(area),
     type: "application_stage_changed",
-    title: `moved ${app.student.name}'s application to ${toStatusName}`,
+    title: `moved ${app.student.name}'s application to ${to.name}`,
     body: NEXT_STEP[key],
     application_id: app.id,
     data: {
@@ -85,16 +94,16 @@ function stageChanged(area: string, app: App, key: StatusKey, from: StatusKey, a
       actor_id: app.account_manager.id.replace("am_", "usr_am_"),
       actor_name: app.account_manager.name,
       actor_role: "account_manager",
-      to_stage_id: `stage_${toStageName.toLowerCase().replace(/\s+/g, "_")}`,
-      from_stage_id: `stage_${fromStageName.toLowerCase().replace(/\s+/g, "_")}`,
-      to_status_id: toStatusId,
-      from_status_id: fromStatusId,
-      to_status_code: key,
-      from_status_code: from,
-      to_stage_code: toStageName.toLowerCase().replace(/\s+/g, "_"),
-      from_stage_code: fromStageName.toLowerCase().replace(/\s+/g, "_"),
-      to_status_name: toStatusName,
-      to_stage_name: toStageName,
+      to_stage_id: `stage_${to.stageCode.toLowerCase()}`,
+      from_stage_id: `stage_${fromStatus.stageCode.toLowerCase()}`,
+      to_status_id: to.id,
+      from_status_id: fromStatus.id,
+      to_status_code: to.code,
+      from_status_code: fromStatus.code,
+      to_stage_code: to.stageCode,
+      from_stage_code: fromStatus.stageCode,
+      to_status_name: to.name,
+      to_stage_name: to.stageName,
     },
     created_at: created,
     read_at: read ? daysAgo(Math.max(0, ageDays - 0.5)) : null,
@@ -127,7 +136,7 @@ function messageReceived(area: string, app: App, fromPartner: boolean, ageDays: 
 }
 
 function newApplication(area: string, app: App, ageDays: number, read: boolean): Notification {
-  const [statusId, statusName, stageName] = STATUSES.newApplication;
+  const { id: statusId, name: statusName, stageName } = STATUSES.newApplication;
   return {
     id: nextId(area),
     type: "new_application",
