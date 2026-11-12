@@ -22,6 +22,8 @@ import Button from "components/ub/core/buttons/Button";
 import TransferPartnersModal from "./TransferPartnersModal";
 import UnsharePartnersModal from "./UnsharePartnersModal";
 import type { AccountManager } from "../types";
+import Checkbox from "components/ub/forms/choices/Checkbox";
+import { fieldGroup } from "components/ub/recipes";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -180,12 +182,10 @@ export default function AccountManagerPartnersTable({ manager, onTransferred }: 
               />
             </div>
 
-            <label className="inline-flex h-10 cursor-pointer select-none items-center gap-2 rounded-lg border border-ub-border bg-ub-surface px-3 text-sm text-ub-text-secondary hover:bg-ub-surface-subtle">
-              <input
-                type="checkbox"
-                className="h-4 w-4 rounded border-ub-border text-ub-text-link focus:ring-ub-border-focus"
+            <label className={`${fieldGroup} inline-flex h-[50px] cursor-pointer select-none items-center gap-2 px-[17px] text-ub-body-sm text-ub-text-secondary`}>
+              <Checkbox
                 checked={includeShared}
-                onChange={(e) => { setIncludeShared(e.target.checked); setCurrentPage(1); }}
+                onChange={(checked) => { setIncludeShared(checked); setCurrentPage(1); }}
               />
               <Share2 className="h-4 w-4 text-ub-text-tertiary" />
               Include shared

@@ -38,6 +38,7 @@ import { NATIONALITIES } from "constants/lists";
 import { fieldGroup } from "components/ub/recipes";
 import CollapsibleSection from "components/ub/forms/layout/CollapsibleSection";
 import { fieldControl } from "components/ub/recipes";
+import Checkbox from "components/ub/forms/choices/Checkbox";
 
 type SectionKey = "details" | "packages" | "services" | "coverage";
 /** Which section holds a validation error key. */
@@ -752,12 +753,10 @@ const EditLogisticsMarketplaceDetails = ({
                       htmlFor={`svc-${svc.id}`}
                       className="-my-1 flex cursor-pointer items-center gap-2.5 py-1"
                     >
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         id={`svc-${svc.id}`}
                         checked={!!selected}
                         onChange={() => toggleService(svc.id)}
-                        className="h-4 w-4 shrink-0 rounded border-ub-border text-ub-tone-warning-text"
                       />
                       {editingServiceId === svc.id ? (
                         <div className="flex items-center gap-1.5">

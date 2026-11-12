@@ -28,6 +28,7 @@ import logoImg from "/public/img/brand/Primary-Logo-Blue.png";
 import registrationIconImg from "/public/img/icons/registration-icon.png";
 import crosshairIconImg from "/public/img/icons/crosshair-icon.png";
 import PublicNavbar from "components/ub/navigation/layout/PublicNavbar";
+import Checkbox from "components/ub/forms/choices/Checkbox";
 
 type Step = "form" | "otp" | "success"; // "otp" rendered by OtpStep
 type PartnerType = "individual" | "agency";
@@ -604,13 +605,11 @@ export default function PartnerRegisterPage() {
               {/* T&C */}
               <div className="border-y border-ub-border p-6" data-field="agreed">
                 <label className="flex cursor-pointer items-center gap-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={partnerType === "individual" ? indForm.agreed : compForm.agreed}
-                    onChange={(e) => partnerType === "individual"
-                      ? updateInd("agreed", e.target.checked)
-                      : updateComp("agreed", e.target.checked)}
-                    className="h-4 w-4 rounded border-ub-border accent-blue-600"
+                    onChange={(checked) => partnerType === "individual"
+                      ? updateInd("agreed", checked)
+                      : updateComp("agreed", checked)}
                   />
                   <span className="text-sm text-ub-text-secondary">
                     I have read and agree to the{" "}

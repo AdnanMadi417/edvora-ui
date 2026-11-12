@@ -36,6 +36,7 @@ import type {
 } from "features/logistical-service/types";
 import { fieldGroup } from "components/ub/recipes";
 import { fieldControl } from "components/ub/recipes";
+import Checkbox from "components/ub/forms/choices/Checkbox";
 
 interface FormData {
   name: string;
@@ -491,21 +492,12 @@ export default function RegisterLogisticsMarketplaceProvider({
                             : "border-ub-border bg-ub-surface"
                         }`}
                       >
-                        <div className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            id={`svc-${svc.id}`}
-                            checked={!!selected}
-                            onChange={() => toggleService(svc.id)}
-                            className="h-4 w-4 rounded border-ub-border-control text-ub-text-link"
-                          />
-                          <label
-                            htmlFor={`svc-${svc.id}`}
-                            className="flex-1 cursor-pointer text-sm font-medium text-ub-text-primary"
-                          >
-                            {svc.name}
-                          </label>
-                        </div>
+                        <Checkbox
+                          id={`svc-${svc.id}`}
+                          checked={!!selected}
+                          onChange={() => toggleService(svc.id)}
+                          label={svc.name}
+                        />
                         {selected && (
                           <div className="mt-3">
                             <label className="mb-1 block text-xs font-medium text-ub-text-secondary">

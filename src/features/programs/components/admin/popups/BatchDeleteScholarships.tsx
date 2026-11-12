@@ -12,6 +12,7 @@ import RichTextDisplay from "components/ub/data/display/RichTextDisplay";
 
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import Checkbox from "components/ub/forms/choices/Checkbox";
 
 interface BatchDeleteScholarshipsProps {
   isOpen: boolean;
@@ -160,12 +161,7 @@ export default function BatchDeleteScholarships({
                             : "border-ub-border bg-ub-surface hover:border-ub-border hover:bg-ub-surface-subtle"
                         }`}
                       >
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => toggleOne(s.name)}
-                          className="mt-0.5 h-4 w-4 shrink-0 rounded border-ub-border text-ub-tone-danger-text focus:ring-ub-tone-danger-text"
-                        />
+                        <Checkbox checked={isChecked} onChange={() => toggleOne(s.name)} className="-mt-0.5" />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-2">
                             <p className={`truncate text-sm font-semibold ${isChecked ? "text-ub-tone-danger-text" : "text-ub-text-primary"}`}>

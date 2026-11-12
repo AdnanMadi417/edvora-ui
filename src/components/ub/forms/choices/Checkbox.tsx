@@ -37,8 +37,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   const filled = checked || indeterminate;
 
   return (
-    <div className={className}>
-      <div className="flex items-start gap-3">
+    // Spans, so a bare checkbox is valid inside a clickable <label> card.
+    <span className={`block ${className}`}>
+      <span className="flex items-start gap-3">
         {/* 24px row so the 20px box lines up with label-md text and the target stays ≥24px. */}
         <span className="relative flex h-6 shrink-0 items-center">
           <input
@@ -79,11 +80,11 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
             )}
           </div>
         )}
-      </div>
+      </span>
       <FieldError id={errorId} className="ms-8">
         {error}
       </FieldError>
-    </div>
+    </span>
   );
 });
 
