@@ -6,6 +6,7 @@
 // from the Knowledge Hub). Behaviour matches the two forms it replaces.
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLeaveGuard } from "hooks/useLeaveGuard";
 import { useRouter } from "next/navigation";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { useAllQualifications } from "features/knowledge-hub/qualifications/hooks";
@@ -68,6 +69,8 @@ export function useApplicationForm(preset?: ApplicationFormPreset) {
   const [errors, setErrors] = useState<Record<string, string | undefined>>({});
   const [step, setStep] = useState<ApplicationFormStepId>("student");
   const [completed, setCompleted] = useState<ApplicationFormStepId[]>([]);
+  // Unsaved work: set on the first change the person makes, cleared once submitted.
+  const [dirty, setDirty] = useState(false);
 
   // Preset arrives from the URL (Knowledge Hub → Apply).
   useEffect(() => {
@@ -118,7 +121,10 @@ export function useApplicationForm(preset?: ApplicationFormPreset) {
     if (!steps.some((s) => s.id === step)) setStep("review");
   }, [steps, step]);
 
-  const update = useCallback((fieldPath: string, value: unknown) => updateNestedFormData<FormDataType>({ fieldPath, value, setFormData, setErrors }), []);
+  const update = useCallback((fieldPath: string, value: unknown) => {
+    setDirty(true);
+    updateNestedFormData<FormDataType>({ fieldPath, value, setFormData, setErrors });
+  }, []);
 
   const validate = useCallback(
     (id: ApplicationFormStepId) => {
@@ -150,6 +156,7 @@ export function useApplicationForm(preset?: ApplicationFormPreset) {
   };
 
   const upload = async (file: File, documentTypeId: string) => {
+    setDirty(true);
     const placeholder: DocumentItem = { document_type_id: documentTypeId, file_url: "", file_key: "", name: file.name, size: `${(file.size / 1024).toFixed(2)} KB`, raw: file, uploading: true, progress: 0 };
     setFormData((prev) => ({ ...prev, documents: [...prev.documents.filter((d) => d.document_type_id !== documentTypeId), placeholder] }));
     try {
@@ -193,6 +200,7 @@ export function useApplicationForm(preset?: ApplicationFormPreset) {
     }
     try {
       await createPartnerApplication(buildPayload(formData));
+      setDirty(false);
       showToast("Application submitted.", "success");
       router.push("/partner/applications");
     } catch (err: unknown) {
@@ -201,8 +209,13 @@ export function useApplicationForm(preset?: ApplicationFormPreset) {
   };
 
   const goTo = (id: ApplicationFormStepId) => setStep(id);
+  const { dialog: leaveDialog } = useLeaveGuard(dirty, {
+    title: "Leave this application?",
+    description: "What you've entered will be lost. Applications can't be saved as drafts yet.",
+  });
 
   return {
+    leaveDialog,
     formData,
     errors,
     update,

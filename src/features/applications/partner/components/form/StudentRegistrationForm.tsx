@@ -11,6 +11,7 @@ export default function StudentRegistrationForm() {
   return (
     <div className="mt-5">
       <ApplicationFormView {...form} mode="new" />
+      {form.leaveDialog}
     </div>
   );
 }

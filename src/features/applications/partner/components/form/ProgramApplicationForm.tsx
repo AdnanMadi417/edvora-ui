@@ -17,6 +17,7 @@ export default function ProgramApplicationForm() {
   return (
     <div className="mt-5">
       <ApplicationFormView {...form} mode="programme" />
+      {form.leaveDialog}
     </div>
   );
 }
