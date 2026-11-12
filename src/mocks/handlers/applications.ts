@@ -347,7 +347,7 @@ mock.post("/applications/:id/change-program", ({ params, body }) => {
   app.programId = body.new_program_id;
   addTimeline(app, { entry_type: "program_changed", detail: { new_program_id: body.new_program_id }, notes: body?.notes || null }, partnerActorOf(app));
   if (app.statusCode === "PROGRAM_CHANGE_SUGGESTED") {
-    transition(app, "SUBMITTED_TO_INSTITUTION", { notes: body?.notes, actor: partnerActorOf(app) });
+    transition(app, "SENT_TO_UNIVERSITY", { notes: body?.notes, actor: partnerActorOf(app) });
   }
   app.updated_at = nowIso();
   return detail(app);
@@ -377,8 +377,8 @@ mock.post("/applications/:id/requested-documents/bulk", ({ params, body }) => {
     },
     partnerActorOf(app),
   );
-  if (app.statusCode === "CORRECTION_REQUESTED") transition(app, "DOCUMENTS_REUPLOADED", { actor: partnerActorOf(app) });
-  else if (arrival) transition(app, "EXTRA_ARRIVAL_DOCUMENTS_UNDER_REVIEW", { actor: partnerActorOf(app) });
+  if (app.statusCode === "CORRECTION_REQUESTED") transition(app, "UNDER_REVIEW", { actor: partnerActorOf(app) });
+  else if (arrival) transition(app, "ARRIVAL_EXTRA_DOCS_UNDER_REVIEW", { actor: partnerActorOf(app) });
   app.updated_at = nowIso();
   return created;
 });
@@ -404,7 +404,7 @@ mock.post("/applications/:id/offer-letter", ({ params, body }) => {
   if (body?.signed_offer_letter_required !== undefined) app.forms.signed_offer_letter = !!body.signed_offer_letter_required;
   if (body?.application_form_2_template_file_key) app.forms.application_form_2 = true;
   if (body?.english_form_template_file_key) app.forms.english_form = true;
-  if (["SUBMITTED_TO_INSTITUTION", "PROGRAM_CHANGE_SUGGESTED"].includes(app.statusCode)) {
+  if (["SENT_TO_UNIVERSITY", "PROGRAM_CHANGE_SUGGESTED"].includes(app.statusCode)) {
     transition(app, "UNIVERSITY_APPROVED", { notes: "Offer letter received from the Institution." });
   }
   app.updated_at = nowIso();
@@ -429,7 +429,7 @@ mock.post("/applications/:id/offer-letter/decision", ({ params, body }) => {
   const reason = body?.reason || null;
   // Timeline: accepting records the status change; declining records the cancellation.
   if (decision === "accept") {
-    transition(app, "VISA_SETUP", { notes: notes ?? "Offer letter accepted by the Advisor.", actor });
+    transition(app, "UNIVERSITY_APPROVED", { notes: notes ?? "Offer letter accepted by the Advisor.", actor });
   } else {
     app.lifecycle = "cancel";
     app.updated_at = nowIso();
@@ -548,7 +548,7 @@ mock.post("/partners/:partnerId/applications", ({ params, body }) => {
     accountManagerName: partner.assigned_manager.name,
     student,
     programId: program.id,
-    statusCode: "NEW_APPLICATION",
+    statusCode: "NEW",
     lifecycle: "active",
     intake_date: body?.intake_date ?? now.slice(0, 10),
     arrival_date: null,

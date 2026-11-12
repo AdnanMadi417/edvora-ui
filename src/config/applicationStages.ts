@@ -1,4 +1,5 @@
 // Application stages and tracker step presets (brief §4.3, §4.5, §11.1).
+import { WORKFLOW } from "./workflow.generated";
 //
 // ⚠ PENDING CONFIRMATION — the final stage list has NOT been confirmed by
 // product/backend (brief §11.1, a blocker). The guide shows three versions:
@@ -77,26 +78,26 @@ export const APPLICATION_PAGE_STEPS: readonly TrackerStepConfig[] = [
   { id: "commission", label: "Commission", stageId: "commission-paid" },
 ];
 
-/** Backend stage codes mapped to the shared visual palette; API labels stay authoritative. */
+/** Backend stage codes (config/workflow.generated.ts) mapped to the shared visual palette; API labels stay authoritative. */
 const API_STAGE_TAGS: Record<string, ApplicationStageId> = {
-  APPLICATION_SUBMISSION: "documents-pending",
-  INSTITUTION_REVIEW: "institution-review",
-  OFFER_AND_VISA_PAYMENT: "offer-received",
+  APPLICATION_REVIEW: "documents-pending",
+  OFFER_LETTER: "offer-received",
   VISA_PROCESSING: "visa-in-progress",
-  ARRIVAL_AND_ENROLLMENT: "arrival-logistics",
+  STUDENT_ARRIVAL_ENROLLMENT: "arrival-logistics",
   PARTNER_COMMISSION_INVOICING: "enrolled",
 };
+const key = (value: string) => value.trim().toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
 export function getApiStageTagId(stage: {
   id: string;
   name: string;
   code?: string;
 }): ApplicationStageId | undefined {
-  const code = (stage.code || stage.name)
-    .toUpperCase()
-    .replace(/&/g, "AND")
-    .replace(/[^A-Z0-9]+/g, "_");
+  // The detail response has no stage code, so fall back to the backend's stage name.
+  const code =
+    stage.code ??
+    WORKFLOW.find((s) => key(s.name) === key(stage.name) || key(s.code) === key(stage.name))?.code;
   return (
-    API_STAGE_TAGS[code] ??
+    (code ? API_STAGE_TAGS[code] : undefined) ??
     APPLICATION_STAGES.find(
       (item) =>
         item.id === stage.id ||

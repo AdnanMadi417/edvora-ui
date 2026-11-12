@@ -213,7 +213,7 @@ paid.forEach((app) => {
       seedPayout(app.partnerId, [app], paidAt);
     }
   }
-  if (app.statusCode === "COMMISSION_DISPUTED") {
+  if (app.statusCode === "DISPUTE_ISSUE_RECEIVED") {
     const payout = payoutSeed.find((p) => !p.voided_at && p.items.some((it) => it.application_id === app.id))!;
     disputeSeed.push({
       id: `dsp_${app.id.slice(4)}`,
@@ -258,7 +258,7 @@ const hasTrail = (appId: string) =>
   payIns.all().some((p) => p.application_id === appId) || payouts.all().some((p) => p.items.some((it) => it.application_id === appId));
 
 /** Is the commission due yet? From Student Enrolled on, or once any money has moved. */
-const inQueue = (app: AppRecord) => reached(app.statusCode, "STUDENT_ENROLLED") || hasTrail(app.id);
+const inQueue = (app: AppRecord) => reached(app.statusCode, "ENROLLMENT_VERIFIED") || hasTrail(app.id);
 
 const daysSince = (iso: string) => Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000));
 
@@ -277,7 +277,7 @@ function queueItem(app: AppRecord): CommissionQueueItem {
   const paidItem = payout?.items.find((it) => it.application_id === app.id);
   const program = programDetail(app.programId);
   // Arrival is what starts the Institution's clock.
-  const arrivalDate = app.arrival_date ?? stepDate(app, "STUDENT_ENROLLED");
+  const arrivalDate = app.arrival_date ?? stepDate(app, "ENROLLMENT_VERIFIED");
 
   const facts = [
     { type: "arrival" as const, date: arrivalDate, reference: null as string | null },
@@ -504,7 +504,7 @@ mock.post("/admin/pay-ins", ({ body }) => {
   const payload = body as CreatePayInPayload;
   if (!appById(payload.application_id)) throw httpError(404, "Application not found");
   const row = insertPayIn(payload.application_id, payload);
-  advance(payload.application_id, ["STUDENT_ENROLLED"], "COMMISSION_READY", CURRENT_FINANCE_USER, "Institution pay-in recorded.");
+  advance(payload.application_id, ["ENROLLMENT_VERIFIED"], "COMMISSION_READY", CURRENT_FINANCE_USER, "Institution pay-in recorded.");
   return stripAppId(row);
 });
 
@@ -619,13 +619,13 @@ mock.post("/partner/applications/:id/dispute", ({ params, body }) => {
   });
   completions.remove(app.id);
   addTimeline(app, { entry_type: "commission_disputed", detail: { justification }, notes: justification || null }, partnerActorOf(app));
-  advance(app.id, ["COMMISSION_PAID", "DISPUTE_RESPONSE_RECEIVED"], "COMMISSION_DISPUTED", partnerActorOf(app));
+  advance(app.id, ["COMMISSION_PAID", "DISPUTE_RESPONSE_RECEIVED"], "DISPUTE_ISSUE_RECEIVED", partnerActorOf(app));
   return stripAppId(row);
 });
 
 function resolveDispute(dispute: DisputeRow, patch: Partial<DisputeRow>) {
   const row = disputes.update(dispute.id, { status: "resolved", resolved_by_user_id: CURRENT_FINANCE_USER.id, updated_at: nowIso(), ...patch })!;
-  advance(dispute.application_id, ["COMMISSION_DISPUTED"], "DISPUTE_RESPONSE_RECEIVED", CURRENT_FINANCE_USER, row.report ?? undefined);
+  advance(dispute.application_id, ["DISPUTE_ISSUE_RECEIVED"], "DISPUTE_RESPONSE_RECEIVED", CURRENT_FINANCE_USER, row.report ?? undefined);
   return stripAppId(row);
 }
 

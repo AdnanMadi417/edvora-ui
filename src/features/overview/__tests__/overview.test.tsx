@@ -205,14 +205,14 @@ test("pipeline uses scoped stage totals and backend order instead of counting a 
           ? [
               {
                 id: "b",
-                name: "Institution Review",
-                code: "INSTITUTION_REVIEW",
+                name: "Offer Letter",
+                code: "OFFER_LETTER",
                 order_index: 2,
               },
               {
                 id: "a",
-                name: "Application Submission",
-                code: "APPLICATION_SUBMISSION",
+                name: "Application Review",
+                code: "APPLICATION_REVIEW",
                 order_index: 1,
               },
             ]
@@ -231,7 +231,7 @@ test("pipeline uses scoped stage totals and backend order instead of counting a 
     result.distribution?.map((stage) => [stage.key, stage.value, stage.stageId])
   ).toEqual([
     ["a", 150, "documents-pending"],
-    ["b", 40, "institution-review"],
+    ["b", 40, "offer-received"],
   ]);
   expect(
     get.mock.calls

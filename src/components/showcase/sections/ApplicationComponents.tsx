@@ -71,7 +71,7 @@ export default function ApplicationComponents() {
   const [offer, setOffer] = useState<OfferStatus>("received");
   const [commission, setCommission] = useState<"expected" | "invoiced" | "paid" | "disputed" | "none">("expected");
   const [activityState, setActivityState] = useState<"ready" | "loading" | "error" | "empty">("ready");
-  const [stage, setStage] = useState<"INSTITUTION_REVIEW" | "OFFER_AND_VISA_PAYMENT" | "ARRIVAL_AND_ENROLLMENT">("OFFER_AND_VISA_PAYMENT");
+  const [stage, setStage] = useState<"SENT_TO_UNIVERSITY" | "WAITING_FOR_PAYMENT" | "ARRIVAL_CONFIRMED">("SENT_TO_UNIVERSITY");
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [tab, setTab] = useState<ApplicationDetailsTab>("overview");
   const [notes, setNotes] = useState([{ id: "n1", author: "Farid Hakimi", body: "Student prefers the January intake.", at: ago(26) }]);
@@ -164,9 +164,9 @@ export default function ApplicationComponents() {
       </Demo>
 
       <Demo name="ApplicationTrackerCard" path="features/applications/components/ApplicationTrackerCard.tsx" description="Horizontal from 768px, vertical below; the current step has aria-current=&quot;step&quot;; the Next step line is announced politely. Steps come from stages.ts." code={`<ApplicationTrackerCard stage={resolveStage({ stageCode, statusCode, lifecycle })} nextStep={view.nextStep} statusName={view.stage.statusName} />`}>
-        <StateSwitch<typeof stage> value={stage} options={["INSTITUTION_REVIEW", "OFFER_AND_VISA_PAYMENT", "ARRIVAL_AND_ENROLLMENT"] as const} onChange={setStage} label="Backend stage" />
+        <StateSwitch<typeof stage> value={stage} options={["SENT_TO_UNIVERSITY", "WAITING_FOR_PAYMENT", "ARRIVAL_CONFIRMED"] as const} onChange={setStage} label="Backend status" />
         <div className="mt-4">
-          <ApplicationTrackerCard stage={resolveStage({ stageCode: stage })} statusName={stage === "INSTITUTION_REVIEW" ? "Submitted to Institution" : stage === "OFFER_AND_VISA_PAYMENT" ? "Waiting for payment" : "Arrival confirmed"} nextStep={stage === "ARRIVAL_AND_ENROLLMENT" ? null : "Pay the visa fee and upload the receipt."} />
+          <ApplicationTrackerCard stage={resolveStage({ stageCode: stage === "ARRIVAL_CONFIRMED" ? "STUDENT_ARRIVAL_ENROLLMENT" : "OFFER_LETTER", statusCode: stage })} statusName={stage === "SENT_TO_UNIVERSITY" ? "Sent to University" : stage === "WAITING_FOR_PAYMENT" ? "Waiting for Payment" : "Arrival Confirmed"} nextStep={stage === "ARRIVAL_CONFIRMED" ? null : stage === "WAITING_FOR_PAYMENT" ? "Pay the visa fee and upload the receipt." : "Wait for the university's decision."} />
         </div>
       </Demo>
 
@@ -268,7 +268,7 @@ export default function ApplicationComponents() {
       <Demo name="ApplicationDetailsLayout" path="features/applications/components/ApplicationDetailsLayout.tsx" description="Page frame: header, alerts, tracker, then the five tabs (scroll on mobile) and their panels; OverviewGrid is 2/3 + 1/3 from 992px; the Primary repeats in a sticky bar below 768px unless stickyAction is false." code={`<ApplicationDetailsLayout header={header} alerts={alerts} tracker={tracker} activeTab={tab} onTabChange={setTab} panels={panels} primaryAction={next} />`}>
         <ApplicationDetailsLayout
           header={<ApplicationHeader studentName="Nur Aisyah Binti Kamal" titleAs="h3" stageId="offer-received" institution="Sunway University" />}
-          tracker={(navigation) => <ApplicationTrackerCard stage={resolveStage({ stageCode: "OFFER_AND_VISA_PAYMENT" })} nextStep="Pay the visa fee and upload the receipt." navigation={navigation} />}
+          tracker={(navigation) => <ApplicationTrackerCard stage={resolveStage({ stageCode: "OFFER_LETTER" })} nextStep="Pay the visa fee and upload the receipt." navigation={navigation} />}
           activeTab={tab}
           onTabChange={setTab}
           tabCounts={{ documents: 1 }}

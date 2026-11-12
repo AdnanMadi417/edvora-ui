@@ -37,7 +37,7 @@ describe("Application Details components", () => {
   });
 
   it("ApplicationTrackerCard: aria-current step and next step", () => {
-    render(<ApplicationTrackerCard stage={resolveStage({ stageCode: "OFFER_AND_VISA_PAYMENT" })} nextStep="Pay the visa fee" />);
+    render(<ApplicationTrackerCard stage={resolveStage({ stageCode: "OFFER_LETTER", statusCode: "WAITING_FOR_PAYMENT" })} nextStep="Pay the visa fee" />);
     const current = screen.getAllByRole("listitem").find((li) => li.getAttribute("aria-current") === "step");
     expect(current).toHaveTextContent("Offer");
     expect(screen.getByText("Pay the visa fee")).toBeInTheDocument();

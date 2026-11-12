@@ -6,7 +6,7 @@
 import type { FileRowState } from "components/ub/data/display/FileRow";
 import type { ApplicationDetail } from "features/applications/shared/applicationTypes";
 import type { ApplicationCommissionItem } from "features/applications/shared/commissionTypes";
-import { resolveStage, type ResolvedStage } from "features/applications/stages";
+import { resolveStage, stageCodeOf, statusCodeOf, type ResolvedStage } from "features/applications/stages";
 
 /** Backend actor ids used in stage.statuses[].next_actions. */
 export type ViewerActor = "2" | "3";
@@ -173,7 +173,8 @@ export function toApplicationView(a: ApplicationDetail & Record<string, any>, vi
   const s = a.student ?? {};
   const p = a.program ?? {};
   const status = a.stage?.statuses?.[0];
-  const statusCode = str(a.status_code) ?? str(status?.code);
+  // The detail response sends stage and status names only; look the codes up from the backend workflow.
+  const statusCode = str(a.status_code) ?? str(statusCodeOf(status));
   const next = (status?.next_actions ?? []).find((n: any) => String(n.actor) === viewer);
   const commissions: ApplicationCommissionItem[] = a.commissions ?? [];
   const c = commissions[0];
@@ -212,7 +213,7 @@ export function toApplicationView(a: ApplicationDetail & Record<string, any>, vi
       apiName: str(a.stage?.name),
       statusName: str(status?.name),
       statusCode,
-      resolved: resolveStage({ stageCode: a.stage?.code, statusCode, lifecycle: a.lifecycle_status }),
+      resolved: resolveStage({ stageCode: stageCodeOf(a.stage), statusCode, lifecycle: a.lifecycle_status }),
     },
     nextStep: str(next?.name),
     documents: [...list(a.documents, "application"), ...list(a.payment_documents, "payment"), ...list(a.arrival_documents, "arrival")],

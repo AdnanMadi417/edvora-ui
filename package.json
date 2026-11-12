@@ -76,7 +76,8 @@
     "test:e2e:ui": "playwright test --ui",
     "test:watch": "jest --watch",
     "test:ci": "jest --ci",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "sync:workflow": "node scripts/sync-workflow.mjs"
   },
   "eslintConfig": {
     "extends": [

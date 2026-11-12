@@ -20,7 +20,7 @@ export const OFFER_STATUS: Record<OfferStatus, { label: string; tone: TagTone }>
 
 /** Pure: offer status from the backend status code and whether an offer letter exists. */
 export function offerStatusOf(statusCode: string | null | undefined, hasOfferLetter: boolean): OfferStatus {
-  if (statusCode === "UNIVERSITY_REJECTED") return "declined";
+  if (statusCode === "REJECTED_BY_UNIVERSITY") return "declined";
   return hasOfferLetter ? "received" : "awaiting";
 }
 

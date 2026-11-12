@@ -7,7 +7,7 @@ import PipelineBar from "components/ub/dashboard/pipeline/PipelineBar";
 import WidgetStatus from "components/ub/dashboard/shared/WidgetStatus";
 import { focusRing } from "components/ub/recipes";
 import ApplicationStatistics from "features/applications/components/ApplicationStatistics";
-import { resolveStage } from "features/applications/stages";
+import { resolveStage, stageCodeOf } from "features/applications/stages";
 
 export interface PipelineStage {
   id: string;
@@ -60,7 +60,7 @@ export default function PipelineCard({
   ).length;
   const chartCounts: Record<string, number> = {};
   for (const stage of stages) {
-    const key = resolveStage({ stageCode: stage.code })?.stageId;
+    const key = resolveStage({ stageCode: stageCodeOf(stage) })?.stageId;
     if (key)
       chartCounts[key] = (chartCounts[key] || 0) + (stageCounts[stage.id] || 0);
   }

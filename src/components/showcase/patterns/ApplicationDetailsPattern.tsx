@@ -87,7 +87,7 @@ const OFFER_LETTER = {
 };
 
 const STAGE = resolveStage({
-  stageCode: "INSTITUTION_REVIEW",
+  stageCode: "OFFER_LETTER",
   statusCode: "CORRECTION_REQUESTED",
   lifecycle: "active",
 });

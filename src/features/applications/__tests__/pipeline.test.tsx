@@ -7,7 +7,7 @@ const stages = [
   {
     id: "submission",
     name: "Application submission",
-    code: "APPLICATION_SUBMISSION",
+    code: "APPLICATION_REVIEW",
   },
   {
     id: "commission",

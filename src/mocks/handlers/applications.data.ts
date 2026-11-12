@@ -1,12 +1,12 @@
 // Application workflow + in-memory application records for the mock API.
-// The UI switches on stage names, status names and status codes, so the
-// pipeline below mirrors the strings the components look for (e.g.
-// "University Approved", "Visa Issued", WAITING_FOR_PAYMENT, COMMISSION_PAID).
+// Stages and statuses come from the backend's workflow (config/workflow.generated.ts),
+// so the demo uses the same codes and names as the real API.
 
 import { daysAgo, daysFromNow, nowIso, pick, placeholderImage, SAMPLE_PDF_URL, table } from "../db";
 import { APPLICATIONS, CURRENT_PARTNER, PROGRAMS, UNIVERSITIES } from "../seed";
 import { DOCUMENT_TYPES, documentTypeByCode } from "./documentTypes";
 import { universityPaymentMethods } from "./universities";
+import { WORKFLOW } from "config/workflow.generated";
 
 // ---------------------------------------------------------------------------
 // Stages & statuses
@@ -23,76 +23,21 @@ type StatusDef = {
   advance?: boolean;
 };
 
-const PIPELINE: { code: string; name: string; statuses: StatusDef[] }[] = [
-  {
-    code: "APPLICATION_SUBMISSION",
-    name: "Application Submission",
-    statuses: [
-      { code: "NEW_APPLICATION", name: "New Application", partner: "Wait for the admissions team to review the documents", manager: "Review the submitted documents" },
-      { code: "CORRECTION_REQUESTED", name: "Correction Requested", partner: "Upload the requested documents", manager: "Wait for the Advisor to re-upload documents", reason: true, docs: true },
-      { code: "DOCUMENTS_REUPLOADED", name: "Documents Re-uploaded", partner: "Wait for the admissions team to review", manager: "Review the re-uploaded documents" },
-    ],
-  },
-  {
-    code: "INSTITUTION_REVIEW",
-    name: "Institution Review",
-    statuses: [
-      { code: "SUBMITTED_TO_INSTITUTION", name: "Submitted to Institution", partner: "Wait for the Institution's admission decision", manager: "Follow up with the Institution" },
-      { code: "PROGRAM_CHANGE_SUGGESTED", name: "Program Change Suggested", partner: "Choose a new program for the student", manager: "Wait for the Advisor's program decision", reason: true },
-      { code: "UNIVERSITY_APPROVED", name: "University Approved", partner: "Review and accept the offer letter", manager: "Set up the visa case and fee", advance: true },
-      { code: "UNIVERSITY_REJECTED", name: "Rejected by Institution", partner: "No further action — consider another program", manager: "Close the application", reason: true },
-    ],
-  },
-  {
-    code: "OFFER_AND_VISA_PAYMENT",
-    name: "Offer & Visa Payment",
-    statuses: [
-      { code: "VISA_SETUP", name: "Visa Setup", partner: "Wait for the visa fee to be confirmed", manager: "Confirm the visa fee amount" },
-      { code: "WAITING_FOR_PAYMENT", name: "Waiting for Payment", partner: "Pay the visa fee and upload the receipt", manager: "Wait for the Advisor's visa payment" },
-      { code: "PAYMENT_SUBMITTED", name: "Payment Submitted", partner: "Wait for payment verification", manager: "Verify the visa payment receipt" },
-      { code: "PAYMENT_REJECTED", name: "Payment Rejected", partner: "Upload a corrected payment receipt", manager: "Wait for the corrected payment receipt", reason: true },
-      { code: "APPLICATION_FORM_REJECTED", name: "Application Form Rejected", partner: "Upload a corrected application form", manager: "Review after re-upload", reason: true },
-      { code: "HEALTH_DECLARATION_REJECTED", name: "Health Declaration Rejected", partner: "Upload a corrected health declaration", manager: "Review after re-upload", reason: true },
-      { code: "PAYMENT_APPROVED", name: "Payment Approved", partner: "Wait for the EMGS submission", manager: "Submit the visa application to EMGS", advance: true },
-    ],
-  },
-  {
-    code: "VISA_PROCESSING",
-    name: "Visa Processing",
-    statuses: [
-      { code: "EVAL_PARTNER_UPLOAD", name: "Waiting for EMGS Eval Upload", partner: "Upload the EMGS evaluation document", manager: "Wait for the EMGS evaluation upload" },
-      { code: "EVAL_UNDER_REVIEW", name: "Eval Under Review", partner: "Wait for the evaluation review", manager: "Review the EMGS evaluation document" },
-      { code: "EVAL_REUPLOAD_REQUIRED", name: "Eval Re-upload Required", partner: "Re-upload the EMGS evaluation document", manager: "Wait for the corrected evaluation", reason: true },
-      { code: "E_VISA_PARTNER_UPLOAD", name: "Waiting for E-Visa Upload", partner: "Upload the student's e-visa", manager: "Wait for the e-visa upload" },
-      { code: "E_VISA_UNDER_REVIEW", name: "E-Visa Under Review", partner: "Wait for the e-visa review", manager: "Review the uploaded e-visa" },
-      { code: "VISA_DOCUMENTS_UNDER_REVIEW", name: "Visa Documents Under Review", partner: "Wait for the visa documents review", manager: "Review the visa documents" },
-      { code: "VISA_ISSUED", name: "Visa Issued", partner: "Confirm the student's arrival date", manager: "Request the arrival date", advance: true },
-    ],
-  },
-  {
-    code: "ARRIVAL_AND_ENROLLMENT",
-    name: "Student Arrival & Enrollment",
-    statuses: [
-      { code: "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE", name: "Waiting for Arrival Date", partner: "Confirm the arrival date and upload the flight ticket", manager: "Wait for the arrival date" },
-      { code: "ARRIVAL_CONFIRMED", name: "Arrival Confirmed", partner: "Prepare the student for arrival", manager: "Arrange airport pickup" },
-      { code: "AWAITING_ARRIVAL", name: "Awaiting Arrival", partner: "Wait for the student to arrive", manager: "Confirm the student has arrived" },
-      { code: "ARRIVAL_EXTRA_DOCS_UPLOAD", name: "Extra Arrival Documents Required", partner: "Upload the completed arrival form", manager: "Wait for the arrival documents", docs: true },
-      { code: "EXTRA_ARRIVAL_DOCUMENTS_UNDER_REVIEW", name: "Extra Arrival Documents Under Review", partner: "Wait for the arrival documents review", manager: "Review the arrival documents" },
-      { code: "STUDENT_ENROLLED", name: "Student Enrolled", partner: "Wait for commission processing", manager: "Mark the commission as ready", advance: true },
-    ],
-  },
-  {
-    code: "PARTNER_COMMISSION_INVOICING",
-    name: "Partner Commission Invoicing",
-    statuses: [
-      { code: "COMMISSION_READY", name: "Commission Ready", partner: "Wait for the commission payout", manager: "Record the commission payout" },
-      { code: "COMMISSION_PAID", name: "Commission Paid", partner: "Confirm you received the commission", manager: "Wait for the Advisor's confirmation" },
-      { code: "COMMISSION_DISPUTED", name: "Commission Disputed", partner: "Wait for the dispute to be resolved", manager: "Review the commission dispute" },
-      { code: "DISPUTE_RESPONSE_RECEIVED", name: "Dispute Response Received", partner: "Confirm the corrected commission", manager: "Wait for the Advisor's confirmation" },
-      { code: "APPLICATION_COMPLETE", name: "Application Completed", partner: "No further action", manager: "No further action" },
-    ],
-  },
-];
+// Built from the backend's own workflow (config/workflow.generated.ts), so the
+// mock API returns the same stage codes, status codes, names and next actions.
+const PIPELINE: { code: string; name: string; statuses: StatusDef[] }[] = WORKFLOW.map((stage) => ({
+  code: stage.code,
+  name: stage.name,
+  statuses: stage.statuses.map((st) => ({
+    code: st.code,
+    name: st.name,
+    partner: st.advisorAction ?? st.note ?? "No action needed",
+    manager: st.managerAction ?? st.note ?? "No action needed",
+    reason: st.requiresReason,
+    docs: st.requiresDocuments,
+    advance: st.advancesStage,
+  })),
+}));
 
 export const STAGES = PIPELINE.map((s, i) => ({
   id: `stage_${String(i + 1).padStart(2, "0")}`,
@@ -127,65 +72,62 @@ export const toStageStatus = (s: Status) => ({
   is_triggers_stage_advance: !!s.advance,
 });
 
-/** Where a manager/admin can move an application from each status. */
-const NEXT: Record<string, string[]> = {
-  NEW_APPLICATION: ["SUBMITTED_TO_INSTITUTION", "CORRECTION_REQUESTED"],
-  CORRECTION_REQUESTED: ["SUBMITTED_TO_INSTITUTION"],
-  DOCUMENTS_REUPLOADED: ["SUBMITTED_TO_INSTITUTION", "CORRECTION_REQUESTED"],
-  SUBMITTED_TO_INSTITUTION: ["UNIVERSITY_APPROVED", "PROGRAM_CHANGE_SUGGESTED", "UNIVERSITY_REJECTED"],
-  PROGRAM_CHANGE_SUGGESTED: ["SUBMITTED_TO_INSTITUTION", "UNIVERSITY_REJECTED"],
-  UNIVERSITY_APPROVED: ["VISA_SETUP"],
-  UNIVERSITY_REJECTED: [],
-  VISA_SETUP: ["WAITING_FOR_PAYMENT"],
-  WAITING_FOR_PAYMENT: ["PAYMENT_SUBMITTED"],
-  PAYMENT_SUBMITTED: ["PAYMENT_APPROVED", "PAYMENT_REJECTED", "APPLICATION_FORM_REJECTED", "HEALTH_DECLARATION_REJECTED"],
-  PAYMENT_REJECTED: ["PAYMENT_SUBMITTED"],
-  APPLICATION_FORM_REJECTED: ["PAYMENT_SUBMITTED"],
-  HEALTH_DECLARATION_REJECTED: ["PAYMENT_SUBMITTED"],
-  PAYMENT_APPROVED: ["EVAL_PARTNER_UPLOAD"],
-  EVAL_PARTNER_UPLOAD: ["EVAL_UNDER_REVIEW"],
-  EVAL_UNDER_REVIEW: ["E_VISA_PARTNER_UPLOAD", "EVAL_REUPLOAD_REQUIRED"],
-  EVAL_REUPLOAD_REQUIRED: ["EVAL_UNDER_REVIEW"],
-  E_VISA_PARTNER_UPLOAD: ["E_VISA_UNDER_REVIEW"],
-  E_VISA_UNDER_REVIEW: ["VISA_DOCUMENTS_UNDER_REVIEW", "VISA_ISSUED"],
-  VISA_DOCUMENTS_UNDER_REVIEW: ["VISA_ISSUED"],
-  VISA_ISSUED: ["WAITING_PARTNER_CONFIRM_ARRIVAL_DATE"],
-  WAITING_PARTNER_CONFIRM_ARRIVAL_DATE: ["ARRIVAL_CONFIRMED"],
-  ARRIVAL_CONFIRMED: ["AWAITING_ARRIVAL"],
-  AWAITING_ARRIVAL: ["STUDENT_ENROLLED", "ARRIVAL_EXTRA_DOCS_UPLOAD"],
-  ARRIVAL_EXTRA_DOCS_UPLOAD: ["EXTRA_ARRIVAL_DOCUMENTS_UNDER_REVIEW"],
-  EXTRA_ARRIVAL_DOCUMENTS_UNDER_REVIEW: ["STUDENT_ENROLLED", "ARRIVAL_EXTRA_DOCS_UPLOAD"],
-  STUDENT_ENROLLED: ["COMMISSION_READY"],
-  COMMISSION_READY: ["COMMISSION_PAID"],
-  COMMISSION_PAID: ["APPLICATION_COMPLETE"],
-  COMMISSION_DISPUTED: ["DISPUTE_RESPONSE_RECEIVED"],
-  DISPUTE_RESPONSE_RECEIVED: ["APPLICATION_COMPLETE"],
-  APPLICATION_COMPLETE: [],
-};
-export const nextStatuses = (code: string) => (NEXT[code] ?? []).map(statusByCode);
-
-/** The usual route to a status, for building a believable history. */
+/** The usual route through the backend workflow, for building a believable history. */
 const HAPPY_PATH = [
-  "NEW_APPLICATION", "SUBMITTED_TO_INSTITUTION", "UNIVERSITY_APPROVED", "VISA_SETUP", "WAITING_FOR_PAYMENT",
-  "PAYMENT_SUBMITTED", "PAYMENT_APPROVED", "EVAL_PARTNER_UPLOAD", "EVAL_UNDER_REVIEW", "E_VISA_PARTNER_UPLOAD",
-  "E_VISA_UNDER_REVIEW", "VISA_ISSUED", "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE", "ARRIVAL_CONFIRMED", "AWAITING_ARRIVAL",
-  "STUDENT_ENROLLED", "COMMISSION_READY", "COMMISSION_PAID", "APPLICATION_COMPLETE",
+  "NEW", "UNDER_REVIEW", "APPROVED", "APPROVED_FROM_STAGE_1", "SENT_TO_UNIVERSITY", "UNIVERSITY_APPROVED",
+  "WAITING_FOR_PAYMENT", "PAYMENT_SUBMITTED", "PAYMENT_APPROVED", "OFFER_LETTER_FORMS_APPROVED",
+  "VISA_DOCUMENTS_UNDER_REVIEW", "SUBMIT_TO_EMGS", "EVAL_READY", "EVAL_PARTNER_UPLOAD", "EVAL_UNDER_REVIEW", "EVAL_APPROVED",
+  "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE", "AWAITING_ARRIVAL", "E_VISA_REQUIRED", "E_VISA_PARTNER_UPLOAD",
+  "E_VISA_UNDER_REVIEW", "E_VISA_APPROVED", "ARRIVAL_CONFIRMED", "ENROLLMENT_VERIFIED",
+  "AWAITING_COMMISSION", "COMMISSION_READY", "COMMISSION_PAID", "APPLICATION_COMPLETE",
 ];
 
-/** Predecessors for statuses the Advisor (not the manager) moves into. */
+/** Side branches: the status each one is reached from. */
 const PREV: Record<string, string> = {
-  DOCUMENTS_REUPLOADED: "CORRECTION_REQUESTED",
-  COMMISSION_DISPUTED: "COMMISSION_PAID",
-  DISPUTE_RESPONSE_RECEIVED: "COMMISSION_DISPUTED",
+  CORRECTION_REQUESTED: "UNDER_REVIEW",
+  REJECTED: "UNDER_REVIEW",
+  UNI_REQ_CORRECTIONS: "SENT_TO_UNIVERSITY",
+  PROGRAM_CHANGE_SUGGESTED: "SENT_TO_UNIVERSITY",
+  REJECTED_BY_UNIVERSITY: "SENT_TO_UNIVERSITY",
+  PAYMENT_REJECTED: "PAYMENT_SUBMITTED",
+  APPLICATION_FORM_REJECTED: "PAYMENT_APPROVED",
+  APPLICATION_FORM_2_REJECTED: "PAYMENT_APPROVED",
+  HEALTH_DECLARATION_REJECTED: "PAYMENT_APPROVED",
+  SIGNED_OFFER_LETTER_REJECTED: "PAYMENT_APPROVED",
+  ENGLISH_FORM_REJECTED: "PAYMENT_APPROVED",
+  VISA_DOCUMENTS_REUPLOAD_REQUIRED: "VISA_DOCUMENTS_UNDER_REVIEW",
+  IMMIGRATION_REQUESTED_DOCUMENTS: "SUBMIT_TO_EMGS",
+  VISA_REJECTED: "SUBMIT_TO_EMGS",
+  EVAL_REUPLOAD_REQUIRED: "EVAL_UNDER_REVIEW",
+  E_VISA_REUPLOAD_REQUIRED: "E_VISA_UNDER_REVIEW",
+  ARRIVAL_EXTRA_DOCS_REQUIRED: "AWAITING_ARRIVAL",
+  ARRIVAL_EXTRA_DOCS_UPLOAD: "ARRIVAL_EXTRA_DOCS_REQUIRED",
+  ARRIVAL_EXTRA_DOCS_UNDER_REVIEW: "ARRIVAL_EXTRA_DOCS_UPLOAD",
+  ARRIVAL_EXTRA_DOCS_REUPLOAD: "ARRIVAL_EXTRA_DOCS_UNDER_REVIEW",
+  ARRIVAL_EXTRA_DOCS_APPROVED: "ARRIVAL_EXTRA_DOCS_UNDER_REVIEW",
+  ENROLLMENT_ISSUE: "ARRIVAL_CONFIRMED",
+  DISPUTE_ISSUE_RECEIVED: "COMMISSION_PAID",
+  DISPUTE_RESPONSE_RECEIVED: "DISPUTE_ISSUE_RECEIVED",
 };
+
+/** Where a manager/admin can move an application from each status: the backend's
+ *  own transitions, plus the next step on the usual route where it lists none. */
+const NEXT: Record<string, string[]> = Object.fromEntries(
+  WORKFLOW.flatMap((stage) => stage.statuses).map((st) => {
+    const i = HAPPY_PATH.indexOf(st.code);
+    const onward = i >= 0 && i < HAPPY_PATH.length - 1 ? [HAPPY_PATH[i + 1]] : [];
+    return [st.code, st.managerNext.length ? st.managerNext : onward];
+  }),
+);
+export const nextStatuses = (code: string) => (NEXT[code] ?? []).map(statusByCode);
 
 export function pathTo(code: string, depth = 0): string[] {
   const i = HAPPY_PATH.indexOf(code);
   if (i >= 0) return HAPPY_PATH.slice(0, i + 1);
-  if (depth > 6) return ["NEW_APPLICATION", code];
+  if (depth > 6) return ["NEW", code];
   // Side branches: walk to the status's predecessor, preferring the happy path.
   const keys = Object.keys(NEXT).filter((k) => k !== code && NEXT[k].includes(code));
-  const prev = PREV[code] ?? keys.find((k) => HAPPY_PATH.includes(k)) ?? keys[0] ?? "NEW_APPLICATION";
+  const prev = PREV[code] ?? keys.find((k) => HAPPY_PATH.includes(k)) ?? keys[0] ?? "NEW";
   return [...pathTo(prev, depth + 1), code];
 }
 
@@ -287,12 +229,12 @@ export type AppRecord = {
 };
 
 const SEED_STATUSES = [
-  "CORRECTION_REQUESTED", "NEW_APPLICATION", "DOCUMENTS_REUPLOADED", "PROGRAM_CHANGE_SUGGESTED",
-  "SUBMITTED_TO_INSTITUTION", "UNIVERSITY_APPROVED", "WAITING_FOR_PAYMENT", "PAYMENT_SUBMITTED",
+  "CORRECTION_REQUESTED", "NEW", "UNDER_REVIEW", "PROGRAM_CHANGE_SUGGESTED",
+  "SENT_TO_UNIVERSITY", "UNIVERSITY_APPROVED", "WAITING_FOR_PAYMENT", "PAYMENT_SUBMITTED",
   "PAYMENT_REJECTED", "EVAL_PARTNER_UPLOAD", "EVAL_UNDER_REVIEW", "E_VISA_PARTNER_UPLOAD",
-  "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE", "E_VISA_UNDER_REVIEW", "VISA_ISSUED", "ARRIVAL_EXTRA_DOCS_UPLOAD",
-  "AWAITING_ARRIVAL", "STUDENT_ENROLLED", "COMMISSION_PAID", "COMMISSION_READY",
-  "COMMISSION_DISPUTED", "APPLICATION_COMPLETE", "NEW_APPLICATION", "UNIVERSITY_REJECTED",
+  "WAITING_PARTNER_CONFIRM_ARRIVAL_DATE", "E_VISA_UNDER_REVIEW", "EVAL_APPROVED", "ARRIVAL_EXTRA_DOCS_UPLOAD",
+  "AWAITING_ARRIVAL", "ENROLLMENT_VERIFIED", "COMMISSION_PAID", "COMMISSION_READY",
+  "DISPUTE_ISSUE_RECEIVED", "APPLICATION_COMPLETE", "NEW", "REJECTED_BY_UNIVERSITY",
 ];
 
 const ADDRESSES = [
@@ -442,7 +384,7 @@ export function stepDate(app: AppRecord, code: string) {
 
 export function documentsFor(app: AppRecord): Doc[] {
   const s = app.statusCode;
-  const fresh = s === "NEW_APPLICATION";
+  const fresh = s === "NEW";
   const base: Doc[] = [
     doc(app, "passport", "Passport", fresh ? "1" : "2", app.created_at, dt("passport")),
     doc(app, "academic_transcript", "Academic Transcript", s === "CORRECTION_REQUESTED" ? "3" : fresh ? "1" : "2", app.created_at, dt("academic_transcript"), s === "CORRECTION_REQUESTED" ? "Not certified — please upload a certified true copy." : null),
@@ -450,10 +392,10 @@ export function documentsFor(app: AppRecord): Doc[] {
     doc(app, "passport_photo", "Passport Photo", fresh ? "1" : "2", app.created_at, dt("passport_photo")),
     doc(app, "english_certificate", "English Proficiency Certificate", fresh ? "1" : "2", app.created_at, dt("english_proficiency")),
   ];
-  if (s === "DOCUMENTS_REUPLOADED") {
+  if (s === "UNDER_REVIEW") {
     base.push(doc(app, "academic_transcript_v2", "Academic Transcript", "1", stepDate(app, s), dt("academic_transcript")));
   }
-  if (reached(s, "UNIVERSITY_APPROVED") && s !== "UNIVERSITY_REJECTED") {
+  if (reached(s, "UNIVERSITY_APPROVED") && s !== "REJECTED_BY_UNIVERSITY") {
     const at = stepDate(app, "UNIVERSITY_APPROVED");
     base.push(doc(app, "application_form_template", "Application Form Template", "2", at, dt("application_form")));
     if (app.forms.application_form_2) base.push(doc(app, "application_form_2_template", "Application Form 2 Template", "2", at));
@@ -484,7 +426,7 @@ export function arrivalDocumentsFor(app: AppRecord): Doc[] {
   if (reached(s, "ARRIVAL_CONFIRMED")) {
     docs.push(doc(app, "flight_ticket", "Flight Ticket", "2", stepDate(app, "ARRIVAL_CONFIRMED"), dt("flight_ticket")));
   }
-  if (reached(s, "VISA_ISSUED")) {
+  if (reached(s, "E_VISA_UNDER_REVIEW")) {
     docs.push(doc(app, "e_visa", "E-Visa", "2", stepDate(app, "E_VISA_UNDER_REVIEW"), dt("e_visa")));
   }
   if (reached(s, "ARRIVAL_EXTRA_DOCS_UPLOAD")) {
@@ -508,8 +450,8 @@ export function emgsFor(app: AppRecord): Doc | null {
 
 export function visaDocFor(app: AppRecord): Doc | null {
   if (app.overrides.visa_document) return app.overrides.visa_document;
-  if (!reached(app.statusCode, "VISA_ISSUED")) return null;
-  return doc(app, "visa_approval_letter", "Visa Approval Letter", "2", stepDate(app, "VISA_ISSUED"));
+  if (!reached(app.statusCode, "EVAL_APPROVED")) return null;
+  return doc(app, "visa_approval_letter", "Visa Approval Letter", "2", stepDate(app, "EVAL_APPROVED"));
 }
 
 // ---------------------------------------------------------------------------
@@ -519,7 +461,7 @@ export function visaDocFor(app: AppRecord): Doc | null {
 // ---------------------------------------------------------------------------
 
 /** Has the application reached the visa stage (Visa Setup or later)? */
-export const hasVisaStage = (app: AppRecord) => reached(app.statusCode, "VISA_SETUP");
+export const hasVisaStage = (app: AppRecord) => reached(app.statusCode, "UNIVERSITY_APPROVED");
 
 /** The first active payment method the application's Institution accepts (universities.ts). */
 export function defaultUniversityPaymentMethodId(app: AppRecord) {
@@ -531,7 +473,7 @@ export function defaultUniversityPaymentMethodId(app: AppRecord) {
 export function visaCaseFor(app: AppRecord) {
   if (app.visaCaseOverride) return app.visaCaseOverride;
   if (!hasVisaStage(app)) return null;
-  const at = stepDate(app, "VISA_SETUP");
+  const at = stepDate(app, "UNIVERSITY_APPROVED");
   return {
     id: `visa_${app.id}`,
     application_id: app.id,
@@ -583,8 +525,8 @@ export function visaPaymentsFor(app: AppRecord) {
 
 // Commission amounts, pay-ins, payouts and disputes are owned by finance.ts
 // (seeded from these statuses); only the commission documents live here.
-const inCommissionStage = (app: AppRecord) => statusByCode(app.statusCode).stageIndex === 5;
-const isPaid = (app: AppRecord) => ["COMMISSION_PAID", "COMMISSION_DISPUTED", "DISPUTE_RESPONSE_RECEIVED", "APPLICATION_COMPLETE"].includes(app.statusCode);
+const inCommissionStage = (app: AppRecord) => statusByCode(app.statusCode).stageIndex === STAGES.findIndex((st) => st.code === "PARTNER_COMMISSION_INVOICING");
+const isPaid = (app: AppRecord) => ["COMMISSION_PAID", "DISPUTE_ISSUE_RECEIVED", "DISPUTE_RESPONSE_RECEIVED", "APPLICATION_COMPLETE"].includes(app.statusCode);
 
 export function commissionDocumentsFor(app: AppRecord) {
   const docs: Record<string, Doc> = {};
@@ -651,7 +593,7 @@ export function seedTimeline(app: AppRecord): TimelineEntry[] {
     if (code === "PAYMENT_SUBMITTED") {
       entries.push({ ...base("visa_payment_created", at, partnerActor), detail: { amount: app.visa_fee_amount, currency: "RM" } });
     }
-    if (code === "VISA_SETUP") {
+    if (code === "UNIVERSITY_APPROVED") {
       entries.push({ ...base("visa_case_updated", at, MANAGER_ACTOR(app)), detail: { visa_fee_amount: app.visa_fee_amount } });
     }
     if (code === "EVAL_UNDER_REVIEW") {
@@ -661,7 +603,7 @@ export function seedTimeline(app: AppRecord): TimelineEntry[] {
       entries.push({ ...base("arrival_date_updated", at, partnerActor), detail: { arrival_date: app.arrival_date } });
     }
   });
-  if (app.statusCode === "COMMISSION_DISPUTED") {
+  if (app.statusCode === "DISPUTE_ISSUE_RECEIVED") {
     entries.push({ ...base("commission_disputed", daysAgo(3), partnerActor), detail: {} });
   }
   if (app.lifecycle !== "active") {

@@ -6,6 +6,7 @@
 // those ids and onto the tracker steps. Components never hard-code stages:
 // change the arrays below and every screen follows.
 
+import { WORKFLOW } from "config/workflow.generated";
 import { APPLICATION_PAGE_STEPS, getStage, type ApplicationStage, type ApplicationStageId, type TrackerStepConfig } from "config/applicationStages";
 
 /** The steps the Application Details tracker shows: through Arrival and Commission,
@@ -19,38 +20,65 @@ export interface StageMapping {
   stepId: string | "done";
 }
 
-/** Backend stage.code → stage tag + tracker step. */
+/** Backend stage code → stage tag + tracker step (codes from config/workflow.generated.ts). */
 export const API_STAGE_MAP: Record<string, StageMapping> = {
-  APPLICATION_SUBMISSION: { stageId: "documents-pending", stepId: "documents" },
-  INSTITUTION_REVIEW: { stageId: "institution-review", stepId: "submitted" },
-  OFFER_AND_VISA_PAYMENT: { stageId: "offer-received", stepId: "offer" },
+  APPLICATION_REVIEW: { stageId: "documents-pending", stepId: "documents" },
+  OFFER_LETTER: { stageId: "submitted", stepId: "submitted" },
   VISA_PROCESSING: { stageId: "visa-in-progress", stepId: "visa" },
-  ARRIVAL_AND_ENROLLMENT: { stageId: "arrival-logistics", stepId: "arrival" },
+  STUDENT_ARRIVAL_ENROLLMENT: { stageId: "arrival-logistics", stepId: "arrival" },
   PARTNER_COMMISSION_INVOICING: { stageId: "enrolled", stepId: "commission" },
 };
 
-/** Status codes that refine the stage tag inside a backend stage. */
+// The backend's Offer Letter stage covers both the Institution's review and the
+// offer itself, so the tracker step comes from the status inside it.
+const OFFER: Partial<StageMapping> = { stageId: "offer-received", stepId: "offer" };
+const AT_INSTITUTION: Partial<StageMapping> = { stageId: "institution-review", stepId: "submitted" };
+
+/** Status codes that refine the stage tag or tracker step inside a backend stage. */
 export const API_STATUS_STAGE_OVERRIDES: Record<string, Partial<StageMapping>> = {
-  SUBMITTED_TO_INSTITUTION: { stageId: "submitted" },
-  UNIVERSITY_APPROVED: { stageId: "offer-received", stepId: "offer" },
-  STUDENT_ENROLLED: { stageId: "enrolled" },
-  COMMISSION_PAID: { stageId: "commission-paid", stepId: "done" },
+  APPROVED: { stageId: "submitted", stepId: "submitted" },
+  SENT_TO_UNIVERSITY: AT_INSTITUTION,
+  UNI_REQ_CORRECTIONS: AT_INSTITUTION,
+  PROGRAM_CHANGE_SUGGESTED: AT_INSTITUTION,
+  REJECTED_BY_UNIVERSITY: AT_INSTITUTION,
+  UNIVERSITY_APPROVED: OFFER,
+  WAITING_FOR_PAYMENT: OFFER,
+  PAYMENT_SUBMITTED: OFFER,
+  PAYMENT_REJECTED: OFFER,
+  PAYMENT_APPROVED: OFFER,
+  OFFER_LETTER_FORMS_APPROVED: OFFER,
+  APPLICATION_FORM_REJECTED: OFFER,
+  APPLICATION_FORM_2_REJECTED: OFFER,
+  HEALTH_DECLARATION_REJECTED: OFFER,
+  SIGNED_OFFER_LETTER_REJECTED: OFFER,
+  ENGLISH_FORM_REJECTED: OFFER,
+  ENROLLMENT_VERIFIED: { stageId: "enrolled" },
+  // Paid, but the Advisor still confirms receipt, so Commission stays the current step.
+  COMMISSION_PAID: { stageId: "commission-paid" },
   APPLICATION_COMPLETE: { stageId: "commission-paid", stepId: "done" },
 };
 
 /** Statuses where the current step needs attention: a correction, rejection or re-upload. */
 export const ATTENTION_STATUS_CODES: ReadonlySet<string> = new Set([
   "CORRECTION_REQUESTED",
+  "REJECTED",
+  "UNI_REQ_CORRECTIONS",
   "PROGRAM_CHANGE_SUGGESTED",
-  "UNIVERSITY_REJECTED",
+  "REJECTED_BY_UNIVERSITY",
   "PAYMENT_REJECTED",
   "APPLICATION_FORM_REJECTED",
   "APPLICATION_FORM_2_REJECTED",
   "HEALTH_DECLARATION_REJECTED",
   "SIGNED_OFFER_LETTER_REJECTED",
   "ENGLISH_FORM_REJECTED",
+  "VISA_DOCUMENTS_REUPLOAD_REQUIRED",
+  "IMMIGRATION_REQUESTED_DOCUMENTS",
   "EVAL_REUPLOAD_REQUIRED",
-  "COMMISSION_DISPUTED",
+  "VISA_REJECTED",
+  "E_VISA_REUPLOAD_REQUIRED",
+  "ARRIVAL_EXTRA_DOCS_REUPLOAD",
+  "ENROLLMENT_ISSUE",
+  "DISPUTE_ISSUE_RECEIVED",
 ]);
 
 /** lifecycle_status values that end the application. */
@@ -80,6 +108,29 @@ export function resolveStage(input: { stageCode?: string | null; statusCode?: st
   return { ...mapping, stage: getStage(mapping.stageId), attention: !!statusCode && ATTENTION_STATUS_CODES.has(statusCode) };
 }
 
+/** Lower-case words joined by underscores, so names and codes compare equal ("Offer Letter" ~ OFFER_LETTER). */
+const key = (value: string) => value.trim().toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+
+/** Backend stage code for a stage object; the detail response sends only the name. */
+export function stageCodeOf(stage: { code?: string | null; name?: string | null } | null | undefined): string | undefined {
+  if (!stage) return undefined;
+  if (stage.code) return stage.code;
+  const name = stage.name ? key(stage.name) : "";
+  return WORKFLOW.find((s) => key(s.name) === name || key(s.code) === name)?.code;
+}
+
+/** Backend status code for a status object, looked up by name when the code is missing. */
+export function statusCodeOf(status: { code?: string | null; name?: string | null } | null | undefined): string | undefined {
+  if (!status) return undefined;
+  if (status.code) return status.code;
+  const name = status.name ? key(status.name) : "";
+  for (const stage of WORKFLOW) {
+    const match = stage.statuses.find((s) => key(s.name) === name || key(s.code) === name);
+    if (match) return match.code;
+  }
+  return undefined;
+}
+
 /**
  * Statuses where the Advisor has to act next. The single rule behind the
  * "Action needed" tag, the pipeline flags and the Advisor Home work queue, so
@@ -87,44 +138,19 @@ export function resolveStage(input: { stageCode?: string | null; statusCode?: st
  * case or spacing: the backend's names ("Correction Requested by Account
  * Manager") and its codes ("CORRECTION_REQUESTED") both match.
  */
-const ADVISOR_ACTION_STATUSES: ReadonlySet<string> = new Set([
-  // Backend status names
-  "correction_requested_by_account_manager",
-  "university_requested_corrections",
-  "program_change_suggested",
-  "waiting_for_payment",
-  "payment_rejected",
-  "waiting_partner_to_confirm_arrival_date",
-  "upload_emgs_eval",
-  "eval_re_upload_required",
-  "upload_e_visa",
-  "e_visa_re_upload_required",
-  "upload_visa_stage_documents",
-  "visa_documents_re_upload_required",
-  "upload_extra_arrival_documents",
-  "extra_arrival_documents_re_upload_required",
-  "commission_ready",
-  // Status codes and the display names that go with them
-  "correction_requested",
-  "application_form_rejected",
-  "health_declaration_rejected",
-  "eval_partner_upload",
-  "waiting_for_emgs_eval_upload",
-  "eval_reupload_required",
-  "e_visa_partner_upload",
-  "waiting_for_e_visa_upload",
-  "waiting_partner_confirm_arrival_date",
-  "waiting_for_arrival_date",
-  "arrival_extra_docs_upload",
-  "extra_arrival_documents_required",
-  // The same statuses as the UI words them (University → Institution, Partner → Advisor)
-  "institution_requested_corrections",
-  "waiting_advisor_to_confirm_arrival_date",
-  "immigration_requested_documents",
-]);
+// From the backend's allowed_actor (config/workflow.generated.ts): each Advisor
+// status by code and by name, plus the name as the UI words it
+// (University → Institution, Partner → Advisor).
+const ADVISOR_ACTION_STATUSES: ReadonlySet<string> = new Set(
+  WORKFLOW.flatMap((stage) => stage.statuses)
+    .filter((status) => status.actor === "advisor")
+    .flatMap((status) => {
+      const name = key(status.name);
+      return [key(status.code), name, name.replace(/university/g, "institution").replace(/partner/g, "advisor")];
+    })
+);
 
-const normalizeStatus = (value: string) => value.trim().toLowerCase().replace(/[\s-]+/g, "_");
 
 export function isAdvisorAction(status: string | null | undefined): boolean {
-  return !!status && ADVISOR_ACTION_STATUSES.has(normalizeStatus(status));
+  return !!status && ADVISOR_ACTION_STATUSES.has(key(status));
 }

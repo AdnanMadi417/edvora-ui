@@ -1,7 +1,7 @@
 import { getDaysLevel, getDaysLabel } from "components/ub/data/badges/DaysTag";
 import { formatEventTime, groupTimeline, timelineGroupOf } from "components/ub/data/display/Timeline";
-import { getStage } from "config/applicationStages";
-import { resolveStage, API_STAGE_MAP, isAdvisorAction } from "features/applications/stages";
+import { getApiStageTagId, getStage } from "config/applicationStages";
+import { resolveStage, API_STAGE_MAP, isAdvisorAction, stageCodeOf, statusCodeOf } from "features/applications/stages";
 import { commissionStateOf, documentName, documentStateOf, toApplicationView } from "features/applications/model/applicationView";
 import { toTimelineEvents } from "features/applications/model/activity";
 import { trackerStepsFor } from "features/applications/components/ApplicationTrackerCard";
@@ -29,27 +29,32 @@ describe("stage → tag and hue", () => {
     Object.values(API_STAGE_MAP).forEach((m) => expect(getStage(m.stageId)).toBeDefined());
   });
   it("uses the status override and flags attention", () => {
-    const r = resolveStage({ stageCode: "INSTITUTION_REVIEW", statusCode: "SUBMITTED_TO_INSTITUTION" });
-    expect(r?.stage?.id).toBe("submitted");
-    expect(r?.stage?.hue).toBe("indigo");
-    expect(resolveStage({ stageCode: "APPLICATION_SUBMISSION", statusCode: "CORRECTION_REQUESTED" })?.attention).toBe(true);
+    const r = resolveStage({ stageCode: "OFFER_LETTER", statusCode: "SENT_TO_UNIVERSITY" });
+    expect(r?.stage?.id).toBe("institution-review");
+    expect(r?.stage?.hue).toBe("sky");
+    expect(resolveStage({ stageCode: "OFFER_LETTER", statusCode: "WAITING_FOR_PAYMENT" })?.stage?.id).toBe("offer-received");
+    expect(resolveStage({ stageCode: "APPLICATION_REVIEW", statusCode: "CORRECTION_REQUESTED" })?.attention).toBe(true);
   });
   it("a closed lifecycle wins", () => {
-    expect(resolveStage({ stageCode: "VISA_PROCESSING", statusCode: "VISA_ISSUED", lifecycle: "cancel" })?.stage?.id).toBe("withdrawn");
+    expect(resolveStage({ stageCode: "VISA_PROCESSING", statusCode: "EVAL_APPROVED", lifecycle: "cancel" })?.stage?.id).toBe("withdrawn");
   });
   it("unknown codes resolve to null so the backend name is shown", () => {
     expect(resolveStage({ stageCode: "SOMETHING_NEW" })).toBeNull();
   });
   it("tracker steps follow the stage", () => {
-    const steps = trackerStepsFor(resolveStage({ stageCode: "OFFER_AND_VISA_PAYMENT" }));
-    expect(steps.map((s) => s.state)).toEqual(["complete", "complete", "complete", "current", "upcoming", "upcoming", "upcoming"]);
+    // The backend's Offer Letter stage holds both Submitted and Offer; the status decides.
+    const steps = trackerStepsFor(resolveStage({ stageCode: "OFFER_LETTER", statusCode: "SENT_TO_UNIVERSITY" }));
+    expect(steps.map((s) => s.state)).toEqual(["complete", "complete", "current", "upcoming", "upcoming", "upcoming", "upcoming"]);
     // Arrival and Commission are steps of their own, not "all done".
     const at = (stageCode: string, statusCode?: string) =>
       trackerStepsFor(resolveStage({ stageCode, statusCode })).find((s) => s.state === "current")?.id;
-    expect(at("ARRIVAL_AND_ENROLLMENT")).toBe("arrival");
+    expect(at("OFFER_LETTER", "WAITING_FOR_PAYMENT")).toBe("offer");
+    expect(at("STUDENT_ARRIVAL_ENROLLMENT")).toBe("arrival");
     expect(at("PARTNER_COMMISSION_INVOICING")).toBe("commission");
-    expect(trackerStepsFor(resolveStage({ stageCode: "PARTNER_COMMISSION_INVOICING", statusCode: "COMMISSION_PAID" })).every((s) => s.state === "complete")).toBe(true);
-    expect(trackerStepsFor(resolveStage({ stageCode: "APPLICATION_SUBMISSION", statusCode: "CORRECTION_REQUESTED" }))[1].state).toBe("attention");
+    // Paid, but the Advisor still confirms receipt; only Application Complete finishes the tracker.
+    expect(at("PARTNER_COMMISSION_INVOICING", "COMMISSION_PAID")).toBe("commission");
+    expect(trackerStepsFor(resolveStage({ stageCode: "PARTNER_COMMISSION_INVOICING", statusCode: "APPLICATION_COMPLETE" })).every((s) => s.state === "complete")).toBe(true);
+    expect(trackerStepsFor(resolveStage({ stageCode: "APPLICATION_REVIEW", statusCode: "CORRECTION_REQUESTED" }))[1].state).toBe("attention");
   });
 });
 
@@ -80,9 +85,9 @@ describe("commission, offer and visa", () => {
     expect(commissionStateOf("paid", true)).toBe("disputed");
   });
   it("offer status", () => {
-    expect(offerStatusOf("UNIVERSITY_REJECTED", false)).toBe("declined");
+    expect(offerStatusOf("REJECTED_BY_UNIVERSITY", false)).toBe("declined");
     expect(offerStatusOf("WAITING_FOR_PAYMENT", true)).toBe("received");
-    expect(offerStatusOf("SUBMITTED_TO_INSTITUTION", false)).toBe("awaiting");
+    expect(offerStatusOf("SENT_TO_UNIVERSITY", false)).toBe("awaiting");
   });
   it("visa steps", () => {
     const d = (state: any) => ({ id: state, name: state, state, group: "visa", uploadedAt: null, reason: null, fileKey: null, fileUrl: null }) as any;
@@ -123,7 +128,7 @@ describe("toApplicationView", () => {
     partner: { id: "p", name: "Farid Hakimi" },
     program: { name: "BSc", tuition_fee: 31000, currency: "myr", university: { name: "Sunway University" } },
     student: { name: "Nur Aisyah Binti Kamal", passport_number: "A123", gender: false },
-    stage: { code: "APPLICATION_SUBMISSION", name: "Application Submission", statuses: [{ code: "CORRECTION_REQUESTED", name: "Correction Requested", next_actions: [{ actor: "2", name: "Upload the requested documents" }, { actor: "3", name: "Wait" }] }] },
+    stage: { code: "APPLICATION_REVIEW", name: "Application Submission", statuses: [{ code: "CORRECTION_REQUESTED", name: "Correction Requested", next_actions: [{ actor: "2", name: "Upload the requested documents" }, { actor: "3", name: "Wait" }] }] },
     documents: [{ id: "d1", document_type: "Academic Transcript", status: "3", approve_notes: "Not certified", file_key: "k" }],
     commissions: [{ id: "c", status: "pending", amount: 4200, currency: "rm", commission_type: null, notes: null, expected_commission_from: 30, expected_commission_to: 60, created_at: "" }],
     offer_letter_document: null,
@@ -157,28 +162,53 @@ describe("partner next action", () => {
     [{ statusCode: "APPLICATION_FORM_REJECTED", isRejectedForm: true }, "reupload-form"],
     [{ statusCode: "EVAL_PARTNER_UPLOAD" }, "emgs"],
     [{ statusCode: "AWAITING_ARRIVAL" }, "payment-proof"],
-    [{ statusCode: "SUBMITTED_TO_INSTITUTION" }, null],
+    [{ statusCode: "SENT_TO_UNIVERSITY" }, null],
     [{ statusCode: "WAITING_FOR_PAYMENT", readOnly: true }, null],
   ])("%o → %s", (input, key) => expect(partnerNextAction({ ...base, ...input })).toBe(key));
 });
 
 describe("isAdvisorAction", () => {
-  it("matches backend names, status codes and display names the same way", () => {
+  it("follows the backend's allowed_actor, by name or code", () => {
     expect(isAdvisorAction("Correction Requested by Account Manager")).toBe(true);
     expect(isAdvisorAction("CORRECTION_REQUESTED")).toBe(true);
-    expect(isAdvisorAction("Correction Requested")).toBe(true);
     expect(isAdvisorAction("Waiting Partner to confirm arrival date")).toBe(true);
-    expect(isAdvisorAction("Waiting for Arrival Date")).toBe(true);
-    expect(isAdvisorAction("Extra Arrival Documents Required")).toBe(true);
-    expect(isAdvisorAction("E-Visa Re-upload Required")).toBe(true);
+    expect(isAdvisorAction("E-visa re-upload required")).toBe(true);
+    // The UI's wording of a backend name matches too.
     expect(isAdvisorAction("Institution Requested Corrections")).toBe(true);
     expect(isAdvisorAction("Waiting Advisor to confirm arrival date")).toBe(true);
+    // Statuses the old hand-written list missed.
+    expect(isAdvisorAction("Signed Offer Letter Rejected")).toBe(true);
+    expect(isAdvisorAction("Awaiting Arrival")).toBe(true);
+    expect(isAdvisorAction("Commission Paid")).toBe(true);
+    expect(isAdvisorAction("DISPUTE_RESPONSE_RECEIVED")).toBe(true);
   });
   it("leaves staff-side and finished statuses alone", () => {
-    expect(isAdvisorAction("Eval Under Review")).toBe(false);
-    expect(isAdvisorAction("Submitted to Institution")).toBe(false);
-    expect(isAdvisorAction("Application Completed")).toBe(false);
+    expect(isAdvisorAction("Eval under review")).toBe(false);
+    expect(isAdvisorAction("Sent to University")).toBe(false);
+    expect(isAdvisorAction("Application Complete")).toBe(false);
+    // The account manager's turn in the backend, though the old list flagged them.
+    expect(isAdvisorAction("Commission Ready")).toBe(false);
+    expect(isAdvisorAction("Extra arrival documents required")).toBe(false);
     expect(isAdvisorAction("")).toBe(false);
     expect(isAdvisorAction(null)).toBe(false);
+  });
+});
+
+describe("codes from names (the detail response sends names only)", () => {
+  it("finds stage and status codes from the backend's names", () => {
+    expect(stageCodeOf({ name: "Student Arrival & Enrollment" })).toBe("STUDENT_ARRIVAL_ENROLLMENT");
+    expect(stageCodeOf({ name: "Offer Letter" })).toBe("OFFER_LETTER");
+    expect(stageCodeOf({ code: "VISA_PROCESSING", name: "anything" })).toBe("VISA_PROCESSING");
+    expect(statusCodeOf({ name: "Waiting for Payment" })).toBe("WAITING_FOR_PAYMENT");
+    expect(statusCodeOf({ name: "Correction Requested by Account Manager" })).toBe("CORRECTION_REQUESTED");
+    expect(statusCodeOf({ name: "Not a real status" })).toBeUndefined();
+  });
+  it("places the tracker from names alone", () => {
+    const resolved = resolveStage({
+      stageCode: stageCodeOf({ name: "Offer Letter" }),
+      statusCode: statusCodeOf({ name: "Waiting for Payment" }),
+    });
+    expect(resolved?.stepId).toBe("offer");
+    expect(getApiStageTagId({ id: "x", name: "Student Arrival & Enrollment" })).toBe("arrival-logistics");
   });
 });

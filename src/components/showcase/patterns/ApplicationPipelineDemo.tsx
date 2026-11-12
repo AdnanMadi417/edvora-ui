@@ -8,15 +8,15 @@ const stages = [
   {
     id: "submission",
     name: "Application submission",
-    code: "APPLICATION_SUBMISSION",
+    code: "APPLICATION_REVIEW",
   },
-  { id: "review", name: "Institution review", code: "INSTITUTION_REVIEW" },
-  { id: "offer", name: "Offer & visa payment", code: "OFFER_AND_VISA_PAYMENT" },
+  { id: "review", name: "Institution review", code: "OFFER_LETTER" },
+  { id: "offer", name: "Offer & visa payment", code: "OFFER_LETTER" },
   { id: "visa", name: "Visa processing", code: "VISA_PROCESSING" },
   {
     id: "arrival",
     name: "Arrival & enrollment",
-    code: "ARRIVAL_AND_ENROLLMENT",
+    code: "STUDENT_ARRIVAL_ENROLLMENT",
   },
   {
     id: "commission",
