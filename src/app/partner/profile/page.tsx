@@ -9,7 +9,7 @@ const Profile: React.FC = () => {
 
   if (loading) return <p>Loading profile...</p>;
   if (error)
-    return <p className="text-red-500">Failed to load profile: {error}</p>;
+    return <p className="text-ub-tone-danger-text">Failed to load profile: {error}</p>;
 
   if (!user) return <p>No user found</p>;
 

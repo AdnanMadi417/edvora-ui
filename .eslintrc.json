@@ -1,6 +1,41 @@
 {
   "extends": "next/core-web-vitals",
   "rules": {
-    "react/no-unescaped-entities": ["error", { "forbid": [">", "}"] }]
-  }
+    "react/no-unescaped-entities": [
+      "error",
+      {
+        "forbid": [
+          ">",
+          "}"
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/**/*.ts",
+        "src/**/*.tsx"
+      ],
+      "excludedFiles": [
+        "src/components/showcase/**",
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "src/mocks/**"
+      ],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "Literal[value=/(bg|text|border|ring|divide|from|to|via|placeholder|fill|stroke|outline|shadow)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]/]",
+            "message": "Use a design token (bg-ub-*, text-ub-*, border-ub-*) instead of a raw Tailwind palette colour, so the screen follows dark mode. See src/styles/tokens."
+          },
+          {
+            "selector": "TemplateElement[value.raw=/(bg|text|border|ring|divide|from|to|via|placeholder|fill|stroke|outline|shadow)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-[0-9]/]",
+            "message": "Use a design token (bg-ub-*, text-ub-*, border-ub-*) instead of a raw Tailwind palette colour, so the screen follows dark mode. See src/styles/tokens."
+          }
+        ]
+      }
+    }
+  ]
 }

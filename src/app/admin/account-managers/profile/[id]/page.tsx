@@ -10,7 +10,7 @@ export default function AccountManagerProfilePage() {
   const { manager, loading, error, refetch } = useAccountManagerDetails(id);
 
   if (loading) return <div className="p-6">Loading...</div>;
-  if (error) return <div className="p-6 text-red-500">{error}</div>;
+  if (error) return <div className="p-6 text-ub-tone-danger-text">{error}</div>;
   if (!manager) return <div className="p-6">Manager not found</div>;
 
   return (

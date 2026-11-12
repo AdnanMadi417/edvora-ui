@@ -14,7 +14,8 @@ import Logo from "components/ub/brand/Logo";
 import { focusRing, iconButtonSizes } from "components/ub/recipes";
 
 const footerLink = clsx(
-  "rounded-ub-xs text-ub-body-sm text-ub-text-secondary transition-colors duration-ub-fast hover:text-ub-text-link hover:underline",
+  // -my-1 py-1: a 24px+ tap area (WCAG 2.5.8) without moving the text.
+  "-my-1 inline-block rounded-ub-xs py-1 text-ub-body-sm text-ub-text-secondary transition-colors duration-ub-fast hover:text-ub-text-link hover:underline",
   focusRing,
 );
 
