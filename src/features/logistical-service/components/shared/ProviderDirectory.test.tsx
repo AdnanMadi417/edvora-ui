@@ -1,6 +1,7 @@
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ProviderDirectory from "./ProviderDirectory";
+import { rowAction, queryRowAction } from "testUtils/rowActions";
 const mockDelete = jest.fn();
 const mockEditService = jest.fn();
 const mockRefetch = jest.fn();
@@ -83,11 +84,11 @@ it("applies status and location filters together", async () => {
   await user.click(screen.getByRole("button", { name: "Apply filters" }));
   await waitFor(() =>
     expect(
-      screen.queryByRole("link", { name: "View City Support" })
+      queryRowAction("View City Support")
     ).not.toBeInTheDocument()
   );
   expect(
-    screen.getByRole("link", { name: "View Airport Assist" })
+    rowAction("View Airport Assist")
   ).toBeInTheDocument();
   expect(
     screen.getByRole("button", { name: "Filters (2)" })
@@ -96,7 +97,7 @@ it("applies status and location filters together", async () => {
 it("requires confirmation to delete a provider", async () => {
   const user = userEvent.setup();
   render(<ProviderDirectory />);
-  await user.click(screen.getByRole("button", { name: "Delete City Support" }));
+  await user.click(rowAction("Delete City Support"));
   expect(mockDelete).not.toHaveBeenCalled();
   await user.click(
     within(
@@ -113,12 +114,12 @@ it("offers data-entry details and edit links without deletion", () => {
     />
   );
   expect(
-    screen.getByRole("link", { name: "View Airport Assist" })
+    rowAction("View Airport Assist")
   ).toHaveAttribute("href", "/data-entry/logistics-marketplace/active");
   expect(
     screen.getByRole("link", { name: "Edit Airport Assist" })
   ).toHaveAttribute("href", "/data-entry/logistics-marketplace/active/edit");
   expect(
-    screen.queryByRole("button", { name: "Delete Airport Assist" })
+    queryRowAction("Delete Airport Assist")
   ).not.toBeInTheDocument();
 });

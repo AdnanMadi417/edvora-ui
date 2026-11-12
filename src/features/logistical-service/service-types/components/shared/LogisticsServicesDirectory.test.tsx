@@ -1,6 +1,7 @@
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import LogisticsServicesDirectory from "./LogisticsServicesDirectory";
+import { rowAction, queryRowAction } from "testUtils/rowActions";
 const mockCreate = jest.fn();
 const mockEdit = jest.fn();
 const mockDelete = jest.fn();
@@ -90,7 +91,7 @@ it("requires confirmation before deletion", async () => {
   const user = userEvent.setup();
   render(<LogisticsServicesDirectory />);
   await user.click(
-    screen.getByRole("button", { name: "Delete Airport transfer" })
+    rowAction("Delete Airport transfer")
   );
   expect(mockDelete).not.toHaveBeenCalled();
   await user.click(
@@ -110,6 +111,6 @@ it("keeps create/edit available to data-entry without deletion", () => {
     screen.getByRole("button", { name: "Edit Airport transfer" })
   ).toBeInTheDocument();
   expect(
-    screen.queryByRole("button", { name: "Delete Airport transfer" })
+    queryRowAction("Delete Airport transfer")
   ).not.toBeInTheDocument();
 });

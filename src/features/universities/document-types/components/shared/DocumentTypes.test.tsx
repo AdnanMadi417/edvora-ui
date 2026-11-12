@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import DocumentTypesDirectory from "./DocumentTypesDirectory";
 import SetStaticTemplatePage from "../admin/SetStaticTemplatePage";
+import { fileInput, rowAction, queryRowAction } from "testUtils/rowActions";
 const mockSet = jest.fn();
 const mockPush = jest.fn();
 const mockRefetch = jest.fn();
@@ -73,12 +74,9 @@ beforeEach(() => {
 });
 it("offers uploads only for supported document types", () => {
   render(<DocumentTypesDirectory />);
-  expect(
-    screen.getByRole("link", { name: "Upload Health declaration template" })
-  ).toHaveAttribute("href", "/admin/document-types/health/edit");
-  expect(
-    screen.queryByRole("link", { name: "Upload Passport template" })
-  ).not.toBeInTheDocument();
+  // Row actions sit in each row's menu; only supported types offer an upload.
+  expect(rowAction("Upload Health declaration template")).toBeInTheDocument();
+  expect(queryRowAction("Upload Passport template")).not.toBeInTheDocument();
   expect(screen.getByText("Missing template")).toBeInTheDocument();
   expect(screen.getByText("Not applicable")).toBeInTheDocument();
 });
@@ -86,7 +84,7 @@ it("uploads the file before saving the existing template payload", async () => {
   const user = userEvent.setup();
   render(<SetStaticTemplatePage id="health" />);
   const file = new File(["pdf"], "health.pdf", { type: "application/pdf" });
-  await user.upload(screen.getByLabelText(/Template file/), file);
+  await user.upload(fileInput(/Template file/), file);
   await user.click(screen.getByRole("button", { name: "Save template" }));
   await waitFor(() =>
     expect(mockSet).toHaveBeenCalledWith("health", {
@@ -103,7 +101,7 @@ it("keeps the selected file when storage upload fails", async () => {
   const user = userEvent.setup();
   render(<SetStaticTemplatePage id="health" />);
   await user.upload(
-    screen.getByLabelText(/Template file/),
+    fileInput(/Template file/),
     new File(["pdf"], "health.pdf", { type: "application/pdf" })
   );
   await user.click(screen.getByRole("button", { name: "Save template" }));
@@ -131,7 +129,7 @@ it("disables saving during storage preparation", async () => {
   const user = userEvent.setup();
   render(<SetStaticTemplatePage id="health" />);
   await user.upload(
-    screen.getByLabelText(/Template file/),
+    fileInput(/Template file/),
     new File(["pdf"], "health.pdf", { type: "application/pdf" })
   );
   await user.click(screen.getByRole("button", { name: "Save template" }));

@@ -124,14 +124,14 @@ export default function UniversityTypeDirectory({
       cell: (type) => (
         <TableActions>
           <TableAction
-            label={"Edit university type"}
+            label={`Edit ${type.name}`}
             icon={<Pencil className="h-4 w-4" />}
             href={`${basePath}/${type.id}/edit`}
             primary
           />
           {allowDelete && (
             <TableAction
-              label={"Delete university type"}
+              label={`Delete ${type.name}`}
               icon={<Trash2 className="h-4 w-4" />}
               onSelect={() => setTarget(type)}
               danger

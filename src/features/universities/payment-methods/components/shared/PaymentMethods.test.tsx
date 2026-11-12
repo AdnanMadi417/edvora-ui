@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import PaymentMethodsDirectory from "./PaymentMethodsDirectory";
 import CreatePayment from "../admin/popups/CreatePayment";
 import EditPaymentMethodDetails from "../admin/EditPaymentMethodDetails";
+import { rowAction, queryRowAction } from "testUtils/rowActions";
 const mockDelete = jest.fn();
 const mockCreate = jest.fn();
 const mockUpdate = jest.fn();
@@ -74,7 +75,7 @@ beforeEach(() => {
 it("requires explicit delete confirmation", async () => {
   const user = userEvent.setup();
   render(<PaymentMethodsDirectory />);
-  await user.click(screen.getByRole("button", { name: "Delete Credit card" }));
+  await user.click(rowAction("Delete Credit card"));
   expect(mockDelete).not.toHaveBeenCalled();
   await user.click(
     within(
@@ -92,13 +93,13 @@ it("uses data-entry details and edit routes without deletion", () => {
     />
   );
   expect(
-    screen.getByRole("link", { name: "View Credit card" })
+    rowAction("View Credit card")
   ).toHaveAttribute("href", "/data-entry/payment-methods/card");
   expect(
     screen.getByRole("link", { name: "Edit Credit card" })
   ).toHaveAttribute("href", "/data-entry/payment-methods/card/edit");
   expect(
-    screen.queryByRole("button", { name: "Delete Credit card" })
+    queryRowAction("Delete Credit card")
   ).not.toBeInTheDocument();
 });
 it("creates a method with a trimmed name and refreshes immediately", async () => {

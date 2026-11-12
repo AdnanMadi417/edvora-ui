@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import UniversityDirectory from "./UniversityDirectory";
 import { useUniversities } from "features/universities/hooks";
 import { sampleUniversities } from "components/showcase/fixtures/universities";
+import { rowAction, queryRowAction } from "testUtils/rowActions";
 
 jest.mock("features/universities/hooks", () => ({
   useUniversities: jest.fn(),
@@ -49,7 +50,7 @@ it("excludes hidden institutions and management controls from partners", async (
     screen.queryByRole("link", { name: "Create university" })
   ).not.toBeInTheDocument();
   expect(
-    screen.queryByRole("button", { name: "Delete university" })
+    queryRowAction("Delete university")
   ).not.toBeInTheDocument();
   await userEvent.click(screen.getByRole("button", { name: "Filters" }));
   expect(
@@ -66,9 +67,9 @@ it("keeps editing and visibility actions for data-entry without deletion", () =>
     3
   );
   expect(
-    screen.getByRole("button", { name: "Unhide university" })
+    rowAction("Unhide university")
   ).toBeInTheDocument();
   expect(
-    screen.queryByRole("button", { name: "Delete university" })
+    queryRowAction("Delete university")
   ).not.toBeInTheDocument();
 });

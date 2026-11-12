@@ -1,6 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import StatementPage from "./StatementPage";
+import { rowAction } from "testUtils/rowActions";
 const mockUseStatement = jest.fn();
 let mockAgency = false;
 const rows = Array.from({ length: 20 }, (_, i) => ({
@@ -89,7 +90,7 @@ it("previews a zero commission and keeps the application route", async () => {
   const user = userEvent.setup();
   render(<StatementPage />);
   await user.click(
-    screen.getByRole("button", { name: "View commission APP-0" })
+    rowAction("View commission APP-0")
   );
   const drawer = screen.getByRole("dialog", { name: "Commission details" });
   expect(within(drawer).getByText("MYR 0")).toBeInTheDocument();

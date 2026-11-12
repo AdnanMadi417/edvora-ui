@@ -1,6 +1,7 @@
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import FieldsOfStudyDirectory from "./FieldsOfStudyDirectory";
+import { rowAction, queryRowAction } from "testUtils/rowActions";
 const mockDelete = jest.fn();
 jest.mock("../../hooks", () => ({
   useAllFields: () => ({
@@ -44,21 +45,21 @@ it("applies status filters only after confirmation", async () => {
     screen.getByRole("combobox", { name: "Status" }),
     "active"
   );
-  expect(screen.getByRole("button", { name: "View Arts" })).toBeInTheDocument();
+  expect(rowAction("View Arts")).toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Apply filters" }));
   await waitFor(() =>
     expect(
-      screen.queryByRole("button", { name: "View Arts" })
+      queryRowAction("View Arts")
     ).not.toBeInTheDocument()
   );
   expect(
-    screen.getByRole("button", { name: "View Computer Science" })
+    rowAction("View Computer Science")
   ).toBeInTheDocument();
 });
 it("requires confirmation before deletion", async () => {
   const user = userEvent.setup();
   render(<FieldsOfStudyDirectory />);
-  await user.click(screen.getByRole("button", { name: "Delete Arts" }));
+  await user.click(rowAction("Delete Arts"));
   expect(mockDelete).not.toHaveBeenCalled();
   await user.click(
     within(
@@ -71,6 +72,6 @@ it("keeps data-entry editing without delete actions", () => {
   render(<FieldsOfStudyDirectory allowDelete={false} />);
   expect(screen.getByRole("button", { name: "Edit Arts" })).toBeInTheDocument();
   expect(
-    screen.queryByRole("button", { name: "Delete Arts" })
+    queryRowAction("Delete Arts")
   ).not.toBeInTheDocument();
 });
