@@ -9,6 +9,8 @@ import {
   buttonBase,
   buttonVariants,
   fieldControl,
+  fieldControlError,
+  fieldGroup,
   fieldWrapper,
   focusRing,
   iconButtonSizes,
@@ -115,7 +117,7 @@ const RichTextEditor = ({
     editorProps: {
       attributes: {
         class:
-          "outline-none min-h-[120px] px-3 py-2.5 text-ub-body-md text-ub-text-primary prose prose-sm max-w-none dark:prose-invert " +
+          "outline-none min-h-[120px] px-[17px] py-3 text-[13px] leading-relaxed text-[var(--ub-field-text)] prose prose-sm max-w-none dark:prose-invert " +
           "prose-headings:text-ub-text-primary prose-p:text-ub-text-primary prose-strong:text-ub-text-primary prose-li:text-ub-text-primary " +
           "prose-a:text-ub-text-link prose-li:marker:text-ub-text-tertiary",
         role: "textbox",
@@ -192,14 +194,11 @@ const RichTextEditor = ({
       <FieldLabel as="span" id={labelId} required={required}>{label}</FieldLabel>
 
       <div
-        className={`overflow-hidden rounded-ub-md border bg-ub-surface transition-[border-color,box-shadow] duration-ub-fast ease-ub-standard focus-within:ring-1 ${
-          error
-            ? "border-ub-danger-500 focus-within:border-ub-danger-500 focus-within:ring-ub-danger-500"
-            : "border-ub-border-control hover:border-ub-border-control-hover focus-within:border-ub-border-focus focus-within:ring-ub-border-focus"
-        }`}
+        // Same fill, outline, hover and focus as every other field; 12px corners like the textarea (multi-line).
+        className={`overflow-hidden ${fieldGroup} !rounded-ub-lg ${error ? fieldControlError : ""}`}
       >
         {/* Toolbar */}
-        <div role="group" aria-label={`${label} formatting`} className="flex flex-wrap items-center gap-0.5 border-b border-ub-border bg-ub-surface-subtle px-2 py-1">
+        <div role="group" aria-label={`${label} formatting`} className="flex flex-wrap items-center gap-0.5 border-b border-[var(--ub-field-ring)] px-2 py-1">
           <ToolbarButton
             onClick={() => editor?.chain().focus().setParagraph().run()}
             active={editor?.isActive("paragraph")}
@@ -274,7 +273,7 @@ const RichTextEditor = ({
 
         {/* Link popover */}
         {linkPopover && (
-          <div className="flex flex-col gap-2 border-b border-ub-border bg-ub-surface-subtle px-3 py-3">
+          <div className="flex flex-col gap-2 border-b border-[var(--ub-field-ring)] px-3 py-3">
             <div className="flex items-center gap-2">
               <div className="flex flex-1 flex-col gap-1.5 sm:flex-row">
                 <input
