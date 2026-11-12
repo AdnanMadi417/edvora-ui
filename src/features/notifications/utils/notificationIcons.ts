@@ -33,7 +33,8 @@ export type NotificationIconConfig = {
   badgeBg: string;
 };
 
-// Maps each status UUID → icon + color config
+// Fallback for older notifications that carry only a status UUID; some of
+// these statuses no longer exist in the backend.
 const STATUS_ICON_MAP: Record<string, NotificationIconConfig> = {
   // Under Review by Account Manager
   "45cd8c15-fd9d-4903-9b41-8f89472505f3": { icon: Eye,            bg: "bg-ub-tone-warning-bg",   iconColor: "text-ub-tone-warning-text",   badgeBg: "bg-ub-tone-warning-dot"   },
@@ -101,6 +102,36 @@ const STATUS_ICON_MAP: Record<string, NotificationIconConfig> = {
   "e65b7472-e484-449d-95ea-8eec6e116a4c": { icon: Trophy,         bg: "bg-ub-tone-plum-bg",  iconColor: "text-ub-tone-plum-text",  badgeBg: "bg-ub-tone-plum-dot"  },
 };
 
+// Icon by the destination status code, which every status-change notification
+// carries. Specific codes first, then patterns that cover the rest of the
+// backend workflow (config/workflow.generated.ts).
+const STATUS_CODE_ICONS: Record<string, NotificationIconConfig> = {
+  NEW: { icon: FilePlus, bg: "bg-ub-tone-brand-bg", iconColor: "text-ub-tone-brand-text", badgeBg: "bg-ub-tone-brand-dot" },
+  PROGRAM_CHANGE_SUGGESTED: { icon: RefreshCw, bg: "bg-ub-tone-plum-bg", iconColor: "text-ub-tone-plum-text", badgeBg: "bg-ub-tone-plum-dot" },
+  WAITING_FOR_PAYMENT: { icon: CreditCard, bg: "bg-ub-tone-warning-bg", iconColor: "text-ub-tone-warning-text", badgeBg: "bg-ub-tone-warning-dot" },
+  WAITING_PARTNER_CONFIRM_ARRIVAL_DATE: { icon: Plane, bg: "bg-ub-tone-sky-bg", iconColor: "text-ub-tone-sky-text", badgeBg: "bg-ub-tone-sky-dot" },
+  AWAITING_ARRIVAL: { icon: Plane, bg: "bg-ub-tone-sky-bg", iconColor: "text-ub-tone-sky-text", badgeBg: "bg-ub-tone-sky-dot" },
+  E_VISA_REQUIRED: { icon: Globe, bg: "bg-ub-tone-sky-bg", iconColor: "text-ub-tone-sky-text", badgeBg: "bg-ub-tone-sky-dot" },
+  AWAITING_COMMISSION: { icon: Receipt, bg: "bg-ub-tone-brand-bg", iconColor: "text-ub-tone-brand-text", badgeBg: "bg-ub-tone-brand-dot" },
+  COMMISSION_READY: { icon: DollarSign, bg: "bg-ub-tone-success-bg", iconColor: "text-ub-tone-success-text", badgeBg: "bg-ub-tone-success-dot" },
+  COMMISSION_PAID: { icon: DollarSign, bg: "bg-ub-tone-success-bg", iconColor: "text-ub-tone-success-text", badgeBg: "bg-ub-tone-success-dot" },
+  DISPUTE_RESPONSE_RECEIVED: { icon: MessageCircle, bg: "bg-ub-tone-brand-bg", iconColor: "text-ub-tone-brand-text", badgeBg: "bg-ub-tone-brand-dot" },
+  APPLICATION_COMPLETE: { icon: Trophy, bg: "bg-ub-tone-plum-bg", iconColor: "text-ub-tone-plum-text", badgeBg: "bg-ub-tone-plum-dot" },
+};
+const STATUS_CODE_PATTERNS: [RegExp, NotificationIconConfig][] = [
+  [/REJECTED/, { icon: XCircle, bg: "bg-ub-tone-danger-bg", iconColor: "text-ub-tone-danger-text", badgeBg: "bg-ub-tone-danger-dot" }],
+  [/CORRECTION|REUPLOAD|REQUIRED|REQUESTED|ISSUE/, { icon: AlertTriangle, bg: "bg-ub-tone-attention-bg", iconColor: "text-ub-tone-attention-text", badgeBg: "bg-ub-tone-attention-dot" }],
+  [/UNDER_REVIEW/, { icon: Eye, bg: "bg-ub-tone-warning-bg", iconColor: "text-ub-tone-warning-text", badgeBg: "bg-ub-tone-warning-dot" }],
+  [/APPROVED|VERIFIED|CONFIRMED|READY/, { icon: CheckCircle, bg: "bg-ub-tone-success-bg", iconColor: "text-ub-tone-success-text", badgeBg: "bg-ub-tone-success-dot" }],
+  [/SENT|SUBMIT/, { icon: Send, bg: "bg-ub-tone-brand-bg", iconColor: "text-ub-tone-brand-text", badgeBg: "bg-ub-tone-brand-dot" }],
+  [/UPLOAD/, { icon: UploadCloud, bg: "bg-ub-tone-brand-bg", iconColor: "text-ub-tone-brand-text", badgeBg: "bg-ub-tone-brand-dot" }],
+];
+
+function iconForStatusCode(code: string | undefined): NotificationIconConfig | undefined {
+  if (!code) return undefined;
+  return STATUS_CODE_ICONS[code] ?? STATUS_CODE_PATTERNS.find(([pattern]) => pattern.test(code))?.[1];
+}
+
 const FALLBACK: NotificationIconConfig = {
   icon: Info,
   bg: "bg-ub-tone-neutral-bg",
@@ -129,8 +160,10 @@ export function getNotificationIconConfig(notification: Notification): Notificat
     return { icon: FilePlus2, bg: "bg-ub-tone-attention-bg", iconColor: "text-ub-tone-attention-text", badgeBg: "bg-ub-tone-attention-dot" };
   }
 
-  // Stage changes → look up the destination status UUID
+  // Stage changes → the destination status code, then the old UUID table
   if (notification.type === "application_stage_changed") {
+    const byCode = iconForStatusCode(notification.data?.to_status_code as string | undefined);
+    if (byCode) return byCode;
     const statusId = notification.data?.to_status_id;
     return (statusId && STATUS_ICON_MAP[statusId]) || FALLBACK;
   }
