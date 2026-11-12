@@ -15,6 +15,7 @@ import SelectField from "components/ub/forms/selection/SelectField";
 
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
 import { parseApiError } from "utils/parseApiError";
+import { fieldControlError, fieldGroup } from "components/ub/recipes";
 
 interface BatchCommissionProgramsProps {
   isOpen: boolean;
@@ -151,11 +152,11 @@ export default function BatchCommissionPrograms({
                   Commission amount <span className="text-ub-tone-danger-text">*</span>
                 </label>
                 <div
-                  className={`mt-2 flex h-12 w-full items-center overflow-hidden rounded-md border focus-within:ring-1 focus-within:ring-ub-border-focus ${
-                    errors.commission_amount ? "border-ub-tone-danger-border" : "border-ub-border"
+                  className={`mt-2 flex h-[50px] w-full items-center overflow-hidden ${fieldGroup} ${
+                    errors.commission_amount ? fieldControlError : ""
                   }`}
                 >
-                  <span className="flex h-full items-center border-r border-ub-border bg-ub-surface-subtle px-3 text-sm font-medium text-ub-text-secondary">
+                  <span className="flex h-full items-center border-e border-[var(--ub-field-ring)] ps-[17px] pe-3 font-medium text-ub-text-secondary">
                     {(CURRENCY.find((c) => c.value === formData.commission_currency)?.label ?? formData.commission_currency).toUpperCase()}
                   </span>
                   <input
@@ -163,7 +164,8 @@ export default function BatchCommissionPrograms({
                     value={formData.commission_amount}
                     onChange={(e) => updateFormData("commission_amount", e.target.value)}
                     placeholder="e.g. 1000"
-                    className="h-full flex-1 px-3 text-sm outline-none"
+                    aria-label="Commission amount"
+                    className="h-full min-w-0 flex-1 bg-transparent ps-3 pe-[17px] outline-none placeholder:text-[var(--ub-field-placeholder)]"
                   />
                 </div>
                 {errors.commission_amount && (

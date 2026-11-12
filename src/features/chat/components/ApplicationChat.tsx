@@ -12,6 +12,7 @@ import { Send, User } from "lucide-react";
 import Loading from "components/ub/feedback/states/Loading";
 import NoMessagesFound from "components/ub/feedback/states/NoMessagesFound";
 import { useToast } from "components/ub/feedback/notifications/ToastContext";
+import { fieldControl } from "components/ub/recipes";
 
 interface AgentPartnerChatProps {
   applicationId: string;
@@ -190,14 +191,16 @@ function ChatInput({
         onKeyDown={(e) => e.key === "Enter" && handleSend()}
         placeholder="Type your message..."
         disabled={sending}
-        className="w-full rounded-full border px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ub-border-focus disabled:opacity-50"
+        aria-label="Message"
+        className={`${fieldControl} h-10`}
       />
       <button
         onClick={handleSend}
         disabled={sending || !text.trim()}
-        className="rounded-full bg-ub-action-primary p-2 text-white transition hover:bg-ub-action-primary-hover disabled:opacity-50"
+        aria-label="Send message"
+        className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ub-action-primary text-white transition hover:bg-ub-action-primary-hover disabled:opacity-50"
       >
-        <Send className="h-5 w-5" />
+        <Send aria-hidden="true" className="h-5 w-5" />
       </button>
     </div>
   );

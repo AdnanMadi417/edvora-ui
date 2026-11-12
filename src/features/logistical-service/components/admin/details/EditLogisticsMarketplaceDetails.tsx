@@ -37,6 +37,7 @@ import { parseApiError } from "utils/parseApiError";
 import { NATIONALITIES } from "constants/lists";
 import { fieldGroup } from "components/ub/recipes";
 import CollapsibleSection from "components/ub/forms/layout/CollapsibleSection";
+import { fieldControl } from "components/ub/recipes";
 
 type SectionKey = "details" | "packages" | "services" | "coverage";
 /** Which section holds a validation error key. */
@@ -771,7 +772,8 @@ const EditLogisticsMarketplaceDetails = ({
                               if (e.key === "Escape") cancelEditService();
                             }}
                             autoFocus
-                            className="w-32 rounded-md border border-ub-border-focus bg-ub-surface px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ub-border-focus"
+                            aria-label="Service name"
+                            className={`${fieldControl} h-8 w-40 !px-3`}
                           />
                           <button
                             type="button"

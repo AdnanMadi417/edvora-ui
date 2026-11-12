@@ -11,6 +11,11 @@ import type {
   PartnerDetails,
 } from "features/partners/types";
 import type { AccountManager } from "features/account-managers/types";
+import { fieldControl, fieldControlHeight } from "components/ub/recipes";
+import {
+  SelectChevron,
+  selectControl,
+} from "components/ub/forms/layout/FieldChrome";
 
 interface Props {
   partner: PartnerDetails;
@@ -154,24 +159,27 @@ export default function AdditionalManagersSection({
 
       {!isMember && (
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-          <select
-            aria-label="Add an account manager"
-            value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
-            disabled={loading || options.length === 0}
-            className="h-10 w-full rounded-lg border border-ub-border bg-ub-surface px-3 text-sm text-ub-text-primary outline-none transition-colors hover:bg-ub-surface-subtle focus:ring-1 focus:ring-ub-border-focus disabled:cursor-not-allowed disabled:opacity-60 sm:w-72"
-          >
-            <option value="">
-              {options.length === 0
-                ? "No other active manager available"
-                : "Select an account manager..."}
-            </option>
-            {options.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name || m.email}
+          <div className="relative w-full sm:w-72">
+            <select
+              aria-label="Add an account manager"
+              value={selectedId}
+              onChange={(e) => setSelectedId(e.target.value)}
+              disabled={loading || options.length === 0}
+              className={`${fieldControl} ${fieldControlHeight} ${selectControl}`}
+            >
+              <option value="">
+                {options.length === 0
+                  ? "No other active manager available"
+                  : "Select an account manager..."}
               </option>
-            ))}
-          </select>
+              {options.map((m) => (
+                <option key={m.id} value={m.id}>
+                  {m.name || m.email}
+                </option>
+              ))}
+            </select>
+            <SelectChevron />
+          </div>
           <Button
             onClick={handleAdd}
             disabled={loading || !selectedId}

@@ -35,6 +35,7 @@ import type {
   ServiceEntry,
 } from "features/logistical-service/types";
 import { fieldGroup } from "components/ub/recipes";
+import { fieldControl } from "components/ub/recipes";
 
 interface FormData {
   name: string;
@@ -520,7 +521,8 @@ export default function RegisterLogisticsMarketplaceProvider({
                                   Number(e.target.value)
                                 )
                               }
-                              className="w-full rounded-md border border-ub-border px-3 py-1.5 text-sm focus:border-ub-border-focus focus:outline-none"
+                              aria-label={`${svc.name} price (RM)`}
+                              className={`${fieldControl} h-10`}
                               placeholder="0"
                             />
                           </div>
@@ -552,7 +554,7 @@ export default function RegisterLogisticsMarketplaceProvider({
                 </div>
 
                 {formData.packages_offered.length === 0 && (
-                  <div className="mb-3 rounded-md border border-dashed border-ub-border-control bg-ub-surface-subtle p-6 text-center">
+                  <div className="mb-3 rounded-ub-lg border border-dashed border-ub-border-control bg-ub-surface-subtle p-6 text-center">
                     <p className="text-sm font-medium text-ub-text-secondary">
                       No packages added yet
                     </p>

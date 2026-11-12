@@ -11,6 +11,8 @@ import Container from "../ui/Container";
 import SectionHeading from "../ui/SectionHeading";
 import Button, { ButtonLink } from "../ui/Button";
 import Card from "../ui/Card";
+import { fieldControl, fieldControlError } from "components/ub/recipes";
+import { SelectChevron, selectControl } from "components/ub/forms/layout/FieldChrome";
 
 // Minimal zod resolver (avoids @hookform/resolvers, whose current types need TS 5).
 const contactResolver: Resolver<ContactInput> = async (values) => {
@@ -24,9 +26,8 @@ const contactResolver: Resolver<ContactInput> = async (values) => {
   return { values: {}, errors };
 };
 
-const fieldBase =
-  "w-full rounded-ub-md border bg-ub-surface px-3 text-ub-body-md text-ub-text-primary placeholder:text-ub-text-tertiary transition-colors duration-ub-fast " +
-  "hover:border-ub-border-control-hover focus:border-ub-border-focus focus:outline-none focus:ring-1 focus:ring-ub-border-focus";
+// The same field look as the app (pill inputs, 12px corners on the multi-line message).
+const fieldBase = fieldControl;
 
 function Field({ id, label, optional, error, children }: { id: string; label: string; optional?: boolean; error?: string; children: React.ReactNode }) {
   return (
@@ -70,7 +71,7 @@ export default function ContactCTA() {
   };
 
   const describedBy = (name: keyof ContactInput) => (errors[name] ? `contact-${name}-error` : undefined);
-  const control = (name: keyof ContactInput) => clsx(fieldBase, errors[name] ? "border-ub-danger-500" : "border-ub-border-control");
+  const control = (name: keyof ContactInput) => clsx(fieldBase, errors[name] && fieldControlError);
 
   return (
     <section id="contact" aria-labelledby="contact-heading" className="scroll-mt-16 py-24 md:py-32">
@@ -90,16 +91,17 @@ export default function ContactCTA() {
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} noValidate className="grid gap-5 sm:grid-cols-2">
                 <Field id="contact-name" label="Name" error={errors.name?.message}>
-                  <input id="contact-name" autoComplete="name" className={clsx(control("name"), "h-12 md:h-10")} aria-invalid={!!errors.name} aria-describedby={describedBy("name")} {...register("name")} />
+                  <input id="contact-name" autoComplete="name" className={clsx(control("name"), "h-[50px]")} aria-invalid={!!errors.name} aria-describedby={describedBy("name")} {...register("name")} />
                 </Field>
                 <Field id="contact-email" label="Work email" error={errors.email?.message}>
-                  <input id="contact-email" type="email" autoComplete="email" className={clsx(control("email"), "h-12 md:h-10")} aria-invalid={!!errors.email} aria-describedby={describedBy("email")} {...register("email")} />
+                  <input id="contact-email" type="email" autoComplete="email" className={clsx(control("email"), "h-[50px]")} aria-invalid={!!errors.email} aria-describedby={describedBy("email")} {...register("email")} />
                 </Field>
                 <Field id="contact-company" label="Company" optional error={errors.company?.message}>
-                  <input id="contact-company" autoComplete="organization" className={clsx(control("company"), "h-12 md:h-10")} aria-invalid={!!errors.company} aria-describedby={describedBy("company")} {...register("company")} />
+                  <input id="contact-company" autoComplete="organization" className={clsx(control("company"), "h-[50px]")} aria-invalid={!!errors.company} aria-describedby={describedBy("company")} {...register("company")} />
                 </Field>
                 <Field id="contact-budget" label="Budget range" error={errors.budget?.message}>
-                  <select id="contact-budget" defaultValue="" className={clsx(control("budget"), "h-12 md:h-10")} aria-invalid={!!errors.budget} aria-describedby={describedBy("budget")} {...register("budget")}>
+                  <div className="relative">
+                  <select id="contact-budget" defaultValue="" className={clsx(control("budget"), "h-[50px]", selectControl)} aria-invalid={!!errors.budget} aria-describedby={describedBy("budget")} {...register("budget")}>
                     <option value="" disabled>
                       Select a range
                     </option>
@@ -109,6 +111,8 @@ export default function ContactCTA() {
                       </option>
                     ))}
                   </select>
+                  <SelectChevron />
+                  </div>
                 </Field>
                 <div className="sm:col-span-2">
                   <Field id="contact-details" label="Project details" error={errors.details?.message}>
@@ -116,7 +120,7 @@ export default function ContactCTA() {
                       id="contact-details"
                       rows={5}
                       placeholder="What are you building, who is it for, and when do you need it?"
-                      className={clsx(control("details"), "py-2.5")}
+                      className={clsx(control("details"), "block min-h-[120px] resize-y !rounded-ub-lg py-3")}
                       aria-invalid={!!errors.details}
                       aria-describedby={describedBy("details")}
                       {...register("details")}
