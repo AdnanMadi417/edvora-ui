@@ -154,3 +154,17 @@ const ADVISOR_ACTION_STATUSES: ReadonlySet<string> = new Set(
 export function isAdvisorAction(status: string | null | undefined): boolean {
   return !!status && ADVISOR_ACTION_STATUSES.has(key(status));
 }
+
+// Staff (account manager, data entry, admin) statuses from the same allowed_actor,
+// except Application Complete, where nobody has anything left to do.
+const STAFF_ACTION_STATUSES: ReadonlySet<string> = new Set(
+  WORKFLOW.flatMap((stage) => stage.statuses)
+    .filter((status) => status.actor && status.actor !== "advisor" && status.code !== "APPLICATION_COMPLETE")
+    .flatMap((status) => [key(status.code), key(status.name)])
+);
+
+/** Statuses where staff act next: the staff counterpart of isAdvisorAction, by code or name. */
+export function isStaffAction(status: string | null | undefined): boolean {
+  return !!status && STAFF_ACTION_STATUSES.has(key(status));
+}
+

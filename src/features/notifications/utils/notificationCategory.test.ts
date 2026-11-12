@@ -19,3 +19,16 @@ describe("getNotificationCategory for Advisors", () => {
     expect(getNotificationCategory({ type: "application_message_received" } as Notification, { forAdvisor: true })).toBe("action_required");
   });
 });
+
+describe("getNotificationCategory for staff", () => {
+  it("flags status changes that are staff's move, from the backend workflow", () => {
+    for (const code of ["NEW", "PAYMENT_SUBMITTED", "EVAL_UNDER_REVIEW", "COMMISSION_READY"]) {
+      expect(getNotificationCategory(stageChange("", code))).toBe("action_required");
+    }
+  });
+  it("treats the Advisor's move and finished applications as information", () => {
+    for (const code of ["CORRECTION_REQUESTED", "WAITING_FOR_PAYMENT", "APPLICATION_COMPLETE"]) {
+      expect(getNotificationCategory(stageChange("", code))).toBe("info");
+    }
+  });
+});

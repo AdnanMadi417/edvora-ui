@@ -1,11 +1,11 @@
 import type { Notification } from "../types";
-import { isAdvisorAction } from "features/applications/stages";
+import { isAdvisorAction, isStaffAction } from "features/applications/stages";
 
 export type NotificationCategory = "action_required" | "info";
 
-// Maps each application-stage status UUID → whether it needs the recipient
-// to do something, or is purely informational. Mirrors the UUIDs in
-// notificationIcons.ts's STATUS_ICON_MAP.
+// Fallback for older notifications that carry only a status UUID (no code or
+// name). Newer ones are categorised from the backend workflow below. Some of
+// these UUIDs belong to statuses the backend has since removed.
 const STATUS_CATEGORY_MAP: Record<string, NotificationCategory> = {
   "45cd8c15-fd9d-4903-9b41-8f89472505f3": "info",            // Under Review by Account Manager
   "aa736b82-fd54-4e9b-8388-df72a3479969": "action_required", // Correction Requested by Account Manager
@@ -48,7 +48,7 @@ const FALLBACK: NotificationCategory = "action_required";
 /**
  * forAdvisor: an Advisor's status-change notifications use the same rule as the
  * Applications list and Home queue (isAdvisorAction), so "Action required"
- * means the status is the Advisor's move.
+ * means the status is the Advisor's move; staff get isStaffAction.
  */
 export function getNotificationCategory(notification: Notification, { forAdvisor = false }: { forAdvisor?: boolean } = {}): NotificationCategory {
   if (notification.type === "application_message_received") return "action_required";
@@ -60,11 +60,12 @@ export function getNotificationCategory(notification: Notification, { forAdvisor
   if (notification.type === "partner_signed_up") return "action_required";
 
   if (notification.type === "application_stage_changed") {
-    if (forAdvisor) {
-      const code = notification.data?.to_status_code as string | undefined;
-      const name = notification.data?.to_status_name as string | undefined;
-      if (code || name) return isAdvisorAction(code) || isAdvisorAction(name) ? "action_required" : "info";
-    }
+    // Whose turn the new status is, from the backend's allowed_actor: the
+    // Advisor's for Advisors, staff's for everyone else.
+    const code = notification.data?.to_status_code as string | undefined;
+    const name = notification.data?.to_status_name as string | undefined;
+    const theirTurn = forAdvisor ? isAdvisorAction : isStaffAction;
+    if (code || name) return theirTurn(code) || theirTurn(name) ? "action_required" : "info";
     const statusId = notification.data?.to_status_id as string | undefined;
     return (statusId && STATUS_CATEGORY_MAP[statusId]) || FALLBACK;
   }
