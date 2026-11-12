@@ -8,7 +8,7 @@ import Logo from "components/ub/brand/Logo";
 import { buttonBase, buttonSizes, buttonVariants, focusRing } from "components/ub/recipes";
 
 const textLink = clsx(
-  "group items-center gap-1 rounded-ub-sm text-ub-label-md text-ub-text-secondary transition-colors duration-ub-fast hover:text-ub-text-link",
+  "group min-h-10 items-center gap-1 rounded-ub-sm px-1 text-ub-label-md text-ub-text-secondary transition-colors duration-ub-fast hover:text-ub-text-link",
   focusRing,
 );
 
@@ -30,7 +30,7 @@ export default function PublicNavbar() {
       )}
     >
       <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4 md:px-6">
-        <Link href="/" className={clsx("shrink-0 rounded-ub-sm", focusRing)}>
+        <Link href="/" aria-label="Unibexs home" className={clsx("shrink-0 rounded-ub-sm", focusRing)}>
           <Logo size={24} priority />
         </Link>
 

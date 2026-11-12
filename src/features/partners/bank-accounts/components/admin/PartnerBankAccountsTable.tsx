@@ -97,12 +97,14 @@ export default function PartnerBankAccountsTable() {
           />
           <button
             type="button"
+            aria-label={activeFiltersCount > 0 ? `Filters, ${activeFiltersCount} active` : "Filters"}
+            aria-expanded={showMobileFilters}
             onClick={() => setShowMobileFilters((v) => !v)}
             className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-ub-border bg-ub-surface text-ub-text-secondary hover:bg-ub-surface-subtle sm:hidden"
           >
             <SlidersHorizontal className="h-4 w-4" />
             {activeFiltersCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-ub-action-primary text-[10px] font-bold text-white">
+              <span aria-hidden="true" className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-ub-action-primary text-[10px] font-bold text-white">
                 {activeFiltersCount}
               </span>
             )}

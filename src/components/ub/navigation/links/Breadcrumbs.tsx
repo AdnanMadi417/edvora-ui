@@ -67,7 +67,8 @@ export default function Breadcrumbs({ items, "aria-label": ariaLabel = "Breadcru
                   <Separator />
                 </li>
               )}
-              <li className={clsx("min-w-0 items-center gap-1.5", isMiddle ? "hidden sm:flex" : "flex")}>
+              {/* Only the current page shrinks and truncates; links keep their width so the row wraps instead of squeezing them. */}
+              <li className={clsx("items-center gap-1.5", isLast ? "min-w-0" : "shrink-0", isMiddle ? "hidden sm:flex" : "flex")}>
                 {isLast ? (
                   <span aria-current="page" className={crumbCurrent} title={item.label}>
                     {item.label}

@@ -13,7 +13,8 @@ export interface TextLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorEleme
 /** Inline link inside running text. For standalone actions use TextButton. */
 export default function TextLink({ href, external, className, children, ...rest }: TextLinkProps) {
   const classes = clsx(
-    "rounded-ub-xs font-medium text-ub-text-link underline decoration-1 underline-offset-2 transition-colors duration-ub-fast hover:decoration-2",
+    // py-1 on an inline link: a 24px+ tap box (WCAG 2.5.8) that does not move the text.
+    "rounded-ub-xs py-1 font-medium text-ub-text-link underline decoration-1 underline-offset-2 transition-colors duration-ub-fast hover:decoration-2",
     focusRing,
     className,
   );

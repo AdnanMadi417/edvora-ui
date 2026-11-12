@@ -374,7 +374,7 @@ export default function PartnerRegisterPage() {
           <button
             type="button"
             onClick={() => setShowCodeEntry(true)}
-            className="text-sm font-medium text-ub-text-link underline-offset-2 transition hover:text-ub-text-link hover:underline"
+            className="min-h-10 rounded-ub-sm px-2 text-sm font-medium text-ub-text-link underline-offset-2 transition hover:text-ub-text-link hover:underline"
           >
             Already have a verification code?
           </button>

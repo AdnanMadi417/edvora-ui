@@ -166,7 +166,7 @@ export default function AdvisorProfileOverview({
               </p>
               <a
                 href={`mailto:${partner.email}`}
-                className="flex items-start gap-2 text-ub-body-sm text-ub-text-link hover:underline"
+                className="-my-1 flex items-start gap-2 py-1 text-ub-body-sm text-ub-text-link hover:underline"
               >
                 <Mail className="mt-0.5 h-4 w-4 shrink-0" />
                 <span className="min-w-0 break-all">{partner.email}</span>
@@ -179,7 +179,7 @@ export default function AdvisorProfileOverview({
               {partner.phone ? (
                 <a
                   href={`tel:${partner.phone}`}
-                  className="flex items-start gap-2 text-ub-body-sm text-ub-text-primary hover:text-ub-text-link"
+                  className="-my-1 flex items-start gap-2 py-1 text-ub-body-sm text-ub-text-primary hover:text-ub-text-link"
                 >
                   <Phone className="mt-0.5 h-4 w-4 shrink-0" />
                   <span className="break-all">{partner.phone}</span>

@@ -326,7 +326,7 @@ export default function ProviderProfileDetails({
                   </p>
                   <a
                     href={`tel:${service.phone_number}`}
-                    className="inline-flex items-center gap-2 break-all text-ub-label-md text-ub-text-primary hover:text-ub-text-link"
+                    className="-my-1 inline-flex items-center gap-2 break-all py-1 text-ub-label-md text-ub-text-primary hover:text-ub-text-link"
                   >
                     <Phone className="h-4 w-4 shrink-0" />
                     {service.phone_number}

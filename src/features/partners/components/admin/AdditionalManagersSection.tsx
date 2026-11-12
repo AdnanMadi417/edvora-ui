@@ -139,7 +139,7 @@ export default function AdditionalManagersSection({
                 disabled={loading}
                 aria-label={`Remove ${m.name || m.email}`}
                 title="Remove shared access"
-                className="flex h-5 w-5 items-center justify-center rounded-full text-ub-icon-interactive transition hover:bg-ub-tone-brand-bg hover:text-ub-text-link disabled:opacity-50"
+                className="-my-0.5 flex h-6 w-6 items-center justify-center rounded-full text-ub-icon-interactive transition hover:bg-ub-tone-brand-bg hover:text-ub-text-link disabled:opacity-50"
               >
                 <X
                   className={`h-3.5 w-3.5 ${
